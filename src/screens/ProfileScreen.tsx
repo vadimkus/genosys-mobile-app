@@ -20,6 +20,21 @@ export default function ProfileScreen() {
     );
   };
 
+  // Default user profile for demo
+  const defaultUser = {
+    name: 'Vadim Kus',
+    email: 'vadim@genosys.ae',
+    phone: '+971 58 548 76 65',
+    role: 'Professional Account',
+    company: 'Genosys Middle East FZ-LLC',
+    location: 'Dubai, UAE',
+    joinDate: '2024-01-15',
+    trainingCompleted: 8,
+    certifications: 3
+  };
+
+  const currentUser = user || defaultUser;
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
@@ -35,9 +50,11 @@ export default function ProfileScreen() {
               <View style={styles.statusIndicator} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{user?.name || 'User'}</Text>
-              <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
-              <Text style={styles.userRole}>Professional Account</Text>
+              <Text style={styles.userName}>{currentUser.name}</Text>
+              <Text style={styles.userEmail}>{currentUser.email}</Text>
+              <Text style={styles.userRole}>{currentUser.role}</Text>
+              <Text style={styles.userCompany}>{currentUser.company}</Text>
+              <Text style={styles.userLocation}>{currentUser.location}</Text>
             </View>
           </View>
         </View>
@@ -59,17 +76,17 @@ export default function ProfileScreen() {
             <Text style={styles.statEmoji}>📚</Text>
           </View>
           <View style={styles.statContent}>
-            <Text style={styles.statNumber}>3</Text>
+            <Text style={styles.statNumber}>{currentUser.trainingCompleted}</Text>
             <Text style={styles.statLabel}>Training</Text>
           </View>
         </View>
         <View style={styles.statCard}>
           <View style={styles.statIcon}>
-            <Text style={styles.statEmoji}>⭐</Text>
+            <Text style={styles.statEmoji}>🏆</Text>
           </View>
           <View style={styles.statContent}>
-            <Text style={styles.statNumber}>5★</Text>
-            <Text style={styles.statLabel}>Rating</Text>
+            <Text style={styles.statNumber}>{currentUser.certifications}</Text>
+            <Text style={styles.statLabel}>Certifications</Text>
           </View>
         </View>
       </View>
@@ -263,6 +280,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999999',
     fontWeight: '500',
+    marginBottom: 2,
+  },
+  userCompany: {
+    fontSize: 11,
+    color: '#666666',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  userLocation: {
+    fontSize: 11,
+    color: '#999999',
+    fontWeight: '400',
   },
   statsContainer: {
     flexDirection: 'row',

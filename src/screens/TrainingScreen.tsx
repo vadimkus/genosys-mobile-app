@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../contexts/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -25,7 +26,31 @@ interface TrainingLesson {
 
 export default function TrainingScreen() {
   const navigation = useNavigation();
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'documents' | 'lessons'>('documents');
+
+  // Default user profile for demo
+  const defaultUser = {
+    name: 'Vadim Kus',
+    email: 'vadim@genosys.ae',
+    role: 'Professional Account',
+    company: 'Genosys Middle East FZ-LLC',
+    trainingCompleted: 8,
+    certifications: 3
+  };
+
+  const currentUser = user || defaultUser;
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: logout }
+      ]
+    );
+  };
 
   const trainingDocuments: TrainingDocument[] = [
     // Training Documents
@@ -329,6 +354,33 @@ export default function TrainingScreen() {
           <Text style={styles.title}>Professional Training</Text>
           <Text style={styles.subtitle}>Comprehensive training materials and product documentation</Text>
         </View>
+        <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('Profile' as never)}>
+          <View style={styles.profileIcon}>
+            <Text style={styles.profileText}>{currentUser.name.charAt(0)}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* User Profile Section */}
+      <View style={styles.userProfileSection}>
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}>{currentUser.name}</Text>
+          <Text style={styles.userRole}>{currentUser.role}</Text>
+          <Text style={styles.userCompany}>{currentUser.company}</Text>
+        </View>
+        <View style={styles.userStats}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{currentUser.trainingCompleted}</Text>
+            <Text style={styles.statLabel}>Training Completed</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{currentUser.certifications}</Text>
+            <Text style={styles.statLabel}>Certifications</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Tab Navigation */}
@@ -400,6 +452,91 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
+  },
+  profileButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  userProfileSection: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginTop: -20,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    marginBottom: 20,
+  },
+  userInfo: {
+    marginBottom: 16,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  userRole: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 2,
+  },
+  userCompany: {
+    fontSize: 12,
+    color: '#999999',
+  },
+  userStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+    paddingVertical: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#666666',
+    textAlign: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#ef4444',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  logoutText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
   },
   title: {
     fontSize: 28,
