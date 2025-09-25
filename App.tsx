@@ -14,6 +14,7 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import CheckoutScreen from './src/screens/CheckoutScreen';
 import OrdersScreen from './src/screens/OrdersScreen';
+import SkinAnalysisScreen from './src/screens/SkinAnalysisScreen';
 
 // Import contexts
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
@@ -91,6 +92,11 @@ function AppNavigator() {
               name="Orders" 
               component={OrdersScreen} 
               options={{ title: 'My Orders' }}
+            />
+            <Stack.Screen 
+              name="SkinAnalysis" 
+              component={SkinAnalysisScreen} 
+              options={{ title: 'Skin Analysis' }}
             />
           </>
         ) : (

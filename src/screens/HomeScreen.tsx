@@ -79,12 +79,16 @@ export default function HomeScreen() {
               <Text style={styles.metricValue}>85%</Text>
             </View>
           </View>
-          <View style={styles.healthInfo}>
-            <View style={styles.infoBox}>
-              <Text style={styles.infoLabel}>Last Analysis</Text>
-              <Text style={styles.infoValue}>2 days ago</Text>
-            </View>
+        <TouchableOpacity 
+          style={styles.healthInfo}
+          onPress={() => navigation.navigate('SkinAnalysis' as never)}
+        >
+          <View style={styles.infoBox}>
+            <Text style={styles.infoLabel}>Last Analysis</Text>
+            <Text style={styles.infoValue}>2 days ago</Text>
+            <Text style={styles.infoAction}>Tap to analyze</Text>
           </View>
+        </TouchableOpacity>
         </View>
       </View>
 
@@ -244,6 +248,16 @@ export default function HomeScreen() {
               <Text style={styles.actionEmoji}>👤</Text>
             </View>
             <Text style={styles.actionTitle}>My Profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('SkinAnalysis' as never)}
+          >
+            <View style={styles.actionIcon}>
+              <Text style={styles.actionEmoji}>🧴</Text>
+            </View>
+            <Text style={styles.actionTitle}>My Skin</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -482,6 +496,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1a1a1a',
+  },
+  infoAction: {
+    fontSize: 12,
+    color: '#3b82f6',
+    marginTop: 4,
+    fontWeight: '500',
   },
   routineCard: {
     backgroundColor: '#ffffff',
