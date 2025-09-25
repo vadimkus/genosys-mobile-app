@@ -7,6 +7,8 @@ import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ActivityIndicat
 // Import our screens
 import HomeScreen from './src/screens/HomeScreen';
 import ProductsScreen from './src/screens/ProductsScreen';
+import ProductDetailScreen from './src/screens/ProductDetailScreen';
+import TrainingScreen from './src/screens/TrainingScreen';
 import CartScreen from './src/screens/CartScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -59,6 +61,16 @@ function AppNavigator() {
               name="Products" 
               component={ProductsScreen} 
               options={{ title: 'Products' }}
+            />
+            <Stack.Screen 
+              name="ProductDetail" 
+              component={ProductDetailScreen} 
+              options={{ title: 'Product Details' }}
+            />
+            <Stack.Screen 
+              name="Training" 
+              component={TrainingScreen} 
+              options={{ title: 'Training Materials' }}
             />
             <Stack.Screen 
               name="Cart" 

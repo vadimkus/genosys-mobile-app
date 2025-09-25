@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../contexts/CartContext';
 
 interface Product {
@@ -13,6 +14,7 @@ interface Product {
 }
 
 export default function ProductsScreen() {
+  const navigation = useNavigation();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,7 +194,11 @@ export default function ProductsScreen() {
           </View>
         ) : (
           filteredProducts.map((product) => (
-            <View key={product.id} style={styles.productCard}>
+            <TouchableOpacity 
+              key={product.id} 
+              style={styles.productCard}
+              onPress={() => navigation.navigate('ProductDetail' as never, { productId: product.id } as never)}
+            >
               <View style={styles.productImageContainer}>
                 {loadingImages.has(product.id) && (
                   <ActivityIndicator 
@@ -240,7 +246,7 @@ export default function ProductsScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))
         )}
       </View>

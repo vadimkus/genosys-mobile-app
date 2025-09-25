@@ -1,9 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+
+  const handleWhatsAppContact = async () => {
+    const phoneNumber = '971585487665';
+    const message = 'Hello! I\'m interested in Genosys products. Can you help me?';
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    
+    try {
+      const supported = await Linking.canOpenURL(whatsappUrl);
+      if (supported) {
+        await Linking.openURL(whatsappUrl);
+      } else {
+        // Fallback to regular phone call
+        await Linking.openURL(`tel:+${phoneNumber}`);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Cannot open WhatsApp. Please call us directly.');
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -37,6 +55,14 @@ export default function HomeScreen() {
           <Text style={styles.featureTitle}>My Profile</Text>
           <Text style={styles.featureDesc}>Manage your account</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.featureCard}
+          onPress={() => navigation.navigate('Training' as never)}
+        >
+          <Text style={styles.featureTitle}>Training Videos</Text>
+          <Text style={styles.featureDesc}>Professional training materials</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.brandInfo}>
@@ -48,7 +74,12 @@ export default function HomeScreen() {
 
       <View style={styles.contactInfo}>
         <Text style={styles.contactTitle}>Contact Us</Text>
-        <Text style={styles.contactText}>📱 +971 58 548 76 65</Text>
+        <TouchableOpacity 
+          style={styles.contactButton}
+          onPress={handleWhatsAppContact}
+        >
+          <Text style={styles.contactButtonText}>📱 WhatsApp: +971 58 548 76 65</Text>
+        </TouchableOpacity>
         <Text style={styles.contactText}>✉️ sales@genosys.ae</Text>
         <Text style={styles.contactSubtext}>Official Distributor in the UAE</Text>
       </View>
@@ -147,5 +178,18 @@ const styles = StyleSheet.create({
     color: '#666',
     fontStyle: 'italic',
     marginTop: 5,
+  },
+  contactButton: {
+    backgroundColor: '#25d366',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginBottom: 10,
+  },
+  contactButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
