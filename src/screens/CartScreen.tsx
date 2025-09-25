@@ -37,11 +37,10 @@ export default function CartScreen() {
           <Text style={styles.headerSubtitle}>{totalItems} items</Text>
         </View>
         <View style={styles.logoContainer}>
-          <Image 
-            source={require('../../assets/genosys-logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <View style={styles.logoTextContainer}>
+            <Text style={styles.logoText}>GENOSYS</Text>
+            <Text style={styles.logoSubtext}>Professional</Text>
+          </View>
         </View>
       </View>
 
@@ -137,9 +136,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
-  logo: {
-    width: 100,
-    height: 30,
+  logoTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 2,
+    marginBottom: 2,
+  },
+  logoSubtext: {
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: '500',
     opacity: 0.9,
   },
   cartItems: {

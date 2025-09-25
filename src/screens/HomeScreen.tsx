@@ -137,11 +137,10 @@ export default function HomeScreen() {
             <Text style={styles.currentPrice}>AED 230</Text>
           </View>
           <View style={styles.productImageContainer}>
-            <Image 
-              source={require('../../assets/genosys-logo.png')}
-              style={styles.productImage}
-              resizeMode="contain"
-            />
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>GENOSYS</Text>
+              <Text style={styles.logoSubtext}>Professional Skincare</Text>
+            </View>
           </View>
           <TouchableOpacity style={styles.buyButton}>
             <Text style={styles.buyButtonText}>Buy Now</Text>
@@ -507,9 +506,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 16,
   },
-  productImage: {
-    width: 80,
-    height: 40,
+  logoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  logoSubtext: {
+    fontSize: 12,
+    color: '#666666',
+    fontWeight: '500',
   },
   buyButton: {
     backgroundColor: '#f5f5f5',
