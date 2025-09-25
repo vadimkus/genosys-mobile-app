@@ -39,6 +39,13 @@ export default function ProfileScreen() {
             <Text style={styles.userRole}>Professional Account</Text>
           </View>
         </View>
+        <View style={styles.logoContainer}>
+          <Image 
+            source={require('../../assets/genosys-logo.png')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
       {/* Quick Stats */}
@@ -235,6 +242,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#b0b0b0',
     fontWeight: '500',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  headerLogo: {
+    width: 120,
+    height: 40,
+    opacity: 0.8,
   },
   statsContainer: {
     flexDirection: 'row',

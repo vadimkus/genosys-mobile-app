@@ -29,7 +29,11 @@ export default function HomeScreen() {
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <View style={styles.heroContent}>
-          <Text style={styles.heroTitle}>Genosys</Text>
+          <Image 
+            source={require('../../assets/genosys-logo.png')}
+            style={styles.heroLogo}
+            resizeMode="contain"
+          />
           <Text style={styles.heroSubtitle}>Premium Korean Dermacosmetics</Text>
           <Text style={styles.heroLocation}>United Arab Emirates</Text>
         </View>
@@ -48,8 +52,8 @@ export default function HomeScreen() {
           <View style={styles.actionIcon}>
             <Text style={styles.actionEmoji}>✨</Text>
           </View>
-          <Text style={styles.actionTitle}>Browse Products</Text>
-          <Text style={styles.actionSubtitle}>Discover our premium range</Text>
+          <Text style={[styles.actionTitle, { color: '#ffffff' }]}>Browse Products</Text>
+          <Text style={[styles.actionSubtitle, { color: '#e0e0e0' }]}>Discover our premium range</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -169,12 +173,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 2,
   },
-  heroTitle: {
-    fontSize: 42,
-    fontWeight: '300',
-    color: '#ffffff',
-    letterSpacing: 2,
-    marginBottom: 8,
+  heroLogo: {
+    width: 200,
+    height: 80,
+    marginBottom: 16,
   },
   heroSubtitle: {
     fontSize: 16,
@@ -251,16 +253,10 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     marginBottom: 4,
   },
-  primaryAction .actionTitle: {
-    color: '#ffffff',
-  },
   actionSubtitle: {
     fontSize: 13,
     color: '#666666',
     lineHeight: 18,
-  },
-  primaryAction .actionSubtitle: {
-    color: '#e0e0e0',
   },
   brandSection: {
     padding: 24,

@@ -182,8 +182,17 @@ export default function ProductsScreen() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Our Products</Text>
-        <Text style={styles.headerSubtitle}>Premium Korean Dermacosmetics</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Our Products</Text>
+          <Text style={styles.headerSubtitle}>Premium Korean Dermacosmetics</Text>
+        </View>
+        <View style={styles.headerLogoContainer}>
+          <Image 
+            source={require('../../assets/genosys-logo.png')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
       {/* Search Bar */}
@@ -240,7 +249,7 @@ export default function ProductsScreen() {
               <TouchableOpacity 
                 key={product.id} 
                 style={styles.productCard}
-                onPress={() => navigation.navigate('ProductDetail' as never, { productId: product.id } as never)}
+                onPress={() => (navigation as any).navigate('ProductDetail', { productId: product.id })}
               >
                 <View style={styles.productImageContainer}>
                   {loadingImages.has(product.id) && (
@@ -342,6 +351,18 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     color: '#e0e0e0',
+  },
+  headerContent: {
+    flex: 1,
+  },
+  headerLogoContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  headerLogo: {
+    width: 100,
+    height: 30,
+    opacity: 0.9,
   },
   searchContainer: {
     paddingHorizontal: 24,

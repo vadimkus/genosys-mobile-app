@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../contexts/CartContext';
 
@@ -32,8 +32,17 @@ export default function CartScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Shopping Cart</Text>
-        <Text style={styles.headerSubtitle}>{totalItems} items</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Shopping Cart</Text>
+          <Text style={styles.headerSubtitle}>{totalItems} items</Text>
+        </View>
+        <View style={styles.logoContainer}>
+          <Image 
+            source={require('../../assets/genosys-logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
       {items.length === 0 ? (
@@ -120,6 +129,18 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     color: '#f0f0f0',
+  },
+  headerContent: {
+    flex: 1,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  logo: {
+    width: 100,
+    height: 30,
+    opacity: 0.9,
   },
   cartItems: {
     padding: 20,

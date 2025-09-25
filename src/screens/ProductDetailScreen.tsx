@@ -24,7 +24,7 @@ export default function ProductDetailScreen() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { productId } = route.params as { productId: string };
+        const productId = (route.params as any)?.productId || '1';
         
         // Fetch product from API
         const response = await fetch(`https://genosys.ae/api/products/${productId}`);
@@ -47,8 +47,9 @@ export default function ProductDetailScreen() {
       } catch (error) {
         console.error('Error fetching product:', error);
         // Fallback to mock data
+        const productId = (route.params as any)?.productId || '1';
         const mockProduct: Product = {
-          id: route.params?.productId || '1',
+          id: productId,
           name: 'Microneedle Roller',
           price: 230,
           description: 'Skin stimulator to promote collagen production and transdermal nutrient delivery. Professional microneedling device for effective skin regeneration. Manufactured in South Korea.',
