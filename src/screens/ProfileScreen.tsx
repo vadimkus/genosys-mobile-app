@@ -49,18 +49,27 @@ export default function ProfileScreen() {
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuText}>Favorites</Text>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('Products' as never)}
+          >
+            <Text style={styles.menuText}>Browse Products</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('Training' as never)}
+          >
             <Text style={styles.menuText}>Training Documents</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuText}>Settings</Text>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('Cart' as never)}
+          >
+            <Text style={styles.menuText}>Shopping Cart</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 

@@ -63,6 +63,14 @@ export default function HomeScreen() {
           <Text style={styles.featureTitle}>Training Videos</Text>
           <Text style={styles.featureDesc}>Professional training materials</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.featureCard}
+          onPress={() => navigation.navigate('Orders' as never)}
+        >
+          <Text style={styles.featureTitle}>My Orders</Text>
+          <Text style={styles.featureDesc}>Track your orders and history</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.brandInfo}>

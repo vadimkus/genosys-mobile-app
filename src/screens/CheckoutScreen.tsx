@@ -11,6 +11,7 @@ import {
   Platform,
   ActivityIndicator
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -24,6 +25,7 @@ interface ShippingAddress {
 }
 
 export default function CheckoutScreen() {
+  const navigation = useNavigation();
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -109,10 +111,10 @@ export default function CheckoutScreen() {
           `Your order #${orderData.id} has been placed. You will receive a confirmation email shortly.`,
           [
             {
-              text: 'OK',
+              text: 'View Orders',
               onPress: () => {
                 clearCart();
-                // Navigate back to home or orders
+                navigation.navigate('Orders' as never);
               }
             }
           ]
