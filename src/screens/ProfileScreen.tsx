@@ -25,46 +25,56 @@ export default function ProfileScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </Text>
-            </View>
-            <View style={styles.statusIndicator} />
-          </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user?.name || 'User'}</Text>
-            <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
-            <Text style={styles.userRole}>Professional Account</Text>
+            <View style={styles.avatarContainer}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </Text>
+              </View>
+              <View style={styles.statusIndicator} />
+            </View>
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>{user?.name || 'User'}</Text>
+              <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
+              <Text style={styles.userRole}>Professional Account</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.logoContainer}>
-          <Image 
-            source={require('../../assets/genosys-logo.png')}
-            style={styles.headerLogo}
-            resizeMode="contain"
-          />
         </View>
       </View>
 
-      {/* Quick Stats */}
+      {/* Stats Cards */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>12</Text>
-          <Text style={styles.statLabel}>Orders</Text>
+          <View style={styles.statIcon}>
+            <Text style={styles.statEmoji}>📦</Text>
+          </View>
+          <View style={styles.statContent}>
+            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statLabel}>Orders</Text>
+          </View>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>3</Text>
-          <Text style={styles.statLabel}>Training</Text>
+          <View style={styles.statIcon}>
+            <Text style={styles.statEmoji}>📚</Text>
+          </View>
+          <View style={styles.statContent}>
+            <Text style={styles.statNumber}>3</Text>
+            <Text style={styles.statLabel}>Training</Text>
+          </View>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>5★</Text>
-          <Text style={styles.statLabel}>Rating</Text>
+          <View style={styles.statIcon}>
+            <Text style={styles.statEmoji}>⭐</Text>
+          </View>
+          <View style={styles.statContent}>
+            <Text style={styles.statNumber}>5★</Text>
+            <Text style={styles.statLabel}>Rating</Text>
+          </View>
         </View>
       </View>
 
-      {/* Main Menu */}
+      {/* Menu Sections */}
       <View style={styles.menuSection}>
         <Text style={styles.sectionTitle}>Account</Text>
         
@@ -172,6 +182,9 @@ export default function ProfileScreen() {
         <Text style={styles.versionText}>Genosys Mobile App v1.0.0</Text>
         <Text style={styles.copyrightText}>© 2024 Genosys Middle East FZ-LLC</Text>
       </View>
+
+      {/* Bottom Spacing */}
+      <View style={styles.bottomSpacing} />
     </ScrollView>
   );
 }
@@ -179,15 +192,23 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#ffffff',
     paddingTop: 60,
     paddingBottom: 30,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   headerContent: {
+    flex: 1,
+  },
+  userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -199,7 +220,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#e8f5e8',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -224,37 +245,28 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ffffff',
   },
-  userInfo: {
+  userDetails: {
     flex: 1,
   },
   userName: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#ffffff',
+    color: '#1a1a1a',
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 14,
-    color: '#e0e0e0',
+    color: '#666666',
     marginBottom: 4,
   },
   userRole: {
     fontSize: 12,
-    color: '#b0b0b0',
+    color: '#999999',
     fontWeight: '500',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  headerLogo: {
-    width: 120,
-    height: 40,
-    opacity: 0.8,
   },
   statsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 20,
     backgroundColor: '#ffffff',
     marginHorizontal: 20,
@@ -270,11 +282,26 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  statIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e8f5e8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  statEmoji: {
+    fontSize: 16,
+  },
+  statContent: {
+    alignItems: 'center',
+  },
   statNumber: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: '#1a1a1a',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
@@ -282,7 +309,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   menuSection: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     marginTop: 24,
   },
   sectionTitle: {
@@ -311,7 +338,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#e8f5e8',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -338,7 +365,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   logoutSection: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     marginTop: 24,
     marginBottom: 20,
   },
@@ -370,7 +397,7 @@ const styles = StyleSheet.create({
   },
   versionContainer: {
     alignItems: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 30,
   },
   versionText: {
@@ -381,5 +408,8 @@ const styles = StyleSheet.create({
   copyrightText: {
     fontSize: 11,
     color: '#cccccc',
+  },
+  bottomSpacing: {
+    height: 30,
   },
 });

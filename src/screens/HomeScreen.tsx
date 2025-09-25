@@ -26,96 +26,177 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Hero Section */}
-      <View style={styles.heroSection}>
-        <View style={styles.heroContent}>
-          <Image 
-            source={require('../../assets/genosys-logo.png')}
-            style={styles.heroLogo}
-            resizeMode="contain"
-          />
-          <Text style={styles.heroSubtitle}>Premium Korean Dermacosmetics</Text>
-          <Text style={styles.heroLocation}>United Arab Emirates</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.greeting}>Hello, Welcome</Text>
+          <Text style={styles.subtitle}>Your premium skincare journey starts here!</Text>
         </View>
-        <View style={styles.heroDecoration}>
-          <View style={styles.decorationCircle} />
-          <View style={[styles.decorationCircle, styles.decorationCircle2]} />
+        <TouchableOpacity style={styles.menuButton}>
+          <View style={styles.menuIcon}>
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+            <View style={styles.menuDot} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Health Report Card */}
+      <View style={styles.healthCard}>
+        <View style={styles.healthHeader}>
+          <Text style={styles.healthTitle}>Skin Health Report</Text>
+          <View style={styles.healthIcon}>
+            <View style={styles.scanIcon}>
+              <Text style={styles.scanEmoji}>📱</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.healthContent}>
+          <View style={styles.healthMetric}>
+            <View style={styles.metricBox}>
+              <Text style={styles.metricLabel}>Your Skin Health</Text>
+              <Text style={styles.metricValue}>85%</Text>
+            </View>
+          </View>
+          <View style={styles.healthInfo}>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Last Analysis</Text>
+              <Text style={styles.infoValue}>2 days ago</Text>
+            </View>
+          </View>
         </View>
       </View>
 
-      {/* Quick Actions Grid */}
-      <View style={styles.quickActions}>
+      {/* Daily Routine Card */}
+      <View style={styles.routineCard}>
+        <View style={styles.routineHeader}>
+          <View style={styles.routineIcon}>
+            <Text style={styles.routineEmoji}>⏰</Text>
+          </View>
+          <View style={styles.routineContent}>
+            <Text style={styles.routineDate}>25 Sep</Text>
+            <Text style={styles.routineTitle}>Daily Routine</Text>
+          </View>
+        </View>
+        <View style={styles.routineFooter}>
+          <Text style={styles.routineAction}>Today</Text>
+          <Text style={styles.routineArrow}>›</Text>
+        </View>
+      </View>
+
+      {/* Category Tabs */}
+      <View style={styles.categoryContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryContent}>
+          {['All', 'Face', 'Body', 'Lip', 'Eye'].map((category, index) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryTab,
+                index === 0 && styles.categoryTabActive
+              ]}
+            >
+              <Text style={[
+                styles.categoryText,
+                index === 0 && styles.categoryTextActive
+              ]}>
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* For You Section */}
+      <View style={styles.forYouSection}>
+        <View style={styles.forYouHeader}>
+          <Text style={styles.forYouTitle}>For You</Text>
+          <TouchableOpacity>
+            <Text style={styles.forYouSeeAll}>See all</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Featured Product Card */}
         <TouchableOpacity 
-          style={[styles.actionCard, styles.primaryAction]}
+          style={styles.productCard}
           onPress={() => navigation.navigate('Products' as never)}
         >
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionEmoji}>✨</Text>
+          <View style={styles.productHeader}>
+            <Text style={styles.productName}>Genosys Microneedle Roller</Text>
+            <TouchableOpacity style={styles.favoriteButton}>
+              <Text style={styles.favoriteIcon}>♡</Text>
+            </TouchableOpacity>
           </View>
-          <Text style={[styles.actionTitle, { color: '#ffffff' }]}>Browse Products</Text>
-          <Text style={[styles.actionSubtitle, { color: '#e0e0e0' }]}>Discover our premium range</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionCard}
-          onPress={() => navigation.navigate('Cart' as never)}
-        >
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionEmoji}>🛍️</Text>
+          <View style={styles.productPricing}>
+            <Text style={styles.originalPrice}>AED 280</Text>
+            <Text style={styles.currentPrice}>AED 230</Text>
           </View>
-          <Text style={styles.actionTitle}>Shopping Cart</Text>
-          <Text style={styles.actionSubtitle}>View your items</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionCard}
-          onPress={() => navigation.navigate('Training' as never)}
-        >
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionEmoji}>📚</Text>
+          <View style={styles.productImageContainer}>
+            <Image 
+              source={require('../../assets/genosys-logo.png')}
+              style={styles.productImage}
+              resizeMode="contain"
+            />
           </View>
-          <Text style={styles.actionTitle}>Training</Text>
-          <Text style={styles.actionSubtitle}>Professional materials</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionCard}
-          onPress={() => navigation.navigate('Orders' as never)}
-        >
-          <View style={styles.actionIcon}>
-            <Text style={styles.actionEmoji}>📦</Text>
-          </View>
-          <Text style={styles.actionTitle}>My Orders</Text>
-          <Text style={styles.actionSubtitle}>Track your orders</Text>
+          <TouchableOpacity style={styles.buyButton}>
+            <Text style={styles.buyButtonText}>Buy Now</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
       </View>
 
-      {/* Brand Story */}
-      <View style={styles.brandSection}>
-        <Text style={styles.sectionTitle}>About Genosys</Text>
-        <Text style={styles.brandDescription}>
-          Leading Korean dermacosmetics brand specializing in professional-grade skincare solutions. 
-          Our products are trusted by beauty professionals worldwide.
-        </Text>
-        <View style={styles.brandStats}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>50+</Text>
-            <Text style={styles.statLabel}>Products</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>1000+</Text>
-            <Text style={styles.statLabel}>Professionals</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>5★</Text>
-            <Text style={styles.statLabel}>Quality</Text>
-          </View>
+      {/* Quick Actions */}
+      <View style={styles.actionsSection}>
+        <Text style={styles.actionsTitle}>Quick Actions</Text>
+        <View style={styles.actionsGrid}>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Products' as never)}
+          >
+            <View style={styles.actionIcon}>
+              <Text style={styles.actionEmoji}>✨</Text>
+            </View>
+            <Text style={styles.actionTitle}>Browse Products</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Cart' as never)}
+          >
+            <View style={styles.actionIcon}>
+              <Text style={styles.actionEmoji}>🛍️</Text>
+            </View>
+            <Text style={styles.actionTitle}>Shopping Cart</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Training' as never)}
+          >
+            <View style={styles.actionIcon}>
+              <Text style={styles.actionEmoji}>📚</Text>
+            </View>
+            <Text style={styles.actionTitle}>Training</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Orders' as never)}
+          >
+            <View style={styles.actionIcon}>
+              <Text style={styles.actionEmoji}>📦</Text>
+            </View>
+            <Text style={styles.actionTitle}>My Orders</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       {/* Contact Section */}
       <View style={styles.contactSection}>
-        <Text style={styles.sectionTitle}>Get in Touch</Text>
         <TouchableOpacity 
           style={styles.whatsappButton}
           onPress={handleWhatsAppContact}
@@ -126,32 +207,13 @@ export default function HomeScreen() {
               <Text style={styles.whatsappTitle}>WhatsApp Support</Text>
               <Text style={styles.whatsappSubtitle}>+971 58 548 76 65</Text>
             </View>
-            <Text style={styles.whatsappArrow}>→</Text>
+            <Text style={styles.whatsappArrow}>›</Text>
           </View>
         </TouchableOpacity>
-        
-        <View style={styles.contactInfo}>
-          <Text style={styles.contactEmail}>sales@genosys.ae</Text>
-          <Text style={styles.contactNote}>Official Distributor in the UAE</Text>
-        </View>
       </View>
 
-      {/* Profile Quick Access */}
-      <TouchableOpacity 
-        style={styles.profileButton}
-        onPress={() => navigation.navigate('Profile' as never)}
-      >
-        <View style={styles.profileContent}>
-          <View style={styles.profileAvatar}>
-            <Text style={styles.profileAvatarText}>👤</Text>
-          </View>
-          <View style={styles.profileText}>
-            <Text style={styles.profileTitle}>My Profile</Text>
-            <Text style={styles.profileSubtitle}>Manage your account</Text>
-          </View>
-          <Text style={styles.profileArrow}>›</Text>
-        </View>
-      </TouchableOpacity>
+      {/* Bottom Spacing */}
+      <View style={styles.bottomSpacing} />
     </ScrollView>
   );
 }
@@ -159,164 +221,360 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#f8f9fa',
   },
-  heroSection: {
-    backgroundColor: '#1a1a1a',
-    paddingTop: 60,
-    paddingBottom: 40,
-    paddingHorizontal: 24,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  heroContent: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    zIndex: 2,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
   },
-  heroLogo: {
-    width: 200,
-    height: 80,
-    marginBottom: 16,
+  headerContent: {
+    flex: 1,
   },
-  heroSubtitle: {
-    fontSize: 16,
-    color: '#e0e0e0',
-    fontWeight: '400',
+  greeting: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1a1a1a',
     marginBottom: 4,
   },
-  heroLocation: {
+  subtitle: {
     fontSize: 14,
-    color: '#b0b0b0',
-    fontWeight: '500',
+    color: '#666666',
+    fontWeight: '400',
   },
-  heroDecoration: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 200,
-    height: 200,
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  decorationCircle: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    top: 20,
-    right: 20,
-  },
-  decorationCircle2: {
-    width: 80,
-    height: 80,
-    top: 60,
-    right: 60,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-  },
-  quickActions: {
+  menuIcon: {
+    width: 16,
+    height: 16,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 20,
-    gap: 16,
   },
-  actionCard: {
+  menuDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#666666',
+    margin: 1,
+  },
+  healthCard: {
     backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginBottom: 16,
     borderRadius: 16,
     padding: 20,
-    width: (width - 56) / 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
+  },
+  healthHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  healthTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  healthIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e8f5e8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scanIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#4ade80',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scanEmoji: {
+    fontSize: 12,
+  },
+  healthContent: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  healthMetric: {
+    flex: 1,
+  },
+  metricBox: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+  },
+  metricLabel: {
+    fontSize: 12,
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  metricValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  healthInfo: {
+    flex: 1,
+  },
+  infoBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#f0f0f0',
   },
-  primaryAction: {
+  infoLabel: {
+    fontSize: 12,
+    color: '#666666',
+    marginBottom: 4,
+  },
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  routineCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  routineHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  routineIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e8f5e8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  routineEmoji: {
+    fontSize: 16,
+  },
+  routineContent: {
+    flex: 1,
+  },
+  routineDate: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 2,
+  },
+  routineTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  routineFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  routineAction: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  routineArrow: {
+    fontSize: 18,
+    color: '#666666',
+  },
+  categoryContainer: {
+    marginBottom: 20,
+  },
+  categoryContent: {
+    paddingHorizontal: 20,
+  },
+  categoryTab: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    marginRight: 8,
+  },
+  categoryTabActive: {
     backgroundColor: '#1a1a1a',
-    borderColor: '#1a1a1a',
+  },
+  categoryText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666666',
+  },
+  categoryTextActive: {
+    color: '#ffffff',
+  },
+  forYouSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  forYouHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  forYouTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  forYouSeeAll: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  productCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  productHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    flex: 1,
+    marginRight: 12,
+  },
+  favoriteButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f8f8f8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoriteIcon: {
+    fontSize: 16,
+    color: '#666666',
+  },
+  productPricing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  originalPrice: {
+    fontSize: 14,
+    color: '#999999',
+    textDecorationLine: 'line-through',
+    marginRight: 8,
+  },
+  currentPrice: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  productImageContainer: {
+    height: 120,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  productImage: {
+    width: 80,
+    height: 40,
+  },
+  buyButton: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  buyButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  actionsSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  actionsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 16,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  actionCard: {
+    width: (width - 56) / 2,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   actionIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#e8f5e8',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   actionEmoji: {
-    fontSize: 24,
+    fontSize: 20,
   },
   actionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  actionSubtitle: {
-    fontSize: 13,
-    color: '#666666',
-    lineHeight: 18,
-  },
-  brandSection: {
-    padding: 24,
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 12,
-  },
-  brandDescription: {
-    fontSize: 15,
-    color: '#666666',
-    lineHeight: 22,
-    marginBottom: 20,
-  },
-  brandStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#999999',
-    fontWeight: '500',
+    textAlign: 'center',
   },
   contactSection: {
-    padding: 24,
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    borderRadius: 16,
+    paddingHorizontal: 20,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
   whatsappButton: {
     backgroundColor: '#25d366',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 16,
+    padding: 20,
   },
   whatsappContent: {
     flexDirection: 'row',
@@ -324,7 +582,7 @@ const styles = StyleSheet.create({
   },
   whatsappIcon: {
     fontSize: 24,
-    marginRight: 12,
+    marginRight: 16,
   },
   whatsappText: {
     flex: 1,
@@ -345,66 +603,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '600',
   },
-  contactInfo: {
-    alignItems: 'center',
-  },
-  contactEmail: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  contactNote: {
-    fontSize: 12,
-    color: '#999999',
-    fontStyle: 'italic',
-  },
-  profileButton: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    marginBottom: 30,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-  },
-  profileContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f8f8f8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  profileAvatarText: {
-    fontSize: 24,
-  },
-  profileText: {
-    flex: 1,
-  },
-  profileTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 2,
-  },
-  profileSubtitle: {
-    fontSize: 14,
-    color: '#666666',
-  },
-  profileArrow: {
-    fontSize: 20,
-    color: '#999999',
-    fontWeight: '300',
+  bottomSpacing: {
+    height: 30,
   },
 });
