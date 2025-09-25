@@ -59,12 +59,7 @@ export default function LoginScreen() {
         {/* Hero Image Section */}
         <View style={styles.heroSection}>
           <View style={styles.heroImageContainer}>
-            <Image 
-              source={require('../../assets/images/genosys-hero.jpg')}
-              style={styles.heroImage}
-              resizeMode="cover"
-            />
-            <View style={styles.heroOverlay}>
+            <View style={styles.heroImagePlaceholder}>
               <Text style={styles.heroImageText}>Professional Skincare</Text>
               <Text style={styles.heroImageSubtext}>Clinical-grade treatments</Text>
             </View>
@@ -272,19 +267,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 5,
-    position: 'relative',
   },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  heroOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  heroImagePlaceholder: {
+    flex: 1,
+    backgroundColor: '#f0f9ff',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -292,15 +278,14 @@ const styles = StyleSheet.create({
   heroImageText: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#1a1a1a',
     marginBottom: 8,
     textAlign: 'center',
   },
   heroImageSubtext: {
     fontSize: 14,
-    color: '#ffffff',
+    color: '#666666',
     textAlign: 'center',
-    opacity: 0.9,
   },
   formSection: {
     paddingHorizontal: 20,
