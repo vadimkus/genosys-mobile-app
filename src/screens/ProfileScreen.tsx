@@ -49,32 +49,31 @@ export default function ProfileScreen() {
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('Products' as never)}
-          >
-            <Text style={styles.menuText}>Browse Products</Text>
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuText}>Account Settings</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('Training' as never)}
-          >
-            <Text style={styles.menuText}>Training Documents</Text>
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuText}>Notifications</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('Cart' as never)}
-          >
-            <Text style={styles.menuText}>Shopping Cart</Text>
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuText}>Privacy & Security</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuText}>Help & Support</Text>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('Home' as never)}
+          >
+            <Text style={styles.menuText}>Back to Home</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
         </View>
