@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -15,7 +17,6 @@ export default function HomeScreen() {
       if (supported) {
         await Linking.openURL(whatsappUrl);
       } else {
-        // Fallback to regular phone call
         await Linking.openURL(`tel:+${phoneNumber}`);
       }
     } catch (error) {
@@ -24,73 +25,129 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Welcome to Genosys</Text>
-        <Text style={styles.heroSubtitle}>Premium Korean Dermacosmetics</Text>
-        <Text style={styles.heroLocation}>United Arab Emirates 🇦🇪</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Hero Section */}
+      <View style={styles.heroSection}>
+        <View style={styles.heroContent}>
+          <Text style={styles.heroTitle}>Genosys</Text>
+          <Text style={styles.heroSubtitle}>Premium Korean Dermacosmetics</Text>
+          <Text style={styles.heroLocation}>United Arab Emirates</Text>
+        </View>
+        <View style={styles.heroDecoration}>
+          <View style={styles.decorationCircle} />
+          <View style={[styles.decorationCircle, styles.decorationCircle2]} />
+        </View>
       </View>
 
-      <View style={styles.features}>
+      {/* Quick Actions Grid */}
+      <View style={styles.quickActions}>
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={[styles.actionCard, styles.primaryAction]}
           onPress={() => navigation.navigate('Products' as never)}
         >
-          <Text style={styles.featureTitle}>Browse Products</Text>
-          <Text style={styles.featureDesc}>Discover our premium skincare range</Text>
+          <View style={styles.actionIcon}>
+            <Text style={styles.actionEmoji}>✨</Text>
+          </View>
+          <Text style={styles.actionTitle}>Browse Products</Text>
+          <Text style={styles.actionSubtitle}>Discover our premium range</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={styles.actionCard}
           onPress={() => navigation.navigate('Cart' as never)}
         >
-          <Text style={styles.featureTitle}>Shopping Cart</Text>
-          <Text style={styles.featureDesc}>View your selected items</Text>
+          <View style={styles.actionIcon}>
+            <Text style={styles.actionEmoji}>🛍️</Text>
+          </View>
+          <Text style={styles.actionTitle}>Shopping Cart</Text>
+          <Text style={styles.actionSubtitle}>View your items</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.featureCard}
-          onPress={() => navigation.navigate('Profile' as never)}
-        >
-          <Text style={styles.featureTitle}>My Profile</Text>
-          <Text style={styles.featureDesc}>Manage your account</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.featureCard}
+          style={styles.actionCard}
           onPress={() => navigation.navigate('Training' as never)}
         >
-          <Text style={styles.featureTitle}>Training Videos</Text>
-          <Text style={styles.featureDesc}>Professional training materials</Text>
+          <View style={styles.actionIcon}>
+            <Text style={styles.actionEmoji}>📚</Text>
+          </View>
+          <Text style={styles.actionTitle}>Training</Text>
+          <Text style={styles.actionSubtitle}>Professional materials</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={styles.actionCard}
           onPress={() => navigation.navigate('Orders' as never)}
         >
-          <Text style={styles.featureTitle}>My Orders</Text>
-          <Text style={styles.featureDesc}>Track your orders and history</Text>
+          <View style={styles.actionIcon}>
+            <Text style={styles.actionEmoji}>📦</Text>
+          </View>
+          <Text style={styles.actionTitle}>My Orders</Text>
+          <Text style={styles.actionSubtitle}>Track your orders</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.brandInfo}>
-        <Text style={styles.brandTitle}>About Genosys</Text>
-        <Text style={styles.brandDesc}>
-          Leading Korean dermacosmetics brand specializing in professional-grade skincare solutions.
+      {/* Brand Story */}
+      <View style={styles.brandSection}>
+        <Text style={styles.sectionTitle}>About Genosys</Text>
+        <Text style={styles.brandDescription}>
+          Leading Korean dermacosmetics brand specializing in professional-grade skincare solutions. 
+          Our products are trusted by beauty professionals worldwide.
         </Text>
+        <View style={styles.brandStats}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>50+</Text>
+            <Text style={styles.statLabel}>Products</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>1000+</Text>
+            <Text style={styles.statLabel}>Professionals</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>5★</Text>
+            <Text style={styles.statLabel}>Quality</Text>
+          </View>
+        </View>
       </View>
 
-      <View style={styles.contactInfo}>
-        <Text style={styles.contactTitle}>Contact Us</Text>
+      {/* Contact Section */}
+      <View style={styles.contactSection}>
+        <Text style={styles.sectionTitle}>Get in Touch</Text>
         <TouchableOpacity 
-          style={styles.contactButton}
+          style={styles.whatsappButton}
           onPress={handleWhatsAppContact}
         >
-          <Text style={styles.contactButtonText}>📱 WhatsApp: +971 58 548 76 65</Text>
+          <View style={styles.whatsappContent}>
+            <Text style={styles.whatsappIcon}>💬</Text>
+            <View style={styles.whatsappText}>
+              <Text style={styles.whatsappTitle}>WhatsApp Support</Text>
+              <Text style={styles.whatsappSubtitle}>+971 58 548 76 65</Text>
+            </View>
+            <Text style={styles.whatsappArrow}>→</Text>
+          </View>
         </TouchableOpacity>
-        <Text style={styles.contactText}>✉️ sales@genosys.ae</Text>
-        <Text style={styles.contactSubtext}>Official Distributor in the UAE</Text>
+        
+        <View style={styles.contactInfo}>
+          <Text style={styles.contactEmail}>sales@genosys.ae</Text>
+          <Text style={styles.contactNote}>Official Distributor in the UAE</Text>
+        </View>
       </View>
+
+      {/* Profile Quick Access */}
+      <TouchableOpacity 
+        style={styles.profileButton}
+        onPress={() => navigation.navigate('Profile' as never)}
+      >
+        <View style={styles.profileContent}>
+          <View style={styles.profileAvatar}>
+            <Text style={styles.profileAvatarText}>👤</Text>
+          </View>
+          <View style={styles.profileText}>
+            <Text style={styles.profileTitle}>My Profile</Text>
+            <Text style={styles.profileSubtitle}>Manage your account</Text>
+          </View>
+          <Text style={styles.profileArrow}>›</Text>
+        </View>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -98,106 +155,260 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fafafa',
   },
-  hero: {
-    backgroundColor: '#ef4444', // Primary red from website
-    padding: 40,
+  heroSection: {
+    backgroundColor: '#1a1a1a',
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroContent: {
     alignItems: 'center',
+    zIndex: 2,
   },
   heroTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 42,
+    fontWeight: '300',
+    color: '#ffffff',
+    letterSpacing: 2,
     marginBottom: 8,
   },
   heroSubtitle: {
     fontSize: 16,
-    color: '#f0f0f0',
-    marginBottom: 8,
+    color: '#e0e0e0',
+    fontWeight: '400',
+    marginBottom: 4,
   },
   heroLocation: {
     fontSize: 14,
-    color: '#f0f0f0',
+    color: '#b0b0b0',
     fontWeight: '500',
   },
-  features: {
-    padding: 20,
+  heroDecoration: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 200,
+    height: 200,
   },
-  featureCard: {
-    backgroundColor: '#fff',
+  decorationCircle: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    top: 20,
+    right: 20,
+  },
+  decorationCircle2: {
+    width: 80,
+    height: 80,
+    top: 60,
+    right: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  },
+  quickActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     padding: 20,
-    marginBottom: 15,
-    borderRadius: 10,
+    gap: 16,
+  },
+  actionCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    width: (width - 56) / 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  primaryAction: {
+    backgroundColor: '#1a1a1a',
+    borderColor: '#1a1a1a',
+  },
+  actionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f8f8f8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  actionEmoji: {
+    fontSize: 24,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  primaryAction .actionTitle: {
+    color: '#ffffff',
+  },
+  actionSubtitle: {
+    fontSize: 13,
+    color: '#666666',
+    lineHeight: 18,
+  },
+  primaryAction .actionSubtitle: {
+    color: '#e0e0e0',
+  },
+  brandSection: {
+    padding: 24,
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     elevation: 3,
   },
-  featureTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ef4444', // Primary red from website
-    marginBottom: 5,
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 12,
   },
-  featureDesc: {
-    fontSize: 14,
-    color: '#666',
+  brandDescription: {
+    fontSize: 15,
+    color: '#666666',
+    lineHeight: 22,
+    marginBottom: 20,
   },
-  brandInfo: {
-    padding: 20,
-    backgroundColor: '#fff',
-    margin: 20,
-    borderRadius: 10,
+  brandStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
-  brandTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ef4444', // Primary red from website
-    marginBottom: 10,
-  },
-  brandDesc: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  contactInfo: {
-    padding: 20,
-    backgroundColor: '#fff',
-    margin: 20,
-    borderRadius: 10,
+  statItem: {
     alignItems: 'center',
   },
-  contactTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ef4444',
-    marginBottom: 15,
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 4,
   },
-  contactText: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
+  statLabel: {
+    fontSize: 12,
+    color: '#999999',
     fontWeight: '500',
   },
-  contactSubtext: {
-    fontSize: 12,
-    color: '#666',
-    fontStyle: 'italic',
-    marginTop: 5,
+  contactSection: {
+    padding: 24,
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  contactButton: {
+  whatsappButton: {
     backgroundColor: '#25d366',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-    marginBottom: 10,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
   },
-  contactButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  whatsappContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  whatsappIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  whatsappText: {
+    flex: 1,
+  },
+  whatsappTitle: {
     fontSize: 16,
-    textAlign: 'center',
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 2,
+  },
+  whatsappSubtitle: {
+    fontSize: 14,
+    color: '#ffffff',
+    opacity: 0.9,
+  },
+  whatsappArrow: {
+    fontSize: 18,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  contactInfo: {
+    alignItems: 'center',
+  },
+  contactEmail: {
+    fontSize: 16,
+    color: '#1a1a1a',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  contactNote: {
+    fontSize: 12,
+    color: '#999999',
+    fontStyle: 'italic',
+  },
+  profileButton: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginBottom: 30,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  profileContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f8f8f8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  profileAvatarText: {
+    fontSize: 24,
+  },
+  profileText: {
+    flex: 1,
+  },
+  profileTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  profileSubtitle: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  profileArrow: {
+    fontSize: 20,
+    color: '#999999',
+    fontWeight: '300',
   },
 });
