@@ -1,328 +1,326 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  TextInput, 
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
 
-interface ShippingAddress {
-  fullName: string;
-  phone: string;
-  address: string;
-  city: string;
-  emirate: string;
-  postalCode: string;
+const { width } = Dimensions.get('window');
+
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
 }
 
 export default function CheckoutScreen() {
   const navigation = useNavigation();
-  const { items, totalPrice, clearCart } = useCart();
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    fullName: user?.name || '',
-    phone: user?.phone || '',
+  const [step, setStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [shippingInfo, setShippingInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
     address: '',
     city: '',
-    emirate: '',
-    postalCode: '',
+    postalCode: ''
   });
-  const [paymentMethod, setPaymentMethod] = useState('cod');
-  const [notes, setNotes] = useState('');
 
-  const emirates = [
-    'Abu Dhabi',
-    'Dubai', 
-    'Sharjah',
-    'Ajman',
-    'Umm Al Quwain',
-    'Ras Al Khaimah',
-    'Fujairah'
+  const cartItems: CartItem[] = [
+    {
+      id: '1',
+      name: 'MULTI VITA RADIANCE CREAM',
+      price: 280,
+      quantity: 1,
+      image: 'https://genosys.ae/images/products/multi-vita-radiance-cream.jpg'
+    },
+    {
+      id: '2',
+      name: 'HR³ MATRIX HAIR SOLUTION',
+      price: 450,
+      quantity: 1,
+      image: 'https://genosys.ae/images/products/hr3-matrix-hair-solution.jpg'
+    }
   ];
 
-  const handleInputChange = (field: keyof ShippingAddress, value: string) => {
-    setShippingAddress(prev => ({ ...prev, [field]: value }));
-  };
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shipping = 25;
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + shipping + tax;
 
-  const validateForm = (): boolean => {
-    const required = ['fullName', 'phone', 'address', 'city', 'emirate'];
-    
-    for (const field of required) {
-      if (!shippingAddress[field as keyof ShippingAddress]) {
-        Alert.alert('Validation Error', `Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
-        return false;
-      }
-    }
-
-    if (shippingAddress.phone.length < 10) {
-      Alert.alert('Validation Error', 'Please enter a valid phone number');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handlePlaceOrder = async () => {
-    if (!validateForm()) return;
-
-    setLoading(true);
-
-    try {
-      // Create order object
-      const order = {
-        userId: user?.id,
-        items: items.map(item => ({
-          productId: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity
-        })),
-        shippingAddress,
-        paymentMethod,
-        notes,
-        total: totalPrice,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
-
-      // Call your website's order API
-      const response = await fetch('https://genosys.ae/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(order),
-      });
-
-      if (response.ok) {
-        const orderData = await response.json();
-        Alert.alert(
-          'Order Placed Successfully!',
-          `Your order #${orderData.id} has been placed. You will receive a confirmation email shortly.`,
-          [
-            {
-              text: 'View Orders',
-              onPress: () => {
-                clearCart();
-                navigation.navigate('Orders' as never);
-              }
-            }
-          ]
-        );
-      } else {
-        throw new Error('Failed to place order');
-      }
-    } catch (error) {
-      console.error('Order placement error:', error);
-      Alert.alert('Error', 'Failed to place order. Please try again.');
-    } finally {
-      setLoading(false);
+  const handleNext = () => {
+    if (step < 3) {
+      setStep(step + 1);
+    } else {
+      handlePlaceOrder();
     }
   };
 
-  if (items.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Your cart is empty</Text>
-        <Text style={styles.emptySubtext}>Add some products to proceed with checkout</Text>
-      </View>
+  const handlePlaceOrder = () => {
+    Alert.alert(
+      'Order Placed Successfully!',
+      'Your order has been confirmed. You will receive a confirmation email shortly.',
+      [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('Home' as never)
+        }
+      ]
     );
-  }
+  };
 
-  return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView style={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Checkout</Text>
-          <Text style={styles.headerSubtitle}>Complete your order</Text>
-        </View>
-
-        {/* Order Summary */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Order Summary</Text>
-          {items.map((item) => (
-            <View key={item.id} style={styles.orderItem}>
-              <Text style={styles.orderItemName}>{item.name}</Text>
-              <Text style={styles.orderItemDetails}>
-                {item.quantity} x AED {item.price} = AED {(item.price * item.quantity).toFixed(2)}
-              </Text>
-            </View>
-          ))}
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total:</Text>
-            <Text style={styles.totalAmount}>AED {totalPrice.toFixed(2)}</Text>
-          </View>
-        </View>
-
-        {/* Shipping Address */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Shipping Address</Text>
-          
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name *</Text>
-            <TextInput
-              style={styles.input}
-              value={shippingAddress.fullName}
-              onChangeText={(value) => handleInputChange('fullName', value)}
-              placeholder="Enter your full name"
-              placeholderTextColor="#999"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Phone Number *</Text>
-            <TextInput
-              style={styles.input}
-              value={shippingAddress.phone}
-              onChangeText={(value) => handleInputChange('phone', value)}
-              placeholder="Enter your phone number"
-              placeholderTextColor="#999"
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Address *</Text>
-            <TextInput
-              style={styles.input}
-              value={shippingAddress.address}
-              onChangeText={(value) => handleInputChange('address', value)}
-              placeholder="Enter your address"
-              placeholderTextColor="#999"
-              multiline
-            />
-          </View>
-
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
-              <Text style={styles.label}>City *</Text>
-              <TextInput
-                style={styles.input}
-                value={shippingAddress.city}
-                onChangeText={(value) => handleInputChange('city', value)}
-                placeholder="Enter city"
-                placeholderTextColor="#999"
-              />
-            </View>
-            <View style={[styles.inputGroup, { flex: 1, marginLeft: 10 }]}>
-              <Text style={styles.label}>Postal Code</Text>
-              <TextInput
-                style={styles.input}
-                value={shippingAddress.postalCode}
-                onChangeText={(value) => handleInputChange('postalCode', value)}
-                placeholder="Postal code"
-                placeholderTextColor="#999"
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Emirate *</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.emirateContainer}>
-              {emirates.map((emirate) => (
-                <TouchableOpacity
-                  key={emirate}
-                  style={[
-                    styles.emirateButton,
-                    shippingAddress.emirate === emirate && styles.emirateButtonActive
-                  ]}
-                  onPress={() => handleInputChange('emirate', emirate)}
-                >
-                  <Text style={[
-                    styles.emirateText,
-                    shippingAddress.emirate === emirate && styles.emirateTextActive
-                  ]}>
-                    {emirate}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-
-        {/* Payment Method */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Payment Method</Text>
-          
-          <TouchableOpacity 
-            style={[
-              styles.paymentOption,
-              paymentMethod === 'cod' && styles.paymentOptionActive
-            ]}
-            onPress={() => setPaymentMethod('cod')}
-          >
+  const renderStepIndicator = () => (
+    <View style={styles.stepIndicator}>
+      {[1, 2, 3].map((stepNumber) => (
+        <View key={stepNumber} style={styles.stepContainer}>
+          <View style={[
+            styles.stepCircle,
+            step >= stepNumber && styles.stepCircleActive
+          ]}>
             <Text style={[
-              styles.paymentText,
-              paymentMethod === 'cod' && styles.paymentTextActive
+              styles.stepNumber,
+              step >= stepNumber && styles.stepNumberActive
             ]}>
-              💳 Cash on Delivery (COD)
+              {stepNumber}
             </Text>
-            <Text style={styles.paymentSubtext}>Pay when your order arrives</Text>
-          </TouchableOpacity>
+          </View>
+          {stepNumber < 3 && (
+            <View style={[
+              styles.stepLine,
+              step > stepNumber && styles.stepLineActive
+            ]} />
+          )}
+        </View>
+      ))}
+    </View>
+  );
 
-          <TouchableOpacity 
-            style={[
-              styles.paymentOption,
-              paymentMethod === 'card' && styles.paymentOptionActive
-            ]}
-            onPress={() => setPaymentMethod('card')}
-          >
-            <Text style={[
-              styles.paymentText,
-              paymentMethod === 'card' && styles.paymentTextActive
-            ]}>
-              💳 Credit/Debit Card
-            </Text>
-            <Text style={styles.paymentSubtext}>Secure online payment</Text>
-          </TouchableOpacity>
+  const renderStep1 = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepTitle}>Shipping Information</Text>
+      <Text style={styles.stepSubtitle}>Enter your delivery details</Text>
+      
+      <View style={styles.form}>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            value={shippingInfo.name}
+            onChangeText={(text) => setShippingInfo({...shippingInfo, name: text})}
+            placeholder="Enter your full name"
+            placeholderTextColor="#999999"
+          />
         </View>
 
-        {/* Order Notes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Order Notes (Optional)</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Email Address</Text>
+          <TextInput
+            style={styles.input}
+            value={shippingInfo.email}
+            onChangeText={(text) => setShippingInfo({...shippingInfo, email: text})}
+            placeholder="Enter your email"
+            placeholderTextColor="#999999"
+            keyboardType="email-address"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Phone Number</Text>
+          <TextInput
+            style={styles.input}
+            value={shippingInfo.phone}
+            onChangeText={(text) => setShippingInfo({...shippingInfo, phone: text})}
+            placeholder="Enter your phone number"
+            placeholderTextColor="#999999"
+            keyboardType="phone-pad"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Address</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Any special instructions for your order..."
-            placeholderTextColor="#999"
+            value={shippingInfo.address}
+            onChangeText={(text) => setShippingInfo({...shippingInfo, address: text})}
+            placeholder="Enter your address"
+            placeholderTextColor="#999999"
             multiline
             numberOfLines={3}
           />
         </View>
 
-        {/* Place Order Button */}
-        <View style={styles.checkoutButtonContainer}>
-          <TouchableOpacity 
-            style={[styles.checkoutButton, loading && styles.checkoutButtonDisabled]}
-            onPress={handlePlaceOrder}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.checkoutButtonText}>
-                Place Order - AED {totalPrice.toFixed(2)}
-              </Text>
-            )}
-          </TouchableOpacity>
+        <View style={styles.inputRow}>
+          <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+            <Text style={styles.inputLabel}>City</Text>
+            <TextInput
+              style={styles.input}
+              value={shippingInfo.city}
+              onChangeText={(text) => setShippingInfo({...shippingInfo, city: text})}
+              placeholder="City"
+              placeholderTextColor="#999999"
+            />
+          </View>
+          <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
+            <Text style={styles.inputLabel}>Postal Code</Text>
+            <TextInput
+              style={styles.input}
+              value={shippingInfo.postalCode}
+              onChangeText={(text) => setShippingInfo({...shippingInfo, postalCode: text})}
+              placeholder="Postal Code"
+              placeholderTextColor="#999999"
+            />
+          </View>
         </View>
+      </View>
+    </View>
+  );
+
+  const renderStep2 = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepTitle}>Payment Method</Text>
+      <Text style={styles.stepSubtitle}>Choose your payment option</Text>
+      
+      <View style={styles.paymentOptions}>
+        <TouchableOpacity
+          style={[
+            styles.paymentOption,
+            paymentMethod === 'card' && styles.paymentOptionActive
+          ]}
+          onPress={() => setPaymentMethod('card')}
+        >
+          <View style={styles.paymentIcon}>
+            <Text style={styles.paymentEmoji}>💳</Text>
+          </View>
+          <View style={styles.paymentInfo}>
+            <Text style={styles.paymentTitle}>Credit/Debit Card</Text>
+            <Text style={styles.paymentSubtitle}>Visa, Mastercard, American Express</Text>
+          </View>
+          <View style={[
+            styles.paymentRadio,
+            paymentMethod === 'card' && styles.paymentRadioActive
+          ]} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.paymentOption,
+            paymentMethod === 'apple' && styles.paymentOptionActive
+          ]}
+          onPress={() => setPaymentMethod('apple')}
+        >
+          <View style={styles.paymentIcon}>
+            <Text style={styles.paymentEmoji}>🍎</Text>
+          </View>
+          <View style={styles.paymentInfo}>
+            <Text style={styles.paymentTitle}>Apple Pay</Text>
+            <Text style={styles.paymentSubtitle}>Pay with Touch ID or Face ID</Text>
+          </View>
+          <View style={[
+            styles.paymentRadio,
+            paymentMethod === 'apple' && styles.paymentRadioActive
+          ]} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.paymentOption,
+            paymentMethod === 'google' && styles.paymentOptionActive
+          ]}
+          onPress={() => setPaymentMethod('google')}
+        >
+          <View style={styles.paymentIcon}>
+            <Text style={styles.paymentEmoji}>📱</Text>
+          </View>
+          <View style={styles.paymentInfo}>
+            <Text style={styles.paymentTitle}>Google Pay</Text>
+            <Text style={styles.paymentSubtitle}>Quick and secure payment</Text>
+          </View>
+          <View style={[
+            styles.paymentRadio,
+            paymentMethod === 'google' && styles.paymentRadioActive
+          ]} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const renderStep3 = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepTitle}>Order Summary</Text>
+      <Text style={styles.stepSubtitle}>Review your order details</Text>
+      
+      <View style={styles.orderItems}>
+        {cartItems.map((item) => (
+          <View key={item.id} style={styles.orderItem}>
+            <View style={styles.orderItemImage}>
+              <Text style={styles.orderItemEmoji}>🧴</Text>
+            </View>
+            <View style={styles.orderItemInfo}>
+              <Text style={styles.orderItemName}>{item.name}</Text>
+              <Text style={styles.orderItemQuantity}>Qty: {item.quantity}</Text>
+            </View>
+            <Text style={styles.orderItemPrice}>AED {item.price}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.orderSummary}>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Subtotal</Text>
+          <Text style={styles.summaryValue}>AED {subtotal}</Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Shipping</Text>
+          <Text style={styles.summaryValue}>AED {shipping}</Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>Tax (5%)</Text>
+          <Text style={styles.summaryValue}>AED {tax}</Text>
+        </View>
+        <View style={[styles.summaryRow, styles.summaryTotal]}>
+          <Text style={styles.summaryTotalLabel}>Total</Text>
+          <Text style={styles.summaryTotalValue}>AED {total}</Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>‹</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Checkout</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
+      {/* Step Indicator */}
+      {renderStepIndicator()}
+
+      {/* Step Content */}
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {step === 1 && renderStep1()}
+        {step === 2 && renderStep2()}
+        {step === 3 && renderStep3()}
       </ScrollView>
-    </KeyboardAvoidingView>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <View style={styles.footerInfo}>
+          <Text style={styles.footerLabel}>Total</Text>
+          <Text style={styles.footerTotal}>AED {total}</Text>
+        </View>
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>
+            {step === 3 ? 'Place Order' : 'Continue'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
@@ -331,181 +329,301 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
-  scrollContainer: {
-    flex: 1,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#666',
-    marginBottom: 5,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
-  },
   header: {
-    backgroundColor: '#ef4444',
-    padding: 20,
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#f0f0f0',
-  },
-  section: {
-    backgroundColor: '#fff',
-    margin: 20,
-    padding: 20,
-    borderRadius: 10,
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: '#ffffff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     elevation: 3,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  orderItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  orderItemName: {
-    fontSize: 14,
-    color: '#333',
-    flex: 1,
-  },
-  orderItemDetails: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'right',
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
     alignItems: 'center',
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    justifyContent: 'center',
   },
-  totalLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  totalAmount: {
+  backButtonText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ef4444',
+    color: '#1a1a1a',
+    fontWeight: '300',
   },
-  inputGroup: {
-    marginBottom: 15,
+  headerTitle: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
-  row: {
+  headerSpacer: {
+    width: 40,
+  },
+  stepIndicator: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 24,
+    backgroundColor: '#ffffff',
+    marginBottom: 20,
   },
-  label: {
+  stepContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  stepCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepCircleActive: {
+    backgroundColor: '#1a1a1a',
+  },
+  stepNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 5,
+    color: '#999999',
+  },
+  stepNumberActive: {
+    color: '#ffffff',
+  },
+  stepLine: {
+    width: 40,
+    height: 2,
+    backgroundColor: '#f0f0f0',
+    marginHorizontal: 8,
+  },
+  stepLineActive: {
+    backgroundColor: '#1a1a1a',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  stepContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  stepTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 8,
+  },
+  stepSubtitle: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 24,
+  },
+  form: {
+    gap: 16,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
     backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
   },
-  emirateContainer: {
-    marginTop: 5,
+  inputRow: {
+    flexDirection: 'row',
   },
-  emirateButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 10,
-    borderRadius: 20,
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  emirateButtonActive: {
-    backgroundColor: '#ef4444',
-    borderColor: '#ef4444',
-  },
-  emirateText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  emirateTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
+  paymentOptions: {
+    gap: 12,
   },
   paymentOption: {
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   paymentOptionActive: {
-    borderColor: '#ef4444',
-    backgroundColor: '#fff5f5',
+    backgroundColor: '#e8f5e8',
+    borderColor: '#4ade80',
   },
-  paymentText: {
+  paymentIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  paymentEmoji: {
+    fontSize: 20,
+  },
+  paymentInfo: {
+    flex: 1,
+  },
+  paymentTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#1a1a1a',
     marginBottom: 2,
   },
-  paymentTextActive: {
-    color: '#ef4444',
+  paymentSubtitle: {
+    fontSize: 14,
+    color: '#666666',
   },
-  paymentSubtext: {
-    fontSize: 12,
-    color: '#666',
+  paymentRadio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
   },
-  checkoutButtonContainer: {
-    padding: 20,
+  paymentRadioActive: {
+    backgroundColor: '#4ade80',
+    borderColor: '#4ade80',
   },
-  checkoutButton: {
-    backgroundColor: '#ef4444',
-    padding: 15,
-    borderRadius: 8,
+  orderItems: {
+    marginBottom: 24,
+  },
+  orderItem: {
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  checkoutButtonDisabled: {
-    backgroundColor: '#ccc',
+  orderItemImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e8f5e8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
-  checkoutButtonText: {
-    color: '#fff',
+  orderItemEmoji: {
+    fontSize: 18,
+  },
+  orderItemInfo: {
+    flex: 1,
+  },
+  orderItemName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  orderItemQuantity: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  orderItemPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  orderSummary: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  summaryTotal: {
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    marginTop: 8,
+    paddingTop: 16,
+  },
+  summaryTotalLabel: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  summaryTotalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  footerInfo: {
+    flex: 1,
+  },
+  footerLabel: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 2,
+  },
+  footerTotal: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  nextButton: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    marginLeft: 16,
+  },
+  nextButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
   },
 });
