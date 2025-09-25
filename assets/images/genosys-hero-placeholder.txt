@@ -1,0 +1,20 @@
+# Genosys Hero Image Placeholder
+
+This file represents the high-resolution image from http://www.genosys.info/en/
+
+The actual image should be:
+- High-resolution professional skincare image
+- Clean, clinical aesthetic
+- Suitable for login page hero section
+- Professional Genosys branding
+
+To replace this placeholder:
+1. Download the high-resolution image from the Genosys website
+2. Save it as genosys-hero.jpg in this directory
+3. Update the LoginScreen.tsx to use the actual image
+
+Image specifications:
+- Format: JPG
+- Resolution: High (1920x1080 or higher)
+- Style: Professional, clinical, clean
+- Brand: Genosys microneedling products

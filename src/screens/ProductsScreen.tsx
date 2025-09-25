@@ -335,7 +335,7 @@ export default function ProductsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fafafa',
   },
   header: {
     flexDirection: 'row',
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 3,
   },
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f5f5f5',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f5f5f5',
     marginRight: 12,
   },
   categoryTabActive: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 5,
   },
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: '#4ade80',
+    backgroundColor: '#3b82f6',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   aiRecommendation: {
-    backgroundColor: '#e8f5e8',
+    backgroundColor: '#f0f9ff',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   aiScore: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#4ade80',
+    color: '#3b82f6',
   },
   aiReason: {
     fontSize: 12,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f5f5f5',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f5f5f5',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1001,
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
   },
   ingredientFill: {
     height: '100%',
-    backgroundColor: '#4ade80',
+    backgroundColor: '#3b82f6',
     borderRadius: 2,
   },
   benefitItem: {
@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
   },
   benefitIcon: {
     fontSize: 14,
-    color: '#4ade80',
+    color: '#3b82f6',
     marginRight: 8,
   },
   benefitText: {
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
   },
   clinicalBarFill: {
     height: '100%',
-    backgroundColor: '#4ade80',
+    backgroundColor: '#3b82f6',
     borderRadius: 3,
   },
 });
