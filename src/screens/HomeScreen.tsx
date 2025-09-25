@@ -1,11 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../contexts/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const { user } = useAuth();
+
+  // Default user profile for demo
+  const defaultUser = {
+    name: 'Vadim Kus',
+    email: 'vadim@genosys.ae',
+    role: 'Professional Account',
+    company: 'Genosys Middle East FZ-LLC',
+    trainingCompleted: 8,
+    certifications: 3
+  };
+
+  const currentUser = user || defaultUser;
 
   const handleWhatsAppContact = async () => {
     const phoneNumber = '971585487665';
@@ -29,8 +43,9 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={styles.greeting}>Hello, Welcome</Text>
+          <Text style={styles.greeting}>Hello, {currentUser.name}</Text>
           <Text style={styles.subtitle}>Your premium skincare journey starts here!</Text>
+          <Text style={styles.userRole}>{currentUser.role}</Text>
         </View>
         <TouchableOpacity style={styles.menuButton}>
           <View style={styles.menuIcon}>
@@ -70,6 +85,35 @@ export default function HomeScreen() {
               <Text style={styles.infoValue}>2 days ago</Text>
             </View>
           </View>
+        </View>
+      </View>
+
+      {/* Profile Summary Card */}
+      <View style={styles.profileCard}>
+        <View style={styles.profileHeader}>
+          <View style={styles.profileIcon}>
+            <Text style={styles.profileEmoji}>👤</Text>
+          </View>
+          <View style={styles.profileContent}>
+            <Text style={styles.profileTitle}>Your Profile</Text>
+            <Text style={styles.profileSubtitle}>{currentUser.company}</Text>
+          </View>
+        </View>
+        <View style={styles.profileStats}>
+          <View style={styles.profileStat}>
+            <Text style={styles.profileStatNumber}>{currentUser.trainingCompleted}</Text>
+            <Text style={styles.profileStatLabel}>Training</Text>
+          </View>
+          <View style={styles.profileStat}>
+            <Text style={styles.profileStatNumber}>{currentUser.certifications}</Text>
+            <Text style={styles.profileStatLabel}>Certifications</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.profileButton}
+            onPress={() => navigation.navigate('Profile' as never)}
+          >
+            <Text style={styles.profileButtonText}>View Profile</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -191,6 +235,16 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.actionTitle}>My Orders</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Profile' as never)}
+          >
+            <View style={styles.actionIcon}>
+              <Text style={styles.actionEmoji}>👤</Text>
+            </View>
+            <Text style={styles.actionTitle}>My Profile</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -243,6 +297,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     fontWeight: '400',
+    marginBottom: 4,
+  },
+  userRole: {
+    fontSize: 12,
+    color: '#999999',
+    fontWeight: '500',
   },
   menuButton: {
     width: 40,
@@ -331,6 +391,80 @@ const styles = StyleSheet.create({
   },
   healthInfo: {
     flex: 1,
+  },
+  profileCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f9ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  profileEmoji: {
+    fontSize: 16,
+  },
+  profileContent: {
+    flex: 1,
+  },
+  profileTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  profileSubtitle: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  profileStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  profileStat: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  profileStatNumber: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  profileStatLabel: {
+    fontSize: 11,
+    color: '#666666',
+    fontWeight: '500',
+  },
+  profileButton: {
+    backgroundColor: '#f0f9ff',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginLeft: 16,
+  },
+  profileButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#3b82f6',
   },
   infoBox: {
     backgroundColor: '#ffffff',
