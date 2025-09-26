@@ -300,11 +300,8 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff',
+    color: '#000000',
     marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
