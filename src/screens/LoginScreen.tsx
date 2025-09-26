@@ -167,6 +167,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: height,
   },
   headerSection: {
     alignItems: 'center',
@@ -260,12 +263,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     marginHorizontal: 20,
     borderRadius: 20,
-    paddingVertical: 20,
+    paddingVertical: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
+    width: width - 40,
+    maxWidth: 400,
   },
   formTitle: {
     fontSize: 24,
