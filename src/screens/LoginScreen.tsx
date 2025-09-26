@@ -146,10 +146,10 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     position: 'absolute',
-    top: '10%',
-    left: '10%',
-    width: '80%',
-    height: '80%',
+    top: '5%',
+    left: '5%',
+    width: '90%',
+    height: '90%',
   },
   overlay: {
     position: 'absolute',
