@@ -63,19 +63,8 @@ export default function LoginScreen() {
             </View>
             <Text style={styles.brandName}>GENOSYS</Text>
           </View>
-          <Text style={styles.tagline}>World-First Microneedling Dedicated Brand</Text>
-          <Text style={styles.subtitle}>Professional skincare solutions for optimal results</Text>
         </View>
 
-        {/* Hero Image Section */}
-        <View style={styles.heroSection}>
-          <View style={styles.heroImageContainer}>
-            <View style={styles.heroImagePlaceholder}>
-              <Text style={styles.heroImageText}>Professional Skincare</Text>
-              <Text style={styles.heroImageSubtext}>Clinical-grade treatments</Text>
-            </View>
-          </View>
-        </View>
 
         {/* Login Form */}
         <View style={styles.formSection}>
@@ -151,59 +140,6 @@ export default function LoginScreen() {
           </View>
         </View>
 
-        {/* Professional Features */}
-        <View style={styles.featuresSection}>
-          <Text style={styles.featuresTitle}>Professional Features</Text>
-          <View style={styles.featuresGrid}>
-            <View style={styles.featureItem}>
-              <View style={styles.featureIcon}>
-                <Text style={styles.featureEmoji}>🧬</Text>
-              </View>
-              <Text style={styles.featureTitle}>Clinical Data</Text>
-              <Text style={styles.featureDescription}>Access to clinical research and efficacy data</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <View style={styles.featureIcon}>
-                <Text style={styles.featureEmoji}>📚</Text>
-              </View>
-              <Text style={styles.featureTitle}>Training Materials</Text>
-              <Text style={styles.featureDescription}>Professional training and certification programs</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <View style={styles.featureIcon}>
-                <Text style={styles.featureEmoji}>🔬</Text>
-              </View>
-              <Text style={styles.featureTitle}>Product Documentation</Text>
-              <Text style={styles.featureDescription}>Detailed product specifications and usage guides</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <View style={styles.featureIcon}>
-                <Text style={styles.featureEmoji}>💼</Text>
-              </View>
-              <Text style={styles.featureTitle}>Professional Support</Text>
-              <Text style={styles.featureDescription}>Dedicated support for professional users</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Contact Information */}
-        <View style={styles.contactSection}>
-          <Text style={styles.contactTitle}>Need Help?</Text>
-          <View style={styles.contactInfo}>
-            <View style={styles.contactItem}>
-              <Text style={styles.contactIcon}>📞</Text>
-              <Text style={styles.contactText}>+971 58 548 76 65</Text>
-            </View>
-            <View style={styles.contactItem}>
-              <Text style={styles.contactIcon}>✉️</Text>
-              <Text style={styles.contactText}>sales@genosys.ae</Text>
-            </View>
-            <View style={styles.contactItem}>
-              <Text style={styles.contactIcon}>🌐</Text>
-              <Text style={styles.contactText}>genosys.ae</Text>
-            </View>
-          </View>
-        </View>
 
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
