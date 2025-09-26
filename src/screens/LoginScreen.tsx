@@ -59,7 +59,6 @@ export default function LoginScreen() {
 
         {/* Login Form */}
         <View style={styles.formSection}>
-          <Text style={styles.formTitle}>Welcome Back</Text>
           <Text style={styles.formSubtitle}>Sign in to your professional account</Text>
 
           <View style={styles.form}>
