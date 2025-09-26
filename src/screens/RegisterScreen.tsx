@@ -84,9 +84,8 @@ export default function RegisterScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
-        {/* Register Form */}
-        <View style={styles.formSection}>
+          {/* Register Form */}
+          <View style={styles.formSection}>
           <Text style={styles.formTitle}>Create Account</Text>
           <Text style={styles.formSubtitle}>Join our professional community</Text>
 
@@ -224,8 +223,8 @@ export default function RegisterScreen() {
           </View>
         </View>
 
-        {/* Bottom Spacing */}
-        <View style={styles.bottomSpacing} />
+          {/* Bottom Spacing */}
+          <View style={styles.bottomSpacing} />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
