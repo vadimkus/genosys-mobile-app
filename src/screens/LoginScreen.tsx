@@ -346,17 +346,17 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 8,
+    paddingVertical: 10,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   loginButtonDisabled: {
     backgroundColor: '#cccccc',
   },
   loginButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
     color: '#ffffff',
   },
   divider: {
@@ -376,15 +376,15 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 8,
+    paddingVertical: 10,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
   registerButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
     color: '#1a1a1a',
   },
   featuresSection: {
