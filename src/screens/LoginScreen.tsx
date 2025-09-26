@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    opacity: 1.0,
+    opacity: 0.7,
   },
   overlay: {
     position: 'absolute',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   keyboardContainer: {
     flex: 1,
