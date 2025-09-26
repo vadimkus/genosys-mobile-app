@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   formSection: {
     paddingHorizontal: 20,
     marginBottom: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginHorizontal: 20,
     borderRadius: 20,
     paddingVertical: 30,
@@ -279,9 +279,12 @@ const styles = StyleSheet.create({
   },
   formSubtitle: {
     fontSize: 16,
-    color: '#666666',
+    color: '#ffffff',
     textAlign: 'center',
     marginBottom: 32,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   form: {
     backgroundColor: '#ffffff',
