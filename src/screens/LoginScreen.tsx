@@ -42,7 +42,7 @@ export default function LoginScreen() {
     <View style={styles.container}>
       {/* Background Image */}
       <Image 
-        source={require('../../images/login.png')} 
+        source={require('../../images/wall2.png')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />
