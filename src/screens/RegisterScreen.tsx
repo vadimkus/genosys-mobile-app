@@ -86,142 +86,142 @@ export default function RegisterScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Register Form */}
           <View style={styles.formSection}>
-          <Text style={styles.formTitle}>Create Account</Text>
-          <Text style={styles.formSubtitle}>Join our professional community</Text>
+            <Text style={styles.formTitle}>Create Account</Text>
+            <Text style={styles.formSubtitle}>Join our professional community</Text>
 
-          <View style={styles.form}>
-            {/* Name Fields */}
-            <View style={styles.nameRow}>
-              <View style={styles.nameField}>
-                <Text style={styles.inputLabel}>First Name</Text>
+            <View style={styles.form}>
+              {/* Name Fields */}
+              <View style={styles.nameRow}>
+                <View style={styles.nameField}>
+                  <Text style={styles.inputLabel}>First Name</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.firstName}
+                    onChangeText={(value) => handleInputChange('firstName', value)}
+                    placeholder="First name"
+                    placeholderTextColor="#999999"
+                    autoCapitalize="words"
+                  />
+                </View>
+                <View style={styles.nameField}>
+                  <Text style={styles.inputLabel}>Last Name</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.lastName}
+                    onChangeText={(value) => handleInputChange('lastName', value)}
+                    placeholder="Last name"
+                    placeholderTextColor="#999999"
+                    autoCapitalize="words"
+                  />
+                </View>
+              </View>
+
+              {/* Email */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email Address</Text>
                 <TextInput
                   style={styles.input}
-                  value={formData.firstName}
-                  onChangeText={(value) => handleInputChange('firstName', value)}
-                  placeholder="First name"
+                  value={formData.email}
+                  onChangeText={(value) => handleInputChange('email', value)}
+                  placeholder="Enter your email"
+                  placeholderTextColor="#999999"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              {/* Password Fields */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    value={formData.password}
+                    onChangeText={(value) => handleInputChange('password', value)}
+                    placeholder="Enter your password"
+                    placeholderTextColor="#999999"
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Confirm Password</Text>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    value={formData.confirmPassword}
+                    onChangeText={(value) => handleInputChange('confirmPassword', value)}
+                    placeholder="Confirm your password"
+                    placeholderTextColor="#999999"
+                    secureTextEntry={!showConfirmPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    <Text style={styles.eyeIcon}>{showConfirmPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Company */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Company (Optional)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.company}
+                  onChangeText={(value) => handleInputChange('company', value)}
+                  placeholder="Your company name"
                   placeholderTextColor="#999999"
                   autoCapitalize="words"
                 />
               </View>
-              <View style={styles.nameField}>
-                <Text style={styles.inputLabel}>Last Name</Text>
+
+              {/* Phone */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Phone (Optional)</Text>
                 <TextInput
                   style={styles.input}
-                  value={formData.lastName}
-                  onChangeText={(value) => handleInputChange('lastName', value)}
-                  placeholder="Last name"
+                  value={formData.phone}
+                  onChangeText={(value) => handleInputChange('phone', value)}
+                  placeholder="Your phone number"
                   placeholderTextColor="#999999"
-                  autoCapitalize="words"
+                  keyboardType="phone-pad"
                 />
               </View>
-            </View>
 
-            {/* Email */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email Address</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.email}
-                onChangeText={(value) => handleInputChange('email', value)}
-                placeholder="Enter your email"
-                placeholderTextColor="#999999"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            {/* Password Fields */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Password</Text>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  value={formData.password}
-                  onChangeText={(value) => handleInputChange('password', value)}
-                  placeholder="Enter your password"
-                  placeholderTextColor="#999999"
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity
-                  style={styles.eyeButton}
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Confirm Password</Text>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  value={formData.confirmPassword}
-                  onChangeText={(value) => handleInputChange('confirmPassword', value)}
-                  placeholder="Confirm your password"
-                  placeholderTextColor="#999999"
-                  secureTextEntry={!showConfirmPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity
-                  style={styles.eyeButton}
-                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  <Text style={styles.eyeIcon}>{showConfirmPassword ? '👁️' : '👁️‍🗨️'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Company */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Company (Optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.company}
-                onChangeText={(value) => handleInputChange('company', value)}
-                placeholder="Your company name"
-                placeholderTextColor="#999999"
-                autoCapitalize="words"
-              />
-            </View>
-
-            {/* Phone */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone (Optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.phone}
-                onChangeText={(value) => handleInputChange('phone', value)}
-                placeholder="Your phone number"
-                placeholderTextColor="#999999"
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            {/* Register Button */}
-            <TouchableOpacity 
-              style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
-              onPress={handleRegister}
-              disabled={isLoading}
-            >
-              <Text style={styles.registerButtonText}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Login Link */}
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Already have an account? </Text>
-              <TouchableOpacity onPress={handleLogin}>
-                <Text style={styles.loginLink}>Sign In</Text>
+              {/* Register Button */}
+              <TouchableOpacity 
+                style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
+                onPress={handleRegister}
+                disabled={isLoading}
+              >
+                <Text style={styles.registerButtonText}>
+                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                </Text>
               </TouchableOpacity>
+
+              {/* Login Link */}
+              <View style={styles.loginContainer}>
+                <Text style={styles.loginText}>Already have an account? </Text>
+                <TouchableOpacity onPress={handleLogin}>
+                  <Text style={styles.loginLink}>Sign In</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
 
           {/* Bottom Spacing */}
           <View style={styles.bottomSpacing} />
