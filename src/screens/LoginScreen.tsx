@@ -55,15 +55,6 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Header Section with Genosys Branding */}
-        <View style={styles.headerSection}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logoCircle}>
-              <Text style={styles.logoText}>G</Text>
-            </View>
-            <Text style={styles.brandName}>GENOSYS</Text>
-          </View>
-        </View>
 
 
         {/* Login Form */}
