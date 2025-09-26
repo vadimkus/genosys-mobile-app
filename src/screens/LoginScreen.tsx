@@ -55,7 +55,14 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
+        {/* Logo Section */}
+        <View style={styles.logoSection}>
+          <Image 
+            source={require('../../images/logo.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
         {/* Login Form */}
         <View style={styles.formSection}>
@@ -168,6 +175,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: height,
+  },
+  logoSection: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  logo: {
+    width: 120,
+    height: 60,
   },
   headerSection: {
     alignItems: 'center',
