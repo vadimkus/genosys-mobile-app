@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions, Image, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,6 +18,23 @@ export default function ProfileScreen() {
         { text: 'Sign Out', style: 'destructive', onPress: logout }
       ]
     );
+  };
+
+  const handleWhatsAppContact = async () => {
+    const phoneNumber = '971585487665';
+    const message = 'Hello! I\'m interested in Genosys products. Can you help me?';
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    
+    try {
+      const supported = await Linking.canOpenURL(whatsappUrl);
+      if (supported) {
+        await Linking.openURL(whatsappUrl);
+      } else {
+        await Linking.openURL(`tel:+${phoneNumber}`);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Cannot open WhatsApp. Please call us directly.');
+    }
   };
 
   // Default user profile for demo
@@ -167,6 +184,20 @@ export default function ProfileScreen() {
             <Text style={styles.menuSubtitle}>Get assistance</Text>
           </View>
           <Text style={styles.menuArrow}>›</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.whatsappButton}
+          onPress={handleWhatsAppContact}
+        >
+          <View style={styles.whatsappContent}>
+            <Text style={styles.whatsappIcon}>💬</Text>
+            <View style={styles.whatsappText}>
+              <Text style={styles.whatsappTitle}>WhatsApp Support</Text>
+              <Text style={styles.whatsappSubtitle}>+971 58 548 76 65</Text>
+            </View>
+            <Text style={styles.whatsappArrow}>›</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity 

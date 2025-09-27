@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, Alert, Dimensions, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
+import SimpleFooter from '../components/SimpleFooter';
 
 const { width } = Dimensions.get('window');
 
@@ -21,22 +22,6 @@ export default function HomeScreen() {
 
   const currentUser = user || defaultUser;
 
-  const handleWhatsAppContact = async () => {
-    const phoneNumber = '971585487665';
-    const message = 'Hello! I\'m interested in Genosys products. Can you help me?';
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    
-    try {
-      const supported = await Linking.canOpenURL(whatsappUrl);
-      if (supported) {
-        await Linking.openURL(whatsappUrl);
-      } else {
-        await Linking.openURL(`tel:+${phoneNumber}`);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Cannot open WhatsApp. Please call us directly.');
-    }
-  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -262,25 +247,9 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Contact Section */}
-      <View style={styles.contactSection}>
-        <TouchableOpacity 
-          style={styles.whatsappButton}
-          onPress={handleWhatsAppContact}
-        >
-          <View style={styles.whatsappContent}>
-            <Text style={styles.whatsappIcon}>💬</Text>
-            <View style={styles.whatsappText}>
-              <Text style={styles.whatsappTitle}>WhatsApp Support</Text>
-              <Text style={styles.whatsappSubtitle}>+971 58 548 76 65</Text>
-            </View>
-            <Text style={styles.whatsappArrow}>›</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
 
-      {/* Bottom Spacing */}
-      <View style={styles.bottomSpacing} />
+      {/* Footer */}
+      <SimpleFooter />
     </ScrollView>
   );
 }
@@ -297,6 +266,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   headerContent: {
     flex: 1,
@@ -304,27 +276,32 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: '#000000',
     marginBottom: 4,
+    fontFamily: 'Pretendard-SemiBold',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666666',
+    color: '#333333',
     fontWeight: '400',
     marginBottom: 4,
+    fontFamily: 'Pretendard-Regular',
   },
   userRole: {
     fontSize: 12,
-    color: '#999999',
+    color: '#666666',
     fontWeight: '500',
+    fontFamily: 'Pretendard-Medium',
   },
   menuButton: {
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
   },
   menuIcon: {
     width: 16,
@@ -336,50 +313,55 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#666666',
+    backgroundColor: '#333333',
     margin: 1,
   },
   healthCard: {
     backgroundColor: '#ffffff',
     marginHorizontal: 20,
     marginBottom: 16,
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   healthHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   healthTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#1a1a1a',
+    letterSpacing: -0.3,
   },
   healthIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f9ff',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f8fafc',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   scanIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#3b82f6',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#10b981',
     alignItems: 'center',
     justifyContent: 'center',
   },
   scanEmoji: {
-    fontSize: 12,
+    fontSize: 10,
   },
   healthContent: {
     flexDirection: 'row',
@@ -389,19 +371,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   metricBox: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#f8fafc',
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
   },
   metricLabel: {
     fontSize: 12,
-    color: '#ffffff',
+    color: '#64748b',
     marginBottom: 4,
+    fontWeight: '500',
   },
   metricValue: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#10b981',
+    letterSpacing: -0.5,
   },
   healthInfo: {
     flex: 1,
@@ -411,26 +398,30 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 16,
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   profileIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f9ff',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f8fafc',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   profileEmoji: {
     fontSize: 16,
@@ -439,69 +430,92 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1a1a1a',
     marginBottom: 2,
+    letterSpacing: -0.2,
   },
   profileSubtitle: {
     fontSize: 12,
-    color: '#666666',
+    color: '#64748b',
+    fontWeight: '500',
   },
   profileStats: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
   profileStat: {
     alignItems: 'center',
     flex: 1,
+    backgroundColor: '#f8fafc',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   profileStatNumber: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1a1a1a',
     marginBottom: 2,
+    letterSpacing: -0.3,
   },
   profileStatLabel: {
-    fontSize: 11,
-    color: '#666666',
-    fontWeight: '500',
+    fontSize: 10,
+    color: '#64748b',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   profileButton: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#10b981',
     borderRadius: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
-    marginLeft: 16,
+    marginLeft: 8,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    elevation: 1,
   },
   profileButtonText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   infoBox: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8fafc',
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
   },
   infoLabel: {
-    fontSize: 12,
-    color: '#666666',
-    marginBottom: 4,
+    fontSize: 11,
+    color: '#64748b',
+    marginBottom: 3,
+    fontWeight: '500',
   },
   infoValue: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: '#1e293b',
+    marginBottom: 4,
   },
   infoAction: {
-    fontSize: 12,
-    color: '#3b82f6',
-    marginTop: 4,
-    fontWeight: '500',
+    fontSize: 10,
+    color: '#10b981',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   routineCard: {
     backgroundColor: '#ffffff',
@@ -689,84 +703,53 @@ const styles = StyleSheet.create({
   },
   actionsSection: {
     paddingHorizontal: 20,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   actionsTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#1a1a1a',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   actionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 8,
   },
   actionCard: {
     width: (width - 56) / 2,
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 12,
+    padding: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   actionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f0f9ff',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f8fafc',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   actionEmoji: {
-    fontSize: 20,
+    fontSize: 14,
   },
   actionTitle: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '600',
     color: '#1a1a1a',
     textAlign: 'center',
-  },
-  contactSection: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  whatsappButton: {
-    backgroundColor: '#25d366',
-    borderRadius: 16,
-    padding: 20,
-  },
-  whatsappContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  whatsappIcon: {
-    fontSize: 24,
-    marginRight: 16,
-  },
-  whatsappText: {
-    flex: 1,
-  },
-  whatsappTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
-    marginBottom: 2,
-  },
-  whatsappSubtitle: {
-    fontSize: 14,
-    color: '#ffffff',
-    opacity: 0.9,
-  },
-  whatsappArrow: {
-    fontSize: 18,
-    color: '#ffffff',
-    fontWeight: '600',
+    lineHeight: 14,
   },
   bottomSpacing: {
     height: 30,

@@ -42,12 +42,13 @@ function AppNavigator() {
         initialRouteName={user ? "Home" : "Login"}
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#ef4444', // Primary red from website
+            backgroundColor: '#ffffff', // White background
           },
-          headerTintColor: '#fff',
+          headerTintColor: '#000000',
           headerTitleStyle: {
             fontWeight: 'bold',
             fontSize: 18,
+            color: '#000000',
           },
         }}
       >
@@ -102,6 +103,7 @@ function AppNavigator() {
           </>
         ) : (
           // Unauthenticated screens
+          <>
           <Stack.Screen 
             name="Login" 
             component={LoginScreen} 
@@ -110,14 +112,15 @@ function AppNavigator() {
               headerShown: false 
             }}
           />
-          <Stack.Screen 
-            name="Register" 
-            component={RegisterScreen} 
-            options={{ 
-              title: 'Create Account',
-              headerShown: false 
-            }}
-          />
+            <Stack.Screen 
+              name="Register" 
+              component={RegisterScreen} 
+              options={{ 
+                title: 'Create Account',
+                headerShown: false 
+              }}
+            />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

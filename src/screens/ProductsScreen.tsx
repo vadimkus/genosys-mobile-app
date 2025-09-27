@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, FlatList, Linking, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import SimpleFooter from '../components/SimpleFooter';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 40;
@@ -328,6 +329,9 @@ export default function ProductsScreen() {
 
       {/* Product Detail Modal */}
       {renderProductDetail()}
+
+      {/* Footer */}
+      <SimpleFooter />
     </View>
   );
 }
