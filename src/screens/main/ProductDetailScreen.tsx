@@ -14,6 +14,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { productService } from '../../services/productService';
 import { Product } from '../../types';
+import { useCart } from '../../contexts/CartContext';
 
 const { width } = Dimensions.get('window');
 
@@ -22,6 +23,7 @@ type ProductDetailScreenNavigationProp = StackNavigationProp<RootStackParamList>
 export default function ProductDetailScreen() {
   const route = useRoute();
   const navigation = useNavigation<ProductDetailScreenNavigationProp>();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -37,10 +39,14 @@ export default function ProductDetailScreen() {
 
   const handleAddToCart = () => {
     if (product) {
+      addToCart(product, quantity);
       Alert.alert(
         'Added to Cart',
         `${product.name} (${quantity} item${quantity > 1 ? 's' : ''}) has been added to your cart.`,
-        [{ text: 'OK' }]
+        [
+          { text: 'Continue Shopping', style: 'cancel' },
+          { text: 'View Cart', onPress: () => navigation.navigate('Cart') }
+        ]
       );
     }
   };

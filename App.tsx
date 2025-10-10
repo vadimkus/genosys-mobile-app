@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppNavigator from './src/navigation/AppNavigator';
 import { useStore } from './src/store/useStore';
+import { CartProvider } from './src/contexts/CartContext';
 
 export default function App() {
   const { isLoading, setLoading } = useStore();
@@ -38,8 +39,10 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <AppNavigator />
-        <StatusBar style="auto" />
+        <CartProvider>
+          <AppNavigator />
+          <StatusBar style="auto" />
+        </CartProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

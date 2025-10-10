@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../store/useStore';
+import { useCart } from '../contexts/CartContext';
 
 // Import screens (we'll create these next)
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -67,6 +68,9 @@ function AuthStackNavigator() {
 
 // Main Tab Navigator
 function MainTabNavigator() {
+  const { getTotalItems } = useCart();
+  const cartItemCount = getTotalItems();
+
   return (
     <MainTab.Navigator
       screenOptions={({ route }) => ({
@@ -85,6 +89,34 @@ function MainTabNavigator() {
             iconName = focused ? 'person' : 'person-outline';
           } else {
             iconName = 'help-outline';
+          }
+
+          if (route.name === 'Cart' && cartItemCount > 0) {
+            return (
+              <View style={{ position: 'relative' }}>
+                <Ionicons name={iconName} size={size} color={color} />
+                <View style={{
+                  position: 'absolute',
+                  right: -6,
+                  top: -3,
+                  backgroundColor: '#dc2626',
+                  borderRadius: 10,
+                  minWidth: 20,
+                  height: 20,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 4,
+                }}>
+                  <Text style={{
+                    color: 'white',
+                    fontSize: 12,
+                    fontWeight: 'bold',
+                  }}>
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </Text>
+                </View>
+              </View>
+            );
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
