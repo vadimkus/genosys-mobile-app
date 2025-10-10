@@ -152,12 +152,13 @@ class ApiService {
         try {
           // Add delay before each attempt
           if (retryCount > 0) {
-            const delay = 30000 + (retryCount * 30000); // 30s, 60s, 90s
+            const delay = 60000 + (retryCount * 60000); // 60s, 120s, 180s
             console.log(`API: Waiting ${delay/1000} seconds before retry ${retryCount}...`);
             await new Promise(resolve => setTimeout(resolve, delay));
           } else {
-            // Initial delay
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            // Initial delay - wait 30 seconds before first attempt
+            console.log('API: Waiting 30 seconds before first attempt...');
+            await new Promise(resolve => setTimeout(resolve, 30000));
           }
           
           console.log(`API: Login attempt ${retryCount + 1}/4`);
@@ -168,24 +169,49 @@ class ApiService {
           clearTimeout(timeout);
           
           // Handle the actual API response format
-          if (response.data && response.data.user && response.data.token) {
+          console.log('API: Full response object:', JSON.stringify(response, null, 2));
+          console.log('API: Response data type:', typeof response.data);
+          console.log('API: Response data keys:', Object.keys(response.data || {}));
+          
+          // Check if response has the expected structure
+          if (response.data && (response.data.user || response.data.data?.user) && (response.data.token || response.data.data?.token)) {
+            const user = response.data.user || response.data.data?.user;
+            const token = response.data.token || response.data.data?.token;
             console.log('API: Login successful, returning user data');
             resolve({
               success: true,
               data: {
-                user: response.data.user,
-                token: response.data.token
+                user,
+                token
               },
-              message: response.data.message
+              message: response.data.message || 'Login successful'
             });
             return;
+          }
+          
+          // Check if it's a successful response with different structure
+          if (response.status === 200 && response.data) {
+            console.log('API: 200 response but unexpected format, trying to parse...');
+            // Try to extract user and token from any structure
+            const user = response.data.user || response.data.data?.user || response.data;
+            const token = response.data.token || response.data.data?.token || response.data.access_token;
+            
+            if (user && token) {
+              console.log('API: Found user and token in alternative format');
+              resolve({
+                success: true,
+                data: { user, token },
+                message: 'Login successful'
+              });
+              return;
+            }
           }
           
           console.log('API: Invalid response format:', response.data);
           resolve({
             success: false,
             data: null,
-            error: 'Invalid response format'
+            error: `Invalid response format. Status: ${response.status}, Data: ${JSON.stringify(response.data)}`
           });
         } catch (error: any) {
           console.error('API: Login error:', error);
