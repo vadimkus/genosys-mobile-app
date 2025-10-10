@@ -8,9 +8,15 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useCart } from '../../contexts/CartContext';
 
+type CartScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+
 export default function CartScreen() {
+  const navigation = useNavigation<CartScreenNavigationProp>();
   const { items, removeFromCart, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCart();
 
   const handleRemoveItem = (productId: string, productName: string) => {
@@ -117,7 +123,10 @@ export default function CartScreen() {
           <Text style={styles.totalPrice}>AED {getTotalPrice().toFixed(2)}</Text>
         </View>
         
-        <TouchableOpacity style={styles.checkoutButton}>
+        <TouchableOpacity 
+          style={styles.checkoutButton}
+          onPress={() => navigation.navigate('Checkout')}
+        >
           <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
         </TouchableOpacity>
       </View>

@@ -66,6 +66,24 @@ function AuthStackNavigator() {
   );
 }
 
+// Main Stack Navigator for screens that need navigation
+function MainStackNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+      }}
+    >
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} />
+      <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+    </Stack.Navigator>
+  );
+}
+
 // Main Tab Navigator
 function MainTabNavigator() {
   const { getTotalItems } = useCart();
@@ -184,45 +202,7 @@ export default function AppNavigator() {
         }}
       >
         {isAuthenticated ? (
-          <>
-            <Stack.Screen name="Main" component={MainTabNavigator} />
-            <Stack.Screen 
-              name="ProductDetail" 
-              component={ProductDetailScreen}
-              options={{ 
-                headerShown: true,
-                title: 'Product Details',
-                headerBackTitle: 'Back'
-              }}
-            />
-            <Stack.Screen 
-              name="Checkout" 
-              component={CheckoutScreen}
-              options={{ 
-                headerShown: true,
-                title: 'Checkout',
-                headerBackTitle: 'Back'
-              }}
-            />
-            <Stack.Screen 
-              name="OrderDetail" 
-              component={OrderDetailScreen}
-              options={{ 
-                headerShown: true,
-                title: 'Order Details',
-                headerBackTitle: 'Back'
-              }}
-            />
-            <Stack.Screen 
-              name="Settings" 
-              component={SettingsScreen}
-              options={{ 
-                headerShown: true,
-                title: 'Settings',
-                headerBackTitle: 'Back'
-              }}
-            />
-          </>
+          <Stack.Screen name="Main" component={MainStackNavigator} />
         ) : (
           <Stack.Screen name="Auth" component={AuthStackNavigator} />
         )}
