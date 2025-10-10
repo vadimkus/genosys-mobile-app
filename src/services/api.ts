@@ -67,9 +67,11 @@ api.interceptors.response.use(
 // Global rate limiter to work across all instances
 class GlobalRateLimiter {
   private static lastRequestTime = 0;
-  private static readonly MIN_REQUEST_INTERVAL = 3000; // 3 seconds between requests
+  private static readonly MIN_REQUEST_INTERVAL = 10000; // 10 seconds between requests
   private static requestQueue: Array<() => Promise<any>> = [];
   private static isProcessingQueue = false;
+  private static retryCount = 0;
+  private static readonly MAX_RETRIES = 3;
 
   static async delayIfNeeded() {
     const now = Date.now();
@@ -114,6 +116,14 @@ class GlobalRateLimiter {
     this.requestQueue.push(request);
     this.processQueue();
   }
+
+  static resetRetryCount() {
+    this.retryCount = 0;
+  }
+
+  static getRetryCount() {
+    return this.retryCount;
+  }
 }
 
 // API Service Class
@@ -125,15 +135,28 @@ class ApiService {
     console.log('API: Credentials:', { email: credentials.email, password: '***' });
     
     return new Promise((resolve) => {
+      // Add timeout to prevent hanging
+      const timeout = setTimeout(() => {
+        console.log('API: Login timeout after 2 minutes');
+        resolve({
+          success: false,
+          data: null,
+          error: 'Login timeout. Please try again.'
+        });
+      }, 120000); // 2 minutes timeout
       const loginRequest = async () => {
         // Add initial delay to prevent immediate rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await GlobalRateLimiter.delayIfNeeded();
         
         try {
           const response = await api.post('/auth/login', credentials);
           console.log('API: Login response status:', response.status);
           console.log('API: Login response data:', response.data);
+          
+          // Reset retry count on success
+          GlobalRateLimiter.retryCount = 0;
+          clearTimeout(timeout);
           
           // Handle the actual API response format
           if (response.data && response.data.user && response.data.token) {
@@ -160,15 +183,32 @@ class ApiService {
           console.error('API: Error response:', error.response?.data);
           
           if (error.response?.status === 429) {
-            console.log('API: Rate limited, will retry in 10 seconds...');
-            // Retry after 10 seconds
+            GlobalRateLimiter.retryCount++;
+            console.log(`API: Rate limited, retry ${GlobalRateLimiter.retryCount}/${GlobalRateLimiter.MAX_RETRIES}`);
+            
+            if (GlobalRateLimiter.retryCount >= GlobalRateLimiter.MAX_RETRIES) {
+              console.log('API: Max retries reached, giving up');
+              clearTimeout(timeout);
+              resolve({
+                success: false,
+                data: null,
+                error: 'Too many requests. Please wait a few minutes and try again.'
+              });
+              return;
+            }
+            
+            // Exponential backoff: 15, 30, 45 seconds
+            const retryDelay = 15000 * GlobalRateLimiter.retryCount;
+            console.log(`API: Will retry in ${retryDelay/1000} seconds...`);
+            
             setTimeout(() => {
               GlobalRateLimiter.addToQueue(loginRequest);
-            }, 10000);
+            }, retryDelay);
             return;
           }
           
           if (error.response?.status === 401) {
+            clearTimeout(timeout);
             resolve({
               success: false,
               data: null,
@@ -177,6 +217,7 @@ class ApiService {
             return;
           }
           
+          clearTimeout(timeout);
           resolve({
             success: false,
             data: null,
