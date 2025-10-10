@@ -18,33 +18,11 @@ interface CategoryCarouselProps {
   onCategoryPress: (categoryName: string) => void;
 }
 
-const categoryIcons: { [key: string]: string } = {
-  'Skincare': '🧴',
-  'Hair Care': '💇',
-  'Makeup': '💄',
-  'Devices': '🔬',
-  'Anti-Aging': '✨',
-  'Beauty Tools': '🛠️',
-  'Face Care': '😊',
-  'Body Care': '🤲',
-  'Hair': '💇‍♀️',
-  'Cream': '🧴',
-  'Serum': '💧',
-  'Mask': '🎭',
-  'Cleanser': '🧼',
-  'Toner': '💦',
-  'Sunscreen': '☀️',
-  'Eye Care': '👁️',
-  'Lip Care': '💋',
-  'Nail Care': '💅',
-};
 
 export default function CategoryCarousel({ categories, onCategoryPress }: CategoryCarouselProps) {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const renderCategoryCard = (category: Category, index: number) => {
-    const icon = categoryIcons[category.name] || '🛍️';
-    
     return (
       <TouchableOpacity
         key={category.name}
@@ -54,9 +32,6 @@ export default function CategoryCarousel({ categories, onCategoryPress }: Catego
         ]}
         onPress={() => onCategoryPress(category.name)}
       >
-        <View style={styles.categoryIconContainer}>
-          <Text style={styles.categoryIcon}>{icon}</Text>
-        </View>
         <View style={styles.categoryInfo}>
           <Text style={styles.categoryName} numberOfLines={1}>
             {category.name}
@@ -72,7 +47,7 @@ export default function CategoryCarousel({ categories, onCategoryPress }: Catego
   if (categories.length === 0) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🛍️ Shop by Category</Text>
+        <Text style={styles.sectionTitle}>Category</Text>
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No categories available</Text>
         </View>
@@ -82,7 +57,7 @@ export default function CategoryCarousel({ categories, onCategoryPress }: Catego
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>🛍️ Shop by Category</Text>
+      <Text style={styles.sectionTitle}>Category</Text>
       
       <ScrollView
         ref={scrollViewRef}
@@ -122,18 +97,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
-  categoryIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  categoryIcon: {
-    fontSize: 24,
   },
   categoryInfo: {
     alignItems: 'center',
