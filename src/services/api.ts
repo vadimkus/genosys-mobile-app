@@ -134,6 +134,9 @@ class ApiService {
     console.log('API: Attempting login to:', `${API_BASE_URL}/auth/login`);
     console.log('API: Credentials:', { email: credentials.email, password: '***' });
     
+    // Reset retry count for new login attempt
+    GlobalRateLimiter.retryCount = 0;
+    
     return new Promise((resolve) => {
       // Add timeout to prevent hanging
       const timeout = setTimeout(() => {
@@ -144,18 +147,24 @@ class ApiService {
           error: 'Login timeout. Please try again.'
         });
       }, 120000); // 2 minutes timeout
-      const loginRequest = async () => {
-        // Add initial delay to prevent immediate rate limiting
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        await GlobalRateLimiter.delayIfNeeded();
-        
+      
+      const attemptLogin = async (retryCount: number = 0) => {
         try {
+          // Add delay before each attempt
+          if (retryCount > 0) {
+            const delay = 5000 + (retryCount * 10000); // 5s, 15s, 25s
+            console.log(`API: Waiting ${delay/1000} seconds before retry ${retryCount}...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+            // Initial delay
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          
+          console.log(`API: Login attempt ${retryCount + 1}/4`);
           const response = await api.post('/auth/login', credentials);
           console.log('API: Login response status:', response.status);
           console.log('API: Login response data:', response.data);
           
-          // Reset retry count on success
-          GlobalRateLimiter.retryCount = 0;
           clearTimeout(timeout);
           
           // Handle the actual API response format
@@ -183,10 +192,7 @@ class ApiService {
           console.error('API: Error response:', error.response?.data);
           
           if (error.response?.status === 429) {
-            GlobalRateLimiter.retryCount++;
-            console.log(`API: Rate limited, retry ${GlobalRateLimiter.retryCount}/${GlobalRateLimiter.MAX_RETRIES}`);
-            
-            if (GlobalRateLimiter.retryCount >= GlobalRateLimiter.MAX_RETRIES) {
+            if (retryCount >= 3) {
               console.log('API: Max retries reached, giving up');
               clearTimeout(timeout);
               resolve({
@@ -197,13 +203,8 @@ class ApiService {
               return;
             }
             
-            // Exponential backoff: 15, 30, 45 seconds
-            const retryDelay = 15000 * GlobalRateLimiter.retryCount;
-            console.log(`API: Will retry in ${retryDelay/1000} seconds...`);
-            
-            setTimeout(() => {
-              GlobalRateLimiter.addToQueue(loginRequest);
-            }, retryDelay);
+            console.log(`API: Rate limited, will retry in ${(5000 + ((retryCount + 1) * 10000))/1000} seconds...`);
+            attemptLogin(retryCount + 1);
             return;
           }
           
@@ -226,7 +227,7 @@ class ApiService {
         }
       };
       
-      GlobalRateLimiter.addToQueue(loginRequest);
+      attemptLogin();
     });
   }
 
