@@ -16,6 +16,8 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useStore } from '../../store/useStore';
 import { productService } from '../../services/productService';
 import { Product, Category } from '../../types';
+import ProductCarousel from '../../components/ProductCarousel';
+import CategoryCarousel from '../../components/CategoryCarousel';
 
 const { width } = Dimensions.get('window');
 
@@ -71,55 +73,6 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  const renderProductCard = (product: Product) => {
-    console.log('🎨 Rendering product card:', product.name);
-    return (
-      <TouchableOpacity 
-        key={product.id} 
-        style={styles.productCard}
-        onPress={() => navigation.navigate('ProductDetail', { productId: product.id })}
-      >
-      <View style={styles.productImageContainer}>
-        <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
-        {product.isOnSale && (
-          <View style={styles.saleBadge}>
-            <Text style={styles.saleText}>SALE</Text>
-          </View>
-        )}
-        {product.isNew && (
-          <View style={styles.newBadge}>
-            <Text style={styles.newText}>NEW</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.productInfo}>
-        <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-        <Text style={styles.productBrand}>{product.brand}</Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
-          {product.originalPrice && (
-            <Text style={styles.originalPrice}>${product.originalPrice.toFixed(2)}</Text>
-          )}
-        </View>
-        <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({product.reviewCount})</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-    );
-  };
-
-  const renderCategoryCard = (category: Category) => (
-    <TouchableOpacity 
-      key={category.name} 
-      style={styles.categoryCard}
-      onPress={() => navigation.navigate('Products', { category: category.name })}
-    >
-      <Text style={styles.categoryName}>{category.name}</Text>
-      <Text style={styles.categoryCount}>{category.count} items</Text>
-    </TouchableOpacity>
-  );
 
   if (loading) {
     return (
@@ -153,55 +106,35 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Featured Products */}
-      {featuredProducts.length > 0 && (
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>⭐ Featured Products</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Products', { featured: true })}>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-            {featuredProducts.map(renderProductCard)}
-          </ScrollView>
-        </View>
-      )}
-      
-      {/* Debug: Show product counts */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🔍 Debug Info</Text>
-        <Text style={styles.debugText}>Total Products: {products.length}</Text>
-        <Text style={styles.debugText}>Featured Products: {featuredProducts.length}</Text>
-        <Text style={styles.debugText}>New Products: {newProducts.length}</Text>
-        <Text style={styles.debugText}>Categories: {categories.length}</Text>
-        <Text style={styles.debugText}>Connected: {isConnected ? 'Yes' : 'No'}</Text>
-      </View>
+      {/* Categories Carousel */}
+      <CategoryCarousel
+        categories={categories}
+        onCategoryPress={(categoryName) => navigation.navigate('Products', { category: categoryName })}
+      />
 
-      {/* Categories */}
-      {categories.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🛍️ Shop by Category</Text>
-          <View style={styles.categoryGrid}>
-            {categories.map(renderCategoryCard)}
-          </View>
-        </View>
-      )}
+      {/* Featured Products Carousel */}
+      <ProductCarousel
+        products={featuredProducts}
+        title="⭐ Featured Products"
+        onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
+        onViewAllPress={() => navigation.navigate('Products', { featured: true })}
+      />
 
-      {/* New Products */}
-      {newProducts.length > 0 && (
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🆕 New Arrivals</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Products', { new: true })}>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-            {newProducts.map(renderProductCard)}
-          </ScrollView>
-        </View>
-      )}
+      {/* New Products Carousel */}
+      <ProductCarousel
+        products={newProducts}
+        title="🆕 New Arrivals"
+        onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
+        onViewAllPress={() => navigation.navigate('Products', { new: true })}
+      />
+
+      {/* All Products Carousel */}
+      <ProductCarousel
+        products={products.slice(0, 10)} // Show first 10 products
+        title="🛍️ All Products"
+        onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
+        onViewAllPress={() => navigation.navigate('Products')}
+      />
 
       {/* Quick Actions */}
       <View style={styles.section}>
@@ -324,132 +257,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#dc2626',
     fontWeight: '600',
-  },
-  horizontalScroll: {
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
-  },
-  productCard: {
-    width: 180,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    overflow: 'hidden',
-  },
-  productImageContainer: {
-    position: 'relative',
-  },
-  productImage: {
-    width: '100%',
-    height: 140,
-    backgroundColor: '#f3f4f6',
-  },
-  saleBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: '#dc2626',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  saleText: {
-    fontSize: 10,
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  newBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#10b981',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  newText: {
-    fontSize: 10,
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  productInfo: {
-    padding: 16,
-  },
-  productName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 4,
-    lineHeight: 20,
-  },
-  productBrand: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  productPrice: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#dc2626',
-  },
-  originalPrice: {
-    fontSize: 14,
-    color: '#9ca3af',
-    textDecorationLine: 'line-through',
-    marginLeft: 8,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rating: {
-    fontSize: 12,
-    color: '#f59e0b',
-    marginRight: 4,
-  },
-  reviewCount: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-  categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  categoryCard: {
-    width: '48%',
-    backgroundColor: '#ffffff',
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  categoryName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 4,
-  },
-  categoryCount: {
-    fontSize: 12,
-    color: '#6b7280',
   },
   quickActionsGrid: {
     flexDirection: 'row',

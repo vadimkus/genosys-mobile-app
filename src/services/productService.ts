@@ -57,9 +57,46 @@ export class ProductService {
       // If we got some data from API, use it
       if (products.length > 0 || featured.length > 0 || newProducts.length > 0 || categories.length > 0) {
         this.products = this.transformProducts(products);
-        this.featuredProducts = this.transformProducts(featured);
-        this.newProducts = this.transformProducts(newProducts);
-        this.categories = this.transformCategories(categories);
+        
+        // If we have products but no featured/new, create them from the main products
+        if (this.products.length > 0) {
+          if (featured.length === 0) {
+            // Create featured products from top-rated products
+            this.featuredProducts = this.products
+              .filter(p => p.averageRating >= 4.5)
+              .sort((a, b) => b.averageRating - a.averageRating)
+              .slice(0, 8);
+          } else {
+            this.featuredProducts = this.transformProducts(featured);
+          }
+          
+          if (newProducts.length === 0) {
+            // Create new products from recently created products
+            this.newProducts = this.products
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 6);
+          } else {
+            this.newProducts = this.transformProducts(newProducts);
+          }
+          
+          if (categories.length === 0) {
+            // Create categories from product categories
+            const categoryMap = new Map();
+            this.products.forEach(product => {
+              if (product.category) {
+                const count = categoryMap.get(product.category) || 0;
+                categoryMap.set(product.category, count + 1);
+              }
+            });
+            this.categories = Array.from(categoryMap.entries())
+              .map(([name, count]) => ({ name, count }))
+              .sort((a, b) => b.count - a.count)
+              .slice(0, 8);
+          } else {
+            this.categories = this.transformCategories(categories);
+          }
+        }
+        
         console.log(`✅ Loaded ${this.products.length} products, ${this.featuredProducts.length} featured, ${this.newProducts.length} new from API`);
       } else {
         // No data from API, use fallback
