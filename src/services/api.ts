@@ -134,9 +134,9 @@ class ApiService {
     console.log('🚀 NEW ULTRA CONSERVATIVE LOGIN STARTING for:', credentials.email);
     console.log('API: Base URL:', API_BASE_URL);
     
-    // ULTRA CONSERVATIVE: Wait 60 seconds before any request
-    console.log('⏰ ULTRA CONSERVATIVE: Waiting 60 seconds before making request to avoid rate limiting...');
-    await new Promise(resolve => setTimeout(resolve, 60000));
+    // CONSERVATIVE: Wait 5 seconds before any request (web login works in 5s)
+    console.log('⏰ CONSERVATIVE: Waiting 5 seconds before making request to avoid rate limiting...');
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     try {
       console.log('API: Making REAL API call to:', `${API_BASE_URL}/auth/login`);
@@ -166,10 +166,10 @@ class ApiService {
       console.error('API: Error response:', error.response?.data);
       
       if (error.response?.status === 429) {
-        console.log('API: Rate limited - waiting 2 minutes before retry...');
-        await new Promise(resolve => setTimeout(resolve, 120000)); // 2 minutes
+        console.log('API: Rate limited - waiting 10 seconds before retry...');
+        await new Promise(resolve => setTimeout(resolve, 10000)); // 10 seconds
         try {
-          console.log('API: Retrying after 2 minute wait...');
+          console.log('API: Retrying after 10 second wait...');
           const retryResponse = await api.post('/auth/login', credentials);
           if (retryResponse.data && retryResponse.data.success) {
             return {
