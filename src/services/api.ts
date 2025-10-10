@@ -67,11 +67,11 @@ api.interceptors.response.use(
 // Global rate limiter to work across all instances
 class GlobalRateLimiter {
   private static lastRequestTime = 0;
-  private static readonly MIN_REQUEST_INTERVAL = 10000; // 10 seconds between requests
+  private static readonly MIN_REQUEST_INTERVAL = 30000; // 30 seconds between requests (very conservative)
   private static requestQueue: Array<() => Promise<any>> = [];
   private static isProcessingQueue = false;
   private static retryCount = 0;
-  private static readonly MAX_RETRIES = 3;
+  private static readonly MAX_RETRIES = 2; // Reduced retries
 
   static async delayIfNeeded() {
     const now = Date.now();
@@ -129,15 +129,16 @@ class GlobalRateLimiter {
 // API Service Class
 class ApiService {
 
-  // Authentication - REAL DATABASE CONNECTION
+  // Authentication - REAL DATABASE CONNECTION with ULTRA CONSERVATIVE rate limiting
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
     console.log('API: REAL DATABASE LOGIN for:', credentials.email);
     console.log('API: Base URL:', API_BASE_URL);
     
+    // ULTRA CONSERVATIVE: Wait 60 seconds before any request
+    console.log('API: Waiting 60 seconds before making request to avoid rate limiting...');
+    await new Promise(resolve => setTimeout(resolve, 60000));
+    
     try {
-      // Use rate limiter to prevent too many requests
-      await GlobalRateLimiter.delayIfNeeded();
-      
       console.log('API: Making REAL API call to:', `${API_BASE_URL}/auth/login`);
       console.log('API: Credentials:', { email: credentials.email, password: '***' });
       
@@ -165,10 +166,10 @@ class ApiService {
       console.error('API: Error response:', error.response?.data);
       
       if (error.response?.status === 429) {
-        console.log('API: Rate limited, will retry in 10 seconds...');
-        // Wait and retry once
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        console.log('API: Rate limited - waiting 2 minutes before retry...');
+        await new Promise(resolve => setTimeout(resolve, 120000)); // 2 minutes
         try {
+          console.log('API: Retrying after 2 minute wait...');
           const retryResponse = await api.post('/auth/login', credentials);
           if (retryResponse.data && retryResponse.data.success) {
             return {
