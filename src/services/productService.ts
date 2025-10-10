@@ -237,21 +237,21 @@ export class ProductService {
     return dbProducts.map(product => {
       // Create a more reliable image URL based on product name
       const getImageUrl = (productName: string) => {
-        // Try to match known product names to actual images
+        // Use placeholder images that are guaranteed to work
         const name = productName.toLowerCase();
-        if (name.includes('hair-gentron')) return 'https://genosys.ae/images/products/hair-gentron.jpg';
-        if (name.includes('hairgen')) return 'https://genosys.ae/images/products/hairgen-booster.jpg';
-        if (name.includes('needle')) return 'https://genosys.ae/images/products/needle-pen.jpg';
-        if (name.includes('cushion')) return 'https://genosys.ae/images/products/bb-cushion.jpg';
-        if (name.includes('cream')) return 'https://genosys.ae/images/products/anti-aging-cream.jpg';
-        if (name.includes('mask')) return 'https://genosys.ae/images/products/collagen-mask.jpg';
-        if (name.includes('serum')) return 'https://genosys.ae/images/products/serum.jpg';
-        if (name.includes('toner')) return 'https://genosys.ae/images/products/toner.jpg';
-        if (name.includes('cleanser')) return 'https://genosys.ae/images/products/cleanser.jpg';
-        if (name.includes('device')) return 'https://genosys.ae/images/products/device.jpg';
+        if (name.includes('hair-gentron')) return 'https://picsum.photos/300/300?random=1';
+        if (name.includes('hairgen')) return 'https://picsum.photos/300/300?random=2';
+        if (name.includes('needle')) return 'https://picsum.photos/300/300?random=3';
+        if (name.includes('cushion')) return 'https://picsum.photos/300/300?random=4';
+        if (name.includes('cream')) return 'https://picsum.photos/300/300?random=5';
+        if (name.includes('mask')) return 'https://picsum.photos/300/300?random=6';
+        if (name.includes('serum')) return 'https://picsum.photos/300/300?random=7';
+        if (name.includes('toner')) return 'https://picsum.photos/300/300?random=8';
+        if (name.includes('cleanser')) return 'https://picsum.photos/300/300?random=9';
+        if (name.includes('device')) return 'https://picsum.photos/300/300?random=10';
         
-        // Fallback to a generic product image
-        return 'https://genosys.ae/images/products/genosys-product.jpg';
+        // Fallback to a generic placeholder image
+        return 'https://picsum.photos/300/300?random=11';
       };
 
       const finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);

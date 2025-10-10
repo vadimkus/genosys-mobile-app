@@ -57,7 +57,7 @@ export default function ProductCarousel({
     >
       <View style={styles.productImageContainer}>
         <Image 
-          source={{ uri: product.imageUrl || 'https://genosys.ae/images/products/genosys-product.jpg' }} 
+          source={{ uri: product.imageUrl || 'https://picsum.photos/300/300?random=0' }} 
           style={styles.productImage}
           resizeMode="cover"
           onError={(error) => {
