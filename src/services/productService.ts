@@ -234,16 +234,39 @@ export class ProductService {
   }
 
   private transformProducts(dbProducts: any[]): Product[] {
-    return dbProducts.map(product => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: parseFloat(product.price),
-      originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : undefined,
-      discountPercentage: product.discountPercentage ? parseInt(product.discountPercentage) : undefined,
-      imageUrl: product.imageUrl || product.imageUrls?.[0] || 'https://via.placeholder.com/300x300',
-      imageUrls: product.imageUrls || [product.imageUrl] || ['https://via.placeholder.com/300x300'],
-      category: product.category,
+    return dbProducts.map(product => {
+      // Create a more reliable image URL based on product name
+      const getImageUrl = (productName: string) => {
+        // Try to match known product names to actual images
+        const name = productName.toLowerCase();
+        if (name.includes('hair-gentron')) return 'https://genosys.ae/images/products/hair-gentron.jpg';
+        if (name.includes('hairgen')) return 'https://genosys.ae/images/products/hairgen-booster.jpg';
+        if (name.includes('needle')) return 'https://genosys.ae/images/products/needle-pen.jpg';
+        if (name.includes('cushion')) return 'https://genosys.ae/images/products/bb-cushion.jpg';
+        if (name.includes('cream')) return 'https://genosys.ae/images/products/anti-aging-cream.jpg';
+        if (name.includes('mask')) return 'https://genosys.ae/images/products/collagen-mask.jpg';
+        if (name.includes('serum')) return 'https://genosys.ae/images/products/serum.jpg';
+        if (name.includes('toner')) return 'https://genosys.ae/images/products/toner.jpg';
+        if (name.includes('cleanser')) return 'https://genosys.ae/images/products/cleanser.jpg';
+        if (name.includes('device')) return 'https://genosys.ae/images/products/device.jpg';
+        
+        // Fallback to a generic product image
+        return 'https://genosys.ae/images/products/genosys-product.jpg';
+      };
+
+      const finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
+      console.log(`🖼️ Product: ${product.name} -> Image: ${finalImageUrl}`);
+
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: parseFloat(product.price),
+        originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : undefined,
+        discountPercentage: product.discountPercentage ? parseInt(product.discountPercentage) : undefined,
+        imageUrl: finalImageUrl,
+        imageUrls: product.imageUrls || [product.imageUrl] || [finalImageUrl],
+        category: product.category,
       brand: product.brand,
       isActive: product.isActive,
       isFeatured: product.isFeatured,

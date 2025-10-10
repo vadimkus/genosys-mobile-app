@@ -57,9 +57,16 @@ export default function ProductCarousel({
     >
       <View style={styles.productImageContainer}>
         <Image 
-          source={{ uri: product.imageUrl || 'https://via.placeholder.com/300x300' }} 
+          source={{ uri: product.imageUrl || 'https://genosys.ae/images/products/genosys-product.jpg' }} 
           style={styles.productImage}
           resizeMode="cover"
+          onError={(error) => {
+            console.log(`❌ Image failed to load for ${product.name}: ${product.imageUrl}`);
+            console.log('Error:', error.nativeEvent.error);
+          }}
+          onLoad={() => {
+            console.log(`✅ Image loaded successfully for ${product.name}: ${product.imageUrl}`);
+          }}
         />
         {product.isOnSale && (
           <View style={styles.saleBadge}>
