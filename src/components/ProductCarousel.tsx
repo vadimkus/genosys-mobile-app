@@ -80,9 +80,9 @@ export default function ProductCarousel({
         <Text style={styles.productBrand}>{product.brand}</Text>
         
         <View style={styles.priceContainer}>
-          <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
+          <Text style={styles.productPrice}>AED {product.price.toFixed(2)}</Text>
           {product.originalPrice && product.originalPrice > product.price && (
-            <Text style={styles.originalPrice}>${product.originalPrice.toFixed(2)}</Text>
+            <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
           )}
         </View>
         
