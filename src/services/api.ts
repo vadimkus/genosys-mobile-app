@@ -129,35 +129,64 @@ class GlobalRateLimiter {
 // API Service Class
 class ApiService {
 
-  // Authentication - SIMPLIFIED VERSION
+  // Authentication - REAL DATABASE CONNECTION
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('API: Simple login for:', credentials.email);
+    console.log('API: Real login attempt for:', credentials.email);
     
-    // Simple mock login that works immediately
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log('API: Mock login successful');
-        resolve({
+    try {
+      // Use rate limiter to prevent too many requests
+      await GlobalRateLimiter.delayIfNeeded();
+      
+      console.log('API: Making real API call to:', `${API_BASE_URL}/auth/login`);
+      console.log('API: Credentials:', { email: credentials.email, password: '***' });
+      
+      const response = await api.post('/auth/login', credentials);
+      console.log('API: Login response received:', response.data);
+      
+      // Handle successful response
+      if (response.data && response.data.success) {
+        console.log('API: Login successful with real data');
+        return {
           success: true,
-          data: {
-            user: {
-              id: '1',
-              email: credentials.email,
-              firstName: 'Test',
-              lastName: 'User',
-              name: 'Test User',
-              phone: '+1234567890',
-              role: 'customer' as const,
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString()
-            },
-            token: 'mock-jwt-token-12345'
-          },
-          message: 'Login successful'
-        });
-      }, 1000); // 1 second delay to simulate network
-    });
+          data: response.data.data,
+          message: response.data.message || 'Login successful'
+        };
+      } else {
+        console.log('API: Login failed - invalid response format');
+        return {
+          success: false,
+          data: null,
+          error: 'Invalid response format'
+        };
+      }
+    } catch (error: any) {
+      console.error('API: Login error:', error);
+      console.error('API: Error response:', error.response?.data);
+      
+      if (error.response?.status === 429) {
+        console.log('API: Rate limited, will retry in 10 seconds...');
+        // Wait and retry once
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        try {
+          const retryResponse = await api.post('/auth/login', credentials);
+          if (retryResponse.data && retryResponse.data.success) {
+            return {
+              success: true,
+              data: retryResponse.data.data,
+              message: retryResponse.data.message || 'Login successful'
+            };
+          }
+        } catch (retryError) {
+          console.error('API: Retry failed:', retryError);
+        }
+      }
+      
+      return {
+        success: false,
+        data: null,
+        error: error.response?.data?.message || error.message || 'Login failed'
+      };
+    }
   }
 
   async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {
