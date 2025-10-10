@@ -71,8 +71,10 @@ export const useStore = create<StoreState>()(
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
+          console.log('Attempting login with:', { email, password: '***' });
           const response = await apiService.login({ email, password });
-          if (response.success) {
+          console.log('Login response:', response);
+          if (response.success && response.data) {
             const { user, token } = response.data;
             await AsyncStorage.setItem('authToken', token);
             set({ 
@@ -81,13 +83,22 @@ export const useStore = create<StoreState>()(
               isLoading: false, 
               error: null 
             });
+            console.log('Login successful, user:', user);
             return true;
+          } else {
+            console.log('Login failed:', response.error || 'Unknown error');
+            set({ 
+              isLoading: false, 
+              error: response.error || 'Login failed' 
+            });
+            return false;
           }
-          return false;
         } catch (error: any) {
+          console.error('Login error:', error);
+          console.error('Error response:', error.response?.data);
           set({ 
             isLoading: false, 
-            error: error.response?.data?.message || 'Login failed' 
+            error: error.response?.data?.message || error.message || 'Login failed' 
           });
           return false;
         }
