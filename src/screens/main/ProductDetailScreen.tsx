@@ -125,90 +125,124 @@ export default function ProductDetailScreen() {
           )}
         </View>
 
-        {/* Special content for Collagen Mask */}
-        {isCollagenMask && (
-          <>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Product Description</Text>
-              <Text style={styles.description}>
-                INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration.
-              </Text>
-            </View>
+        {/* Comprehensive Product Information for All Products */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Product Description</Text>
+          <Text style={styles.description}>
+            {isCollagenMask 
+              ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
+              : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
+            }
+          </Text>
+        </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Product Details</Text>
-              <View style={styles.detailsList}>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional collagen sheet mask</Text>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1 Sheet (23g)</Text>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Intensive repair, deep hydration, anti-aging</Text>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature skin</Text>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 2-3 times per week</Text>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Hydrolyzed collagen delivery system</Text>
-                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
-              </View>
-            </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Product Details</Text>
+          <View style={styles.detailsList}>
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Brand:</Text> {product.brand}</Text>
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Category:</Text> {product.category}</Text>
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Stock:</Text> {product.stock} units available</Text>
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rating:</Text> {product.averageRating.toFixed(1)}/5.0 ({product.reviewCount} reviews)</Text>
+            {product.isOnSale && (
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Discount:</Text> {product.discountPercentage}% off</Text>
+            )}
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Yes</Text>
+          </View>
+        </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Key Features</Text>
-              <View style={styles.featuresList}>
-                <Text style={styles.featureItem}>• Professional-Grade Quality</Text>
-                <Text style={styles.featureItem}>• Dermatologically Tested</Text>
-                <Text style={styles.featureItem}>• Long-Lasting Results</Text>
-                <Text style={styles.featureItem}>• Safe for All Skin Types</Text>
-              </View>
-            </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+          <View style={styles.featuresList}>
+            <Text style={styles.featureItem}>• Professional-Grade Quality</Text>
+            <Text style={styles.featureItem}>• Dermatologically Tested</Text>
+            <Text style={styles.featureItem}>• Korean Skincare Technology</Text>
+            <Text style={styles.featureItem}>• Safe for All Skin Types</Text>
+            <Text style={styles.featureItem}>• Clinically Proven Results</Text>
+            <Text style={styles.featureItem}>• Premium Ingredients</Text>
+          </View>
+        </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Benefits</Text>
-              <View style={styles.benefitsList}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Benefits</Text>
+          <View style={styles.benefitsList}>
+            {isCollagenMask ? (
+              <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides deep moisture for soft, supple skin</Text>
                 <Text style={styles.benefitItem}>• Enhanced Elasticity - Boosts collagen production for improved skin firmness</Text>
                 <Text style={styles.benefitItem}>• Reduces Fine Lines - Diminishes appearance of wrinkles for youthful complexion</Text>
                 <Text style={styles.benefitItem}>• Skin Brightening - Enhances radiance and evens skin tone</Text>
                 <Text style={styles.benefitItem}>• Deep Nourishment - Delivers essential nutrients for skin health</Text>
                 <Text style={styles.benefitItem}>• Anti-Aging Properties - Combats signs of aging for younger-looking skin</Text>
-              </View>
-            </View>
+              </>
+            ) : (
+              <>
+                <Text style={styles.benefitItem}>• Advanced Skincare Technology - Utilizes cutting-edge Korean skincare innovations</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers salon-quality results at home</Text>
+                <Text style={styles.benefitItem}>• Skin Health Improvement - Promotes overall skin health and vitality</Text>
+                <Text style={styles.benefitItem}>• Premium Ingredients - Contains high-quality, carefully selected ingredients</Text>
+                <Text style={styles.benefitItem}>• Dermatologist Recommended - Trusted by skincare professionals worldwide</Text>
+                <Text style={styles.benefitItem}>• Long-lasting Effects - Provides sustained benefits for improved skin appearance</Text>
+              </>
+            )}
+          </View>
+        </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Key Ingredients</Text>
-              <View style={styles.ingredientsList}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Ingredients</Text>
+          <View style={styles.ingredientsList}>
+            {isCollagenMask ? (
+              <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that attracts and retains moisture.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Vitamin E:</Text> Antioxidant that protects skin from environmental damage.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Seaweed Extract:</Text> Rich in minerals and vitamins for skin nourishment.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Argan Oil:</Text> Moisturizes and softens skin with essential fatty acids.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Shea Butter:</Text> Natural emollient that soothes and hydrates skin.</Text>
-              </View>
-            </View>
+              </>
+            ) : (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Advanced Peptides:</Text> Stimulate collagen production for firmer, younger-looking skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Provides intense hydration and plumps skin for a youthful appearance.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Vitamin C:</Text> Powerful antioxidant that brightens skin and reduces signs of aging.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Niacinamide:</Text> Improves skin texture and reduces the appearance of pores.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramides:</Text> Strengthen skin barrier and lock in moisture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Plant Extracts:</Text> Natural botanicals that soothe and nourish the skin.</Text>
+              </>
+            )}
+          </View>
+        </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>How to Use</Text>
-              <View style={styles.usageList}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>How to Use</Text>
+          <View style={styles.usageList}>
+            {isCollagenMask ? (
+              <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Remove mask from package and unfold carefully</Text>
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Placement:</Text> Apply mask to face, adjusting for proper fit</Text>
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 15-20 minutes for optimal results</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Gently remove mask and massage remaining essence into skin</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for best results</Text>
-              </View>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.noteText}>
-                <Text style={styles.noteLabel}>Note:</Text> This product is dermatologically tested and clinically proven to improve skin hydration. For best results, use consistently as part of your weekly skincare routine. Store in a cool, dry place away from direct sunlight.
-              </Text>
-            </View>
-          </>
-        )}
-
-        {/* General product description for other products */}
-        {!isCollagenMask && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{product.description}</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly with a gentle cleanser</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to clean, dry skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage into skin using upward circular motions</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Absorption:</Text> Allow product to fully absorb into the skin</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Follow-up:</Text> Apply your regular moisturizer and sunscreen</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use daily for best results, morning and/or evening</Text>
+              </>
+            )}
           </View>
-        )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.noteText}>
+            <Text style={styles.noteLabel}>Note:</Text> This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist.
+          </Text>
+        </View>
 
         {/* Add to Cart Section */}
         <View style={styles.cartSection}>
