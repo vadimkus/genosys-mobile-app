@@ -112,114 +112,114 @@ export class ProductService {
   private async loadFallbackData(): Promise<void> {
     console.log('🏠 Loading fallback product data...');
     
-    // Fallback data for when API is not available
-    this.products = [
-      {
-        id: '1',
-        name: 'Genosys Anti-Aging Cream',
-        description: 'Premium anti-aging cream with advanced peptides and Korean skincare technology',
-        price: 89.99,
-        originalPrice: 129.99,
-        discountPercentage: 31,
-        imageUrl: 'https://genosys.ae/images/products/anti-aging-cream.jpg',
-        imageUrls: ['https://genosys.ae/images/products/anti-aging-cream.jpg'],
-        category: 'Skincare',
-        brand: 'Genosys',
-        isActive: true,
-        isFeatured: true,
-        isNew: false,
-        isOnSale: true,
-        stock: 50,
-        averageRating: 4.8,
-        reviewCount: 127,
-        createdAt: '2024-01-15T10:00:00.000Z',
-        updatedAt: '2024-01-15T10:00:00.000Z'
-      },
-      {
-        id: '2',
-        name: 'Hair Growth Serum',
-        description: 'Revolutionary hair growth serum with natural ingredients and advanced technology',
-        price: 149.99,
-        originalPrice: 199.99,
-        discountPercentage: 25,
-        imageUrl: 'https://genosys.ae/images/products/hair-serum.jpg',
-        imageUrls: ['https://genosys.ae/images/products/hair-serum.jpg'],
-        category: 'Hair Care',
-        brand: 'Genosys',
-        isActive: true,
-        isFeatured: true,
-        isNew: true,
-        isOnSale: true,
-        stock: 30,
-        averageRating: 4.9,
-        reviewCount: 89,
-        createdAt: '2024-01-20T10:00:00.000Z',
-        updatedAt: '2024-01-20T10:00:00.000Z'
-      },
-      {
-        id: '3',
-        name: 'Skin Care Blemish Balm Cushion',
-        description: 'Premium BB cushion with skin caring properties and natural coverage',
-        price: 79.99,
-        originalPrice: 99.99,
-        discountPercentage: 20,
-        imageUrl: 'https://genosys.ae/images/products/bb-cushion.jpg',
-        imageUrls: ['https://genosys.ae/images/products/bb-cushion.jpg'],
-        category: 'Makeup',
-        brand: 'Genosys',
-        isActive: true,
-        isFeatured: false,
-        isNew: true,
-        isOnSale: true,
-        stock: 25,
-        averageRating: 4.7,
-        reviewCount: 156,
-        createdAt: '2024-01-25T10:00:00.000Z',
-        updatedAt: '2024-01-25T10:00:00.000Z'
-      },
-      {
-        id: '4',
-        name: 'Hair-GENTRON Device',
-        description: 'Advanced hair growth device with red and blue light therapy',
-        price: 299.99,
-        originalPrice: 399.99,
-        discountPercentage: 25,
-        imageUrl: 'https://genosys.ae/images/products/hair-gentron.jpg',
-        imageUrls: ['https://genosys.ae/images/products/hair-gentron.jpg'],
-        category: 'Devices',
-        brand: 'Genosys',
-        isActive: true,
-        isFeatured: true,
-        isNew: false,
-        isOnSale: true,
-        stock: 15,
-        averageRating: 4.6,
-        reviewCount: 78,
-        createdAt: '2024-01-10T10:00:00.000Z',
-        updatedAt: '2024-01-10T10:00:00.000Z'
-      },
-      {
-        id: '5',
-        name: 'ND Cell Anti-Wrinkle Cream',
-        description: 'Advanced anti-wrinkle cream with ND Cell technology',
-        price: 119.99,
-        originalPrice: 149.99,
-        discountPercentage: 20,
-        imageUrl: 'https://genosys.ae/images/products/nd-cell-cream.jpg',
-        imageUrls: ['https://genosys.ae/images/products/nd-cell-cream.jpg'],
-        category: 'Skincare',
-        brand: 'Genosys',
-        isActive: true,
-        isFeatured: false,
-        isNew: true,
-        isOnSale: true,
-        stock: 40,
-        averageRating: 4.5,
-        reviewCount: 92,
-        createdAt: '2024-01-30T10:00:00.000Z',
-        updatedAt: '2024-01-30T10:00:00.000Z'
-      }
-    ];
+        // Fallback data for when API is not available
+        this.products = [
+          {
+            id: '1',
+            name: 'Genosys Anti-Aging Cream',
+            description: 'Premium anti-aging cream with advanced peptides and Korean skincare technology',
+            price: 89.99,
+            originalPrice: 129.99,
+            discountPercentage: 31,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fanti-wrinkle-cream.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fanti-wrinkle-cream.png&w=1200&q=75'],
+            category: 'Skincare',
+            brand: 'Genosys',
+            isActive: true,
+            isFeatured: true,
+            isNew: false,
+            isOnSale: true,
+            stock: 50,
+            averageRating: 4.8,
+            reviewCount: 127,
+            createdAt: '2024-01-15T10:00:00.000Z',
+            updatedAt: '2024-01-15T10:00:00.000Z'
+          },
+          {
+            id: '2',
+            name: 'Hair Growth Serum',
+            description: 'Revolutionary hair growth serum with natural ingredients and advanced technology',
+            price: 149.99,
+            originalPrice: 199.99,
+            discountPercentage: 25,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fhair%2Fhair-care.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fhair%2Fhair-care.png&w=1200&q=75'],
+            category: 'Hair Care',
+            brand: 'Genosys',
+            isActive: true,
+            isFeatured: true,
+            isNew: true,
+            isOnSale: true,
+            stock: 30,
+            averageRating: 4.9,
+            reviewCount: 89,
+            createdAt: '2024-01-20T10:00:00.000Z',
+            updatedAt: '2024-01-20T10:00:00.000Z'
+          },
+          {
+            id: '3',
+            name: 'Skin Care Blemish Balm Cushion',
+            description: 'Premium BB cushion with skin caring properties and natural coverage',
+            price: 79.99,
+            originalPrice: 99.99,
+            discountPercentage: 20,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fcushion%2Fblemish-balm-cushion.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fcushion%2Fblemish-balm-cushion.png&w=1200&q=75'],
+            category: 'Makeup',
+            brand: 'Genosys',
+            isActive: true,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: true,
+            stock: 25,
+            averageRating: 4.7,
+            reviewCount: 156,
+            createdAt: '2024-01-25T10:00:00.000Z',
+            updatedAt: '2024-01-25T10:00:00.000Z'
+          },
+          {
+            id: '4',
+            name: 'Hair-GENTRON Device',
+            description: 'Advanced hair growth device with red and blue light therapy',
+            price: 299.99,
+            originalPrice: 399.99,
+            discountPercentage: 25,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhair-gentron.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhair-gentron.png&w=1200&q=75'],
+            category: 'Devices',
+            brand: 'Genosys',
+            isActive: true,
+            isFeatured: true,
+            isNew: false,
+            isOnSale: true,
+            stock: 15,
+            averageRating: 4.6,
+            reviewCount: 78,
+            createdAt: '2024-01-10T10:00:00.000Z',
+            updatedAt: '2024-01-10T10:00:00.000Z'
+          },
+          {
+            id: '5',
+            name: 'ND Cell Anti-Wrinkle Cream',
+            description: 'Advanced anti-wrinkle cream with ND Cell technology',
+            price: 119.99,
+            originalPrice: 149.99,
+            discountPercentage: 20,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fnd-cell-cream.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fnd-cell-cream.png&w=1200&q=75'],
+            category: 'Skincare',
+            brand: 'Genosys',
+            isActive: true,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: true,
+            stock: 40,
+            averageRating: 4.5,
+            reviewCount: 92,
+            createdAt: '2024-01-30T10:00:00.000Z',
+            updatedAt: '2024-01-30T10:00:00.000Z'
+          }
+        ];
 
     this.featuredProducts = this.products.filter(p => p.isFeatured);
     this.newProducts = this.products.filter(p => p.isNew);
@@ -235,23 +235,30 @@ export class ProductService {
 
   private transformProducts(dbProducts: any[]): Product[] {
     return dbProducts.map(product => {
-      // Create a more reliable image URL based on product name
+      // Create actual product image URLs based on product name
       const getImageUrl = (productName: string) => {
-        // Use placeholder images that are guaranteed to work
         const name = productName.toLowerCase();
-        if (name.includes('hair-gentron')) return 'https://picsum.photos/300/300?random=1';
-        if (name.includes('hairgen')) return 'https://picsum.photos/300/300?random=2';
-        if (name.includes('needle')) return 'https://picsum.photos/300/300?random=3';
-        if (name.includes('cushion')) return 'https://picsum.photos/300/300?random=4';
-        if (name.includes('cream')) return 'https://picsum.photos/300/300?random=5';
-        if (name.includes('mask')) return 'https://picsum.photos/300/300?random=6';
-        if (name.includes('serum')) return 'https://picsum.photos/300/300?random=7';
-        if (name.includes('toner')) return 'https://picsum.photos/300/300?random=8';
-        if (name.includes('cleanser')) return 'https://picsum.photos/300/300?random=9';
-        if (name.includes('device')) return 'https://picsum.photos/300/300?random=10';
         
-        // Fallback to a generic placeholder image
-        return 'https://picsum.photos/300/300?random=11';
+        // Map product names to actual Genosys product images
+        if (name.includes('collagen mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('hair-gentron')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhair-gentron.png&w=1200&q=75';
+        if (name.includes('hairgen')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhairgen-booster.png&w=1200&q=75';
+        if (name.includes('needle')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fneedle-pen-k.png&w=1200&q=75';
+        if (name.includes('cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fcushion%2Fblemish-balm-cushion.png&w=1200&q=75';
+        if (name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fanti-wrinkle-cream.png&w=1200&q=75';
+        if (name.includes('mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fmask%2Fcollagen-mask.png&w=1200&q=75';
+        if (name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fserum%2Fanti-wrinkle-serum.png&w=1200&q=75';
+        if (name.includes('toner')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Ftoner%2Fproblem-control-toner.png&w=1200&q=75';
+        if (name.includes('cleanser')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fcleanser%2Fsnow-cleanser.png&w=1200&q=75';
+        if (name.includes('device')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fdevice.png&w=1200&q=75';
+        if (name.includes('hair')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fhair%2Fhair-care.png&w=1200&q=75';
+        if (name.includes('skin')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fskin%2Fskin-care.png&w=1200&q=75';
+        if (name.includes('eye')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Feye%2Feye-care.png&w=1200&q=75';
+        if (name.includes('sun')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fsun%2Fsun-cream.png&w=1200&q=75';
+        if (name.includes('power solution')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fpower%2Fpower-solution.png&w=1200&q=75';
+        
+        // Fallback to a generic Genosys product image
+        return 'https://genosys.ae/_next/image?url=%2Fimages%2Fproducts%2Fdefault.png&w=1200&q=75';
       };
 
       const finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
