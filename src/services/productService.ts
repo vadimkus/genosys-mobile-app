@@ -278,7 +278,7 @@ export class ProductService {
       createdAt: product.createdAt,
       updatedAt: product.updatedAt
     }));
-  }
+  };
 
   private transformCategories(dbCategories: any[]): Category[] {
     return dbCategories.map(cat => ({
