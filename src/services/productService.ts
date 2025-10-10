@@ -239,16 +239,20 @@ export class ProductService {
       const getImageUrl = (productName: string) => {
         const name = productName.toLowerCase();
         
-        // Specific product mappings for better visual representation
-        if (name.includes('intensive repair collagen mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('bio-ferment age defying powder mask') || name.includes('bfad')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBFAD.png&w=1200&q=75';
-        if (name.includes('genosys skin reboot pdrn mask pack')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75';
-        if (name.includes('eyecell eye zone care kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYEZ.jpg&w=1200&q=75';
-        if (name.includes('geno-led ir ii')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('hair-gentron')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+            // Specific product mappings for better visual representation
+            if (name.includes('intensive repair collagen mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+            if (name.includes('bio-ferment age defying powder mask') || name.includes('bfad')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBFAD.png&w=1200&q=75';
+            if (name.includes('genosys skin reboot pdrn mask pack')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75';
+            if (name.includes('eyecell eye zone care kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYEZ.jpg&w=1200&q=75';
+            if (name.includes('geno-led ir ii')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FLEDD.jpg&w=1200&q=75';
+            if (name.includes('hair-gentron')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fgen.jpg&w=1200&q=75';
         
         // Hair care products
-        if (name.includes('hr³ matrix') || name.includes('hair matrix')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('hr³ matrix hair solution') || name.includes('hair solution')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHHR.jpg&w=1200&q=75';
+        if (name.includes('hr³ matrix hair tonic') || name.includes('hair tonic')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHT.jpg&w=1200&q=75';
+        if (name.includes('hr³ matrix mesopecia kit') || name.includes('mesopecia kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fmeso.jpg&w=1200&q=75';
+        if (name.includes('hr³ matrix scalp peeling') || name.includes('scalp peeling')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fscal.jpg&w=1200&q=75';
+        if (name.includes('hr³ matrix scalp shampoo') || name.includes('scalp shampoo')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fscal.jpg&w=1200&q=75';
         if (name.includes('hairgen booster')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Skincare creams
@@ -274,7 +278,7 @@ export class ProductService {
         if (name.includes('skin rescue overnight cream mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Eye care
-        if (name.includes('eyecell eye peptide gel patch')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYEZ.jpg&w=1200&q=75';
+        if (name.includes('eyecell eye peptide gel patch')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPatch.jpg&w=1200&q=75';
         
         // Serums
         if (name.includes('multi functional') && name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';

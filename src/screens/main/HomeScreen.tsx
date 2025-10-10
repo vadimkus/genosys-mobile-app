@@ -130,7 +130,7 @@ export default function HomeScreen() {
 
       {/* All Products Carousel */}
       <ProductCarousel
-        products={products.slice(0, 10)} // Show first 10 products
+        products={products} // Show all products
         title="🛍️ All Products"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
         onViewAllPress={() => navigation.navigate('Products')}
