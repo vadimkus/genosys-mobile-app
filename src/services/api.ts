@@ -64,26 +64,54 @@ api.interceptors.response.use(
   }
 );
 
-// Global rate limiter to work across all instances
+// Professional Rate Limiter with Exponential Backoff and Jitter
 class GlobalRateLimiter {
   private static lastRequestTime = 0;
-  private static readonly MIN_REQUEST_INTERVAL = 30000; // 30 seconds between requests (very conservative)
+  private static readonly MIN_REQUEST_INTERVAL = 10000; // 10 seconds base interval
   private static requestQueue: Array<() => Promise<any>> = [];
   private static isProcessingQueue = false;
   private static retryCount = 0;
-  private static readonly MAX_RETRIES = 2; // Reduced retries
+  private static readonly MAX_RETRIES = 3;
+  private static circuitBreakerOpen = false;
+  private static circuitBreakerResetTime = 0;
+  private static readonly CIRCUIT_BREAKER_TIMEOUT = 300000; // 5 minutes
 
   static async delayIfNeeded() {
+    // Check circuit breaker
+    if (this.circuitBreakerOpen) {
+      const now = Date.now();
+      if (now - this.circuitBreakerResetTime > this.CIRCUIT_BREAKER_TIMEOUT) {
+        console.log('Circuit breaker: Attempting to reset...');
+        this.circuitBreakerOpen = false;
+      } else {
+        throw new Error('Circuit breaker is open - too many failed requests');
+      }
+    }
+
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
     
     if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
       const delay = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-      console.log(`Global Rate Limiter: waiting ${delay}ms`);
+      console.log(`Rate Limiter: waiting ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
     
     this.lastRequestTime = Date.now();
+  }
+
+  static openCircuitBreaker() {
+    this.circuitBreakerOpen = true;
+    this.circuitBreakerResetTime = Date.now();
+    console.log('Circuit breaker: OPEN - too many failed requests');
+  }
+
+  static calculateBackoffDelay(attempt: number): number {
+    // Exponential backoff with jitter: base * 2^attempt + random(0, 1000)
+    const baseDelay = 5000; // 5 seconds base
+    const exponentialDelay = baseDelay * Math.pow(2, attempt);
+    const jitter = Math.random() * 1000; // Random 0-1000ms
+    return Math.min(exponentialDelay + jitter, 60000); // Cap at 60 seconds
   }
 
   static async processQueue() {
@@ -129,66 +157,70 @@ class GlobalRateLimiter {
 // API Service Class
 class ApiService {
 
-  // Authentication - REAL DATABASE CONNECTION with ULTRA CONSERVATIVE rate limiting
+  // Authentication - PROFESSIONAL RATE LIMITING with Exponential Backoff
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('🚀 NEW ULTRA CONSERVATIVE LOGIN STARTING for:', credentials.email);
+    console.log('🔐 PROFESSIONAL LOGIN STARTING for:', credentials.email);
     console.log('API: Base URL:', API_BASE_URL);
     
-    // CONSERVATIVE: Wait 5 seconds before any request (web login works in 5s)
-    console.log('⏰ CONSERVATIVE: Waiting 5 seconds before making request to avoid rate limiting...');
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Use professional rate limiter
+    await GlobalRateLimiter.delayIfNeeded();
     
-    try {
-      console.log('API: Making REAL API call to:', `${API_BASE_URL}/auth/login`);
-      console.log('API: Credentials:', { email: credentials.email, password: '***' });
-      
-      const response = await api.post('/auth/login', credentials);
-      console.log('API: REAL Login response received:', response.data);
-      
-      // Handle successful response
-      if (response.data && response.data.success) {
-        console.log('API: Login successful with real data');
-        return {
-          success: true,
-          data: response.data.data,
-          message: response.data.message || 'Login successful'
-        };
-      } else {
-        console.log('API: Login failed - invalid response format');
-        return {
-          success: false,
-          data: null,
-          error: 'Invalid response format'
-        };
-      }
-    } catch (error: any) {
-      console.error('API: Login error:', error);
-      console.error('API: Error response:', error.response?.data);
-      
-      if (error.response?.status === 429) {
-        console.log('API: Rate limited - waiting 10 seconds before retry...');
-        await new Promise(resolve => setTimeout(resolve, 10000)); // 10 seconds
-        try {
-          console.log('API: Retrying after 10 second wait...');
-          const retryResponse = await api.post('/auth/login', credentials);
-          if (retryResponse.data && retryResponse.data.success) {
-            return {
-              success: true,
-              data: retryResponse.data.data,
-              message: retryResponse.data.message || 'Login successful'
-            };
+    let lastError: any = null;
+    
+    for (let attempt = 0; attempt <= GlobalRateLimiter.MAX_RETRIES; attempt++) {
+      try {
+        console.log(`🚀 Login attempt ${attempt + 1}/${GlobalRateLimiter.MAX_RETRIES + 1}`);
+        console.log('API: Making REAL API call to:', `${API_BASE_URL}/auth/login`);
+        
+        const response = await api.post('/auth/login', credentials);
+        console.log('API: Login response received:', response.data);
+        
+        // Handle successful response
+        if (response.data && response.data.success) {
+          console.log('✅ Login successful with real data');
+          GlobalRateLimiter.retryCount = 0; // Reset on success
+          return {
+            success: true,
+            data: response.data.data,
+            message: response.data.message || 'Login successful'
+          };
+        } else {
+          console.log('❌ Login failed - invalid response format');
+          return {
+            success: false,
+            data: null,
+            error: 'Invalid response format'
+          };
+        }
+      } catch (error: any) {
+        lastError = error;
+        console.error(`❌ Login attempt ${attempt + 1} failed:`, error.message);
+        
+        if (error.response?.status === 429) {
+          console.log('⏳ Rate limited (429) - implementing exponential backoff');
+          
+          if (attempt < GlobalRateLimiter.MAX_RETRIES) {
+            const backoffDelay = GlobalRateLimiter.calculateBackoffDelay(attempt);
+            console.log(`⏰ Waiting ${Math.round(backoffDelay / 1000)}s before retry...`);
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+          } else {
+            console.log('🚨 Max retries reached - opening circuit breaker');
+            GlobalRateLimiter.openCircuitBreaker();
           }
-        } catch (retryError) {
-          console.error('API: Retry failed:', retryError);
+        } else {
+          // Non-rate-limit error, don't retry
+          break;
         }
       }
-      
-      return {
-        success: false,
-        data: null,
-        error: error.response?.data?.message || error.message || 'Login failed'
-      };
     }
+    
+    // All attempts failed
+    console.log('💥 All login attempts failed');
+    return {
+      success: false,
+      data: null,
+      error: lastError?.response?.data?.message || lastError?.message || 'Login failed after multiple attempts'
+    };
   }
 
   async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {
