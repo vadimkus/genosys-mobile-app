@@ -81,8 +81,16 @@ export default function CheckoutScreen() {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Checkout</Text>
-        <Text style={styles.subtitle}>Complete your purchase</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>Checkout</Text>
+          <Text style={styles.subtitle}>Complete your purchase</Text>
+        </View>
       </View>
 
       {/* Order Summary */}
@@ -244,6 +252,23 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#374151',
+    fontWeight: '600',
+  },
+  headerContent: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
