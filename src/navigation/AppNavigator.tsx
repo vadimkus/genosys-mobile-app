@@ -203,8 +203,10 @@ export default function AppNavigator() {
         }}
       >
         {isAuthenticated ? (
-          <Stack.Screen name="Main" component={MainStackNavigator} />
-      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+          <>
+            <Stack.Screen name="Main" component={MainStackNavigator} />
+            <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+          </>
         ) : (
           <Stack.Screen name="Auth" component={AuthStackNavigator} />
         )}
