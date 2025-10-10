@@ -30,9 +30,9 @@ export const getProducts = async () => {
   try {
     console.log('📦 Fetching products from API...');
     const response = await dbApi.get('/products');
-    return response.data.data || [];
+    return response.data.data || response.data || [];
   } catch (error) {
-    console.error('❌ Error fetching products from API:', error);
+    console.log('⚠️ Products API not available, will use fallback data');
     throw error;
   }
 };
@@ -41,10 +41,11 @@ export const getProducts = async () => {
 export const getFeaturedProducts = async () => {
   try {
     console.log('⭐ Fetching featured products from API...');
+    // Try the featured endpoint first
     const response = await dbApi.get('/products/featured');
-    return response.data.data || [];
+    return response.data.data || response.data || [];
   } catch (error) {
-    console.error('❌ Error fetching featured products from API:', error);
+    console.log('⚠️ Featured products API not available, will use fallback data');
     throw error;
   }
 };
@@ -53,10 +54,11 @@ export const getFeaturedProducts = async () => {
 export const getNewProducts = async () => {
   try {
     console.log('🆕 Fetching new products from API...');
+    // Try the new products endpoint first
     const response = await dbApi.get('/products/new');
-    return response.data.data || [];
+    return response.data.data || response.data || [];
   } catch (error) {
-    console.error('❌ Error fetching new products from API:', error);
+    console.log('⚠️ New products API not available, will use fallback data');
     throw error;
   }
 };
@@ -65,10 +67,11 @@ export const getNewProducts = async () => {
 export const getCategories = async () => {
   try {
     console.log('🏷️ Fetching categories from API...');
+    // Try the categories endpoint first
     const response = await dbApi.get('/categories');
-    return response.data.data || [];
+    return response.data.data || response.data || [];
   } catch (error) {
-    console.error('❌ Error fetching categories from API:', error);
+    console.log('⚠️ Categories API not available, will use fallback data');
     throw error;
   }
 };

@@ -41,19 +41,31 @@ export class ProductService {
     try {
       console.log('📦 Loading products from API...');
       
-      const [products, featured, newProducts, categories] = await Promise.all([
-        getProducts(),
-        getFeaturedProducts(),
-        getNewProducts(),
-        getCategories()
+      // Try to load data from API, but don't fail if some endpoints don't exist
+      const [productsResult, featuredResult, newProductsResult, categoriesResult] = await Promise.allSettled([
+        getProducts().catch(() => []),
+        getFeaturedProducts().catch(() => []),
+        getNewProducts().catch(() => []),
+        getCategories().catch(() => [])
       ]);
 
-      this.products = this.transformProducts(products);
-      this.featuredProducts = this.transformProducts(featured);
-      this.newProducts = this.transformProducts(newProducts);
-      this.categories = this.transformCategories(categories);
+      const products = productsResult.status === 'fulfilled' ? productsResult.value : [];
+      const featured = featuredResult.status === 'fulfilled' ? featuredResult.value : [];
+      const newProducts = newProductsResult.status === 'fulfilled' ? newProductsResult.value : [];
+      const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
 
-      console.log(`✅ Loaded ${this.products.length} products, ${this.featuredProducts.length} featured, ${this.newProducts.length} new`);
+      // If we got some data from API, use it
+      if (products.length > 0 || featured.length > 0 || newProducts.length > 0 || categories.length > 0) {
+        this.products = this.transformProducts(products);
+        this.featuredProducts = this.transformProducts(featured);
+        this.newProducts = this.transformProducts(newProducts);
+        this.categories = this.transformCategories(categories);
+        console.log(`✅ Loaded ${this.products.length} products, ${this.featuredProducts.length} featured, ${this.newProducts.length} new from API`);
+      } else {
+        // No data from API, use fallback
+        console.log('⚠️ No data from API, using fallback data');
+        await this.loadFallbackData();
+      }
     } catch (error) {
       console.error('❌ Error loading data from API:', error);
       await this.loadFallbackData();
