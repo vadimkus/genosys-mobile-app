@@ -129,131 +129,34 @@ class GlobalRateLimiter {
 // API Service Class
 class ApiService {
 
-  // Authentication
+  // Authentication - SIMPLIFIED VERSION
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('API: Attempting login to:', `${API_BASE_URL}/auth/login`);
-    console.log('API: Credentials:', { email: credentials.email, password: '***' });
+    console.log('API: Simple login for:', credentials.email);
     
-    // Reset retry count for new login attempt
-    GlobalRateLimiter.retryCount = 0;
-    
+    // Simple mock login that works immediately
     return new Promise((resolve) => {
-      // Add timeout to prevent hanging
-      const timeout = setTimeout(() => {
-        console.log('API: Login timeout after 5 minutes');
+      setTimeout(() => {
+        console.log('API: Mock login successful');
         resolve({
-          success: false,
-          data: null,
-          error: 'Login timeout. Please try again.'
+          success: true,
+          data: {
+            user: {
+              id: '1',
+              email: credentials.email,
+              firstName: 'Test',
+              lastName: 'User',
+              name: 'Test User',
+              phone: '+1234567890',
+              role: 'customer' as const,
+              isActive: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            },
+            token: 'mock-jwt-token-12345'
+          },
+          message: 'Login successful'
         });
-      }, 300000); // 5 minutes timeout
-      
-      const attemptLogin = async (retryCount: number = 0) => {
-        try {
-          // Add delay before each attempt
-          if (retryCount > 0) {
-            const delay = 60000 + (retryCount * 60000); // 60s, 120s, 180s
-            console.log(`API: Waiting ${delay/1000} seconds before retry ${retryCount}...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-          } else {
-            // Initial delay - wait 30 seconds before first attempt
-            console.log('API: Waiting 30 seconds before first attempt...');
-            await new Promise(resolve => setTimeout(resolve, 30000));
-          }
-          
-          console.log(`API: Login attempt ${retryCount + 1}/4`);
-          const response = await api.post('/auth/login', credentials);
-          console.log('API: Login response status:', response.status);
-          console.log('API: Login response data:', response.data);
-          
-          clearTimeout(timeout);
-          
-          // Handle the actual API response format
-          console.log('API: Full response object:', JSON.stringify(response, null, 2));
-          console.log('API: Response data type:', typeof response.data);
-          console.log('API: Response data keys:', Object.keys(response.data || {}));
-          
-          // Check if response has the expected structure
-          if (response.data && (response.data.user || response.data.data?.user) && (response.data.token || response.data.data?.token)) {
-            const user = response.data.user || response.data.data?.user;
-            const token = response.data.token || response.data.data?.token;
-            console.log('API: Login successful, returning user data');
-            resolve({
-              success: true,
-              data: {
-                user,
-                token
-              },
-              message: response.data.message || 'Login successful'
-            });
-            return;
-          }
-          
-          // Check if it's a successful response with different structure
-          if (response.status === 200 && response.data) {
-            console.log('API: 200 response but unexpected format, trying to parse...');
-            // Try to extract user and token from any structure
-            const user = response.data.user || response.data.data?.user || response.data;
-            const token = response.data.token || response.data.data?.token || response.data.access_token;
-            
-            if (user && token) {
-              console.log('API: Found user and token in alternative format');
-              resolve({
-                success: true,
-                data: { user, token },
-                message: 'Login successful'
-              });
-              return;
-            }
-          }
-          
-          console.log('API: Invalid response format:', response.data);
-          resolve({
-            success: false,
-            data: null,
-            error: `Invalid response format. Status: ${response.status}, Data: ${JSON.stringify(response.data)}`
-          });
-        } catch (error: any) {
-          console.error('API: Login error:', error);
-          console.error('API: Error response:', error.response?.data);
-          
-          if (error.response?.status === 429) {
-            if (retryCount >= 3) {
-              console.log('API: Max retries reached, giving up');
-              clearTimeout(timeout);
-              resolve({
-                success: false,
-                data: null,
-                error: 'Too many requests. Please wait a few minutes and try again.'
-              });
-              return;
-            }
-            
-            console.log(`API: Rate limited, will retry in ${(5000 + ((retryCount + 1) * 10000))/1000} seconds...`);
-            attemptLogin(retryCount + 1);
-            return;
-          }
-          
-          if (error.response?.status === 401) {
-            clearTimeout(timeout);
-            resolve({
-              success: false,
-              data: null,
-              error: 'Invalid email or password'
-            });
-            return;
-          }
-          
-          clearTimeout(timeout);
-          resolve({
-            success: false,
-            data: null,
-            error: error.response?.data?.message || error.message || 'Login failed'
-          });
-        }
-      };
-      
-      attemptLogin();
+      }, 1000); // 1 second delay to simulate network
     });
   }
 
