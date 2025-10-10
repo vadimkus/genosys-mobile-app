@@ -261,7 +261,7 @@ export class ProductService {
         if (name.includes('skin barrier protecting cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('egf repair oxymask cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEGF.jpg&w=1200&q=75';
         if (name.includes('soothing repair postcream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('eyecell eye contour cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYEZ.jpg&w=1200&q=75';
+        if (name.includes('eyecell eye contour cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEC.jpg&w=1200&q=75';
         
         // Sun protection
         if (name.includes('sun cream') || name.includes('ultra shield')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
