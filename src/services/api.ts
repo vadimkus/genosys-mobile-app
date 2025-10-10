@@ -76,6 +76,7 @@ class ApiService {
     
     // Handle the actual API response format
     if (response.data && response.data.user && response.data.token) {
+      console.log('API: Login successful, returning user data');
       return {
         success: true,
         data: {
@@ -86,6 +87,7 @@ class ApiService {
       };
     }
     
+    console.log('API: Invalid response format:', response.data);
     return {
       success: false,
       data: null,

@@ -74,6 +74,8 @@ export const useStore = create<StoreState>()(
           console.log('Attempting login with:', { email, password: '***' });
           const response = await apiService.login({ email, password });
           console.log('Login response:', response);
+          console.log('Response success:', response.success);
+          console.log('Response data:', response.data);
           if (response.success && response.data) {
             const { user, token } = response.data;
             await AsyncStorage.setItem('authToken', token);
