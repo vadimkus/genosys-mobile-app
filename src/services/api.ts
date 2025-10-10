@@ -131,17 +131,18 @@ class ApiService {
 
   // Authentication - REAL DATABASE CONNECTION
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('API: Real login attempt for:', credentials.email);
+    console.log('API: REAL DATABASE LOGIN for:', credentials.email);
+    console.log('API: Base URL:', API_BASE_URL);
     
     try {
       // Use rate limiter to prevent too many requests
       await GlobalRateLimiter.delayIfNeeded();
       
-      console.log('API: Making real API call to:', `${API_BASE_URL}/auth/login`);
+      console.log('API: Making REAL API call to:', `${API_BASE_URL}/auth/login`);
       console.log('API: Credentials:', { email: credentials.email, password: '***' });
       
       const response = await api.post('/auth/login', credentials);
-      console.log('API: Login response received:', response.data);
+      console.log('API: REAL Login response received:', response.data);
       
       // Handle successful response
       if (response.data && response.data.success) {
