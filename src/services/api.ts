@@ -131,11 +131,11 @@ class ApiService {
 
   // Authentication - REAL DATABASE CONNECTION with ULTRA CONSERVATIVE rate limiting
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('API: REAL DATABASE LOGIN for:', credentials.email);
+    console.log('🚀 NEW ULTRA CONSERVATIVE LOGIN STARTING for:', credentials.email);
     console.log('API: Base URL:', API_BASE_URL);
     
     // ULTRA CONSERVATIVE: Wait 60 seconds before any request
-    console.log('API: Waiting 60 seconds before making request to avoid rate limiting...');
+    console.log('⏰ ULTRA CONSERVATIVE: Waiting 60 seconds before making request to avoid rate limiting...');
     await new Promise(resolve => setTimeout(resolve, 60000));
     
     try {
