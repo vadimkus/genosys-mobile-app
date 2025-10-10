@@ -64,27 +64,27 @@ api.interceptors.response.use(
   }
 );
 
-// API Service Class
-class ApiService {
-  private lastRequestTime = 0;
-  private readonly MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
-  private requestQueue: Array<() => Promise<any>> = [];
-  private isProcessingQueue = false;
+// Global rate limiter to work across all instances
+class GlobalRateLimiter {
+  private static lastRequestTime = 0;
+  private static readonly MIN_REQUEST_INTERVAL = 3000; // 3 seconds between requests
+  private static requestQueue: Array<() => Promise<any>> = [];
+  private static isProcessingQueue = false;
 
-  private async delayIfNeeded() {
+  static async delayIfNeeded() {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
     
     if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
       const delay = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-      console.log(`API: Rate limiting - waiting ${delay}ms`);
+      console.log(`Global Rate Limiter: waiting ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
     
     this.lastRequestTime = Date.now();
   }
 
-  private async processQueue() {
+  static async processQueue() {
     if (this.isProcessingQueue || this.requestQueue.length === 0) {
       return;
     }
@@ -97,7 +97,7 @@ class ApiService {
         try {
           await request();
         } catch (error) {
-          console.error('API: Queue processing error:', error);
+          console.error('Global Rate Limiter: Queue processing error:', error);
         }
       }
       
@@ -110,6 +110,15 @@ class ApiService {
     this.isProcessingQueue = false;
   }
 
+  static addToQueue(request: () => Promise<any>) {
+    this.requestQueue.push(request);
+    this.processQueue();
+  }
+}
+
+// API Service Class
+class ApiService {
+
   // Authentication
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
     console.log('API: Attempting login to:', `${API_BASE_URL}/auth/login`);
@@ -117,7 +126,9 @@ class ApiService {
     
     return new Promise((resolve) => {
       const loginRequest = async () => {
-        await this.delayIfNeeded();
+        // Add initial delay to prevent immediate rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await GlobalRateLimiter.delayIfNeeded();
         
         try {
           const response = await api.post('/auth/login', credentials);
@@ -149,12 +160,11 @@ class ApiService {
           console.error('API: Error response:', error.response?.data);
           
           if (error.response?.status === 429) {
-            console.log('API: Rate limited, will retry in 5 seconds...');
-            // Retry after 5 seconds
+            console.log('API: Rate limited, will retry in 10 seconds...');
+            // Retry after 10 seconds
             setTimeout(() => {
-              this.requestQueue.push(loginRequest);
-              this.processQueue();
-            }, 5000);
+              GlobalRateLimiter.addToQueue(loginRequest);
+            }, 10000);
             return;
           }
           
@@ -175,8 +185,7 @@ class ApiService {
         }
       };
       
-      this.requestQueue.push(loginRequest);
-      this.processQueue();
+      GlobalRateLimiter.addToQueue(loginRequest);
     });
   }
 
@@ -378,5 +387,13 @@ class ApiService {
 }
 
 // Export singleton instance
-export const apiService = new ApiService();
+// Create singleton API service instance
+let apiServiceInstance: ApiService | null = null;
+
+export const apiService = (() => {
+  if (!apiServiceInstance) {
+    apiServiceInstance = new ApiService();
+  }
+  return apiServiceInstance;
+})();
 export default apiService;
