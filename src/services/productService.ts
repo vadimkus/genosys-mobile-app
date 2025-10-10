@@ -267,18 +267,19 @@ export class ProductService {
         imageUrl: finalImageUrl,
         imageUrls: product.imageUrls || [product.imageUrl] || [finalImageUrl],
         category: product.category,
-      brand: product.brand,
-      isActive: product.isActive,
-      isFeatured: product.isFeatured,
-      isNew: product.isNew,
-      isOnSale: product.isOnSale,
-      stock: product.stock,
-      averageRating: product.averageRating ? parseFloat(product.averageRating) : 0,
-      reviewCount: product.reviewCount ? parseInt(product.reviewCount) : 0,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt
-    }));
-  };
+        brand: product.brand,
+        isActive: product.isActive,
+        isFeatured: product.isFeatured,
+        isNew: product.isNew,
+        isOnSale: product.isOnSale,
+        stock: product.stock,
+        averageRating: product.averageRating ? parseFloat(product.averageRating) : 0,
+        reviewCount: product.reviewCount ? parseInt(product.reviewCount) : 0,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      };
+    });
+  }
 
   private transformCategories(dbCategories: any[]): Category[] {
     return dbCategories.map(cat => ({
