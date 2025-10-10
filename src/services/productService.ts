@@ -71,10 +71,13 @@ export class ProductService {
           }
           
           if (newProducts.length === 0) {
-            // Create new products from recently created products
+            // Create new products - only specific products for new arrivals
             this.newProducts = this.products
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .slice(0, 6);
+              .filter(product => 
+                product.name.toLowerCase().includes('bio-ferment age defying powder mask') ||
+                product.name.toLowerCase().includes('genosys skin reboot pdrn mask pack')
+              );
+            console.log('⚠️ New products API not available, using specific new arrival products.');
           } else {
             this.newProducts = this.transformProducts(newProducts);
           }
@@ -222,7 +225,10 @@ export class ProductService {
         ];
 
     this.featuredProducts = this.products.filter(p => p.isFeatured);
-    this.newProducts = this.products.filter(p => p.isNew);
+    this.newProducts = this.products.filter(product => 
+      product.name.toLowerCase().includes('bio-ferment age defying powder mask') ||
+      product.name.toLowerCase().includes('genosys skin reboot pdrn mask pack')
+    );
     this.categories = [
       { name: 'Skincare', count: 15 },
       { name: 'Hair Care', count: 8 },
