@@ -44,12 +44,20 @@ export default function HomeScreen() {
       const connected = await productService.initialize();
       setIsConnected(connected);
       
-      setProducts(productService.getAllProducts());
-      setFeaturedProducts(productService.getFeaturedProducts());
-      setNewProducts(productService.getNewProducts());
-      setCategories(productService.getCategories());
+      const allProducts = productService.getAllProducts();
+      const featured = productService.getFeaturedProducts();
+      const newProducts = productService.getNewProducts();
+      const categories = productService.getCategories();
       
-      console.log(`✅ Loaded ${products.length} products, ${featuredProducts.length} featured`);
+      setProducts(allProducts);
+      setFeaturedProducts(featured);
+      setNewProducts(newProducts);
+      setCategories(categories);
+      
+      console.log(`✅ Loaded ${allProducts.length} products, ${featured.length} featured, ${newProducts.length} new`);
+      console.log('📦 All products:', allProducts.map(p => p.name));
+      console.log('⭐ Featured products:', featured.map(p => p.name));
+      console.log('🆕 New products:', newProducts.map(p => p.name));
     } catch (error) {
       console.error('❌ Error loading home data:', error);
     } finally {
@@ -63,12 +71,14 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  const renderProductCard = (product: Product) => (
-    <TouchableOpacity 
-      key={product.id} 
-      style={styles.productCard}
-      onPress={() => navigation.navigate('ProductDetail', { productId: product.id })}
-    >
+  const renderProductCard = (product: Product) => {
+    console.log('🎨 Rendering product card:', product.name);
+    return (
+      <TouchableOpacity 
+        key={product.id} 
+        style={styles.productCard}
+        onPress={() => navigation.navigate('ProductDetail', { productId: product.id })}
+      >
       <View style={styles.productImageContainer}>
         <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
         {product.isOnSale && (
@@ -97,7 +107,8 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableOpacity>
-  );
+    );
+  };
 
   const renderCategoryCard = (category: Category) => (
     <TouchableOpacity 
@@ -156,6 +167,16 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
       )}
+      
+      {/* Debug: Show product counts */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>🔍 Debug Info</Text>
+        <Text style={styles.debugText}>Total Products: {products.length}</Text>
+        <Text style={styles.debugText}>Featured Products: {featuredProducts.length}</Text>
+        <Text style={styles.debugText}>New Products: {newProducts.length}</Text>
+        <Text style={styles.debugText}>Categories: {categories.length}</Text>
+        <Text style={styles.debugText}>Connected: {isConnected ? 'Yes' : 'No'}</Text>
+      </View>
 
       {/* Categories */}
       {categories.length > 0 && (
@@ -457,5 +478,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1f2937',
     textAlign: 'center',
+  },
+  debugText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 4,
   },
 });
