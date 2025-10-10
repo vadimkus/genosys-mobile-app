@@ -30,8 +30,11 @@ export default function LoginScreen() {
       return;
     }
 
+    console.log('LoginScreen - Starting login process');
     clearError();
     const success = await login(email, password);
+    console.log('LoginScreen - Login result:', success);
+    console.log('LoginScreen - Current error:', error);
     
     if (!success && error) {
       Alert.alert('Login Failed', error);

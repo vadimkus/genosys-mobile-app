@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -122,13 +123,23 @@ function MainTabNavigator() {
   );
 }
 
+// Loading Screen Component
+function LoadingScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+      <Text style={{ fontSize: 18, color: '#dc2626' }}>Loading...</Text>
+    </View>
+  );
+}
+
 // Main App Navigator
 export default function AppNavigator() {
   const { isAuthenticated, isLoading } = useStore();
 
+  console.log('AppNavigator - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
+
   if (isLoading) {
-    // You can add a loading screen component here
-    return null;
+    return <LoadingScreen />;
   }
 
   return (
