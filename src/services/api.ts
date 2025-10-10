@@ -66,33 +66,79 @@ api.interceptors.response.use(
 
 // API Service Class
 class ApiService {
+  private lastRequestTime = 0;
+  private readonly MIN_REQUEST_INTERVAL = 1000; // 1 second between requests
+
+  private async delayIfNeeded() {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    
+    if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
+      const delay = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+      console.log(`API: Rate limiting - waiting ${delay}ms`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    this.lastRequestTime = Date.now();
+  }
+
   // Authentication
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
     console.log('API: Attempting login to:', `${API_BASE_URL}/auth/login`);
     console.log('API: Credentials:', { email: credentials.email, password: '***' });
-    const response = await api.post('/auth/login', credentials);
-    console.log('API: Login response status:', response.status);
-    console.log('API: Login response data:', response.data);
     
-    // Handle the actual API response format
-    if (response.data && response.data.user && response.data.token) {
-      console.log('API: Login successful, returning user data');
+    await this.delayIfNeeded();
+    
+    try {
+      const response = await api.post('/auth/login', credentials);
+      console.log('API: Login response status:', response.status);
+      console.log('API: Login response data:', response.data);
+      
+      // Handle the actual API response format
+      if (response.data && response.data.user && response.data.token) {
+        console.log('API: Login successful, returning user data');
+        return {
+          success: true,
+          data: {
+            user: response.data.user,
+            token: response.data.token
+          },
+          message: response.data.message
+        };
+      }
+      
+      console.log('API: Invalid response format:', response.data);
       return {
-        success: true,
-        data: {
-          user: response.data.user,
-          token: response.data.token
-        },
-        message: response.data.message
+        success: false,
+        data: null,
+        error: 'Invalid response format'
+      };
+    } catch (error: any) {
+      console.error('API: Login error:', error);
+      console.error('API: Error response:', error.response?.data);
+      
+      if (error.response?.status === 429) {
+        return {
+          success: false,
+          data: null,
+          error: 'Too many requests. Please wait a moment and try again.'
+        };
+      }
+      
+      if (error.response?.status === 401) {
+        return {
+          success: false,
+          data: null,
+          error: 'Invalid email or password'
+        };
+      }
+      
+      return {
+        success: false,
+        data: null,
+        error: error.response?.data?.message || error.message || 'Login failed'
       };
     }
-    
-    console.log('API: Invalid response format:', response.data);
-    return {
-      success: false,
-      data: null,
-      error: 'Invalid response format'
-    };
   }
 
   async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {
