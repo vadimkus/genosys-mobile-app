@@ -136,43 +136,6 @@ export default function HomeScreen() {
         onViewAllPress={() => navigation.navigate('Products')}
       />
 
-      {/* Quick Actions */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>⚡ Quick Actions</Text>
-        <View style={styles.quickActionsGrid}>
-          <TouchableOpacity 
-            style={styles.quickActionCard}
-            onPress={() => navigation.navigate('Cart')}
-          >
-            <Text style={styles.quickActionIcon}>🛒</Text>
-            <Text style={styles.quickActionText}>My Cart</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.quickActionCard}
-            onPress={() => navigation.navigate('Orders')}
-          >
-            <Text style={styles.quickActionIcon}>📦</Text>
-            <Text style={styles.quickActionText}>My Orders</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.quickActionCard}
-            onPress={() => navigation.navigate('Favorites')}
-          >
-            <Text style={styles.quickActionIcon}>❤️</Text>
-            <Text style={styles.quickActionText}>Favorites</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.quickActionCard}
-            onPress={() => navigation.navigate('Profile')}
-          >
-            <Text style={styles.quickActionIcon}>👤</Text>
-            <Text style={styles.quickActionText}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
     </ScrollView>
   );
 }
@@ -257,34 +220,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#dc2626',
     fontWeight: '600',
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  quickActionCard: {
-    width: '48%',
-    backgroundColor: '#ffffff',
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  quickActionIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  quickActionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
-    textAlign: 'center',
   },
   debugText: {
     fontSize: 14,
