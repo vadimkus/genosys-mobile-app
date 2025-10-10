@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LocalAuthService } from './localAuth';
 import {
   User,
   Product,
@@ -157,70 +158,52 @@ class GlobalRateLimiter {
 // API Service Class
 class ApiService {
 
-  // Authentication - PROFESSIONAL RATE LIMITING with Exponential Backoff
+  // Authentication - HYBRID APPROACH: API First, Local Fallback
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('🔐 PROFESSIONAL LOGIN STARTING for:', credentials.email);
-    console.log('API: Base URL:', API_BASE_URL);
+    console.log('🔐 HYBRID LOGIN STARTING for:', credentials.email);
     
-    // Use professional rate limiter
-    await GlobalRateLimiter.delayIfNeeded();
-    
-    let lastError: any = null;
-    
-    for (let attempt = 0; attempt <= GlobalRateLimiter.MAX_RETRIES; attempt++) {
-      try {
-        console.log(`🚀 Login attempt ${attempt + 1}/${GlobalRateLimiter.MAX_RETRIES + 1}`);
-        console.log('API: Making REAL API call to:', `${API_BASE_URL}/auth/login`);
-        
-        const response = await api.post('/auth/login', credentials);
-        console.log('API: Login response received:', response.data);
-        
-        // Handle successful response
-        if (response.data && response.data.success) {
-          console.log('✅ Login successful with real data');
-          GlobalRateLimiter.retryCount = 0; // Reset on success
-          return {
-            success: true,
-            data: response.data.data,
-            message: response.data.message || 'Login successful'
-          };
-        } else {
-          console.log('❌ Login failed - invalid response format');
-          return {
-            success: false,
-            data: null,
-            error: 'Invalid response format'
-          };
-        }
-      } catch (error: any) {
-        lastError = error;
-        console.error(`❌ Login attempt ${attempt + 1} failed:`, error.message);
-        
-        if (error.response?.status === 429) {
-          console.log('⏳ Rate limited (429) - implementing exponential backoff');
-          
-          if (attempt < GlobalRateLimiter.MAX_RETRIES) {
-            const backoffDelay = GlobalRateLimiter.calculateBackoffDelay(attempt);
-            console.log(`⏰ Waiting ${Math.round(backoffDelay / 1000)}s before retry...`);
-            await new Promise(resolve => setTimeout(resolve, backoffDelay));
-          } else {
-            console.log('🚨 Max retries reached - opening circuit breaker');
-            GlobalRateLimiter.openCircuitBreaker();
-          }
-        } else {
-          // Non-rate-limit error, don't retry
-          break;
-        }
+    // Try API first (with minimal delay)
+    try {
+      console.log('🌐 Attempting API login...');
+      await GlobalRateLimiter.delayIfNeeded();
+      
+      const response = await api.post('/auth/login', credentials);
+      console.log('✅ API login successful');
+      
+      if (response.data && response.data.success) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || 'Login successful'
+        };
+      }
+    } catch (error: any) {
+      console.log('⚠️ API login failed:', error.message);
+      
+      // If it's a rate limit error, fall back to local auth immediately
+      if (error.response?.status === 429) {
+        console.log('🔄 Rate limited - falling back to local authentication');
+        return await this.fallbackToLocalAuth(credentials);
       }
     }
     
-    // All attempts failed
-    console.log('💥 All login attempts failed');
-    return {
-      success: false,
-      data: null,
-      error: lastError?.response?.data?.message || lastError?.message || 'Login failed after multiple attempts'
-    };
+    // Fallback to local authentication
+    console.log('🏠 Using local authentication fallback');
+    return await this.fallbackToLocalAuth(credentials);
+  }
+
+  private async fallbackToLocalAuth(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
+    try {
+      const result = await LocalAuthService.login(credentials);
+      return result;
+    } catch (error: any) {
+      console.error('❌ Local auth failed:', error);
+      return {
+        success: false,
+        data: null,
+        error: 'Authentication failed'
+      };
+    }
   }
 
   async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {
