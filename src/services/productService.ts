@@ -121,8 +121,8 @@ export class ProductService {
             price: 89.99,
             originalPrice: 129.99,
             discountPercentage: 31,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fanti-wrinkle-cream.png&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fanti-wrinkle-cream.png&w=1200&q=75'],
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Skincare',
             brand: 'Genosys',
             isActive: true,
@@ -142,8 +142,8 @@ export class ProductService {
             price: 149.99,
             originalPrice: 199.99,
             discountPercentage: 25,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fhair%2Fhair-care.png&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fhair%2Fhair-care.png&w=1200&q=75'],
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Hair Care',
             brand: 'Genosys',
             isActive: true,
@@ -163,8 +163,8 @@ export class ProductService {
             price: 79.99,
             originalPrice: 99.99,
             discountPercentage: 20,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fcushion%2Fblemish-balm-cushion.png&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fcushion%2Fblemish-balm-cushion.png&w=1200&q=75'],
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Makeup',
             brand: 'Genosys',
             isActive: true,
@@ -184,8 +184,8 @@ export class ProductService {
             price: 299.99,
             originalPrice: 399.99,
             discountPercentage: 25,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhair-gentron.png&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhair-gentron.png&w=1200&q=75'],
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Devices',
             brand: 'Genosys',
             isActive: true,
@@ -205,8 +205,8 @@ export class ProductService {
             price: 119.99,
             originalPrice: 149.99,
             discountPercentage: 20,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fnd-cell-cream.png&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fnd-cell-cream.png&w=1200&q=75'],
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Skincare',
             brand: 'Genosys',
             isActive: true,
@@ -239,26 +239,27 @@ export class ProductService {
       const getImageUrl = (productName: string) => {
         const name = productName.toLowerCase();
         
-        // Map product names to actual Genosys product images
+        // Map product names to actual working Genosys product images
         if (name.includes('collagen mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('hair-gentron')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhair-gentron.png&w=1200&q=75';
-        if (name.includes('hairgen')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fhairgen-booster.png&w=1200&q=75';
-        if (name.includes('needle')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fneedle-pen-k.png&w=1200&q=75';
-        if (name.includes('cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fcushion%2Fblemish-balm-cushion.png&w=1200&q=75';
-        if (name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fcream%2Fanti-wrinkle-cream.png&w=1200&q=75';
-        if (name.includes('mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fmask%2Fcollagen-mask.png&w=1200&q=75';
-        if (name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fserum%2Fanti-wrinkle-serum.png&w=1200&q=75';
-        if (name.includes('toner')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Ftoner%2Fproblem-control-toner.png&w=1200&q=75';
-        if (name.includes('cleanser')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fcleanser%2Fsnow-cleanser.png&w=1200&q=75';
-        if (name.includes('device')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fdevices%2Fdevice.png&w=1200&q=75';
-        if (name.includes('hair')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fhair%2Fhair-care.png&w=1200&q=75';
-        if (name.includes('skin')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fskin%2Fskin-care.png&w=1200&q=75';
-        if (name.includes('eye')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Feye%2Feye-care.png&w=1200&q=75';
-        if (name.includes('sun')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fsun%2Fsun-cream.png&w=1200&q=75';
-        if (name.includes('power solution')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fpower%2Fpower-solution.png&w=1200&q=75';
+        if (name.includes('bio-ferment') || name.includes('bfad')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBFAD.png&w=1200&q=75';
+        if (name.includes('hair-gentron')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('hairgen')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('needle')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('toner')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('cleanser')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('device')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('hair')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('skin')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('eye')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('sun')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('power solution')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
-        // Fallback to a generic Genosys product image
-        return 'https://genosys.ae/_next/image?url=%2Fimages%2Fproducts%2Fdefault.png&w=1200&q=75';
+        // Use the working image as fallback for all products
+        return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
       };
 
       const finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
