@@ -1,164 +1,76 @@
-import { Pool } from 'pg';
+import axios from 'axios';
 
-// Database configuration
-const POSTGRES_URL = process.env.POSTGRES_URL || 'postgres://bba1d642802ecf0af6b89802617217c7ee4bd9e45a9df009f7fcc332176072e7:sk_-vf4T6G2TVhfLC4FwIJsi@db.prisma.io:5432/postgres?sslmode=require';
+// API Configuration
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://genosys.ae/api';
 
-// Create connection pool
-const pool = new Pool({
-  connectionString: POSTGRES_URL,
-  ssl: {
-    rejectUnauthorized: false
+// Create axios instance for database API calls
+const dbApi = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
   },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
 });
 
-// Test database connection
+// Test database connection via API
 export const testConnection = async (): Promise<boolean> => {
   try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT NOW()');
-    client.release();
-    console.log('✅ Database connected successfully:', result.rows[0]);
+    console.log('🔄 Testing database connection via API...');
+    const response = await dbApi.get('/health');
+    console.log('✅ Database API connected successfully:', response.data);
     return true;
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.log('⚠️ Database API not available, using fallback data');
     return false;
   }
 };
 
-// Get all products
+// Get all products via API
 export const getProducts = async () => {
   try {
-    const client = await pool.connect();
-    const result = await client.query(`
-      SELECT 
-        id,
-        name,
-        description,
-        price,
-        "originalPrice",
-        "discountPercentage",
-        "imageUrl",
-        "imageUrls",
-        category,
-        brand,
-        "isActive",
-        "isFeatured",
-        "isNew",
-        "isOnSale",
-        stock,
-        "averageRating",
-        "reviewCount",
-        "createdAt",
-        "updatedAt"
-      FROM "Product" 
-      WHERE "isActive" = true 
-      ORDER BY "createdAt" DESC
-    `);
-    client.release();
-    return result.rows;
+    console.log('📦 Fetching products from API...');
+    const response = await dbApi.get('/products');
+    return response.data.data || [];
   } catch (error) {
-    console.error('❌ Error fetching products:', error);
+    console.error('❌ Error fetching products from API:', error);
     throw error;
   }
 };
 
-// Get featured products
+// Get featured products via API
 export const getFeaturedProducts = async () => {
   try {
-    const client = await pool.connect();
-    const result = await client.query(`
-      SELECT 
-        id,
-        name,
-        description,
-        price,
-        "originalPrice",
-        "discountPercentage",
-        "imageUrl",
-        "imageUrls",
-        category,
-        brand,
-        "isActive",
-        "isFeatured",
-        "isNew",
-        "isOnSale",
-        stock,
-        "averageRating",
-        "reviewCount",
-        "createdAt",
-        "updatedAt"
-      FROM "Product" 
-      WHERE "isActive" = true AND "isFeatured" = true
-      ORDER BY "createdAt" DESC
-      LIMIT 8
-    `);
-    client.release();
-    return result.rows;
+    console.log('⭐ Fetching featured products from API...');
+    const response = await dbApi.get('/products/featured');
+    return response.data.data || [];
   } catch (error) {
-    console.error('❌ Error fetching featured products:', error);
+    console.error('❌ Error fetching featured products from API:', error);
     throw error;
   }
 };
 
-// Get new products
+// Get new products via API
 export const getNewProducts = async () => {
   try {
-    const client = await pool.connect();
-    const result = await client.query(`
-      SELECT 
-        id,
-        name,
-        description,
-        price,
-        "originalPrice",
-        "discountPercentage",
-        "imageUrl",
-        "imageUrls",
-        category,
-        brand,
-        "isActive",
-        "isFeatured",
-        "isNew",
-        "isOnSale",
-        stock,
-        "averageRating",
-        "reviewCount",
-        "createdAt",
-        "updatedAt"
-      FROM "Product" 
-      WHERE "isActive" = true AND "isNew" = true
-      ORDER BY "createdAt" DESC
-      LIMIT 6
-    `);
-    client.release();
-    return result.rows;
+    console.log('🆕 Fetching new products from API...');
+    const response = await dbApi.get('/products/new');
+    return response.data.data || [];
   } catch (error) {
-    console.error('❌ Error fetching new products:', error);
+    console.error('❌ Error fetching new products from API:', error);
     throw error;
   }
 };
 
-// Get categories
+// Get categories via API
 export const getCategories = async () => {
   try {
-    const client = await pool.connect();
-    const result = await client.query(`
-      SELECT DISTINCT category, COUNT(*) as count
-      FROM "Product" 
-      WHERE "isActive" = true AND category IS NOT NULL
-      GROUP BY category
-      ORDER BY count DESC
-      LIMIT 6
-    `);
-    client.release();
-    return result.rows;
+    console.log('🏷️ Fetching categories from API...');
+    const response = await dbApi.get('/categories');
+    return response.data.data || [];
   } catch (error) {
-    console.error('❌ Error fetching categories:', error);
+    console.error('❌ Error fetching categories from API:', error);
     throw error;
   }
 };
 
-export default pool;
+export default dbApi;

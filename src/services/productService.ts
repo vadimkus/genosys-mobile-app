@@ -39,7 +39,7 @@ export class ProductService {
 
   private async loadAllData(): Promise<void> {
     try {
-      console.log('📦 Loading products from database...');
+      console.log('📦 Loading products from API...');
       
       const [products, featured, newProducts, categories] = await Promise.all([
         getProducts(),
@@ -55,7 +55,7 @@ export class ProductService {
 
       console.log(`✅ Loaded ${this.products.length} products, ${this.featuredProducts.length} featured, ${this.newProducts.length} new`);
     } catch (error) {
-      console.error('❌ Error loading data from database:', error);
+      console.error('❌ Error loading data from API:', error);
       await this.loadFallbackData();
     }
   }
@@ -63,12 +63,12 @@ export class ProductService {
   private async loadFallbackData(): Promise<void> {
     console.log('🏠 Loading fallback product data...');
     
-    // Fallback data for when database is not available
+    // Fallback data for when API is not available
     this.products = [
       {
         id: '1',
         name: 'Genosys Anti-Aging Cream',
-        description: 'Premium anti-aging cream with advanced peptides',
+        description: 'Premium anti-aging cream with advanced peptides and Korean skincare technology',
         price: 89.99,
         originalPrice: 129.99,
         discountPercentage: 31,
@@ -89,7 +89,7 @@ export class ProductService {
       {
         id: '2',
         name: 'Hair Growth Serum',
-        description: 'Revolutionary hair growth serum with natural ingredients',
+        description: 'Revolutionary hair growth serum with natural ingredients and advanced technology',
         price: 149.99,
         originalPrice: 199.99,
         discountPercentage: 25,
@@ -106,6 +106,69 @@ export class ProductService {
         reviewCount: 89,
         createdAt: '2024-01-20T10:00:00.000Z',
         updatedAt: '2024-01-20T10:00:00.000Z'
+      },
+      {
+        id: '3',
+        name: 'Skin Care Blemish Balm Cushion',
+        description: 'Premium BB cushion with skin caring properties and natural coverage',
+        price: 79.99,
+        originalPrice: 99.99,
+        discountPercentage: 20,
+        imageUrl: 'https://genosys.ae/images/products/bb-cushion.jpg',
+        imageUrls: ['https://genosys.ae/images/products/bb-cushion.jpg'],
+        category: 'Makeup',
+        brand: 'Genosys',
+        isActive: true,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: true,
+        stock: 25,
+        averageRating: 4.7,
+        reviewCount: 156,
+        createdAt: '2024-01-25T10:00:00.000Z',
+        updatedAt: '2024-01-25T10:00:00.000Z'
+      },
+      {
+        id: '4',
+        name: 'Hair-GENTRON Device',
+        description: 'Advanced hair growth device with red and blue light therapy',
+        price: 299.99,
+        originalPrice: 399.99,
+        discountPercentage: 25,
+        imageUrl: 'https://genosys.ae/images/products/hair-gentron.jpg',
+        imageUrls: ['https://genosys.ae/images/products/hair-gentron.jpg'],
+        category: 'Devices',
+        brand: 'Genosys',
+        isActive: true,
+        isFeatured: true,
+        isNew: false,
+        isOnSale: true,
+        stock: 15,
+        averageRating: 4.6,
+        reviewCount: 78,
+        createdAt: '2024-01-10T10:00:00.000Z',
+        updatedAt: '2024-01-10T10:00:00.000Z'
+      },
+      {
+        id: '5',
+        name: 'ND Cell Anti-Wrinkle Cream',
+        description: 'Advanced anti-wrinkle cream with ND Cell technology',
+        price: 119.99,
+        originalPrice: 149.99,
+        discountPercentage: 20,
+        imageUrl: 'https://genosys.ae/images/products/nd-cell-cream.jpg',
+        imageUrls: ['https://genosys.ae/images/products/nd-cell-cream.jpg'],
+        category: 'Skincare',
+        brand: 'Genosys',
+        isActive: true,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: true,
+        stock: 40,
+        averageRating: 4.5,
+        reviewCount: 92,
+        createdAt: '2024-01-30T10:00:00.000Z',
+        updatedAt: '2024-01-30T10:00:00.000Z'
       }
     ];
 
@@ -114,8 +177,10 @@ export class ProductService {
     this.categories = [
       { name: 'Skincare', count: 15 },
       { name: 'Hair Care', count: 8 },
-      { name: 'Anti-Aging', count: 12 },
-      { name: 'Beauty Devices', count: 5 }
+      { name: 'Makeup', count: 12 },
+      { name: 'Devices', count: 5 },
+      { name: 'Anti-Aging', count: 10 },
+      { name: 'Beauty Tools', count: 7 }
     ];
   }
 
