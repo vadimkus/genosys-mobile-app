@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { RootStackParamList, MainTabParamList } from '../../navigation/AppNavigator';
 import { useStore } from '../../store/useStore';
 import { productService } from '../../services/productService';
 import { Product, Category } from '../../types';
@@ -109,7 +109,7 @@ export default function HomeScreen() {
       {/* Categories Carousel */}
       <CategoryCarousel
         categories={categories}
-        onCategoryPress={(categoryName) => navigation.navigate('Products', { category: categoryName })}
+        onCategoryPress={(categoryName) => navigation.navigate('MainTabs', { screen: 'Products', params: { category: categoryName } })}
       />
 
       {/* Featured Products Carousel */}
@@ -117,7 +117,7 @@ export default function HomeScreen() {
         products={featuredProducts}
         title="⭐ Featured Products"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        onViewAllPress={() => navigation.navigate('Products', { featured: true })}
+        onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { featured: true } })}
       />
 
       {/* New Products Carousel */}
@@ -125,7 +125,7 @@ export default function HomeScreen() {
         products={newProducts}
         title="🆕 New Arrivals"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        onViewAllPress={() => navigation.navigate('Products', { new: true })}
+        onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { new: true } })}
       />
 
       {/* All Products Carousel */}
@@ -133,7 +133,7 @@ export default function HomeScreen() {
         products={products} // Show all products
         title="🛍️ All Products"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        onViewAllPress={() => navigation.navigate('Products')}
+        onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products' })}
       />
 
     </ScrollView>

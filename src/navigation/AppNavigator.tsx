@@ -25,6 +25,7 @@ import SettingsScreen from '../screens/main/SettingsScreen';
 export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
+  MainTabs: { screen?: string; params?: any };
   ProductDetail: { productId: string };
   Checkout: undefined;
   OrderDetail: { orderId: string };
@@ -203,6 +204,7 @@ export default function AppNavigator() {
       >
         {isAuthenticated ? (
           <Stack.Screen name="Main" component={MainStackNavigator} />
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
         ) : (
           <Stack.Screen name="Auth" component={AuthStackNavigator} />
         )}
