@@ -67,7 +67,9 @@ api.interceptors.response.use(
 // API Service Class
 class ApiService {
   private lastRequestTime = 0;
-  private readonly MIN_REQUEST_INTERVAL = 1000; // 1 second between requests
+  private readonly MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+  private requestQueue: Array<() => Promise<any>> = [];
+  private isProcessingQueue = false;
 
   private async delayIfNeeded() {
     const now = Date.now();
@@ -82,63 +84,100 @@ class ApiService {
     this.lastRequestTime = Date.now();
   }
 
+  private async processQueue() {
+    if (this.isProcessingQueue || this.requestQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessingQueue = true;
+    
+    while (this.requestQueue.length > 0) {
+      const request = this.requestQueue.shift();
+      if (request) {
+        try {
+          await request();
+        } catch (error) {
+          console.error('API: Queue processing error:', error);
+        }
+      }
+      
+      // Wait between requests
+      if (this.requestQueue.length > 0) {
+        await new Promise(resolve => setTimeout(resolve, this.MIN_REQUEST_INTERVAL));
+      }
+    }
+    
+    this.isProcessingQueue = false;
+  }
+
   // Authentication
   async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
     console.log('API: Attempting login to:', `${API_BASE_URL}/auth/login`);
     console.log('API: Credentials:', { email: credentials.email, password: '***' });
     
-    await this.delayIfNeeded();
-    
-    try {
-      const response = await api.post('/auth/login', credentials);
-      console.log('API: Login response status:', response.status);
-      console.log('API: Login response data:', response.data);
-      
-      // Handle the actual API response format
-      if (response.data && response.data.user && response.data.token) {
-        console.log('API: Login successful, returning user data');
-        return {
-          success: true,
-          data: {
-            user: response.data.user,
-            token: response.data.token
-          },
-          message: response.data.message
-        };
-      }
-      
-      console.log('API: Invalid response format:', response.data);
-      return {
-        success: false,
-        data: null,
-        error: 'Invalid response format'
+    return new Promise((resolve) => {
+      const loginRequest = async () => {
+        await this.delayIfNeeded();
+        
+        try {
+          const response = await api.post('/auth/login', credentials);
+          console.log('API: Login response status:', response.status);
+          console.log('API: Login response data:', response.data);
+          
+          // Handle the actual API response format
+          if (response.data && response.data.user && response.data.token) {
+            console.log('API: Login successful, returning user data');
+            resolve({
+              success: true,
+              data: {
+                user: response.data.user,
+                token: response.data.token
+              },
+              message: response.data.message
+            });
+            return;
+          }
+          
+          console.log('API: Invalid response format:', response.data);
+          resolve({
+            success: false,
+            data: null,
+            error: 'Invalid response format'
+          });
+        } catch (error: any) {
+          console.error('API: Login error:', error);
+          console.error('API: Error response:', error.response?.data);
+          
+          if (error.response?.status === 429) {
+            console.log('API: Rate limited, will retry in 5 seconds...');
+            // Retry after 5 seconds
+            setTimeout(() => {
+              this.requestQueue.push(loginRequest);
+              this.processQueue();
+            }, 5000);
+            return;
+          }
+          
+          if (error.response?.status === 401) {
+            resolve({
+              success: false,
+              data: null,
+              error: 'Invalid email or password'
+            });
+            return;
+          }
+          
+          resolve({
+            success: false,
+            data: null,
+            error: error.response?.data?.message || error.message || 'Login failed'
+          });
+        }
       };
-    } catch (error: any) {
-      console.error('API: Login error:', error);
-      console.error('API: Error response:', error.response?.data);
       
-      if (error.response?.status === 429) {
-        return {
-          success: false,
-          data: null,
-          error: 'Too many requests. Please wait a moment and try again.'
-        };
-      }
-      
-      if (error.response?.status === 401) {
-        return {
-          success: false,
-          data: null,
-          error: 'Invalid email or password'
-        };
-      }
-      
-      return {
-        success: false,
-        data: null,
-        error: error.response?.data?.message || error.message || 'Login failed'
-      };
-    }
+      this.requestQueue.push(loginRequest);
+      this.processQueue();
+    });
   }
 
   async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {

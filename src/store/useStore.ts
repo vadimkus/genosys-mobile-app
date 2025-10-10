@@ -69,6 +69,13 @@ export const useStore = create<StoreState>()(
       setError: (error) => set({ error }),
 
       login: async (email, password) => {
+        // Prevent multiple simultaneous login attempts
+        const { isLoading } = get();
+        if (isLoading) {
+          console.log('Login already in progress, ignoring duplicate request');
+          return false;
+        }
+
         set({ isLoading: true, error: null });
         try {
           console.log('Attempting login with:', { email, password: '***' });
