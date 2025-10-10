@@ -140,24 +140,24 @@ class ApiService {
     return new Promise((resolve) => {
       // Add timeout to prevent hanging
       const timeout = setTimeout(() => {
-        console.log('API: Login timeout after 2 minutes');
+        console.log('API: Login timeout after 5 minutes');
         resolve({
           success: false,
           data: null,
           error: 'Login timeout. Please try again.'
         });
-      }, 120000); // 2 minutes timeout
+      }, 300000); // 5 minutes timeout
       
       const attemptLogin = async (retryCount: number = 0) => {
         try {
           // Add delay before each attempt
           if (retryCount > 0) {
-            const delay = 5000 + (retryCount * 10000); // 5s, 15s, 25s
+            const delay = 30000 + (retryCount * 30000); // 30s, 60s, 90s
             console.log(`API: Waiting ${delay/1000} seconds before retry ${retryCount}...`);
             await new Promise(resolve => setTimeout(resolve, delay));
           } else {
             // Initial delay
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 10000));
           }
           
           console.log(`API: Login attempt ${retryCount + 1}/4`);
