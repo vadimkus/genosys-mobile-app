@@ -1519,6 +1519,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Regeneration - Promotes cellular renewal and skin repair</Text>
                 <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade results for comprehensive eye care</Text>
               </>
+            ) : product.name === 'EyeCell EYE PEPTIDE GEL PATCH' ? (
+              <>
+                <Text style={styles.benefitItem}>• Reduces Puffiness and Dark Circles - Effectively combats under-eye bags and dark circles for a refreshed appearance</Text>
+                <Text style={styles.benefitItem}>• Smooths Fine Lines and Wrinkles - Peptide complex works to diminish the appearance of fine lines, promoting smoother skin</Text>
+                <Text style={styles.benefitItem}>• Hydrates and Soothes - Deep hydration and soothing effect, reducing signs of fatigue and stress</Text>
+                <Text style={styles.benefitItem}>• Improves Skin Elasticity - Advanced peptide technology enhances skin firmness and elasticity</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging Properties - Targets multiple signs of aging around the delicate eye area</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade results for comprehensive eye care</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.benefitItem}>• Age Defying - Reduces fine lines and wrinkles through advanced fermentation technology</Text>
@@ -1622,6 +1631,17 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Provides anti-aging and skin-soothing properties with wrinkle-reducing effects for improved skin texture.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Arbutin:</Text> Natural skin brightening agent that helps even skin tone and reduce the appearance of dark spots.</Text>
               </>
+            ) : product.name === 'EyeCell EYE PEPTIDE GEL PATCH' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Peptide Complex:</Text> Includes Copper Tripeptide-1, Acetyl Hexapeptide-8, Palmitoyl Hexapeptide-12, Palmitoyl Oligopeptide, and Palmitoyl Tetrapeptide-7 to reduce fine lines and improve skin elasticity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Increases skin moisture levels, plumping the eye area and providing deep hydration for a refreshed appearance.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Arbutin:</Text> Natural skin brightening agent that helps reduce the appearance of dark circles and evens skin tone.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Retinyl Palmitate:</Text> Vitamin A derivative that supports skin renewal and combats signs of aging around the eye area.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Extracts:</Text> Chamomile, Lavender, Peppermint, and Rosemary extracts that soothe and revitalize the delicate eye area.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Provides anti-aging and skin-soothing properties with wrinkle-reducing effects for improved skin texture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Niacinamide:</Text> Amide of nicotinic acid (Vitamin B3) that evens out skin tone, improves discolorations, and protects skin against oxidative stress.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Provides wound healing effect, antioxidation effect, and promotes collagen synthesis.</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bio-Fermented Extracts:</Text> Advanced fermentation process creates beneficial compounds, peptides, and amino acids that enhance skin barrier function and provide anti-aging benefits through natural biological processes.</Text>
@@ -1705,6 +1725,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> Gently massage until fully absorbed using your ring finger for optimal absorption</Text>
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Best Results:</Text> For best results, use in conjunction with the Genosys EyeCell Eye Contour Cream as part of your daily eye care routine</Text>
               </>
+            ) : product.name === 'EyeCell EYE PEPTIDE GEL PATCH' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse the face thoroughly</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 2 patches under the eyes, ensuring good contact with the skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 20-40 minutes, then remove and discard the patches</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Intensive Treatment:</Text> For more intensive treatment effect, apply 4 patches (2 under eyes, 2 on eyebrow area)</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> After use, close the lid and cap securely and keep it completely sealed</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Best Results:</Text> For optimal results, use regularly as part of your skincare routine</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and apply toner if desired</Text>
@@ -1770,6 +1799,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine."
               : product.name === 'EyeCell EYE CONTOUR SERUM'
               ? "This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine."
+              : product.name === 'EyeCell EYE PEPTIDE GEL PATCH'
+              ? "This product is dermatologically tested and safe for all skin types. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
               : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1784,7 +1815,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -1792,7 +1823,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : '2.8 MB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : '850 KB'}</Text>
               </View>
               <TouchableOpacity 
                 style={styles.documentationButton}
@@ -1800,7 +1831,9 @@ export default function ProductDetailScreen() {
                   // Open the product documentation PDF
                   const pdfUrl = product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' 
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf'
-                    : 'https://genosys.ae/documents/ppt/Genosys%20Ez%20Co2%20Mask.pdf';
+                    : product.name === 'EZ CO₂ MASK KIT'
+                    ? 'https://genosys.ae/documents/ppt/Genosys%20Ez%20Co2%20Mask.pdf'
+                    : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
               >
