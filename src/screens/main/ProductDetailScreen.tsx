@@ -162,7 +162,7 @@ export default function ProductDetailScreen() {
       {/* Reviews and Price */}
       <View style={styles.reviewsPriceSection}>
         <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
+          <Text style={styles.rating}>⭐⭐⭐⭐ {product.averageRating.toFixed(1)}</Text>
         </View>
 
         <View style={styles.priceContainer}>
