@@ -1945,7 +1945,7 @@ export default function ProductDetailScreen() {
                     : product.name === 'GENO-LED IR II'
                     ? 'https://genosys.ae/documents/ppt/GENO-LED%20IR%20II_2025.pdf'
                     : product.name === 'SKIN REBOOT PDRN MASK PACK'
-                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
+                    ? 'https://genosys.ae/documents/ppt/SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}

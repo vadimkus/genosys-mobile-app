@@ -243,7 +243,7 @@ export default function TrainingMaterialsScreen() {
       size: '1.2 MB',
       url: 'https://genosys.ae/training',
       category: 'Product Documentation',
-      description: 'Genosys skin reboot PDRN mask pack protocols'
+      description: 'Skin reboot PDRN mask pack protocols'
     },
     {
       id: '27',
