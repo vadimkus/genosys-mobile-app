@@ -394,7 +394,6 @@ export default function ProductsScreen() {
       <View style={styles.horizontalProductsSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Browse Products</Text>
-          <Text style={styles.sectionSubtitle}>Scroll horizontally to see more</Text>
         </View>
         
         <FlatList
