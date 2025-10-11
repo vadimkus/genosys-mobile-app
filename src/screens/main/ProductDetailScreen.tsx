@@ -123,6 +123,20 @@ export default function ProductDetailScreen() {
         )}
       </View>
 
+      {/* Stock Status */}
+      <View style={styles.stockStatusContainer}>
+        <View style={[styles.stockIndicator, { backgroundColor: product.inStock ? '#10b981' : '#ef4444' }]}>
+          <Ionicons 
+            name={product.inStock ? "checkmark-circle" : "close-circle"} 
+            size={16} 
+            color="#ffffff" 
+          />
+        </View>
+        <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
+          {product.inStock ? 'In Stock' : 'Out of Stock'}
+        </Text>
+      </View>
+
       {/* Add to Cart Section */}
       <View style={styles.cartSection}>
         <Text style={styles.cartSectionTitle}>Add to Cart</Text>
@@ -561,6 +575,32 @@ const styles = StyleSheet.create({
   noteLabel: {
     fontWeight: '600',
     color: '#92400e',
+  },
+  stockStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginVertical: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  stockIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  stockStatusText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   cartSection: {
     backgroundColor: '#ffffff',
