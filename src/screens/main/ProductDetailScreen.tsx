@@ -194,7 +194,7 @@ export default function ProductDetailScreen() {
         </View>
 
         <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-          <Text style={styles.addToCartText}>Add to Cart - AED {(product.price * quantity).toFixed(2)}</Text>
+          <Text style={styles.addToCartText}>AED {(product.price * quantity).toFixed(2)}</Text>
         </TouchableOpacity>
       </View>
 
