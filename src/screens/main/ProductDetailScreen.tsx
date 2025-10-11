@@ -1919,7 +1919,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#3b82f6',
+    borderLeftColor: '#ffffff',
   },
   detailsList: {
     backgroundColor: '#ffffff',
