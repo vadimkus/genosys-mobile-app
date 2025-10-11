@@ -260,34 +260,67 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Product Details</Text>
           <View style={styles.detailsList}>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> {product.category === 'Serum' ? 'Advanced skin brightening serum' : product.category === 'Cream' ? 'Professional skincare cream' : product.category === 'Mask' ? 'Professional sheet mask' : 'Professional skincare product'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> {product.category === 'Serum' ? 'Skin brightening and melanin control' : product.category === 'Cream' ? 'Anti-aging and skin nourishment' : product.category === 'Mask' ? 'Intensive skin repair and hydration' : 'Professional skincare treatment'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> {product.category === 'Serum' ? 'MELAZERO® melanin care complex with multi-vitamin formula' : product.category === 'Cream' ? 'Advanced peptides with Korean skincare technology' : product.category === 'Mask' ? 'Hydrolyzed collagen with hyaluronic acid' : 'Korean skincare technology with proven ingredients'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> {product.category === 'Serum' ? 'Skin brightening, even skin tone, natural radiance, melanin control' : product.category === 'Cream' ? 'Anti-aging, skin firmness, hydration, wrinkle reduction' : product.category === 'Mask' ? 'Intensive hydration, skin firmness, elasticity, anti-aging' : 'Professional skincare results, skin health, premium quality'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> {product.category === 'Serum' ? 'Daily brightening treatment, morning and evening' : product.category === 'Cream' ? 'Daily anti-aging care, morning and evening' : product.category === 'Mask' ? '2-3 times per week for intensive treatment' : 'As directed for optimal results'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially {product.category === 'Serum' ? 'dull and uneven skin' : product.category === 'Cream' ? 'mature and aging skin' : product.category === 'Mask' ? 'dry and damaged skin' : 'all skin types'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> {product.category === 'Serum' ? 'Apply to clean skin before moisturizer' : product.category === 'Cream' ? 'Apply to clean skin as final step' : product.category === 'Mask' ? 'Apply to clean skin, leave for 15-20 minutes' : 'Apply to clean skin as directed'}</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+              <>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive hydro soothing cream</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 50g (Homecare) / 250g (Professional)</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hydration, soothing, skin repair, barrier protection</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially sensitive and irritated skin</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> {product.category === 'Serum' ? 'Advanced skin brightening serum' : product.category === 'Cream' ? 'Professional skincare cream' : product.category === 'Mask' ? 'Professional sheet mask' : 'Professional skincare product'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> {product.category === 'Serum' ? 'Skin brightening and melanin control' : product.category === 'Cream' ? 'Anti-aging and skin nourishment' : product.category === 'Mask' ? 'Intensive skin repair and hydration' : 'Professional skincare treatment'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> {product.category === 'Serum' ? 'MELAZERO® melanin care complex with multi-vitamin formula' : product.category === 'Cream' ? 'Advanced peptides with Korean skincare technology' : product.category === 'Mask' ? 'Hydrolyzed collagen with hyaluronic acid' : 'Korean skincare technology with proven ingredients'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> {product.category === 'Serum' ? 'Skin brightening, even skin tone, natural radiance, melanin control' : product.category === 'Cream' ? 'Anti-aging, skin firmness, hydration, wrinkle reduction' : product.category === 'Mask' ? 'Intensive hydration, skin firmness, elasticity, anti-aging' : 'Professional skincare results, skin health, premium quality'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> {product.category === 'Serum' ? 'Daily brightening treatment, morning and evening' : product.category === 'Cream' ? 'Daily anti-aging care, morning and evening' : product.category === 'Mask' ? '2-3 times per week for intensive treatment' : 'As directed for optimal results'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially {product.category === 'Serum' ? 'dull and uneven skin' : product.category === 'Cream' ? 'mature and aging skin' : product.category === 'Mask' ? 'dry and damaged skin' : 'all skin types'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> {product.category === 'Serum' ? 'Apply to clean skin before moisturizer' : product.category === 'Cream' ? 'Apply to clean skin as final step' : product.category === 'Mask' ? 'Apply to clean skin, leave for 15-20 minutes' : 'Apply to clean skin as directed'}</Text>
+                <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+              </>
+            )}
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Features</Text>
           <View style={styles.featuresList}>
-            <Text style={styles.featureItem}>• Professional-Grade Quality</Text>
-            <Text style={styles.featureItem}>• Dermatologically Tested</Text>
-            <Text style={styles.featureItem}>• Korean Skincare Technology</Text>
-            <Text style={styles.featureItem}>• Safe for All Skin Types</Text>
-            <Text style={styles.featureItem}>• Clinically Proven Results</Text>
-            <Text style={styles.featureItem}>• Premium Ingredients</Text>
+            {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+              <>
+                <Text style={styles.featureItem}>• Intensive Hydration - Advanced hydrating formula for long-lasting moisture</Text>
+                <Text style={styles.featureItem}>• Soothing Properties - Calms skin irritation and provides relief for sensitive skin</Text>
+                <Text style={styles.featureItem}>• Natural Ingredients - Aloe vera and snail secretion filtrate for gentle care</Text>
+                <Text style={styles.featureItem}>• Professional & Home Use - Available in 50g and 250g sizes</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.featureItem}>• Professional-Grade Quality</Text>
+                <Text style={styles.featureItem}>• Dermatologically Tested</Text>
+                <Text style={styles.featureItem}>• Korean Skincare Technology</Text>
+                <Text style={styles.featureItem}>• Safe for All Skin Types</Text>
+                <Text style={styles.featureItem}>• Clinically Proven Results</Text>
+                <Text style={styles.featureItem}>• Premium Ingredients</Text>
+              </>
+            )}
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
           <View style={styles.benefitsList}>
-            {isCollagenMask ? (
+            {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Intensive Hydration - Provides long-lasting moisture for all skin types</Text>
+                <Text style={styles.benefitItem}>• Skin Soothing - Calms irritation and reduces redness and inflammation</Text>
+                <Text style={styles.benefitItem}>• Skin Repair - Promotes natural healing and skin regeneration</Text>
+                <Text style={styles.benefitItem}>• Barrier Protection - Strengthens skin's natural protective barrier</Text>
+                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive and irritated skin</Text>
+                <Text style={styles.benefitItem}>• Versatile Use - Perfect for both professional treatments and daily home care</Text>
+              </>
+            ) : isCollagenMask ? (
               <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides deep moisture for soft, supple skin</Text>
                 <Text style={styles.benefitItem}>• Enhanced Elasticity - Boosts collagen production for improved skin firmness</Text>
