@@ -21,6 +21,7 @@ interface ProductCarouselProps {
   onProductPress: (productId: string) => void;
   showViewAll?: boolean;
   onViewAllPress?: () => void;
+  showNewBadge?: boolean;
 }
 
 export default function ProductCarousel({
@@ -29,6 +30,7 @@ export default function ProductCarousel({
   onProductPress,
   showViewAll = true,
   onViewAllPress,
+  showNewBadge = false,
 }: ProductCarouselProps) {
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -73,7 +75,7 @@ export default function ProductCarousel({
             <Text style={styles.saleText}>SALE</Text>
           </View>
         )}
-        {product.isNew && (
+        {(product.isNew || showNewBadge) && (
           <View style={styles.newBadge}>
             <Text style={styles.newText}>NEW</Text>
           </View>

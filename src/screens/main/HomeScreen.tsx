@@ -110,6 +110,7 @@ export default function HomeScreen() {
         title="🆕 New Arrivals"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
         showViewAll={false}
+        showNewBadge={true}
       />
 
     </ScrollView>
