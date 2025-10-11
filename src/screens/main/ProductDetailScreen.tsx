@@ -35,10 +35,14 @@ export default function ProductDetailScreen() {
 
   useEffect(() => {
     const { productId } = route.params as { productId: string };
+    console.log('Product ID from route:', productId);
     if (productId) {
       const foundProduct = productService.getProductById(productId);
+      console.log('Found product:', foundProduct);
       setProduct(foundProduct || null);
       if (foundProduct) {
+        console.log('Product size options:', foundProduct.sizeOptions);
+        console.log('Product name:', foundProduct.name);
         setSelectedSize(foundProduct.defaultSize || (foundProduct.sizeOptions && foundProduct.sizeOptions[0]) || '');
       }
     }
