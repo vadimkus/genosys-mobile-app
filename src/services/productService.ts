@@ -86,52 +86,142 @@ export class ProductService {
             // Use predefined categories and count products in each
             this.categories = [
               {
-                id: 'daily-serum',
-                name: 'Daily Serum',
-                slug: 'daily-serum',
-                count: this.products.filter(p => p.category === 'Daily Serum').length,
+                id: 'all-products',
+                name: 'All products',
+                slug: 'all-products',
+                count: this.products.length,
                 isActive: true,
                 sortOrder: 1,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               },
               {
-                id: 'main-treatment',
-                name: 'Main Treatment',
-                slug: 'main-treatment',
-                count: this.products.filter(p => p.category === 'Main Treatment').length,
+                id: 'microneedling',
+                name: 'Microneedling',
+                slug: 'microneedling',
+                count: this.products.filter(p => p.category === 'Microneedling').length,
                 isActive: true,
                 sortOrder: 2,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               },
               {
-                id: 'pre-treatment',
-                name: 'Pre-Treatment',
-                slug: 'pre-treatment',
-                count: this.products.filter(p => p.category === 'Pre-Treatment').length,
+                id: 'pro-solution',
+                name: 'PRO Solution',
+                slug: 'pro-solution',
+                count: this.products.filter(p => p.category === 'PRO Solution').length,
                 isActive: true,
                 sortOrder: 3,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               },
               {
-                id: 'hair-scalp-solution',
-                name: 'Hair and Scalp Solution',
-                slug: 'hair-scalp-solution',
-                count: this.products.filter(p => p.category === 'Hair and Scalp Solution').length,
+                id: 'cleanser',
+                name: 'Cleanser',
+                slug: 'cleanser',
+                count: this.products.filter(p => p.category === 'Cleanser').length,
                 isActive: true,
                 sortOrder: 4,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               },
               {
-                id: 'eyecell-products',
-                name: 'EyeCell Products',
-                slug: 'eyecell-products',
-                count: this.products.filter(p => p.category === 'EyeCell Products').length,
+                id: 'peeling',
+                name: 'Peeling',
+                slug: 'peeling',
+                count: this.products.filter(p => p.category === 'Peeling').length,
                 isActive: true,
                 sortOrder: 5,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'toner-mist',
+                name: 'Toner/Mist',
+                slug: 'toner-mist',
+                count: this.products.filter(p => p.category === 'Toner/Mist').length,
+                isActive: true,
+                sortOrder: 6,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'serum',
+                name: 'Serum',
+                slug: 'serum',
+                count: this.products.filter(p => p.category === 'Serum').length,
+                isActive: true,
+                sortOrder: 7,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'cream',
+                name: 'Cream',
+                slug: 'cream',
+                count: this.products.filter(p => p.category === 'Cream').length,
+                isActive: true,
+                sortOrder: 8,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'mask',
+                name: 'Mask',
+                slug: 'mask',
+                count: this.products.filter(p => p.category === 'Mask').length,
+                isActive: true,
+                sortOrder: 9,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'sun',
+                name: 'Sun',
+                slug: 'sun',
+                count: this.products.filter(p => p.category === 'Sun').length,
+                isActive: true,
+                sortOrder: 10,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'cushion-bb',
+                name: 'Cushion BB',
+                slug: 'cushion-bb',
+                count: this.products.filter(p => p.category === 'Cushion BB').length,
+                isActive: true,
+                sortOrder: 11,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'scalp-hair',
+                name: 'Scalp/Hair',
+                slug: 'scalp-hair',
+                count: this.products.filter(p => p.category === 'Scalp/Hair').length,
+                isActive: true,
+                sortOrder: 12,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'eye-care',
+                name: 'Eye Care',
+                slug: 'eye-care',
+                count: this.products.filter(p => p.category === 'Eye Care').length,
+                isActive: true,
+                sortOrder: 13,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              },
+              {
+                id: 'device',
+                name: 'Device',
+                slug: 'device',
+                count: this.products.filter(p => p.category === 'Device').length,
+                isActive: true,
+                sortOrder: 14,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               }
@@ -156,12 +246,12 @@ export class ProductService {
   private async loadFallbackData(): Promise<void> {
     console.log('🏠 Loading fallback product data...');
     
-    // Load categories exactly matching Genosys website structure
+    // Load categories exactly as specified
     this.categories = [
       {
-        id: 'daily-serum',
-        name: 'Daily Serum',
-        slug: 'daily-serum',
+        id: 'all-products',
+        name: 'All products',
+        slug: 'all-products',
         count: 0,
         isActive: true,
         sortOrder: 1,
@@ -169,9 +259,9 @@ export class ProductService {
         updatedAt: new Date().toISOString()
       },
       {
-        id: 'main-treatment',
-        name: 'Main Treatment',
-        slug: 'main-treatment',
+        id: 'microneedling',
+        name: 'Microneedling',
+        slug: 'microneedling',
         count: 0,
         isActive: true,
         sortOrder: 2,
@@ -179,9 +269,9 @@ export class ProductService {
         updatedAt: new Date().toISOString()
       },
       {
-        id: 'pre-treatment',
-        name: 'Pre-Treatment',
-        slug: 'pre-treatment',
+        id: 'pro-solution',
+        name: 'PRO Solution',
+        slug: 'pro-solution',
         count: 0,
         isActive: true,
         sortOrder: 3,
@@ -189,9 +279,9 @@ export class ProductService {
         updatedAt: new Date().toISOString()
       },
       {
-        id: 'hair-scalp-solution',
-        name: 'Hair and Scalp Solution',
-        slug: 'hair-scalp-solution',
+        id: 'cleanser',
+        name: 'Cleanser',
+        slug: 'cleanser',
         count: 0,
         isActive: true,
         sortOrder: 4,
@@ -199,12 +289,102 @@ export class ProductService {
         updatedAt: new Date().toISOString()
       },
       {
-        id: 'eyecell-products',
-        name: 'EyeCell Products',
-        slug: 'eyecell-products',
+        id: 'peeling',
+        name: 'Peeling',
+        slug: 'peeling',
         count: 0,
         isActive: true,
         sortOrder: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'toner-mist',
+        name: 'Toner/Mist',
+        slug: 'toner-mist',
+        count: 0,
+        isActive: true,
+        sortOrder: 6,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'serum',
+        name: 'Serum',
+        slug: 'serum',
+        count: 0,
+        isActive: true,
+        sortOrder: 7,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'cream',
+        name: 'Cream',
+        slug: 'cream',
+        count: 0,
+        isActive: true,
+        sortOrder: 8,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'mask',
+        name: 'Mask',
+        slug: 'mask',
+        count: 0,
+        isActive: true,
+        sortOrder: 9,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'sun',
+        name: 'Sun',
+        slug: 'sun',
+        count: 0,
+        isActive: true,
+        sortOrder: 10,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'cushion-bb',
+        name: 'Cushion BB',
+        slug: 'cushion-bb',
+        count: 0,
+        isActive: true,
+        sortOrder: 11,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'scalp-hair',
+        name: 'Scalp/Hair',
+        slug: 'scalp-hair',
+        count: 0,
+        isActive: true,
+        sortOrder: 12,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'eye-care',
+        name: 'Eye Care',
+        slug: 'eye-care',
+        count: 0,
+        isActive: true,
+        sortOrder: 13,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'device',
+        name: 'Device',
+        slug: 'device',
+        count: 0,
+        isActive: true,
+        sortOrder: 14,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -521,40 +701,88 @@ export class ProductService {
   private mapProductToCategory(productName: string, originalCategory?: string): string {
     const name = productName.toLowerCase();
     
-    // Daily Serums
-    if (name.includes('serum') || name.includes('all for sensitive') || 
-        name.includes('anti-wrinkle serum') || name.includes('problem control serum') ||
-        name.includes('moisture replenishing') && name.includes('serum')) {
-      return 'Daily Serum';
+    // Microneedling
+    if (name.includes('microneedle') || name.includes('needle pen') || name.includes('roller')) {
+      return 'Microneedling';
     }
     
-    // Main Treatments (Power Solutions)
+    // PRO Solution (Power Solutions)
     if (name.includes('power solution') || name.includes('aws') || name.includes('pcs') || 
         name.includes('sws') || name.includes('cts') || name.includes('cvs') || 
         name.includes('hes')) {
-      return 'Main Treatment';
+      return 'PRO Solution';
     }
     
-    // Pre-Treatment
-    if (name.includes('ez co₂ mask') || name.includes('skin renewal peeling') || 
-        name.includes('peeling gel') || name.includes('peeling system')) {
-      return 'Pre-Treatment';
+    // Cleanser
+    if (name.includes('cleanser') || name.includes('snow o₂ cleanser') || 
+        name.includes('makeup remover') || name.includes('defender')) {
+      return 'Cleanser';
     }
     
-    // Hair & Scalp Solutions
+    // Peeling
+    if (name.includes('peeling') || name.includes('skin renewal peeling') || 
+        name.includes('epi turnover') || name.includes('peeling system')) {
+      return 'Peeling';
+    }
+    
+    // Toner/Mist
+    if (name.includes('toner') || name.includes('mist') || name.includes('microbiome energy infusing mist') ||
+        name.includes('intensive problem control toner')) {
+      return 'Toner/Mist';
+    }
+    
+    // Serum
+    if (name.includes('serum') || name.includes('all for sensitive') || 
+        name.includes('anti-wrinkle serum') || name.includes('problem control serum') ||
+        name.includes('moisture replenishing') && name.includes('serum')) {
+      return 'Serum';
+    }
+    
+    // Cream
+    if (name.includes('cream') || name.includes('balm') || name.includes('moisturizer') ||
+        name.includes('anti-wrinkle cream') || name.includes('blemish balm') ||
+        name.includes('intensive hydro soothing cream') || name.includes('intensive problem control cream')) {
+      return 'Cream';
+    }
+    
+    // Mask
+    if (name.includes('mask') || name.includes('gel mask') || name.includes('collagen mask') ||
+        name.includes('overnight') || name.includes('treatment') || name.includes('ez co₂ mask')) {
+      return 'Mask';
+    }
+    
+    // Sun
+    if (name.includes('sun cream') || name.includes('spf') || name.includes('ultra shield') ||
+        name.includes('sun protection') || name.includes('multi sun cream')) {
+      return 'Sun';
+    }
+    
+    // Cushion BB
+    if (name.includes('cushion') || name.includes('bb') || name.includes('blemish balm cushion')) {
+      return 'Cushion BB';
+    }
+    
+    // Scalp/Hair
     if (name.includes('hr³ matrix') || name.includes('hair') || name.includes('scalp') || 
-        name.includes('hairgen') || name.includes('hair-gentron')) {
-      return 'Hair and Scalp Solution';
+        name.includes('hairgen') || name.includes('hair-gentron') || name.includes('hair tonic') ||
+        name.includes('hair solution') || name.includes('scalp shampoo')) {
+      return 'Scalp/Hair';
     }
     
-    // EyeCell Products
+    // Eye Care
     if (name.includes('eyecell') || name.includes('eye contour') || name.includes('eye peptide') || 
-        name.includes('eye zone')) {
-      return 'EyeCell Products';
+        name.includes('eye zone') || name.includes('eye care')) {
+      return 'Eye Care';
     }
     
-    // Default fallback - assign to Daily Serum for other products
-    return originalCategory || 'Daily Serum';
+    // Device
+    if (name.includes('device') || name.includes('geno-led') || name.includes('led') ||
+        name.includes('equipment') || name.includes('tool')) {
+      return 'Device';
+    }
+    
+    // Default fallback
+    return originalCategory || 'Serum';
   }
 
   private transformCategories(dbCategories: any[]): Category[] {
