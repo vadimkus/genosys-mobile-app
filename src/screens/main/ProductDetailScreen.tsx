@@ -177,6 +177,512 @@ export default function ProductDetailScreen() {
       );
     }
     
+    // HR³ MATRIX SCALP SHAMPOO α
+    if (name.includes('hr³ matrix scalp shampoo') || name.includes('scalp shampoo')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional scalp shampoo</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 300ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Scalp cleansing, hair growth support, professional treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional scalp treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // HR³ MATRIX HAIR SOLUTION α
+    if (name.includes('hr³ matrix hair solution') || name.includes('hair solution')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional hair growth solution</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth stimulation, scalp health, professional treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional hair treatment, daily application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // HR³ MATRIX HAIR TONIC α
+    if (name.includes('hr³ matrix hair tonic') || name.includes('hair tonic')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional hair tonic</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 150ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair strengthening, scalp nourishment, growth support</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially weak hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily hair care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // HairGen BOOSTER
+    if (name.includes('hairgen booster')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Hair growth booster</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth acceleration, scalp stimulation, professional results</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially slow-growing hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional hair treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // Hair-GENTRON Device
+    if (name.includes('hair-gentron')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional hair growth device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Red and blue light therapy</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth stimulation, scalp health, professional treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional hair treatment device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // INTENSIVE PROBLEM CONTROL CREAM
+    if (name.includes('intensive problem control cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive problem control cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Problem skin treatment, acne control, skin healing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Problem skin, acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily problem skin care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // INTENSIVE PROBLEM CONTROL TONER
+    if (name.includes('intensive problem control toner')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive problem control toner</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 200ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Problem skin treatment, pore cleansing, skin balancing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Problem skin, oily skin, acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily skin care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // INTENSIVE BLEMISH BALM CREAM
+    if (name.includes('intensive blemish balm cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive blemish balm cream with SPF</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>SPF Rating:</Text> SPF 30 PA++</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Blemish coverage, sun protection, skin care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially blemish-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sun protection and coverage</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // MOISTURE REPLENISHING HYALURON CREAM
+    if (name.includes('moisture replenishing hyaluron cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Moisture replenishing hyaluron cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Deep hydration, moisture replenishment, skin plumping</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dry skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily moisturizing care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // MOISTURE REPLENISHING HYALURON SERUM
+    if (name.includes('moisture replenishing hyaluron serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Moisture replenishing hyaluron serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Intensive hydration, moisture boost, skin plumping</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dry and dehydrated skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily hydration treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // HYDRO COOL MODELING MASK
+    if (name.includes('hydro cool modeling mask')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Hydro cool modeling mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1000g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Cooling effect, skin firming, modeling treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially tired skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional modeling treatment, 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // EyeCell EYE CONTOUR SERUM
+    if (name.includes('eyecell eye contour serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye contour serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 15ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Eye area treatment, anti-aging, dark circle reduction</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily eye care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // MICROBIOME ENERGY INFUSING MIST
+    if (name.includes('microbiome energy infusing mist')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Microbiome energy infusing mist</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 150ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin microbiome balance, energy infusion, skin revitalization</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially tired skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily skin misting, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // Genosys Anti-Aging Cream
+    if (name.includes('genosys anti-aging cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Premium anti-aging cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Anti-aging, wrinkle reduction, skin firmness, premium care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-aging care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // Hair Growth Serum
+    if (name.includes('hair growth serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Revolutionary hair growth serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth stimulation, natural ingredients, advanced technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily hair treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // Skin Care Blemish Balm Cushion
+    if (name.includes('skin care blemish balm cushion')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Premium BB cushion with skin care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 15g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Natural coverage, skin caring properties, blemish coverage</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially blemish-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily coverage and skin care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // EGF REPAIR OXYMASK CREAM
+    if (name.includes('egf repair oxymask cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> EGF repair oxymask cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> EGF repair, oxygen therapy, skin rejuvenation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional repair treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SOOTHING REPAIR POSTCREAM
+    if (name.includes('soothing repair postcream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Soothing repair post-treatment cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Post-treatment soothing, skin repair, calming care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Post-treatment care, daily application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // EyeCell EYE CONTOUR CREAM
+    if (name.includes('eyecell eye contour cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye contour cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Eye area care, anti-aging, dark circle reduction</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily eye care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SKIN BARRIER PROTECTING CREAM
+    if (name.includes('skin barrier protecting cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Skin barrier protecting cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin barrier protection, moisture retention, skin health</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily barrier protection, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // ULTRA SHIELD SUN CREAM
+    if (name.includes('ultra shield sun cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Ultra shield sun protection cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>SPF Rating:</Text> SPF 50+ PA+++</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 60ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Maximum UV protection, anti-aging, skin care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sun protection, morning application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // EZ CO₂ MASK KIT
+    if (name.includes('ez co₂ mask kit')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> EZ CO₂ mask kit</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> Kit (Multiple components)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> CO₂ therapy, skin rejuvenation, professional treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional CO₂ treatment, 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SOOTHING BOMB SEA ALGAE MASK
+    if (name.includes('soothing bomb sea algae mask')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Soothing bomb sea algae mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Soothing effect, sea algae benefits, skin calming</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Soothing treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SKIN RESCUE OVERNIGHT CREAM MASK
+    if (name.includes('skin rescue overnight cream mask')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Skin rescue overnight cream mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Overnight skin rescue, intensive repair, skin recovery</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Overnight treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // EyeCell EYE PEPTIDE GEL PATCH
+    if (name.includes('eyecell eye peptide gel patch')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye peptide gel patch</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30 patches</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Eye area treatment, peptide therapy, anti-aging</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Eye patch treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // MULTI VITA RADIANCE SERUM
+    if (name.includes('multi vita radiance serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Multi-vitamin radiance serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin brightening, radiance boost, vitamin nourishment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily radiance treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // PROBLEM CONTROL SERUM
+    if (name.includes('problem control serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Problem control serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Problem skin treatment, acne control, skin healing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Problem skin, acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily problem skin treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // ALL FOR SENSITIVE SERUM
+    if (name.includes('all for sensitive serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> All for sensitive serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Sensitive skin care, gentle treatment, skin soothing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Sensitive skin, reactive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sensitive skin care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // INTENSIVE REPAIR COLLAGEN MASK
+    if (name.includes('intensive repair collagen mask')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive repair collagen mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Intensive repair, collagen therapy, skin rejuvenation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Intensive repair treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // BIO-FERMENT AGE DEFYING POWDER MASK
+    if (name.includes('bio-ferment age defying powder mask') || name.includes('bfad')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Bio-ferment age defying powder mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Age defying, bio-ferment technology, anti-aging</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Age defying treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // GENOSYS SKIN REBOOT PDRN MASK PACK
+    if (name.includes('genosys skin reboot pdrn mask pack')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Genosys skin reboot PDRN mask pack</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin reboot, PDRN therapy, skin regeneration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Skin reboot treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // EyeCell EYE ZONE CARE KIT
+    if (name.includes('eyecell eye zone care kit')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye zone care kit</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> Kit (Multiple components)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Comprehensive eye care, anti-aging, dark circle reduction</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Complete eye care routine, daily application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // GENO-LED IR II
+    if (name.includes('geno-led ir ii')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Geno-LED IR II device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> LED and infrared therapy</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin rejuvenation, LED therapy, infrared treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional LED treatment device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // HR³ MATRIX MESOPECIA KIT
+    if (name.includes('hr³ matrix mesopecia kit') || name.includes('mesopecia kit')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> HR³ Matrix mesopecia kit</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> Kit (Multiple components)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Mesopecia treatment, hair growth, scalp health</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional mesopecia treatment kit</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // HR³ MATRIX SCALP PEELING
+    if (name.includes('hr³ matrix scalp peeling') || name.includes('scalp peeling')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> HR³ Matrix scalp peeling</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Scalp exfoliation, hair growth support, scalp health</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially oily scalp</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Scalp peeling treatment, 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // ND Cell Anti-Wrinkle Cream (Original)
+    if (name.includes('nd cell anti-wrinkle cream') && !name.includes('nd cell anti-wrinkle cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> ND Cell anti-wrinkle cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Advanced anti-wrinkle, ND Cell technology, skin rejuvenation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-aging care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
     // Default generic details for other products
     return (
       <>
