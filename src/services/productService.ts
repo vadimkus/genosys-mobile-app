@@ -1156,6 +1156,22 @@ export class ProductService {
         product.name = product.name.replace('GENOSYS ', '');
       }
       
+      // Map product categories based on product names
+      const getCategory = (productName: string) => {
+        const name = productName.toLowerCase();
+        
+        // Sun protection products
+        if (name.includes('sun cream') || name.includes('ultra shield') || name.includes('sun protection')) {
+          return 'Sun';
+        }
+        
+        // Return original category if no specific mapping
+        return product.category;
+      };
+      
+      // Apply category mapping
+      product.category = getCategory(product.name);
+      
       // Create comprehensive product image mapping based on actual product names
       const getImageUrl = (productName: string) => {
         const name = productName.toLowerCase();
