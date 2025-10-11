@@ -93,12 +93,6 @@ export default function HomeScreen() {
             </Text>
             <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Premium dermacosmetics and products</Text>
           </View>
-          <View style={styles.statusContainer}>
-            <View style={[styles.statusDot, { backgroundColor: isConnected ? '#10b981' : '#f59e0b' }]} />
-            <Text style={[styles.statusText, { color: theme.colors.textSecondary }]}>
-              {isConnected ? 'Live Data' : 'Offline Mode'}
-            </Text>
-          </View>
         </View>
       </View>
 
