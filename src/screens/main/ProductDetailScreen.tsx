@@ -728,11 +728,12 @@ export default function ProductDetailScreen() {
     if (name.includes('geno-led ir ii')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Geno-LED IR II device</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> LED and infrared therapy</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin rejuvenation, LED therapy, infrared treatment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional LED treatment device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Light Wavelengths:</Text> Red light (630-660nm) and Infrared (800-1000nm)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Treatment Time:</Text> 10-20 minutes per session</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Frequency:</Text> 3-5 times per week for optimal results</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Safety:</Text> FDA-cleared for home use</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Power Source:</Text> Rechargeable battery with long-lasting performance</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Design:</Text> Ergonomic, portable, and easy to use</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1324,6 +1325,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'GENO-LED IR II' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1459,6 +1465,8 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS EyeCell EYE PEPTIDE GEL PATCH is a specialized treatment designed to rejuvenate and care for the delicate skin around the eyes. These crescent-shaped gel patches are infused with a potent blend of peptides, botanical extracts, and other active ingredients to address common eye area concerns including puffiness, dark circles, fine lines, and signs of fatigue."
                 : product.name === 'EyeCell EYE ZONE CARE KIT'
                 ? "GENOSYS EyeCell EYE ZONE CARE KIT is a comprehensive professional-grade solution designed to address various concerns in the delicate eye area, including fine lines, dark circles, puffiness, and crow's feet. This advanced kit combines cosmeceuticals with a specialized micro-needle roller to enhance the absorption of active ingredients and stimulate collagen production for comprehensive eye rejuvenation."
+                : product.name === 'GENO-LED IR II'
+                ? "GENOSYS GENO-LED IR II is an advanced LED therapy device that combines infrared and red light technology to provide professional-grade skin rejuvenation treatments. This innovative device utilizes specific wavelengths of light to stimulate cellular activity, promote collagen production, and enhance overall skin health for both professional and home use."
                 : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                 ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
                 : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1532,6 +1540,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Professional and Home Use - Suitable for both professional treatments and daily home care</Text>
                 <Text style={styles.benefitItem}>• Complete System - All-in-one kit for comprehensive eye area rejuvenation</Text>
                 <Text style={styles.benefitItem}>• Visible Results - Delivers a more youthful, vibrant, and refreshed appearance</Text>
+              </>
+            ) : product.name === 'GENO-LED IR II' ? (
+              <>
+                <Text style={styles.benefitItem}>• Stimulates Collagen Production - Red light therapy promotes natural collagen synthesis for firmer, younger-looking skin</Text>
+                <Text style={styles.benefitItem}>• Reduces Inflammation - Infrared light helps calm irritated skin and reduces redness and swelling</Text>
+                <Text style={styles.benefitItem}>• Improves Skin Texture - Regular use enhances skin smoothness and reduces fine lines and wrinkles</Text>
+                <Text style={styles.benefitItem}>• Accelerates Healing - Promotes faster recovery from skin treatments and reduces downtime</Text>
+                <Text style={styles.benefitItem}>• Enhances Circulation - Improves blood flow and oxygen delivery to skin cells</Text>
+                <Text style={styles.benefitItem}>• Safe and Non-Invasive - Gentle, pain-free treatment suitable for all skin types</Text>
               </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
@@ -1764,6 +1781,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Patch Application:</Text> Place the Eye Peptide Gel Patches under the eyes and leave them on for 20-40 minutes</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Cream Application:</Text> Finish by applying the Eye Contour Cream to the treated area</Text>
               </>
+            ) : product.name === 'GENO-LED IR II' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and ensure the device is fully charged</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Positioning:</Text> Hold the device 1-2 inches away from your skin and turn it on</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Treatment:</Text> Move the device slowly across the treatment area for 10-20 minutes per session</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use 3-5 times per week for optimal results</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Safety:</Text> Avoid direct eye contact and follow the built-in timer controls</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Maintenance:</Text> Clean the device after each use and store in a cool, dry place</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and apply toner if desired</Text>
@@ -1833,6 +1859,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen."
               : product.name === 'EyeCell EYE ZONE CARE KIT'
               ? "This product is dermatologically tested and safe for all skin types. Regular use can lead to a more youthful, vibrant, and refreshed appearance around the eyes. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen."
+              : product.name === 'GENO-LED IR II'
+              ? "This device is designed for professional and home use. For best results, use consistently as part of your skincare routine. Consult with a skincare professional for personalized treatment protocols."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
               : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1847,7 +1875,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -1855,7 +1883,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : '850 KB'}</Text>
               </View>
               <TouchableOpacity 
                 style={styles.documentationButton}
@@ -1867,6 +1895,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/Genosys%20Ez%20Co2%20Mask.pdf'
                     : product.name === 'EyeCell EYE ZONE CARE KIT'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf'
+                    : product.name === 'GENO-LED IR II'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20GENO-LED%20IR%20II.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
