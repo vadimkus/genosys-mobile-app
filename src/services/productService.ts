@@ -1188,7 +1188,13 @@ export class ProductService {
       };
       
       // Apply category mapping
+      const originalCategory = product.category;
       product.category = getCategory(product.name);
+      
+      // Debug: Log category mapping for sun products
+      if (product.name.toLowerCase().includes('sun') || product.name.toLowerCase().includes('ultra shield')) {
+        console.log(`☀️ Category mapping for ${product.name}: ${originalCategory} -> ${product.category}`);
+      }
       
       // Create comprehensive product image mapping based on actual product names
       const getImageUrl = (productName: string) => {
