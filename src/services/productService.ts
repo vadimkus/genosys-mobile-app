@@ -232,7 +232,19 @@ export class ProductService {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               }
-            ].filter(cat => cat.count > 0); // Only show categories with products
+            ];
+            
+            // Update category counts after product categorization
+            this.categories.forEach(category => {
+              if (category.name === 'All') {
+                category.count = this.products.length;
+              } else {
+                category.count = this.products.filter(p => p.category === category.name).length;
+              }
+            });
+            
+            // Filter out categories with 0 products, but keep Sun category even if 0
+            this.categories = this.categories.filter(cat => cat.count > 0 || cat.name === 'Sun');
           } else {
             console.log('🏷️ Using API categories, transforming them');
             this.categories = this.transformCategories(categories);
