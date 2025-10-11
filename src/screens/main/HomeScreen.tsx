@@ -91,7 +91,7 @@ export default function HomeScreen() {
             <Text style={[styles.greeting, { color: theme.colors.text }]}>
               {user?.firstName || 'User'}
             </Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Discover premium dermacosmetics and products</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Premium dermacosmetics and products</Text>
           </View>
           <View style={styles.statusContainer}>
             <View style={[styles.statusDot, { backgroundColor: isConnected ? '#10b981' : '#f59e0b' }]} />
