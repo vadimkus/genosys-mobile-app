@@ -92,7 +92,16 @@ export class ProductService {
               }
             });
             this.categories = Array.from(categoryMap.entries())
-              .map(([name, count]) => ({ name, count }))
+              .map(([name, count]) => ({ 
+                id: name.toLowerCase().replace(/\s+/g, '-'),
+                name, 
+                slug: name.toLowerCase().replace(/\s+/g, '-'),
+                count,
+                isActive: true,
+                sortOrder: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              }))
               .sort((a, b) => b.count - a.count)
               .slice(0, 8);
           } else {
@@ -128,11 +137,15 @@ export class ProductService {
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Skincare',
             brand: 'Genosys',
-            isActive: true,
+            sku: 'GEN-001',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 50,
             isFeatured: true,
             isNew: false,
             isOnSale: true,
             stock: 50,
+            rating: 4.8,
             averageRating: 4.8,
             reviewCount: 127,
             createdAt: '2024-01-15T10:00:00.000Z',
@@ -149,11 +162,15 @@ export class ProductService {
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Hair Care',
             brand: 'Genosys',
-            isActive: true,
+            sku: 'GEN-002',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 30,
             isFeatured: true,
             isNew: true,
             isOnSale: true,
             stock: 30,
+            rating: 4.9,
             averageRating: 4.9,
             reviewCount: 89,
             createdAt: '2024-01-20T10:00:00.000Z',
@@ -170,11 +187,15 @@ export class ProductService {
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Makeup',
             brand: 'Genosys',
-            isActive: true,
+            sku: 'GEN-003',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 25,
             isFeatured: false,
             isNew: true,
             isOnSale: true,
             stock: 25,
+            rating: 4.7,
             averageRating: 4.7,
             reviewCount: 156,
             createdAt: '2024-01-25T10:00:00.000Z',
@@ -191,11 +212,15 @@ export class ProductService {
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Devices',
             brand: 'Genosys',
-            isActive: true,
+            sku: 'GEN-004',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 15,
             isFeatured: true,
             isNew: false,
             isOnSale: true,
             stock: 15,
+            rating: 4.6,
             averageRating: 4.6,
             reviewCount: 78,
             createdAt: '2024-01-10T10:00:00.000Z',
@@ -212,11 +237,15 @@ export class ProductService {
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'Skincare',
             brand: 'Genosys',
-            isActive: true,
+            sku: 'GEN-005',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 40,
             isFeatured: false,
             isNew: true,
             isOnSale: true,
             stock: 40,
+            rating: 4.5,
             averageRating: 4.5,
             reviewCount: 92,
             createdAt: '2024-01-30T10:00:00.000Z',
@@ -230,12 +259,66 @@ export class ProductService {
       product.name.toLowerCase().includes('genosys skin reboot pdrn mask pack')
     );
     this.categories = [
-      { name: 'Skincare', count: 15 },
-      { name: 'Hair Care', count: 8 },
-      { name: 'Makeup', count: 12 },
-      { name: 'Devices', count: 5 },
-      { name: 'Anti-Aging', count: 10 },
-      { name: 'Beauty Tools', count: 7 }
+      { 
+        id: 'skincare',
+        name: 'Skincare', 
+        slug: 'skincare',
+        count: 15,
+        isActive: true,
+        sortOrder: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      { 
+        id: 'hair-care',
+        name: 'Hair Care', 
+        slug: 'hair-care',
+        count: 8,
+        isActive: true,
+        sortOrder: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      { 
+        id: 'makeup',
+        name: 'Makeup', 
+        slug: 'makeup',
+        count: 12,
+        isActive: true,
+        sortOrder: 2,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      { 
+        id: 'devices',
+        name: 'Devices', 
+        slug: 'devices',
+        count: 5,
+        isActive: true,
+        sortOrder: 3,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      { 
+        id: 'anti-aging',
+        name: 'Anti-Aging', 
+        slug: 'anti-aging',
+        count: 10,
+        isActive: true,
+        sortOrder: 4,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      { 
+        id: 'beauty-tools',
+        name: 'Beauty Tools', 
+        slug: 'beauty-tools',
+        count: 7,
+        isActive: true,
+        sortOrder: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
     ];
   }
 
@@ -258,16 +341,16 @@ export class ProductService {
         if (name.includes('hr³ matrix hair tonic') || name.includes('hair tonic')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHT.jpg&w=1200&q=75';
         if (name.includes('hr³ matrix mesopecia kit') || name.includes('mesopecia kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fmeso.jpg&w=1200&q=75';
         if (name.includes('hr³ matrix scalp peeling') || name.includes('scalp peeling')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fscal.jpg&w=1200&q=75';
-        if (name.includes('hr³ matrix scalp shampoo') || name.includes('scalp shampoo')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fscal.jpg&w=1200&q=75';
-        if (name.includes('hairgen booster')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('hr³ matrix scalp shampoo') || name.includes('scalp shampoo')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSham.jpg&w=1200&q=75';
+        if (name.includes('hairgen booster')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBooster.jpg&w=1200&q=75';
         
         // Skincare creams
-        if (name.includes('blemish balm cream') || name.includes('blemish balm cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('blemish balm cream') || name.includes('blemish balm cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBLEM.jpg&w=1200&q=75';
         if (name.includes('anti-wrinkle cream') || name.includes('nd cell')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('multi functional') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('moisture replenishing') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('intensive problem control cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('intensive hydro soothing cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('moisture replenishing') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHER.jpg&w=1200&q=75';
+        if (name.includes('intensive problem control cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75';
+        if (name.includes('intensive hydro soothing cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHSC.jpg&w=1200&q=75';
         if (name.includes('skin barrier protecting cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('egf repair oxymask cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEGF.jpg&w=1200&q=75';
         if (name.includes('soothing repair postcream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
@@ -280,7 +363,7 @@ export class ProductService {
         if (name.includes('ez co₂ mask kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEZE.jpg&w=1200&q=75';
         if (name.includes('peptide gel mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('soothing bomb sea algae mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('hydro cool modeling mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('hydro cool modeling mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHYDR.jpg&w=1200&q=75';
         if (name.includes('skin rescue overnight cream mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Eye care
@@ -292,12 +375,12 @@ export class ProductService {
         if (name.includes('problem control serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('all for sensitive serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FASE.jpg&w=1200&q=75';
         if (name.includes('moisture replenishing') && name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('eyecell eye contour serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYEZ.jpg&w=1200&q=75';
+        if (name.includes('eyecell eye contour serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYS.jpg&w=1200&q=75';
         
         // Boosters and toners
         if (name.includes('snow booster')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('intensive problem control toner')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('microbiome energy infusing mist')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('intensive problem control toner')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPRS.jpg&w=1200&q=75';
+        if (name.includes('microbiome energy infusing mist')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fmist.jpg&w=1200&q=75';
         
         // Peeling and cleansing
         if (name.includes('skin renewal peeling system')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
@@ -332,11 +415,15 @@ export class ProductService {
         imageUrls: product.imageUrls || [product.imageUrl] || [finalImageUrl],
         category: product.category,
         brand: product.brand,
-        isActive: product.isActive,
+        sku: product.sku || `GEN-${product.id}`,
+        images: product.imageUrls || [product.imageUrl] || [finalImageUrl],
+        inStock: product.inStock !== undefined ? product.inStock : true,
+        stockQuantity: product.stockQuantity || product.stock || 0,
+        stock: product.stock || 0,
         isFeatured: product.isFeatured,
         isNew: product.isNew,
         isOnSale: product.isOnSale,
-        stock: product.stock,
+        rating: product.rating || product.averageRating ? parseFloat(product.averageRating) : 0,
         averageRating: product.averageRating ? parseFloat(product.averageRating) : 0,
         reviewCount: product.reviewCount ? parseInt(product.reviewCount) : 0,
         createdAt: product.createdAt,
@@ -347,8 +434,14 @@ export class ProductService {
 
   private transformCategories(dbCategories: any[]): Category[] {
     return dbCategories.map(cat => ({
+      id: cat.category.toLowerCase().replace(/\s+/g, '-'),
       name: cat.category,
-      count: parseInt(cat.count)
+      slug: cat.category.toLowerCase().replace(/\s+/g, '-'),
+      count: parseInt(cat.count),
+      isActive: true,
+      sortOrder: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }));
   }
 

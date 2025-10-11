@@ -16,6 +16,7 @@ import ProductsScreen from '../screens/main/ProductsScreen';
 import CartScreen from '../screens/main/CartScreen';
 import OrdersScreen from '../screens/main/OrdersScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
+import EditProfileScreen from '../screens/main/EditProfileScreen';
 import ProductDetailScreen from '../screens/main/ProductDetailScreen';
 import CheckoutScreen from '../screens/main/CheckoutScreen';
 import OrderDetailScreen from '../screens/main/OrderDetailScreen';
@@ -30,6 +31,7 @@ export type RootStackParamList = {
   Checkout: undefined;
   OrderDetail: { orderId: string };
   Settings: undefined;
+  EditProfile: undefined;
 };
 
 export type AuthStackParamList = {
@@ -81,6 +83,7 @@ function MainStackNavigator() {
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
     </Stack.Navigator>
   );
 }

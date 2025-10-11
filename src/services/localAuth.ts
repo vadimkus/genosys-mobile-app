@@ -8,7 +8,7 @@ interface LoginCredentials {
 
 interface AuthResponse {
   success: boolean;
-  data?: {
+  data: {
     user: User;
     token: string;
   };
@@ -44,6 +44,7 @@ export class LocalAuthService {
         phone: user.phone,
         role: user.role as 'customer' | 'distributor' | 'admin',
         isActive: user.isActive,
+        emailVerified: user.emailVerified || true,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       };
@@ -60,6 +61,7 @@ export class LocalAuthService {
       console.log('❌ LOCAL AUTH: Invalid credentials');
       return {
         success: false,
+        data: { user: {} as User, token: '' },
         error: 'Invalid email or password'
       };
     }

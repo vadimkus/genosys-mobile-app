@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Product, CartItem, Order, AppState } from '../types';
+import { User, Product, CartItem, Order, AppState, RegisterForm } from '../types';
 import { apiService } from '../services/api';
 
 interface StoreState extends AppState {
@@ -13,16 +13,10 @@ interface StoreState extends AppState {
   
   // Auth actions
   login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    phone?: string;
-    company?: string;
-    role: 'customer' | 'distributor';
-  }) => Promise<boolean>;
+  register: (userData: RegisterForm) => Promise<boolean>;
+  forgotPassword: (email: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  updateProfile: (profileData: Partial<User>) => Promise<boolean>;
   
   // Cart actions
   addToCart: (product: Product, quantity?: number) => Promise<void>;
@@ -138,6 +132,25 @@ export const useStore = create<StoreState>()(
         }
       },
 
+      forgotPassword: async (email) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await apiService.forgotPassword(email);
+          if (response.success) {
+            set({ isLoading: false, error: null });
+            return true;
+          }
+          set({ isLoading: false, error: response.error || 'Failed to send reset email' });
+          return false;
+        } catch (error: any) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || 'Failed to send reset email' 
+          });
+          return false;
+        }
+      },
+
       logout: async () => {
         try {
           await apiService.logout();
@@ -153,6 +166,46 @@ export const useStore = create<StoreState>()(
             wishlist: [],
             favorites: []
           });
+        }
+      },
+
+      updateProfile: async (profileData) => {
+        set({ isLoading: true, error: null });
+        try {
+          // Try API first
+          const response = await apiService.updateProfile(profileData);
+          if (response.success && response.data) {
+            set({ 
+              user: response.data, 
+              isLoading: false, 
+              error: null 
+            });
+            return true;
+          }
+          set({ isLoading: false, error: response.error || 'Failed to update profile' });
+          return false;
+        } catch (error: any) {
+          console.log('API update failed, updating local user data:', error.message);
+          // Fallback: Update local user data when API is not available
+          const { user } = get();
+          if (user) {
+            const updatedUser = {
+              ...user,
+              ...profileData,
+              name: profileData.name || `${profileData.firstName || user.firstName} ${profileData.lastName || user.lastName}`.trim()
+            };
+            set({ 
+              user: updatedUser,
+              isLoading: false, 
+              error: null 
+            });
+            return true;
+          }
+          set({ 
+            isLoading: false, 
+            error: 'Failed to update profile' 
+          });
+          return false;
         }
       },
 

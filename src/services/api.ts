@@ -8,6 +8,7 @@ import {
   Order,
   Category,
   Review,
+  Address,
   Wishlist,
   Coupon,
   ApiResponse,
@@ -200,7 +201,7 @@ class ApiService {
       console.error('❌ Local auth failed:', error);
       return {
         success: false,
-        data: null,
+        data: { user: {} as User, token: '' },
         error: 'Authentication failed'
       };
     }

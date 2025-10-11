@@ -7,9 +7,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppNavigator from './src/navigation/AppNavigator';
 import { useStore } from './src/store/useStore';
 import { CartProvider } from './src/contexts/CartContext';
+import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
-export default function App() {
+function AppContent() {
   const { isLoading, setLoading } = useStore();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     // Initialize app
@@ -37,12 +39,22 @@ export default function App() {
   }
 
   return (
+    <>
+      <AppNavigator />
+      <StatusBar style={isDark ? "light" : "dark"} />
+    </>
+  );
+}
+
+export default function App() {
+  return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <CartProvider>
-          <AppNavigator />
-          <StatusBar style="auto" />
-        </CartProvider>
+        <ThemeProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

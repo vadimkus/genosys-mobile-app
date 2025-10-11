@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, MainTabParamList } from '../../navigation/AppNavigator';
 import { useStore } from '../../store/useStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import { productService } from '../../services/productService';
 import { Product, Category } from '../../types';
 import ProductCarousel from '../../components/ProductCarousel';
@@ -26,6 +27,7 @@ type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { user } = useStore();
+  const { theme } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
@@ -85,24 +87,26 @@ export default function HomeScreen() {
 
   return (
     <ScrollView 
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.greetingContainer}>
-          <Text style={styles.greeting}>
-            Welcome back, {user?.firstName || 'User'}! 👋
-          </Text>
-          <Text style={styles.subtitle}>Discover premium beauty products</Text>
-        </View>
-        <View style={styles.statusContainer}>
-          <View style={[styles.statusDot, { backgroundColor: isConnected ? '#10b981' : '#f59e0b' }]} />
-          <Text style={styles.statusText}>
-            {isConnected ? 'Live Data' : 'Offline Mode'}
-          </Text>
+        <View style={styles.headerTop}>
+          <View style={styles.greetingContainer}>
+            <Text style={[styles.greeting, { color: theme.colors.text }]}>
+              {user?.firstName || 'User'}!
+            </Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Discover premium dermacosmetics and products</Text>
+          </View>
+          <View style={styles.statusContainer}>
+            <View style={[styles.statusDot, { backgroundColor: isConnected ? '#10b981' : '#f59e0b' }]} />
+            <Text style={[styles.statusText, { color: theme.colors.textSecondary }]}>
+              {isConnected ? 'Live Data' : 'Offline Mode'}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -158,8 +162,9 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#ffffff',
-    padding: 20,
-    paddingTop: 40,
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
@@ -168,36 +173,48 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'nowrap',
+    gap: 8,
+  },
   greetingContainer: {
-    marginBottom: 16,
+    flex: 1,
+    marginRight: 12,
+    minWidth: 200,
   },
   greeting: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#1f2937',
     marginBottom: 4,
+    lineHeight: 30,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#6b7280',
+    lineHeight: 20,
   },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f3f4f6',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 16,
     alignSelf: 'flex-start',
+    marginTop: 12,
   },
   statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 8,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#374151',
     fontWeight: '500',
   },

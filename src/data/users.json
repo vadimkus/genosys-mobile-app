@@ -10,6 +10,7 @@
       "phone": "+971 50 123 4567",
       "role": "customer",
       "isActive": true,
+      "emailVerified": true,
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
     },
@@ -23,6 +24,7 @@
       "phone": "+971 50 987 6543",
       "role": "admin",
       "isActive": true,
+      "emailVerified": true,
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }

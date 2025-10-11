@@ -5,6 +5,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  firstName: string;
+  lastName: string;
   phone?: string;
   address?: string;
   company?: string;
@@ -27,8 +29,11 @@ export interface Product {
   brand: string;
   sku: string;
   images: string[];
+  imageUrl: string;
+  imageUrls: string[];
   inStock: boolean;
   stockQuantity: number;
+  stock: number;
   weight?: number;
   dimensions?: {
     length: number;
@@ -41,8 +46,11 @@ export interface Product {
   warnings?: string;
   isFeatured: boolean;
   isNew: boolean;
+  isOnSale: boolean;
   rating: number;
+  averageRating: number;
   reviewCount: number;
+  discountPercentage?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -133,6 +141,7 @@ export interface Category {
   children?: Category[];
   isActive: boolean;
   sortOrder: number;
+  count: number;
   createdAt: string;
   updatedAt: string;
 }

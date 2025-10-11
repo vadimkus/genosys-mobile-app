@@ -12,12 +12,14 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useCart } from '../../contexts/CartContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 type CartScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function CartScreen() {
   const navigation = useNavigation<CartScreenNavigationProp>();
   const { items, removeFromCart, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCart();
+  const { theme } = useTheme();
 
   const handleRemoveItem = (productId: string, productName: string) => {
     Alert.alert(
@@ -52,18 +54,18 @@ export default function CartScreen() {
 
   if (items.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>Your cart is empty</Text>
-        <Text style={styles.emptySubtitle}>Add some products to get started</Text>
+      <View style={[styles.emptyContainer, { backgroundColor: theme.colors.background }]}>
+        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Your cart is empty</Text>
+        <Text style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}>Add some products to get started</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Shopping Cart</Text>
-        <Text style={styles.itemCount}>{getTotalItems()} item{getTotalItems() !== 1 ? 's' : ''}</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>Shopping Cart</Text>
+        <Text style={[styles.itemCount, { color: theme.colors.textSecondary }]}>{getTotalItems()} item{getTotalItems() !== 1 ? 's' : ''}</Text>
         {items.length > 0 && (
           <TouchableOpacity style={styles.clearButton} onPress={handleClearCart}>
             <Text style={styles.clearButtonText}>Clear All</Text>
@@ -147,13 +149,13 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   emptyTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
     marginBottom: 8,
   },
   emptySubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#6b7280',
   },
   header: {
@@ -167,12 +169,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
   },
   itemCount: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
   },
   clearButton: {
@@ -215,18 +217,18 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   productName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1f2937',
     marginBottom: 4,
   },
   productBrand: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
     marginBottom: 4,
   },
   productPrice: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#dc2626',
   },
@@ -244,12 +246,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#374151',
   },
   quantityText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1f2937',
     marginHorizontal: 12,
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemTotalPrice: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#1f2937',
     marginBottom: 8,
@@ -289,12 +291,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   totalLabel: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#1f2937',
   },
   totalPrice: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#dc2626',
   },
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
   },
   checkoutButtonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });

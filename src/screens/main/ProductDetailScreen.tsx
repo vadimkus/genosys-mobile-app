@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  StatusBar,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -15,6 +16,8 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { productService } from '../../services/productService';
 import { Product } from '../../types';
 import { useCart } from '../../contexts/CartContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +27,7 @@ export default function ProductDetailScreen() {
   const route = useRoute();
   const navigation = useNavigation<ProductDetailScreenNavigationProp>();
   const { addToCart } = useCart();
+  const { theme } = useTheme();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -45,7 +49,7 @@ export default function ProductDetailScreen() {
         `${product.name} (${quantity} item${quantity > 1 ? 's' : ''}) has been added to your cart.`,
         [
           { text: 'Continue Shopping', style: 'cancel' },
-          { text: 'View Cart', onPress: () => navigation.navigate('Cart') }
+          { text: 'View Cart', onPress: () => navigation.navigate('MainTabs', { screen: 'Cart' }) }
         ]
       );
     }
@@ -60,20 +64,21 @@ export default function ProductDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading product details...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <Text style={[styles.loadingText, { color: theme.colors.text }]}>Loading product details...</Text>
       </View>
     );
   }
 
   if (!product) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Product not found</Text>
+      <View style={[styles.errorContainer, { backgroundColor: theme.colors.background }]}>
+        <Text style={[styles.errorText, { color: theme.colors.text }]}>Product not found</Text>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
+          <Ionicons name="arrow-back" size={20} color="#dc2626" />
           <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
@@ -84,16 +89,20 @@ export default function ProductDetailScreen() {
   const isCollagenMask = product.name.toLowerCase().includes('intensive repair collagen mask');
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Ionicons name="arrow-back" size={20} color="#dc2626" />
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       </View>
+      
+      <ScrollView style={styles.scrollContainer}>
 
       {/* Product Image */}
       <View style={styles.imageContainer}>
@@ -112,6 +121,30 @@ export default function ProductDetailScreen() {
             <Text style={styles.newText}>NEW</Text>
           </View>
         )}
+      </View>
+
+      {/* Add to Cart Section */}
+      <View style={styles.cartSection}>
+        <Text style={styles.cartSectionTitle}>Add to Cart</Text>
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={() => handleQuantityChange(-1)}
+          >
+            <Text style={styles.quantityButtonText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.quantityText}>{quantity}</Text>
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={() => handleQuantityChange(1)}
+          >
+            <Text style={styles.quantityButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
+          <Text style={styles.addToCartText}>Add to Cart - AED {(product.price * quantity).toFixed(2)}</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Product Info */}
@@ -249,31 +282,9 @@ export default function ProductDetailScreen() {
             <Text style={styles.noteLabel}>Note:</Text> This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist.
           </Text>
         </View>
+      </View>
 
-        {/* Add to Cart Section */}
-        <View style={styles.cartSection}>
-          <View style={styles.quantityContainer}>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => handleQuantityChange(-1)}
-            >
-              <Text style={styles.quantityButtonText}>-</Text>
-            </TouchableOpacity>
-            <Text style={styles.quantityText}>{quantity}</Text>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => handleQuantityChange(1)}
-            >
-              <Text style={styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-            <Text style={styles.addToCartText}>Add to Cart - AED {(product.price * quantity).toFixed(2)}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Shipping Info */}
+      {/* Shipping Info */}
         <View style={styles.shippingInfo}>
           <Text style={styles.shippingTitle}>Shipping Information</Text>
           <Text style={styles.shippingItem}>🚚 Free Shipping on orders over 1,000 AED</Text>
@@ -281,8 +292,8 @@ export default function ProductDetailScreen() {
           <Text style={styles.shippingItem}>🏛️ 5% UAE Tax Payer - Supporting local economy</Text>
           <Text style={styles.shippingItem}>📦 In Stock - Ready to ship</Text>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -316,13 +327,30 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingTop: 50,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  scrollContainer: {
+    flex: 1,
   },
   backButton: {
-    padding: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#f9fafb',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    gap: 8,
   },
   backButtonText: {
     fontSize: 16,
@@ -536,14 +564,24 @@ const styles = StyleSheet.create({
   },
   cartSection: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 16,
+    padding: 24,
+    margin: 20,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#f3f4f6',
+  },
+  cartSectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -573,13 +611,19 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     backgroundColor: '#dc2626',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    borderRadius: 16,
     alignItems: 'center',
+    shadowColor: '#dc2626',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   addToCartText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   shippingInfo: {

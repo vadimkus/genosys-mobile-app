@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function SettingsScreen() {
+  const { theme } = useTheme();
+  
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-      <Text style={styles.subtitle}>App preferences</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.title, { color: theme.colors.text }]}>Settings</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>App preferences</Text>
     </View>
   );
 }

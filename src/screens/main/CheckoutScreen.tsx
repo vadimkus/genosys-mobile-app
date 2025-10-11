@@ -13,6 +13,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useCart } from '../../contexts/CartContext';
 import { useStore } from '../../store/useStore';
+import { useTheme } from '../../contexts/ThemeContext';
 
 type CheckoutScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -20,6 +21,7 @@ export default function CheckoutScreen() {
   const navigation = useNavigation<CheckoutScreenNavigationProp>();
   const { user } = useStore();
   const { items, getTotalItems, getTotalPrice, clearCart } = useCart();
+  const { theme } = useTheme();
   
   const [shippingInfo, setShippingInfo] = useState({
     firstName: user?.firstName || '',
@@ -64,9 +66,9 @@ export default function CheckoutScreen() {
 
   if (items.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>Your cart is empty</Text>
-        <Text style={styles.emptySubtitle}>Add some products to checkout</Text>
+      <View style={[styles.emptyContainer, { backgroundColor: theme.colors.background }]}>
+        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Your cart is empty</Text>
+        <Text style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}>Add some products to checkout</Text>
         <TouchableOpacity 
           style={styles.shopButton}
           onPress={() => navigation.navigate('MainTabs', { screen: 'Products' })}
@@ -78,7 +80,7 @@ export default function CheckoutScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity

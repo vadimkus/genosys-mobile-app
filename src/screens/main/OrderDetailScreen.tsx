@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function OrderDetailScreen() {
+  const { theme } = useTheme();
+  
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Order Details</Text>
-      <Text style={styles.subtitle}>Order information</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.title, { color: theme.colors.text }]}>Order Details</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Order information</Text>
     </View>
   );
 }
