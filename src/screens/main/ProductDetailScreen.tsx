@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
   stockStatusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     marginHorizontal: 20,
     marginVertical: 8,
   },
