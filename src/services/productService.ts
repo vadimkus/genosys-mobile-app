@@ -1268,17 +1268,17 @@ export class ProductService {
       return 'Toner/Mist';
     }
     
+    // Eye Care (must come before Serum and Cream to catch EyeCell products)
+    if (name.includes('eyecell') || name.includes('eye contour') || name.includes('eye peptide') || 
+        name.includes('eye zone') || name.includes('eye care')) {
+      return 'Eye Care';
+    }
+    
     // Serum
     if (name.includes('serum') || name.includes('all for sensitive') || 
         name.includes('anti-wrinkle serum') || name.includes('problem control serum') ||
         name.includes('moisture replenishing') && name.includes('serum')) {
       return 'Serum';
-    }
-    
-    // Eye Care (must come before Cream to catch EyeCell products)
-    if (name.includes('eyecell') || name.includes('eye contour') || name.includes('eye peptide') || 
-        name.includes('eye zone') || name.includes('eye care')) {
-      return 'Eye Care';
     }
     
     // Cream
