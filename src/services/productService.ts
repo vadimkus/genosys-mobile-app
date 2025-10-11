@@ -1273,6 +1273,9 @@ export class ProductService {
         // Sun protection
         if (name.includes('sun cream') || name.includes('ultra shield')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSSUN.jpg&w=1200&q=75';
         
+        // Cushion BB products
+        if (name.includes('skin caring blemish balm cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBBC.jpg&w=1200&q=75';
+        
         // Masks
         if (name.includes('ez co₂ mask kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEZE.jpg&w=1200&q=75';
         if (name.includes('peptide gel mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
