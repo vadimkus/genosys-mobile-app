@@ -616,6 +616,31 @@ export class ProductService {
             reviewCount: 76,
             createdAt: '2024-02-15T10:00:00.000Z',
             updatedAt: '2024-02-15T10:00:00.000Z'
+          },
+          {
+            id: '10',
+            name: 'Microneedle Roller',
+            description: 'Professional microneedling device for advanced skin rejuvenation and collagen stimulation',
+            price: 199.99,
+            originalPrice: 249.99,
+            discountPercentage: 20,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fgenosys-microneedling-devices.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fgenosys-microneedling-devices.jpg&w=1200&q=75'],
+            category: 'Microneedling',
+            brand: 'Genosys',
+            sku: 'GEN-010',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fgenosys-microneedling-devices.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 15,
+            isFeatured: true,
+            isNew: false,
+            isOnSale: true,
+            stock: 15,
+            rating: 4.0,
+            averageRating: 4.9,
+            reviewCount: 89,
+            createdAt: '2024-02-20T10:00:00.000Z',
+            updatedAt: '2024-02-20T10:00:00.000Z'
           }
         ];
 
