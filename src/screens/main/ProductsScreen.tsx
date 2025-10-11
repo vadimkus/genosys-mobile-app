@@ -147,6 +147,11 @@ export default function ProductsScreen() {
             <Text style={styles.newText}>NEW</Text>
           </View>
         )}
+        {item.inStock && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
         <TouchableOpacity
           style={styles.addToCartButton}
           onPress={() => handleAddToCart(item)}
@@ -197,6 +202,11 @@ export default function ProductsScreen() {
         {item.isNew && (
           <View style={styles.newBadge}>
             <Text style={styles.newText}>NEW</Text>
+          </View>
+        )}
+        {item.inStock && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
         <TouchableOpacity
@@ -602,6 +612,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   newText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  inStockBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    backgroundColor: '#10b981',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  inStockText: {
     color: '#ffffff',
     fontSize: 12,
     fontWeight: 'bold',
