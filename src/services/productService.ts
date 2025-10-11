@@ -1212,9 +1212,14 @@ export class ProductService {
       const getCategory = (productName: string) => {
         const name = productName.toLowerCase();
         
-        // Sun protection products
+        // Sun protection products (only actual sun creams)
         if (name.includes('sun cream') || name.includes('ultra shield') || name.includes('sun protection')) {
           return 'Sun';
+        }
+        
+        // Cushion BB products (blemish balm products)
+        if (name.includes('blemish balm') || name.includes('cushion') || name.includes('bb')) {
+          return 'Cushion BB';
         }
         
         // Return original category if no specific mapping
@@ -1231,7 +1236,7 @@ export class ProductService {
       }
       
       // Debug: Log category mapping for cushion products
-      if (product.name.toLowerCase().includes('cushion') || product.name.toLowerCase().includes('blemish balm')) {
+      if (product.name.toLowerCase().includes('cushion') || product.name.toLowerCase().includes('blemish balm') || product.name.toLowerCase().includes('bb')) {
         console.log(`💄 Category mapping for ${product.name}: ${originalCategory} -> ${product.category}`);
       }
       
