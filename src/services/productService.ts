@@ -88,6 +88,7 @@ export class ProductService {
           }
           
           if (categories.length === 0) {
+            console.log('🏷️ Using fallback categories because API categories is empty');
             // Use predefined categories and count products in each
             this.categories = [
               {
@@ -232,6 +233,7 @@ export class ProductService {
               }
             ].filter(cat => cat.count > 0); // Only show categories with products
           } else {
+            console.log('🏷️ Using API categories, transforming them');
             this.categories = this.transformCategories(categories);
             
             // Ensure Sun category is always included
@@ -248,6 +250,8 @@ export class ProductService {
                 updatedAt: new Date().toISOString()
               });
               console.log('☀️ Added Sun category to API categories');
+            } else {
+              console.log('☀️ Sun category already exists in API categories');
             }
           }
         }
