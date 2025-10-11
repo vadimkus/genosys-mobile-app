@@ -522,11 +522,12 @@ export default function ProductDetailScreen() {
     if (name.includes('eyecell eye contour cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye contour cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Eye area care, anti-aging, dark circle reduction</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily eye care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Eye contour cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 20g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature and aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced peptide and botanical callus culture technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Wrinkle reduction, dark circle diminishment, puffiness relief</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
