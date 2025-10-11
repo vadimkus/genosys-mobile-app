@@ -239,6 +239,9 @@ export class ProductService {
         // No data from API, use fallback
         console.log('⚠️ No data from API, using fallback data');
         await this.loadFallbackData();
+        
+        // Always add EyeCell products to ensure they're available
+        await this.addEyeCellProducts();
       }
     } catch (error) {
       console.error('❌ Error loading data from API:', error);
@@ -361,10 +364,12 @@ export class ProductService {
     ];
 
     // Add EyeCell products to existing products if they don't already exist
+    let addedCount = 0;
     eyeCellProducts.forEach(eyeCellProduct => {
       const exists = this.products.some(p => p.id === eyeCellProduct.id);
       if (!exists) {
         this.products.push(eyeCellProduct);
+        addedCount++;
       }
     });
 
@@ -374,7 +379,7 @@ export class ProductService {
       eyeCareCategory.count = this.products.filter(p => p.category === 'Eye Care').length;
     }
 
-    console.log(`✅ Added ${eyeCellProducts.length} EyeCell products to existing data`);
+    console.log(`✅ Added ${addedCount} EyeCell products to existing data (${eyeCellProducts.length - addedCount} already existed)`);
   }
 
   private async loadFallbackData(): Promise<void> {
