@@ -8,6 +8,7 @@ export class ProductService {
   private newProducts: Product[] = [];
   private categories: Category[] = [];
   private isConnected = false;
+  private eyeCellProductsAdded = false;
 
   static getInstance(): ProductService {
     if (!ProductService.instance) {
@@ -246,10 +247,18 @@ export class ProductService {
     } catch (error) {
       console.error('❌ Error loading data from API:', error);
       await this.loadFallbackData();
+      
+      // Always add EyeCell products to ensure they're available
+      await this.addEyeCellProducts();
     }
   }
 
   private async addEyeCellProducts(): Promise<void> {
+    if (this.eyeCellProductsAdded) {
+      console.log('👁️ EyeCell products already added, skipping...');
+      return;
+    }
+    
     console.log('👁️ Adding EyeCell products to existing data...');
     
     const eyeCellProducts = [
@@ -379,6 +388,7 @@ export class ProductService {
       eyeCareCategory.count = this.products.filter(p => p.category === 'Eye Care').length;
     }
 
+    this.eyeCellProductsAdded = true;
     console.log(`✅ Added ${addedCount} EyeCell products to existing data (${eyeCellProducts.length - addedCount} already existed)`);
   }
 
