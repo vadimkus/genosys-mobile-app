@@ -239,7 +239,7 @@ export default function TrainingMaterialsScreen() {
     },
     {
       id: '26',
-      title: 'GENOSYS SKIN REBOOT PDRN MASK PACK',
+      title: 'SKIN REBOOT PDRN MASK PACK',
       size: '1.2 MB',
       url: 'https://genosys.ae/training',
       category: 'Product Documentation',

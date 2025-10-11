@@ -282,11 +282,13 @@ export default function ProductDetailScreen() {
     if (name.includes('hr³ matrix hair solution') || name.includes('hair solution')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional hair growth solution</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth stimulation, scalp health, professional treatment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional hair treatment, daily application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Premium hair and scalp solution</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 5ml*8pcs</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Hair loss prevention and regrowth</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced peptide and botanical extract technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair loss prevention, regrowth stimulation, scalp health</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>System:</Text> Part of HR³ MATRIX MESOPECIA KIT</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -694,8 +696,8 @@ export default function ProductDetailScreen() {
       );
     }
     
-    // GENOSYS SKIN REBOOT PDRN MASK PACK
-    if (name.includes('genosys skin reboot pdrn mask pack')) {
+    // SKIN REBOOT PDRN MASK PACK
+    if (name.includes('skin reboot pdrn mask pack')) {
       return (
         <>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional-grade PDRN mask pack</Text>
@@ -1331,7 +1333,7 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
-        {product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' && (
+        {product.name === 'SKIN REBOOT PDRN MASK PACK' && (
           <View style={styles.inStockBadge}>
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
@@ -1406,7 +1408,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '101g (60 patches)';
             if (product.name === 'EyeCell EYE ZONE CARE KIT') return '1 Kit';
             if (product.name === 'GENO-LED IR II') return '1 Device';
-            if (product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK') return '30 sheets per container';
+            if (product.name === 'SKIN REBOOT PDRN MASK PACK') return '30 sheets per container';
             if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') return '300g';
             if (product.name === 'EGF REPAIR OXYMASK CREAM') return '50g';
             if (product.name === 'EPI TURNOVER BOOSTING PEELING GEL') return '100g';
@@ -1475,8 +1477,10 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS EyeCell EYE ZONE CARE KIT is a comprehensive professional-grade solution designed to address various concerns in the delicate eye area, including fine lines, dark circles, puffiness, and crow's feet. This advanced kit combines cosmeceuticals with a specialized micro-needle roller to enhance the absorption of active ingredients and stimulate collagen production for comprehensive eye rejuvenation."
                 : product.name === 'GENO-LED IR II'
                 ? "GENOSYS GENO-LED IR II is an advanced LED therapy device that combines infrared and red light technology to provide professional-grade skin rejuvenation treatments. This innovative device utilizes specific wavelengths of light to stimulate cellular activity, promote collagen production, and enhance overall skin health for both professional and home use."
-                : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK'
-                ? "GENOSYS SKIN REBOOT PDRN MASK PACK is a professional-grade treatment mask infused with PDRN (Polydeoxyribonucleotide) extracted from salmon DNA. This advanced mask promotes cellular regeneration, accelerates skin repair, and enhances overall skin health. Perfect for post-treatment care and intensive skin rejuvenation."
+                : product.name === 'SKIN REBOOT PDRN MASK PACK'
+                ? "SKIN REBOOT PDRN MASK PACK is a professional-grade treatment mask infused with PDRN (Polydeoxyribonucleotide) extracted from salmon DNA. This advanced mask promotes cellular regeneration, accelerates skin repair, and enhances overall skin health. Perfect for post-treatment care and intensive skin rejuvenation."
+                : product.name === 'HR³ MATRIX HAIR SOLUTION α'
+                ? "GENOSYS HR³ MATRIX HAIR SOLUTION α is a premium scalp and hair care treatment specifically formulated to combat hair loss and promote healthy hair regrowth. This advanced solution addresses the fundamental causes of hair loss by accelerating angiogenesis, inhibiting hair loss substances, and providing essential nutrients to hair follicles for optimal growth and strength."
                 : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                 ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
                 : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1560,7 +1564,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Enhances Circulation - Improves blood flow and oxygen delivery to skin cells</Text>
                 <Text style={styles.benefitItem}>• Safe and Non-Invasive - Gentle, pain-free treatment suitable for all skin types</Text>
               </>
-            ) : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? (
+            ) : product.name === 'SKIN REBOOT PDRN MASK PACK' ? (
               <>
                 <Text style={styles.benefitItem}>• Skin Regeneration - Accelerates cell regeneration and improves skin texture</Text>
                 <Text style={styles.benefitItem}>• Deep Hydration - Provides intense moisture for plump, dewy skin</Text>
@@ -1701,7 +1705,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Skin-soothing and anti-inflammatory properties for gentle, effective care.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Provitamin B5 that provides deep penetrating moisture and reduces inflammation.</Text>
               </>
-            ) : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? (
+            ) : product.name === 'SKIN REBOOT PDRN MASK PACK' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>PDRN (Polydeoxyribonucleotide):</Text> DNA-based ingredient derived from salmon that accelerates skin regeneration, improves elasticity, and promotes healing with 95% similarity to human DNA.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol (Pro-Vitamin B5):</Text> Deeply hydrates and soothes the skin while supporting the skin barrier and promoting wound healing with strong water-binding capacity.</Text>
@@ -1822,7 +1826,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Safety:</Text> Avoid direct eye contact and follow the built-in timer controls</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Maintenance:</Text> Clean the device after each use and store in a cool, dry place</Text>
               </>
-            ) : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? (
+            ) : product.name === 'SKIN REBOOT PDRN MASK PACK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Prepare:</Text> Cleanse your face and pat dry</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Extract:</Text> Take out one sheet mask with the built-in tweezers</Text>
@@ -1902,7 +1906,7 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. Regular use can lead to a more youthful, vibrant, and refreshed appearance around the eyes. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen."
               : product.name === 'GENO-LED IR II'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your skincare routine. Consult with a skincare professional for personalized treatment protocols."
-              : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK'
+              : product.name === 'SKIN REBOOT PDRN MASK PACK'
               ? "This product is clinically proven to restore skin barrier function damaged by physical irritation. For optimal results, use consistently 2-3 times per week. Store in a cool, dry place and ensure the container is tightly sealed after each use to maintain product freshness."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
@@ -1918,7 +1922,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -1926,7 +1930,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -1940,7 +1944,7 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf'
                     : product.name === 'GENO-LED IR II'
                     ? 'https://genosys.ae/documents/ppt/GENO-LED%20IR%20II_2025.pdf'
-                    : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK'
+                    : product.name === 'SKIN REBOOT PDRN MASK PACK'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
