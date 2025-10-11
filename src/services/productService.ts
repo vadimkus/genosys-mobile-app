@@ -76,7 +76,7 @@ export class ProductService {
             this.newProducts = this.products
               .filter(product => 
                 product.name.toLowerCase().includes('bio-ferment age defying powder mask') ||
-                product.name.toLowerCase().includes('genosys skin reboot pdrn mask pack')
+                product.name.toLowerCase().includes('skin reboot pdrn mask pack')
               );
             console.log('⚠️ New products API not available, using specific new arrival products.');
           } else {
@@ -1056,7 +1056,7 @@ export class ProductService {
     this.featuredProducts = this.products.filter(p => p.isFeatured);
     this.newProducts = this.products.filter(product => 
       product.name.toLowerCase().includes('bio-ferment age defying powder mask') ||
-      product.name.toLowerCase().includes('genosys skin reboot pdrn mask pack')
+      product.name.toLowerCase().includes('skin reboot pdrn mask pack')
     );
     this.categories = [
       { 
@@ -1131,7 +1131,7 @@ export class ProductService {
             // Specific product mappings for better visual representation
             if (name.includes('intensive repair collagen mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
             if (name.includes('bio-ferment age defying powder mask') || name.includes('bfad')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBFAD.png&w=1200&q=75';
-            if (name.includes('genosys skin reboot pdrn mask pack')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75';
+            if (name.includes('skin reboot pdrn mask pack')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75';
             if (name.includes('eyecell eye zone care kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYEZ.jpg&w=1200&q=75';
             if (name.includes('geno-led ir ii')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FLEDD.jpg&w=1200&q=75';
             if (name.includes('hair-gentron')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fgen.jpg&w=1200&q=75';
