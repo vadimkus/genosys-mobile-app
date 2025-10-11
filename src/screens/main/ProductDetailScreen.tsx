@@ -1352,19 +1352,6 @@ export default function ProductDetailScreen() {
         </View>
       )}
 
-      {/* Stock Status */}
-      <View style={styles.stockStatusContainer}>
-        <View style={[styles.stockIndicator, { backgroundColor: product.inStock ? '#10b981' : '#ef4444' }]}>
-          <Ionicons 
-            name={product.inStock ? "checkmark-circle" : "close-circle"} 
-            size={16} 
-            color="#ffffff" 
-          />
-        </View>
-        <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          {product.inStock ? 'In Stock' : 'Out of Stock'}
-        </Text>
-      </View>
 
       {/* Product Category */}
       <TouchableOpacity 
