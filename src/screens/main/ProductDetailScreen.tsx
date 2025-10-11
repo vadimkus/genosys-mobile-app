@@ -951,6 +951,21 @@ export default function ProductDetailScreen() {
       );
     }
     
+    // EPI TURNOVER BOOSTING PEELING GEL
+    if (name.includes('epi turnover boosting peeling gel')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Enzyme-based peeling gel</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, including sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Natural enzyme exfoliation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Gentle exfoliation, radiance enhancement, pore purification</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
     // CLAY DETOX MASK
     if (name.includes('clay detox mask')) {
       return (
