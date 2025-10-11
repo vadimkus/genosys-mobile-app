@@ -1896,7 +1896,7 @@ export default function ProductDetailScreen() {
                     : product.name === 'EyeCell EYE ZONE CARE KIT'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf'
                     : product.name === 'GENO-LED IR II'
-                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20GENO-LED%20IR%20II.pdf'
+                    ? 'https://genosys.ae/documents/ppt/GENO-LED%20IR%20II_2025.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
