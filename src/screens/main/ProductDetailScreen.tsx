@@ -93,12 +93,11 @@ export default function ProductDetailScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={20} color="#dc2626" />
-          <Text style={styles.backButtonText}>Back</Text>
+          <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
       </View>
       
@@ -373,19 +372,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#f9fafb',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    gap: 8,
+    padding: 8,
   },
   backButtonText: {
     fontSize: 16,
+    fontWeight: '500',
     color: '#dc2626',
-    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   imageContainer: {
     position: 'relative',
