@@ -31,12 +31,16 @@ export default function ProductDetailScreen() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState('');
 
   useEffect(() => {
     const { productId } = route.params as { productId: string };
     if (productId) {
       const foundProduct = productService.getProductById(productId);
       setProduct(foundProduct || null);
+      if (foundProduct) {
+        setSelectedSize(foundProduct.defaultSize || (foundProduct.sizeOptions && foundProduct.sizeOptions[0]) || '');
+      }
     }
     setLoading(false);
   }, [route.params]);
@@ -127,6 +131,33 @@ export default function ProductDetailScreen() {
           </View>
         )}
       </View>
+
+      {/* Size Selection */}
+      {product.sizeOptions && product.sizeOptions.length > 0 && (
+        <View style={styles.sizeSelectionContainer}>
+          <Text style={[styles.sizeSelectionTitle, { color: theme.colors.text }]}>Size</Text>
+          <View style={styles.sizeOptionsContainer}>
+            {product.sizeOptions.map((size, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.sizeOption,
+                  selectedSize === size && styles.sizeOptionSelected
+                ]}
+                onPress={() => setSelectedSize(size)}
+              >
+                <Text style={[
+                  styles.sizeOptionText,
+                  { color: theme.colors.text },
+                  selectedSize === size && styles.sizeOptionTextSelected
+                ]}>
+                  {size}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
 
       {/* Stock Status */}
       <View style={styles.stockStatusContainer}>
@@ -715,5 +746,41 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 6,
     lineHeight: 20,
+  },
+  sizeSelectionContainer: {
+    padding: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  sizeSelectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#1f2937',
+  },
+  sizeOptionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  sizeOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: '#ffffff',
+  },
+  sizeOptionSelected: {
+    backgroundColor: '#dc2626',
+    borderColor: '#dc2626',
+  },
+  sizeOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  sizeOptionTextSelected: {
+    color: '#ffffff',
   },
 });
