@@ -1435,6 +1435,8 @@ export default function ProductDetailScreen() {
               ? "GENOSYS ALL FOR SENSITIVE SERUM is a specialized skin repairing serum designed specifically for sensitive skin. This advanced formula provides a protective moisture barrier while delivering anti-inflammatory and soothing properties to calm and repair sensitized skin. Perfect for those with reactive, easily irritated skin."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
+              : product.name === 'EGF REPAIR OXYMASK CREAM'
+              ? "GENOSYS EGF REPAIR OXYMASK CREAM is a unique oxygen bubbling mask cream designed to rejuvenate dull and stressed skin. This innovative 'S.O.S' cream effectively addresses skin damage from various causes, providing immediate relief and long-term skin regeneration through advanced oxygen therapy and skin-regenerating ingredients."
               : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1471,6 +1473,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Renewal - Promotes cellular turnover for younger-looking skin</Text>
                 <Text style={styles.benefitItem}>• Hydration Boost - Provides intense moisture and plumping effects</Text>
                 <Text style={styles.benefitItem}>• Firming Action - Improves skin elasticity and firmness</Text>
+              </>
+            ) : product.name === 'EGF REPAIR OXYMASK CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Oxygen Therapy - Supplies oxygen to the skin, improving cellular metabolism</Text>
+                <Text style={styles.benefitItem}>• Skin Regeneration - Accelerates healing process and reduces skin irritations</Text>
+                <Text style={styles.benefitItem}>• Anti-Inflammatory - Provides soothing effects for sensitive and damaged skin</Text>
+                <Text style={styles.benefitItem}>• Deep Hydration - Promotes intense moisture retention and skin plumping</Text>
+                <Text style={styles.benefitItem}>• Collagen Stimulation - Enhances skin elasticity and firmness</Text>
+                <Text style={styles.benefitItem}>• EGF Technology - Advanced epidermal growth factor for cellular renewal</Text>
+                <Text style={styles.benefitItem}>• Bubbling Action - Unique oxygen bubbling effect for enhanced penetration</Text>
               </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
@@ -1525,6 +1537,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Fermented Ginseng Extract:</Text> Traditional Korean ingredient enhanced through fermentation, providing energizing and revitalizing effects while improving skin tone and reducing fatigue signs.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Provides intense hydration and plumping effects, helping to reduce the appearance of fine lines and wrinkles while maintaining optimal skin moisture levels.</Text>
               </>
+            ) : product.name === 'EGF REPAIR OXYMASK CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Oligopeptide-1 (EGF):</Text> Epidermal Growth Factor stimulates cell proliferation and aids in wound healing, promoting faster skin recovery and regeneration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Madecassoside:</Text> Derived from Centella Asiatica, it combats redness, reduces itching, and soothes sensitive skin while providing anti-inflammatory benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Promotes collagen synthesis and has wound-healing properties, helping to improve skin texture and reduce signs of aging.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>SEPITONIC M3 (Mineral Complex):</Text> Enhances cellular metabolism and revitalizes the skin, providing essential minerals for optimal skin function and health.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Salmon Oil:</Text> Rich in unsaturated fatty acids, it offers anti-inflammatory and wound-healing effects while providing deep nourishment to the skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Provides anti-aging benefits by reducing the appearance of wrinkles and fine lines, promoting smoother, more youthful-looking skin.</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1566,6 +1587,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Rinse thoroughly with lukewarm water</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use 1-2 times per week for optimal results</Text>
               </>
+            ) : product.name === 'EGF REPAIR OXYMASK CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and ensure skin is dry</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a thin layer of the cream mask evenly on dry skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Bubbling Process:</Text> Do not rub; wait for the oxygen bubbles to form and cover the face</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Massage:</Text> Once the bubbles start popping (after 1-2 minutes), gently massage and tap for better absorption</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Completion:</Text> Do not rinse off</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use in the morning and evening</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -1594,6 +1624,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
+              : product.name === 'EGF REPAIR OXYMASK CREAM'
+              ? "This product is dermatologically tested and suitable for all skin types. For optimal bubbling, avoid rubbing the product during application. For best results, incorporate it into your daily skincare routine."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>
