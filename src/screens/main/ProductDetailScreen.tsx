@@ -368,12 +368,12 @@ export default function ProductDetailScreen() {
     if (name.includes('intensive blemish balm cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive blemish balm cream with SPF</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Natural coverage cream with SPF protection</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>SPF Rating:</Text> SPF 30 PA++</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Blemish coverage, sun protection, skin care</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially blemish-prone skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sun protection and coverage</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Coverage:</Text> Natural to medium coverage</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Blemish coverage, sun protection, post-treatment care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially sensitive and post-treatment skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1765,6 +1765,13 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Wound healing and anti-inflammatory effects</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Tea Leaf Extract:</Text> Antioxidant protection and skin renewal</Text>
               </>
+            ) : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Anti-aging ingredient that helps reduce fine lines and wrinkles while promoting skin renewal.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that calms irritated skin and promotes skin regeneration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Origanum Vulgare Leaf Extract:</Text> Natural antioxidant extract that provides protection against environmental damage and free radicals.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that enhances skin protection and provides natural coverage benefits.</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1879,6 +1886,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 15-20 minutes to allow the CO₂ therapy to work</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Remove mask and gently massage any remaining product into the skin</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use 1-2 times per week for optimal results</Text>
+              </>
+            ) : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse and moisturize your skin before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to areas needing coverage and blend gently</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Blending:</Text> Use fingertips or a beauty sponge to blend for natural-looking coverage</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Build Coverage:</Text> Layer for additional coverage on areas with more significant blemishes</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Setting:</Text> Allow to set for a few minutes before applying additional makeup if desired</Text>
               </>
             ) : isCollagenMask ? (
               <>
