@@ -74,18 +74,6 @@ export default function ProfileScreen() {
     navigation.navigate('MainTabs', { screen: 'Orders' });
   };
 
-  const handleSettings = () => {
-    navigation.navigate('Settings');
-  };
-
-  const handleHelp = () => {
-    Alert.alert('Help & Support', 'Contact us at support@genosys.ae');
-  };
-
-  const handleAbout = () => {
-    Alert.alert('About Genosys', 'Genosys Mobile App v1.0.0\nPremium Korean Dermacosmetics');
-  };
-
   const handleTraining = () => {
     navigation.navigate('TrainingMaterials');
   };
@@ -302,34 +290,6 @@ export default function ProfileScreen() {
                 <Text style={styles.fileSize}>10.4 MB</Text>
                 <Ionicons name="download-outline" size={16} color="#dc2626" />
               </View>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.menuSection}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Support</Text>
-            
-            <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="settings-outline" size={24} color="#6b7280" />
-                <Text style={styles.menuItemText}>Settings</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={handleHelp}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="help-circle-outline" size={24} color="#6b7280" />
-                <Text style={styles.menuItemText}>Help & Support</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={handleAbout}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="information-circle-outline" size={24} color="#6b7280" />
-                <Text style={styles.menuItemText}>About</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
             </TouchableOpacity>
           </View>
 
