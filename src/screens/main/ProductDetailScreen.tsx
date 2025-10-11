@@ -1306,6 +1306,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.newText}>NEW</Text>
           </View>
         )}
+        {product.name === 'EyeCell EYE CONTOUR SERUM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1908,6 +1913,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   newText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  inStockBadge: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    backgroundColor: '#10b981',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  inStockText: {
     color: '#ffffff',
     fontSize: 12,
     fontWeight: 'bold',
