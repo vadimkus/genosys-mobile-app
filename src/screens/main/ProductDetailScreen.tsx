@@ -1916,10 +1916,13 @@ const styles = StyleSheet.create({
   },
   descriptionBlock: {
     backgroundColor: '#ffffff',
+    borderRadius: 12,
     padding: 16,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   detailsList: {
     backgroundColor: '#ffffff',
