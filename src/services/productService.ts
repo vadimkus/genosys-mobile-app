@@ -232,6 +232,9 @@ export class ProductService {
         }
         
         console.log(`✅ Loaded ${this.products.length} products, ${this.featuredProducts.length} featured, ${this.newProducts.length} new from API`);
+        
+        // Always add EyeCell products to ensure they're available
+        await this.addEyeCellProducts();
       } else {
         // No data from API, use fallback
         console.log('⚠️ No data from API, using fallback data');
@@ -241,6 +244,137 @@ export class ProductService {
       console.error('❌ Error loading data from API:', error);
       await this.loadFallbackData();
     }
+  }
+
+  private async addEyeCellProducts(): Promise<void> {
+    console.log('👁️ Adding EyeCell products to existing data...');
+    
+    const eyeCellProducts = [
+      {
+        id: '54',
+        name: 'EyeCell EYE CONTOUR CREAM',
+        description: 'Daily eye cream that reduces fine lines, dark circles, and puffiness. Advanced peptide technology.',
+        price: 0, // Login to see price
+        originalPrice: 0,
+        discountPercentage: 0,
+        imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Feyecell.jpg&w=1200&q=75',
+        imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell.jpg&w=1200&q=75'],
+        category: 'Eye Care',
+        brand: 'Genosys',
+        sku: 'GEN-054',
+        images: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell.jpg&w=1200&q=75'],
+        inStock: true,
+        stockQuantity: 25,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: false,
+        stock: 25,
+        rating: 4.0,
+        averageRating: 4.8,
+        reviewCount: 0,
+        sizeOptions: ['20g'],
+        defaultSize: '20g',
+        createdAt: '2024-03-05T10:00:00.000Z',
+        updatedAt: '2024-03-05T10:00:00.000Z'
+      },
+      {
+        id: '55',
+        name: 'EyeCell EYE CONTOUR SERUM',
+        description: 'Advanced eye contour serum for anti-aging and dark circle reduction. Professional eye area treatment.',
+        price: 0, // Login to see price
+        originalPrice: 0,
+        discountPercentage: 0,
+        imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-serum.jpg&w=1200&q=75',
+        imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-serum.jpg&w=1200&q=75'],
+        category: 'Eye Care',
+        brand: 'Genosys',
+        sku: 'GEN-055',
+        images: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-serum.jpg&w=1200&q=75'],
+        inStock: true,
+        stockQuantity: 20,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: false,
+        stock: 20,
+        rating: 4.0,
+        averageRating: 4.7,
+        reviewCount: 0,
+        sizeOptions: ['15ml'],
+        defaultSize: '15ml',
+        createdAt: '2024-03-05T10:00:00.000Z',
+        updatedAt: '2024-03-05T10:00:00.000Z'
+      },
+      {
+        id: '56',
+        name: 'EyeCell EYE PEPTIDE GEL PATCH',
+        description: 'Professional eye peptide gel patches for intensive eye area treatment. Advanced peptide therapy.',
+        price: 0, // Login to see price
+        originalPrice: 0,
+        discountPercentage: 0,
+        imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-patch.jpg&w=1200&q=75',
+        imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-patch.jpg&w=1200&q=75'],
+        category: 'Eye Care',
+        brand: 'Genosys',
+        sku: 'GEN-056',
+        images: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-patch.jpg&w=1200&q=75'],
+        inStock: true,
+        stockQuantity: 15,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: false,
+        stock: 15,
+        rating: 4.0,
+        averageRating: 4.6,
+        reviewCount: 0,
+        sizeOptions: ['30 patches'],
+        defaultSize: '30 patches',
+        createdAt: '2024-03-05T10:00:00.000Z',
+        updatedAt: '2024-03-05T10:00:00.000Z'
+      },
+      {
+        id: '57',
+        name: 'EyeCell EYE ZONE CARE KIT',
+        description: 'Comprehensive eye care kit with multiple components for complete eye area treatment and anti-aging.',
+        price: 0, // Login to see price
+        originalPrice: 0,
+        discountPercentage: 0,
+        imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-kit.jpg&w=1200&q=75',
+        imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-kit.jpg&w=1200&q=75'],
+        category: 'Eye Care',
+        brand: 'Genosys',
+        sku: 'GEN-057',
+        images: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell-kit.jpg&w=1200&q=75'],
+        inStock: true,
+        stockQuantity: 10,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: false,
+        stock: 10,
+        rating: 4.0,
+        averageRating: 4.8,
+        reviewCount: 0,
+        sizeOptions: ['1 Kit'],
+        defaultSize: '1 Kit',
+        createdAt: '2024-03-05T10:00:00.000Z',
+        updatedAt: '2024-03-05T10:00:00.000Z'
+      }
+    ];
+
+    // Add EyeCell products to existing products if they don't already exist
+    eyeCellProducts.forEach(eyeCellProduct => {
+      const exists = this.products.some(p => p.id === eyeCellProduct.id);
+      if (!exists) {
+        this.products.push(eyeCellProduct);
+      }
+    });
+
+    // Update categories to include Eye Care count
+    const eyeCareCategory = this.categories.find(c => c.name === 'Eye Care');
+    if (eyeCareCategory) {
+      eyeCareCategory.count = this.products.filter(p => p.category === 'Eye Care').length;
+    }
+
+    console.log(`✅ Added ${eyeCellProducts.length} EyeCell products to existing data`);
   }
 
   private async loadFallbackData(): Promise<void> {
