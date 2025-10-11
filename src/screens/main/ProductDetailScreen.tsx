@@ -167,6 +167,7 @@ export default function ProductDetailScreen() {
 
         <View style={styles.priceContainer}>
           <Text style={styles.price}>AED {product.price.toFixed(2)}</Text>
+          <Text style={styles.vatText}>(VAT included)</Text>
           {product.originalPrice && product.originalPrice > product.price && (
             <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
           )}
@@ -463,8 +464,8 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     marginBottom: 24,
   },
   price: {
@@ -472,6 +473,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#dc2626',
     marginRight: 12,
+  },
+  vatText: {
+    fontSize: 12,
+    color: '#6b7280',
+    fontStyle: 'italic',
+    marginTop: 2,
   },
   originalPrice: {
     fontSize: 18,
