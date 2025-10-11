@@ -1653,6 +1653,14 @@ export default function ProductDetailScreen() {
           </View>
         )}
 
+        {/* Shipping Info */}
+        <View style={styles.shippingInfo}>
+          <Text style={styles.shippingTitle}>Shipping Information</Text>
+          <Text style={styles.shippingItem}>🚚 Free Shipping on orders over 1,000 AED</Text>
+          <Text style={styles.shippingItem}>💳 Secure Payment with Stripe checkout</Text>
+          <Text style={styles.shippingItem}>🏛️ 5% UAE Tax Payer - Supporting local economy</Text>
+        </View>
+
         {/* Footer Section */}
         <View style={styles.footerSection}>
           <Image 
@@ -1665,14 +1673,6 @@ export default function ProductDetailScreen() {
           <Text style={styles.footerCopyright}>© 2025 Genosys Middle East FZ-LLC. All rights reserved.</Text>
         </View>
       </View>
-
-      {/* Shipping Info */}
-        <View style={styles.shippingInfo}>
-          <Text style={styles.shippingTitle}>Shipping Information</Text>
-          <Text style={styles.shippingItem}>🚚 Free Shipping on orders over 1,000 AED</Text>
-          <Text style={styles.shippingItem}>💳 Secure Payment with Stripe checkout</Text>
-          <Text style={styles.shippingItem}>🏛️ 5% UAE Tax Payer - Supporting local economy</Text>
-        </View>
       </ScrollView>
     </View>
   );
