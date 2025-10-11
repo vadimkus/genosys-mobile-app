@@ -27,7 +27,6 @@ export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { user } = useStore();
   const { theme } = useTheme();
-  const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,16 +45,13 @@ export default function HomeScreen() {
       const connected = await productService.initialize();
       setIsConnected(connected);
       
-      const allProducts = productService.getAllProducts();
       const featured = productService.getFeaturedProducts();
       const newProducts = productService.getNewProducts();
       
-      setProducts(allProducts);
       setFeaturedProducts(featured);
       setNewProducts(newProducts);
       
-      console.log(`✅ Loaded ${allProducts.length} products, ${featured.length} featured, ${newProducts.length} new`);
-      console.log('📦 All products:', allProducts.map(p => p.name));
+      console.log(`✅ Loaded ${featured.length} featured, ${newProducts.length} new products`);
       console.log('⭐ Featured products:', featured.map(p => p.name));
       console.log('🆕 New products:', newProducts.map(p => p.name));
     } catch (error) {
@@ -120,14 +116,6 @@ export default function HomeScreen() {
         title="🆕 New Arrivals"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
         onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { new: true } })}
-      />
-
-      {/* All Products Carousel */}
-      <ProductCarousel
-        products={products} // Show all products
-        title="🛍️ All Products"
-        onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products' })}
       />
 
     </ScrollView>
