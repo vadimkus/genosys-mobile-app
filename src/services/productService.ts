@@ -1336,7 +1336,7 @@ export class ProductService {
         discountPercentage: product.discountPercentage ? parseInt(product.discountPercentage) : undefined,
         imageUrl: finalImageUrl,
         imageUrls: product.imageUrls || [product.imageUrl] || [finalImageUrl],
-        category: this.mapProductToCategory(product.name, product.category),
+        category: product.category,
         brand: product.brand,
         sku: product.sku || `GEN-${product.id}`,
         images: product.imageUrls || [product.imageUrl] || [finalImageUrl],
