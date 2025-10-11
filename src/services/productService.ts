@@ -239,6 +239,10 @@ export class ProductService {
         const sunProducts = this.products.filter(p => p.category === 'Sun');
         console.log('☀️ Sun products found:', sunProducts.map(p => p.name));
         
+        // Debug: Check if Sun category exists
+        const sunCategory = this.categories.find(c => c.name === 'Sun');
+        console.log('☀️ Sun category exists:', !!sunCategory, sunCategory ? `count: ${sunCategory.count}` : 'not found');
+        
         // Always add EyeCell products to ensure they're available
         await this.addEyeCellProducts();
       } else {
@@ -253,6 +257,10 @@ export class ProductService {
         console.log('🏷️ Fallback categories loaded:', this.categories.map(c => `${c.name} (${c.count})`));
         const sunProducts = this.products.filter(p => p.category === 'Sun');
         console.log('☀️ Fallback sun products found:', sunProducts.map(p => p.name));
+        
+        // Debug: Check if Sun category exists in fallback
+        const sunCategory = this.categories.find(c => c.name === 'Sun');
+        console.log('☀️ Fallback Sun category exists:', !!sunCategory, sunCategory ? `count: ${sunCategory.count}` : 'not found');
       }
     } catch (error) {
       console.error('❌ Error loading data from API:', error);
