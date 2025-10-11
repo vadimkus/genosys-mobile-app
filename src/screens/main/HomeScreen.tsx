@@ -115,7 +115,7 @@ export default function HomeScreen() {
         products={newProducts}
         title="🆕 New Arrivals"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { new: true } })}
+        showViewAll={false}
       />
 
     </ScrollView>
