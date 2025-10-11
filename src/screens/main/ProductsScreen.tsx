@@ -91,11 +91,25 @@ export default function ProductsScreen() {
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      console.log('🔍 Searching for:', searchQuery);
+      console.log('📦 Total products before search:', products.length);
+      
+      filtered = filtered.filter(product => {
+        const nameMatch = product.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        const brandMatch = product.brand?.toLowerCase().includes(searchQuery.toLowerCase());
+        const categoryMatch = product.category?.toLowerCase().includes(searchQuery.toLowerCase());
+        const descriptionMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const isMatch = nameMatch || brandMatch || categoryMatch || descriptionMatch;
+        
+        if (isMatch) {
+          console.log('✅ Found match:', product.name);
+        }
+        
+        return isMatch;
+      });
+      
+      console.log('📦 Products after search:', filtered.length);
     }
 
     // Category filter
