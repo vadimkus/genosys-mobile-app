@@ -1253,7 +1253,7 @@ export class ProductService {
         
         // Masks
         if (name.includes('ez co₂ mask kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEZE.jpg&w=1200&q=75';
-        if (name.includes('peptide gel mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('peptide gel mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
         if (name.includes('soothing bomb sea algae mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('hydro cool modeling mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHYDR.jpg&w=1200&q=75';
         if (name.includes('skin rescue overnight cream mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
@@ -1282,10 +1282,13 @@ export class ProductService {
         
         // Power solutions
         if (name.includes('power solution cts')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FCTS.jpg&w=1200&q=75';
+        if (name.includes('power solution cvs')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FCVS.jpg&w=1200&q=75';
+        if (name.includes('power solution hes')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHES.jpg&w=1200&q=75';
         if (name.includes('power solution')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Devices
-        if (name.includes('needle pen-k') || name.includes('microneedle roller')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('microneedle roller')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fgenosys-microneedling-devices.jpg&w=1200&q=75';
+        if (name.includes('needle pen-k')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Multi vita radiance cream
         if (name.includes('multi vita radiance cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
