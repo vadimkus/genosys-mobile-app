@@ -87,6 +87,7 @@ export class ProductService {
             this.newProducts = this.transformProducts(newProducts);
           }
           
+          console.log('🏷️ Categories length check:', categories.length, 'Empty?', categories.length === 0);
           if (categories.length === 0) {
             console.log('🏷️ Using fallback categories because API categories is empty');
             // Use predefined categories and count products in each
