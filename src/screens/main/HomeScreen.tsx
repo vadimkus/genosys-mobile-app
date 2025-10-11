@@ -16,9 +16,8 @@ import { RootStackParamList, MainTabParamList } from '../../navigation/AppNaviga
 import { useStore } from '../../store/useStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import { productService } from '../../services/productService';
-import { Product, Category } from '../../types';
+import { Product } from '../../types';
 import ProductCarousel from '../../components/ProductCarousel';
-import CategoryCarousel from '../../components/CategoryCarousel';
 
 const { width } = Dimensions.get('window');
 
@@ -31,7 +30,6 @@ export default function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -51,12 +49,10 @@ export default function HomeScreen() {
       const allProducts = productService.getAllProducts();
       const featured = productService.getFeaturedProducts();
       const newProducts = productService.getNewProducts();
-      const categories = productService.getCategories();
       
       setProducts(allProducts);
       setFeaturedProducts(featured);
       setNewProducts(newProducts);
-      setCategories(categories);
       
       console.log(`✅ Loaded ${allProducts.length} products, ${featured.length} featured, ${newProducts.length} new`);
       console.log('📦 All products:', allProducts.map(p => p.name));
@@ -110,16 +106,10 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Categories Carousel */}
-      <CategoryCarousel
-        categories={categories}
-        onCategoryPress={(categoryName) => navigation.navigate('MainTabs', { screen: 'Products', params: { category: categoryName } })}
-      />
-
       {/* Featured Products Carousel */}
       <ProductCarousel
         products={featuredProducts}
-        title="⭐ Featured Products"
+        title="🎁 Genosys Kits - active discount"
         onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
         onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { featured: true } })}
       />
