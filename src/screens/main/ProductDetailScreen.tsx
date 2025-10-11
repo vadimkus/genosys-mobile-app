@@ -1697,20 +1697,23 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <Text style={styles.documentationText}>
               Download the complete product manual and usage guide for professional application.
             </Text>
             <View style={styles.documentationInfo}>
-              <Text style={styles.documentationFileInfo}>📄 File size: 2.1 MB</Text>
+              <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : '2.8 MB'}</Text>
             </View>
             <TouchableOpacity 
               style={styles.documentationButton}
               onPress={() => {
                 // Open the product documentation PDF
-                Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf');
+                const pdfUrl = product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' 
+                  ? 'https://genosys.ae/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf'
+                  : 'https://genosys.ae/documents/ppt/Genosys%20Ez%20Co2%20Mask.pdf';
+                Linking.openURL(pdfUrl);
               }}
             >
               <Text style={styles.documentationButtonText}>View PDF</Text>
