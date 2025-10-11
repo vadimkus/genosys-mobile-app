@@ -36,6 +36,8 @@ export default function ProductDetailScreen() {
   useEffect(() => {
     const { productId } = route.params as { productId: string };
     console.log('Product ID from route:', productId);
+    console.log('All products in service:', productService.getAllProducts().length);
+    console.log('Product 11:', productService.getProductById('11'));
     if (productId) {
       const foundProduct = productService.getProductById(productId);
       console.log('Found product:', foundProduct);
