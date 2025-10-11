@@ -566,11 +566,14 @@ export default function ProductDetailScreen() {
     if (name.includes('ez co₂ mask kit')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> EZ CO₂ mask kit</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> Kit (Multiple components)</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> CO₂ therapy, skin rejuvenation, professional treatment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional CO₂ treatment, 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional carboxy therapy kit (Gel + Sheet Mask)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1 kit</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull and stressed skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> CO₂ therapy with Bohr Effect mechanism</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Oxygen therapy, skin firming, brightening, anti-blemish</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Kit Contents:</Text> Gel 20g x 5ea, Mask 12g x 5ea, 1 Peptide Mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Special Feature:</Text> Catalytic mask for enhanced treatment absorption</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
