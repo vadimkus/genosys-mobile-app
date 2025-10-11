@@ -1381,7 +1381,18 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'EyeCell EYE CONTOUR CREAM' ? '20g' : product.name === 'EyeCell EYE CONTOUR SERUM' ? '15ml' : product.name === 'EyeCell EYE PEPTIDE GEL PATCH' ? '30 patches' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1 Kit' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : product.name === 'EZ CO₂ MASK KIT' ? '1 Kit' : '30ml'}
+          Size: {(() => {
+            if (product.name === 'ALL FOR SENSITIVE SERUM') return '30ml';
+            if (product.name === 'EyeCell EYE CONTOUR CREAM') return '20g';
+            if (product.name === 'EyeCell EYE CONTOUR SERUM') return '15ml';
+            if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '30 patches';
+            if (product.name === 'EyeCell EYE ZONE CARE KIT') return '1 Kit';
+            if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') return '300g';
+            if (product.name === 'EGF REPAIR OXYMASK CREAM') return '50g';
+            if (product.name === 'EPI TURNOVER BOOSTING PEELING GEL') return '100g';
+            if (product.name === 'EZ CO₂ MASK KIT') return '1 Kit';
+            return '30ml';
+          })()}
         </Text>
       </View>
 
