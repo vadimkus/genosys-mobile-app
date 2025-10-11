@@ -1506,15 +1506,15 @@ export default function ProductDetailScreen() {
 
         {/* Key Features Section for SKIN REBOOT PDRN MASK PACK */}
         {product.name === 'SKIN REBOOT PDRN MASK PACK' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Key Features</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
             <View style={styles.detailsList}>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>PDRN Technology:</Text> Contains PDRN extracted from salmon DNA to promote cellular regeneration and accelerate skin healing and repair processes.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Ultra-Slim Fit Sheet:</Text> Ultra-slim fit sheet adheres seamlessly to the skin for effective delivery of active ingredients and maximum absorption.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Convenient Packaging:</Text> Contains 30 sheets per container with tissue-style packaging that allows for convenient one-by-one dispensing with built-in tweezers.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Barrier Restoration:</Text> Clinical results show significant improvement in restoring the skin barrier damaged by physical irritation or environmental stress.</Text>
-            </View>
           </View>
+        </View>
         )}
 
 
@@ -1720,10 +1720,15 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'SKIN REBOOT PDRN MASK PACK' ? (
               <>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>PDRN (Polydeoxyribonucleotide):</Text> DNA-based ingredient derived from salmon that accelerates skin regeneration, improves elasticity, and promotes healing.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol (Pro-Vitamin B5):</Text> Deeply hydrates and soothes the skin while supporting the skin barrier and promoting wound healing.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Provides deep moisture retention, plumps the skin, and helps reduce the appearance of fine lines and wrinkles.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>PDRN (Polydeoxyribonucleotide):</Text> DNA-based ingredient derived from salmon that accelerates skin regeneration, improves elasticity, and promotes healing with 95% similarity to human DNA.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol (Pro-Vitamin B5):</Text> Deeply hydrates and soothes the skin while supporting the skin barrier and promoting wound healing with strong water-binding capacity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Provides deep moisture retention, plumps the skin, and helps reduce the appearance of fine lines and wrinkles for enhanced hydration.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Peptide Complex:</Text> Stimulates collagen production and improves skin firmness for a more youthful, resilient complexion.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramide:</Text> Key lipid component that reinforces skin barrier, helps maintain skin homeostasis, and prevents transepidermal water loss.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Acts as a precursor to ceramides, promoting ceramide synthesis in the skin and strengthening the skin barrier.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Skin-soothing and anti-inflammatory properties for gentle, effective care and enhanced skin comfort.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Shea Butter:</Text> Skin-friendly, plant-derived emollient rich in triglycerides and fatty acids for intense moisturization and antioxidant protection.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Leaf Complex:</Text> Camellia Sinensis, Mentha Rotundifolia, and Thyme extracts providing antioxidant, anti-inflammatory, and natural antibacterial properties.</Text>
               </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
