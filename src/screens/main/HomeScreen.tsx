@@ -89,7 +89,7 @@ export default function HomeScreen() {
         <View style={styles.headerTop}>
           <View style={styles.greetingContainer}>
             <Text style={[styles.greeting, { color: theme.colors.text }]}>
-              {user?.firstName || 'User'}!
+              {user?.firstName || 'User'}
             </Text>
             <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Discover premium dermacosmetics and products</Text>
           </View>
