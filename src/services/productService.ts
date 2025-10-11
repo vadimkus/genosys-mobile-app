@@ -883,7 +883,7 @@ export class ProductService {
         // Skincare creams
         if (name.includes('blemish balm cream') || name.includes('blemish balm cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBLEM.jpg&w=1200&q=75';
         if (name.includes('anti-wrinkle cream') || name.includes('nd cell')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        if (name.includes('multi functional') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('multi functional') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FANT.jpg&w=1200&q=75';
         if (name.includes('moisture replenishing') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHER.jpg&w=1200&q=75';
         if (name.includes('intensive problem control cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75';
         if (name.includes('intensive hydro soothing cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHSC.jpg&w=1200&q=75';
@@ -893,7 +893,7 @@ export class ProductService {
         if (name.includes('eyecell eye contour cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEC.jpg&w=1200&q=75';
         
         // Sun protection
-        if (name.includes('sun cream') || name.includes('ultra shield')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('sun cream') || name.includes('ultra shield')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSSUN.jpg&w=1200&q=75';
         
         // Masks
         if (name.includes('ez co₂ mask kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEZE.jpg&w=1200&q=75';
@@ -925,6 +925,7 @@ export class ProductService {
         if (name.includes('snow o₂ cleanser')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Power solutions
+        if (name.includes('power solution cts')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FCTS.jpg&w=1200&q=75';
         if (name.includes('power solution')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Devices
