@@ -133,6 +133,13 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
+          {product.inStock ? 'In Stock' : 'Out of Stock'}
+        </Text>
+      </View>
+
+      {/* Product Category */}
+      <View style={styles.categoryContainer}>
+        <Text style={[styles.categoryText, { color: theme.colors.textSecondary }]}>
           {product.category}
         </Text>
       </View>
@@ -594,6 +601,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#6b7280',
+  },
+  categoryContainer: {
+    marginHorizontal: 20,
+    marginVertical: 4,
+  },
+  categoryText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#6b7280',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   cartSection: {
     backgroundColor: '#ffffff',
