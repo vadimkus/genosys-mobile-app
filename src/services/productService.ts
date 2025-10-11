@@ -863,6 +863,33 @@ export class ProductService {
             defaultSize: '50g',
             createdAt: '2024-03-04T10:00:00.000Z',
             updatedAt: '2024-03-04T10:00:00.000Z'
+          },
+          {
+            id: '20',
+            name: 'INTENSIVE PROBLEM CONTROL CREAM',
+            description: 'Advanced problem control cream for targeted treatment of skin concerns and blemish control',
+            price: 99.99,
+            originalPrice: 129.99,
+            discountPercentage: 23,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75'],
+            category: 'Cream',
+            brand: 'Genosys',
+            sku: 'GEN-020',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 28,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: true,
+            stock: 28,
+            rating: 4.0,
+            averageRating: 4.5,
+            reviewCount: 76,
+            sizeOptions: ['50g', '250g'],
+            defaultSize: '50g',
+            createdAt: '2024-03-05T10:00:00.000Z',
+            updatedAt: '2024-03-05T10:00:00.000Z'
           }
         ];
 
@@ -1228,6 +1255,11 @@ export class ProductService {
       return ['50g', '250g'];
     }
     
+    // INTENSIVE PROBLEM CONTROL CREAM
+    if (name.includes('intensive problem control cream')) {
+      return ['50g', '250g'];
+    }
+    
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
       return ['30ml', '50ml'];
@@ -1286,6 +1318,11 @@ export class ProductService {
     
     // MOISTURE REPLENISHING HYALURON CREAM
     if (name.includes('moisture replenishing hyaluron cream')) {
+      return '50g';
+    }
+    
+    // INTENSIVE PROBLEM CONTROL CREAM
+    if (name.includes('intensive problem control cream')) {
       return '50g';
     }
     
