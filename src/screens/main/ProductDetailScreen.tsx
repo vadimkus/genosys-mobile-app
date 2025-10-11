@@ -1381,7 +1381,7 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'EyeCell EYE CONTOUR CREAM' ? '20g' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : product.name === 'EZ CO₂ MASK KIT' ? '1 Kit' : '30ml'}
+          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'EyeCell EYE CONTOUR CREAM' ? '20g' : product.name === 'EyeCell EYE CONTOUR SERUM' ? '15ml' : product.name === 'EyeCell EYE PEPTIDE GEL PATCH' ? '30 patches' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1 Kit' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : product.name === 'EZ CO₂ MASK KIT' ? '1 Kit' : '30ml'}
         </Text>
       </View>
 
