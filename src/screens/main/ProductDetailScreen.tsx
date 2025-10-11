@@ -139,6 +139,9 @@ export default function ProductDetailScreen() {
 
       {/* Product Category */}
       <View style={styles.categoryContainer}>
+        <View style={styles.categoryIcon}>
+          <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+        </View>
         <Text style={[styles.categoryText, { color: theme.colors.textSecondary }]}>
           {product.category}
         </Text>
@@ -603,8 +606,13 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   categoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginHorizontal: 20,
     marginVertical: 4,
+  },
+  categoryIcon: {
+    marginRight: 6,
   },
   categoryText: {
     fontSize: 12,
