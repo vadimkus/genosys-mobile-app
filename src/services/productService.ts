@@ -836,6 +836,33 @@ export class ProductService {
             reviewCount: 45,
             createdAt: '2024-03-03T10:00:00.000Z',
             updatedAt: '2024-03-03T10:00:00.000Z'
+          },
+          {
+            id: '19',
+            name: 'MOISTURE REPLENISHING HYALURON CREAM',
+            description: 'Intensive moisture replenishing cream with hyaluronic acid for deep hydration and skin nourishment',
+            price: 89.99,
+            originalPrice: 119.99,
+            discountPercentage: 25,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHER.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHER.jpg&w=1200&q=75'],
+            category: 'Cream',
+            brand: 'Genosys',
+            sku: 'GEN-019',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHER.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 35,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: true,
+            stock: 35,
+            rating: 4.0,
+            averageRating: 4.6,
+            reviewCount: 98,
+            sizeOptions: ['50g', '250g'],
+            defaultSize: '50g',
+            createdAt: '2024-03-04T10:00:00.000Z',
+            updatedAt: '2024-03-04T10:00:00.000Z'
           }
         ];
 
@@ -1196,6 +1223,11 @@ export class ProductService {
       return ['50g', '250g'];
     }
     
+    // MOISTURE REPLENISHING HYALURON CREAM
+    if (name.includes('moisture replenishing hyaluron cream')) {
+      return ['50g', '250g'];
+    }
+    
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
       return ['30ml', '50ml'];
@@ -1249,6 +1281,11 @@ export class ProductService {
     
     // INTENSIVE HYDRO SOOTHING CREAM
     if (name.includes('intensive hydro soothing cream')) {
+      return '50g';
+    }
+    
+    // MOISTURE REPLENISHING HYALURON CREAM
+    if (name.includes('moisture replenishing hyaluron cream')) {
       return '50g';
     }
     
