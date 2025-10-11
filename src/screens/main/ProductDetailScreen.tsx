@@ -138,7 +138,10 @@ export default function ProductDetailScreen() {
       </View>
 
       {/* Product Category */}
-      <View style={styles.stockStatusContainer}>
+      <TouchableOpacity 
+        style={styles.stockStatusContainer}
+        onPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { category: product.category } })}
+      >
         <View style={[styles.stockIndicator, { backgroundColor: '#10b981' }]}>
           <Ionicons 
             name="checkmark-circle" 
@@ -149,7 +152,7 @@ export default function ProductDetailScreen() {
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
           {product.category}
         </Text>
-      </View>
+      </TouchableOpacity>
 
       {/* Add to Cart Section */}
       <View style={styles.cartSection}>
