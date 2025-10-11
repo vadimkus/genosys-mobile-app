@@ -1432,6 +1432,8 @@ export default function ProductDetailScreen() {
           <Text style={styles.description}>
             {product.name === 'ALL FOR SENSITIVE SERUM' 
               ? "GENOSYS ALL FOR SENSITIVE SERUM is a specialized skin repairing serum designed specifically for sensitive skin. This advanced formula provides a protective moisture barrier while delivering anti-inflammatory and soothing properties to calm and repair sensitized skin. Perfect for those with reactive, easily irritated skin."
+              : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
+              ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
               : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1458,6 +1460,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Moisture Barrier - Creates a protective layer to prevent moisture loss</Text>
                 <Text style={styles.benefitItem}>• Gentle Formula - Specifically designed for sensitive and reactive skin</Text>
                 <Text style={styles.benefitItem}>• Skin Repair - Helps repair damaged skin and restore healthy function</Text>
+              </>
+            ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
+              <>
+                <Text style={styles.benefitItem}>• Age Defying - Reduces fine lines and wrinkles through advanced fermentation technology</Text>
+                <Text style={styles.benefitItem}>• Bio-Ferment Technology - Harnesses the power of beneficial microorganisms for skin health</Text>
+                <Text style={styles.benefitItem}>• Deep Penetration - Powder-to-mask formula ensures maximum ingredient absorption</Text>
+                <Text style={styles.benefitItem}>• Antioxidant Protection - Neutralizes free radicals and environmental damage</Text>
+                <Text style={styles.benefitItem}>• Skin Renewal - Promotes cellular turnover for younger-looking skin</Text>
+                <Text style={styles.benefitItem}>• Hydration Boost - Provides intense moisture and plumping effects</Text>
+                <Text style={styles.benefitItem}>• Firming Action - Improves skin elasticity and firmness</Text>
               </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
@@ -1503,6 +1515,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hamamelis Virginiana (Witch Hazel) Extract:</Text> A natural astringent that helps tighten pores, reduce inflammation, and provide gentle cleansing properties while being gentle on sensitive skin.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing in sensitive skin.</Text>
               </>
+            ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bio-Fermented Extracts:</Text> Advanced fermentation process creates beneficial compounds, peptides, and amino acids that enhance skin barrier function and provide anti-aging benefits through natural biological processes.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Fermented Rice Extract:</Text> Rich in vitamins, minerals, and antioxidants, fermented rice provides gentle exfoliation and brightening effects while nourishing the skin with essential nutrients.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Fermented Soybean Extract:</Text> Contains isoflavones and peptides that help improve skin elasticity, reduce inflammation, and provide antioxidant protection against environmental stressors.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Fermented Green Tea Extract:</Text> Enhanced antioxidant properties through fermentation, providing superior protection against free radicals and helping to reduce signs of aging and environmental damage.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Fermented Ginseng Extract:</Text> Traditional Korean ingredient enhanced through fermentation, providing energizing and revitalizing effects while improving skin tone and reducing fatigue signs.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Provides intense hydration and plumping effects, helping to reduce the appearance of fine lines and wrinkles while maintaining optimal skin moisture levels.</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1535,6 +1556,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> Gently pat with fingers until fully absorbed</Text>
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as part of your daily skincare routine for sensitive skin care</Text>
               </>
+            ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and apply toner if desired</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Mixing:</Text> Mix the powder with water or your preferred liquid to create a smooth paste</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Application:</Text> Apply evenly to clean skin, avoiding the eye area</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 15-20 minutes</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Rinse thoroughly with lukewarm water</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use 1-2 times per week for optimal results</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -1561,6 +1591,8 @@ export default function ProductDetailScreen() {
           <Text style={styles.noteText}>
             <Text style={styles.noteLabel}>Note:</Text> {product.name === 'ALL FOR SENSITIVE SERUM' 
               ? "This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine."
+              : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
+              ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>
