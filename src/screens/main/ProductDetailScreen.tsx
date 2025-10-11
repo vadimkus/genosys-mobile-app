@@ -674,11 +674,12 @@ export default function ProductDetailScreen() {
     if (name.includes('bio-ferment age defying powder mask') || name.includes('bfad')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Bio-ferment age defying powder mask</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Age defying, bio-ferment technology, anti-aging</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Age defying treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Powder mask (activates with water)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 300g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature and aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Bio-fermentation process</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Age defying, skin renewal, deep hydration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 1-2 times per week</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
