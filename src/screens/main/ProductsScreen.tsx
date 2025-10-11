@@ -149,7 +149,9 @@ export default function ProductsScreen() {
         )}
         {item.inStock && (
           <View style={styles.inStockBadge}>
-            <Text style={styles.inStockText}>IN STOCK</Text>
+            <Text style={styles.inStockText}>
+              {(item.name === 'Hair-GENTRON Device' || item.name === 'HairGen Booster') ? 'ORDER' : 'IN STOCK'}
+            </Text>
           </View>
         )}
         <TouchableOpacity
@@ -206,7 +208,9 @@ export default function ProductsScreen() {
         )}
         {item.inStock && (
           <View style={styles.inStockBadge}>
-            <Text style={styles.inStockText}>IN STOCK</Text>
+            <Text style={styles.inStockText}>
+              {(item.name === 'Hair-GENTRON Device' || item.name === 'HairGen Booster') ? 'ORDER' : 'IN STOCK'}
+            </Text>
           </View>
         )}
         <TouchableOpacity
