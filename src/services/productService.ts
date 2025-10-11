@@ -56,7 +56,7 @@ export class ProductService {
       const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
 
       // Debug: Log API categories
-      console.log('🏷️ API categories received:', categories.map(c => c.name || c));
+      console.log('🏷️ API categories received:', categories.map((c: any) => c.name || c));
       console.log('🏷️ API categories count:', categories.length);
 
       // If we got some data from API, use it
@@ -233,6 +233,22 @@ export class ProductService {
             ].filter(cat => cat.count > 0); // Only show categories with products
           } else {
             this.categories = this.transformCategories(categories);
+            
+            // Ensure Sun category is always included
+            const sunCategoryExists = this.categories.some(c => c.name === 'Sun');
+            if (!sunCategoryExists) {
+              this.categories.push({
+                id: 'sun',
+                name: 'Sun',
+                slug: 'sun',
+                count: this.products.filter(p => p.category === 'Sun').length,
+                isActive: true,
+                sortOrder: 10,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              });
+              console.log('☀️ Added Sun category to API categories');
+            }
           }
         }
         
