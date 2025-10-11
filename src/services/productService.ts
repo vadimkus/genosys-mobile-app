@@ -1151,6 +1151,11 @@ export class ProductService {
 
   private transformProducts(dbProducts: any[]): Product[] {
     return dbProducts.map(product => {
+      // Remove GENOSYS prefix from product names for cleaner display
+      if (product.name && product.name.startsWith('GENOSYS ')) {
+        product.name = product.name.replace('GENOSYS ', '');
+      }
+      
       // Create comprehensive product image mapping based on actual product names
       const getImageUrl = (productName: string) => {
         const name = productName.toLowerCase();
