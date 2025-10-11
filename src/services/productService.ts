@@ -1410,7 +1410,7 @@ export class ProductService {
     }
     
     // Cushion BB (must come before Cream to catch cushion products)
-    if (name.includes('cushion') || name.includes('bb') || name.includes('blemish balm cushion')) {
+    if (name.includes('cushion') || name.includes('bb') || name.includes('blemish balm')) {
       return 'Cushion BB';
     }
     
