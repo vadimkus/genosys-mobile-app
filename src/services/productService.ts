@@ -890,6 +890,33 @@ export class ProductService {
             defaultSize: '50g',
             createdAt: '2024-03-05T10:00:00.000Z',
             updatedAt: '2024-03-05T10:00:00.000Z'
+          },
+          {
+            id: '54',
+            name: 'EyeCell EYE CONTOUR CREAM',
+            description: 'Daily eye cream that reduces fine lines, dark circles, and puffiness. Advanced peptide technology.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Feyecell.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell.jpg&w=1200&q=75'],
+            category: 'Eye Care',
+            brand: 'Genosys',
+            sku: 'GEN-054',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Feyecell.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 25,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 25,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['20g'],
+            defaultSize: '20g',
+            createdAt: '2024-03-05T10:00:00.000Z',
+            updatedAt: '2024-03-05T10:00:00.000Z'
           }
         ];
 

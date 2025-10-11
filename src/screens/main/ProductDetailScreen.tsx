@@ -1381,7 +1381,7 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : product.name === 'EZ CO₂ MASK KIT' ? '1 Kit' : '30ml'}
+          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'EyeCell EYE CONTOUR CREAM' ? '20g' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : product.name === 'EZ CO₂ MASK KIT' ? '1 Kit' : '30ml'}
         </Text>
       </View>
 
@@ -1434,6 +1434,8 @@ export default function ProductDetailScreen() {
             <Text style={styles.description}>
               {product.name === 'ALL FOR SENSITIVE SERUM' 
                 ? "GENOSYS ALL FOR SENSITIVE SERUM is a specialized skin repairing serum designed specifically for sensitive skin. This advanced formula provides a protective moisture barrier while delivering anti-inflammatory and soothing properties to calm and repair sensitized skin. Perfect for those with reactive, easily irritated skin."
+                : product.name === 'EyeCell EYE CONTOUR CREAM'
+                ? "GENOSYS EyeCell EYE CONTOUR CREAM is a daily eye care product specifically designed to address multiple concerns around the delicate eye area. This advanced eye cream targets fine wrinkles, crow's feet, dark circles, and under-eye puffiness while promoting microcirculation to enhance overall skin health and provide comprehensive eye area care."
                 : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                 ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
                 : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1469,6 +1471,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Moisture Barrier - Creates a protective layer to prevent moisture loss</Text>
                 <Text style={styles.benefitItem}>• Gentle Formula - Specifically designed for sensitive and reactive skin</Text>
                 <Text style={styles.benefitItem}>• Skin Repair - Helps repair damaged skin and restore healthy function</Text>
+              </>
+            ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Fine Wrinkle Reduction - Targets and reduces fine lines around the eye area</Text>
+                <Text style={styles.benefitItem}>• Crow's Feet Diminishing - Helps diminish the appearance of crow's feet</Text>
+                <Text style={styles.benefitItem}>• Dark Circle Lightening - Lightens dark circles and under-eye discoloration</Text>
+                <Text style={styles.benefitItem}>• Puffiness Relief - Alleviates under-eye puffiness and swelling</Text>
+                <Text style={styles.benefitItem}>• Microcirculation Enhancement - Promotes blood circulation for healthier skin</Text>
+                <Text style={styles.benefitItem}>• Firming Effects - Provides firming and lifting benefits</Text>
+                <Text style={styles.benefitItem}>• Daily Care - Suitable for daily use in morning and evening routines</Text>
               </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
@@ -1554,6 +1566,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hamamelis Virginiana (Witch Hazel) Extract:</Text> A natural astringent that helps tighten pores, reduce inflammation, and provide gentle cleansing properties while being gentle on sensitive skin.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing in sensitive skin.</Text>
               </>
+            ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Palmitoyl Hexapeptide-12:</Text> Stimulates fibroblast cell growth, imparting firming effects and helping to improve skin elasticity around the delicate eye area.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Promotes collagen synthesis in skin fibroblasts, aiding in skin regeneration and helping to reduce the appearance of fine lines and wrinkles.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Rosa Damascena Callus Culture Extract:</Text> Offers moisturizing, soothing, and whitening effects with anti-aging benefits, helping to brighten the eye area and reduce signs of aging.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis Root Extract:</Text> Provides anti-inflammatory, antioxidant, antimicrobial, antifungal, antiviral, and free radical scavenging properties for comprehensive skin protection.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sodium Hyaluronate:</Text> Hydrates the skin, reduces water loss, minimizes the appearance of wrinkles and fine lines, and improves skin elasticity for a more youthful appearance.</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bio-Fermented Extracts:</Text> Advanced fermentation process creates beneficial compounds, peptides, and amino acids that enhance skin barrier function and provide anti-aging benefits through natural biological processes.</Text>
@@ -1624,6 +1644,12 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> Gently pat with fingers until fully absorbed</Text>
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as part of your daily skincare routine for sensitive skin care</Text>
               </>
+            ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Apply the cream to pre-cleansed skin around the eyes in the morning and evening</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Gently pat the product around the eye contour area using your ring finger for optimal absorption</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Best Results:</Text> For best results, use in conjunction with other Genosys EyeCell products</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and apply toner if desired</Text>
@@ -1685,6 +1711,8 @@ export default function ProductDetailScreen() {
           <Text style={styles.noteText}>
             <Text style={styles.noteLabel}>Note:</Text> {product.name === 'ALL FOR SENSITIVE SERUM' 
               ? "This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine."
+              : product.name === 'EyeCell EYE CONTOUR CREAM'
+              ? "This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
               : product.name === 'EGF REPAIR OXYMASK CREAM'
