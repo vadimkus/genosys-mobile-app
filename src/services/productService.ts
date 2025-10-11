@@ -1413,11 +1413,15 @@ export class ProductService {
       return 'Serum';
     }
     
-    // Cream
-    if (name.includes('cream') || name.includes('balm') || name.includes('moisturizer') ||
-        name.includes('anti-wrinkle cream') || name.includes('blemish balm') ||
-        name.includes('intensive hydro soothing cream') || name.includes('intensive problem control cream')) {
-      return 'Cream';
+    // Sun (must come before Cream to catch sun products)
+    if (name.includes('sun cream') || name.includes('spf') || name.includes('ultra shield') ||
+        name.includes('sun protection') || name.includes('multi sun cream')) {
+      return 'Sun';
+    }
+    
+    // Cushion BB (must come before Cream to catch cushion products)
+    if (name.includes('cushion') || name.includes('bb') || name.includes('blemish balm cushion')) {
+      return 'Cushion BB';
     }
     
     // Mask
@@ -1426,15 +1430,12 @@ export class ProductService {
       return 'Mask';
     }
     
-    // Sun
-    if (name.includes('sun cream') || name.includes('spf') || name.includes('ultra shield') ||
-        name.includes('sun protection') || name.includes('multi sun cream')) {
-      return 'Sun';
-    }
-    
-    // Cushion BB
-    if (name.includes('cushion') || name.includes('bb') || name.includes('blemish balm cushion')) {
-      return 'Cushion BB';
+    // Cream (more specific to avoid catching sun and cushion products)
+    if (name.includes('cream') && !name.includes('sun') && !name.includes('cushion') && 
+        !name.includes('spf') && !name.includes('ultra shield') ||
+        name.includes('moisturizer') || name.includes('anti-wrinkle cream') ||
+        name.includes('intensive hydro soothing cream') || name.includes('intensive problem control cream')) {
+      return 'Cream';
     }
     
     // Scalp/Hair
