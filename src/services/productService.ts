@@ -382,11 +382,14 @@ export class ProductService {
       }
     });
 
-    // Update categories to include Eye Care count
-    const eyeCareCategory = this.categories.find(c => c.name === 'Eye Care');
-    if (eyeCareCategory) {
-      eyeCareCategory.count = this.products.filter(p => p.category === 'Eye Care').length;
-    }
+    // Update all category counts to reflect current products
+    this.categories.forEach(category => {
+      if (category.name === 'All products') {
+        category.count = this.products.length;
+      } else {
+        category.count = this.products.filter(p => p.category === category.name).length;
+      }
+    });
 
     this.eyeCellProductsAdded = true;
     console.log(`✅ Added ${addedCount} EyeCell products to existing data (${eyeCellProducts.length - addedCount} already existed)`);
