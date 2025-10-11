@@ -1086,9 +1086,8 @@ export class ProductService {
     }
     
     // Scalp/Hair
-    if (name.includes('hr³ matrix') || name.includes('hair') || name.includes('scalp') || 
-        name.includes('hairgen') || name.includes('hair tonic') ||
-        name.includes('hair solution') || name.includes('scalp shampoo')) {
+    if (name.includes('hr³ matrix') || name.includes('scalp') || 
+        name.includes('hair tonic') || name.includes('hair solution') || name.includes('scalp shampoo')) {
       return 'Scalp/Hair';
     }
     
