@@ -1370,6 +1370,20 @@ export default function ProductDetailScreen() {
         </Text>
       </TouchableOpacity>
 
+      {/* Product Size */}
+      <View style={styles.stockStatusContainer}>
+        <View style={[styles.stockIndicator, { backgroundColor: '#10b981' }]}>
+          <Ionicons 
+            name="checkmark-circle" 
+            size={16} 
+            color="#ffffff" 
+          />
+        </View>
+        <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
+          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : '30ml'}
+        </Text>
+      </View>
+
       {/* Reviews and Price */}
       <View style={styles.reviewsPriceSection}>
         <View style={styles.ratingContainer}>
