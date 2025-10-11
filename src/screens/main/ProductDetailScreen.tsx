@@ -1399,6 +1399,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'EyeCell EYE CONTOUR SERUM') return '10ml';
             if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '101g (60 patches)';
             if (product.name === 'EyeCell EYE ZONE CARE KIT') return '1 Kit';
+            if (product.name === 'GENO-LED IR II') return '1 Device';
             if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') return '300g';
             if (product.name === 'EGF REPAIR OXYMASK CREAM') return '50g';
             if (product.name === 'EPI TURNOVER BOOSTING PEELING GEL') return '100g';
