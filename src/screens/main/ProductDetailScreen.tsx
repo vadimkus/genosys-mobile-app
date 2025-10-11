@@ -423,11 +423,12 @@ export default function ProductDetailScreen() {
     if (name.includes('eyecell eye contour serum')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye contour serum</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 15ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Eye area treatment, anti-aging, dark circle reduction</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily eye care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Eye contour serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 10ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature and aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced peptide and botanical callus culture technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Wrinkle reduction, dark circle diminishment, puffiness relief</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1384,7 +1385,7 @@ export default function ProductDetailScreen() {
           Size: {(() => {
             if (product.name === 'ALL FOR SENSITIVE SERUM') return '30ml';
             if (product.name === 'EyeCell EYE CONTOUR CREAM') return '20g';
-            if (product.name === 'EyeCell EYE CONTOUR SERUM') return '15ml';
+            if (product.name === 'EyeCell EYE CONTOUR SERUM') return '10ml';
             if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '30 patches';
             if (product.name === 'EyeCell EYE ZONE CARE KIT') return '1 Kit';
             if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') return '300g';
@@ -1447,6 +1448,8 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS ALL FOR SENSITIVE SERUM is a specialized skin repairing serum designed specifically for sensitive skin. This advanced formula provides a protective moisture barrier while delivering anti-inflammatory and soothing properties to calm and repair sensitized skin. Perfect for those with reactive, easily irritated skin."
                 : product.name === 'EyeCell EYE CONTOUR CREAM'
                 ? "GENOSYS EyeCell EYE CONTOUR CREAM is a daily eye care product specifically designed to address multiple concerns around the delicate eye area. This advanced eye cream targets fine wrinkles, crow's feet, dark circles, and under-eye puffiness while promoting microcirculation to enhance overall skin health and provide comprehensive eye area care."
+                : product.name === 'EyeCell EYE CONTOUR SERUM'
+                ? "GENOSYS EyeCell EYE CONTOUR SERUM is a highly enriched all-in-one eye serum specifically designed to address multiple concerns around the delicate eye area. This advanced serum targets fine wrinkles, dark circles, and under-eye puffiness while promoting skin regeneration and providing comprehensive eye area care with its powerful peptide complex and botanical callus culture extracts."
                 : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                 ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
                 : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1492,6 +1495,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Microcirculation Enhancement - Promotes blood circulation for healthier skin</Text>
                 <Text style={styles.benefitItem}>• Firming Effects - Provides firming and lifting benefits</Text>
                 <Text style={styles.benefitItem}>• Daily Care - Suitable for daily use in morning and evening routines</Text>
+              </>
+            ) : product.name === 'EyeCell EYE CONTOUR SERUM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Wrinkle Reduction - Stimulates collagen production and relaxes facial muscles for smoother skin</Text>
+                <Text style={styles.benefitItem}>• Dark Circle Diminishment - Anti-dark circle complex strengthens skin and visibly reduces dark circles</Text>
+                <Text style={styles.benefitItem}>• Puffiness Relief - Alleviates under-eye puffiness and swelling</Text>
+                <Text style={styles.benefitItem}>• Hydration and Firmness - Deeply moisturizes and plumps skin, enhancing elasticity</Text>
+                <Text style={styles.benefitItem}>• Antioxidant Protection - Botanical stem cell extracts provide soothing and whitening effects</Text>
+                <Text style={styles.benefitItem}>• Skin Regeneration - Promotes cellular renewal and skin repair</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade results for comprehensive eye care</Text>
               </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
@@ -1585,6 +1598,17 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis Root Extract:</Text> Provides anti-inflammatory, antioxidant, antimicrobial, antifungal, antiviral, and free radical scavenging properties for comprehensive skin protection.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sodium Hyaluronate:</Text> Hydrates the skin, reduces water loss, minimizes the appearance of wrinkles and fine lines, and improves skin elasticity for a more youthful appearance.</Text>
               </>
+            ) : product.name === 'EyeCell EYE CONTOUR SERUM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Palmitoyl Hexapeptide-12:</Text> Stimulates fibroblast growth for firming effects and improved skin elasticity around the delicate eye area.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Promotes collagen synthesis and skin regeneration, reducing fine lines and wrinkles for a more youthful appearance.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Acetyl Hexapeptide-8:</Text> Acts as muscle relaxant, reducing wrinkle appearance and expression lines for smoother skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Anti-Dark Circle Complex (Haloxyl™):</Text> Specialized complex for dark circle reduction and skin strengthening, targeting under-eye discoloration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Vitis Vinifera (Grape) Callus Culture Extract:</Text> Provides antioxidant and skin-renewing properties with anti-aging benefits for enhanced skin health.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Rosa Damascena Callus Culture Extract:</Text> Offers moisturizing, soothing, and whitening effects with anti-aging benefits, helping to brighten the eye area.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Provides anti-aging and skin-soothing properties with wrinkle-reducing effects for improved skin texture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Arbutin:</Text> Natural skin brightening agent that helps even skin tone and reduce the appearance of dark spots.</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bio-Fermented Extracts:</Text> Advanced fermentation process creates beneficial compounds, peptides, and amino acids that enhance skin barrier function and provide anti-aging benefits through natural biological processes.</Text>
@@ -1660,6 +1684,13 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Apply the cream to pre-cleansed skin around the eyes in the morning and evening</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Gently pat the product around the eye contour area using your ring finger for optimal absorption</Text>
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Best Results:</Text> For best results, use in conjunction with other Genosys EyeCell products</Text>
+              </>
+            ) : product.name === 'EyeCell EYE CONTOUR SERUM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and ensure the eye area is clean and dry</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount around the eye area in the morning and evening</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> Gently massage until fully absorbed using your ring finger for optimal absorption</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Best Results:</Text> For best results, use in conjunction with the Genosys EyeCell Eye Contour Cream as part of your daily eye care routine</Text>
               </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
