@@ -90,13 +90,13 @@ export class ProductService {
           console.log('🏷️ Categories length check:', categories.length, 'Empty?', categories.length === 0);
           if (categories.length === 0) {
             console.log('🏷️ Using fallback categories because API categories is empty');
-            // Use predefined categories and count products in each
+            // Use predefined categories (without counts initially)
             this.categories = [
               {
                 id: 'all-products',
                 name: 'All',
                 slug: 'all-products',
-                count: this.products.length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 1,
                 createdAt: new Date().toISOString(),
@@ -106,7 +106,7 @@ export class ProductService {
                 id: 'microneedling',
                 name: 'Microneedling',
                 slug: 'microneedling',
-                count: this.products.filter(p => p.category === 'Microneedling').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 2,
                 createdAt: new Date().toISOString(),
@@ -116,7 +116,7 @@ export class ProductService {
                 id: 'pro-solution',
                 name: 'PRO Solution',
                 slug: 'pro-solution',
-                count: this.products.filter(p => p.category === 'PRO Solution').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 3,
                 createdAt: new Date().toISOString(),
@@ -126,7 +126,7 @@ export class ProductService {
                 id: 'cleanser',
                 name: 'Cleanser',
                 slug: 'cleanser',
-                count: this.products.filter(p => p.category === 'Cleanser').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 4,
                 createdAt: new Date().toISOString(),
@@ -136,7 +136,7 @@ export class ProductService {
                 id: 'peeling',
                 name: 'Peeling',
                 slug: 'peeling',
-                count: this.products.filter(p => p.category === 'Peeling').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 5,
                 createdAt: new Date().toISOString(),
@@ -146,7 +146,7 @@ export class ProductService {
                 id: 'toner-mist',
                 name: 'Toner/Mist',
                 slug: 'toner-mist',
-                count: this.products.filter(p => p.category === 'Toner/Mist').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 6,
                 createdAt: new Date().toISOString(),
@@ -156,7 +156,7 @@ export class ProductService {
                 id: 'serum',
                 name: 'Serum',
                 slug: 'serum',
-                count: this.products.filter(p => p.category === 'Serum').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 7,
                 createdAt: new Date().toISOString(),
@@ -166,7 +166,7 @@ export class ProductService {
                 id: 'cream',
                 name: 'Cream',
                 slug: 'cream',
-                count: this.products.filter(p => p.category === 'Cream').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 8,
                 createdAt: new Date().toISOString(),
@@ -176,7 +176,7 @@ export class ProductService {
                 id: 'mask',
                 name: 'Mask',
                 slug: 'mask',
-                count: this.products.filter(p => p.category === 'Mask').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 9,
                 createdAt: new Date().toISOString(),
@@ -186,7 +186,7 @@ export class ProductService {
                 id: 'sun',
                 name: 'Sun',
                 slug: 'sun',
-                count: this.products.filter(p => p.category === 'Sun').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 10,
                 createdAt: new Date().toISOString(),
@@ -196,7 +196,7 @@ export class ProductService {
                 id: 'cushion-bb',
                 name: 'Cushion BB',
                 slug: 'cushion-bb',
-                count: this.products.filter(p => p.category === 'Cushion BB').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 11,
                 createdAt: new Date().toISOString(),
@@ -206,7 +206,7 @@ export class ProductService {
                 id: 'scalp-hair',
                 name: 'Scalp/Hair',
                 slug: 'scalp-hair',
-                count: this.products.filter(p => p.category === 'Scalp/Hair').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 12,
                 createdAt: new Date().toISOString(),
@@ -216,7 +216,7 @@ export class ProductService {
                 id: 'eye-care',
                 name: 'Eye Care',
                 slug: 'eye-care',
-                count: this.products.filter(p => p.category === 'Eye Care').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 13,
                 createdAt: new Date().toISOString(),
@@ -226,7 +226,7 @@ export class ProductService {
                 id: 'device',
                 name: 'Device',
                 slug: 'device',
-                count: this.products.filter(p => p.category === 'Device').length,
+                count: 0, // Will be calculated later
                 isActive: true,
                 sortOrder: 14,
                 createdAt: new Date().toISOString(),
