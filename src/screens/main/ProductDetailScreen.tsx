@@ -138,11 +138,15 @@ export default function ProductDetailScreen() {
       </View>
 
       {/* Product Category */}
-      <View style={styles.categoryContainer}>
-        <View style={styles.categoryIcon}>
-          <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+      <View style={styles.stockStatusContainer}>
+        <View style={[styles.stockIndicator, { backgroundColor: '#10b981' }]}>
+          <Ionicons 
+            name="checkmark-circle" 
+            size={16} 
+            color="#ffffff" 
+          />
         </View>
-        <Text style={[styles.categoryText, { color: theme.colors.textSecondary }]}>
+        <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
           {product.category}
         </Text>
       </View>
@@ -604,22 +608,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#6b7280',
-  },
-  categoryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginVertical: 4,
-  },
-  categoryIcon: {
-    marginRight: 6,
-  },
-  categoryText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#6b7280',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   cartSection: {
     backgroundColor: '#ffffff',
