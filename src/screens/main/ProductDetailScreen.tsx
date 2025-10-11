@@ -33,6 +33,80 @@ export default function ProductDetailScreen() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');
 
+  const getPriceForSize = (product: Product, size: string) => {
+    if (!product || !size) return product?.price || 0;
+    
+    // Define size-based pricing for different products
+    const name = product.name.toLowerCase();
+    
+    // INTENSIVE HYDRO SOOTHING CREAM
+    if (name.includes('intensive hydro soothing cream')) {
+      if (size === '50g') return 45.99;
+      if (size === '250g') return 89.99;
+    }
+    
+    // MULTI FUNCTIONAL ANTI-WRINKLE CREAM
+    if (name.includes('multi functional anti-wrinkle cream')) {
+      if (size === '30ml') return 65.99;
+      if (size === '50ml') return 89.99;
+    }
+    
+    // MULTI FUNCTIONAL ANTI-WRINKLE SERUM
+    if (name.includes('multi functional anti-wrinkle serum')) {
+      if (size === '15ml') return 45.99;
+      if (size === '30ml') return 75.99;
+    }
+    
+    // MULTI SUN CREAM
+    if (name.includes('multi sun cream')) {
+      if (size === '50ml') return 35.99;
+      if (size === '100ml') return 59.99;
+    }
+    
+    // MULTI VITA RADIANCE CREAM
+    if (name.includes('multi vita radiance cream')) {
+      if (size === '30ml') return 55.99;
+      if (size === '60ml') return 89.99;
+    }
+    
+    // ND Cell ANTI-WRINKLE CREAM
+    if (name.includes('nd cell anti-wrinkle cream')) {
+      if (size === '30ml') return 75.99;
+      if (size === '50ml') return 119.99;
+    }
+    
+    // PEPTIDE GEL MASK
+    if (name.includes('peptide gel mask')) {
+      if (size === '50ml') return 45.99;
+      if (size === '100ml') return 79.99;
+    }
+    
+    // POWER SOLUTION AWS
+    if (name.includes('power solution aws')) {
+      if (size === '30ml') return 65.99;
+      if (size === '60ml') return 99.99;
+    }
+    
+    // Microneedle Roller
+    if (name.includes('microneedle roller')) {
+      if (size === '0.25mm') return 25.99;
+      if (size === '0.5mm') return 29.99;
+      if (size === '0.1mm') return 22.99;
+      if (size === '0.15mm') return 24.99;
+      if (size === '0.2mm') return 26.99;
+    }
+    
+    // Needle Pen-K
+    if (name.includes('needle pen-k')) {
+      if (size === '0.25mm') return 89.99;
+      if (size === '0.5mm') return 99.99;
+      if (size === '1.0mm') return 109.99;
+    }
+    
+    // Default to original price if no size-specific pricing
+    return product.price;
+  };
+
   const getProductDetails = (product: Product) => {
     const name = product.name.toLowerCase();
     
@@ -1114,9 +1188,10 @@ export default function ProductDetailScreen() {
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, quantity);
+      const sizeText = selectedSize ? ` (Size: ${selectedSize})` : '';
       Alert.alert(
         'Added to Cart',
-        `${product.name} (${quantity} item${quantity > 1 ? 's' : ''}) has been added to your cart.`,
+        `${product.name}${sizeText} (${quantity} item${quantity > 1 ? 's' : ''}) has been added to your cart.`,
         [
           { text: 'Continue Shopping', style: 'cancel' },
           { text: 'View Cart', onPress: () => navigation.navigate('MainTabs', { screen: 'Cart' }) }
@@ -1269,7 +1344,7 @@ export default function ProductDetailScreen() {
         </View>
 
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>AED {product.price.toFixed(2)}</Text>
+          <Text style={styles.price}>AED {getPriceForSize(product, selectedSize).toFixed(2)}</Text>
           <Text style={styles.vatText}>(VAT included)</Text>
           {product.originalPrice && product.originalPrice > product.price && (
             <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
@@ -1297,7 +1372,7 @@ export default function ProductDetailScreen() {
         </View>
 
         <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-          <Text style={styles.addToCartText}>AED {(product.price * quantity).toFixed(2)}</Text>
+          <Text style={styles.addToCartText}>AED {(getPriceForSize(product, selectedSize) * quantity).toFixed(2)}</Text>
         </TouchableOpacity>
       </View>
 
