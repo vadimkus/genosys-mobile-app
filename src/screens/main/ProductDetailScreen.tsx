@@ -613,11 +613,12 @@ export default function ProductDetailScreen() {
     if (name.includes('eyecell eye peptide gel patch')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Eye peptide gel patch</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30 patches</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Eye area treatment, peptide therapy, anti-aging</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging eye area</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Eye patch treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Thermo-sensitive hydrogel patches</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 101g (60 patches)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature and aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Patented thermo-sensitive hydrogel technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Puffiness reduction, dark circle lightening, fine line smoothing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 20-40 minutes per application</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1311,6 +1312,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1391,7 +1397,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'ALL FOR SENSITIVE SERUM') return '30ml';
             if (product.name === 'EyeCell EYE CONTOUR CREAM') return '20g';
             if (product.name === 'EyeCell EYE CONTOUR SERUM') return '10ml';
-            if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '30 patches';
+            if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '101g (60 patches)';
             if (product.name === 'EyeCell EYE ZONE CARE KIT') return '1 Kit';
             if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') return '300g';
             if (product.name === 'EGF REPAIR OXYMASK CREAM') return '50g';
@@ -1455,6 +1461,8 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS EyeCell EYE CONTOUR CREAM is a daily eye care product specifically designed to address multiple concerns around the delicate eye area. This advanced eye cream targets fine wrinkles, crow's feet, dark circles, and under-eye puffiness while promoting microcirculation to enhance overall skin health and provide comprehensive eye area care."
                 : product.name === 'EyeCell EYE CONTOUR SERUM'
                 ? "GENOSYS EyeCell EYE CONTOUR SERUM is a highly enriched all-in-one eye serum specifically designed to address multiple concerns around the delicate eye area. This advanced serum targets fine wrinkles, dark circles, and under-eye puffiness while promoting skin regeneration and providing comprehensive eye area care with its powerful peptide complex and botanical callus culture extracts."
+                : product.name === 'EyeCell EYE PEPTIDE GEL PATCH'
+                ? "GENOSYS EyeCell EYE PEPTIDE GEL PATCH is a specialized treatment designed to rejuvenate and care for the delicate skin around the eyes. These crescent-shaped gel patches are infused with a potent blend of peptides, botanical extracts, and other active ingredients to address common eye area concerns including puffiness, dark circles, fine lines, and signs of fatigue."
                 : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                 ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
                 : product.name === 'EGF REPAIR OXYMASK CREAM'
