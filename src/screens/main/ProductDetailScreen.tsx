@@ -647,11 +647,11 @@ export default function ProductDetailScreen() {
     if (name.includes('all for sensitive serum')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> All for sensitive serum</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Sensitive skin care, gentle treatment, skin soothing</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Sensitive skin, reactive skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sensitive skin care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Sensitive, reactive, and easily irritated skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Gentle, non-irritating serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Barrier repair, anti-inflammatory, soothing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Apply to clean skin morning and evening, gently pat until absorbed</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
