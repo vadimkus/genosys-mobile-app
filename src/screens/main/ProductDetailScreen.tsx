@@ -1940,7 +1940,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : (product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK') ? '1.8 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -1954,8 +1954,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf'
                     : product.name === 'GENO-LED IR II'
                     ? 'https://genosys.ae/documents/ppt/GENO-LED%20IR%20II_2025.pdf'
-                    : product.name === 'SKIN REBOOT PDRN MASK PACK'
-                    ? 'https://genosys.ae/documents/ppt/SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
+                    : (product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK')
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
