@@ -1275,6 +1275,12 @@ export class ProductService {
       return 'Serum';
     }
     
+    // Eye Care (must come before Cream to catch EyeCell products)
+    if (name.includes('eyecell') || name.includes('eye contour') || name.includes('eye peptide') || 
+        name.includes('eye zone') || name.includes('eye care')) {
+      return 'Eye Care';
+    }
+    
     // Cream
     if (name.includes('cream') || name.includes('balm') || name.includes('moisturizer') ||
         name.includes('anti-wrinkle cream') || name.includes('blemish balm') ||
@@ -1305,11 +1311,6 @@ export class ProductService {
       return 'Scalp/Hair';
     }
     
-    // Eye Care
-    if (name.includes('eyecell') || name.includes('eye contour') || name.includes('eye peptide') || 
-        name.includes('eye zone') || name.includes('eye care')) {
-      return 'Eye Care';
-    }
     
     // Device
     if (name.includes('device') || name.includes('geno-led') || name.includes('led') ||
