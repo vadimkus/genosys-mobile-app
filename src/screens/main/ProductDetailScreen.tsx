@@ -9,6 +9,7 @@ import {
   Dimensions,
   Alert,
   StatusBar,
+  Linking,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -1597,6 +1598,29 @@ export default function ProductDetailScreen() {
             }
           </Text>
         </View>
+
+        {/* Product Documentation Section */}
+        {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Product Documentation</Text>
+            <Text style={styles.documentationText}>
+              Download the complete product manual and usage guide for professional application.
+            </Text>
+            <View style={styles.documentationInfo}>
+              <Text style={styles.documentationFileInfo}>📄 File size: 2.1 MB</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.documentationButton}
+              onPress={() => {
+                // Open the product documentation PDF
+                Linking.openURL('https://genosys.ae/_next/static/media/BIO-FERMENT-AGE-DEFYING-POWDER-MASK.pdf');
+              }}
+            >
+              <Text style={styles.documentationButtonText}>View PDF</Text>
+              <Text style={styles.documentationButtonText}>Download</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Shipping Info */}
@@ -1883,6 +1907,34 @@ const styles = StyleSheet.create({
   noteLabel: {
     fontWeight: '600',
     color: '#92400e',
+  },
+  documentationText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#374151',
+    marginBottom: 8,
+  },
+  documentationInfo: {
+    marginBottom: 12,
+  },
+  documentationFileInfo: {
+    fontSize: 12,
+    color: '#6b7280',
+    fontStyle: 'italic',
+  },
+  documentationButton: {
+    backgroundColor: '#3b82f6',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  documentationButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   stockStatusContainer: {
     flexDirection: 'row',
