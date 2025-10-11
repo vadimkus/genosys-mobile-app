@@ -1550,6 +1550,11 @@ export class ProductService {
       return ['30ml', '60ml'];
     }
     
+    // INTENSIVE BLEMISH BALM CREAM
+    if (name.includes('intensive blemish balm cream')) {
+      return ['50g'];
+    }
+    
     return undefined;
   }
 
@@ -1614,6 +1619,11 @@ export class ProductService {
     // POWER SOLUTION AWS
     if (name.includes('power solution aws')) {
       return '30ml';
+    }
+    
+    // INTENSIVE BLEMISH BALM CREAM
+    if (name.includes('intensive blemish balm cream')) {
+      return '50g';
     }
     
     return undefined;
