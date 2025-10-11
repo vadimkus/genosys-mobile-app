@@ -286,6 +286,7 @@ export class ProductService {
         // Debug: Check Cushion BB products
         const cushionBBProducts = this.products.filter(p => p.category === 'Cushion BB');
         console.log('💄 Cushion BB products found:', cushionBBProducts.map(p => p.name));
+        console.log('💄 All product categories:', this.products.map(p => `${p.name}: ${p.category}`));
         
         // Debug: Check if Cushion BB category exists
         const cushionBBCategory = this.categories.find(c => c.name === 'Cushion BB');
