@@ -133,7 +133,7 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          {product.inStock ? 'In Stock' : 'Out of Stock'}
+          {product.category}
         </Text>
       </View>
 
