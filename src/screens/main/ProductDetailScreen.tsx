@@ -1613,7 +1613,7 @@ export default function ProductDetailScreen() {
               style={styles.documentationButton}
               onPress={() => {
                 // Open the product documentation PDF
-                Linking.openURL('https://genosys.ae/_next/static/media/BIO-FERMENT-AGE-DEFYING-POWDER-MASK.pdf');
+                Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf');
               }}
             >
               <Text style={styles.documentationButtonText}>View PDF</Text>
