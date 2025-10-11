@@ -45,6 +45,8 @@ export default function ProductDetailScreen() {
       if (foundProduct) {
         console.log('Product size options:', foundProduct.sizeOptions);
         console.log('Product name:', foundProduct.name);
+        console.log('Size options length:', foundProduct.sizeOptions?.length);
+        console.log('Size options array:', foundProduct.sizeOptions);
         setSelectedSize(foundProduct.defaultSize || (foundProduct.sizeOptions && foundProduct.sizeOptions[0]) || '');
       }
     }
@@ -139,6 +141,12 @@ export default function ProductDetailScreen() {
       </View>
 
       {/* Size Selection */}
+      {(() => {
+        console.log('Size selection check - product:', product?.name);
+        console.log('Size selection check - sizeOptions:', product?.sizeOptions);
+        console.log('Size selection check - length:', product?.sizeOptions?.length);
+        return null;
+      })()}
       {product.sizeOptions && product.sizeOptions.length > 0 && (
         <View style={styles.sizeSelectionContainer}>
           <Text style={[styles.sizeSelectionTitle, { color: theme.colors.text }]}>Size</Text>
