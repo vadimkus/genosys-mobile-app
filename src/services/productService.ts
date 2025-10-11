@@ -55,6 +55,10 @@ export class ProductService {
       const newProducts = newProductsResult.status === 'fulfilled' ? newProductsResult.value : [];
       const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
 
+      // Debug: Log API categories
+      console.log('🏷️ API categories received:', categories.map(c => c.name || c));
+      console.log('🏷️ API categories count:', categories.length);
+
       // If we got some data from API, use it
       if (products.length > 0 || featured.length > 0 || newProducts.length > 0 || categories.length > 0) {
         this.products = this.transformProducts(products);
