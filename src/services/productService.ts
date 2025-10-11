@@ -254,6 +254,11 @@ export class ProductService {
   }
 
   private async addEyeCellProducts(): Promise<void> {
+    if (this.eyeCellProductsAdded) {
+      console.log('👁️ EyeCell products already added, skipping...');
+      return;
+    }
+    
     console.log('👁️ Adding EyeCell products to existing data...');
     console.log(`📊 Current products count: ${this.products.length}`);
     console.log(`📊 Current Eye Care products: ${this.products.filter(p => p.category === 'Eye Care').length}`);
@@ -392,6 +397,7 @@ export class ProductService {
       }
     });
 
+    this.eyeCellProductsAdded = true;
     console.log(`✅ Added ${addedCount} EyeCell products to existing data (${eyeCellProducts.length - addedCount} already existed)`);
     console.log(`📊 Final products count: ${this.products.length}`);
     console.log(`📊 Final Eye Care products: ${this.products.filter(p => p.category === 'Eye Care').length}`);
