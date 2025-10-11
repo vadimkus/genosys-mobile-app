@@ -811,6 +811,31 @@ export class ProductService {
             reviewCount: 67,
             createdAt: '2024-03-02T10:00:00.000Z',
             updatedAt: '2024-03-02T10:00:00.000Z'
+          },
+          {
+            id: '18',
+            name: 'Geno LED IR II',
+            description: 'Professional LED light therapy device with infrared technology for advanced skin treatment',
+            price: 399.99,
+            originalPrice: 499.99,
+            discountPercentage: 20,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FLEDD.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FLEDD.jpg&w=1200&q=75'],
+            category: 'Device',
+            brand: 'Genosys',
+            sku: 'GEN-018',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FLEDD.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 8,
+            isFeatured: true,
+            isNew: false,
+            isOnSale: true,
+            stock: 8,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 45,
+            createdAt: '2024-03-03T10:00:00.000Z',
+            updatedAt: '2024-03-03T10:00:00.000Z'
           }
         ];
 
