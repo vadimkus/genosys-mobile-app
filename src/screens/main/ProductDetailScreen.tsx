@@ -41,66 +41,66 @@ export default function ProductDetailScreen() {
     
     // INTENSIVE HYDRO SOOTHING CREAM
     if (name.includes('intensive hydro soothing cream')) {
-      if (size === '50g') return 45.99;
-      if (size === '250g') return 89.99;
+      if (size === '50g') return 290.00;  // Homecare size - Real price from genosys.ae
+      if (size === '250g') return 420.00;  // Professional size - Real price from genosys.ae
     }
     
     // MULTI FUNCTIONAL ANTI-WRINKLE CREAM
     if (name.includes('multi functional anti-wrinkle cream')) {
-      if (size === '30ml') return 65.99;
-      if (size === '50ml') return 89.99;
+      if (size === '30ml') return 129.99;
+      if (size === '50ml') return 189.99;
     }
     
     // MULTI FUNCTIONAL ANTI-WRINKLE SERUM
     if (name.includes('multi functional anti-wrinkle serum')) {
-      if (size === '15ml') return 45.99;
-      if (size === '30ml') return 75.99;
+      if (size === '15ml') return 99.99;
+      if (size === '30ml') return 159.99;
     }
     
     // MULTI SUN CREAM
     if (name.includes('multi sun cream')) {
-      if (size === '50ml') return 35.99;
-      if (size === '100ml') return 59.99;
+      if (size === '50ml') return 79.99;
+      if (size === '100ml') return 129.99;
     }
     
     // MULTI VITA RADIANCE CREAM
     if (name.includes('multi vita radiance cream')) {
-      if (size === '30ml') return 55.99;
-      if (size === '60ml') return 89.99;
+      if (size === '30ml') return 119.99;
+      if (size === '60ml') return 189.99;
     }
     
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
-      if (size === '30ml') return 75.99;
-      if (size === '50ml') return 119.99;
+      if (size === '30ml') return 149.99;
+      if (size === '50ml') return 229.99;
     }
     
     // PEPTIDE GEL MASK
     if (name.includes('peptide gel mask')) {
-      if (size === '50ml') return 45.99;
-      if (size === '100ml') return 79.99;
+      if (size === '50ml') return 89.99;
+      if (size === '100ml') return 149.99;
     }
     
     // POWER SOLUTION AWS
     if (name.includes('power solution aws')) {
-      if (size === '30ml') return 65.99;
-      if (size === '60ml') return 99.99;
+      if (size === '30ml') return 119.99;
+      if (size === '60ml') return 189.99;
     }
     
     // Microneedle Roller
     if (name.includes('microneedle roller')) {
-      if (size === '0.25mm') return 25.99;
-      if (size === '0.5mm') return 29.99;
-      if (size === '0.1mm') return 22.99;
-      if (size === '0.15mm') return 24.99;
-      if (size === '0.2mm') return 26.99;
+      if (size === '0.25mm') return 49.99;
+      if (size === '0.5mm') return 59.99;
+      if (size === '0.1mm') return 39.99;
+      if (size === '0.15mm') return 44.99;
+      if (size === '0.2mm') return 49.99;
     }
     
     // Needle Pen-K
     if (name.includes('needle pen-k')) {
-      if (size === '0.25mm') return 89.99;
-      if (size === '0.5mm') return 99.99;
-      if (size === '1.0mm') return 109.99;
+      if (size === '0.25mm') return 149.99;
+      if (size === '0.5mm') return 169.99;
+      if (size === '1.0mm') return 189.99;
     }
     
     // Default to original price if no size-specific pricing
