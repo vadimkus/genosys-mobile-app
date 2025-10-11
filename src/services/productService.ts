@@ -1087,7 +1087,7 @@ export class ProductService {
     
     // Scalp/Hair
     if (name.includes('hr³ matrix') || name.includes('hair') || name.includes('scalp') || 
-        name.includes('hairgen') || name.includes('hair-gentron') || name.includes('hair tonic') ||
+        name.includes('hairgen') || name.includes('hair tonic') ||
         name.includes('hair solution') || name.includes('scalp shampoo')) {
       return 'Scalp/Hair';
     }
@@ -1100,7 +1100,7 @@ export class ProductService {
     
     // Device
     if (name.includes('device') || name.includes('geno-led') || name.includes('led') ||
-        name.includes('equipment') || name.includes('tool')) {
+        name.includes('equipment') || name.includes('tool') || name.includes('hair-gentron')) {
       return 'Device';
     }
     
