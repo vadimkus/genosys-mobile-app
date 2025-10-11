@@ -105,7 +105,7 @@ export default function ProfileScreen() {
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>My Profile</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>Profile</Text>
           <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Manage your account and preferences</Text>
         </View>
         <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
