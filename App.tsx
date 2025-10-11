@@ -8,6 +8,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { useStore } from './src/store/useStore';
 import { CartProvider } from './src/contexts/CartContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
+import { productService } from './src/services/productService';
 
 function AppContent() {
   const { isLoading, setLoading } = useStore();
@@ -18,6 +19,11 @@ function AppContent() {
     const initializeApp = async () => {
       setLoading(true);
       try {
+        // Initialize product service
+        console.log('🔄 Initializing ProductService...');
+        await productService.initialize();
+        console.log('✅ ProductService initialized');
+        
         // Check for existing auth token
         // You can add token validation logic here
         setLoading(false);
