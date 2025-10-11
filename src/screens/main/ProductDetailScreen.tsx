@@ -1381,7 +1381,7 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : '30ml'}
+          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : '30ml'}
         </Text>
       </View>
 
