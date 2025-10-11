@@ -656,6 +656,7 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Sensitive, reactive, and easily irritated skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Gentle, non-irritating serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Barrier repair, anti-inflammatory, soothing</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1415,7 +1416,9 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Product Description</Text>
           <Text style={styles.description}>
-            {isCollagenMask 
+            {product.name === 'ALL FOR SENSITIVE SERUM' 
+              ? "GENOSYS ALL FOR SENSITIVE SERUM is a specialized skin repairing serum designed specifically for sensitive skin. This advanced formula provides a protective moisture barrier while delivering anti-inflammatory and soothing properties to calm and repair sensitized skin. Perfect for those with reactive, easily irritated skin."
+              : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
             }
@@ -1433,7 +1436,16 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
           <View style={styles.benefitsList}>
-            {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+            {product.name === 'ALL FOR SENSITIVE SERUM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Skin Barrier Repair - Strengthens and rebuilds the skin's natural protective barrier</Text>
+                <Text style={styles.benefitItem}>• Anti-Inflammatory - Reduces redness and calms irritated, sensitive skin</Text>
+                <Text style={styles.benefitItem}>• Soothing Relief - Provides immediate comfort for sensitized skin</Text>
+                <Text style={styles.benefitItem}>• Moisture Barrier - Creates a protective layer to prevent moisture loss</Text>
+                <Text style={styles.benefitItem}>• Gentle Formula - Specifically designed for sensitive and reactive skin</Text>
+                <Text style={styles.benefitItem}>• Skin Repair - Helps repair damaged skin and restore healthy function</Text>
+              </>
+            ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides long-lasting moisture for all skin types</Text>
                 <Text style={styles.benefitItem}>• Skin Soothing - Calms irritation and reduces redness and inflammation</Text>
@@ -1467,7 +1479,17 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Ingredients</Text>
           <View style={styles.ingredientsList}>
-            {isCollagenMask ? (
+            {product.name === 'ALL FOR SENSITIVE SERUM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>MultiEx BSASM® Plus:</Text> A patented complex that helps strengthen the skin barrier and provides long-lasting hydration while protecting sensitive skin from environmental stressors.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> A plant-derived ingredient that provides natural anti-inflammatory benefits and helps soothe irritated skin while supporting the skin's natural healing process.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> A powerful humectant that attracts and retains moisture, providing deep hydration without causing irritation or clogging pores.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> A natural lipid that helps restore the skin's barrier function and provides gentle antimicrobial protection while being suitable for sensitive skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Aloe Barbadensis Leaf Extract:</Text> Known for its soothing and healing properties, aloe vera helps calm irritated skin, reduce inflammation, and provide natural moisture to sensitive skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hamamelis Virginiana (Witch Hazel) Extract:</Text> A natural astringent that helps tighten pores, reduce inflammation, and provide gentle cleansing properties while being gentle on sensitive skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing in sensitive skin.</Text>
+              </>
+            ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that attracts and retains moisture.</Text>
@@ -1492,7 +1514,15 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How to Use</Text>
           <View style={styles.usageList}>
-            {isCollagenMask ? (
+            {product.name === 'ALL FOR SENSITIVE SERUM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly with a gentle cleanser</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the serum to clean skin in the morning and evening</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> Gently pat with fingers until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as part of your daily skincare routine for sensitive skin care</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Note:</Text> This product is dermatologically tested and specifically formulated for sensitive skin</Text>
+              </>
+            ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Remove mask from package and unfold carefully</Text>
