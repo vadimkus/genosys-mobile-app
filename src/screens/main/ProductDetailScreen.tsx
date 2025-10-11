@@ -103,6 +103,12 @@ export default function ProductDetailScreen() {
       
       <ScrollView style={styles.scrollContainer}>
 
+      {/* Product Name */}
+      <View style={styles.productNameSection}>
+        <Text style={styles.brand}>{product.brand}</Text>
+        <Text style={styles.productName}>{product.name}</Text>
+      </View>
+
       {/* Product Image */}
       <View style={styles.imageContainer}>
         <Image
@@ -179,9 +185,6 @@ export default function ProductDetailScreen() {
 
       {/* Product Info */}
       <View style={styles.content}>
-        <Text style={styles.brand}>{product.brand}</Text>
-        <Text style={styles.productName}>{product.name}</Text>
-        
         <View style={styles.ratingContainer}>
           <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
           <Text style={styles.reviewCount}>({product.reviewCount} reviews)</Text>
@@ -418,6 +421,10 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+  },
+  productNameSection: {
+    padding: 20,
+    paddingBottom: 10,
   },
   brand: {
     fontSize: 14,
