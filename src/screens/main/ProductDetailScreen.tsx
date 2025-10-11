@@ -1617,7 +1617,6 @@ export default function ProductDetailScreen() {
               }}
             >
               <Text style={styles.documentationButtonText}>View PDF</Text>
-              <Text style={styles.documentationButtonText}>Download</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -1927,9 +1926,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   documentationButtonText: {
     color: '#ffffff',
