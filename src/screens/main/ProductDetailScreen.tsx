@@ -163,7 +163,6 @@ export default function ProductDetailScreen() {
       <View style={styles.reviewsPriceSection}>
         <View style={styles.ratingContainer}>
           <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({product.reviewCount} reviews)</Text>
         </View>
 
         <View style={styles.priceContainer}>
@@ -218,7 +217,7 @@ export default function ProductDetailScreen() {
             <Text style={styles.detailItem}><Text style={styles.detailLabel}>Brand:</Text> {product.brand}</Text>
             <Text style={styles.detailItem}><Text style={styles.detailLabel}>Category:</Text> {product.category}</Text>
             <Text style={styles.detailItem}><Text style={styles.detailLabel}>Stock:</Text> {product.stock} units available</Text>
-            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rating:</Text> {product.averageRating.toFixed(1)}/5.0 ({product.reviewCount} reviews)</Text>
+            <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rating:</Text> {product.averageRating.toFixed(1)}/5.0</Text>
             {product.isOnSale && (
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Discount:</Text> {product.discountPercentage}% off</Text>
             )}
@@ -622,70 +621,70 @@ const styles = StyleSheet.create({
   },
   cartSection: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    margin: 20,
-    marginBottom: 16,
+    borderRadius: 12,
+    padding: 16,
+    margin: 16,
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
     borderWidth: 1,
     borderColor: '#f3f4f6',
     alignItems: 'center',
   },
   cartSectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#1f2937',
-    marginBottom: 16,
+    marginBottom: 12,
     textAlign: 'center',
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   quantityButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#f3f4f6',
     justifyContent: 'center',
     alignItems: 'center',
   },
   quantityButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#374151',
   },
   quantityText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#1f2937',
-    marginHorizontal: 20,
-    minWidth: 30,
+    marginHorizontal: 16,
+    minWidth: 24,
     textAlign: 'center',
   },
   addToCartButton: {
     backgroundColor: '#dc2626',
-    paddingVertical: 18,
-    paddingHorizontal: 32,
-    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
     shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   addToCartText: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   shippingInfo: {
