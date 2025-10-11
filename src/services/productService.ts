@@ -678,6 +678,33 @@ export class ProductService {
             defaultSize: '50g',
             createdAt: '2024-02-25T10:00:00.000Z',
             updatedAt: '2024-02-25T10:00:00.000Z'
+          },
+          {
+            id: '12',
+            name: 'ND Cell ANTI-WRINKLE CREAM',
+            description: 'Advanced anti-wrinkle cream with ND Cell technology for deep skin rejuvenation and wrinkle reduction',
+            price: 89.99,
+            originalPrice: 119.99,
+            discountPercentage: 25,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FND.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FND.jpg&w=1200&q=75'],
+            category: 'Cream',
+            brand: 'Genosys',
+            sku: 'GEN-012',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FND.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 25,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: true,
+            stock: 25,
+            rating: 4.0,
+            averageRating: 4.7,
+            reviewCount: 89,
+            sizeOptions: ['30ml', '50ml'],
+            defaultSize: '30ml',
+            createdAt: '2024-02-26T10:00:00.000Z',
+            updatedAt: '2024-02-26T10:00:00.000Z'
           }
         ];
 
