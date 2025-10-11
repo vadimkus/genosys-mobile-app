@@ -640,7 +640,7 @@ export class ProductService {
         if (name.includes('multi vita radiance serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('problem control serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('all for sensitive serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FASE.jpg&w=1200&q=75';
-        if (name.includes('moisture replenishing') && name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('moisture replenishing') && name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHRS.jpg&w=1200&q=75';
         if (name.includes('eyecell eye contour serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEYS.jpg&w=1200&q=75';
         
         // Boosters and toners
