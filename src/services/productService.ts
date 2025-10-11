@@ -234,6 +234,11 @@ export class ProductService {
         
         console.log(`✅ Loaded ${this.products.length} products, ${this.featuredProducts.length} featured, ${this.newProducts.length} new from API`);
         
+        // Debug: Log categories and sun products
+        console.log('🏷️ Categories loaded:', this.categories.map(c => `${c.name} (${c.count})`));
+        const sunProducts = this.products.filter(p => p.category === 'Sun');
+        console.log('☀️ Sun products found:', sunProducts.map(p => p.name));
+        
         // Always add EyeCell products to ensure they're available
         await this.addEyeCellProducts();
       } else {
@@ -243,6 +248,11 @@ export class ProductService {
         
         // Always add EyeCell products to ensure they're available
         await this.addEyeCellProducts();
+        
+        // Debug: Log categories and sun products for fallback
+        console.log('🏷️ Fallback categories loaded:', this.categories.map(c => `${c.name} (${c.count})`));
+        const sunProducts = this.products.filter(p => p.category === 'Sun');
+        console.log('☀️ Fallback sun products found:', sunProducts.map(p => p.name));
       }
     } catch (error) {
       console.error('❌ Error loading data from API:', error);
@@ -417,7 +427,7 @@ export class ProductService {
 
     // Update all category counts to reflect current products
     this.categories.forEach(category => {
-      if (category.name === 'All products') {
+      if (category.name === 'All' || category.name === 'All products') {
         category.count = this.products.length;
       } else {
         category.count = this.products.filter(p => p.category === category.name).length;
@@ -437,7 +447,7 @@ export class ProductService {
     this.categories = [
       {
         id: 'all-products',
-        name: 'All products',
+        name: 'All',
         slug: 'all-products',
         count: 0,
         isActive: true,
