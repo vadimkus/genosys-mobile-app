@@ -1979,7 +1979,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   footerSection: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
     padding: 24,
     marginTop: 20,
     alignItems: 'center',
