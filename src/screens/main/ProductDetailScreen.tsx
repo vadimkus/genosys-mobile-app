@@ -1429,30 +1429,6 @@ export default function ProductDetailScreen() {
           </View>
         </View>
 
-        {product.name !== 'ALL FOR SENSITIVE SERUM' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Key Features</Text>
-            <View style={styles.featuresList}>
-              {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
-                <>
-                  <Text style={styles.featureItem}>• Intensive Hydration - Advanced hydrating formula for long-lasting moisture</Text>
-                  <Text style={styles.featureItem}>• Soothing Properties - Calms skin irritation and provides relief for sensitive skin</Text>
-                  <Text style={styles.featureItem}>• Natural Ingredients - Aloe vera and snail secretion filtrate for gentle care</Text>
-                  <Text style={styles.featureItem}>• Professional & Home Use - Available in 50g and 250g sizes</Text>
-                </>
-              ) : (
-                <>
-                  <Text style={styles.featureItem}>• Professional-Grade Quality</Text>
-                  <Text style={styles.featureItem}>• Dermatologically Tested</Text>
-                  <Text style={styles.featureItem}>• Korean Skincare Technology</Text>
-                  <Text style={styles.featureItem}>• Safe for All Skin Types</Text>
-                  <Text style={styles.featureItem}>• Clinically Proven Results</Text>
-                  <Text style={styles.featureItem}>• Premium Ingredients</Text>
-                </>
-              )}
-            </View>
-          </View>
-        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
