@@ -1652,6 +1652,18 @@ export default function ProductDetailScreen() {
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Footer Section */}
+        <View style={styles.footerSection}>
+          <Image 
+            source={{ uri: 'https://genosys.ae/_next/image?url=%2Fimages%2FFull.avif%3Fv%3D1760037369129&w=640&q=75' }}
+            style={styles.footerLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.footerCompanyName}>Genosys Middle East FZ-LLC</Text>
+          <Text style={styles.footerDescription}>Official Distributor in the UAE</Text>
+          <Text style={styles.footerCopyright}>© 2025 Genosys Middle East FZ-LLC. All rights reserved.</Text>
+        </View>
       </View>
 
       {/* Shipping Info */}
@@ -1965,6 +1977,37 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  footerSection: {
+    backgroundColor: '#f8fafc',
+    padding: 24,
+    marginTop: 20,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  footerLogo: {
+    width: 120,
+    height: 60,
+    marginBottom: 16,
+  },
+  footerCompanyName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  footerDescription: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  footerCopyright: {
+    fontSize: 12,
+    color: '#9ca3af',
+    textAlign: 'center',
   },
   stockStatusContainer: {
     flexDirection: 'row',
