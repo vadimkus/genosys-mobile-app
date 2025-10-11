@@ -1077,33 +1077,6 @@ export class ProductService {
             defaultSize: '50g',
             createdAt: '2024-03-05T10:00:00.000Z',
             updatedAt: '2024-03-05T10:00:00.000Z'
-          },
-          {
-            id: '21',
-            name: 'SKIN REBOOT PDRN MASK PACK',
-            description: 'Professional-grade treatment mask infused with PDRN (Polydeoxyribonucleotide) extracted from salmon DNA. This advanced mask promotes cellular regeneration, accelerates skin repair, and enhances overall skin health.',
-            price: 0, // Login to see price
-            originalPrice: 0,
-            discountPercentage: 0,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75'],
-            category: 'Mask',
-            brand: 'Genosys',
-            sku: 'GEN-021',
-            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FPDRN.png&w=1200&q=75'],
-            inStock: true,
-            stockQuantity: 20,
-            isFeatured: false,
-            isNew: true,
-            isOnSale: false,
-            stock: 20,
-            rating: 4.0,
-            averageRating: 4.8,
-            reviewCount: 0,
-            sizeOptions: ['30 sheets per container'],
-            defaultSize: '30 sheets per container',
-            createdAt: '2024-03-06T10:00:00.000Z',
-            updatedAt: '2024-03-06T10:00:00.000Z'
           }
         ];
 
