@@ -1520,7 +1520,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the serum to clean skin in the morning and evening</Text>
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> Gently pat with fingers until fully absorbed</Text>
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as part of your daily skincare routine for sensitive skin care</Text>
-                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Note:</Text> This product is dermatologically tested and specifically formulated for sensitive skin</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Note:</Text> This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine.</Text>
               </>
             ) : isCollagenMask ? (
               <>
@@ -1546,7 +1546,10 @@ export default function ProductDetailScreen() {
 
         <View style={styles.section}>
           <Text style={styles.noteText}>
-            <Text style={styles.noteLabel}>Note:</Text> This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist.
+            <Text style={styles.noteLabel}>Note:</Text> {product.name === 'ALL FOR SENSITIVE SERUM' 
+              ? "This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine."
+              : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
+            }
           </Text>
         </View>
       </View>
