@@ -59,8 +59,8 @@ export default function ProductDetailScreen() {
     
     // MULTI FUNCTIONAL ANTI-WRINKLE CREAM
     if (name.includes('multi functional anti-wrinkle cream')) {
-      if (size === '30ml') return 129.99;
-      if (size === '50ml') return 189.99;
+      if (size === '30ml') return 290.00;  // Same pricing as other creams
+      if (size === '50ml') return 420.00;  // Same pricing as other creams
     }
     
     // MULTI FUNCTIONAL ANTI-WRINKLE SERUM
