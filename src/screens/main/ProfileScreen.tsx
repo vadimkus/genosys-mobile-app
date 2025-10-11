@@ -10,7 +10,8 @@ import {
   Switch,
   ActivityIndicator,
   RefreshControl,
-  Dimensions
+  Dimensions,
+  Linking
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -83,6 +84,50 @@ export default function ProfileScreen() {
 
   const handleAbout = () => {
     Alert.alert('About Genosys', 'Genosys Mobile App v1.0.0\nPremium Korean Dermacosmetics');
+  };
+
+  const handleTraining = () => {
+    Alert.alert(
+      'Professional Training',
+      'Access comprehensive training materials and documentation for Genosys products.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'View Training', onPress: () => Linking.openURL('https://genosys.ae/training') }
+      ]
+    );
+  };
+
+  const handleDownloadCatalog = () => {
+    Alert.alert(
+      'Product Catalogue 2026',
+      'Download the complete product catalogue (235.5 MB)',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Download', onPress: () => Linking.openURL('https://genosys.ae/training') }
+      ]
+    );
+  };
+
+  const handleDownloadHomeCareGuide = () => {
+    Alert.alert(
+      'Home Care Guide 2026',
+      'Download the home care guide (9.8 MB)',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Download', onPress: () => Linking.openURL('https://genosys.ae/training') }
+      ]
+    );
+  };
+
+  const handleDownloadProfessionalManual = () => {
+    Alert.alert(
+      'Professional Manual 2026',
+      'Download the professional manual (10.4 MB)',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Download', onPress: () => Linking.openURL('https://genosys.ae/training') }
+      ]
+    );
   };
 
   if (isLoading) {
@@ -223,7 +268,52 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.menuSection}>
-            <Text style={styles.sectionTitle}>Support</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Professional Training</Text>
+            
+            <TouchableOpacity style={styles.menuItem} onPress={handleTraining}>
+              <View style={styles.menuItemLeft}>
+                <Ionicons name="school-outline" size={24} color="#6b7280" />
+                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Training Materials</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={handleDownloadCatalog}>
+              <View style={styles.menuItemLeft}>
+                <Ionicons name="document-text-outline" size={24} color="#6b7280" />
+                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Product Catalogue 2026</Text>
+              </View>
+              <View style={styles.downloadContainer}>
+                <Text style={styles.fileSize}>235.5 MB</Text>
+                <Ionicons name="download-outline" size={16} color="#dc2626" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={handleDownloadHomeCareGuide}>
+              <View style={styles.menuItemLeft}>
+                <Ionicons name="home-outline" size={24} color="#6b7280" />
+                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Home Care Guide 2026</Text>
+              </View>
+              <View style={styles.downloadContainer}>
+                <Text style={styles.fileSize}>9.8 MB</Text>
+                <Ionicons name="download-outline" size={16} color="#dc2626" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={handleDownloadProfessionalManual}>
+              <View style={styles.menuItemLeft}>
+                <Ionicons name="medical-outline" size={24} color="#6b7280" />
+                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Professional Manual 2026</Text>
+              </View>
+              <View style={styles.downloadContainer}>
+                <Text style={styles.fileSize}>10.4 MB</Text>
+                <Ionicons name="download-outline" size={16} color="#dc2626" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.menuSection}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Support</Text>
             
             <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
               <View style={styles.menuItemLeft}>
@@ -487,6 +577,16 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: '#dc2626',
     fontSize: 16,
+    fontWeight: '500',
+  },
+  downloadContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  fileSize: {
+    fontSize: 12,
+    color: '#6b7280',
     fontWeight: '500',
   },
 });
