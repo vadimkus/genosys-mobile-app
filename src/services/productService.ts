@@ -962,6 +962,8 @@ export class ProductService {
         rating: product.rating || product.averageRating ? parseFloat(product.averageRating) : 4.0,
         averageRating: product.averageRating ? parseFloat(product.averageRating) : 4.0,
         reviewCount: product.reviewCount ? parseInt(product.reviewCount) : 0,
+        sizeOptions: this.getSizeOptions(product.name),
+        defaultSize: this.getDefaultSize(product.name),
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       };
@@ -1104,6 +1106,118 @@ export class ProductService {
 
   isDatabaseConnected(): boolean {
     return this.isConnected;
+  }
+
+  private getSizeOptions(productName: string): string[] | undefined {
+    const name = productName.toLowerCase();
+    
+    // Microneedle Roller
+    if (name.includes('microneedle roller')) {
+      return ['0.25mm', '0.5mm', '0.1mm', '0.15mm', '0.2mm'];
+    }
+    
+    // Needle Pen-K
+    if (name.includes('needle pen-k')) {
+      return ['0.25mm', '0.5mm', '1.0mm'];
+    }
+    
+    // Multi Functional Anti-Wrinkle Cream
+    if (name.includes('multi functional anti-wrinkle cream')) {
+      return ['30ml', '50ml'];
+    }
+    
+    // Multi Functional Anti-Wrinkle Serum
+    if (name.includes('multi functional anti-wrinkle serum')) {
+      return ['15ml', '30ml'];
+    }
+    
+    // Multi Sun Cream
+    if (name.includes('multi sun cream')) {
+      return ['50ml', '100ml'];
+    }
+    
+    // Multi Vita Radiance Cream
+    if (name.includes('multi vita radiance cream')) {
+      return ['30ml', '60ml'];
+    }
+    
+    // INTENSIVE HYDRO SOOTHING CREAM
+    if (name.includes('intensive hydro soothing cream')) {
+      return ['50g', '250g'];
+    }
+    
+    // ND Cell ANTI-WRINKLE CREAM
+    if (name.includes('nd cell anti-wrinkle cream')) {
+      return ['30ml', '50ml'];
+    }
+    
+    // PEPTIDE GEL MASK
+    if (name.includes('peptide gel mask')) {
+      return ['50ml', '100ml'];
+    }
+    
+    // POWER SOLUTION AWS
+    if (name.includes('power solution aws')) {
+      return ['30ml', '60ml'];
+    }
+    
+    return undefined;
+  }
+
+  private getDefaultSize(productName: string): string | undefined {
+    const name = productName.toLowerCase();
+    
+    // Microneedle Roller
+    if (name.includes('microneedle roller')) {
+      return '0.25mm';
+    }
+    
+    // Needle Pen-K
+    if (name.includes('needle pen-k')) {
+      return '0.25mm';
+    }
+    
+    // Multi Functional Anti-Wrinkle Cream
+    if (name.includes('multi functional anti-wrinkle cream')) {
+      return '30ml';
+    }
+    
+    // Multi Functional Anti-Wrinkle Serum
+    if (name.includes('multi functional anti-wrinkle serum')) {
+      return '30ml';
+    }
+    
+    // Multi Sun Cream
+    if (name.includes('multi sun cream')) {
+      return '50ml';
+    }
+    
+    // Multi Vita Radiance Cream
+    if (name.includes('multi vita radiance cream')) {
+      return '30ml';
+    }
+    
+    // INTENSIVE HYDRO SOOTHING CREAM
+    if (name.includes('intensive hydro soothing cream')) {
+      return '50g';
+    }
+    
+    // ND Cell ANTI-WRINKLE CREAM
+    if (name.includes('nd cell anti-wrinkle cream')) {
+      return '30ml';
+    }
+    
+    // PEPTIDE GEL MASK
+    if (name.includes('peptide gel mask')) {
+      return '50ml';
+    }
+    
+    // POWER SOLUTION AWS
+    if (name.includes('power solution aws')) {
+      return '30ml';
+    }
+    
+    return undefined;
   }
 }
 
