@@ -86,20 +86,20 @@ export class ProductService {
             // Use predefined categories and count products in each
             this.categories = [
               {
-                id: 'daily-serums',
-                name: 'Daily Serums',
-                slug: 'daily-serums',
-                count: this.products.filter(p => p.category === 'Daily Serums').length,
+                id: 'daily-serum',
+                name: 'Daily Serum',
+                slug: 'daily-serum',
+                count: this.products.filter(p => p.category === 'Daily Serum').length,
                 isActive: true,
                 sortOrder: 1,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               },
               {
-                id: 'main-treatments',
-                name: 'Main Treatments',
-                slug: 'main-treatments',
-                count: this.products.filter(p => p.category === 'Main Treatments').length,
+                id: 'main-treatment',
+                name: 'Main Treatment',
+                slug: 'main-treatment',
+                count: this.products.filter(p => p.category === 'Main Treatment').length,
                 isActive: true,
                 sortOrder: 2,
                 createdAt: new Date().toISOString(),
@@ -116,10 +116,10 @@ export class ProductService {
                 updatedAt: new Date().toISOString()
               },
               {
-                id: 'hair-scalp-solutions',
-                name: 'Hair & Scalp Solutions',
-                slug: 'hair-scalp-solutions',
-                count: this.products.filter(p => p.category === 'Hair & Scalp Solutions').length,
+                id: 'hair-scalp-solution',
+                name: 'Hair and Scalp Solution',
+                slug: 'hair-scalp-solution',
+                count: this.products.filter(p => p.category === 'Hair and Scalp Solution').length,
                 isActive: true,
                 sortOrder: 4,
                 createdAt: new Date().toISOString(),
@@ -132,36 +132,6 @@ export class ProductService {
                 count: this.products.filter(p => p.category === 'EyeCell Products').length,
                 isActive: true,
                 sortOrder: 5,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              },
-              {
-                id: 'skincare-creams',
-                name: 'Skincare Creams',
-                slug: 'skincare-creams',
-                count: this.products.filter(p => p.category === 'Skincare Creams').length,
-                isActive: true,
-                sortOrder: 6,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              },
-              {
-                id: 'masks-treatments',
-                name: 'Masks & Treatments',
-                slug: 'masks-treatments',
-                count: this.products.filter(p => p.category === 'Masks & Treatments').length,
-                isActive: true,
-                sortOrder: 7,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              },
-              {
-                id: 'sun-protection',
-                name: 'Sun Protection',
-                slug: 'sun-protection',
-                count: this.products.filter(p => p.category === 'Sun Protection').length,
-                isActive: true,
-                sortOrder: 8,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               }
@@ -186,12 +156,12 @@ export class ProductService {
   private async loadFallbackData(): Promise<void> {
     console.log('🏠 Loading fallback product data...');
     
-    // Load comprehensive categories from Genosys website structure
+    // Load categories exactly matching Genosys website structure
     this.categories = [
       {
-        id: 'daily-serums',
-        name: 'Daily Serums',
-        slug: 'daily-serums',
+        id: 'daily-serum',
+        name: 'Daily Serum',
+        slug: 'daily-serum',
         count: 0,
         isActive: true,
         sortOrder: 1,
@@ -199,9 +169,9 @@ export class ProductService {
         updatedAt: new Date().toISOString()
       },
       {
-        id: 'main-treatments',
-        name: 'Main Treatments',
-        slug: 'main-treatments',
+        id: 'main-treatment',
+        name: 'Main Treatment',
+        slug: 'main-treatment',
         count: 0,
         isActive: true,
         sortOrder: 2,
@@ -219,9 +189,9 @@ export class ProductService {
         updatedAt: new Date().toISOString()
       },
       {
-        id: 'hair-scalp-solutions',
-        name: 'Hair & Scalp Solutions',
-        slug: 'hair-scalp-solutions',
+        id: 'hair-scalp-solution',
+        name: 'Hair and Scalp Solution',
+        slug: 'hair-scalp-solution',
         count: 0,
         isActive: true,
         sortOrder: 4,
@@ -235,36 +205,6 @@ export class ProductService {
         count: 0,
         isActive: true,
         sortOrder: 5,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'skincare-creams',
-        name: 'Skincare Creams',
-        slug: 'skincare-creams',
-        count: 0,
-        isActive: true,
-        sortOrder: 6,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'masks-treatments',
-        name: 'Masks & Treatments',
-        slug: 'masks-treatments',
-        count: 0,
-        isActive: true,
-        sortOrder: 7,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'sun-protection',
-        name: 'Sun Protection',
-        slug: 'sun-protection',
-        count: 0,
-        isActive: true,
-        sortOrder: 8,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -585,14 +525,14 @@ export class ProductService {
     if (name.includes('serum') || name.includes('all for sensitive') || 
         name.includes('anti-wrinkle serum') || name.includes('problem control serum') ||
         name.includes('moisture replenishing') && name.includes('serum')) {
-      return 'Daily Serums';
+      return 'Daily Serum';
     }
     
     // Main Treatments (Power Solutions)
     if (name.includes('power solution') || name.includes('aws') || name.includes('pcs') || 
         name.includes('sws') || name.includes('cts') || name.includes('cvs') || 
         name.includes('hes')) {
-      return 'Main Treatments';
+      return 'Main Treatment';
     }
     
     // Pre-Treatment
@@ -604,7 +544,7 @@ export class ProductService {
     // Hair & Scalp Solutions
     if (name.includes('hr³ matrix') || name.includes('hair') || name.includes('scalp') || 
         name.includes('hairgen') || name.includes('hair-gentron')) {
-      return 'Hair & Scalp Solutions';
+      return 'Hair and Scalp Solution';
     }
     
     // EyeCell Products
@@ -613,26 +553,8 @@ export class ProductService {
       return 'EyeCell Products';
     }
     
-    // Skincare Creams
-    if (name.includes('cream') || name.includes('balm') || name.includes('moisturizer') ||
-        name.includes('anti-wrinkle cream') || name.includes('blemish balm')) {
-      return 'Skincare Creams';
-    }
-    
-    // Masks & Treatments
-    if (name.includes('mask') || name.includes('gel mask') || name.includes('collagen mask') ||
-        name.includes('overnight') || name.includes('treatment')) {
-      return 'Masks & Treatments';
-    }
-    
-    // Sun Protection
-    if (name.includes('sun cream') || name.includes('spf') || name.includes('ultra shield') ||
-        name.includes('sun protection')) {
-      return 'Sun Protection';
-    }
-    
-    // Default fallback
-    return originalCategory || 'Skincare Creams';
+    // Default fallback - assign to Daily Serum for other products
+    return originalCategory || 'Daily Serum';
   }
 
   private transformCategories(dbCategories: any[]): Category[] {
