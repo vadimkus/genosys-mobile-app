@@ -1381,7 +1381,7 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : '30ml'}
+          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : product.name === 'EZ CO₂ MASK KIT' ? '1 Kit' : '30ml'}
         </Text>
       </View>
 
@@ -1439,6 +1439,8 @@ export default function ProductDetailScreen() {
               ? "GENOSYS EGF REPAIR OXYMASK CREAM is a unique oxygen bubbling mask cream designed to rejuvenate dull and stressed skin. This innovative 'S.O.S' cream effectively addresses skin damage from various causes, providing immediate relief and long-term skin regeneration through advanced oxygen therapy and skin-regenerating ingredients."
               : product.name === 'EPI TURNOVER BOOSTING PEELING GEL'
               ? "GENOSYS EPI TURNOVER BOOSTING PEELING GEL is an enzyme-based exfoliating gel designed to gently remove dead skin cells without causing irritation. This innovative peeling gel utilizes natural enzymes and plant extracts to purify, nourish, and moisturize the skin, making it suitable for all skin types while promoting a smoother, more radiant complexion."
+              : product.name === 'EZ CO₂ MASK KIT'
+              ? "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients."
               : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1495,6 +1497,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Enzyme Technology - Natural enzyme-based exfoliation for gentle skin renewal</Text>
                 <Text style={styles.benefitItem}>• All Skin Types - Suitable for sensitive and all skin types</Text>
                 <Text style={styles.benefitItem}>• Professional Results - Delivers salon-quality exfoliation at home</Text>
+              </>
+            ) : product.name === 'EZ CO₂ MASK KIT' ? (
+              <>
+                <Text style={styles.benefitItem}>• Oxygen Therapy - Accelerates oxygen delivery to skin tissues through CO₂ therapy</Text>
+                <Text style={styles.benefitItem}>• Skin Firming - Provides firming effects through improved cellular metabolism</Text>
+                <Text style={styles.benefitItem}>• Brightening - Helps correct skin tone and reduce hyperpigmentation</Text>
+                <Text style={styles.benefitItem}>• Anti-Blemish - Reduces blemishes and improves overall skin clarity</Text>
+                <Text style={styles.benefitItem}>• Catalytic Effect - Prepares skin for optimal absorption of active ingredients</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers salon-quality carboxy therapy at home</Text>
+                <Text style={styles.benefitItem}>• Microneedling Enhancement - Acts as a catalytic mask for better treatment results</Text>
               </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
@@ -1567,6 +1579,17 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Vitamin C (Ascorbic Acid):</Text> Brightens the skin and boosts collagen production, helping to reduce signs of aging and improve skin radiance.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothes and calms the skin, reducing irritation and providing gentle care for sensitive skin during exfoliation.</Text>
               </>
+            ) : product.name === 'EZ CO₂ MASK KIT' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactic Acid:</Text> Gentle exfoliation and skin renewal</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Portulaca Oleracea Extract:</Text> Antioxidant and anti-inflammatory properties</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Rosemary Leaf Extract:</Text> Antimicrobial and circulation-boosting effects</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Chamomile Flower Extract:</Text> Soothing and anti-inflammatory benefits</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Licorice Root Extract:</Text> Skin brightening and anti-inflammatory properties</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis Root Extract:</Text> Antioxidant and anti-aging benefits</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Wound healing and anti-inflammatory effects</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Tea Leaf Extract:</Text> Antioxidant protection and skin renewal</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1625,6 +1648,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Removal:</Text> Rinse off the clumped dead skin cells with lukewarm water</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 1-2 times per week for optimal results</Text>
               </>
+            ) : product.name === 'EZ CO₂ MASK KIT' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and ensure skin is dry</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Gel Application:</Text> Apply the CO₂ gel evenly to clean skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Mask Placement:</Text> Place the sheet mask over the treated area</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 15-20 minutes to allow the CO₂ therapy to work</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Remove mask and gently massage any remaining product into the skin</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use 1-2 times per week for optimal results</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -1657,6 +1689,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and suitable for all skin types. For optimal bubbling, avoid rubbing the product during application. For best results, incorporate it into your daily skincare routine."
               : product.name === 'EPI TURNOVER BOOSTING PEELING GEL'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve smoother, more radiant skin."
+              : product.name === 'EZ CO₂ MASK KIT'
+              ? "This product is dermatologically tested and safe for all skin types. The CO₂ therapy mechanism accelerates oxygen delivery to skin tissues, providing professional-grade results. For best results, use as part of your weekly skincare routine."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>
