@@ -243,6 +243,9 @@ export class ProductService {
               }
             });
             
+            // Debug: Log category counts after recalculation
+            console.log('🏷️ Category counts after recalculation:', this.categories.map(c => `${c.name} (${c.count})`));
+            
             // Filter out categories with 0 products, but keep Sun and Cushion BB categories even if 0
             this.categories = this.categories.filter(cat => cat.count > 0 || cat.name === 'Sun' || cat.name === 'Cushion BB');
           } else {
@@ -279,6 +282,14 @@ export class ProductService {
         // Debug: Check if Sun category exists
         const sunCategory = this.categories.find(c => c.name === 'Sun');
         console.log('☀️ Sun category exists:', !!sunCategory, sunCategory ? `count: ${sunCategory.count}` : 'not found');
+        
+        // Debug: Check Cushion BB products
+        const cushionBBProducts = this.products.filter(p => p.category === 'Cushion BB');
+        console.log('💄 Cushion BB products found:', cushionBBProducts.map(p => p.name));
+        
+        // Debug: Check if Cushion BB category exists
+        const cushionBBCategory = this.categories.find(c => c.name === 'Cushion BB');
+        console.log('💄 Cushion BB category exists:', !!cushionBBCategory, cushionBBCategory ? `count: ${cushionBBCategory.count}` : 'not found');
         
         // Always add EyeCell products to ensure they're available
         await this.addEyeCellProducts();
