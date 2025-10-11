@@ -539,6 +539,8 @@ export class ProductService {
             rating: 4.0,
             averageRating: 4.7,
             reviewCount: 143,
+            sizeOptions: ['30ml', '50ml'],
+            defaultSize: '30ml',
             createdAt: '2024-02-01T10:00:00.000Z',
             updatedAt: '2024-02-01T10:00:00.000Z'
           },
@@ -564,6 +566,8 @@ export class ProductService {
             rating: 4.0,
             averageRating: 4.8,
             reviewCount: 167,
+            sizeOptions: ['15ml', '30ml'],
+            defaultSize: '30ml',
             createdAt: '2024-02-05T10:00:00.000Z',
             updatedAt: '2024-02-05T10:00:00.000Z'
           },
@@ -589,6 +593,8 @@ export class ProductService {
             rating: 4.0,
             averageRating: 4.6,
             reviewCount: 98,
+            sizeOptions: ['50ml', '100ml'],
+            defaultSize: '50ml',
             createdAt: '2024-02-10T10:00:00.000Z',
             updatedAt: '2024-02-10T10:00:00.000Z'
           },
@@ -614,6 +620,8 @@ export class ProductService {
             rating: 4.0,
             averageRating: 4.4,
             reviewCount: 76,
+            sizeOptions: ['30ml', '60ml'],
+            defaultSize: '30ml',
             createdAt: '2024-02-15T10:00:00.000Z',
             updatedAt: '2024-02-15T10:00:00.000Z'
           },
@@ -639,6 +647,8 @@ export class ProductService {
             rating: 4.0,
             averageRating: 4.9,
             reviewCount: 89,
+            sizeOptions: ['0.25mm', '0.5mm', '0.1mm', '0.15mm', '0.2mm'],
+            defaultSize: '0.25mm',
             createdAt: '2024-02-20T10:00:00.000Z',
             updatedAt: '2024-02-20T10:00:00.000Z'
           }

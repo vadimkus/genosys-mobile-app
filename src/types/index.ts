@@ -51,6 +51,8 @@ export interface Product {
   averageRating: number;
   reviewCount: number;
   discountPercentage?: number;
+  sizeOptions?: string[];
+  defaultSize?: string;
   createdAt: string;
   updatedAt: string;
 }
