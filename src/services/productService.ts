@@ -243,8 +243,8 @@ export class ProductService {
               }
             });
             
-            // Filter out categories with 0 products, but keep Sun category even if 0
-            this.categories = this.categories.filter(cat => cat.count > 0 || cat.name === 'Sun');
+            // Filter out categories with 0 products, but keep Sun and Cushion BB categories even if 0
+            this.categories = this.categories.filter(cat => cat.count > 0 || cat.name === 'Sun' || cat.name === 'Cushion BB');
           } else {
             console.log('🏷️ Using API categories, transforming them');
             this.categories = this.transformCategories(categories);
@@ -1231,6 +1231,11 @@ export class ProductService {
       // Debug: Log category mapping for sun products
       if (product.name.toLowerCase().includes('sun') || product.name.toLowerCase().includes('ultra shield')) {
         console.log(`☀️ Category mapping for ${product.name}: ${originalCategory} -> ${product.category}`);
+      }
+      
+      // Debug: Log category mapping for cushion products
+      if (product.name.toLowerCase().includes('cushion') || product.name.toLowerCase().includes('blemish balm')) {
+        console.log(`💄 Category mapping for ${product.name}: ${originalCategory} -> ${product.category}`);
       }
       
       // Create comprehensive product image mapping based on actual product names
