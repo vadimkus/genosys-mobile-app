@@ -254,12 +254,9 @@ export class ProductService {
   }
 
   private async addEyeCellProducts(): Promise<void> {
-    if (this.eyeCellProductsAdded) {
-      console.log('👁️ EyeCell products already added, skipping...');
-      return;
-    }
-    
     console.log('👁️ Adding EyeCell products to existing data...');
+    console.log(`📊 Current products count: ${this.products.length}`);
+    console.log(`📊 Current Eye Care products: ${this.products.filter(p => p.category === 'Eye Care').length}`);
     
     const eyeCellProducts = [
       {
@@ -376,9 +373,13 @@ export class ProductService {
     let addedCount = 0;
     eyeCellProducts.forEach(eyeCellProduct => {
       const exists = this.products.some(p => p.id === eyeCellProduct.id);
+      console.log(`🔍 Checking ${eyeCellProduct.name} (ID: ${eyeCellProduct.id}) - Exists: ${exists}`);
       if (!exists) {
         this.products.push(eyeCellProduct);
         addedCount++;
+        console.log(`✅ Added ${eyeCellProduct.name}`);
+      } else {
+        console.log(`⚠️ Skipped ${eyeCellProduct.name} (already exists)`);
       }
     });
 
@@ -391,8 +392,9 @@ export class ProductService {
       }
     });
 
-    this.eyeCellProductsAdded = true;
     console.log(`✅ Added ${addedCount} EyeCell products to existing data (${eyeCellProducts.length - addedCount} already existed)`);
+    console.log(`📊 Final products count: ${this.products.length}`);
+    console.log(`📊 Final Eye Care products: ${this.products.filter(p => p.category === 'Eye Care').length}`);
   }
 
   private async loadFallbackData(): Promise<void> {
