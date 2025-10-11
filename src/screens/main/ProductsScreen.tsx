@@ -232,33 +232,18 @@ export default function ProductsScreen() {
   const renderCategoryFilter = () => (
     <View style={styles.categoryContainer}>
       <View style={styles.categoryContent}>
-      <TouchableOpacity
-        style={[
-          styles.categoryChip,
-          !selectedCategory && styles.categoryChipActive
-        ]}
-        onPress={() => setSelectedCategory(null)}
-      >
-        <Text style={[
-          styles.categoryChipText,
-          !selectedCategory && styles.categoryChipTextActive
-        ]}>
-          All
-        </Text>
-      </TouchableOpacity>
-      
       {categories.map((category) => (
         <TouchableOpacity
           key={category.id}
           style={[
             styles.categoryChip,
-            selectedCategory === category.name && styles.categoryChipActive
+            (selectedCategory === category.name || (!selectedCategory && category.name === 'All')) && styles.categoryChipActive
           ]}
-          onPress={() => setSelectedCategory(category.name)}
+          onPress={() => setSelectedCategory(category.name === 'All' ? null : category.name)}
         >
           <Text style={[
             styles.categoryChipText,
-            selectedCategory === category.name && styles.categoryChipTextActive
+            (selectedCategory === category.name || (!selectedCategory && category.name === 'All')) && styles.categoryChipTextActive
           ]}>
             {category.name}
           </Text>
