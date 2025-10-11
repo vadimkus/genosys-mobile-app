@@ -45,6 +45,18 @@ export default function ProductDetailScreen() {
       if (size === '250g') return 420.00;  // Professional size - Real price from genosys.ae
     }
     
+    // MOISTURE REPLENISHING HYALURON CREAM
+    if (name.includes('moisture replenishing hyaluron cream')) {
+      if (size === '50g') return 290.00;  // Same pricing as hydro soothing cream
+      if (size === '250g') return 420.00;  // Same pricing as hydro soothing cream
+    }
+    
+    // INTENSIVE PROBLEM CONTROL CREAM
+    if (name.includes('intensive problem control cream')) {
+      if (size === '50g') return 290.00;  // Same pricing as hydro soothing cream
+      if (size === '250g') return 420.00;  // Same pricing as hydro soothing cream
+    }
+    
     // MULTI FUNCTIONAL ANTI-WRINKLE CREAM
     if (name.includes('multi functional anti-wrinkle cream')) {
       if (size === '30ml') return 129.99;
@@ -65,8 +77,8 @@ export default function ProductDetailScreen() {
     
     // MULTI VITA RADIANCE CREAM
     if (name.includes('multi vita radiance cream')) {
-      if (size === '30ml') return 119.99;
-      if (size === '60ml') return 189.99;
+      if (size === '30ml') return 290.00;  // Same pricing as hydro soothing cream
+      if (size === '60ml') return 420.00;  // Same pricing as hydro soothing cream
     }
     
     // ND Cell ANTI-WRINKLE CREAM
