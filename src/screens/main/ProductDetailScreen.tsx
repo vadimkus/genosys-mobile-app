@@ -617,6 +617,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderWidth: 1,
     borderColor: '#f3f4f6',
+    alignItems: 'center',
   },
   cartSectionTitle: {
     fontSize: 20,
@@ -628,6 +629,7 @@ const styles = StyleSheet.create({
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
   },
   quantityButton: {
@@ -657,6 +659,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 16,
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
     shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
