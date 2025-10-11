@@ -1381,7 +1381,7 @@ export default function ProductDetailScreen() {
           />
         </View>
         <Text style={[styles.stockStatusText, { color: theme.colors.text }]}>
-          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : '30ml'}
+          Size: {product.name === 'ALL FOR SENSITIVE SERUM' ? '30ml' : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '300g' : product.name === 'EGF REPAIR OXYMASK CREAM' ? '50g' : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? '100g' : '30ml'}
         </Text>
       </View>
 
@@ -1437,6 +1437,8 @@ export default function ProductDetailScreen() {
               ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
               : product.name === 'EGF REPAIR OXYMASK CREAM'
               ? "GENOSYS EGF REPAIR OXYMASK CREAM is a unique oxygen bubbling mask cream designed to rejuvenate dull and stressed skin. This innovative 'S.O.S' cream effectively addresses skin damage from various causes, providing immediate relief and long-term skin regeneration through advanced oxygen therapy and skin-regenerating ingredients."
+              : product.name === 'EPI TURNOVER BOOSTING PEELING GEL'
+              ? "GENOSYS EPI TURNOVER BOOSTING PEELING GEL is an enzyme-based exfoliating gel designed to gently remove dead skin cells without causing irritation. This innovative peeling gel utilizes natural enzymes and plant extracts to purify, nourish, and moisturize the skin, making it suitable for all skin types while promoting a smoother, more radiant complexion."
               : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1483,6 +1485,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Collagen Stimulation - Enhances skin elasticity and firmness</Text>
                 <Text style={styles.benefitItem}>• EGF Technology - Advanced epidermal growth factor for cellular renewal</Text>
                 <Text style={styles.benefitItem}>• Bubbling Action - Unique oxygen bubbling effect for enhanced penetration</Text>
+              </>
+            ) : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? (
+              <>
+                <Text style={styles.benefitItem}>• Gentle Exfoliation - Effectively removes dead skin cells, promoting smoother skin texture</Text>
+                <Text style={styles.benefitItem}>• Radiance Enhancement - Helps correct skin tone, resulting in a brighter complexion</Text>
+                <Text style={styles.benefitItem}>• Deep Moisturization - Provides hydration to the skin, preventing dryness</Text>
+                <Text style={styles.benefitItem}>• Pore Purification - Cleanses and purifies pores, reducing the likelihood of breakouts</Text>
+                <Text style={styles.benefitItem}>• Enzyme Technology - Natural enzyme-based exfoliation for gentle skin renewal</Text>
+                <Text style={styles.benefitItem}>• All Skin Types - Suitable for sensitive and all skin types</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers salon-quality exfoliation at home</Text>
               </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
@@ -1546,6 +1558,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Salmon Oil:</Text> Rich in unsaturated fatty acids, it offers anti-inflammatory and wound-healing effects while providing deep nourishment to the skin.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Provides anti-aging benefits by reducing the appearance of wrinkles and fine lines, promoting smoother, more youthful-looking skin.</Text>
               </>
+            ) : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Natural Enzymes:</Text> Facilitate gentle exfoliation by breaking down dead skin cells naturally, providing effective yet non-irritating skin renewal.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Retinol (Vitamin A):</Text> Promotes skin renewal and improves texture while supporting cellular turnover for a more youthful appearance.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Provitamin A:</Text> Supports skin health and regeneration, providing essential nutrients for optimal skin function and recovery.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Vitamin E:</Text> Provides antioxidant protection and moisturization, helping to protect the skin from environmental damage while maintaining hydration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Vitamin C (Ascorbic Acid):</Text> Brightens the skin and boosts collagen production, helping to reduce signs of aging and improve skin radiance.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothes and calms the skin, reducing irritation and providing gentle care for sensitive skin during exfoliation.</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1596,6 +1617,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Completion:</Text> Do not rinse off</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use in the morning and evening</Text>
               </>
+            ) : product.name === 'EPI TURNOVER BOOSTING PEELING GEL' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and ensure skin is dry</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the gel to clean, dry skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in a circular motion for up to one minute</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Removal:</Text> Rinse off the clumped dead skin cells with lukewarm water</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 1-2 times per week for optimal results</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -1626,6 +1655,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
               : product.name === 'EGF REPAIR OXYMASK CREAM'
               ? "This product is dermatologically tested and suitable for all skin types. For optimal bubbling, avoid rubbing the product during application. For best results, incorporate it into your daily skincare routine."
+              : product.name === 'EPI TURNOVER BOOSTING PEELING GEL'
+              ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve smoother, more radiant skin."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>
