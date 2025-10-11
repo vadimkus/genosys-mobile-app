@@ -304,7 +304,6 @@ export default function ProductDetailScreen() {
           <Text style={styles.shippingItem}>🚚 Free Shipping on orders over 1,000 AED</Text>
           <Text style={styles.shippingItem}>💳 Secure Payment with Stripe checkout</Text>
           <Text style={styles.shippingItem}>🏛️ 5% UAE Tax Payer - Supporting local economy</Text>
-          <Text style={styles.shippingItem}>📦 In Stock - Ready to ship</Text>
         </View>
       </ScrollView>
     </View>
