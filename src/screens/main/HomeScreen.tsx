@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     alignSelf: 'flex-start',
-    marginTop: 12,
+    marginTop: 13,
   },
   statusDot: {
     width: 6,
