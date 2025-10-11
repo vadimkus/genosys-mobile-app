@@ -378,7 +378,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#dc2626',
-    textDecorationLine: 'underline',
   },
   imageContainer: {
     position: 'relative',
