@@ -1193,15 +1193,6 @@ export class ProductService {
 
   private transformProducts(dbProducts: any[]): Product[] {
     return dbProducts
-      .filter(product => {
-        // Remove duplicate blemish balm products - keep only the higher SPF version
-        const name = product.name.toLowerCase();
-        if (name.includes('intensive blemish balm cream') && name.includes('spf 30')) {
-          console.log('🚫 Filtering out duplicate blemish balm product:', product.name);
-          return false;
-        }
-        return true;
-      })
       .map(product => {
         // Remove GENOSYS prefix from product names for cleaner display
         if (product.name && product.name.startsWith('GENOSYS ')) {
