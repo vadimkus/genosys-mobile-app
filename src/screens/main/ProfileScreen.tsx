@@ -87,14 +87,7 @@ export default function ProfileScreen() {
   };
 
   const handleTraining = () => {
-    Alert.alert(
-      'Professional Training',
-      'Access comprehensive training materials and documentation for Genosys products.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'View Training', onPress: () => Linking.openURL('https://genosys.ae/training') }
-      ]
-    );
+    navigation.navigate('TrainingMaterials');
   };
 
   const handleDownloadCatalog = () => {

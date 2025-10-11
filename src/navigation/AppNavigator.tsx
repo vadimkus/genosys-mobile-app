@@ -21,6 +21,7 @@ import ProductDetailScreen from '../screens/main/ProductDetailScreen';
 import CheckoutScreen from '../screens/main/CheckoutScreen';
 import OrderDetailScreen from '../screens/main/OrderDetailScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
+import TrainingMaterialsScreen from '../screens/main/TrainingMaterialsScreen';
 
 // Navigation types
 export type RootStackParamList = {
@@ -32,6 +33,7 @@ export type RootStackParamList = {
   OrderDetail: { orderId: string };
   Settings: undefined;
   EditProfile: undefined;
+  TrainingMaterials: undefined;
 };
 
 export type AuthStackParamList = {
@@ -84,6 +86,7 @@ function MainStackNavigator() {
       <Stack.Screen name="Checkout" component={CheckoutScreen} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="TrainingMaterials" component={TrainingMaterialsScreen} />
     </Stack.Navigator>
   );
 }
