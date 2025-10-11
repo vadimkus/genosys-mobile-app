@@ -159,6 +159,21 @@ export default function ProductDetailScreen() {
         </Text>
       </TouchableOpacity>
 
+      {/* Reviews and Price */}
+      <View style={styles.reviewsPriceSection}>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
+          <Text style={styles.reviewCount}>({product.reviewCount} reviews)</Text>
+        </View>
+
+        <View style={styles.priceContainer}>
+          <Text style={styles.price}>AED {product.price.toFixed(2)}</Text>
+          {product.originalPrice && product.originalPrice > product.price && (
+            <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
+          )}
+        </View>
+      </View>
+
       {/* Add to Cart Section */}
       <View style={styles.cartSection}>
         <Text style={styles.cartSectionTitle}>Add to Cart</Text>
@@ -185,17 +200,6 @@ export default function ProductDetailScreen() {
 
       {/* Product Info */}
       <View style={styles.content}>
-        <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({product.reviewCount} reviews)</Text>
-        </View>
-
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>AED {product.price.toFixed(2)}</Text>
-          {product.originalPrice && product.originalPrice > product.price && (
-            <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
-          )}
-        </View>
 
         {/* Comprehensive Product Information for All Products */}
         <View style={styles.section}>
@@ -424,6 +428,11 @@ const styles = StyleSheet.create({
   },
   productNameSection: {
     padding: 20,
+    paddingBottom: 10,
+  },
+  reviewsPriceSection: {
+    padding: 20,
+    paddingTop: 10,
     paddingBottom: 10,
   },
   brand: {
