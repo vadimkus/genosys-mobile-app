@@ -492,11 +492,13 @@ export default function ProductDetailScreen() {
     if (name.includes('egf repair oxymask cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> EGF repair oxymask cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> EGF repair, oxygen therapy, skin rejuvenation</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional repair treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Oxygen bubbling mask cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged and stressed skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> EGF and oxygen therapy</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin regeneration, oxygen therapy, anti-inflammatory</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Special Feature:</Text> Unique oxygen bubbling effect</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
