@@ -698,11 +698,12 @@ export default function ProductDetailScreen() {
     if (name.includes('genosys skin reboot pdrn mask pack')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Genosys skin reboot PDRN mask pack</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin reboot, PDRN therapy, skin regeneration</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Skin reboot treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional-grade PDRN mask pack</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30 sheets per container</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin regeneration, barrier repair, anti-aging</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially damaged or aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 2-3 times per week or as needed for intensive care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> PDRN (salmon DNA) extraction technology</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1277,7 +1278,7 @@ export default function ProductDetailScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -1400,6 +1401,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') return '101g (60 patches)';
             if (product.name === 'EyeCell EYE ZONE CARE KIT') return '1 Kit';
             if (product.name === 'GENO-LED IR II') return '1 Device';
+            if (product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK') return '30 sheets per container';
             if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') return '300g';
             if (product.name === 'EGF REPAIR OXYMASK CREAM') return '50g';
             if (product.name === 'EPI TURNOVER BOOSTING PEELING GEL') return '100g';
@@ -1422,7 +1424,7 @@ export default function ProductDetailScreen() {
             <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
           )}
         </View>
-      </View>
+        </View>
 
       {/* Add to Cart Section */}
       <View style={styles.cartSection}>
@@ -1455,7 +1457,7 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Product Description</Text>
           <View style={styles.descriptionBlock}>
-            <Text style={styles.description}>
+          <Text style={styles.description}>
               {product.name === 'ALL FOR SENSITIVE SERUM' 
                 ? "GENOSYS ALL FOR SENSITIVE SERUM is a specialized skin repairing serum designed specifically for sensitive skin. This advanced formula provides a protective moisture barrier while delivering anti-inflammatory and soothing properties to calm and repair sensitized skin. Perfect for those with reactive, easily irritated skin."
                 : product.name === 'EyeCell EYE CONTOUR CREAM'
@@ -1468,6 +1470,8 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS EyeCell EYE ZONE CARE KIT is a comprehensive professional-grade solution designed to address various concerns in the delicate eye area, including fine lines, dark circles, puffiness, and crow's feet. This advanced kit combines cosmeceuticals with a specialized micro-needle roller to enhance the absorption of active ingredients and stimulate collagen production for comprehensive eye rejuvenation."
                 : product.name === 'GENO-LED IR II'
                 ? "GENOSYS GENO-LED IR II is an advanced LED therapy device that combines infrared and red light technology to provide professional-grade skin rejuvenation treatments. This innovative device utilizes specific wavelengths of light to stimulate cellular activity, promote collagen production, and enhance overall skin health for both professional and home use."
+                : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK'
+                ? "GENOSYS SKIN REBOOT PDRN MASK PACK is a professional-grade treatment mask infused with PDRN (Polydeoxyribonucleotide) extracted from salmon DNA. This advanced mask promotes cellular regeneration, accelerates skin repair, and enhances overall skin health. Perfect for post-treatment care and intensive skin rejuvenation."
                 : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                 ? "GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits."
                 : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1477,10 +1481,10 @@ export default function ProductDetailScreen() {
                 : product.name === 'EZ CO₂ MASK KIT'
                 ? "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients."
                 : isCollagenMask 
-                ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
-                : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
-              }
-            </Text>
+              ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
+              : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
+            }
+          </Text>
           </View>
         </View>
 
@@ -1550,6 +1554,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Accelerates Healing - Promotes faster recovery from skin treatments and reduces downtime</Text>
                 <Text style={styles.benefitItem}>• Enhances Circulation - Improves blood flow and oxygen delivery to skin cells</Text>
                 <Text style={styles.benefitItem}>• Safe and Non-Invasive - Gentle, pain-free treatment suitable for all skin types</Text>
+              </>
+            ) : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? (
+              <>
+                <Text style={styles.benefitItem}>• Skin Regeneration - Accelerates cell regeneration and improves skin texture</Text>
+                <Text style={styles.benefitItem}>• Deep Hydration - Provides intense moisture for plump, dewy skin</Text>
+                <Text style={styles.benefitItem}>• Elasticity Enhancement - Boosts skin firmness and elasticity</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging - Reduces fine lines and signs of aging</Text>
+                <Text style={styles.benefitItem}>• Soothing Effect - Calms inflammation and supports skin healing</Text>
+                <Text style={styles.benefitItem}>• Barrier Repair - Restores damaged skin barrier function</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade skin rejuvenation</Text>
               </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
@@ -1682,6 +1696,18 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Skin-soothing and anti-inflammatory properties for gentle, effective care.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Provitamin B5 that provides deep penetrating moisture and reduces inflammation.</Text>
               </>
+            ) : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>PDRN (Polydeoxyribonucleotide):</Text> DNA-based ingredient derived from salmon that accelerates skin regeneration, improves elasticity, and promotes healing with 95% similarity to human DNA.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol (Pro-Vitamin B5):</Text> Deeply hydrates and soothes the skin while supporting the skin barrier and promoting wound healing with strong water-binding capacity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Provides deep moisture retention, plumps the skin, and helps reduce the appearance of fine lines and wrinkles for enhanced hydration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Peptide Complex:</Text> Stimulates collagen production and improves skin firmness for a more youthful, resilient complexion.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramide:</Text> Key lipid component that reinforces skin barrier, helps maintain skin homeostasis, and prevents transepidermal water loss.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Acts as a precursor to ceramides, promoting ceramide synthesis in the skin and strengthening the skin barrier.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Skin-soothing and anti-inflammatory properties for gentle, effective care and enhanced skin comfort.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Shea Butter:</Text> Skin-friendly, plant-derived emollient rich in triglycerides and fatty acids for intense moisturization and antioxidant protection.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Leaf Complex:</Text> Camellia Sinensis, Mentha Rotundifolia, and Thyme extracts providing antioxidant, anti-inflammatory, and natural antibacterial properties.</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bio-Fermented Extracts:</Text> Advanced fermentation process creates beneficial compounds, peptides, and amino acids that enhance skin barrier function and provide anti-aging benefits through natural biological processes.</Text>
@@ -1791,6 +1817,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Safety:</Text> Avoid direct eye contact and follow the built-in timer controls</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Maintenance:</Text> Clean the device after each use and store in a cool, dry place</Text>
               </>
+            ) : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Prepare:</Text> Cleanse your face and pat dry</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Extract:</Text> Take out one sheet mask with the built-in tweezers</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Apply:</Text> Apply the mask closely to the face, smoothing out any air bubbles</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Wait:</Text> Leave on for 10-15 minutes to allow active ingredients to absorb</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Remove:</Text> Remove the mask sheet and gently pat the remaining essence into your skin</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Store:</Text> Close the closure seal and cap tightly to prevent the product from drying out</Text>
+              </>
             ) : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly and apply toner if desired</Text>
@@ -1862,6 +1897,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. Regular use can lead to a more youthful, vibrant, and refreshed appearance around the eyes. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen."
               : product.name === 'GENO-LED IR II'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your skincare routine. Consult with a skincare professional for personalized treatment protocols."
+              : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK'
+              ? "This product is clinically proven to restore skin barrier function damaged by physical irritation. For optimal results, use consistently 2-3 times per week. Store in a cool, dry place and ensure the container is tightly sealed after each use to maintain product freshness."
               : product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin."
               : product.name === 'EGF REPAIR OXYMASK CREAM'
@@ -1876,7 +1913,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -1884,9 +1921,9 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : '850 KB'}</Text>
               </View>
-              <TouchableOpacity 
+            <TouchableOpacity
                 style={styles.documentationButton}
                 onPress={() => {
                   // Open the product documentation PDF
@@ -1898,14 +1935,16 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf'
                     : product.name === 'GENO-LED IR II'
                     ? 'https://genosys.ae/documents/ppt/GENO-LED%20IR%20II_2025.pdf'
+                    : product.name === 'GENOSYS SKIN REBOOT PDRN MASK PACK'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
               >
                 <Text style={styles.documentationButtonText}>View PDF</Text>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
+        </View>
         )}
 
         {/* Shipping Info */}
@@ -1928,7 +1967,7 @@ export default function ProductDetailScreen() {
           <Text style={styles.footerCopyright}>© 2025 Genosys Middle East FZ-LLC. All rights reserved.</Text>
         </View>
       </View>
-      </ScrollView>
+    </ScrollView>
     </View>
   );
 }
