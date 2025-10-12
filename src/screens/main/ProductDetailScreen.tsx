@@ -355,15 +355,17 @@ export default function ProductDetailScreen() {
       );
     }
     
-    // Hair-GENTRON Device
+    // Hair-GENTRON
     if (name.includes('hair-gentron')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional hair growth device</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Red and blue light therapy</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth stimulation, scalp health, professional treatment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially thinning hair</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional hair treatment device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> LED helmet with massaging and heating functions</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1 Device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Patent:</Text> No. 10-2151442 (Korea)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Award:</Text> Bronze medal winner of 2020 Korea invention patent competition</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Light Types:</Text> Infrared + Red + Blue LED combination</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Features:</Text> Massaging, heating, music mode</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1435,6 +1437,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'Hair-GENTRON' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1514,6 +1521,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'HR³ MATRIX HAIR TONIC α') return '70ml';
             if (product.name === 'HR³ MATRIX SCALP PEELING α') return '100ml';
             if (product.name === 'HR³ MATRIX SCALP SHAMPOO α') return '300ml';
+            if (product.name === 'Hair-GENTRON') return '1 Device';
             return '30ml';
           })()}
         </Text>
@@ -1664,6 +1672,28 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Peptide Technology:</Text> Advanced peptide complex including Sh-polypeptide-71 and Copper Tripeptide-1 for targeted hair follicle nourishment and growth stimulation.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Botanical Extracts:</Text> Rich blend of traditional herbs and plant extracts including Sophora Japonica, Portulaca Oleracea, and Polygonum Multiflorum for natural scalp nourishment.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Scalp Revitalization:</Text> Niacinamide and botanical extracts work synergistically to improve scalp circulation and provide essential nutrients to hair follicles.</Text>
+          </View>
+        </View>
+        )}
+        {product.name === 'Hair-GENTRON' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Multi-LED Light Therapy:</Text> Infrared light + Red light + Blue light combination for comprehensive scalp treatment and hair follicle stimulation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Massaging Function:</Text> Air pressure massaging system that can be used simultaneously with light therapy for enhanced treatment effectiveness.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Heating Function:</Text> Optional heating feature that can be added during treatment to improve blood circulation and enhance light penetration.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Music Mode:</Text> Built-in relaxation features to help users feel comfortable and relaxed during treatment sessions.</Text>
+          </View>
+        </View>
+        )}
+        {product.name === 'Hair-GENTRON' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>How It Works</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}>1. <Text style={styles.detailLabel}>Light Therapy:</Text> Infrared, red, and blue LED lights stimulate hair follicles and improve scalp health</Text>
+              <Text style={styles.detailItem}>2. <Text style={styles.detailLabel}>Massaging:</Text> Air pressure massaging improves blood circulation and enhances treatment effectiveness</Text>
+              <Text style={styles.detailItem}>3. <Text style={styles.detailLabel}>Heating:</Text> Optional heating function increases blood flow and light penetration</Text>
+              <Text style={styles.detailItem}>4. <Text style={styles.detailLabel}>Relaxation:</Text> Music mode and comfortable design ensure a pleasant treatment experience</Text>
           </View>
         </View>
         )}
@@ -1838,6 +1868,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Scalp Health - Promotes healthy scalp environment for optimal hair growth</Text>
                 <Text style={styles.benefitItem}>• Professional Quality - Advanced formulation with patented ingredients</Text>
                 <Text style={styles.benefitItem}>• Dermatologically Tested - Safe for regular use on all hair types</Text>
+              </>
+            ) : product.name === 'Hair-GENTRON' ? (
+              <>
+                <Text style={styles.benefitItem}>• Hair Growth Stimulation - Promotes natural hair growth through advanced light therapy</Text>
+                <Text style={styles.benefitItem}>• Improved Blood Circulation - Enhances scalp blood flow for better nutrient delivery to hair follicles</Text>
+                <Text style={styles.benefitItem}>• Non-Invasive Treatment - Safe and painless therapy without side effects</Text>
+                <Text style={styles.benefitItem}>• Professional & Home Use - Suitable for both professional clinics and home care</Text>
+                <Text style={styles.benefitItem}>• Stress Relief - Massaging function helps reduce tension and stress</Text>
+                <Text style={styles.benefitItem}>• Optimal Light Distance - Guaranteed proper distance from light source to scalp for maximum effectiveness</Text>
               </>
             ) : product.name === 'HYDRO COOL MODELING MASK' ? (
               <>
@@ -2306,6 +2345,8 @@ export default function ProductDetailScreen() {
               ? "This product is designed for use in conjunction with microneedling treatments. For best results, use as part of the complete HR³ MATRIX treatment protocol. Avoid contact with eyes and discontinue use if irritation occurs."
               : product.name === 'HR³ MATRIX SCALP SHAMPOO α'
               ? "This product is KFDA approved as a functional product for improving hair loss symptoms. For best results, use as part of the complete HR³ MATRIX treatment protocol. Regular use helps maintain optimal scalp health and promotes healthy hair growth."
+              : product.name === 'Hair-GENTRON'
+              ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
               : product.name === 'HYDRO COOL MODELING MASK'
               ? "This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
@@ -2314,7 +2355,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2322,7 +2363,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -2350,6 +2391,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20PEELING%20ALPHA.pdf'
                     : product.name === 'HR³ MATRIX SCALP SHAMPOO α'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20SHAMPOO%20ALPHA.pdf'
+                    : product.name === 'Hair-GENTRON'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20HAIR-GENTRON.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
