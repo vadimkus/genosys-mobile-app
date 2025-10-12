@@ -1770,18 +1770,13 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'HR³ MATRIX HAIR TONIC α' ? (
               <>
-                <Text style={styles.benefitItem}>• Strengthens Hair Follicles</Text>
-                <Text style={styles.benefitItem}>  Provides essential nutrients and peptides for stronger, healthier hair</Text>
-                <Text style={styles.benefitItem}>• Improves Scalp Health</Text>
-                <Text style={styles.benefitItem}>  Nourishes and revitalizes the scalp environment for optimal hair growth</Text>
-                <Text style={styles.benefitItem}>• Enhances Blood Circulation</Text>
-                <Text style={styles.benefitItem}>  Increases nutrient delivery to hair follicles through improved blood flow</Text>
-                <Text style={styles.benefitItem}>• Prevents Hair Loss</Text>
-                <Text style={styles.benefitItem}>  Targets fundamental causes of hair thinning and provides protective benefits</Text>
+                <Text style={styles.benefitItem}>• Strengthens Hair Follicles - Provides essential nutrients and peptides for stronger, healthier hair</Text>
+                <Text style={styles.benefitItem}>• Improves Scalp Health - Nourishes and revitalizes the scalp environment for optimal hair growth</Text>
+                <Text style={styles.benefitItem}>• Enhances Blood Circulation - Increases nutrient delivery to hair follicles through improved blood flow</Text>
+                <Text style={styles.benefitItem}>• Prevents Hair Loss - Targets fundamental causes of hair thinning and provides protective benefits</Text>
                 <Text style={styles.benefitItem}>• Promotes Hair Growth</Text>
                 <Text style={styles.benefitItem}>  Stimulates hair follicle activity and supports natural hair regrowth</Text>
-                <Text style={styles.benefitItem}>• Antioxidant Protection</Text>
-                <Text style={styles.benefitItem}>  Botanical extracts provide antioxidant benefits for scalp protection</Text>
+                <Text style={styles.benefitItem}>• Antioxidant Protection - Botanical extracts provide antioxidant benefits for scalp protection</Text>
               </>
             ) : product.name === 'HYDRO COOL MODELING MASK' ? (
               <>
