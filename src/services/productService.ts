@@ -1271,10 +1271,10 @@ export class ProductService {
         
         // Masks
         if (name.includes('ez co₂ mask kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEZE.jpg&w=1200&q=75';
+        if (name.includes('skin rescue overnight cream mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSKIN.jpg&w=1200&q=75';
         if (name.includes('peptide gel mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
         if (name.includes('soothing bomb sea algae mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('hydro cool modeling mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHYDR.jpg&w=1200&q=75';
-        if (name.includes('skin rescue overnight cream mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Eye care
         if (name.includes('eyecell eye peptide gel patch')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPatch.jpg&w=1200&q=75';
