@@ -1715,6 +1715,19 @@ export default function ProductDetailScreen() {
           </View>
         </View>
         )}
+
+        {/* Key Features Section for INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++] */}
+        {product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Coverage Technology:</Text> Advanced formula that provides natural-looking coverage while allowing your skin's natural tone to shine through.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>SPF 30 PA++ Protection:</Text> Broad-spectrum sun protection that shields skin from harmful UV rays and environmental damage.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Blemish Coverage:</Text> Effectively covers redness, blemishes, and imperfections for a flawless, even complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Post-Treatment Care:</Text> Ideal for covering redness and blemishes after dermatological treatments while promoting skin healing.</Text>
+          </View>
+        </View>
+        )}
         {product.name === 'HairGen BOOSTER' && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How It Works</Text>
@@ -1898,6 +1911,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Professional Quality - Advanced formulation with patented ingredients</Text>
                 <Text style={styles.benefitItem}>• Dermatologically Tested - Safe for regular use on all hair types</Text>
               </>
+            ) : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+              <>
+                <Text style={styles.benefitItem}>• Natural Coverage - Provides flawless coverage while maintaining natural skin appearance</Text>
+                <Text style={styles.benefitItem}>• Sun Protection - SPF 30 PA++ shields skin from harmful UV rays and environmental damage</Text>
+                <Text style={styles.benefitItem}>• Blemish Concealing - Effectively covers redness, blemishes, and skin imperfections</Text>
+                <Text style={styles.benefitItem}>• Post-Treatment Care - Safe for use after dermatological procedures and treatments</Text>
+                <Text style={styles.benefitItem}>• Environmental Protection - Guards against harmful environmental factors and pollutants</Text>
+                <Text style={styles.benefitItem}>• Skin Tone Enhancement - Helps express and enhance your natural skin tone</Text>
+              </>
             ) : product.name === 'HairGen BOOSTER' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Hair Growth - Stimulates hair follicles and promotes natural hair regrowth</Text>
@@ -1960,7 +1982,14 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Ingredients</Text>
           <View style={styles.ingredientsList}>
-            {product.name === 'ALL FOR SENSITIVE SERUM' ? (
+            {product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Anti-aging ingredient that helps reduce fine lines and wrinkles while promoting skin renewal.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that calms irritated skin and promotes skin regeneration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Origanum Vulgare Leaf Extract:</Text> Natural antioxidant extract that provides protection against environmental damage and free radicals.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that enhances skin protection and provides natural coverage benefits.</Text>
+              </>
+            ) : product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>MultiEx BSASM® Plus:</Text> A patented complex that helps strengthen the skin barrier and provides long-lasting hydration while protecting sensitive skin from environmental stressors.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> A plant-derived ingredient that provides natural anti-inflammatory benefits and helps soothe irritated skin while supporting the skin's natural healing process.</Text>
@@ -2169,7 +2198,15 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How to Use</Text>
           <View style={styles.usageList}>
-            {product.name === 'ALL FOR SENSITIVE SERUM' ? (
+            {product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse and moisturize your skin before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to areas needing coverage and blend gently</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Blending:</Text> Use fingertips or a beauty sponge to blend for natural-looking coverage</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Build Coverage:</Text> Layer for additional coverage on areas with more significant blemishes</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Setting:</Text> Allow to set for a few minutes before applying additional makeup if desired</Text>
+              </>
+            ) : product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly with a gentle cleanser</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the serum to clean skin in the morning and evening</Text>
@@ -2387,6 +2424,8 @@ export default function ProductDetailScreen() {
               ? "This product is KFDA approved as a functional product for improving hair loss symptoms. For best results, use as part of the complete HR³ MATRIX treatment protocol. Regular use helps maintain optimal scalp health and promotes healthy hair growth."
               : product.name === 'Hair-GENTRON'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
+              : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]'
+              ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day."
               : product.name === 'HairGen BOOSTER'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
               : product.name === 'HYDRO COOL MODELING MASK'
