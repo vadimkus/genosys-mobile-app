@@ -857,7 +857,7 @@ export class ProductService {
             updatedAt: '2024-02-20T10:00:00.000Z'
           },
           {
-            id: '11',
+            id: '28',
             name: 'INTENSIVE HYDRO SOOTHING CREAM',
             description: 'Intensive hydro soothing cream with aloe vera and snail secretion filtrate for deep hydration and skin comfort',
             price: 79.99,
@@ -867,7 +867,7 @@ export class ProductService {
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHSC.jpg&w=1200&q=75'],
             category: 'Cream',
             brand: 'Genosys',
-            sku: 'GEN-011',
+            sku: 'GEN-028',
             images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHSC.jpg&w=1200&q=75'],
             inStock: true,
             stockQuantity: 40,
