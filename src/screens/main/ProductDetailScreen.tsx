@@ -1934,12 +1934,12 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
               <>
-                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Special Overnight Care:</Text> Apply sufficient amount on face at the last step of skincare routine, once or twice a week when skin needs special care</Text>
-                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Post-Care:</Text> Apply to create protective film over skin after skin procedures for extra protection</Text>
-                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Before Makeup:</Text> Apply sufficient amount, wait 10 minutes, wipe gently with toner-soaked cotton pad, then apply small amount again for moist skin base</Text>
-                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Morning Use:</Text> Can be used instead of cream or after cream, ensure sufficient absorption to avoid makeup pilling</Text>
-                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Choose proper frequency and amount based on skin type and concerns</Text>
-                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Best Times:</Text> When skin needs extra boost, looks dull/sallow, becomes dry/sensitive, after sunburn, or for intensive home care</Text>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a generous amount to face and neck</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage until oxygen capsules burst and blend with cream</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Overnight:</Text> Leave on overnight for maximum benefits</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for optimal results</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Wake up to revitalized, refreshed skin</Text>
               </>
             ) : isCollagenMask ? (
               <>
