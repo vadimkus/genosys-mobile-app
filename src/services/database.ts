@@ -16,9 +16,12 @@ const dbApi = axios.create({
 export const testConnection = async (): Promise<boolean> => {
   try {
     console.log('🔄 Testing database connection via API...');
-    const response = await dbApi.get('/health');
-    console.log('✅ Database API connected successfully:', response.data);
-    return true;
+    // Temporarily force fallback data to use updated images
+    console.log('⚠️ Forcing fallback data to use updated images');
+    return false;
+    // const response = await dbApi.get('/health');
+    // console.log('✅ Database API connected successfully:', response.data);
+    // return true;
   } catch (error) {
     console.log('⚠️ Database API not available, using fallback data');
     return false;
