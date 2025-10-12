@@ -1539,6 +1539,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'Hair-GENTRON') return '1 Device';
             if (product.name === 'HairGen BOOSTER') return '1 Device';
             if (product.name === 'INTENSIVE HYDRO SOOTHING CREAM') return '50g/250g';
+            if (product.name === 'INTENSIVE PROBLEM CONTROL TONER') return '200ml/500ml';
             return '30ml';
           })()}
         </Text>
