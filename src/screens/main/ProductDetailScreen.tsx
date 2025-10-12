@@ -379,6 +379,24 @@ export default function ProductDetailScreen() {
       );
     }
     
+    // SKIN RESCUE OVERNIGHT CREAM MASK
+    if (name.includes('skin rescue overnight cream mask')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Overnight cream mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Fatigued and stressed skin recovery</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Dual formula with oxygen capsules and pink ceramide complex</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin revitalization, oxygen therapy, overnight recovery, erythema improvement</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Overnight treatment 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially fatigued skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply generously, massage until capsules burst, leave overnight</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Results:</Text> Clinically proven to improve erythema and transepidermal water loss</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
     // MOISTURE REPLENISHING HYALURON CREAM
     if (name.includes('moisture replenishing hyaluron cream')) {
       return (
@@ -1345,6 +1363,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1777,6 +1800,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Origanum Vulgare Leaf Extract:</Text> Natural antioxidant extract that provides protection against environmental damage and free radicals.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that enhances skin protection and provides natural coverage benefits.</Text>
               </>
+            ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pink Ceramide Complex:</Text> Unique ceramide complex that provides intensive skin protection and recovery benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Oxygen Capsules:</Text> Italian oxygenated water capsules that burst on contact for instant oxygen therapy.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Growth Factor Complex:</Text> EGF, aFGF, bFGF, PIGF, IGF work together to promote skin renewal and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pumpkin Extract:</Text> Cucurbita Pepo fruit extract provides antioxidant protection and skin nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that helps strengthen skin barrier and improve moisture retention.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Swelling Controller:</Text> Special ingredient that helps control swelling and inflammation for comfortable application.</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1899,6 +1931,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Blending:</Text> Use fingertips or a beauty sponge to blend for natural-looking coverage</Text>
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Build Coverage:</Text> Layer for additional coverage on areas with more significant blemishes</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Setting:</Text> Allow to set for a few minutes before applying additional makeup if desired</Text>
+              </>
+            ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a generous amount to face and neck</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage until oxygen capsules burst and blend with cream</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Overnight:</Text> Leave on overnight for maximum benefits</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for optimal results</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Wake up to revitalized, refreshed skin</Text>
               </>
             ) : isCollagenMask ? (
               <>

@@ -1555,6 +1555,11 @@ export class ProductService {
       return ['50g'];
     }
     
+    // SKIN RESCUE OVERNIGHT CREAM MASK
+    if (name.includes('skin rescue overnight cream mask')) {
+      return ['100g'];
+    }
+    
     return undefined;
   }
 
@@ -1624,6 +1629,11 @@ export class ProductService {
     // INTENSIVE BLEMISH BALM CREAM
     if (name.includes('intensive blemish balm cream')) {
       return '50g';
+    }
+    
+    // SKIN RESCUE OVERNIGHT CREAM MASK
+    if (name.includes('skin rescue overnight cream mask')) {
+      return '100g';
     }
     
     return undefined;
