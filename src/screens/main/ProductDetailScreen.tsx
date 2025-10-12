@@ -1375,6 +1375,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
