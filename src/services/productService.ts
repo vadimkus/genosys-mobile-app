@@ -1670,7 +1670,7 @@ export class ProductService {
     
     // Multi Functional Anti-Wrinkle Cream
     if (name.includes('multi functional anti-wrinkle cream')) {
-      return ['30ml', '50ml'];
+      return ['50g', '250g'];
     }
     
     // Multi Functional Anti-Wrinkle Serum
@@ -1751,7 +1751,7 @@ export class ProductService {
     
     // Multi Functional Anti-Wrinkle Cream
     if (name.includes('multi functional anti-wrinkle cream')) {
-      return '30ml';
+      return '50g';
     }
     
     // Multi Functional Anti-Wrinkle Serum
