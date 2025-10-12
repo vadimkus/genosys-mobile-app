@@ -392,11 +392,13 @@ export default function ProductDetailScreen() {
     if (name.includes('intensive problem control toner')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive problem control toner</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 200ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Problem skin treatment, pore cleansing, skin balancing</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Problem skin, oily skin, acne-prone skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily skin care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Intensive problem control toner</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 200ml (Homecare) / 500ml (Professional)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Acne-prone, sensitive, and problematic skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced active ingredient complex</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Problem control, pore minimizing, skin soothing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Problematic, acne-prone, sensitive skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1959,6 +1961,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Barrier Support - Strengthens the skin's natural defenses</Text>
                 <Text style={styles.benefitItem}>• Moisture Retention - Keeps skin hydrated without clogging pores</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? (
+              <>
+                <Text style={styles.benefitItem}>• Intensive Problem Control - Targets acne, blemishes, and skin irritations effectively</Text>
+                <Text style={styles.benefitItem}>• Pore Minimizing - Helps reduce pore size and tighten skin texture</Text>
+                <Text style={styles.benefitItem}>• Skin Soothing - Calms irritated and sensitive skin with anti-inflammatory properties</Text>
+                <Text style={styles.benefitItem}>• Dead Skin Cell Removal - Gently exfoliates and removes impurities for clearer skin</Text>
+                <Text style={styles.benefitItem}>• pH Balancing - Restores optimal skin pH levels for healthy skin barrier</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade benefits for problem skin management</Text>
+              </>
             ) : product.name === 'HairGen BOOSTER' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Hair Growth - Stimulates hair follicles and promotes natural hair regrowth</Text>
@@ -2045,6 +2056,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> A gentle, soothing ingredient that helps calm irritated skin, reduce redness, and promote skin healing while being suitable for sensitive skin.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus/Pumpkin Ferment Extract:</Text> A probiotic ingredient that helps balance the skin's microbiome, providing natural antimicrobial benefits and supporting healthy skin flora.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Trehalose:</Text> A natural sugar that acts as a humectant, helping to retain moisture and protect the skin from environmental stressors while maintaining skin hydration.</Text>
+              </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Salicylic Acid:</Text> Beta-hydroxy acid that penetrates pores to dissolve dead skin cells and excess oil, helping to prevent acne breakouts and improve skin texture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Witch Hazel Extract:</Text> Natural astringent that tightens pores, reduces inflammation, and provides soothing relief for irritated and sensitive skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Tea Tree Extract:</Text> Powerful antimicrobial and anti-inflammatory agent that helps combat acne-causing bacteria while soothing irritated skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Aloe Vera Extract:</Text> Soothing and healing ingredient that calms inflammation, reduces redness, and promotes skin healing for problem areas.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Niacinamide:</Text> Vitamin B3 derivative that helps regulate sebum production, minimize pores, and improve skin barrier function for healthier skin.</Text>
               </>
             ) : product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
@@ -2279,6 +2298,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as part of your morning and evening skincare routine for best results</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Target Areas:</Text> Focus on problematic areas and areas prone to breakouts</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Daily Cleansing:</Text> Soak a cotton pad with toner and gently wipe along the skin texture to remove dead skin cells and residues after washing the face</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Intensive Treatment:</Text> Soak cotton pads with toner and apply them to the face. Leave them on for 5-10 minutes to enhance pore contraction effect and soothe the skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Application:</Text> Use morning and evening as part of your skincare routine</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Target Areas:</Text> Focus on problematic areas, T-zone, and areas prone to breakouts</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Follow-up:</Text> Follow with appropriate moisturizer for best results</Text>
+              </>
             ) : product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly with a gentle cleanser</Text>
@@ -2503,6 +2530,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day."
               : product.name === 'INTENSIVE PROBLEM CONTROL CREAM'
               ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day."
+              : product.name === 'INTENSIVE PROBLEM CONTROL TONER'
+              ? "This product is dermatologically tested and safe for all skin types. Particularly effective for problematic and acne-prone skin. For best results, use as part of your daily skincare routine and follow with appropriate moisturizer."
               : product.name === 'HairGen BOOSTER'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
               : product.name === 'HYDRO COOL MODELING MASK'
@@ -2513,7 +2542,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2521,7 +2550,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -2551,6 +2580,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20SHAMPOO%20ALPHA.pdf'
                     : product.name === 'Hair-GENTRON'
                     ? 'https://genosys.ae/documents/ppt/HAIR%20GENTRON.pdf'
+                    : product.name === 'INTENSIVE PROBLEM CONTROL TONER'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
