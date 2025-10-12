@@ -1736,7 +1736,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Inhibits Hair Loss Causes - Targets root causes including 5α-reductase inhibition to suppress DHT conversion</Text>
                 <Text style={styles.benefitItem}>• Stimulates Hair Growth - Supplies essential nutrients to hair follicles and promotes angiogenesis for new hair growth</Text>
                 <Text style={styles.benefitItem}>• Regulates Sebum Secretion</Text>
-                <Text style={styles.benefitItem}>  Controls excessive sebum production for balanced and healthy scalp environment</Text>
+                <Text style={styles.benefitItem}>  • Controls excessive sebum production for balanced and healthy scalp environment</Text>
                 <Text style={styles.benefitItem}>• Deep Scalp Cleansing - Removes keratin, sebum, and impurities for optimal treatment absorption</Text>
                 <Text style={styles.benefitItem}>• Enhanced Absorption - Roller device ensures deeper penetration of active ingredients</Text>
                 <Text style={styles.benefitItem}>• Comprehensive Treatment - Complete system addressing all aspects of hair loss and scalp health</Text>
