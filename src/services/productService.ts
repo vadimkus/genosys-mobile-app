@@ -1481,7 +1481,9 @@ export class ProductService {
         return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
       };
 
-      const finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
+      // For specific products, always use local mapping to ensure correct images
+      const useLocalMapping = product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM';
+      const finalImageUrl = useLocalMapping ? getImageUrl(product.name) : (product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name));
       console.log(`🖼️ Product: ${product.name} -> Image: ${finalImageUrl}`);
 
       return {
