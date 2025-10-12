@@ -1254,6 +1254,33 @@ export class ProductService {
             defaultSize: '100ml',
             createdAt: '2024-03-10T10:00:00.000Z',
             updatedAt: '2024-03-10T10:00:00.000Z'
+          },
+          {
+            id: '44',
+            name: 'HR³ MATRIX SCALP SHAMPOO α',
+            description: 'Professional functional shampoo for hair loss prevention and scalp health. KFDA-approved with advanced ingredient complex for optimal hair growth.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHR3SHAMPOO.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3SHAMPOO.jpg&w=1200&q=75'],
+            category: 'Scalp/Hair',
+            brand: 'Genosys',
+            sku: 'GEN-044',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3SHAMPOO.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 20,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 20,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['300ml'],
+            defaultSize: '300ml',
+            createdAt: '2024-03-11T10:00:00.000Z',
+            updatedAt: '2024-03-11T10:00:00.000Z'
           }
         ];
 
