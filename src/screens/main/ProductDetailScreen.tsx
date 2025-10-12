@@ -1462,6 +1462,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'EGF REPAIR OXYMASK CREAM') return '50g';
             if (product.name === 'EPI TURNOVER BOOSTING PEELING GEL') return '100g';
             if (product.name === 'EZ CO₂ MASK KIT') return '1 Kit';
+            if (product.name === 'HYDRO COOL MODELING MASK') return '1kg';
             return '30ml';
           })()}
         </Text>
