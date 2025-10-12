@@ -1594,6 +1594,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'MICROBIOME ENERGY INFUSING MIST') return '80ml';
             if (product.name === 'MOISTURE REPLENISHING HYALURON CREAM') return '50g/250g';
             if (product.name === 'INTENSIVE PROBLEM CONTROL CREAM') return '50g/250g';
+            if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM') return '50g/250g';
             if (product.name === 'MOISTURE REPLENISHING HYALURON SERUM') return '30ml';
             return '30ml';
           })()}
