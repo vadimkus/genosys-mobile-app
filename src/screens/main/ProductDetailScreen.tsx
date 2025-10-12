@@ -345,11 +345,12 @@ export default function ProductDetailScreen() {
     if (name.includes('hairgen booster')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Hair growth booster</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Hair growth acceleration, scalp stimulation, professional results</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hair Type:</Text> All hair types, especially slow-growing hair</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional hair treatment, 2-3 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Auto-microneedling LED device for scalp treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1 Device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Microneedling + LED light therapy</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Components:</Text> HR³ MATRIX HAIR SOLUTION α + HR³ MATRIX HAIR STAMP</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Benefits:</Text> Hair growth stimulation, scalp health improvement, nutrient delivery</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1442,6 +1443,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'HairGen BOOSTER' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1522,6 +1528,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'HR³ MATRIX SCALP PEELING α') return '100ml';
             if (product.name === 'HR³ MATRIX SCALP SHAMPOO α') return '300ml';
             if (product.name === 'Hair-GENTRON') return '1 Device';
+            if (product.name === 'HairGen BOOSTER') return '1 Device';
             return '30ml';
           })()}
         </Text>
@@ -1697,6 +1704,28 @@ export default function ProductDetailScreen() {
           </View>
         </View>
         )}
+        {product.name === 'HairGen BOOSTER' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Auto-Microneedling Technology:</Text> Automated microneedling system that creates micro-channels in the scalp to enhance nutrient absorption and stimulate natural healing processes.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>LED Light Therapy:</Text> Advanced LED light system that stimulates hair follicles, improves scalp circulation, and promotes cellular regeneration for enhanced hair growth.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>HR³ MATRIX HAIR SOLUTION α:</Text> Premium anti-hair loss solution that supplies essential nutrients to combat factors causing hair loss and promote healthy hair growth.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>HR³ MATRIX HAIR STAMP:</Text> Patented delivery enhancer with microneedles that leads to scalp regeneration and collagen production through natural wound healing processes.</Text>
+          </View>
+        </View>
+        )}
+        {product.name === 'HairGen BOOSTER' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>How It Works</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}>1. <Text style={styles.detailLabel}>Microneedling:</Text> Creates micro-channels in the scalp to enhance product absorption</Text>
+              <Text style={styles.detailItem}>2. <Text style={styles.detailLabel}>LED Therapy:</Text> Light therapy stimulates hair follicles and improves scalp circulation</Text>
+              <Text style={styles.detailItem}>3. <Text style={styles.detailLabel}>Nutrient Delivery:</Text> HR³ MATRIX HAIR SOLUTION α provides essential nutrients for hair growth</Text>
+              <Text style={styles.detailItem}>4. <Text style={styles.detailLabel}>Regeneration:</Text> Natural wound healing process promotes collagen production and scalp health</Text>
+          </View>
+        </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
@@ -1868,6 +1897,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Scalp Health - Promotes healthy scalp environment for optimal hair growth</Text>
                 <Text style={styles.benefitItem}>• Professional Quality - Advanced formulation with patented ingredients</Text>
                 <Text style={styles.benefitItem}>• Dermatologically Tested - Safe for regular use on all hair types</Text>
+              </>
+            ) : product.name === 'HairGen BOOSTER' ? (
+              <>
+                <Text style={styles.benefitItem}>• Enhanced Hair Growth - Stimulates hair follicles and promotes natural hair regrowth</Text>
+                <Text style={styles.benefitItem}>• Improved Scalp Health - Increases blood circulation and nutrient delivery to hair roots</Text>
+                <Text style={styles.benefitItem}>• Collagen Production - Promotes scalp regeneration and strengthens hair structure</Text>
+                <Text style={styles.benefitItem}>• Nutrient Absorption - Creates pathways for better penetration of hair care products</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Advanced technology for both professional and home use</Text>
+                <Text style={styles.benefitItem}>• Non-Invasive Treatment - Safe and effective without side effects</Text>
               </>
             ) : product.name === 'Hair-GENTRON' ? (
               <>
@@ -2346,6 +2384,8 @@ export default function ProductDetailScreen() {
               : product.name === 'HR³ MATRIX SCALP SHAMPOO α'
               ? "This product is KFDA approved as a functional product for improving hair loss symptoms. For best results, use as part of the complete HR³ MATRIX treatment protocol. Regular use helps maintain optimal scalp health and promotes healthy hair growth."
               : product.name === 'Hair-GENTRON'
+              ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
+              : product.name === 'HairGen BOOSTER'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
               : product.name === 'HYDRO COOL MODELING MASK'
               ? "This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort."
