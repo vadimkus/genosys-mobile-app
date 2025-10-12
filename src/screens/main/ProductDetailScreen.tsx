@@ -2052,6 +2052,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Instant Hydration - Provides immediate moisture and long-lasting hydration</Text>
                 <Text style={styles.benefitItem}>• Natural Radiance - Enhances skin's natural glow and radiance</Text>
                 <Text style={styles.benefitItem}>• Barrier Strengthening - Improves skin's natural moisture barrier function</Text>
+                <Text style={styles.benefitItem}>  and enhances skin's natural defense mechanisms</Text>
                 <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
               </>
