@@ -2242,7 +2242,7 @@ export default function ProductDetailScreen() {
                     : product.name === 'HR³ MATRIX MESOPECIA KIT'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20MESOPECIA%20KIT.pdf'
                     : product.name === 'HR³ MATRIX HAIR TONIC α'
-                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20TONIC.pdf'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20TONIC%20ALPHA.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
