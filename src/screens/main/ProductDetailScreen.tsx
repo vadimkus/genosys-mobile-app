@@ -391,10 +391,7 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Overnight treatment 2-3 times per week</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially fatigued skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply generously, massage until capsules burst, leave overnight</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Clinical Results:</Text> 15% improvement in TEWL, 26% improvement in erythema after 4 weeks</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Special Care:</Text> Intensive overnight care for skin needing extra boost</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Post-Care:</Text> Protective film after skin procedures</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Makeup Base:</Text> Perfect base for makeup application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Results:</Text> Clinically proven to improve erythema and transepidermal water loss</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1805,18 +1802,12 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
               <>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pink Ceramide Complex:</Text> Unique ceramide complex with Epilobium Angustifolium extract, Lactobacillus Ferment Lysate, and Ceramide NP for intensive skin protection and barrier strengthening.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Oxygen Capsules:</Text> Italian oxygenated water capsules that burst on contact, increasing oxygen in skin tissue for cellular respiration and ATP production.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>EGF (sh-Oligopeptide-1):</Text> Epidermal Growth Factor that stimulates keratinocyte proliferation and promotes natural cell renewal and wound healing.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>aFGF (sh-Polypeptide-11):</Text> Acidic Fibroblast Growth Factor that stimulates fibroblast cell growth and promotes collagen synthesis.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>bFGF (sh-Polypeptide-1):</Text> Basic Fibroblast Growth Factor that promotes synthesis of collagen, elastin and extracellular matrix components.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>PIGF (sh-Polypeptide-16):</Text> Placental Growth Factor that accelerates skin healing by enhancing angiogenesis.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>IGF-1 (sh-Oligopeptide-2):</Text> Insulin-like Growth Factor that stimulates cell proliferation and promotes wound healing.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Swelling Controller:</Text> Patented complex of Bromelain, Ruscus Aculeatus, Melissa Officinalis, Arnica Montana, and Vitis Vinifera extracts to reduce swelling.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pumpkin Extract:</Text> Cucurbita Pepo fruit extract rich in beta-carotene that boosts collagen production and moisturizes skin.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Ceramide precursor that prevents moisture loss, strengthens skin barrier, and improves firmness by inhibiting MMP-1.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Macadamia Ternifolia Seed Oil:</Text> Contains linoleic acid for TEWL prevention and palmitoleic acid for wound healing, with phytosterols for calming effects.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Rich in triterpenes with antimicrobial, anti-inflammatory, wound healing, and collagen synthesis properties.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pink Ceramide Complex:</Text> Unique ceramide complex that provides intensive skin protection and recovery benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Oxygen Capsules:</Text> Italian oxygenated water capsules that burst on contact for instant oxygen therapy.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Growth Factor Complex:</Text> EGF, aFGF, bFGF, PIGF, IGF work together to promote skin renewal and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pumpkin Extract:</Text> Cucurbita Pepo fruit extract provides antioxidant protection and skin nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that helps strengthen skin barrier and improve moisture retention.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Swelling Controller:</Text> Special ingredient that helps control swelling and inflammation for comfortable application.</Text>
               </>
             ) : isCollagenMask ? (
               <>
