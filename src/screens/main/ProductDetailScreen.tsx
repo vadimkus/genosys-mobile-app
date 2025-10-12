@@ -2392,7 +2392,7 @@ export default function ProductDetailScreen() {
                     : product.name === 'HR³ MATRIX SCALP SHAMPOO α'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20SHAMPOO%20ALPHA.pdf'
                     : product.name === 'Hair-GENTRON'
-                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20HAIR-GENTRON.pdf'
+                    ? 'https://genosys.ae/documents/ppt/HAIR%20GENTRON.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
