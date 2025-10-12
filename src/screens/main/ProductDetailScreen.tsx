@@ -1259,6 +1259,20 @@ export default function ProductDetailScreen() {
       );
     }
     
+    // MICROBIOME ENERGY INFUSING MIST
+    if (name.includes('microbiome energy infusing mist')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Microbiome energy infusing mist</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 80ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Microbiome balance, hydration, radiance, barrier protection</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily skincare routine, on-the-go hydration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
     // Default generic details for other products
     return (
       <>
@@ -1551,6 +1565,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'HairGen BOOSTER') return '1 Device';
             if (product.name === 'INTENSIVE HYDRO SOOTHING CREAM') return '50g/250g';
             if (product.name === 'INTENSIVE PROBLEM CONTROL TONER') return '200ml/500ml';
+            if (product.name === 'MICROBIOME ENERGY INFUSING MIST') return '80ml';
             return '30ml';
           })()}
         </Text>
@@ -1771,6 +1786,19 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}>2. <Text style={styles.detailLabel}>LED Therapy:</Text> Light therapy stimulates hair follicles and improves scalp circulation</Text>
               <Text style={styles.detailItem}>3. <Text style={styles.detailLabel}>Nutrient Delivery:</Text> HR³ MATRIX HAIR SOLUTION α provides essential nutrients for hair growth</Text>
               <Text style={styles.detailItem}>4. <Text style={styles.detailLabel}>Regeneration:</Text> Natural wound healing process promotes collagen production and scalp health</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for MICROBIOME ENERGY INFUSING MIST */}
+        {product.name === 'MICROBIOME ENERGY INFUSING MIST' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Microbiome Technology:</Text> Advanced probiotic and prebiotic blend that corrects and maintains the natural balance of skin microbiome.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Instant Hydration:</Text> Powerful hyaluronic acid complex that provides immediate and long-lasting moisture to the skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Radiance:</Text> Unique formula that revitalizes skin and enhances natural glow and radiance for a healthy complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Barrier Protection:</Text> Strengthens skin's natural moisture barrier and enhances skin's natural defense mechanisms.</Text>
           </View>
         </View>
         )}
@@ -2017,6 +2045,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Barrier Protection - Strengthens skin's natural protective barrier</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive and irritated skin</Text>
                 <Text style={styles.benefitItem}>• Versatile Use - Perfect for both professional treatments and daily home care</Text>
+              </>
+            ) : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? (
+              <>
+                <Text style={styles.benefitItem}>• Microbiome Balance - Restores and maintains healthy skin microbiome</Text>
+                <Text style={styles.benefitItem}>• Instant Hydration - Provides immediate moisture and long-lasting hydration</Text>
+                <Text style={styles.benefitItem}>• Natural Radiance - Enhances skin's natural glow and radiance</Text>
+                <Text style={styles.benefitItem}>• Barrier Strengthening - Improves skin's natural moisture barrier function</Text>
+                <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
+                <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
               </>
             ) : isCollagenMask ? (
               <>
@@ -2269,6 +2306,13 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Argan Oil:</Text> Moisturizes and softens skin with essential fatty acids.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Shea Butter:</Text> Natural emollient that soothes and hydrates skin.</Text>
               </>
+            ) : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>CUREBIOME (Probiotics & Prebiotics):</Text> Advanced microbiome technology that corrects skin microbiome balance and promotes healthy skin flora.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>FENSEBIOME™ (Acetyl Heptapeptide-4):</Text> Innovative peptide that enhances skin's natural defense mechanisms and microbiome health.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronan 10 Multi-Complex:</Text> Multi-molecular hyaluronic acid complex that provides deep hydration and plumping effects.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Butyrospermum Parkii (Shea) Butter:</Text> Natural emollient that provides additional moisture and helps maintain skin's natural barrier.</Text>
+              </>
             ) : (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Advanced Peptides:</Text> Stimulate collagen production for firmer, younger-looking skin.</Text>
@@ -2476,6 +2520,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Solution Application:</Text> Apply HR³ MATRIX HAIR SOLUTION using the dropper while rolling</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Post-Treatment:</Text> Use HR³ MATRIX Shampoo and Tonic for optimal maintenance</Text>
               </>
+            ) : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Hold the bottle 15-20cm away from your face and mist evenly</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Absorption:</Text> Gently pat the mist into your skin with your fingertips</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening, or as needed throughout the day</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Layering:</Text> Can be used before or after other skincare products</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -2554,7 +2606,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2562,7 +2614,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -2594,6 +2646,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/HAIR%20GENTRON.pdf'
                     : product.name === 'INTENSIVE PROBLEM CONTROL TONER'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf'
+                    : product.name === 'MICROBIOME ENERGY INFUSING MIST'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20MICROBIOME%20ENERGY%20INFUSING%20MIST.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
