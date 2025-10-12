@@ -1657,6 +1657,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Professional Results - Delivers salon-quality carboxy therapy at home</Text>
                 <Text style={styles.benefitItem}>• Microneedling Enhancement - Acts as a catalytic mask for better treatment results</Text>
               </>
+            ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
+              <>
+                <Text style={styles.benefitItem}>• Skin Revitalization - Provides intensive care to fatigued and stressed skin</Text>
+                <Text style={styles.benefitItem}>• Oxygen Therapy - Delivers instant oxygen therapy for skin renewal and energy</Text>
+                <Text style={styles.benefitItem}>• Overnight Recovery - Works while you sleep to repair and rejuvenate skin</Text>
+                <Text style={styles.benefitItem}>• Erythema Improvement - Helps reduce redness and skin irritation</Text>
+                <Text style={styles.benefitItem}>• Moisture Retention - Improves transepidermal water loss for better hydration</Text>
+                <Text style={styles.benefitItem}>• Growth Factor Benefits - Stimulates natural skin renewal and healing processes</Text>
+              </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides long-lasting moisture for all skin types</Text>
