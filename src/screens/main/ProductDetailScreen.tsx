@@ -2421,8 +2421,9 @@ const styles = StyleSheet.create({
   benefitItem: {
     fontSize: 14,
     color: '#374151',
-    marginBottom: 8,
-    lineHeight: 20,
+    marginBottom: 12,
+    lineHeight: 22,
+    paddingVertical: 2,
   },
   ingredientsList: {
     backgroundColor: '#ffffff',
