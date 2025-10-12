@@ -119,7 +119,7 @@ export default function ProductDetailScreen() {
     // INTENSIVE PROBLEM CONTROL TONER
     if (name.includes('intensive problem control toner')) {
       if (size === '200ml') return 260.00;  // Homecare size - Current price
-      if (size === '500ml') return 380.00;  // Professional size - Higher price for larger size
+      if (size === '500ml') return 490.00;  // Professional size - Updated price
     }
     
     // Default to original price if no size-specific pricing
