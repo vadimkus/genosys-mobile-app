@@ -429,11 +429,13 @@ export default function ProductDetailScreen() {
     if (name.includes('hydro cool modeling mask')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Hydro cool modeling mask</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1000g</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Cooling effect, skin firming, modeling treatment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially tired skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional modeling treatment, 1-2 times per week</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional modeling mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1kg</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Post-treatment skin soothing and hydration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced cooling and hydrating formula</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Cooling effect, hydration, pore minimizing, skin soothing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1741,6 +1743,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Enhanced Absorption - Roller device ensures deeper penetration of active ingredients</Text>
                 <Text style={styles.benefitItem}>• Comprehensive Treatment - Complete system addressing all aspects of hair loss and scalp health</Text>
               </>
+            ) : product.name === 'HYDRO COOL MODELING MASK' ? (
+              <>
+                <Text style={styles.benefitItem}>• Immediate Cooling Effect - Provides instant cooling and refreshing sensation</Text>
+                <Text style={styles.benefitItem}>• Post-Treatment Soothing - Calms and soothes skin after professional treatments</Text>
+                <Text style={styles.benefitItem}>• Enhanced Hydration - Delivers deep moisture and improves skin hydration</Text>
+                <Text style={styles.benefitItem}>• Pore Minimizing - Helps reduce pore size for smoother skin texture</Text>
+                <Text style={styles.benefitItem}>• Skin Barrier Support - Strengthens and enhances skin barrier function</Text>
+                <Text style={styles.benefitItem}>• Collagen Synthesis - Stimulates collagen production for firmer skin</Text>
+              </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides long-lasting moisture for all skin types</Text>
@@ -1893,6 +1904,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that helps strengthen skin barrier and improve moisture retention.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Swelling Controller:</Text> Special ingredient that helps control swelling and inflammation for comfortable application.</Text>
               </>
+            ) : product.name === 'HYDRO COOL MODELING MASK' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Powerful botanical extract that increases collagen synthesis, enhances skin barrier function, and provides anti-inflammatory benefits for improved skin health and texture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Deep hydrating ingredient that attracts and retains moisture, providing intense hydration and plumping effects for smoother, more youthful-looking skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramide:</Text> Essential lipid that strengthens the skin barrier, locks in moisture, and protects against environmental damage for healthier, more resilient skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that calms irritated skin, promotes cell regeneration, and provides gentle exfoliation for improved skin texture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Mentha Piperita (Peppermint) Extract:</Text> Natural cooling agent that provides refreshing sensation, soothes inflammation, and helps reduce skin redness and irritation.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Chamaecyparis Obtusa Water:</Text> Purified water extract that provides gentle hydration and soothing properties, helping to calm and refresh the skin naturally.</Text>
+              </>
             ) : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sh-polypeptide-71:</Text> Supports hair follicle health and growth stimulation for stronger, healthier hair.</Text>
@@ -2041,6 +2061,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Build Coverage:</Text> Layer for additional coverage on areas with more significant blemishes</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Setting:</Text> Allow to set for a few minutes before applying additional makeup if desired</Text>
               </>
+            ) : product.name === 'HYDRO COOL MODELING MASK' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Cleanse:</Text> Begin with thoroughly cleansed facial skin</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the modeling mask evenly to the face</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Processing Time:</Text> Leave the mask on for 15-20 minutes</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Removal:</Text> Gently rub the residue into the skin for additional benefits</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Rinse:</Text> Rinse off any remaining residue with lukewarm water</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Follow-up:</Text> Continue with your regular skincare routine</Text>
+              </>
             ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -2118,6 +2147,8 @@ export default function ProductDetailScreen() {
               ? "This product is designed for both professional and home use. For best results, use as part of the complete HR³ MATRIX MESOPECIA KIT system. Consult with a hair care professional for personalized treatment protocols. Store in a cool, dry place away from direct sunlight."
               : product.name === 'HR³ MATRIX MESOPECIA KIT'
               ? "This comprehensive kit is designed for both professional and home use. For best results, follow the complete treatment protocol and use in conjunction with HR³ MATRIX Shampoo and Tonic for optimal hair health maintenance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'HYDRO COOL MODELING MASK'
+              ? "This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>

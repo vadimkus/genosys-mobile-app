@@ -1173,6 +1173,33 @@ export class ProductService {
             defaultSize: '1 Kit',
             createdAt: '2024-03-07T10:00:00.000Z',
             updatedAt: '2024-03-07T10:00:00.000Z'
+          },
+          {
+            id: '35',
+            name: 'HYDRO COOL MODELING MASK',
+            description: 'Professional modeling mask with immediate cooling and soothing effects for post-treatment skin care. Provides instant cooling sensation, enhances hydration, and reduces pore size.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHYDRO.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHYDRO.jpg&w=1200&q=75'],
+            category: 'Mask',
+            brand: 'Genosys',
+            sku: 'GEN-035',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHYDRO.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 8,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 8,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['1kg'],
+            defaultSize: '1kg',
+            createdAt: '2024-03-08T10:00:00.000Z',
+            updatedAt: '2024-03-08T10:00:00.000Z'
           }
         ];
 
