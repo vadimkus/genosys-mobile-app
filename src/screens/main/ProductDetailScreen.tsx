@@ -1543,7 +1543,21 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Ultra-Slim Fit Sheet:</Text> Ultra-slim fit sheet adheres seamlessly to the skin for effective delivery of active ingredients and maximum absorption.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Convenient Packaging:</Text> Contains 30 sheets per container with tissue-style packaging that allows for convenient one-by-one dispensing with built-in tweezers.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Barrier Restoration:</Text> Clinical results show significant improvement in restoring the skin barrier damaged by physical irritation or environmental stress.</Text>
-          </View>
+            </View>
+        </View>
+        )}
+
+        {/* Key Features Section for SKIN RESCUE OVERNIGHT CREAM MASK */}
+        {product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Dual Formula Technology:</Text> Combines oxygen capsules with pink ceramide complex for comprehensive skin recovery and protection.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Overnight Treatment:</Text> Specifically designed for overnight use to maximize skin recovery while you sleep.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Oxygen Therapy:</Text> Italian oxygenated water capsules that burst on contact, delivering instant oxygen therapy for skin renewal.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Growth Factor Complex:</Text> Contains EGF, aFGF, bFGF, PIGF, IGF growth factors that work together to promote skin renewal and healing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Clinical Results:</Text> Clinically proven to improve erythema and transepidermal water loss for healthier, more resilient skin.</Text>
+            </View>
         </View>
         )}
 
