@@ -1227,6 +1227,33 @@ export class ProductService {
             defaultSize: '70ml',
             createdAt: '2024-03-09T10:00:00.000Z',
             updatedAt: '2024-03-09T10:00:00.000Z'
+          },
+          {
+            id: '46',
+            name: 'HR³ MATRIX SCALP PEELING α',
+            description: 'Gentle scalp peeling solution for microneedling treatment preparation. Removes keratinized particles, provides refreshing cooling sensation, and optimizes scalp condition for enhanced treatment absorption.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHR3PEELING.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3PEELING.jpg&w=1200&q=75'],
+            category: 'Scalp/Hair',
+            brand: 'Genosys',
+            sku: 'GEN-046',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3PEELING.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 15,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 15,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['100ml'],
+            defaultSize: '100ml',
+            createdAt: '2024-03-10T10:00:00.000Z',
+            updatedAt: '2024-03-10T10:00:00.000Z'
           }
         ];
 

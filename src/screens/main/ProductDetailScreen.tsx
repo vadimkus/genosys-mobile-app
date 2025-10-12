@@ -310,6 +310,21 @@ export default function ProductDetailScreen() {
       );
     }
     
+    // HR³ MATRIX SCALP PEELING α
+    if (name.includes('hr³ matrix scalp peeling') || name.includes('scalp peeling')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Scalp peeling solution</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Scalp preparation for microneedling treatments</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Gentle exfoliating and refreshing formula</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Scalp cleansing, refreshing sensation, treatment preparation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
     // HairGen BOOSTER
     if (name.includes('hairgen booster')) {
       return (
@@ -1394,6 +1409,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'HR³ MATRIX SCALP PEELING α' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1471,6 +1491,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'EZ CO₂ MASK KIT') return '1 Kit';
             if (product.name === 'HYDRO COOL MODELING MASK') return '1kg';
             if (product.name === 'HR³ MATRIX HAIR TONIC α') return '70ml';
+            if (product.name === 'HR³ MATRIX SCALP PEELING α') return '100ml';
             return '30ml';
           })()}
         </Text>
@@ -1778,6 +1799,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>  Stimulates hair follicle activity and supports natural hair regrowth</Text>
                 <Text style={styles.benefitItem}>• Antioxidant Protection - Botanical extracts provide antioxidant benefits for scalp protection</Text>
               </>
+            ) : product.name === 'HR³ MATRIX SCALP PEELING α' ? (
+              <>
+                <Text style={styles.benefitItem}>• Gentle Scalp Exfoliation - Effectively removes keratinized particles and dead skin cells</Text>
+                <Text style={styles.benefitItem}>• Refreshing Cooling Effect - Provides a soothing, cooling sensation for scalp comfort</Text>
+                <Text style={styles.benefitItem}>• Disinfecting Properties - Helps cleanse the scalp and prepare for treatment</Text>
+                <Text style={styles.benefitItem}>• Anti-Inflammatory Action - Reduces inflammation and soothes irritated scalp</Text>
+                <Text style={styles.benefitItem}>• Enhanced Blood Circulation - Stimulates blood flow to hair follicles</Text>
+                <Text style={styles.benefitItem}>• Treatment Preparation - Optimizes scalp condition for microneedling procedures</Text>
+              </>
             ) : product.name === 'HYDRO COOL MODELING MASK' ? (
               <>
                 <Text style={styles.benefitItem}>• Immediate Cooling Effect - Provides instant cooling and refreshing sensation</Text>
@@ -1960,6 +1990,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Niacinamide:</Text> Improves blood circulation in the scalp for enhanced nutrient delivery.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Citrus Paradisi Seed Oil:</Text> Provides antimicrobial benefits for scalp health and protection.</Text>
               </>
+            ) : product.name === 'HR³ MATRIX SCALP PEELING α' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Salicylic Acid:</Text> Provides gentle exfoliation to remove dead skin cells and unclog hair follicles, promoting healthier scalp condition and improved treatment absorption.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Menthol:</Text> Delivers a refreshing, cooling sensation that soothes the scalp and provides immediate comfort during and after application.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sophora Japonica Linn Extract:</Text> Provides antioxidant properties and helps reduce inflammation, promoting scalp health and creating an optimal environment for hair growth.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Tea Extract:</Text> Offers anti-inflammatory and antioxidant benefits, helping to soothe the scalp and protect against environmental damage.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Grapefruit Seed Oil:</Text> Provides natural antimicrobial properties to help cleanse the scalp and maintain a healthy scalp environment.</Text>
+              </>
             ) : product.name === 'HR³ MATRIX HAIR TONIC α' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sh-polypeptide-71:</Text> Supports hair follicle health and growth stimulation for stronger, healthier hair.</Text>
@@ -2116,6 +2154,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Enhancement:</Text> Use with GENOSYS STAMP (ROLLER) for deeper penetration</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for optimal results</Text>
               </>
+            ) : product.name === 'HR³ MATRIX SCALP PEELING α' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Scalp Preparation:</Text> Ensure the scalp is clean and dry before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount of the peeling solution to the scalp</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage the solution into the scalp using circular motions</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Processing Time:</Text> Allow the solution to work for 2-3 minutes</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Rinse:</Text> Thoroughly rinse with lukewarm water</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Follow-up:</Text> Proceed with your regular microneedling treatment protocol</Text>
+              </>
             ) : product.name === 'HYDRO COOL MODELING MASK' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Cleanse:</Text> Begin with thoroughly cleansed facial skin</Text>
@@ -2204,6 +2251,8 @@ export default function ProductDetailScreen() {
               ? "This comprehensive kit is designed for both professional and home use. For best results, follow the complete treatment protocol and use in conjunction with HR³ MATRIX Shampoo and Tonic for optimal hair health maintenance. Store in a cool, dry place away from direct sunlight."
               : product.name === 'HR³ MATRIX HAIR TONIC α'
               ? "This product is designed for both professional and home use. For best results, use as part of the complete HR³ MATRIX MESOPECIA KIT system. Consult with a hair care professional for personalized treatment protocols."
+              : product.name === 'HR³ MATRIX SCALP PEELING α'
+              ? "This product is designed for use in conjunction with microneedling treatments. For best results, use as part of the complete HR³ MATRIX treatment protocol. Avoid contact with eyes and discontinue use if irritation occurs."
               : product.name === 'HYDRO COOL MODELING MASK'
               ? "This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
@@ -2212,7 +2261,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2220,7 +2269,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -2244,6 +2293,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20MESOPECIA%20KIT.pdf'
                     : product.name === 'HR³ MATRIX HAIR TONIC α'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20TONIC%20ALPHA.pdf'
+                    : product.name === 'HR³ MATRIX SCALP PEELING α'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20PEELING%20ALPHA.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
