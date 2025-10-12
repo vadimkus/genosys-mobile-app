@@ -1534,6 +1534,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'HR³ MATRIX SCALP SHAMPOO α') return '300ml';
             if (product.name === 'Hair-GENTRON') return '1 Device';
             if (product.name === 'HairGen BOOSTER') return '1 Device';
+            if (product.name === 'INTENSIVE HYDRO SOOTHING CREAM') return '50g/250g';
             return '30ml';
           })()}
         </Text>
