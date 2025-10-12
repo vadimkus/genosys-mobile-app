@@ -1995,7 +1995,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Salicylic Acid:</Text> Provides gentle exfoliation to remove dead skin cells and unclog hair follicles, promoting healthier scalp condition and improved treatment absorption.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Menthol:</Text> Delivers a refreshing, cooling sensation that soothes the scalp and provides immediate comfort during and after application.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sophora Japonica Linn Extract:</Text> Provides antioxidant properties and helps reduce inflammation, promoting scalp health and creating an optimal environment for hair growth.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Tea Extract:</Text> Offers anti-inflammatory and antioxidant benefits, helping to soothe the scalp and protect against environmental damage.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Green Tea Extract:</Text> Provides anti-inflammatory and antioxidant benefits, helping to soothe the scalp and protect against environmental damage.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Grapefruit Seed Oil:</Text> Provides natural antimicrobial properties to help cleanse the scalp and maintain a healthy scalp environment.</Text>
               </>
             ) : product.name === 'HR³ MATRIX HAIR TONIC α' ? (
