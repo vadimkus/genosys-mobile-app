@@ -1200,6 +1200,33 @@ export class ProductService {
             defaultSize: '1kg',
             createdAt: '2024-03-08T10:00:00.000Z',
             updatedAt: '2024-03-08T10:00:00.000Z'
+          },
+          {
+            id: '43',
+            name: 'HR³ MATRIX HAIR TONIC α',
+            description: 'Specialized hair tonic with peptide technology and botanical extracts. Strengthens hair follicles, improves scalp health, and promotes hair growth.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHR3TONIC.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3TONIC.jpg&w=1200&q=75'],
+            category: 'Scalp/Hair',
+            brand: 'Genosys',
+            sku: 'GEN-043',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3TONIC.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 12,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 12,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['70ml'],
+            defaultSize: '70ml',
+            createdAt: '2024-03-09T10:00:00.000Z',
+            updatedAt: '2024-03-09T10:00:00.000Z'
           }
         ];
 
