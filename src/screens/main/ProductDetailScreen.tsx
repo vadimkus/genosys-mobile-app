@@ -1996,6 +1996,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve smoother, more radiant skin."
               : product.name === 'EZ CO₂ MASK KIT'
               ? "This product is dermatologically tested and safe for all skin types. The CO₂ therapy mechanism accelerates oxygen delivery to skin tissues, providing professional-grade results. For best results, use as part of your weekly skincare routine."
+              : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK'
+              ? "This product is dermatologically tested and clinically proven to improve erythema and transepidermal water loss. For best results, use consistently as part of your weekly skincare routine. Store in a cool, dry place away from direct sunlight."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>
