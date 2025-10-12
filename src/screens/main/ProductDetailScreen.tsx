@@ -447,11 +447,12 @@ export default function ProductDetailScreen() {
     if (name.includes('moisture replenishing hyaluron cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Moisture replenishing hyaluron cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Deep hydration, moisture replenishment, skin plumping</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dry skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily moisturizing care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Advanced moisturizing cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g (Homecare) / 250g (Professional)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Deep hydration, 72-hour persistence, skin barrier protection</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dry and dehydrated skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily morning and evening application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> 4-step hydration system with multi-molecular hyaluronic acid</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1571,6 +1572,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'INTENSIVE HYDRO SOOTHING CREAM') return '50g/250g';
             if (product.name === 'INTENSIVE PROBLEM CONTROL TONER') return '200ml/500ml';
             if (product.name === 'MICROBIOME ENERGY INFUSING MIST') return '80ml';
+            if (product.name === 'MOISTURE REPLENISHING HYALURON CREAM') return '50g/250g';
             return '30ml';
           })()}
         </Text>
@@ -1804,6 +1806,19 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Instant Hydration:</Text> Powerful hyaluronic acid complex that provides immediate and long-lasting moisture to the skin.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Radiance:</Text> Unique formula that revitalizes skin and enhances natural glow and radiance for a healthy complexion.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Barrier Protection:</Text> Strengthens skin's natural moisture barrier and enhances skin's natural defense mechanisms.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for MOISTURE REPLENISHING HYALURON CREAM */}
+        {product.name === 'MOISTURE REPLENISHING HYALURON CREAM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>4-Step Hydration System:</Text> Advanced multi-layered hydration that cools, attracts, replenishes, and locks in moisture for comprehensive skin hydration.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>72-Hour Hydration Persistence:</Text> Clinically proven to maintain skin hydration for up to 72 hours, providing long-lasting moisture benefits.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hyaluronan 11 Multi-Complex:</Text> Advanced hyaluronic acid complex with multiple molecular weights for deep penetration and surface protection.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Mushroom Extract Complex:</Text> Powerful anti-inflammatory and antioxidant properties from various mushroom extracts for skin nourishment and protection.</Text>
           </View>
         </View>
         )}
@@ -2060,6 +2075,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>  and enhances skin's natural defense mechanisms</Text>
                 <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
+              </>
+            ) : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Deep Hydration - Multi-layered moisture delivery for comprehensive skin hydration</Text>
+                <Text style={styles.benefitItem}>• Long-Lasting Results - 72-hour hydration persistence for sustained moisture</Text>
+                <Text style={styles.benefitItem}>• Skin Barrier Protection - Strengthens moisture barrier to prevent water loss</Text>
+                <Text style={styles.benefitItem}>• Cooling Sensation - Natural cooling agents provide instant skin refreshment</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging Benefits - Reduces fine lines and improves skin elasticity</Text>
+                <Text style={styles.benefitItem}>• All Skin Types - Suitable for all skin types, including sensitive skin</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Salon-quality hydration at home</Text>
               </>
             ) : isCollagenMask ? (
               <>
@@ -2319,6 +2344,13 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronan 10 Multi-Complex:</Text> Multi-molecular hyaluronic acid complex that provides deep hydration and plumping effects.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Butyrospermum Parkii (Shea) Butter:</Text> Natural emollient that provides additional moisture and helps maintain skin's natural barrier.</Text>
               </>
+            ) : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronan 11 Multi-Complex:</Text> Advanced hyaluronic acid complex with low, middle, and high molecular weights for comprehensive skin hydration and protection.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Mushroom Extracts:</Text> Various mushroom extracts provide powerful anti-inflammatory and antioxidant properties for skin nourishment and protection.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Moisture Magnet Technology:</Text> Special ingredients that attract and retain moisture, creating a moisture reservoir in the skin for sustained hydration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Natural Cooling Agents:</Text> Natural-origin cooling agents provide instant skin refreshment and help lower skin temperature for a refreshing sensation.</Text>
+              </>
             ) : (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Advanced Peptides:</Text> Stimulate collagen production for firmer, younger-looking skin.</Text>
@@ -2534,6 +2566,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening, or as needed throughout the day</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Layering:</Text> Can be used before or after other skincare products</Text>
               </>
+            ) : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Cleanse:</Text> Start with clean, dry skin</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Apply:</Text> Take a small amount and gently massage onto face and neck</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Use upward circular motions until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for best results</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Follow-up:</Text> Apply sunscreen during the day</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -2612,7 +2652,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2620,7 +2660,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -2654,6 +2694,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf'
                     : product.name === 'MICROBIOME ENERGY INFUSING MIST'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20MICROBIOME%20ENERGY%20INFUSING%20MIST.pdf'
+                    : product.name === 'MOISTURE REPLENISHING HYALURON CREAM'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20MOISTURE%20REPLENISHING%20HYALURON%20CREAM.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
