@@ -1701,6 +1701,11 @@ export class ProductService {
       return ['50g', '250g'];
     }
     
+    // INTENSIVE PROBLEM CONTROL TONER
+    if (name.includes('intensive problem control toner')) {
+      return ['200ml', '500ml'];
+    }
+    
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
       return ['30ml', '50ml'];
@@ -1775,6 +1780,11 @@ export class ProductService {
     // INTENSIVE PROBLEM CONTROL CREAM
     if (name.includes('intensive problem control cream')) {
       return '50g';
+    }
+    
+    // INTENSIVE PROBLEM CONTROL TONER
+    if (name.includes('intensive problem control toner')) {
+      return '200ml';
     }
     
     // ND Cell ANTI-WRINKLE CREAM
