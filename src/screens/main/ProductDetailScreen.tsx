@@ -1719,7 +1719,7 @@ export default function ProductDetailScreen() {
             ) : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? (
               <>
                 <Text style={styles.benefitItem}>• Prevents Hair Loss - Targets fundamental causes of hair loss and inhibits substances responsible for hair thinning</Text>
-                <Text style={styles.benefitItem}>• Promotes Hair Regrowth - Accelerates angiogenesis and stimulates hair follicle activity</Text>
+                <Text style={styles.benefitItem}>• Promotes Hair Regrowth - Accelerates angiogenesis and stimulates hair follicle activity for new growth</Text>
                 <Text style={styles.benefitItem}>• Strengthens Hair Follicles - Provides essential nutrients and peptides for stronger, healthier hair</Text>
                 <Text style={styles.benefitItem}>• Improves Scalp Health - Nourishes and revitalizes the scalp environment for optimal hair growth</Text>
                 <Text style={styles.benefitItem}>• Enhances Blood Circulation - Increases nutrient delivery to hair follicles through improved blood flow</Text>
@@ -2423,6 +2423,8 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
     lineHeight: 20,
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
   ingredientsList: {
     backgroundColor: '#ffffff',
