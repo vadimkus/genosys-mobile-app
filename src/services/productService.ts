@@ -1119,6 +1119,33 @@ export class ProductService {
             defaultSize: '50g',
             createdAt: '2024-03-05T10:00:00.000Z',
             updatedAt: '2024-03-05T10:00:00.000Z'
+          },
+          {
+            id: '45',
+            name: 'HR³ MATRIX HAIR SOLUTION α',
+            description: 'Premium hair and scalp solution with advanced peptide technology. Prevents hair loss, promotes regrowth, and strengthens hair follicles with botanical extracts.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHR3.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3.jpg&w=1200&q=75'],
+            category: 'Scalp/Hair',
+            brand: 'Genosys',
+            sku: 'GEN-045',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 15,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 15,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['5ml*8pcs'],
+            defaultSize: '5ml*8pcs',
+            createdAt: '2024-03-06T10:00:00.000Z',
+            updatedAt: '2024-03-06T10:00:00.000Z'
           }
         ];
 

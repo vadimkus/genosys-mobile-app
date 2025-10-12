@@ -1561,6 +1561,18 @@ export default function ProductDetailScreen() {
         </View>
         )}
 
+        {/* Key Features Section for HR³ MATRIX HAIR SOLUTION α */}
+        {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Advanced Peptide Technology:</Text> Features Sh-polypeptide-71, Copper Tripeptide-1, and Pentapeptide-20 for targeted hair follicle support and growth stimulation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Botanical Extracts:</Text> Rich blend of traditional herbs including Sophora Japonica, Portulaca Oleracea, and Polygonum Multiflorum for natural scalp nourishment.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Scalp Circulation Enhancement:</Text> Niacinamide and botanical extracts work together to improve blood circulation and nutrient delivery to hair follicles.</Text>
+            </View>
+        </View>
+        )}
+
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
@@ -1679,6 +1691,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Erythema Improvement - Helps reduce redness and skin irritation</Text>
                 <Text style={styles.benefitItem}>• Moisture Retention - Improves transepidermal water loss for better hydration</Text>
                 <Text style={styles.benefitItem}>• Growth Factor Benefits - Stimulates natural skin renewal and healing processes</Text>
+              </>
+            ) : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? (
+              <>
+                <Text style={styles.benefitItem}>• Prevents Hair Loss - Targets fundamental causes of hair loss and inhibits substances responsible for hair thinning</Text>
+                <Text style={styles.benefitItem}>• Promotes Hair Regrowth - Accelerates angiogenesis and stimulates hair follicle activity for new growth</Text>
+                <Text style={styles.benefitItem}>• Strengthens Hair Follicles - Provides essential nutrients and peptides for stronger, healthier hair</Text>
+                <Text style={styles.benefitItem}>• Improves Scalp Health - Nourishes and revitalizes the scalp environment for optimal hair growth</Text>
+                <Text style={styles.benefitItem}>• Enhances Blood Circulation - Increases nutrient delivery to hair follicles through improved blood flow</Text>
+                <Text style={styles.benefitItem}>• Antioxidant Protection - Sophora Japonica and other botanical extracts provide antioxidant benefits</Text>
               </>
             ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
               <>
@@ -1832,6 +1853,18 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that helps strengthen skin barrier and improve moisture retention.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Swelling Controller:</Text> Special ingredient that helps control swelling and inflammation for comfortable application.</Text>
               </>
+            ) : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sh-polypeptide-71:</Text> Supports hair follicle health and growth stimulation for stronger, healthier hair.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Promotes collagen synthesis and hair strength for improved hair quality.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pentapeptide-20:</Text> Aids in hair growth and follicle nourishment for optimal hair development.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sophora Japonica Bud Extract:</Text> Antioxidant properties for scalp protection and hair health.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Portulaca Oleracea:</Text> Traditional herb for scalp nourishment and hair strengthening.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Polygonum Multiflorum Root:</Text> Known for hair strengthening properties and scalp health.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Angelica Gigas Root:</Text> Supports scalp health and circulation for better hair growth.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Niacinamide:</Text> Improves blood circulation in the scalp for enhanced nutrient delivery.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Citrus Paradisi Seed Oil:</Text> Provides antimicrobial benefits for scalp health and protection.</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Protein that supports skin structure and improves firmness.</Text>
@@ -1964,6 +1997,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for optimal results</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Wake up to revitalized, refreshed skin</Text>
               </>
+            ) : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse scalp thoroughly with HR³ MATRIX SCALP PEELING</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the solution evenly to the scalp and hair roots</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage into scalp for 2-3 minutes to enhance absorption</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Enhancement:</Text> Use with GENOSYS STAMP (ROLLER) for deeper penetration</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for optimal results</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -2012,13 +2053,15 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. The CO₂ therapy mechanism accelerates oxygen delivery to skin tissues, providing professional-grade results. For best results, use as part of your weekly skincare routine."
               : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK'
               ? "This product is dermatologically tested and clinically proven to improve erythema and transepidermal water loss. For best results, use consistently as part of your weekly skincare routine. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'HR³ MATRIX HAIR SOLUTION α'
+              ? "This product is designed for both professional and home use. For best results, use as part of the complete HR³ MATRIX MESOPECIA KIT system. Consult with a hair care professional for personalized treatment protocols. Store in a cool, dry place away from direct sunlight."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
             }
           </Text>
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2026,13 +2069,13 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
                 onPress={() => {
                   // Open the product documentation PDF
-                  const pdfUrl = product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' 
+                  const pdfUrl = product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf'
                     : product.name === 'EZ CO₂ MASK KIT'
                     ? 'https://genosys.ae/documents/ppt/Genosys%20Ez%20Co2%20Mask.pdf'
@@ -2044,6 +2087,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf'
                     : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20SKIN%20RESCUE%20OVERNIGHT%20CREAM%20MASK.pdf'
+                    : product.name === 'HR³ MATRIX HAIR SOLUTION α'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20SOLUTION.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
