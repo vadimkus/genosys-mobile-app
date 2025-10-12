@@ -1488,6 +1488,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1573,6 +1578,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'INTENSIVE PROBLEM CONTROL TONER') return '200ml/500ml';
             if (product.name === 'MICROBIOME ENERGY INFUSING MIST') return '80ml';
             if (product.name === 'MOISTURE REPLENISHING HYALURON CREAM') return '50g/250g';
+            if (product.name === 'INTENSIVE PROBLEM CONTROL CREAM') return '50g/250g';
             return '30ml';
           })()}
         </Text>
@@ -2086,6 +2092,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• All Skin Types - Suitable for all skin types, including sensitive skin</Text>
                 <Text style={styles.benefitItem}>• Professional Results - Salon-quality hydration at home</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Anti-microbial - Helps combat bacteria and prevent breakouts</Text>
+                <Text style={styles.benefitItem}>• Anti-inflammatory - Reduces redness and calms irritated skin</Text>
+                <Text style={styles.benefitItem}>• Sebum Control - Regulates oil production for balanced skin</Text>
+                <Text style={styles.benefitItem}>• Soothing Relief - Provides comfort for problematic skin</Text>
+                <Text style={styles.benefitItem}>• Skin Barrier Support - Strengthens the skin's natural defenses</Text>
+                <Text style={styles.benefitItem}>• Moisture Retention - Keeps skin hydrated without clogging pores</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides deep moisture for soft, supple skin</Text>
@@ -2351,6 +2366,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Moisture Magnet Technology:</Text> Special ingredients that attract and retain moisture, creating a moisture reservoir in the skin for sustained hydration.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Natural Cooling Agents:</Text> Natural-origin cooling agents provide instant skin refreshment and help lower skin temperature for a refreshing sensation.</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Zinc PCA:</Text> A powerful sebum-regulating ingredient that helps control oil production and has antimicrobial properties to prevent breakouts and maintain clear skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol (Vitamin B5):</Text> Provides deep hydration and has anti-inflammatory properties that help soothe irritated skin while promoting healing and skin barrier function.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> A gentle, soothing ingredient that helps calm irritated skin, reduce redness, and promote skin healing while being suitable for sensitive skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus/Pumpkin Ferment Extract:</Text> A probiotic ingredient that helps balance the skin's microbiome, providing natural antimicrobial benefits and supporting healthy skin flora.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Trehalose:</Text> A natural sugar that acts as a humectant, helping to retain moisture and protect the skin from environmental stressors while maintaining skin hydration.</Text>
+              </>
             ) : (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Advanced Peptides:</Text> Stimulate collagen production for firmer, younger-looking skin.</Text>
@@ -2574,6 +2598,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for best results</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Follow-up:</Text> Apply sunscreen during the day</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to cleansed skin</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage into the skin until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use twice daily as part of your morning and evening skincare routine</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Results:</Text> Use consistently for best results in controlling problematic skin</Text>
+              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -2652,7 +2684,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM' || product.name === 'INTENSIVE PROBLEM CONTROL CREAM') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2660,7 +2692,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? '1.2 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -2696,6 +2728,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20MICROBIOME%20ENERGY%20INFUSING%20MIST.pdf'
                     : product.name === 'MOISTURE REPLENISHING HYALURON CREAM'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20MOISTURE%20REPLENISHING%20HYALURON%20CREAM.pdf'
+                    : product.name === 'INTENSIVE PROBLEM CONTROL CREAM'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20CREAM.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}
