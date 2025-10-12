@@ -1146,6 +1146,33 @@ export class ProductService {
             defaultSize: '5ml*8pcs',
             createdAt: '2024-03-06T10:00:00.000Z',
             updatedAt: '2024-03-06T10:00:00.000Z'
+          },
+          {
+            id: '47',
+            name: 'HR³ MATRIX MESOPECIA KIT',
+            description: 'Complete hair and scalp treatment system with scalp peeling, hair solution, and roller device. Prevents hair loss, stimulates regrowth, and promotes scalp health.',
+            price: 0, // Login to see price
+            originalPrice: 0,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FHR3KIT.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3KIT.jpg&w=1200&q=75'],
+            category: 'Scalp/Hair',
+            brand: 'Genosys',
+            sku: 'GEN-047',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FHR3KIT.jpg&w=1200&q=75'],
+            inStock: true,
+            stockQuantity: 10,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: false,
+            stock: 10,
+            rating: 4.0,
+            averageRating: 4.8,
+            reviewCount: 0,
+            sizeOptions: ['1 Kit'],
+            defaultSize: '1 Kit',
+            createdAt: '2024-03-07T10:00:00.000Z',
+            updatedAt: '2024-03-07T10:00:00.000Z'
           }
         ];
 
