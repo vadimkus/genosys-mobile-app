@@ -1956,6 +1956,7 @@ export default function ProductDetailScreen() {
           </View>
         </View>
 
+        {product.name !== 'HairGen BOOSTER' && product.name !== 'Hair-GENTRON' && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Ingredients</Text>
           <View style={styles.ingredientsList}>
@@ -2163,6 +2164,7 @@ export default function ProductDetailScreen() {
             )}
           </View>
         </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How to Use</Text>
