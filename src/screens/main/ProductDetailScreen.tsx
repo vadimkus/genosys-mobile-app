@@ -1721,7 +1721,7 @@ export default function ProductDetailScreen() {
             <View style={styles.detailsList}>
               <Text style={styles.detailItem}>1. <Text style={styles.detailLabel}>Microneedling:</Text> Creates micro-channels in the scalp to enhance product absorption</Text>
               <Text style={styles.detailItem}>2. <Text style={styles.detailLabel}>LED Therapy:</Text> Light therapy stimulates hair follicles and improves scalp circulation</Text>
-              <Text style={styles.detailItem}>3. <Text style={styles.detailLabel}>Nutrient Delivery:</Text> HR³ MATRIX HAIR SOLUTION α provides essential{'\n'}   nutrients for hair growth</Text>
+              <Text style={styles.detailItem}>3. <Text style={styles.detailLabel}>Nutrient Delivery:</Text> HR³ MATRIX HAIR SOLUTION α provides essential nutrients for hair growth</Text>
               <Text style={styles.detailItem}>4. <Text style={styles.detailLabel}>Regeneration:</Text> Natural wound healing process promotes collagen production and scalp health</Text>
           </View>
         </View>
