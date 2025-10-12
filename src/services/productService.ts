@@ -1422,8 +1422,8 @@ export class ProductService {
         
         // Skincare creams
         if (name.includes('blemish balm cream') || name.includes('blemish balm cushion')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBLEM.jpg&w=1200&q=75';
-        if (name.includes('anti-wrinkle cream') || name.includes('nd cell')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('multi functional') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FANT.jpg&w=1200&q=75';
+        if (name.includes('anti-wrinkle cream') || name.includes('nd cell')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('moisture replenishing') && name.includes('cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHER.jpg&w=1200&q=75';
         if (name.includes('intensive problem control cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75';
         if (name.includes('intensive hydro soothing cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHSC.jpg&w=1200&q=75';
