@@ -1728,6 +1728,19 @@ export default function ProductDetailScreen() {
           </View>
         </View>
         )}
+
+        {/* Key Features Section for INTENSIVE HYDRO SOOTHING CREAM */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Intensive Hydration:</Text> Advanced hydrating formula that provides long-lasting moisture and helps maintain optimal skin hydration levels.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Soothing Properties:</Text> Calms down skin irritation and provides relief for sensitive, stressed, or damaged skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Ingredients:</Text> Formulated with premium natural ingredients including aloe vera and snail secretion filtrate for gentle, effective care.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional & Home Use:</Text> Available in both homecare (50g) and professional (250g) sizes for versatile application.</Text>
+          </View>
+        </View>
+        )}
         {product.name === 'HairGen BOOSTER' && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How It Works</Text>
@@ -1911,6 +1924,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Professional Quality - Advanced formulation with patented ingredients</Text>
                 <Text style={styles.benefitItem}>• Dermatologically Tested - Safe for regular use on all hair types</Text>
               </>
+            ) : product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Intensive Hydration - Provides long-lasting moisture for all skin types</Text>
+                <Text style={styles.benefitItem}>• Skin Soothing - Calms irritation and reduces redness and inflammation</Text>
+                <Text style={styles.benefitItem}>• Skin Repair - Promotes natural healing and skin regeneration</Text>
+                <Text style={styles.benefitItem}>• Barrier Protection - Strengthens skin's natural protective barrier</Text>
+                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive and irritated skin</Text>
+                <Text style={styles.benefitItem}>• Versatile Use - Perfect for both professional treatments and daily home care</Text>
+              </>
             ) : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
               <>
                 <Text style={styles.benefitItem}>• Natural Coverage - Provides flawless coverage while maintaining natural skin appearance</Text>
@@ -1982,7 +2004,16 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Ingredients</Text>
           <View style={styles.ingredientsList}>
-            {product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+            {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Aloe Barbadensis Leaf Extract:</Text> Natural soothing and healing ingredient that calms irritated skin and provides gentle hydration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Snail Secretion Filtrate:</Text> Premium ingredient rich in glycoproteins and growth factors that promote skin regeneration and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that attracts and retains moisture, providing intense hydration and plumping effects.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus/Pumpkin Ferment Extract:</Text> Fermented ingredient that provides probiotics and nutrients for improved skin health and texture.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> Natural immune-boosting ingredient that enhances skin's defense mechanisms and promotes healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that provides additional skin protection and soothing benefits.</Text>
+              </>
+            ) : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Anti-aging ingredient that helps reduce fine lines and wrinkles while promoting skin renewal.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that calms irritated skin and promotes skin regeneration.</Text>
@@ -2198,7 +2229,15 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How to Use</Text>
           <View style={styles.usageList}>
-            {product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
+            {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a generous amount to the face and neck area</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in circular motions until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for optimal results</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Professional Use:</Text> Can be used as a treatment mask for enhanced benefits</Text>
+              </>
+            ) : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse and moisturize your skin before application</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to areas needing coverage and blend gently</Text>
@@ -2424,6 +2463,8 @@ export default function ProductDetailScreen() {
               ? "This product is KFDA approved as a functional product for improving hair loss symptoms. For best results, use as part of the complete HR³ MATRIX treatment protocol. Regular use helps maintain optimal scalp health and promotes healthy hair growth."
               : product.name === 'Hair-GENTRON'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
+              : product.name === 'INTENSIVE HYDRO SOOTHING CREAM'
+              ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed for additional hydration."
               : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]'
               ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day."
               : product.name === 'HairGen BOOSTER'
