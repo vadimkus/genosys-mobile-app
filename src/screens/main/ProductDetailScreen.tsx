@@ -376,11 +376,13 @@ export default function ProductDetailScreen() {
     if (name.includes('intensive problem control cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Intensive problem control cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Problem skin treatment, acne control, skin healing</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Problem skin, acne-prone skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily problem skin care, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Specialized problem control cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g (Homecare) 250g (Professional)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Problematic and acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced anti-microbial and anti-inflammatory formula</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Sebum control, anti-microbial, anti-inflammatory, soothing relief</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening skincare routine</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially problematic and acne-prone skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1948,6 +1950,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Environmental Protection - Guards against harmful environmental factors and pollutants</Text>
                 <Text style={styles.benefitItem}>• Skin Tone Enhancement - Helps express and enhance your natural skin tone</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Anti-microbial - Helps combat bacteria and prevent breakouts</Text>
+                <Text style={styles.benefitItem}>• Anti-inflammatory - Reduces redness and calms irritated skin</Text>
+                <Text style={styles.benefitItem}>• Sebum Control - Regulates oil production for balanced skin</Text>
+                <Text style={styles.benefitItem}>• Soothing Relief - Provides comfort for problematic skin</Text>
+                <Text style={styles.benefitItem}>• Skin Barrier Support - Strengthens the skin's natural defenses</Text>
+                <Text style={styles.benefitItem}>• Moisture Retention - Keeps skin hydrated without clogging pores</Text>
+              </>
             ) : product.name === 'HairGen BOOSTER' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Hair Growth - Stimulates hair follicles and promotes natural hair regrowth</Text>
@@ -2025,6 +2036,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that calms irritated skin and promotes skin regeneration.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Origanum Vulgare Leaf Extract:</Text> Natural antioxidant extract that provides protection against environmental damage and free radicals.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that enhances skin protection and provides natural coverage benefits.</Text>
+              </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Zinc PCA:</Text> A powerful sebum-regulating ingredient that helps control oil production and has antimicrobial properties to prevent breakouts and maintain clear skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol (Vitamin B5):</Text> Provides deep hydration and has anti-inflammatory properties that help soothe irritated skin while promoting healing and skin barrier function.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> A gentle, soothing ingredient that helps calm irritated skin, reduce redness, and promote skin healing while being suitable for sensitive skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus/Pumpkin Ferment Extract:</Text> A probiotic ingredient that helps balance the skin's microbiome, providing natural antimicrobial benefits and supporting healthy skin flora.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Trehalose:</Text> A natural sugar that acts as a humectant, helping to retain moisture and protect the skin from environmental stressors while maintaining skin hydration.</Text>
               </>
             ) : product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
@@ -2251,6 +2271,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Build Coverage:</Text> Layer for additional coverage on areas with more significant blemishes</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Setting:</Text> Allow to set for a few minutes before applying additional makeup if desired</Text>
               </>
+            ) : product.name === 'INTENSIVE PROBLEM CONTROL CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to cleansed skin twice daily</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage into the skin until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as part of your morning and evening skincare routine for best results</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Target Areas:</Text> Focus on problematic areas and areas prone to breakouts</Text>
+              </>
             ) : product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly with a gentle cleanser</Text>
@@ -2472,6 +2500,8 @@ export default function ProductDetailScreen() {
               : product.name === 'INTENSIVE HYDRO SOOTHING CREAM'
               ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed for additional hydration."
               : product.name === 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]'
+              ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day."
+              : product.name === 'INTENSIVE PROBLEM CONTROL CREAM'
               ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day."
               : product.name === 'HairGen BOOSTER'
               ? "This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols."
