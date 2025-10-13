@@ -1622,6 +1622,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM') return '50g/250g';
             if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM') return '30ml';
             if (product.name === 'MULTI SUN CREAM [SPF 40 PA++]') return '40g';
+            if (product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]') return '50g';
             if (product.name === 'MOISTURE REPLENISHING HYALURON SERUM') return '30ml';
             return '30ml';
           })()}
