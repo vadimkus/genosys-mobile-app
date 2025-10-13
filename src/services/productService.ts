@@ -1447,7 +1447,7 @@ export class ProductService {
         
         // Serums
         if (name.includes('multi functional') && name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FMSSS.jpg&w=1200&q=75';
-        if (name.includes('multi vita radiance serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('multi vita radiance serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FRADS.jpg&w=1200&q=75';
         if (name.includes('problem control serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         if (name.includes('all for sensitive serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FASE.jpg&w=1200&q=75';
         if (name.includes('moisture replenishing') && name.includes('serum')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHRS.jpg&w=1200&q=75';
