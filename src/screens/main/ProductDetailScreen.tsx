@@ -2212,8 +2212,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
                 <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
-                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting</Text>
-                <Text style={styles.benefitItem}>  from sun damage</Text>
+                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting from sun damage</Text>
               </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM' ? (
               <>
