@@ -2150,7 +2150,8 @@ export default function ProductDetailScreen() {
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
               <>
                 <Text style={styles.benefitItem}>• Wrinkle Reduction - Visibly smooths fine lines and deep wrinkles for younger-looking skin</Text>
-                <Text style={styles.benefitItem}>• Skin Firmness - Reinforces skin elasticity and firmness for a more lifted appearance</Text>
+                <Text style={styles.benefitItem}>• Skin Firmness - Reinforces skin elasticity and firmness</Text>
+                <Text style={styles.benefitItem}>  for a more lifted appearance</Text>
                 <Text style={styles.benefitItem}>• Gentle Formula - Natural bakuchiol provides retinol-like benefits without irritation or sensitivity</Text>
                 <Text style={styles.benefitItem}>• Enhanced Penetration - Lipid barrier technology ensures optimal ingredient delivery</Text>
                 <Text style={styles.benefitItem}>• Skin Tone Balance - Improves overall skin tone and texture for radiant complexion</Text>
