@@ -99,14 +99,12 @@ export default function ProductDetailScreen() {
     
     // PEPTIDE GEL MASK
     if (name.includes('peptide gel mask')) {
-      if (size === '50ml') return 89.99;
-      if (size === '100ml') return 149.99;
+      return 380.00; // Fixed price for single size product
     }
     
     // POWER SOLUTION AWS
     if (name.includes('power solution aws')) {
-      if (size === '30ml') return 119.99;
-      if (size === '60ml') return 189.99;
+      return 580.00; // Fixed price for single size product
     }
     
     // Microneedle Roller
@@ -269,11 +267,15 @@ export default function ProductDetailScreen() {
     if (name.includes('peptide gel mask')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Peptide gel mask</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 50ml / 100ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Intensive skin rejuvenation, anti-aging, peptide therapy</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 2-3 times per week for intensive treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional thermo-sensitive hydrogel mask</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 38g x 5ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Post-treatment care and cooling therapy</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Patented thermo-sensitive hydrogel technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Instant cooling relief, deep hydration, enhanced penetration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, post-procedure care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially post-treatment skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply evenly to treatment area, avoid eye area</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Duration:</Text> 15-20 minutes for optimal results</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -283,11 +285,15 @@ export default function ProductDetailScreen() {
     if (name.includes('power solution aws')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Power Solution AWS</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 30ml / 60ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Advanced skin treatment, AWS technology, optimal results</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatment solution</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional anti-aging ampoule</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Microneedling treatments and anti-aging</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced anti-aging formula with professional-grade ingredients</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Wrinkle reduction, skin firmness, healing promotion, skin regeneration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, microneedling post-care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and mature skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced results</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1619,6 +1625,16 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'PEPTIDE GEL MASK' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'POWER SOLUTION AWS' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1715,6 +1731,8 @@ export default function ProductDetailScreen() {
             if (product.name === 'ND Cell ANTI-WRINKLE CREAM') return '50g';
             if (product.name === 'SKIN BARRIER PROTECTING CREAM') return '100g';
             if (product.name === 'Needle Pen-K') return '1 Device';
+            if (product.name === 'PEPTIDE GEL MASK') return '38g x 5ea';
+            if (product.name === 'POWER SOLUTION AWS') return '2ml x 10ea';
             return '30ml';
           })()}
         </Text>
@@ -1723,7 +1741,7 @@ export default function ProductDetailScreen() {
       {/* Reviews and Price */}
       <View style={styles.reviewsPriceSection}>
         <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>⭐⭐⭐⭐ {product.averageRating.toFixed(1)}</Text>
+          <Text style={styles.rating}>⭐⭐⭐⭐⭐ {product.averageRating.toFixed(1)}/5</Text>
         </View>
 
         <View style={styles.priceContainer}>
@@ -1807,6 +1825,10 @@ export default function ProductDetailScreen() {
       ? "SKIN BARRIER PROTECTING CREAM is an advanced skin barrier strengthening cream with enriched ceramide and amino acid complex. This innovative formula encourages healthy and soft skin by promoting water retention and protecting the skin barrier with MultiEx BSASM® Plus technology."
       : product.name === 'Needle Pen-K'
       ? "Needle Pen-K is a professional automatic microneedling device designed to enhance collagen production and improve transdermal nutrient delivery. This advanced device creates micro-channels in the skin to significantly increase the absorption rate of active skincare ingredients while promoting natural skin rejuvenation through controlled micro-injuries."
+      : product.name === 'PEPTIDE GEL MASK'
+      ? "PEPTIDE GEL MASK is a revolutionary thermo-sensitive hydrogel mask that provides instant cooling relief and deep hydration for post-treatment skin care. This patented technology transforms from gel to fluid upon contact with skin temperature, ensuring optimal ingredient delivery and maximum comfort."
+      : product.name === 'POWER SOLUTION AWS'
+      ? "POWER SOLUTION AWS is a professional anti-aging ampoule specifically formulated for microneedling treatments. This advanced formula helps reduce the appearance of wrinkles and improve skin firmness while promoting optimal healing and skin regeneration post-treatment."
       : product.name === 'Microneedle Roller'
       ? "The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Stimulates natural collagen production and improves skin texture. Manufactured in South Korea."
                 : isCollagenMask 
@@ -1971,6 +1993,32 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Enriched Ceramide Complex:</Text> High concentration of ceramides that help restore and maintain skin barrier function.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Amino Acid Complex:</Text> Essential amino acids that help support skin barrier integrity and moisture retention.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Water Retention:</Text> Promotes optimal water retention for healthy, hydrated, and soft skin.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for PEPTIDE GEL MASK */}
+        {product.name === 'PEPTIDE GEL MASK' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Thermo-Sensitive Technology:</Text> Patented hydrogel that transforms from gel to fluid at body temperature for enhanced skin adhesion and ingredient penetration.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Instant Cooling Effect:</Text> Provides immediate cooling relief by displacing skin heat with moisture, perfect for post-treatment care.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Advanced Peptide Formula:</Text> Contains Acetyl Hexapeptide-8 and other peptides for enhanced skin regeneration and healing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Post-Treatment Care:</Text> Specifically recommended after dermatological procedures like laser treatments and microneedling.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for POWER SOLUTION AWS */}
+        {product.name === 'POWER SOLUTION AWS' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Anti-Aging Formula:</Text> Specifically designed to target and reduce the appearance of wrinkles and fine lines.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Firmness Improvement:</Text> Helps improve skin firmness and elasticity for a more youthful appearance.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Wrinkle Reduction:</Text> Targets existing wrinkles while helping prevent new ones from forming.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Peptide Technology:</Text> Contains firming peptide complex and adenosine for advanced anti-aging benefits.</Text>
           </View>
         </View>
         )}
@@ -2458,6 +2506,24 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Long-lasting Hydration - Provides sustained moisture for all-day comfort</Text>
                 <Text style={styles.benefitItem}>• Gentle Formula - Suitable for sensitive and compromised skin</Text>
               </>
+            ) : product.name === 'PEPTIDE GEL MASK' ? (
+              <>
+                <Text style={styles.benefitItem}>• Instant Cooling Relief - Provides immediate cooling sensation to soothe irritated skin</Text>
+                <Text style={styles.benefitItem}>• Deep Hydration - Delivers intense moisture for optimal skin recovery</Text>
+                <Text style={styles.benefitItem}>• Enhanced Penetration - Thermo-sensitive technology ensures maximum ingredient absorption</Text>
+                <Text style={styles.benefitItem}>• Post-Treatment Healing - Accelerates recovery after dermatological procedures</Text>
+                <Text style={styles.benefitItem}>• Skin Comfort - Reduces inflammation and irritation from treatments</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Clinical-grade formula for advanced skincare treatments</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION AWS' ? (
+              <>
+                <Text style={styles.benefitItem}>• Wrinkle Reduction - Targets and reduces the appearance of wrinkles and fine lines</Text>
+                <Text style={styles.benefitItem}>• Skin Firming - Improves skin firmness and elasticity</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging - Helps prevent and reverse signs of aging</Text>
+                <Text style={styles.benefitItem}>• Elasticity Enhancement - Promotes natural skin flexibility and resilience</Text>
+                <Text style={styles.benefitItem}>• Skin Regeneration - Stimulates cellular renewal and healing processes</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade anti-aging for advanced treatments</Text>
+              </>
             ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Product Absorption - Increases absorption rate of active skincare ingredients by up to 300%</Text>
@@ -2591,6 +2657,24 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Amino Acid Complex:</Text> Essential amino acids that support skin barrier integrity and natural repair processes.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Shea Butter:</Text> Rich emollient that provides deep hydration and helps protect skin from environmental stress.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Macadamia Oil:</Text> Nourishing oil that helps restore skin barrier function and provides antioxidant protection.</Text>
+              </>
+            ) : product.name === 'PEPTIDE GEL MASK' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Acetyl Hexapeptide-8:</Text> Advanced peptide that helps relax facial muscles and reduce expression lines for smoother skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that attracts and retains moisture for deep hydration and plumping effects.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hydrolyzed Collagen:</Text> Bioactive collagen peptides that support skin structure and promote elasticity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Chondrus Crispus Extract:</Text> Natural carrageenan extract that provides soothing and anti-inflammatory benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Dipotassium Glycyrrhizate:</Text> Licorice root derivative that provides anti-inflammatory and soothing properties.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Extracts:</Text> Arnica Montana and Chamomile extracts provide natural soothing and healing benefits.</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION AWS' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Human growth hormone-like peptide that stimulates skin regeneration and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Acetyl Hexapeptide-8:</Text> Advanced peptide that helps relax facial muscles and reduce expression lines.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramide:</Text> Essential lipid that helps maintain skin barrier function and moisture retention.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Natural anti-aging ingredient that helps improve skin texture and reduce fine lines.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that promotes skin regeneration and comfort.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Healing peptide that promotes skin repair and reduces inflammation for faster recovery.</Text>
               </>
             ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
@@ -2923,6 +3007,23 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Target Areas:</Text> Focus on areas with compromised skin barrier</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvement in skin barrier function within 2-4 weeks</Text>
               </>
+            ) : product.name === 'PEPTIDE GEL MASK' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure it's dry before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply the gel mask evenly to the treatment area, avoiding eye area</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Contact:</Text> The mask will transform from gel to fluid upon contact with skin temperature</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 15-20 minutes for optimal results</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Gently remove and massage any remaining product into skin</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION AWS' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and prepare for microneedling treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 1-2 ampoules during microneedling for optimal penetration</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Post-Treatment:</Text> Continue application for enhanced anti-aging results</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
+              </>
             ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure device is properly sterilized</Text>
@@ -3188,6 +3289,10 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and specifically formulated for the delicate neck and décolleté area. For best results, use consistently as part of your daily skincare routine. Always use sunscreen during daytime to protect treated areas from UV damage."
               : product.name === 'SKIN BARRIER PROTECTING CREAM'
               ? "This product is dermatologically tested and clinically proven to improve skin restorative force. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'PEPTIDE GEL MASK'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'POWER SOLUTION AWS'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
               : product.name === 'Needle Pen-K'
               ? "This is a professional medical device. For best results and safety, use as directed by a skincare professional. Ensure proper sterilization and follow all safety guidelines. Not recommended for use on active acne or inflamed skin."
               : product.name === 'EyeCell EYE CONTOUR SERUM'

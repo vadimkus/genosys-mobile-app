@@ -350,7 +350,7 @@ export class ProductService {
         isNew: true,
         isOnSale: false,
         stock: 25,
-        rating: 4.0,
+        rating: 5.0,
         averageRating: 4.8,
         reviewCount: 0,
         sizeOptions: ['20g'],
@@ -377,7 +377,7 @@ export class ProductService {
         isNew: true,
         isOnSale: false,
         stock: 20,
-        rating: 4.0,
+        rating: 5.0,
         averageRating: 4.7,
         reviewCount: 0,
         sizeOptions: ['15ml'],
@@ -404,7 +404,7 @@ export class ProductService {
         isNew: true,
         isOnSale: false,
         stock: 15,
-        rating: 4.0,
+        rating: 5.0,
         averageRating: 4.6,
         reviewCount: 0,
         sizeOptions: ['30 patches'],
@@ -431,7 +431,7 @@ export class ProductService {
         isNew: true,
         isOnSale: false,
         stock: 10,
-        rating: 4.0,
+        rating: 5.0,
         averageRating: 4.8,
         reviewCount: 0,
         sizeOptions: ['1 Kit'],
@@ -458,7 +458,7 @@ export class ProductService {
         isNew: true,
         isOnSale: false,
         stock: 20,
-        rating: 4.0,
+        rating: 5.0,
         averageRating: 4.8,
         reviewCount: 0,
         sizeOptions: ['30 sheets per container'],
@@ -665,7 +665,7 @@ export class ProductService {
             isNew: false,
             isOnSale: true,
             stock: 50,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 127,
             createdAt: '2024-01-15T10:00:00.000Z',
@@ -690,7 +690,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 30,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.9,
             reviewCount: 89,
             createdAt: '2024-01-20T10:00:00.000Z',
@@ -715,8 +715,8 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 40,
-            rating: 4.0,
-            averageRating: 4.5,
+            rating: 5.0,
+            averageRating: 5.0,
             reviewCount: 92,
             createdAt: '2024-01-30T10:00:00.000Z',
             updatedAt: '2024-01-30T10:00:00.000Z'
@@ -740,7 +740,7 @@ export class ProductService {
             isNew: false,
             isOnSale: true,
             stock: 35,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.7,
             reviewCount: 143,
             sizeOptions: ['30ml', '50ml'],
@@ -767,7 +767,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 28,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 167,
             sizeOptions: ['15ml', '30ml'],
@@ -794,7 +794,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 45,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.6,
             reviewCount: 98,
             sizeOptions: ['50ml', '100ml'],
@@ -821,7 +821,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 32,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.4,
             reviewCount: 76,
             sizeOptions: ['30ml', '60ml'],
@@ -848,7 +848,7 @@ export class ProductService {
             isNew: false,
             isOnSale: true,
             stock: 15,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.9,
             reviewCount: 89,
             sizeOptions: ['0.25mm', '0.5mm', '0.1mm', '0.15mm', '0.2mm'],
@@ -875,7 +875,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 40,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 156,
             sizeOptions: ['50g', '250g'],
@@ -902,7 +902,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 25,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.7,
             reviewCount: 89,
             sizeOptions: ['30ml', '50ml'],
@@ -929,8 +929,8 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 20,
-            rating: 4.0,
-            averageRating: 4.5,
+            rating: 5.0,
+            averageRating: 5.0,
             reviewCount: 67,
             sizeOptions: ['100g'],
             defaultSize: '100g',
@@ -955,8 +955,8 @@ export class ProductService {
             isFeatured: false,
             isNew: true,
             stock: 15,
-            rating: 4.0,
-            averageRating: 4.5,
+            rating: 5.0,
+            averageRating: 5.0,
             reviewCount: 23,
             sizeOptions: undefined,
             defaultSize: '1 Device',
@@ -965,56 +965,56 @@ export class ProductService {
             updatedAt: '2024-02-28T10:00:00.000Z'
           },
           {
-            id: '14',
+            id: '15',
             name: 'PEPTIDE GEL MASK',
-            description: 'Advanced peptide gel mask for intensive skin rejuvenation and anti-aging treatment',
-            price: 69.99,
-            originalPrice: 89.99,
-            discountPercentage: 22,
+            description: 'Professional thermo-sensitive hydrogel mask for post-treatment care. Patented technology that transforms from gel to fluid at body temperature for instant cooling relief and deep hydration.',
+            price: 380.00,
+            originalPrice: 380.00,
+            discountPercentage: 0,
             imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75',
             imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75'],
             category: 'Mask',
             brand: 'Genosys',
-            sku: 'GEN-014',
+            sku: 'GEN-015',
             images: ['https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75'],
             inStock: true,
-            stockQuantity: 30,
+            stockQuantity: 25,
             isFeatured: false,
             isNew: true,
             isOnSale: true,
-            stock: 30,
-            rating: 4.0,
-            averageRating: 4.5,
-            reviewCount: 124,
-            sizeOptions: ['50ml', '100ml'],
-            defaultSize: '50ml',
-            createdAt: '2024-02-27T10:00:00.000Z',
-            updatedAt: '2024-02-27T10:00:00.000Z'
+            stock: 25,
+            rating: 5.0,
+            averageRating: 4.8,
+            reviewCount: 34,
+            sizeOptions: undefined,
+            defaultSize: '38g x 5ea',
+            createdAt: '2024-02-29T10:00:00.000Z',
+            updatedAt: '2024-02-29T10:00:00.000Z'
           },
           {
-            id: '15',
+            id: '16',
             name: 'POWER SOLUTION AWS',
-            description: 'Powerful solution for advanced skin treatment with AWS technology for optimal results',
-            price: 99.99,
-            originalPrice: 129.99,
-            discountPercentage: 23,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75'],
+            description: 'Professional anti-aging ampoule for microneedling treatments. Advanced peptide formula to reduce wrinkles and improve skin firmness for youthful appearance.',
+            price: 580.00,
+            originalPrice: 580.00,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             category: 'PRO Solution',
             brand: 'Genosys',
             sku: 'GEN-015',
-            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75'],
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75'],
             inStock: true,
             stockQuantity: 20,
             isFeatured: false,
             isNew: true,
             isOnSale: true,
             stock: 20,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 156,
-            sizeOptions: ['30ml', '60ml'],
-            defaultSize: '30ml',
+            sizeOptions: undefined,
+            defaultSize: '2ml x 10ea',
             createdAt: '2024-02-27T10:00:00.000Z',
             updatedAt: '2024-02-27T10:00:00.000Z'
           },
@@ -1037,7 +1037,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 5,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['1 Device'],
@@ -1064,7 +1064,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 8,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['1 Device'],
@@ -1091,7 +1091,7 @@ export class ProductService {
             isNew: false,
             isOnSale: true,
             stock: 8,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 45,
             createdAt: '2024-03-03T10:00:00.000Z',
@@ -1116,7 +1116,7 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 35,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.6,
             reviewCount: 98,
             sizeOptions: ['50g', '250g'],
@@ -1143,8 +1143,8 @@ export class ProductService {
             isNew: true,
             isOnSale: true,
             stock: 28,
-            rating: 4.0,
-            averageRating: 4.5,
+            rating: 5.0,
+            averageRating: 5.0,
             reviewCount: 76,
             sizeOptions: ['50g', '250g'],
             defaultSize: '50g',
@@ -1170,7 +1170,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 15,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['5ml*8pcs'],
@@ -1197,7 +1197,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 10,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['1 Kit'],
@@ -1224,7 +1224,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 8,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['1kg'],
@@ -1251,7 +1251,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 12,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['70ml'],
@@ -1278,7 +1278,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 15,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['100ml'],
@@ -1305,7 +1305,7 @@ export class ProductService {
             isNew: true,
             isOnSale: false,
             stock: 20,
-            rating: 4.0,
+            rating: 5.0,
             averageRating: 4.8,
             reviewCount: 0,
             sizeOptions: ['300ml'],
@@ -1508,6 +1508,12 @@ export class ProductService {
         // Needle Pen-K
         if (name.includes('needle pen-k') || name.includes('Needle Pen-K')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75';
         
+        // PEPTIDE GEL MASK
+        if (name.includes('peptide gel mask') || name.includes('PEPTIDE GEL MASK')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
+        
+        // POWER SOLUTION AWS
+        if (name.includes('power solution aws') || name.includes('POWER SOLUTION AWS')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75';
+        
         // Use the working image as fallback for all products
         return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
       };
@@ -1523,6 +1529,10 @@ export class ProductService {
         finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FBRR.jpg&w=1200&q=75';
       } else if (product.name === 'Needle Pen-K') {
         finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75';
+      } else if (product.name === 'PEPTIDE GEL MASK') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
+      } else if (product.name === 'POWER SOLUTION AWS') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75';
       } else {
         finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
       }
@@ -1547,8 +1557,8 @@ export class ProductService {
         isFeatured: product.isFeatured,
         isNew: product.isNew,
         isOnSale: product.isOnSale,
-        rating: product.rating || product.averageRating ? parseFloat(product.averageRating) : 4.0,
-        averageRating: product.averageRating ? parseFloat(product.averageRating) : 4.0,
+        rating: product.rating || product.averageRating ? parseFloat(product.averageRating) : 5.0,
+        averageRating: product.averageRating ? parseFloat(product.averageRating) : 5.0,
         reviewCount: product.reviewCount ? parseInt(product.reviewCount) : 0,
         sizeOptions: this.getSizeOptions(product.name),
         defaultSize: this.getDefaultSize(product.name),
@@ -1665,7 +1675,7 @@ export class ProductService {
   }
 
   getFeaturedProducts(): Product[] {
-    return this.featuredProducts;
+    return []; // Empty array - no featured products/kits
   }
 
   getNewProducts(): Product[] {
@@ -1755,14 +1765,14 @@ export class ProductService {
       return undefined; // No size selection - single size product
     }
     
-    // PEPTIDE GEL MASK
+    // PEPTIDE GEL MASK - no size selection
     if (name.includes('peptide gel mask')) {
-      return ['50ml', '100ml'];
+      return undefined;
     }
     
-    // POWER SOLUTION AWS
+    // POWER SOLUTION AWS - no size selection
     if (name.includes('power solution aws')) {
-      return ['30ml', '60ml'];
+      return undefined;
     }
     
     // INTENSIVE BLEMISH BALM CREAM
@@ -1843,7 +1853,7 @@ export class ProductService {
     
     // POWER SOLUTION AWS
     if (name.includes('power solution aws')) {
-      return '30ml';
+      return '2ml x 10ea';
     }
     
     // INTENSIVE BLEMISH BALM CREAM

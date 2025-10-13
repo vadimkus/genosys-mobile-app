@@ -183,8 +183,7 @@ export default function ProductsScreen() {
         </Text>
         
         <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={14} color="#f59e0b" />
-          <Text style={styles.ratingText}>{item.averageRating.toFixed(1)}</Text>
+          <Text style={styles.ratingText}>⭐⭐⭐⭐⭐ {item.averageRating.toFixed(1)}/5</Text>
           <Text style={styles.reviewCount}>({item.reviewCount})</Text>
         </View>
         
@@ -242,8 +241,7 @@ export default function ProductsScreen() {
         </Text>
         
         <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={14} color="#f59e0b" />
-          <Text style={styles.ratingText}>{item.averageRating.toFixed(1)}</Text>
+          <Text style={styles.ratingText}>⭐⭐⭐⭐⭐ {item.averageRating.toFixed(1)}/5</Text>
           <Text style={styles.reviewCount}>({item.reviewCount})</Text>
         </View>
         

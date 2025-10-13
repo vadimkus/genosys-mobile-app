@@ -96,7 +96,7 @@ export default function ProductCarousel({
         </View>
         
         <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>⭐ {product.averageRating.toFixed(1)}</Text>
+          <Text style={styles.rating}>⭐⭐⭐⭐⭐ {product.averageRating.toFixed(1)}/5</Text>
           <Text style={styles.reviewCount}>({product.reviewCount})</Text>
         </View>
       </View>
