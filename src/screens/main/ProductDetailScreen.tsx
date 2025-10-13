@@ -2210,9 +2210,8 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
                 <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
                 <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
-                <View style={styles.benefitItemWrapper}>
-                  <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting from sun damage</Text>
-                </View>
+                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting</Text>
+                <Text style={styles.benefitItem}>  from sun damage</Text>
                 <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
               </>
@@ -3205,11 +3204,6 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
     lineHeight: 20,
-  },
-  benefitItemWrapper: {
-    flex: 1,
-    flexWrap: 'wrap',
-    marginBottom: 8,
   },
   ingredientsList: {
     backgroundColor: '#ffffff',
