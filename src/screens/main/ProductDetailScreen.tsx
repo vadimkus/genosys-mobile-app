@@ -2252,12 +2252,24 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' ? (
               <>
-                <Text style={styles.benefitItem}>• Maximum UV Protection - SPF 50+ PA++++ provides superior sun protection</Text>
-                <Text style={styles.benefitItem}>• Sunburn Recovery - Helps promote skin recovery from sun damage and exposure</Text>
-                <Text style={styles.benefitItem}>• Non-Greasy Feel - Silky, lightweight texture for comfortable daily wear</Text>
-                <Text style={styles.benefitItem}>• Skin Recovery - MicroHA™ and ProbioMETA™ technology promote skin healing</Text>
-                <Text style={styles.benefitItem}>• Antioxidant Protection - Tropical antioxidant complex fights free radical damage</Text>
-                <Text style={styles.benefitItem}>• Reef-Safe - Environmentally conscious formula safe for marine ecosystems</Text>
+                <View style={styles.benefitItemWrapper}>
+                  <Text style={styles.benefitItem}>• Maximum UV Protection - SPF 50+ PA++++ provides superior sun protection</Text>
+                </View>
+                <View style={styles.benefitItemWrapper}>
+                  <Text style={styles.benefitItem}>• Sunburn Recovery - Helps promote skin recovery from sun damage and exposure</Text>
+                </View>
+                <View style={styles.benefitItemWrapper}>
+                  <Text style={styles.benefitItem}>• Non-Greasy Feel - Silky, lightweight texture for comfortable daily wear</Text>
+                </View>
+                <View style={styles.benefitItemWrapper}>
+                  <Text style={styles.benefitItem}>• Skin Recovery - MicroHA™ and ProbioMETA™ technology promote skin healing</Text>
+                </View>
+                <View style={styles.benefitItemWrapper}>
+                  <Text style={styles.benefitItem}>• Antioxidant Protection - Tropical antioxidant complex fights free radical damage</Text>
+                </View>
+                <View style={styles.benefitItemWrapper}>
+                  <Text style={styles.benefitItem}>• Reef-Safe - Environmentally conscious formula safe for marine ecosystems</Text>
+                </View>
               </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM' ? (
               <>
@@ -3270,7 +3282,10 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     flexWrap: 'wrap',
     flexShrink: 1,
-    flex: 1,
+  },
+  benefitItemWrapper: {
+    width: '100%',
+    marginBottom: 8,
   },
   ingredientsList: {
     backgroundColor: '#ffffff',
