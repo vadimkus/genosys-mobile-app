@@ -1678,9 +1678,9 @@ export class ProductService {
       return undefined;
     }
     
-    // Multi Sun Cream
+    // Multi Sun Cream - no size selection, only 40g
     if (name.includes('multi sun cream')) {
-      return ['50ml', '100ml'];
+      return undefined;
     }
     
     // Multi Vita Radiance Cream
@@ -1761,7 +1761,7 @@ export class ProductService {
     
     // Multi Sun Cream
     if (name.includes('multi sun cream')) {
-      return '50ml';
+      return '40g';
     }
     
     // Multi Vita Radiance Cream

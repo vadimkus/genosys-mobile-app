@@ -71,8 +71,7 @@ export default function ProductDetailScreen() {
     
     // MULTI SUN CREAM
     if (name.includes('multi sun cream')) {
-      if (size === '50ml') return 79.99;
-      if (size === '100ml') return 129.99;
+      return 79.99;  // Fixed price for 40g only
     }
     
     // MULTI VITA RADIANCE CREAM
