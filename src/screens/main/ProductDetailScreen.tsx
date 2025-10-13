@@ -2205,7 +2205,16 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Enhanced Penetration - Aquaporin stimulation improves moisture transport into skin</Text>
                 <Text style={styles.benefitItem}>• Long-Lasting Results - Sustained hydration that lasts throughout the day</Text>
               </>
-            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? null : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM' ? (
+            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
+              <>
+                <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
+                <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
+                <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
+                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting from sun damage</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
+                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
+              </>
+            ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM' ? (
               <>
                 <Text style={styles.benefitItem}>• Wrinkle Reduction - Smooths fine lines and wrinkles, improving skin texture</Text>
                 <Text style={styles.benefitItem}>• Firming - Enhances skin firmness and elasticity for a more youthful appearance</Text>
