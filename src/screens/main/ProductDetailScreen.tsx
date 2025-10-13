@@ -58,6 +58,12 @@ export default function ProductDetailScreen() {
       if (size === '250g') return 420.00;  // Same pricing as hydro soothing cream
     }
     
+    // MULTI VITA RADIANCE CREAM
+    if (name.includes('multi vita radiance cream')) {
+      if (size === '50g') return 290.00;  // Homecare size - Real price from genosys.ae
+      if (size === '230g') return 420.00;  // Professional size - Real price from genosys.ae
+    }
+    
     // MULTI FUNCTIONAL ANTI-WRINKLE CREAM
     if (name.includes('multi functional anti-wrinkle cream')) {
       if (size === '50g') return 290.00;  // Homecare size - Same pricing as other creams
@@ -76,8 +82,8 @@ export default function ProductDetailScreen() {
     
     // MULTI VITA RADIANCE CREAM
     if (name.includes('multi vita radiance cream')) {
-      if (size === '30ml') return 290.00;  // Same pricing as hydro soothing cream
-      if (size === '60ml') return 420.00;  // Same pricing as hydro soothing cream
+      if (size === '50g') return 290.00;  // Homecare size - Real price from genosys.ae
+      if (size === '230g') return 420.00;  // Professional size - Real price from genosys.ae
     }
     
     // ND Cell ANTI-WRINKLE CREAM
@@ -209,7 +215,7 @@ export default function ProductDetailScreen() {
       return (
         <>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Multi-vitamin radiance cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 30ml / 60ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 50g / 230g</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin brightening, radiance, vitamin nourishment</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily care, morning and evening</Text>
@@ -503,6 +509,24 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Cooling effect, hydration, pore minimizing, skin soothing</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home care</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // MULTI VITA RADIANCE CREAM
+    if (name.includes('multi vita radiance cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Multi-vitamin radiance cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g (Homecare) / 230g (Professional)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Anti-aging and skin brightening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> VITA 12 Complex with Astaxanthin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Brightening, deep moisturizing, antioxidant protection</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and dull skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Ingredients:</Text> Astaxanthin, VITA 12 Complex, Gluconolactone, Glycyrrhiza Uralensis, Macadamia Ternifolia Seed Oil, Ascorbic Acid, Ceramide NP</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Directions:</Text> Apply the cream to the face and gently massage in both morning and evening for optimal results</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1538,6 +1562,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'MULTI VITA RADIANCE CREAM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1629,6 +1658,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'MULTI SUN CREAM [SPF 40 PA++]') return '40g';
             if (product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]') return '50g';
             if (product.name === 'MOISTURE REPLENISHING HYALURON SERUM') return '30ml';
+            if (product.name === 'MULTI VITA RADIANCE CREAM') return '50g/230g';
             return '30ml';
           })()}
         </Text>
@@ -1711,6 +1741,8 @@ export default function ProductDetailScreen() {
       ? "MULTI SUN CREAM [SPF 40 PA++] is an advanced daily sunscreen designed to provide comprehensive UV protection while maintaining a natural, glowing complexion. This innovative formula combines high-level sun protection with skin-nourishing ingredients to protect against both UVA and UVB rays while promoting healthy, radiant skin."
       : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]'
       ? "ULTRA SHIELD SUN CREAM [SPF 50+ PA++++] is a non-greasy, silky sunscreen with powerful UV protection and sunburn care effect. This advanced formula strongly defends skin against UV rays while promoting skin recovery from sun damage with innovative MicroHA™ and ProbioMETA™ technology."
+      : product.name === 'MULTI VITA RADIANCE CREAM'
+      ? "GENOSYS MULTI VITA RADIANCE CREAM combines a complex of 12 vitamins with potent antioxidants like Astaxanthin to provide effective protection against free radicals, thereby slowing down the skin's aging process. This advanced formula deeply nourishes and moisturizes the skin, evens out skin tone, and imparts a noticeable radiance while activating collagen production and shielding the skin from UV radiation and environmental stressors."
                 : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -2249,6 +2281,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration</Text>
                 <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
+              </>
+            ) : product.name === 'MULTI VITA RADIANCE CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Brightening - Helps lighten pigmentation spots and improve overall skin tone</Text>
+                <Text style={styles.benefitItem}>• Deep Moisturizing - Provides intense hydration, leaving the skin soft and supple</Text>
+                <Text style={styles.benefitItem}>• Antioxidant Protection - Protects against free radicals, reducing signs of aging</Text>
+                <Text style={styles.benefitItem}>• Skin Nourishment - Supplies essential nutrients to enhance skin health and appearance</Text>
+                <Text style={styles.benefitItem}>• Collagen Activation - Stimulates collagen production for firmer, more youthful skin</Text>
+                <Text style={styles.benefitItem}>• UV Protection - Shields skin from harmful UV radiation and environmental stressors</Text>
               </>
             ) : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' ? (
               <>
@@ -2944,6 +2985,8 @@ export default function ProductDetailScreen() {
               ? "This advanced hydration serum uses a 4-step hydration system to provide comprehensive moisture delivery and retention. The coconut water base provides natural electrolytes for optimal skin balance, while the multi-molecular hyaluronic acid complex ensures deep penetration and surface protection. For best results, use consistently as part of your daily skincare routine."
       : product.name === 'MULTI SUN CREAM [SPF 40 PA++]'
       ? "This product is dermatologically tested and safe for all skin types. For best results, apply generously and reapply as needed. Perfect for daily use and outdoor activities. Store in a cool, dry place away from direct sunlight."
+      : product.name === 'MULTI VITA RADIANCE CREAM'
+      ? "This product is dermatologically tested and safe for all skin types. The orange color of the cream is the natural color of Astaxanthin and no artificial pigment is added. If exposed to air, the color of the product may change slightly but the effect remains unchanged. Please close the cap after use. For best results, use consistently as part of your daily skincare routine."
       : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]'
       ? "This product is dermatologically tested and reef-safe. For best results, apply generously and reapply every 2 hours or after swimming/sweating. Store in a cool, dry place away from direct sunlight."
               : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM'
@@ -2956,7 +2999,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM' || product.name === 'MOISTURE REPLENISHING HYALURON SERUM' || product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM' || product.name === 'MOISTURE REPLENISHING HYALURON SERUM' || product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' || product.name === 'MULTI VITA RADIANCE CREAM') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -2964,7 +3007,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : product.name === 'MOISTURE REPLENISHING HYALURON SERUM' ? '1.3 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : product.name === 'MOISTURE REPLENISHING HYALURON SERUM' ? '1.3 MB' : product.name === 'MULTI VITA RADIANCE CREAM' ? '1.2 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -3004,6 +3047,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20MOISTURE%20REPLENISHING%20HYALURON%20SERUM.pdf'
                     : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20ULTRA%20SHIELD%20SUN%20CREAM.pdf'
+                    : product.name === 'MULTI VITA RADIANCE CREAM'
+                    ? 'https://genosys.ae/documents/ppt/GENOSYS%20MULTI%20VITA%20RADIANCE%20CREAM.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}

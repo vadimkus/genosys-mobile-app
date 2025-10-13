@@ -1475,7 +1475,7 @@ export class ProductService {
         if (name.includes('needle pen-k')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
         
         // Multi vita radiance cream
-        if (name.includes('multi vita radiance cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('multi vita radiance cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FRAA.jpg&w=1200&q=75';
         
         // Use the working image as fallback for all products
         return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
@@ -1685,7 +1685,7 @@ export class ProductService {
     
     // Multi Vita Radiance Cream
     if (name.includes('multi vita radiance cream')) {
-      return ['30ml', '60ml'];
+      return ['50g', '230g'];
     }
     
     // INTENSIVE HYDRO SOOTHING CREAM
@@ -1766,7 +1766,7 @@ export class ProductService {
     
     // Multi Vita Radiance Cream
     if (name.includes('multi vita radiance cream')) {
-      return '30ml';
+      return '50g';
     }
     
     // INTENSIVE HYDRO SOOTHING CREAM
