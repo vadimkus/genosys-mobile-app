@@ -2252,8 +2252,8 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' ? (
               <>
-                <Text style={styles.benefitItem}>• Maximum UV Protection - SPF 50+ PA++++</Text>
-                <Text style={styles.benefitItem}>• Sunburn Recovery - Helps promote skin recovery</Text>
+                <Text style={styles.benefitItem}>• Maximum UV Protection - SPF 50+ PA++++ provides superior sun protection</Text>
+                <Text style={styles.benefitItem}>• Sunburn Recovery - Helps promote skin recovery from sun damage and exposure</Text>
                 <Text style={styles.benefitItem}>• Non-Greasy Feel - Silky, lightweight texture for comfortable daily wear</Text>
                 <Text style={styles.benefitItem}>• Skin Recovery - MicroHA™ and ProbioMETA™ technology promote skin healing</Text>
                 <Text style={styles.benefitItem}>• Antioxidant Protection - Tropical antioxidant complex fights free radical damage</Text>
