@@ -741,10 +741,6 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily brightening treatment, morning and evening</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull and uneven skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply to clean skin before moisturizer</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rating:</Text> 4.8/5 stars</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Shipping:</Text> Free shipping on orders over 1,000 AED</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Payment:</Text> Secure Stripe checkout</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Tax:</Text> 5% UAE Tax Payer - Supporting local economy</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
