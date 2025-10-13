@@ -210,19 +210,6 @@ export default function ProductDetailScreen() {
         );
       }
     
-    // MULTI VITA RADIANCE CREAM
-    if (name.includes('multi vita radiance cream')) {
-      return (
-        <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Multi-vitamin radiance cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 50g / 230g</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin brightening, radiance, vitamin nourishment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily care, morning and evening</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
-        </>
-      );
-    }
     
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
