@@ -165,10 +165,11 @@ export default function ProductDetailScreen() {
       return (
         <>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Multi-functional anti-wrinkle serum</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 15ml / 30ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Advanced anti-aging, wrinkle reduction, skin renewal</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially mature and aging skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Wrinkle reduction, skin firmness, anti-aging</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and mature skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-aging treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Clinical Testing:</Text> Clinically tested for efficacy and safety</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1508,6 +1509,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1595,6 +1601,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'MOISTURE REPLENISHING HYALURON CREAM') return '50g/250g';
             if (product.name === 'INTENSIVE PROBLEM CONTROL CREAM') return '50g/250g';
             if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM') return '50g/250g';
+            if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM') return '30ml';
             if (product.name === 'MOISTURE REPLENISHING HYALURON SERUM') return '30ml';
             return '30ml';
           })()}
@@ -1672,6 +1679,8 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS EPI TURNOVER BOOSTING PEELING GEL is an enzyme-based exfoliating gel designed to gently remove dead skin cells without causing irritation. This innovative peeling gel utilizes natural enzymes and plant extracts to purify, nourish, and moisturize the skin, making it suitable for all skin types while promoting a smoother, more radiant complexion."
                 : product.name === 'EZ CO₂ MASK KIT'
                 ? "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients."
+                : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM'
+                ? "MULTI FUNCTIONAL ANTI-WRINKLE SERUM is an advanced anti-aging serum that combines the power of bakuchiol, a natural alternative to retinol, with cutting-edge peptide technology. This clinically-tested formula helps visibly smooth wrinkles, reinforce skin firmness, and restore youthful radiance for all skin types."
                 : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1749,6 +1758,20 @@ export default function ProductDetailScreen() {
           </View>
         </View>
         )}
+
+        {/* Key Features Section for MULTI FUNCTIONAL ANTI-WRINKLE SERUM */}
+        {product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Retinol Alternative:</Text> Features bakuchiol, a plant-derived alternative to retinol that provides anti-aging benefits without irritation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Advanced Peptide Complex:</Text> Contains Anti-aging Peptide 6 and other peptides that target specific signs of aging for comprehensive results.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Lipid Barrier Technology:</Text> Innovative liposome delivery system with ceramides, cholesterol, and phytosphingosine for enhanced penetration.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Clinical Validation:</Text> Clinically tested with proven results in improving skin age index and overall skin quality.</Text>
+          </View>
+        </View>
+        )}
+
         {product.name === 'Hair-GENTRON' && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Features</Text>
@@ -2125,6 +2148,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
               </>
+            ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Wrinkle Reduction - Visibly smooths fine lines and deep wrinkles for younger-looking skin</Text>
+                <Text style={styles.benefitItem}>• Skin Firmness - Reinforces skin elasticity and firmness for a more lifted appearance</Text>
+                <Text style={styles.benefitItem}>• Gentle Formula - Natural bakuchiol provides retinol-like benefits without irritation or sensitivity</Text>
+                <Text style={styles.benefitItem}>• Enhanced Penetration - Lipid barrier technology ensures optimal ingredient delivery</Text>
+                <Text style={styles.benefitItem}>• Skin Tone Balance - Improves overall skin tone and texture for radiant complexion</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging Protection - Comprehensive approach to preventing and reversing signs of aging</Text>
+              </>
             ) : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? (
               <>
                 <Text style={styles.benefitItem}>• Deep Hydration - Multi-layered moisture delivery for comprehensive skin hydration</Text>
@@ -2444,6 +2476,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Mushroom Extracts:</Text> Powerful mushroom extracts provide anti-inflammatory, antioxidant, and protective benefits for healthy skin.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Moisture Magnet Technology:</Text> Advanced ingredients that attract and retain moisture for long-lasting hydration and skin comfort.</Text>
               </>
+            ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bakuchiol:</Text> Natural plant-derived alternative to retinol that provides anti-aging benefits without irritation or photosensitivity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Anti-aging Peptide 6:</Text> Advanced peptide that targets specific aging mechanisms for comprehensive anti-wrinkle benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lipid Barrier Liposome:</Text> Ceramide NP, cholesterol, and phytosphingosine create a protective barrier while enhancing ingredient penetration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Collagen & Elastin:</Text> Essential proteins that support skin structure and elasticity for firm, youthful skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Propolis Extract:</Text> Natural bee-derived ingredient that provides antioxidant protection and skin healing benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine & Niacinamide:</Text> Powerful combination that improves skin texture, reduces fine lines, and enhances skin barrier function.</Text>
+              </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bakuchiol:</Text> A natural alternative to retinol, known for its powerful anti-aging properties. It helps reduce fine lines and wrinkles while being gentle on sensitive skin.</Text>
@@ -2685,6 +2726,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use twice daily as part of your morning and evening skincare routine</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Results:</Text> Use consistently for best results in controlling problematic skin</Text>
               </>
+            ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 2-3 drops to face and neck, avoiding eye area</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in upward motions until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Follow-up:</Text> Apply moisturizer and sunscreen during daytime</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use once daily, preferably in the evening</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvements typically seen within 4-6 weeks of consistent use</Text>
+              </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Application:</Text> Apply a thin layer of the cream to the face, neck, and décolleté with gentle patting motions</Text>
@@ -2773,6 +2823,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort."
               : product.name === 'MOISTURE REPLENISHING HYALURON SERUM'
               ? "This advanced hydration serum uses a 4-step hydration system to provide comprehensive moisture delivery and retention. The coconut water base provides natural electrolytes for optimal skin balance, while the multi-molecular hyaluronic acid complex ensures deep penetration and surface protection. For best results, use consistently as part of your daily skincare routine."
+              : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM'
+              ? "This product is dermatologically tested and clinically proven. For best results, use consistently as part of your daily skincare routine. Suitable for all skin types, including sensitive skin. Store in a cool, dry place away from direct sunlight."
               : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM'
               ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your daily skincare routine to achieve youthful, radiant skin."
               : "This product is dermatologically tested and clinically proven for professional skincare results. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. If irritation occurs, discontinue use and consult a dermatologist."
