@@ -179,7 +179,7 @@ export default function ProductsScreen() {
       <View style={styles.productInfo}>
         <Text style={styles.productBrand}>{item.brand}</Text>
         <Text style={styles.productName} numberOfLines={2}>
-          {item.name}
+          Genosys {item.name}
         </Text>
         
         <View style={styles.ratingContainer}>
@@ -238,7 +238,7 @@ export default function ProductsScreen() {
       <View style={styles.horizontalProductInfo}>
         <Text style={styles.productBrand}>{item.brand}</Text>
         <Text style={styles.productName} numberOfLines={2}>
-          {item.name}
+          Genosys {item.name}
         </Text>
         
         <View style={styles.ratingContainer}>

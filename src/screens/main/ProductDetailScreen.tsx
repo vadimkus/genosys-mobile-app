@@ -80,6 +80,11 @@ export default function ProductDetailScreen() {
       return 210.00;  // Fixed price for 40g only
     }
     
+    // Needle Pen-K
+    if (name.includes('needle pen-k')) {
+      return 1450.00;  // Fixed price for device
+    }
+    
     // MULTI VITA RADIANCE CREAM
     if (name.includes('multi vita radiance cream')) {
       if (size === '50g') return 290.00;  // Homecare size - Real price from genosys.ae
@@ -106,11 +111,7 @@ export default function ProductDetailScreen() {
     
     // Microneedle Roller
     if (name.includes('microneedle roller')) {
-      if (size === '0.25mm') return 49.99;
-      if (size === '0.5mm') return 59.99;
-      if (size === '0.1mm') return 39.99;
-      if (size === '0.15mm') return 44.99;
-      if (size === '0.2mm') return 49.99;
+      return 230.00;  // Fixed price for all needle sizes
     }
     
     // Needle Pen-K
@@ -215,11 +216,50 @@ export default function ProductDetailScreen() {
     if (name.includes('nd cell anti-wrinkle cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> ND Cell anti-wrinkle cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 30ml / 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Advanced anti-wrinkle, skin rejuvenation, ND Cell technology</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-aging care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Specialized anti-aging cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Neck and décolleté area anti-aging</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced peptide complex with vitamin blend</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Lifting, firming, depigmentation, texture refinement</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-aging treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging neck and décolleté</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply to clean neck and décolleté area</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested and clinically proven</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SKIN BARRIER PROTECTING CREAM
+    if (name.includes('skin barrier protecting cream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Skin barrier strengthening cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Barrier protection and repair</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> MultiEx BSASM® Plus with ceramide and amino acid complex</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Barrier protection, moisture retention, skin softening, water retention promotion</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily barrier protection and repair, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially compromised and sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply to clean skin, focus on dry or damaged areas</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // Needle Pen-K
+    if (name.includes('needle pen-k')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional automatic microneedling device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1 Device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Collagen production and transdermal nutrient delivery</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Automatic microneedling with adjustable depth and speed</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Collagen production, enhanced absorption, skin rejuvenation, micro-channel creation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional and home use, controlled micro-injuries</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and textured skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Creates micro-channels for enhanced ingredient absorption</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Safety:</Text> Professional-grade device with controlled penetration</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -257,11 +297,16 @@ export default function ProductDetailScreen() {
     if (name.includes('microneedle roller')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional microneedle roller</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Needle Sizes:</Text> 0.25mm, 0.5mm, 0.1mm, 0.15mm, 0.2mm</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin rejuvenation, collagen stimulation, advanced treatment</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional microneedling treatment</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Professional microneedle roller device</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Needle Count:</Text> 450 ultra-thin needles</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Needle Thickness:</Text> 25% thinner than competitors</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Patented Diskneedle Therapy System (DTS)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Skin rejuvenation and product absorption enhancement</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Enhanced product absorption, reduced skin trauma, professional-grade results</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments by licensed practitioners</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Treatment Areas:</Text> Face, body, scalp applications</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Safety:</Text> Medical-grade stainless steel needles</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -878,19 +923,6 @@ export default function ProductDetailScreen() {
       );
     }
     
-    // ND Cell Anti-Wrinkle Cream (Original)
-    if (name.includes('nd cell anti-wrinkle cream') && !name.includes('nd cell anti-wrinkle cream')) {
-      return (
-        <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> ND Cell anti-wrinkle cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 50ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Advanced anti-wrinkle, ND Cell technology, skin rejuvenation</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging skin</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-aging care, morning and evening</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
-        </>
-      );
-    }
     
     // MELAZERO SERUM
     if (name.includes('melazero serum')) {
@@ -1567,6 +1599,26 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'Microneedle Roller' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'ND Cell ANTI-WRINKLE CREAM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SKIN BARRIER PROTECTING CREAM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'Needle Pen-K' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1659,6 +1711,10 @@ export default function ProductDetailScreen() {
             if (product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]') return '50g';
             if (product.name === 'MOISTURE REPLENISHING HYALURON SERUM') return '30ml';
             if (product.name === 'MULTI VITA RADIANCE CREAM') return '50g/230g';
+            if (product.name === 'Microneedle Roller') return '0.25mm/0.5mm/0.1mm/0.15mm/0.2mm';
+            if (product.name === 'ND Cell ANTI-WRINKLE CREAM') return '50g';
+            if (product.name === 'SKIN BARRIER PROTECTING CREAM') return '100g';
+            if (product.name === 'Needle Pen-K') return '1 Device';
             return '30ml';
           })()}
         </Text>
@@ -1745,6 +1801,14 @@ export default function ProductDetailScreen() {
       ? "Multi-vitamin radiance cream with MELAZERO® technology. Brightens and evens skin tone. GENOSYS MULTI VITA RADIANCE CREAM combines a complex of 12 vitamins with potent antioxidants like Astaxanthin to provide effective protection against free radicals, thereby slowing down the skin's aging process. This advanced formula deeply nourishes and moisturizes the skin, evens out skin tone, and imparts a noticeable radiance while activating collagen production and shielding the skin from UV radiation and environmental stressors."
       : product.name === 'MULTI VITA RADIANCE SERUM'
       ? "Skin brightening serum with multi vitamins and patented MELAZERO® melanin care complex. Vitamin C derivative formula for even skin tone and natural radiance with moisturizing barrier protection. MULTI VITA RADIANCE SERUM is an advanced skin brightening serum that combines multi vitamins with patented MELAZERO® melanin care complex for comprehensive skin radiance. This innovative formula helps even skin tone, revive skin's natural brightness, and provides a natural glow with moisturizing barrier protection."
+      : product.name === 'ND Cell ANTI-WRINKLE CREAM'
+      ? "ND Cell ANTI-WRINKLE CREAM is a specialized anti-aging cream designed for the delicate neck and décolleté area. This advanced formula targets the special needs of these sensitive areas with a powerful peptide complex and vitamin blend for lifting, firming, and depigmentation."
+      : product.name === 'SKIN BARRIER PROTECTING CREAM'
+      ? "SKIN BARRIER PROTECTING CREAM is an advanced skin barrier strengthening cream with enriched ceramide and amino acid complex. This innovative formula encourages healthy and soft skin by promoting water retention and protecting the skin barrier with MultiEx BSASM® Plus technology."
+      : product.name === 'Needle Pen-K'
+      ? "Needle Pen-K is a professional automatic microneedling device designed to enhance collagen production and improve transdermal nutrient delivery. This advanced device creates micro-channels in the skin to significantly increase the absorption rate of active skincare ingredients while promoting natural skin rejuvenation through controlled micro-injuries."
+      : product.name === 'Microneedle Roller'
+      ? "The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Stimulates natural collagen production and improves skin texture. Manufactured in South Korea."
                 : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1869,6 +1933,57 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Multi Vitamin Complex:</Text> Advanced VITA 12 Complex with multiple vitamins for comprehensive skin nourishment and radiance.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Vitamin C Derivative:</Text> Stable 3-O-Ethyl Ascorbic Acid provides powerful antioxidant protection and skin brightening benefits.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Moisturizing Barrier:</Text> Panthenol-rich formula creates a protective barrier while providing deep hydration and skin comfort.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for Microneedle Roller */}
+        {product.name === 'Microneedle Roller' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Patented DTS Technology:</Text> Diskneedle Therapy System ensures safe and effective treatments with reduced recovery time.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Ultra-Thin Needles:</Text> 450 needles per unit, 25% thinner than other brands for enhanced comfort and effectiveness.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Manufactured in South Korea with precision engineering for professional use.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for ND Cell ANTI-WRINKLE CREAM */}
+        {product.name === 'ND Cell ANTI-WRINKLE CREAM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Advanced Peptide Complex:</Text> Copper Tripeptide-1 and multiple peptides work synergistically to stimulate collagen production and skin renewal.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Lifting & Firming:</Text> Specialized formula that lifts and firms delicate skin around neck and décolleté area.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Depigmentation Effect:</Text> Excellent depigmentation properties help reduce age spots and uneven skin tone.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Vitamin Complex:</Text> Comprehensive vitamin blend (A, B5, C, E) provides antioxidant protection and skin nourishment.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for SKIN BARRIER PROTECTING CREAM */}
+        {product.name === 'SKIN BARRIER PROTECTING CREAM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>MultiEx BSASM® Plus:</Text> Advanced technology that helps strengthen and protect the skin barrier for optimal skin health.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Enriched Ceramide Complex:</Text> High concentration of ceramides that help restore and maintain skin barrier function.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Amino Acid Complex:</Text> Essential amino acids that help support skin barrier integrity and moisture retention.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Water Retention:</Text> Promotes optimal water retention for healthy, hydrated, and soft skin.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for Needle Pen-K */}
+        {product.name === 'Needle Pen-K' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Automatic Microneedling:</Text> Advanced automatic technology for precise, controlled microneedling therapy with consistent results.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Collagen Production:</Text> Stimulates natural collagen and elastin production through controlled micro-injuries for skin rejuvenation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Enhanced Absorption:</Text> Creates physical pathways through skin to dramatically increase absorption of active skincare ingredients.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Medical-grade device manufactured in South Korea with precision engineering for optimal results.</Text>
           </View>
         </View>
         )}
@@ -2315,6 +2430,43 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Moisturizing - Creates protective barrier while providing deep hydration</Text>
                 <Text style={styles.benefitItem}>• Gentle Formula - Suitable for all skin types with anti-inflammatory properties</Text>
               </>
+            ) : product.name === 'Microneedle Roller' ? (
+              <>
+                <Text style={styles.benefitItem}>• Enhanced Product Absorption - Creates microchannels for 300% better product penetration</Text>
+                <Text style={styles.benefitItem}>• Natural Collagen Induction - Stimulates skin's healing response for firmer, younger-looking skin</Text>
+                <Text style={styles.benefitItem}>• Reduced Fine Lines & Wrinkles - Promotes elastin production for improved skin texture</Text>
+                <Text style={styles.benefitItem}>• Scar Reduction - Effective for treating acne scars, surgical scars, and stretch marks</Text>
+                <Text style={styles.benefitItem}>• Pore Minimization - Helps reduce pore size and improve skin smoothness</Text>
+                <Text style={styles.benefitItem}>• Hyperpigmentation Treatment - Aids in reducing dark spots and uneven skin tone</Text>
+                <Text style={styles.benefitItem}>• Minimal Downtime - Less invasive than traditional treatments with faster recovery</Text>
+              </>
+            ) : product.name === 'ND Cell ANTI-WRINKLE CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Anti-Aging - Targets fine lines and wrinkles in delicate neck and décolleté area</Text>
+                <Text style={styles.benefitItem}>• Lifting Effect - Helps lift and firm sagging skin</Text>
+                <Text style={styles.benefitItem}>• Texture Refinement - Refines skin texture for smoother, younger-looking skin</Text>
+                <Text style={styles.benefitItem}>• Depigmentation - Reduces age spots and uneven skin tone</Text>
+                <Text style={styles.benefitItem}>• Collagen Stimulation - Peptides help stimulate natural collagen production</Text>
+                <Text style={styles.benefitItem}>• Hydration - Deep moisturizing for delicate skin areas</Text>
+              </>
+            ) : product.name === 'SKIN BARRIER PROTECTING CREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Barrier Protection - Strengthens and protects the skin barrier from environmental damage</Text>
+                <Text style={styles.benefitItem}>• Moisture Retention - Promotes optimal water retention for healthy, hydrated skin</Text>
+                <Text style={styles.benefitItem}>• Skin Softening - Helps achieve soft, smooth, and supple skin texture</Text>
+                <Text style={styles.benefitItem}>• Barrier Repair - Helps repair and restore compromised skin barrier function</Text>
+                <Text style={styles.benefitItem}>• Long-lasting Hydration - Provides sustained moisture for all-day comfort</Text>
+                <Text style={styles.benefitItem}>• Gentle Formula - Suitable for sensitive and compromised skin</Text>
+              </>
+            ) : product.name === 'Needle Pen-K' ? (
+              <>
+                <Text style={styles.benefitItem}>• Enhanced Product Absorption - Increases absorption rate of active skincare ingredients by up to 300%</Text>
+                <Text style={styles.benefitItem}>• Collagen Stimulation - Promotes natural collagen and elastin production for firmer, younger-looking skin</Text>
+                <Text style={styles.benefitItem}>• Skin Rejuvenation - Accelerates natural wound healing process for improved skin texture and tone</Text>
+                <Text style={styles.benefitItem}>• Precise Control - Automatic technology ensures consistent, controlled microneedling depth and speed</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Medical-grade device delivers clinical-quality results at home</Text>
+                <Text style={styles.benefitItem}>• Versatile Treatment - Suitable for face, neck, and body for comprehensive skin improvement</Text>
+              </>
             ) : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' ? (
               <>
                 <View style={styles.benefitItemWrapper}>
@@ -2367,7 +2519,7 @@ export default function ProductDetailScreen() {
           </View>
         </View>
 
-        {product.name !== 'HairGen BOOSTER' && product.name !== 'Hair-GENTRON' && (
+        {product.name !== 'HairGen BOOSTER' && product.name !== 'Hair-GENTRON' && product.name !== 'Microneedle Roller' && product.name !== 'Needle Pen-K' && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Key Ingredients</Text>
           <View style={styles.ingredientsList}>
@@ -2422,6 +2574,23 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Niacinamide:</Text> Vitamin B3 that helps improve skin texture, reduce pore size, and enhance skin barrier function.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Glutathione:</Text> Powerful antioxidant that helps protect skin from environmental damage and promotes skin health.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Gluconolactone (PHA):</Text> Gentle exfoliating acid that helps improve skin texture and enhance product penetration.</Text>
+              </>
+            ) : product.name === 'ND Cell ANTI-WRINKLE CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Powerful peptide that stimulates collagen synthesis and promotes skin healing and renewal.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Acetyl Hexapeptide-8:</Text> "Botox-like" peptide that helps relax facial muscles and reduce expression lines.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Palmitoyl Hexapeptide-12:</Text> Advanced peptide that helps improve skin firmness and elasticity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Deep hydrating ingredient that plumps skin and reduces the appearance of fine lines.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramide:</Text> Essential lipid that helps strengthen skin barrier and maintain moisture balance.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Squalane:</Text> Natural emollient that provides deep hydration and helps improve skin texture.</Text>
+              </>
+            ) : product.name === 'SKIN BARRIER PROTECTING CREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Ceramide Complex:</Text> Essential lipids that help strengthen and maintain skin barrier function and integrity.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>MultiEx BSASM® Plus:</Text> Advanced technology that enhances skin barrier protection and moisture retention.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Amino Acid Complex:</Text> Essential amino acids that support skin barrier integrity and natural repair processes.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Shea Butter:</Text> Rich emollient that provides deep hydration and helps protect skin from environmental stress.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Macadamia Oil:</Text> Nourishing oil that helps restore skin barrier function and provides antioxidant protection.</Text>
               </>
             ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
@@ -2736,6 +2905,42 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for optimal results</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvements typically seen within 4-6 weeks of consistent use</Text>
               </>
+            ) : product.name === 'ND Cell ANTI-WRINKLE CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse neck and décolleté area thoroughly</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to neck and décolleté area</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in upward motions from chest to neck</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Technique:</Text> Use upward strokes to help lift and firm the skin</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for optimal results</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvements typically seen within 4-8 weeks of consistent use</Text>
+              </>
+            ) : product.name === 'SKIN BARRIER PROTECTING CREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a generous amount to face and neck</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in upward motions until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for optimal results</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Target Areas:</Text> Focus on areas with compromised skin barrier</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvement in skin barrier function within 2-4 weeks</Text>
+              </>
+            ) : product.name === 'Needle Pen-K' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure device is properly sterilized</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Settings:</Text> Adjust needle depth and speed according to treatment area and skin sensitivity</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Application:</Text> Move device in gentle, overlapping motions across treatment area</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Post-Treatment:</Text> Apply recommended serums or treatments for enhanced absorption</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Recovery:</Text> Follow post-treatment care instructions for optimal healing</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by skincare professional or device instructions</Text>
+              </>
+            ) : product.name === 'Microneedle Roller' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and sanitize the roller</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Roll gently in vertical, horizontal, and diagonal directions</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Coverage:</Text> Treat each area for 2-3 minutes with light pressure</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Post-Treatment:</Text> Apply soothing serum or hyaluronic acid</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use once every 4-6 weeks for optimal results</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Maintenance:</Text> Clean and sanitize after each use</Text>
+              </>
             ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Apply the cream to pre-cleansed skin around the eyes in the morning and evening</Text>
@@ -2979,6 +3184,12 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine."
               : product.name === 'EyeCell EYE CONTOUR CREAM'
               ? "This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine."
+              : product.name === 'ND Cell ANTI-WRINKLE CREAM'
+              ? "This product is dermatologically tested and specifically formulated for the delicate neck and décolleté area. For best results, use consistently as part of your daily skincare routine. Always use sunscreen during daytime to protect treated areas from UV damage."
+              : product.name === 'SKIN BARRIER PROTECTING CREAM'
+              ? "This product is dermatologically tested and clinically proven to improve skin restorative force. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'Needle Pen-K'
+              ? "This is a professional medical device. For best results and safety, use as directed by a skincare professional. Ensure proper sterilization and follow all safety guidelines. Not recommended for use on active acne or inflamed skin."
               : product.name === 'EyeCell EYE CONTOUR SERUM'
               ? "This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine."
               : product.name === 'EyeCell EYE PEPTIDE GEL PATCH'
@@ -3031,6 +3242,8 @@ export default function ProductDetailScreen() {
       ? "This product is dermatologically tested and safe for all skin types. The orange color of the cream is the natural color of Astaxanthin and no artificial pigment is added. If exposed to air, the color of the product may change slightly but the effect remains unchanged. Please close the cap after use. For best results, use consistently as part of your daily skincare routine."
       : product.name === 'MULTI VITA RADIANCE SERUM'
       ? "This product is dermatologically tested and suitable for all skin types. The color of the serum is the natural color of ingredients and no artificial pigment is added. For best results, use consistently as part of your daily skincare routine. Always use sunscreen during daytime to protect skin from UV damage. Store in a cool, dry place away from direct sunlight."
+      : product.name === 'Microneedle Roller'
+      ? "This device is intended for professional use by licensed practitioners. Consult with a qualified professional to determine the appropriate treatment protocol based on your individual skin needs and concerns."
       : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]'
       ? "This product is dermatologically tested and reef-safe. For best results, apply generously and reapply every 2 hours or after swimming/sweating. Store in a cool, dry place away from direct sunlight."
               : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM'
@@ -3043,7 +3256,7 @@ export default function ProductDetailScreen() {
         </View>
 
         {/* Product Documentation Section */}
-        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM' || product.name === 'MOISTURE REPLENISHING HYALURON SERUM' || product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' || product.name === 'MULTI VITA RADIANCE CREAM' || product.name === 'MULTI VITA RADIANCE SERUM') && (
+        {(product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' || product.name === 'EZ CO₂ MASK KIT' || product.name === 'EyeCell EYE PEPTIDE GEL PATCH' || product.name === 'EyeCell EYE ZONE CARE KIT' || product.name === 'GENO-LED IR II' || product.name === 'SKIN REBOOT PDRN MASK PACK' || product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' || product.name === 'HR³ MATRIX HAIR SOLUTION α' || product.name === 'HR³ MATRIX MESOPECIA KIT' || product.name === 'HR³ MATRIX HAIR TONIC α' || product.name === 'HR³ MATRIX SCALP PEELING α' || product.name === 'HR³ MATRIX SCALP SHAMPOO α' || product.name === 'Hair-GENTRON' || product.name === 'INTENSIVE PROBLEM CONTROL TONER' || product.name === 'MICROBIOME ENERGY INFUSING MIST' || product.name === 'MOISTURE REPLENISHING HYALURON CREAM' || product.name === 'MOISTURE REPLENISHING HYALURON SERUM' || product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' || product.name === 'MULTI VITA RADIANCE CREAM' || product.name === 'MULTI VITA RADIANCE SERUM' || product.name === 'Microneedle Roller') && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Product Documentation</Text>
             <View style={styles.documentationBlock}>
@@ -3051,7 +3264,7 @@ export default function ProductDetailScreen() {
                 Download the complete product manual and usage guide for professional application.
               </Text>
               <View style={styles.documentationInfo}>
-                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : product.name === 'MOISTURE REPLENISHING HYALURON SERUM' ? '1.3 MB' : product.name === 'MULTI VITA RADIANCE CREAM' ? '1.2 MB' : product.name === 'MULTI VITA RADIANCE SERUM' ? '1.1 MB' : '850 KB'}</Text>
+                <Text style={styles.documentationFileInfo}>📄 File size: {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' ? '2.1 MB' : product.name === 'EZ CO₂ MASK KIT' ? '2.8 MB' : product.name === 'EyeCell EYE ZONE CARE KIT' ? '1.5 MB' : product.name === 'GENO-LED IR II' ? '4.6 MB' : product.name === 'SKIN REBOOT PDRN MASK PACK' ? '1.8 MB' : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? '1.0 MB' : product.name === 'HR³ MATRIX HAIR SOLUTION α' ? '1.1 MB' : product.name === 'HR³ MATRIX MESOPECIA KIT' ? '1.2 MB' : product.name === 'HR³ MATRIX HAIR TONIC α' ? '650 KB' : product.name === 'HR³ MATRIX SCALP PEELING α' ? '900 KB' : product.name === 'HR³ MATRIX SCALP SHAMPOO α' ? '800 KB' : product.name === 'Hair-GENTRON' ? '650 KB' : product.name === 'INTENSIVE PROBLEM CONTROL TONER' ? '750 KB' : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? '1.0 MB' : product.name === 'MOISTURE REPLENISHING HYALURON CREAM' ? '1.4 MB' : product.name === 'MOISTURE REPLENISHING HYALURON SERUM' ? '1.3 MB' : product.name === 'MULTI VITA RADIANCE CREAM' ? '1.2 MB' : product.name === 'MULTI VITA RADIANCE SERUM' ? '1.1 MB' : product.name === 'Microneedle Roller' ? '1.5 MB' : product.name === 'ND Cell ANTI-WRINKLE CREAM' ? '1.2 MB' : '850 KB'}</Text>
               </View>
             <TouchableOpacity
                 style={styles.documentationButton}
@@ -3095,6 +3308,8 @@ export default function ProductDetailScreen() {
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20MULTI%20VITA%20RADIANCE%20CREAM.pdf'
                     : product.name === 'MULTI VITA RADIANCE SERUM'
                     ? 'https://genosys.ae/documents/ppt/GENOSYS%20MULTI%20VITA%20RADIANCE%20SERUM.pdf'
+                    : product.name === 'Microneedle Roller'
+                    ? 'https://genosys.ae/documents/ppt/Overview%20of%20Microneedling_S.pdf'
                     : 'https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf';
                   Linking.openURL(pdfUrl);
                 }}

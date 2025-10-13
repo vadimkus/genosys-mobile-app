@@ -84,7 +84,7 @@ export default function ProductCarousel({
       
       <View style={styles.productInfo}>
         <Text style={styles.productName} numberOfLines={2}>
-          {product.name}
+          Genosys {product.name}
         </Text>
         <Text style={styles.productBrand}>{product.brand}</Text>
         

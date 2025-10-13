@@ -912,30 +912,57 @@ export class ProductService {
           },
           {
             id: '13',
-            name: 'Needle Pen-K',
-            description: 'Professional needle pen device for advanced skin treatment and precision application',
-            price: 149.99,
-            originalPrice: 199.99,
+            name: 'SKIN BARRIER PROTECTING CREAM',
+            description: 'Advanced skin barrier protecting cream with ceramides and hyaluronic acid for deep hydration and protection',
+            price: 89.99,
+            originalPrice: 119.99,
             discountPercentage: 25,
-            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FNeedlePenK.jpg&w=1200&q=75',
-            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FNeedlePenK.jpg&w=1200&q=75'],
-            category: 'Device',
+            imageUrl: 'https://genosys.ae/images/BRR.jpg',
+            imageUrls: ['https://genosys.ae/images/BRR.jpg'],
+            category: 'Cream',
             brand: 'Genosys',
             sku: 'GEN-013',
-            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FNeedlePenK.jpg&w=1200&q=75'],
+            images: ['https://genosys.ae/images/BRR.jpg'],
+            inStock: true,
+            stockQuantity: 20,
+            isFeatured: false,
+            isNew: true,
+            isOnSale: true,
+            stock: 20,
+            rating: 4.0,
+            averageRating: 4.5,
+            reviewCount: 67,
+            sizeOptions: ['100g'],
+            defaultSize: '100g',
+            createdAt: '2024-02-27T10:00:00.000Z',
+            updatedAt: '2024-02-27T10:00:00.000Z'
+          },
+          {
+            id: '14',
+            name: 'Needle Pen-K',
+            description: 'Professional microneedling device for advanced skin rejuvenation and collagen stimulation',
+            price: 1450.00,
+            originalPrice: 1450.00,
+            discountPercentage: 0,
+            imageUrl: 'https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75',
+            imageUrls: ['https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75'],
+            category: 'Device',
+            brand: 'Genosys',
+            sku: 'GEN-014',
+            images: ['https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75'],
             inStock: true,
             stockQuantity: 15,
             isFeatured: false,
             isNew: true,
-            isOnSale: true,
             stock: 15,
             rating: 4.0,
-            averageRating: 4.6,
-            reviewCount: 67,
-            sizeOptions: ['0.25mm', '0.5mm', '1.0mm'],
-            defaultSize: '0.25mm',
-            createdAt: '2024-02-27T10:00:00.000Z',
-            updatedAt: '2024-02-27T10:00:00.000Z'
+            averageRating: 4.5,
+            reviewCount: 23,
+            sizeOptions: undefined,
+            defaultSize: '1 Device',
+            isOnSale: false,
+            createdAt: '2024-02-28T10:00:00.000Z',
+            updatedAt: '2024-02-28T10:00:00.000Z'
           },
           {
             id: '14',
@@ -1472,10 +1499,14 @@ export class ProductService {
         
         // Devices
         if (name.includes('microneedle roller')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fgenosys-microneedling-devices.jpg&w=1200&q=75';
-        if (name.includes('needle pen-k')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
-        
         // Multi vita radiance cream
         if (name.includes('multi vita radiance cream')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FRAA.jpg&w=1200&q=75';
+        
+        // ND Cell ANTI-WRINKLE CREAM
+        if (name.includes('nd cell anti-wrinkle cream') || name.includes('ND Cell ANTI-WRINKLE CREAM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FND.jpg&w=1200&q=75';
+        
+        // Needle Pen-K
+        if (name.includes('needle pen-k') || name.includes('Needle Pen-K')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75';
         
         // Use the working image as fallback for all products
         return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
@@ -1483,7 +1514,18 @@ export class ProductService {
 
       // For specific products, always use local mapping to ensure correct images
       const useLocalMapping = product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM';
-      const finalImageUrl = useLocalMapping ? getImageUrl(product.name) : (product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name));
+      let finalImageUrl;
+      if (useLocalMapping) {
+        finalImageUrl = getImageUrl(product.name);
+      } else if (product.name === 'ND Cell ANTI-WRINKLE CREAM') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FND.jpg&w=1200&q=75';
+      } else if (product.name === 'SKIN BARRIER PROTECTING CREAM') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FBRR.jpg&w=1200&q=75';
+      } else if (product.name === 'Needle Pen-K') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FNeedle-pen.jpg&w=1200&q=75';
+      } else {
+        finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
+      }
       console.log(`🖼️ Product: ${product.name} -> Image: ${finalImageUrl}`);
 
       return {
@@ -1663,9 +1705,9 @@ export class ProductService {
       return ['0.25mm', '0.5mm', '0.1mm', '0.15mm', '0.2mm'];
     }
     
-    // Needle Pen-K
+    // Needle Pen-K - no size selection
     if (name.includes('needle pen-k')) {
-      return ['0.25mm', '0.5mm', '1.0mm'];
+      return undefined;
     }
     
     // Multi Functional Anti-Wrinkle Cream
@@ -1710,7 +1752,7 @@ export class ProductService {
     
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
-      return ['30ml', '50ml'];
+      return undefined; // No size selection - single size product
     }
     
     // PEPTIDE GEL MASK
@@ -1791,7 +1833,7 @@ export class ProductService {
     
     // ND Cell ANTI-WRINKLE CREAM
     if (name.includes('nd cell anti-wrinkle cream')) {
-      return '30ml';
+      return '50g';
     }
     
     // PEPTIDE GEL MASK
