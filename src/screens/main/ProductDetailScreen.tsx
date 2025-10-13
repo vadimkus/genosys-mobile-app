@@ -3268,6 +3268,9 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
     lineHeight: 20,
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    flex: 1,
   },
   ingredientsList: {
     backgroundColor: '#ffffff',
