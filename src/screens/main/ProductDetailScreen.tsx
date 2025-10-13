@@ -2253,7 +2253,7 @@ export default function ProductDetailScreen() {
             ) : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]' ? (
               <>
                 <View style={styles.benefitItemWrapper}>
-                  <Text style={styles.benefitItem}>• Maximum UV Protection - SPF 50+ PA++++ provides superior sun protection</Text>
+                  <Text style={styles.benefitItem}>• Maximum UV Protection - SPF 50+ PA++++</Text>
                 </View>
                 <View style={styles.benefitItemWrapper}>
                   <Text style={styles.benefitItem}>• Sunburn Recovery - Helps promote skin recovery from sun damage and exposure</Text>
@@ -3278,7 +3278,6 @@ const styles = StyleSheet.create({
   benefitItem: {
     fontSize: 14,
     color: '#374151',
-    marginBottom: 8,
     lineHeight: 20,
     flexWrap: 'wrap',
     flexShrink: 1,
