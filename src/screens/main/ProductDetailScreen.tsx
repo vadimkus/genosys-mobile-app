@@ -178,12 +178,11 @@ export default function ProductDetailScreen() {
     if (name.includes('multi sun cream')) {
       return (
         <>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Multi-functional sun protection cream</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> 50ml / 100ml</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>SPF Rating:</Text> SPF 40 PA++</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> UV protection, anti-aging, skin brightening</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
-          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sun protection, morning application</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Daily sunscreen with SPF 40 PA++</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 40g</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Protection:</Text> UVA/UVB protection, SPF 40, PA++</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, including sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily sun protection, outdoor activities</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1513,6 +1512,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'MULTI SUN CREAM [SPF 40 PA++]' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1601,6 +1605,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'INTENSIVE PROBLEM CONTROL CREAM') return '50g/250g';
             if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM') return '50g/250g';
             if (product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM') return '30ml';
+            if (product.name === 'MULTI SUN CREAM [SPF 40 PA++]') return '40g';
             if (product.name === 'MOISTURE REPLENISHING HYALURON SERUM') return '30ml';
             return '30ml';
           })()}
@@ -1680,6 +1685,8 @@ export default function ProductDetailScreen() {
                 ? "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients."
                 : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM'
                 ? "MULTI FUNCTIONAL ANTI-WRINKLE SERUM is an advanced anti-aging serum that combines the power of bakuchiol, a natural alternative to retinol, with cutting-edge peptide technology. This clinically-tested formula helps visibly smooth wrinkles, reinforce skin firmness, and restore youthful radiance for all skin types."
+                : product.name === 'MULTI SUN CREAM [SPF 40 PA++]'
+                ? "MULTI SUN CREAM [SPF 40 PA++] is an advanced daily sunscreen designed to provide comprehensive UV protection while maintaining a natural, glowing complexion. This innovative formula combines high-level sun protection with skin-nourishing ingredients to protect against both UVA and UVB rays while promoting healthy, radiant skin."
                 : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
@@ -1767,6 +1774,19 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Advanced Peptide Complex:</Text> Contains Anti-aging Peptide 6 and other peptides that target specific signs of aging for comprehensive results.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Lipid Barrier Technology:</Text> Innovative liposome delivery system with ceramides, cholesterol, and phytosphingosine for enhanced penetration.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Clinical Validation:</Text> Clinically tested with proven results in improving skin age index and overall skin quality.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for MULTI SUN CREAM */}
+        {product.name === 'MULTI SUN CREAM [SPF 40 PA++]' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>High SPF Protection:</Text> SPF 40 PA++ provides strong protection against both UVA and UVB rays for comprehensive sun defense.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Non-Greasy Formula:</Text> Lightweight, non-greasy texture that absorbs quickly without leaving a white cast or sticky residue.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Glowing Effect:</Text> Advanced formula that enhances natural skin radiance while providing sun protection.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Daily Use Formula:</Text> Gentle enough for daily use while providing robust protection for all skin types.</Text>
           </View>
         </View>
         )}
@@ -2147,6 +2167,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
               </>
+            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
+              <>
+                <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
+                <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
+                <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
+                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting from sun damage</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
+                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
+              </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
               <>
                 <Text style={styles.benefitItem}>• Wrinkle Reduction - Visibly smooths fine lines and deep wrinkles for younger-looking skin</Text>
@@ -2476,6 +2505,15 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Mushroom Extracts:</Text> Powerful mushroom extracts provide anti-inflammatory, antioxidant, and protective benefits for healthy skin.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Moisture Magnet Technology:</Text> Advanced ingredients that attract and retain moisture for long-lasting hydration and skin comfort.</Text>
               </>
+            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Palmitoyl Pentapeptide-4:</Text> Advanced peptide that helps repair and protect skin from environmental damage while promoting healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Sodium Hyaluronate:</Text> Deep hydrating ingredient that attracts and retains moisture for plump, hydrated skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Callus Culture Extracts:</Text> Rosa Damascena and Vitis Vinifera extracts provide antioxidant protection and skin nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Soothing and healing ingredient that calms irritated skin and promotes skin repair.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis Root Extract:</Text> Powerful antioxidant that protects skin from free radical damage and environmental stress.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus/Soymilk Ferment Filtrate:</Text> Probiotic ingredient that supports skin's natural barrier function and overall skin health.</Text>
+              </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bakuchiol:</Text> Natural plant-derived alternative to retinol that provides anti-aging benefits without irritation or photosensitivity.</Text>
@@ -2726,6 +2764,14 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use twice daily as part of your morning and evening skincare routine</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Results:</Text> Use consistently for best results in controlling problematic skin</Text>
               </>
+            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly before application</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply generously to face, neck, and exposed areas 15-30 minutes before sun exposure</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Reapplication:</Text> Reapply every 2 hours or after swimming, sweating, or towel drying</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Daily Use:</Text> Use as the final step in your morning skincare routine</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Coverage:</Text> Ensure even coverage for optimal protection</Text>
+              </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
@@ -2823,6 +2869,8 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort."
               : product.name === 'MOISTURE REPLENISHING HYALURON SERUM'
               ? "This advanced hydration serum uses a 4-step hydration system to provide comprehensive moisture delivery and retention. The coconut water base provides natural electrolytes for optimal skin balance, while the multi-molecular hyaluronic acid complex ensures deep penetration and surface protection. For best results, use consistently as part of your daily skincare routine."
+              : product.name === 'MULTI SUN CREAM [SPF 40 PA++]'
+              ? "This product is dermatologically tested and safe for all skin types. For best results, apply generously and reapply as needed. Perfect for daily use and outdoor activities. Store in a cool, dry place away from direct sunlight."
               : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM'
               ? "This product is dermatologically tested and clinically proven. For best results, use consistently as part of your daily skincare routine. Suitable for all skin types, including sensitive skin. Store in a cool, dry place away from direct sunlight."
               : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE CREAM'
