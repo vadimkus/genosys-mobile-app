@@ -2216,15 +2216,13 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
               <>
-                {console.log('🌞 Rendering MULTI SUN CREAM benefits in main chain')}
                 <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
                 <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
                 <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
                 <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting</Text>
-                <Text style={styles.benefitItem}>  from sun damage - TEXT WRAPPING TEST</Text>
+                <Text style={styles.benefitItem}>  from sun damage</Text>
                 <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
-                <Text style={styles.benefitItem}>• TEST BENEFIT - This should be visible if code is executing</Text>
               </>
             ) : isCollagenMask ? (
               <>
