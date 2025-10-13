@@ -66,8 +66,7 @@ export default function ProductDetailScreen() {
     
     // MULTI FUNCTIONAL ANTI-WRINKLE SERUM
     if (name.includes('multi functional anti-wrinkle serum')) {
-      if (size === '15ml') return 99.99;
-      if (size === '30ml') return 159.99;
+      return 330.00;  // Fixed price for 30ml only
     }
     
     // MULTI SUN CREAM

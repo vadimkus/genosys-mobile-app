@@ -1673,9 +1673,9 @@ export class ProductService {
       return ['50g', '250g'];
     }
     
-    // Multi Functional Anti-Wrinkle Serum
+    // Multi Functional Anti-Wrinkle Serum - no size selection, only 30ml
     if (name.includes('multi functional anti-wrinkle serum')) {
-      return ['15ml', '30ml'];
+      return undefined;
     }
     
     // Multi Sun Cream
