@@ -527,6 +527,11 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and dull skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Ingredients:</Text> Astaxanthin, VITA 12 Complex, Gluconolactone, Glycyrrhiza Uralensis, Macadamia Ternifolia Seed Oil, Ascorbic Acid, Ceramide NP</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Directions:</Text> Apply the cream to the face and gently massage in both morning and evening for optimal results</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Clinical Testing:</Text> Dermatologically tested and safe for all skin types</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rating:</Text> 4.8/5 stars</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Shipping:</Text> Free shipping on orders over 1,000 AED</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Payment:</Text> Secure Stripe checkout</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Tax:</Text> 5% UAE Tax Payer - Supporting local economy</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1742,7 +1747,7 @@ export default function ProductDetailScreen() {
       : product.name === 'ULTRA SHIELD SUN CREAM [SPF 50+ PA++++]'
       ? "ULTRA SHIELD SUN CREAM [SPF 50+ PA++++] is a non-greasy, silky sunscreen with powerful UV protection and sunburn care effect. This advanced formula strongly defends skin against UV rays while promoting skin recovery from sun damage with innovative MicroHA™ and ProbioMETA™ technology."
       : product.name === 'MULTI VITA RADIANCE CREAM'
-      ? "GENOSYS MULTI VITA RADIANCE CREAM combines a complex of 12 vitamins with potent antioxidants like Astaxanthin to provide effective protection against free radicals, thereby slowing down the skin's aging process. This advanced formula deeply nourishes and moisturizes the skin, evens out skin tone, and imparts a noticeable radiance while activating collagen production and shielding the skin from UV radiation and environmental stressors."
+      ? "Multi-vitamin radiance cream with MELAZERO® technology. Brightens and evens skin tone. GENOSYS MULTI VITA RADIANCE CREAM combines a complex of 12 vitamins with potent antioxidants like Astaxanthin to provide effective protection against free radicals, thereby slowing down the skin's aging process. This advanced formula deeply nourishes and moisturizes the skin, evens out skin tone, and imparts a noticeable radiance while activating collagen production and shielding the skin from UV radiation and environmental stressors."
                 : isCollagenMask 
               ? "INTENSIVE REPAIR COLLAGEN MASK is a professional-grade sheet mask designed to restore skin firmness and elasticity. This innovative mask provides intensive repair and anti-aging benefits with hydrolyzed collagen and hyaluronic acid for comprehensive skin nourishment and hydration."
               : product.description || "Premium Korean dermacosmetics product designed for professional skincare results. This high-quality product combines advanced Korean skincare technology with proven ingredients to deliver exceptional results for all skin types."
