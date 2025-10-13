@@ -2224,6 +2224,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>  from sun damage - TEXT WRAPPING TEST</Text>
                 <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
+                <Text style={styles.benefitItem}>• TEST BENEFIT - This should be visible if code is executing</Text>
               </>
             ) : isCollagenMask ? (
               <>
