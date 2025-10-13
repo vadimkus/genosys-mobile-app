@@ -2223,15 +2223,6 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Brightening - Evens out skin tone and adds natural radiance</Text>
                 <Text style={styles.benefitItem}>• Deep Hydration - Provides intense moisture for plump, healthy-looking skin</Text>
               </>
-            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
-              <>
-                <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
-                <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
-                <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
-                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting from sun damage</Text>
-                <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
-                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
-              </>
             ) : isCollagenMask ? (
               <>
                 <Text style={styles.benefitItem}>• Intensive Hydration - Provides deep moisture for soft, supple skin</Text>
