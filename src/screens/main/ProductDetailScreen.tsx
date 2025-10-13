@@ -1916,6 +1916,7 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
           <View style={styles.benefitsList}>
+            {console.log('🔍 Benefits section - Product name:', product.name)}
             {product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
                 <Text style={styles.benefitItem}>• Skin Barrier Repair - Strengthens and rebuilds the skin's natural protective barrier</Text>
