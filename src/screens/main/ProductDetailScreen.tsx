@@ -2168,6 +2168,7 @@ export default function ProductDetailScreen() {
               </>
             ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
               <>
+                {console.log('🌞 Rendering MULTI SUN CREAM benefits with text wrapping')}
                 <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
                 <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
                 <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
