@@ -2167,17 +2167,6 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
                 <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
               </>
-            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
-              <>
-                {console.log('🌞 Rendering MULTI SUN CREAM benefits with text wrapping')}
-                <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
-                <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
-                <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
-                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting</Text>
-                <Text style={styles.benefitItem}>  from sun damage - TEXT WRAPPING TEST</Text>
-                <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
-                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
-              </>
             ) : product.name === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM' ? (
               <>
                 <Text style={styles.benefitItem}>• Wrinkle Reduction - Visibly smooths fine lines and deep wrinkles for younger-looking skin</Text>
@@ -2224,6 +2213,17 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Antioxidant Protection - Shields the skin from oxidative stress and environmental damage</Text>
                 <Text style={styles.benefitItem}>• Brightening - Evens out skin tone and adds natural radiance</Text>
                 <Text style={styles.benefitItem}>• Deep Hydration - Provides intense moisture for plump, healthy-looking skin</Text>
+              </>
+            ) : product.name === 'MULTI SUN CREAM [SPF 40 PA++]' ? (
+              <>
+                {console.log('🌞 Rendering MULTI SUN CREAM benefits in main chain')}
+                <Text style={styles.benefitItem}>• UV Protection - Comprehensive protection against UVA and UVB rays</Text>
+                <Text style={styles.benefitItem}>• Skin Soothing - Calms and soothes skin irritated by sun exposure</Text>
+                <Text style={styles.benefitItem}>• Natural Glow - Enhances skin's natural radiance and luminosity</Text>
+                <Text style={styles.benefitItem}>• Moisture Lock - Helps maintain skin hydration while protecting</Text>
+                <Text style={styles.benefitItem}>  from sun damage - TEXT WRAPPING TEST</Text>
+                <Text style={styles.benefitItem}>• Anti-Aging - Prevents premature aging caused by UV exposure</Text>
+                <Text style={styles.benefitItem}>• Gentle Care - Suitable for sensitive skin and daily use</Text>
               </>
             ) : isCollagenMask ? (
               <>
