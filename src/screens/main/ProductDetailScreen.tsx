@@ -33,6 +33,7 @@ export default function ProductDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
 
   const getPriceForSize = (product: Product, size: string) => {
     if (!product || !size) return product?.price || 0;
@@ -143,6 +144,11 @@ export default function ProductDetailScreen() {
       if (selectedSize === '20g') return 204.00;
       if (selectedSize === '100g') return 440.00;
       return 204.00; // Default to 20g price
+    }
+    
+    // SKIN CARING BLEMISH BALM CUSHION
+    if (name.includes('skin caring blemish balm cushion')) {
+      return 300.00; // Fixed price for single size product
     }
     
     // Microneedle Roller
@@ -459,6 +465,25 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply thin layer to affected areas, massage gently</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Centella asiatica complex with sh-Polypeptide-7</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested and clinically proven</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SKIN CARING BLEMISH BALM CUSHION
+    if (name.includes('skin caring blemish balm cushion')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Blemish balm cushion</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 15g (includes replacement refill)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Post-treatment coverage and skin protection</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> 60% moisture essence with 40% peptide complex</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Natural healthy glow, skin calming, sun protection, post-treatment care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily makeup base, especially after professional treatments</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially post-treatment skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>SPF Rating:</Text> SPF 50 / PA++++</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Available Colors:</Text> Beige, Ivory, Camel</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Color Note:</Text> Beige is darker than Ivory to suit Fitzpatrick 2-4</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1554,6 +1579,11 @@ export default function ProductDetailScreen() {
         } else {
           setSelectedSize(foundProduct.defaultSize || (foundProduct.sizeOptions && foundProduct.sizeOptions[0]) || '');
         }
+        
+        // Set default color for SKIN CARING BLEMISH BALM CUSHION
+        if (foundProduct.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]') {
+          setSelectedColor('Ivory'); // Default to Ivory color
+        }
       }
     }
     setLoading(false);
@@ -1850,6 +1880,11 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1895,6 +1930,32 @@ export default function ProductDetailScreen() {
         </View>
       )}
 
+      {/* Color Selection for SKIN CARING BLEMISH BALM CUSHION */}
+      {product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' && (
+        <View style={styles.sizeSelectionContainer}>
+          <Text style={[styles.sizeSelectionTitle, { color: theme.colors.text }]}>Color</Text>
+          <View style={styles.sizeOptionsContainer}>
+            {['Beige', 'Ivory', 'Camel'].map((color, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.sizeOption,
+                  selectedColor === color && styles.sizeOptionSelected
+                ]}
+                onPress={() => setSelectedColor(color)}
+              >
+                <Text style={[
+                  styles.sizeOptionText,
+                  { color: theme.colors.text },
+                  selectedColor === color && styles.sizeOptionTextSelected
+                ]}>
+                  {color}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
 
       {/* Product Category */}
       <TouchableOpacity 
@@ -1965,6 +2026,7 @@ export default function ProductDetailScreen() {
             if (product.name === 'POWER SOLUTION SWS') return '2ml x 10ea';
             if (product.name === 'PROBLEM CONTROL SERUM') return '30ml';
             if (product.name === 'SOOTHING REPAIR POSTCREAM') return '20g/100g';
+    if (product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]') return '15g';
             return '30ml';
           })()}
         </Text>
@@ -2073,8 +2135,10 @@ export default function ProductDetailScreen() {
       ? "POWER SOLUTION SWS is a professional anti-pigment ampoule specifically formulated for microneedling treatments. This advanced formula helps improve pigmentation, even skin tone, and brighten the skin surface while promoting optimal healing and skin clarity post-treatment."
       : product.name === 'PROBLEM CONTROL SERUM'
       ? "PROBLEM CONTROL SERUM is a specialized anti-blemish serum designed for combination and oily acne-prone skin. This advanced formula helps fight skin breakouts by regulating excessive oil and sebum production while refining skin texture for a healthier, clearer complexion."
-      : product.name === 'SOOTHING REPAIR POSTCREAM'
-      ? "SOOTHING REPAIR POSTCREAM is a specialized regenerating cream designed for healthy skin recovery after professional treatments. This advanced formula helps irritated skin rapidly recover from redness, erythema, and edema while promoting healthy rejuvenation with centella complex and peptide technology."
+        : product.name === 'SOOTHING REPAIR POSTCREAM'
+        ? "SOOTHING REPAIR POSTCREAM is a specialized regenerating cream designed for healthy skin recovery after professional treatments. This advanced formula helps irritated skin rapidly recover from redness, erythema, and edema while promoting healthy rejuvenation with centella complex and peptide technology."
+        : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]'
+        ? "SKIN CARING BLEMISH BALM CUSHION is a BB cushion that can be used after professional treatment. More than 60% of the product is composed of moisture essence, which enables a natural and healthy glow. Various peptide complex 40% - helps calm the irritated skin. (SPF 50 / PA++++)"
       : product.name === 'Microneedle Roller'
       ? "The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Stimulates natural collagen production and improves skin texture. Manufactured in South Korea."
                 : isCollagenMask 
@@ -2363,6 +2427,19 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rapid Recovery:</Text> Helps skin rapidly recover from redness, erythema, and edema after professional treatments.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Peptide Technology:</Text> Advanced sh-Polypeptide-7 helps promote skin regeneration and healing processes.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Gentle Healing:</Text> Suitable for sensitive, post-treatment skin with dermatologically tested formula.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Post-Treatment Safe:</Text> BB cushion that can be used after professional treatment for immediate coverage and protection.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>High Moisture Content:</Text> More than 60% moisture essence composition for natural and healthy glow.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Peptide Complex:</Text> 40% peptide complex helps calm irritated skin and promote healing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Sun Protection:</Text> SPF 50 / PA++++ provides comprehensive protection from harmful UV rays.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Color Options:</Text> Available in Beige, Ivory, and Camel to suit different skin tones.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Convenient Application:</Text> Quick and easy base makeup application with included puff.</Text>
             </View>
         </View>
         )}
@@ -2921,16 +2998,25 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Gentle Formula - Suitable for combination and oily skin types</Text>
                 <Text style={styles.benefitItem}>• Clear Complexion - Promotes a healthier, clearer skin appearance</Text>
               </>
-            ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
-              <>
-                <Text style={styles.benefitItem}>• Rapid Recovery - Helps skin quickly recover from professional treatment side effects</Text>
-                <Text style={styles.benefitItem}>• Redness Reduction - Soothes and reduces redness and inflammation</Text>
-                <Text style={styles.benefitItem}>• Erythema Relief - Helps alleviate erythema and skin irritation</Text>
-                <Text style={styles.benefitItem}>• Edema Reduction - Helps reduce swelling and edema after treatments</Text>
-                <Text style={styles.benefitItem}>• Skin Regeneration - Promotes healthy skin cell regeneration and renewal</Text>
-                <Text style={styles.benefitItem}>• Gentle Healing - Suitable for sensitive, post-treatment skin</Text>
-              </>
-            ) : product.name === 'Needle Pen-K' ? (
+        ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
+          <>
+            <Text style={styles.benefitItem}>• Rapid Recovery - Helps skin quickly recover from professional treatment side effects</Text>
+            <Text style={styles.benefitItem}>• Redness Reduction - Soothes and reduces redness and inflammation</Text>
+            <Text style={styles.benefitItem}>• Erythema Relief - Helps alleviate erythema and skin irritation</Text>
+            <Text style={styles.benefitItem}>• Edema Reduction - Helps reduce swelling and edema after treatments</Text>
+            <Text style={styles.benefitItem}>• Skin Regeneration - Promotes healthy skin cell regeneration and renewal</Text>
+            <Text style={styles.benefitItem}>• Gentle Healing - Suitable for sensitive, post-treatment skin</Text>
+          </>
+        ) : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' ? (
+          <>
+            <Text style={styles.benefitItem}>• Post-Treatment Coverage - BB cushion that can be used after professional treatment</Text>
+            <Text style={styles.benefitItem}>• Convenient Application - Quick and easy base makeup in the morning</Text>
+            <Text style={styles.benefitItem}>• Skin Protection - Protection from harmful environment and external factors</Text>
+            <Text style={styles.benefitItem}>• Sun Protection - SPF 50 / PA++++ comprehensive UV protection</Text>
+            <Text style={styles.benefitItem}>• Natural Coverage - Provides natural healthy glow with skin cover up</Text>
+            <Text style={styles.benefitItem}>• Skin Calming - Peptide complex helps calm irritated skin</Text>
+          </>
+        ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Product Absorption - Increases absorption rate of active skincare ingredients by up to 300%</Text>
                 <Text style={styles.benefitItem}>• Collagen Stimulation - Promotes natural collagen and elastin production for firmer, younger-looking skin</Text>
@@ -3136,16 +3222,25 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Gentle healing ingredient that soothes irritated skin and promotes skin regeneration.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> Natural immune-boosting ingredient that helps strengthen skin's natural defense mechanisms.</Text>
               </>
-            ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
-              <>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Complex:</Text> Powerful healing complex with asiaticoside, madecassic acid, and asiatic acid for skin recovery.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Advanced peptide that helps promote skin regeneration and healing processes.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Dipotassium Glycyrrhizate:</Text> Licorice root extract that provides anti-inflammatory and soothing benefits.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Vitamin B5 that helps soothe irritated skin and promote healing.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Plant Callus Extracts:</Text> Vitis Vinifera and Rosa Damascena callus culture extracts for enhanced healing properties.</Text>
-                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis:</Text> Chinese skullcap root extract with anti-inflammatory and antioxidant properties.</Text>
-              </>
-            ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
+        ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Complex:</Text> Powerful healing complex with asiaticoside, madecassic acid, and asiatic acid for skin recovery.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Advanced peptide that helps promote skin regeneration and healing processes.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Dipotassium Glycyrrhizate:</Text> Licorice root extract that provides anti-inflammatory and soothing benefits.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Vitamin B5 that helps soothe irritated skin and promote healing.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Plant Callus Extracts:</Text> Vitis Vinifera and Rosa Damascena callus culture extracts for enhanced healing properties.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis:</Text> Chinese skullcap root extract with anti-inflammatory and antioxidant properties.</Text>
+          </>
+        ) : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Repairing Pep9 Complex:</Text> Advanced peptide complex including Hexapeptide-9, Copper Tripeptide-1, Palmitoyl Pentapeptide-4, Palmitoyl Tripeptide-1, Hexapeptide-11, Tripeptide-1, and Alanine/Histidine/Lysine Polypeptide Copper HCl for collagen induction and skin regeneration.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Acetyl Hexapeptide-8:</Text> Firming peptide that helps improve skin elasticity and firmness.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Nonapeptide-1:</Text> Skin brightening peptide that helps even skin tone and reduce pigmentation.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Volufiline™:</Text> Sarsasapogenin from anemarrhena asphodeloides root that provides volume-enhancing benefits with anti-inflammatory and antioxidant features.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Glutathione:</Text> Powerful antioxidant that helps brighten and even skin by blocking tyrosinase activity, beneficial for cystic acne and breakouts.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Moisture Essence:</Text> High concentration of hydrating ingredients for natural and healthy glow.</Text>
+          </>
+        ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Palmitoyl Hexapeptide-12:</Text> Stimulates fibroblast cell growth, imparting firming effects and helping to improve skin elasticity around the delicate eye area.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Promotes collagen synthesis in skin fibroblasts, aiding in skin regeneration and helping to reduce the appearance of fine lines and wrinkles.</Text>
@@ -3542,16 +3637,25 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for optimal results</Text>
                 <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvements typically seen within 2-4 weeks of consistent use</Text>
               </>
-            ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
-              <>
-                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin gently after professional treatment</Text>
-                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a thin layer to affected areas</Text>
-                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in circular motions until absorbed</Text>
-                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as needed for post-treatment recovery</Text>
-                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Duration:</Text> Continue until skin fully recovers from treatment</Text>
-                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvement in redness and irritation within 24-48 hours</Text>
-              </>
-            ) : product.name === 'Needle Pen-K' ? (
+        ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin gently after professional treatment</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a thin layer to affected areas</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in circular motions until absorbed</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as needed for post-treatment recovery</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Duration:</Text> Continue until skin fully recovers from treatment</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvement in redness and irritation within 24-48 hours</Text>
+          </>
+        ) : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse and moisturize skin before application</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Press the puff lightly onto cushion and pat evenly onto skin</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Technique:</Text> We recommend patting the puff gently on the skin several times</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Enhancement:</Text> Multiple gentle pats enhance the long-lasting effect</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Coverage:</Text> Apply to entire face for even coverage and natural finish</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use daily as base makeup, especially after professional treatments</Text>
+          </>
+        ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure device is properly sterilized</Text>
                 <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Settings:</Text> Adjust needle depth and speed according to treatment area and skin sensitivity</Text>
@@ -3832,8 +3936,10 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
               : product.name === 'PROBLEM CONTROL SERUM'
               ? "This product is dermatologically tested and specifically formulated for combination and oily skin types. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight."
-              : product.name === 'SOOTHING REPAIR POSTCREAM'
-              ? "This product is dermatologically tested and specifically formulated for post-treatment skin recovery. Use as directed by your skincare professional. Store in a cool, dry place away from direct sunlight."
+        : product.name === 'SOOTHING REPAIR POSTCREAM'
+        ? "This product is dermatologically tested and specifically formulated for post-treatment skin recovery. Use as directed by your skincare professional. Store in a cool, dry place away from direct sunlight."
+        : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]'
+        ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. Reapply sunscreen as needed throughout the day."
               : product.name === 'Needle Pen-K'
               ? "This is a professional medical device. For best results and safety, use as directed by a skincare professional. Ensure proper sterilization and follow all safety guidelines. Not recommended for use on active acne or inflamed skin."
               : product.name === 'EyeCell EYE CONTOUR SERUM'
