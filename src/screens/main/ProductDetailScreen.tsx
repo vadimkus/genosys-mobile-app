@@ -151,6 +151,47 @@ export default function ProductDetailScreen() {
       return 300.00; // Fixed price for single size product
     }
     
+    // SKIN DEFENDER LIP & EYE MAKEUP REMOVER
+    if (name.includes('skin defender lip')) {
+      return 290.00; // Fixed price for 200ml
+    }
+    
+    // SNOW O₂ CLEANSER
+    if (name.includes('snow o₂ cleanser')) {
+      // Price varies by size: 180ml = 330 AED, 500ml = 510 AED
+      if (selectedSize === '180ml') return 330.00;
+      if (selectedSize === '500ml') return 510.00;
+      return 330.00; // Default to 180ml price
+    }
+    
+    // SNOW BOOSTER
+    if (name.includes('snow booster')) {
+      // Price varies by size: 200ml = 290 AED, 1000ml = 490 AED
+      if (selectedSize === '200ml') return 290.00;
+      if (selectedSize === '1000ml') return 490.00;
+      return 290.00; // Default to 200ml price
+    }
+    
+    // SKIN RENEWAL PEELING SYSTEM (SRS)
+    if (name.includes('skin renewal peeling system')) {
+      return 450.00; // Fixed price for 2ml x 10ea
+    }
+    
+    // MICROBIOME ENERGY INFUSING MIST
+    if (name.includes('microbiome energy infusing mist')) {
+      return 280.00; // Fixed price for 80ml
+    }
+    
+    // SOOTHING BOMB SEA ALGAE MASK
+    if (name.includes('soothing bomb sea algae mask')) {
+      return 180.00; // Fixed price for 1 sheet (23g)
+    }
+    
+    // SKIN RESCUE OVERNIGHT CREAM MASK
+    if (name.includes('skin rescue overnight cream mask')) {
+      return 320.00; // Fixed price for 100g
+    }
+    
     // Microneedle Roller
     if (name.includes('microneedle roller')) {
       return 230.00;  // Fixed price for all needle sizes
@@ -488,6 +529,131 @@ export default function ProductDetailScreen() {
         </>
       );
     }
+    
+    // SKIN DEFENDER LIP & EYE MAKEUP REMOVER
+    if (name.includes('skin defender lip')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Biphasic makeup remover</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 200ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Lip and eye area makeup removal</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Dual-layer formula with vitamin complex and firming peptides</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Gentle cleansing, effective makeup removal, skin nourishment, no irritation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily makeup removal, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, including sensitive eye and lip areas</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Shake well, apply to cotton pad, gently wipe lip and eye areas</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested and ophthalmologically tested</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+        // SNOW O₂ CLEANSER
+        if (name.includes('snow o₂ cleanser')) {
+          return (
+            <>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Oxygen bubble cleanser</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 180ml (Homecare) / 500ml (Professional)</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Deep cleansing and skin nourishment</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Oxygen therapy mechanism with natural bubble generation</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Gentle cleansing, oxygen therapy, makeup removal, skin nourishment</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening cleansing</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially sensitive skin</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply to wet skin, massage gently, rinse thoroughly</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Oxygen bubble technology with gentle surfactants</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            </>
+          );
+        }
+        
+        // SNOW BOOSTER
+        if (name.includes('snow booster')) {
+          return (
+            <>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Daily moisturizing and skin refining toner</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 200ml (Homecare) / 1000ml (Professional)</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Hydration and skin refinement</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Botanical extract complex with pH balancing system</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Deep moisturization, skin soothing, texture refinement, pH balancing</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Morning and evening after cleansing</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply with cotton pad or pat gently with hands</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Lightweight, fast-absorbing formula</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            </>
+          );
+        }
+        
+        // SKIN RENEWAL PEELING SYSTEM (SRS)
+        if (name.includes('skin renewal peeling system')) {
+          return (
+            <>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional chemical peeling system</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Skin renewal and exfoliation</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Multi-AHA complex with naturally occurring acids</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Dead cell removal, cell turnover, skin brightening, tone evening</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments only</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull and textured skin</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply evenly to face by licensed practitioner</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            </>
+          );
+        }
+        
+        // MICROBIOME ENERGY INFUSING MIST
+        if (name.includes('microbiome energy infusing mist')) {
+          return (
+            <>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Type:</Text> Microbiome energy infusing mist</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 80ml</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Microbiome balance, hydration, radiance, barrier protection</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily skincare routine, on-the-go hydration</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced probiotic and prebiotic blend with hyaluronic acid complex</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Mist evenly and gently pat into skin</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            </>
+          );
+        }
+        
+        // SOOTHING BOMB SEA ALGAE MASK
+        if (name.includes('soothing bomb sea algae mask')) {
+          return (
+            <>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Eucalace® sheet mask</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 1 sheet (23g)</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Stressed and irritated skin relief</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Eucalace® sheet mask technology with sea algae complex</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Intensive relief, deep hydration, soothing effect, skin healing</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> 2-3 times per week for optimal results</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially stressed and irritated skin</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply to clean skin, leave for 15-20 minutes</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Sea algae complex with centella asiatica extract</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            </>
+          );
+        }
+        
+        // SKIN RESCUE OVERNIGHT CREAM MASK
+        if (name.includes('skin rescue overnight cream mask')) {
+          return (
+            <>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Overnight cream mask</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 100g</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Fatigued and stressed skin recovery</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Dual formula with oxygen capsules and pink ceramide complex</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin revitalization, oxygen therapy, overnight recovery, erythema improvement</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Overnight treatment 2-3 times per week</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially fatigued skin</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply generously, massage until capsules burst, leave overnight</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Results:</Text> Clinically proven to improve erythema and transepidermal water loss</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+            </>
+          );
+        }
     
     // Microneedle Roller
     if (name.includes('microneedle roller')) {
@@ -1584,6 +1750,16 @@ export default function ProductDetailScreen() {
         if (foundProduct.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]') {
           setSelectedColor('Ivory'); // Default to Ivory color
         }
+        
+        // Set default size for SNOW O₂ CLEANSER
+        if (foundProduct.name === 'SNOW O₂ CLEANSER') {
+          setSelectedSize('180ml'); // Default to 180ml size
+        }
+        
+        // Set default size for SNOW BOOSTER
+        if (foundProduct.name === 'SNOW BOOSTER') {
+          setSelectedSize('200ml'); // Default to 200ml size
+        }
       }
     }
     setLoading(false);
@@ -1661,17 +1837,27 @@ export default function ProductDetailScreen() {
       {/* Product Image */}
       <View style={styles.imageContainer}>
         <Image
-          source={{ 
-            uri: product.name === 'POWER SOLUTION PCS' 
-              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
-              : product.name === 'POWER SOLUTION SWS'
-              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
-              : product.name === 'PROBLEM CONTROL SERUM'
-              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
-              : product.name === 'SOOTHING REPAIR POSTCREAM'
-              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
-              : product.imageUrl 
-          }}
+        source={{
+          uri: product.name === 'POWER SOLUTION PCS'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
+            : product.name === 'POWER SOLUTION SWS'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
+            : product.name === 'PROBLEM CONTROL SERUM'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
+            : product.name === 'SOOTHING REPAIR POSTCREAM'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
+            : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75'
+            : product.name === 'SNOW O₂ CLEANSER'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75'
+            : product.name === 'SNOW BOOSTER'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75'
+            : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75'
+            : product.name === 'SOOTHING BOMB SEA ALGAE MASK'
+            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75'
+            : product.imageUrl
+        }}
           style={styles.productImage}
           resizeMode="cover"
         />
@@ -1885,6 +2071,41 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SNOW O₂ CLEANSER' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SNOW BOOSTER' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'MICROBIOME ENERGY INFUSING MIST' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SOOTHING BOMB SEA ALGAE MASK' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1894,19 +2115,23 @@ export default function ProductDetailScreen() {
         console.log('Size selection check - length:', product?.sizeOptions?.length);
         return null;
       })()}
-      {(() => {
-        // Add size options for SOOTHING REPAIR POSTCREAM
-        const postCreamSizeOptions = product.name === 'SOOTHING REPAIR POSTCREAM' ? ['20g', '100g'] : null;
-        const finalSizeOptions = postCreamSizeOptions || product.sizeOptions;
-        return finalSizeOptions && finalSizeOptions.length > 0;
-      })() && (
+        {(() => {
+          // Add size options for SOOTHING REPAIR POSTCREAM, SNOW O₂ CLEANSER, and SNOW BOOSTER
+          const postCreamSizeOptions = product.name === 'SOOTHING REPAIR POSTCREAM' ? ['20g', '100g'] : null;
+          const snowCleanserSizeOptions = product.name === 'SNOW O₂ CLEANSER' ? ['180ml', '500ml'] : null;
+          const snowBoosterSizeOptions = product.name === 'SNOW BOOSTER' ? ['200ml', '1000ml'] : null;
+          const finalSizeOptions = postCreamSizeOptions || snowCleanserSizeOptions || snowBoosterSizeOptions || product.sizeOptions;
+          return finalSizeOptions && finalSizeOptions.length > 0;
+        })() && (
         <View style={styles.sizeSelectionContainer}>
           <Text style={[styles.sizeSelectionTitle, { color: theme.colors.text }]}>Size</Text>
           <View style={styles.sizeOptionsContainer}>
             {(() => {
-              // Add size options for SOOTHING REPAIR POSTCREAM
+              // Add size options for SOOTHING REPAIR POSTCREAM, SNOW O₂ CLEANSER, and SNOW BOOSTER
               const postCreamSizeOptions = product.name === 'SOOTHING REPAIR POSTCREAM' ? ['20g', '100g'] : null;
-              const finalSizeOptions = postCreamSizeOptions || product.sizeOptions;
+              const snowCleanserSizeOptions = product.name === 'SNOW O₂ CLEANSER' ? ['180ml', '500ml'] : null;
+              const snowBoosterSizeOptions = product.name === 'SNOW BOOSTER' ? ['200ml', '1000ml'] : null;
+              const finalSizeOptions = postCreamSizeOptions || snowCleanserSizeOptions || snowBoosterSizeOptions || product.sizeOptions;
               return finalSizeOptions;
             })()?.map((size, index) => (
               <TouchableOpacity
@@ -2027,6 +2252,13 @@ export default function ProductDetailScreen() {
             if (product.name === 'PROBLEM CONTROL SERUM') return '30ml';
             if (product.name === 'SOOTHING REPAIR POSTCREAM') return '20g/100g';
     if (product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]') return '15g';
+    if (product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER') return '200ml';
+    if (product.name === 'SNOW O₂ CLEANSER') return '180ml/500ml';
+    if (product.name === 'SNOW BOOSTER') return '200ml/1000ml';
+    if (product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)') return '2ml x 10ea';
+    if (product.name === 'MICROBIOME ENERGY INFUSING MIST') return '80ml';
+    if (product.name === 'SOOTHING BOMB SEA ALGAE MASK') return '1 sheet (23g)';
+    if (product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK') return '100g';
             return '30ml';
           })()}
         </Text>
@@ -2139,6 +2371,20 @@ export default function ProductDetailScreen() {
         ? "SOOTHING REPAIR POSTCREAM is a specialized regenerating cream designed for healthy skin recovery after professional treatments. This advanced formula helps irritated skin rapidly recover from redness, erythema, and edema while promoting healthy rejuvenation with centella complex and peptide technology."
         : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]'
         ? "SKIN CARING BLEMISH BALM CUSHION is a BB cushion that can be used after professional treatment. More than 60% of the product is composed of moisture essence, which enables a natural and healthy glow. Various peptide complex 40% - helps calm the irritated skin. (SPF 50 / PA++++)"
+        : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
+        ? "SKIN DEFENDER LIP & EYE MAKEUP REMOVER is an advanced biphasic makeup remover specifically designed for the delicate lip and eye areas. This innovative formula combines vitamin complex and firming peptides to provide gentle yet effective cleansing without irritation."
+        : product.name === 'SNOW O₂ CLEANSER'
+        ? "SNOW O₂ CLEANSER is a revolutionary oxygen bubble cleanser that combines gentle cleansing with oxygen therapy for deep skin nourishment. This innovative formula naturally generates oxygen bubbles to effectively remove makeup, dirt, and impurities while providing a luxurious treatment sensation without irritation."
+        : product.name === 'SNOW BOOSTER'
+        ? "SNOW BOOSTER is a premium daily moisturizing and skin refining toner designed for all skin types. This advanced formula combines powerful botanical extracts with innovative fermentation technology to provide deep hydration, pH balancing, and skin refinement for a healthy, glowing complexion."
+        : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)'
+        ? "SKIN RENEWAL PEELING SYSTEM (SRS) is a professional peeling treatment with naturally occurring AHA acids designed for smoother, brighter, and more even skin tone. These naturally occurring acids found in fruits and other foods help remove dead cells on the surface of the skin, encouraging cell turnover and bringing new healthy cells to the surface."
+        : product.name === 'MICROBIOME ENERGY INFUSING MIST'
+        ? "MICROBIOME ENERGY INFUSING MIST is an advanced revitalizing mist designed to restore and balance the skin's natural microbiome while providing instant hydration and radiance. This innovative formula combines cutting-edge probiotic technology with powerful hydrating ingredients to enhance skin's natural strength and glow."
+        : product.name === 'SOOTHING BOMB SEA ALGAE MASK'
+        ? "SOOTHING BOMB SEA ALGAE MASK is an Eucalace® sheet mask inspired by the healing power of the ocean. This innovative mask provides intensive relief to the skin and moisturizes with sea algae complex and centella asiatica extract for comprehensive skin healing and hydration."
+        : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK'
+        ? "SKIN RESCUE OVERNIGHT CREAM MASK is a revitalizing overnight treatment that provides intensive care to fatigued skin. This innovative dual formula combines oxygen capsules with pink ceramide complex for comprehensive skin renewal and recovery."
       : product.name === 'Microneedle Roller'
       ? "The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Stimulates natural collagen production and improves skin texture. Manufactured in South Korea."
                 : isCollagenMask 
@@ -2440,6 +2686,86 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Sun Protection:</Text> SPF 50 / PA++++ provides comprehensive protection from harmful UV rays.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Color Options:</Text> Available in Beige, Ivory, and Camel to suit different skin tones.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Convenient Application:</Text> Quick and easy base makeup application with included puff.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Biphasic Technology:</Text> Dual-layer formula with essence layer containing vitamins and firming peptides, plus oil layer for powerful cleansing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Gentle Formula:</Text> Specifically designed for delicate lip and eye areas with non-greasy, non-irritating properties.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Vitamin Complex:</Text> 10 Vitamin Complex provides nourishment while cleansing, promoting healthy skin around the eyes and lips.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Firming Peptides:</Text> Palmitoyl Tripeptide-5 and Acetyl Tetrapeptide-5 help maintain skin firmness and elasticity.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Testing:</Text> Dermatologically tested and ophthalmologically tested for safety and efficacy.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SNOW O₂ CLEANSER' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Oxygen Therapy Mechanism:</Text> Advanced oxygen therapy technology that provides deep cleansing and skin nourishment through natural oxygen bubbles.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Gentle Cleansing:</Text> Effective removal of makeup and impurities without excessive cleansing movement or skin irritation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Oxygen Bubbles:</Text> Naturally generated oxygen bubbles provide a luxurious treatment sensation while cleansing the skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>All-in-One Formula:</Text> Comprehensive cleanser that removes makeup, dirt, and impurities while nourishing the skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> Available in 180ml (Homecare) and 500ml (Professional) sizes.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SNOW BOOSTER' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Daily Moisturizing:</Text> Provides essential hydration and moisture replenishment for all skin types, maintaining optimal skin barrier function.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Refining:</Text> Helps refine skin texture and improve overall skin quality through gentle exfoliation and pH balancing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>pH Balancing:</Text> Restores optimal skin pH levels after cleansing, promoting healthy skin function and barrier protection.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Botanical Extracts:</Text> Enriched with natural botanical extracts that provide soothing, anti-inflammatory, and antioxidant benefits.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size Options:</Text> Available in 200ml (Homecare) and 1000ml (Professional) sizes.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Naturally Occurring AHA Complex:</Text> Multi-acid formula with glycolic, lactic, mandelic, and phytic acids derived from natural sources for gentle yet effective exfoliation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Cell Turnover Enhancement:</Text> Encourages natural skin renewal by removing dead surface cells and promoting new healthy cell growth.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade Formula:</Text> Specifically formulated for professional use to deliver controlled and effective peeling results.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Peptide Support:</Text> Enhanced with sh-Polypeptide-7 for skin regeneration and healing support during the renewal process.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'MICROBIOME ENERGY INFUSING MIST' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Microbiome Technology:</Text> Advanced probiotic and prebiotic blend that corrects and maintains the natural balance of skin microbiome.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Instant Hydration:</Text> Powerful hyaluronic acid complex that provides immediate and long-lasting moisture to the skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Radiance:</Text> Unique formula that revitalizes skin and enhances natural glow and radiance for a healthy complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Barrier Protection:</Text> Strengthens skin's natural moisture barrier and enhances skin's natural defense mechanisms.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SOOTHING BOMB SEA ALGAE MASK' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Eucalace® Technology:</Text> Advanced sheet mask technology that provides optimal skin contact and ingredient delivery.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Sea Algae Complex:</Text> Powerful sea algae extracts provide intensive relief and healing benefits for stressed skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Ocean Healing Power:</Text> Inspired by the healing power of the ocean for natural skin recovery and rejuvenation.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Centella Asiatica:</Text> Traditional healing herb that provides soothing and anti-inflammatory benefits.</Text>
+            </View>
+        </View>
+        )}
+        {product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Dual Formula Technology:</Text> Oxygen capsules burst smoothly when touching skin and melt with pink ceramide cream for maximum efficacy.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Oxygen Therapy:</Text> Italian oxygenated water capsules provide instant oxygen therapy for skin revitalization.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Pink Ceramide Complex:</Text> Unique pink ceramide complex provides intensive skin protection and recovery benefits.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Growth Factor Complex:</Text> Advanced growth factor complex (EGF, aFGF, bFGF, PIGF, IGF) promotes skin renewal and healing.</Text>
             </View>
         </View>
         )}
@@ -3016,6 +3342,69 @@ export default function ProductDetailScreen() {
             <Text style={styles.benefitItem}>• Natural Coverage - Provides natural healthy glow with skin cover up</Text>
             <Text style={styles.benefitItem}>• Skin Calming - Peptide complex helps calm irritated skin</Text>
           </>
+        ) : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER' ? (
+          <>
+            <Text style={styles.benefitItem}>• Effective Makeup Removal - Removes even waterproof makeup from delicate areas</Text>
+            <Text style={styles.benefitItem}>• Gentle Cleansing - Non-irritating formula suitable for sensitive skin</Text>
+            <Text style={styles.benefitItem}>• Nourishing Properties - Vitamin complex provides skin nourishment</Text>
+            <Text style={styles.benefitItem}>• Firming Action - Peptides help maintain skin firmness and elasticity</Text>
+            <Text style={styles.benefitItem}>• Easy Application - Shake well before use for optimal results</Text>
+            <Text style={styles.benefitItem}>• Professional Quality - Dermatologically tested for safety and efficacy</Text>
+          </>
+        ) : product.name === 'SNOW O₂ CLEANSER' ? (
+          <>
+            <Text style={styles.benefitItem}>• Deep Cleansing - Effectively removes makeup, dirt, and skin impurities without irritation</Text>
+            <Text style={styles.benefitItem}>• Oxygen Therapy - Provides skin with oxygen for improved circulation and nourishment</Text>
+            <Text style={styles.benefitItem}>• Gentle Formula - Suitable for all skin types, including sensitive skin</Text>
+            <Text style={styles.benefitItem}>• Luxurious Experience - Creates a spa-like treatment sensation with oxygen bubbles</Text>
+            <Text style={styles.benefitItem}>• No Irritation - Gentle cleansing without excessive movement or skin damage</Text>
+            <Text style={styles.benefitItem}>• Skin Nourishment - Provides essential nutrients while cleansing for healthy skin</Text>
+          </>
+        ) : product.name === 'SNOW BOOSTER' ? (
+          <>
+            <Text style={styles.benefitItem}>• Deep Hydration - Provides immediate and long-lasting moisture to all skin types</Text>
+            <Text style={styles.benefitItem}>• Skin Refinement - Gently exfoliates and refines skin texture for smoother appearance</Text>
+            <Text style={styles.benefitItem}>• pH Restoration - Balances skin pH levels after cleansing for optimal skin health</Text>
+            <Text style={styles.benefitItem}>• Soothing Properties - Calms and soothes irritated or sensitive skin</Text>
+            <Text style={styles.benefitItem}>• Antioxidant Protection - Protects against environmental damage and free radicals</Text>
+            <Text style={styles.benefitItem}>• Versatile Usage - Suitable for daily use in both homecare and professional settings</Text>
+          </>
+        ) : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)' ? (
+          <>
+            <Text style={styles.benefitItem}>• Skin Renewal - Removes dead skin cells and promotes natural cell turnover</Text>
+            <Text style={styles.benefitItem}>• Brightening - Reveals fresh, radiant skin for a brighter complexion</Text>
+            <Text style={styles.benefitItem}>• Even Tone - Helps achieve smoother, more even skin tone and texture</Text>
+            <Text style={styles.benefitItem}>• Professional Results - Clinical-grade peeling for advanced skincare treatments</Text>
+            <Text style={styles.benefitItem}>• Natural Acids - Uses naturally occurring AHA acids from fruits and foods</Text>
+            <Text style={styles.benefitItem}>• Safe & Tested - Dermatologically tested for professional use</Text>
+          </>
+        ) : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? (
+          <>
+            <Text style={styles.benefitItem}>• Microbiome Balance - Restores and maintains healthy skin microbiome</Text>
+            <Text style={styles.benefitItem}>• Instant Hydration - Provides immediate moisture and long-lasting hydration</Text>
+            <Text style={styles.benefitItem}>• Natural Radiance - Enhances skin's natural glow and radiance</Text>
+            <Text style={styles.benefitItem}>• Barrier Strengthening - Improves skin's natural moisture barrier function</Text>
+            <Text style={styles.benefitItem}>• Skin Revitalization - Energizes and revitalizes tired, stressed skin</Text>
+            <Text style={styles.benefitItem}>• Gentle Care - Suitable for all skin types, including sensitive skin</Text>
+          </>
+        ) : product.name === 'SOOTHING BOMB SEA ALGAE MASK' ? (
+          <>
+            <Text style={styles.benefitItem}>• Intensive Relief - Provides immediate relief to stressed and irritated skin</Text>
+            <Text style={styles.benefitItem}>• Deep Hydration - Sea algae complex delivers intense moisture for skin hydration</Text>
+            <Text style={styles.benefitItem}>• Soothing Effect - Centella asiatica provides calming and anti-inflammatory benefits</Text>
+            <Text style={styles.benefitItem}>• Skin Healing - Promotes natural skin healing and recovery processes</Text>
+            <Text style={styles.benefitItem}>• Ocean Therapy - Harnesses the healing power of marine ingredients</Text>
+            <Text style={styles.benefitItem}>• Convenient Use - Easy-to-use sheet mask format for quick application</Text>
+          </>
+        ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
+          <>
+            <Text style={styles.benefitItem}>• Skin Revitalization - Provides intensive care to fatigued and stressed skin</Text>
+            <Text style={styles.benefitItem}>• Oxygen Therapy - Delivers instant oxygen therapy for skin renewal and energy</Text>
+            <Text style={styles.benefitItem}>• Overnight Recovery - Works while you sleep to repair and rejuvenate skin</Text>
+            <Text style={styles.benefitItem}>• Erythema Improvement - Helps reduce redness and skin irritation</Text>
+            <Text style={styles.benefitItem}>• Moisture Retention - Improves transepidermal water loss for better hydration</Text>
+            <Text style={styles.benefitItem}>• Growth Factor Benefits - Stimulates natural skin renewal and healing processes</Text>
+          </>
         ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Product Absorption - Increases absorption rate of active skincare ingredients by up to 300%</Text>
@@ -3239,6 +3628,65 @@ export default function ProductDetailScreen() {
             <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Volufiline™:</Text> Sarsasapogenin from anemarrhena asphodeloides root that provides volume-enhancing benefits with anti-inflammatory and antioxidant features.</Text>
             <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Glutathione:</Text> Powerful antioxidant that helps brighten and even skin by blocking tyrosinase activity, beneficial for cystic acne and breakouts.</Text>
             <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Moisture Essence:</Text> High concentration of hydrating ingredients for natural and healthy glow.</Text>
+          </>
+        ) : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>10 Vitamin Complex:</Text> Comprehensive vitamin blend that provides nourishment and antioxidant protection while cleansing.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Firming Peptides:</Text> Palmitoyl Tripeptide-5 and Acetyl Tetrapeptide-5 help maintain skin firmness and reduce signs of aging.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Extracts:</Text> Rosa Damascena Flower Water, Carrot Root Extract, and Broccoli Extract provide natural nourishment.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Nourishing Oils:</Text> Carrot Seed Oil and Sea Buckthorn Oil provide essential fatty acids and vitamins for skin health.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Biphasic Formula:</Text> Dual-layer technology with essence and oil layers for effective yet gentle makeup removal.</Text>
+          </>
+        ) : product.name === 'SNOW O₂ CLEANSER' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that provides gentle cleansing and skin nourishment.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>MultiEx Phytrogen:</Text> Multi-functional plant extract that enhances oxygen delivery and skin health.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Methyl Perfluoroisobutyl Ether:</Text> Specialized ingredient that creates the oxygen bubble effect for enhanced cleansing and treatment sensation.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Oxygen Therapy Technology:</Text> Advanced mechanism that naturally generates oxygen bubbles for deep cleansing and skin nourishment.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Gentle Surfactants:</Text> Mild cleansing agents that effectively remove impurities without skin irritation.</Text>
+          </>
+        ) : product.name === 'SNOW BOOSTER' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytolex SC:</Text> Advanced botanical complex that provides deep hydration and skin-soothing properties while supporting natural skin barrier function.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Nelumbo Nucifera Flower Extract:</Text> Sacred lotus extract known for its antioxidant properties, skin brightening effects, and ability to promote skin radiance.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus/Pumpkin Ferment Extract:</Text> Innovative fermentation technology that enhances ingredient absorption and provides probiotic benefits for skin microbiome health.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Betaine:</Text> Natural moisturizing agent that helps maintain skin hydration and provides gentle cleansing properties without stripping natural oils.</Text>
+          </>
+        ) : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Glycolic Acid:</Text> The smallest AHA molecule that penetrates deeply to exfoliate and stimulate collagen production for smoother, younger-looking skin.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactic Acid:</Text> Gentle AHA that exfoliates while providing hydration, improving skin texture and tone without excessive irritation.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Mandelic Acid:</Text> Larger molecule AHA that works more gently on the skin surface, ideal for sensitive skin and reducing post-inflammatory hyperpigmentation.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytic Acid:</Text> Natural chelating agent with antioxidant properties that helps brighten skin and enhance the effectiveness of other AHA acids.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Advanced peptide that supports skin regeneration and healing during the peeling process for optimal recovery.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis Root Extract:</Text> Powerful antioxidant botanical extract that soothes skin and provides anti-inflammatory benefits during treatment.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Houttuynia Cordata Extract:</Text> Natural extract with anti-inflammatory and antibacterial properties that helps soothe and protect skin during peeling.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Chamaecyparis Obtusa Water:</Text> Purified cypress water that provides gentle hydration and soothing properties to calm skin during the renewal process.</Text>
+          </>
+        ) : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>CUREBIOME (Probiotics & Prebiotics):</Text> Advanced microbiome technology that corrects skin microbiome balance and promotes healthy skin flora.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>FENSEBIOME™ (Acetyl Heptapeptide-4):</Text> Innovative peptide that enhances skin's natural defense mechanisms and microbiome health.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronan 10 Multi-Complex:</Text> Multi-molecular hyaluronic acid complex that provides deep hydration and plumping effects.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Butyrospermum Parkii (Shea) Butter:</Text> Natural emollient that provides additional moisture and helps maintain skin's natural barrier.</Text>
+          </>
+        ) : product.name === 'SOOTHING BOMB SEA ALGAE MASK' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Jania Rubens Extract:</Text> Red algae extract that provides antioxidant protection and skin nourishment.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Undaria Pinnatifida Extract:</Text> Wakame seaweed extract that provides hydration and skin conditioning benefits.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Bambusa Vulgaris Extract:</Text> Bamboo extract that provides natural silica and skin strengthening benefits.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Extract:</Text> Traditional healing herb that provides soothing and anti-inflammatory benefits.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Witch Hazel Extract:</Text> Natural astringent that helps tone and soothe irritated skin.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol & Allantoin:</Text> Soothing ingredients that help calm irritated skin and promote healing.</Text>
+          </>
+        ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
+          <>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pink Ceramide Complex:</Text> Unique ceramide complex that provides intensive skin protection and recovery benefits.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Oxygen Capsules:</Text> Italian oxygenated water capsules that burst on contact for instant oxygen therapy.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Growth Factor Complex:</Text> EGF, aFGF, bFGF, PIGF, IGF work together to promote skin renewal and healing.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pumpkin Extract:</Text> Cucurbita Pepo fruit extract provides antioxidant protection and skin nourishment.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that helps strengthen skin barrier and improve moisture retention.</Text>
+            <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Swelling Controller:</Text> Special ingredient that helps control swelling and inflammation for comfortable application.</Text>
           </>
         ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
@@ -3655,6 +4103,69 @@ export default function ProductDetailScreen() {
             <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Coverage:</Text> Apply to entire face for even coverage and natural finish</Text>
             <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use daily as base makeup, especially after professional treatments</Text>
           </>
+        ) : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Shake Well:</Text> Shake the bottle well before use to mix the biphasic layers</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a small amount to cotton pad or fingertips</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Gentle Removal:</Text> Gently wipe away makeup from lips and eye area</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Rinse:</Text> Rinse with lukewarm water if desired</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Follow-up:</Text> Continue with your regular skincare routine</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Storage:</Text> Store in a cool, dry place away from direct sunlight</Text>
+          </>
+        ) : product.name === 'SNOW O₂ CLEANSER' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Application:</Text> Apply product to dry face, avoiding the eye area</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Wait:</Text> Allow oxygen bubbles to form naturally on the skin surface</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Activation:</Text> Wet your fingers and gently spread the product across the face</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Bubble Formation:</Text> Let the oxygen bubbles develop fully for maximum effect</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Massage:</Text> Gently massage with wet hands in circular motions</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Rinse:</Text> Rinse thoroughly with lukewarm water to remove all product and bubbles</Text>
+          </>
+        ) : product.name === 'SNOW BOOSTER' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Method 1 - Skin Cleansing & Exfoliation:</Text> Soak a cotton pad with toner and gently wipe along the skin texture to remove dead skin cells and residues after cleansing</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Method 2 - Immediate Moisture Replenishment:</Text> Spray the product (200ml homecare version) generously with eyes closed and tap gently. Can be used even over makeup for instant hydration</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Method 3 - Intensive Moisturizing Treatment:</Text> Soak cotton pads with toner and apply to face as a hydrating mask. Leave on for 5-10 minutes for intensive moisturizing and soothing effects</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Application:</Text> Apply with cotton pad or pat gently with hands</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening after cleansing</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Storage:</Text> Store in a cool, dry place away from direct sunlight</Text>
+          </>
+        ) : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure it's completely dry</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply peeling solution evenly to face, avoiding eye and lip areas</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Duration:</Text> Leave on for recommended time as directed by professional (varies by skin type)</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Neutralization:</Text> Neutralize and rinse thoroughly with cool water</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Post-Care:</Text> Apply soothing and protective products as recommended</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Professional treatment schedule as determined by skincare specialist</Text>
+          </>
+        ) : product.name === 'MICROBIOME ENERGY INFUSING MIST' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse your skin thoroughly before application</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Hold the bottle 15-20cm away from your face and mist evenly</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Absorption:</Text> Gently pat the mist into your skin with your fingertips</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening, or as needed throughout the day</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Layering:</Text> Can be used before or after other skincare products</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Storage:</Text> Store in a cool, dry place and shake well before use for best results</Text>
+          </>
+        ) : product.name === 'SOOTHING BOMB SEA ALGAE MASK' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Remove mask from package and unfold carefully</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Placement:</Text> Apply mask to face, adjusting for proper fit</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Duration:</Text> Leave on for 15-20 minutes for optimal results</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Removal:</Text> Gently remove mask and massage remaining essence into skin</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for best results</Text>
+          </>
+        ) : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK' ? (
+          <>
+            <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+            <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a generous amount to face and neck</Text>
+            <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage until oxygen capsules burst and blend with cream</Text>
+            <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Overnight:</Text> Leave on overnight for maximum benefits</Text>
+            <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use 2-3 times per week for optimal results</Text>
+            <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Wake up to revitalized, refreshed skin</Text>
+          </>
         ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure device is properly sterilized</Text>
@@ -3940,6 +4451,20 @@ export default function ProductDetailScreen() {
         ? "This product is dermatologically tested and specifically formulated for post-treatment skin recovery. Use as directed by your skincare professional. Store in a cool, dry place away from direct sunlight."
         : product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]'
         ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight. Reapply sunscreen as needed throughout the day."
+        : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
+        ? "This product is dermatologically tested and specifically formulated for delicate lip and eye areas. For best results, shake well before use and store in a cool, dry place away from direct sunlight."
+        : product.name === 'SNOW O₂ CLEANSER'
+        ? "This product is dermatologically tested and suitable for all skin types. For best results, use as part of your daily cleansing routine. Store in a cool, dry place away from direct sunlight."
+        : product.name === 'SNOW BOOSTER'
+        ? "This product is dermatologically tested and safe for all skin types. For best results, use as part of your daily skincare routine. The 200ml size is perfect for homecare, while the 1000ml size is ideal for professional use in clinics and spas."
+        : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)'
+        ? "This is a professional-grade chemical peeling system and should only be administered by licensed skincare professionals. Post-treatment sun protection is essential. May cause temporary redness and sensitivity. Not recommended for pregnant or nursing women. Always perform a patch test before use."
+        : product.name === 'MICROBIOME ENERGY INFUSING MIST'
+        ? "This product is dermatologically tested and safe for all skin types. Perfect for daily use and can be reapplied throughout the day for instant hydration. Store in a cool, dry place and shake well before use for best results."
+        : product.name === 'SOOTHING BOMB SEA ALGAE MASK'
+        ? "This product is dermatologically tested and clinically proven to improve skin hydration. For best results, use consistently as part of your weekly skincare routine. Store in a cool, dry place away from direct sunlight."
+        : product.name === 'SKIN RESCUE OVERNIGHT CREAM MASK'
+        ? "This product is dermatologically tested and clinically proven to improve erythema and transepidermal water loss. For best results, use consistently as part of your weekly skincare routine. Store in a cool, dry place away from direct sunlight."
               : product.name === 'Needle Pen-K'
               ? "This is a professional medical device. For best results and safety, use as directed by a skincare professional. Ensure proper sterilization and follow all safety guidelines. Not recommended for use on active acne or inflamed skin."
               : product.name === 'EyeCell EYE CONTOUR SERUM'

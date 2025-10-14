@@ -1466,7 +1466,7 @@ export class ProductService {
         if (name.includes('ez co₂ mask kit')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FEZE.jpg&w=1200&q=75';
         if (name.includes('skin rescue overnight cream mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSKIN.jpg&w=1200&q=75';
         if (name.includes('peptide gel mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
-        if (name.includes('soothing bomb sea algae mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
+        if (name.includes('soothing bomb sea algae mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75';
         if (name.includes('hydro cool modeling mask')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FHYDR.jpg&w=1200&q=75';
         
         // Eye care
@@ -1523,8 +1523,20 @@ export class ProductService {
         // PROBLEM CONTROL SERUM
         if (name.includes('problem control serum') || name.includes('PROBLEM CONTROL SERUM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75';
         
-        // SOOTHING REPAIR POSTCREAM
-        if (name.includes('soothing repair postcream') || name.includes('SOOTHING REPAIR POSTCREAM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75';
+  // SOOTHING REPAIR POSTCREAM
+  if (name.includes('soothing repair postcream') || name.includes('SOOTHING REPAIR POSTCREAM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75';
+  
+  // SKIN DEFENDER LIP & EYE MAKEUP REMOVER
+  if (name.includes('skin defender lip') || name.includes('SKIN DEFENDER LIP')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75';
+  
+  // SNOW O₂ CLEANSER
+  if (name.includes('snow o₂ cleanser') || name.includes('SNOW O₂ CLEANSER')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75';
+  
+  // SNOW BOOSTER
+  if (name.includes('snow booster') || name.includes('SNOW BOOSTER')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75';
+  
+  // SKIN RENEWAL PEELING SYSTEM (SRS)
+  if (name.includes('skin renewal peeling system') || name.includes('SKIN RENEWAL PEELING SYSTEM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75';
         
         // Use the working image as fallback for all products
         return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
@@ -1551,9 +1563,19 @@ export class ProductService {
         finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75';
       } else if (product.name === 'PROBLEM CONTROL SERUM') {
         finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75';
-      } else if (product.name === 'SOOTHING REPAIR POSTCREAM') {
-        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75';
-      } else {
+        } else if (product.name === 'SOOTHING REPAIR POSTCREAM') {
+          finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75';
+        } else if (product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER') {
+          finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75';
+        } else if (product.name === 'SNOW O₂ CLEANSER') {
+          finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75';
+        } else if (product.name === 'SNOW BOOSTER') {
+          finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75';
+        } else if (product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)') {
+          finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75';
+        } else if (product.name === 'SOOTHING BOMB SEA ALGAE MASK') {
+          finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75';
+        } else {
         finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
       }
       console.log(`🖼️ Product: ${product.name} -> Image: ${finalImageUrl}`);
