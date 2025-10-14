@@ -107,6 +107,21 @@ export default function ProductDetailScreen() {
       return 580.00; // Fixed price for single size product
     }
     
+    // POWER SOLUTION CTS
+    if (name.includes('power solution cts')) {
+      return 580.00; // Fixed price for single size product
+    }
+    
+    // POWER SOLUTION CVS
+    if (name.includes('power solution cvs')) {
+      return 580.00; // Fixed price for single size product
+    }
+    
+    // POWER SOLUTION HES
+    if (name.includes('power solution hes')) {
+      return 580.00; // Fixed price for single size product
+    }
+    
     // Microneedle Roller
     if (name.includes('microneedle roller')) {
       return 230.00;  // Fixed price for all needle sizes
@@ -293,6 +308,60 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, microneedling post-care</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and mature skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced results</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // POWER SOLUTION CTS
+    if (name.includes('power solution cts')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional skin remodeling ampoule</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Microneedling treatments and skin remodeling</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced skin remodeling formula with professional-grade ingredients</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Skin elasticity retention, increased skin strength, healing promotion, regeneration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, microneedling post-care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially aging and sagging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced remodeling</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // POWER SOLUTION CVS
+    if (name.includes('power solution cvs')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional skin revitalizing ampoule</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Microneedling treatments and skin revitalization</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced revitalizing formula with essential nutrients</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Essential nutrient supply, soothing hydration, healing promotion, skin regeneration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, post-microneedling care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dull and tired skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced revitalization</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // POWER SOLUTION HES
+    if (name.includes('power solution hes')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional hydrating and firming ampoule</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Microneedling treatments and professional skincare</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced hydrating and firming formula with peptides</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Long-lasting moisturizing, plumping effects, irritation relief, healing promotion</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, post-microneedling care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dry and aging skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced hydration and firming</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
@@ -1635,6 +1704,21 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'POWER SOLUTION CTS' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'POWER SOLUTION CVS' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'POWER SOLUTION HES' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1733,6 +1817,9 @@ export default function ProductDetailScreen() {
             if (product.name === 'Needle Pen-K') return '1 Device';
             if (product.name === 'PEPTIDE GEL MASK') return '38g x 5ea';
             if (product.name === 'POWER SOLUTION AWS') return '2ml x 10ea';
+            if (product.name === 'POWER SOLUTION CTS') return '2ml x 10ea';
+            if (product.name === 'POWER SOLUTION CVS') return '2ml x 10ea';
+            if (product.name === 'POWER SOLUTION HES') return '2ml x 10ea';
             return '30ml';
           })()}
         </Text>
@@ -1829,6 +1916,12 @@ export default function ProductDetailScreen() {
       ? "PEPTIDE GEL MASK is a revolutionary thermo-sensitive hydrogel mask that provides instant cooling relief and deep hydration for post-treatment skin care. This patented technology transforms from gel to fluid upon contact with skin temperature, ensuring optimal ingredient delivery and maximum comfort."
       : product.name === 'POWER SOLUTION AWS'
       ? "POWER SOLUTION AWS is a professional anti-aging ampoule specifically formulated for microneedling treatments. This advanced formula helps reduce the appearance of wrinkles and improve skin firmness while promoting optimal healing and skin regeneration post-treatment."
+      : product.name === 'POWER SOLUTION CTS'
+      ? "POWER SOLUTION CTS is a professional skin remodeling ampoule specifically formulated for microneedling treatments. This advanced formula helps the skin retain its natural elasticity and increases skin strength while promoting optimal healing and regeneration post-treatment."
+      : product.name === 'POWER SOLUTION CVS'
+      ? "POWER SOLUTION CVS is a professional skin revitalizing ampoule designed specifically for microneedling treatments. This advanced formula supplies essential nutrients to the skin while providing soothing and hydrating benefits to promote optimal healing and skin regeneration post-treatment."
+      : product.name === 'POWER SOLUTION HES'
+      ? "POWER SOLUTION HES is a professional hydrating and firming ampoule specifically formulated for microneedling treatments. This advanced formula combines powerful hydrating agents with firming peptides to provide long-lasting moisturizing and plumping effects while relieving skin irritation and promoting optimal healing post-treatment."
       : product.name === 'Microneedle Roller'
       ? "The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Stimulates natural collagen production and improves skin texture. Manufactured in South Korea."
                 : isCollagenMask 
@@ -2023,6 +2116,48 @@ export default function ProductDetailScreen() {
         </View>
         )}
 
+        {/* Key Features Section for POWER SOLUTION CTS */}
+        {product.name === 'POWER SOLUTION CTS' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Remodeling:</Text> Advanced formula that helps remodel and restructure skin for improved texture and firmness.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Elasticity Enhancement:</Text> Promotes skin elasticity and natural flexibility for youthful, resilient skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Strength Building:</Text> Increases skin strength and resilience for better overall skin health.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Collagen Support:</Text> Contains collagen and peptides to support skin structure and firmness.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Advanced skin remodeling formula with professional-grade ingredients for clinical treatments.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for POWER SOLUTION CVS */}
+        {product.name === 'POWER SOLUTION CVS' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Revitalization:</Text> Advanced formula that revitalizes and rejuvenates skin for a healthy, radiant complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Nutrient Supply:</Text> Delivers essential nutrients directly to the skin for optimal health and vitality.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Soothing & Hydrating:</Text> Calms irritated skin while providing deep hydration for comfort and healing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Botanical Stem Cell Technology:</Text> Contains botanical stem cell extracts for enhanced skin regeneration and protection.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Advanced revitalizing formula with professional-grade ingredients for clinical treatments.</Text>
+          </View>
+        </View>
+        )}
+
+        {/* Key Features Section for POWER SOLUTION HES */}
+        {product.name === 'POWER SOLUTION HES' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Microneedling Formula:</Text> Specifically designed for use with microneedling treatments to maximize ingredient penetration and effectiveness.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Hydrating & Firming:</Text> Advanced formula that provides deep hydration while promoting skin firmness and elasticity.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Growth Factor Technology:</Text> Contains sh-polypeptide-7, a human growth hormone-like peptide for enhanced skin regeneration.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin-Friendly Formulation:</Text> Free from harmful additives, parabens, ethanol, artificial fragrances, and sulfates for safe use.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Advanced hydrating and firming formula with professional-grade ingredients.</Text>
+            </View>
+        </View>
+        )}
+
         {/* Key Features Section for Needle Pen-K */}
         {product.name === 'Needle Pen-K' && (
         <View style={styles.section}>
@@ -2162,7 +2297,6 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
           <View style={styles.benefitsList}>
-            {console.log('🔍 Benefits section - Product name:', product.name)}
             {product.name === 'ALL FOR SENSITIVE SERUM' ? (
               <>
                 <Text style={styles.benefitItem}>• Skin Barrier Repair - Strengthens and rebuilds the skin's natural protective barrier</Text>
@@ -2524,6 +2658,33 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Regeneration - Stimulates cellular renewal and healing processes</Text>
                 <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade anti-aging for advanced treatments</Text>
               </>
+            ) : product.name === 'POWER SOLUTION CTS' ? (
+              <>
+                <Text style={styles.benefitItem}>• Skin Remodeling - Helps restructure and improve skin texture and appearance</Text>
+                <Text style={styles.benefitItem}>• Elasticity Enhancement - Promotes natural skin flexibility and resilience</Text>
+                <Text style={styles.benefitItem}>• Strength Building - Increases skin strength and overall health</Text>
+                <Text style={styles.benefitItem}>• Collagen Support - Provides essential building blocks for skin structure</Text>
+                <Text style={styles.benefitItem}>• Enhanced Healing - Accelerates skin recovery and regeneration processes</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade remodeling for advanced treatments</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION CVS' ? (
+              <>
+                <Text style={styles.benefitItem}>• Skin Revitalization - Restores skin vitality and promotes healthy cell turnover</Text>
+                <Text style={styles.benefitItem}>• Nutrient Delivery - Supplies essential nutrients for optimal skin health</Text>
+                <Text style={styles.benefitItem}>• Soothing Relief - Calms and soothes irritated skin from treatments</Text>
+                <Text style={styles.benefitItem}>• Deep Hydration - Provides long-lasting moisture for plump, healthy skin</Text>
+                <Text style={styles.benefitItem}>• Enhanced Healing - Accelerates skin recovery and regeneration processes</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade revitalization for advanced treatments</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION HES' ? (
+              <>
+                <Text style={styles.benefitItem}>• Deep Hydration - Provides long-lasting moisturizing effects for plump, hydrated skin</Text>
+                <Text style={styles.benefitItem}>• Skin Firming - Promotes skin elasticity and firmness for youthful appearance</Text>
+                <Text style={styles.benefitItem}>• Irritation Relief - Soothes and calms skin irritation from microneedling treatments</Text>
+                <Text style={styles.benefitItem}>• Enhanced Penetration - Optimized for microneedling to maximize ingredient absorption</Text>
+                <Text style={styles.benefitItem}>• Skin Regeneration - Stimulates cellular renewal and healing processes</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade results for advanced skincare treatments</Text>
+              </>
             ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Product Absorption - Increases absorption rate of active skincare ingredients by up to 300%</Text>
@@ -2675,6 +2836,33 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Adenosine:</Text> Natural anti-aging ingredient that helps improve skin texture and reduce fine lines.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Soothing and healing ingredient that promotes skin regeneration and comfort.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Healing peptide that promotes skin repair and reduces inflammation for faster recovery.</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION CTS' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Human growth hormone-like peptide that stimulates skin regeneration and remodeling.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Collagen:</Text> Essential protein that provides structural support and improves skin firmness.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that provides deep hydration and plumping effects.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Healing peptide that promotes skin repair and reduces inflammation.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Callus Culture Extracts:</Text> Rosa Damascena and Vitis Vinifera extracts provide antioxidant protection and nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Palmitoyl Hexapeptide-12:</Text> Advanced peptide that helps improve skin elasticity and firmness.</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION CVS' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Human growth hormone-like peptide that stimulates skin regeneration and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Callus Culture Extracts:</Text> Rosa Damascena and Vitis Vinifera extracts provide antioxidant protection and skin nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Soothing and hydrating ingredient that helps maintain skin barrier function.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Gentle healing ingredient that soothes irritated skin and promotes cell renewal.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that attracts and retains moisture for deep hydration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Lactobacillus Ferment Lysate:</Text> Probiotic ingredient that supports skin's natural barrier and overall health.</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION HES' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Human growth hormone-like peptide that stimulates skin regeneration and healing processes.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Hyaluronic Acid:</Text> Powerful humectant that attracts and retains moisture for deep hydration and plumping effects.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>BIOPHYTEX™:</Text> Advanced botanical complex that provides antioxidant protection and skin nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Healing peptide that promotes skin repair and reduces inflammation for faster recovery.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Soothing and hydrating ingredient that helps maintain skin barrier function and comfort.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that supports skin barrier function and provides anti-inflammatory benefits.</Text>
               </>
             ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
@@ -3024,6 +3212,30 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
               </>
+            ) : product.name === 'POWER SOLUTION CTS' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and prepare for microneedling treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 1-2 ampoules during microneedling for optimal penetration</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Post-Treatment:</Text> Continue application for enhanced skin remodeling</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION CVS' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and prepare for microneedling treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 1-2 ampoules during microneedling for optimal nutrient delivery</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Post-Treatment:</Text> Continue application for enhanced skin revitalization</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION HES' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and prepare for microneedling treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 1-2 ampoules during microneedling treatment for optimal penetration</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Post-Treatment:</Text> Continue application for 3-5 days post-treatment for enhanced results</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
+              </>
             ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure device is properly sterilized</Text>
@@ -3292,6 +3504,12 @@ export default function ProductDetailScreen() {
               : product.name === 'PEPTIDE GEL MASK'
               ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
               : product.name === 'POWER SOLUTION AWS'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'POWER SOLUTION CTS'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'POWER SOLUTION CVS'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'POWER SOLUTION HES'
               ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
               : product.name === 'Needle Pen-K'
               ? "This is a professional medical device. For best results and safety, use as directed by a skincare professional. Ensure proper sterilization and follow all safety guidelines. Not recommended for use on active acne or inflamed skin."
