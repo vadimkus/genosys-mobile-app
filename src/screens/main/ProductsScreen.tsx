@@ -147,7 +147,17 @@ export default function ProductsScreen() {
     >
       <View style={styles.productImageContainer}>
         <Image
-          source={{ uri: item.imageUrl }}
+          source={{ 
+            uri: item.name === 'POWER SOLUTION PCS' 
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
+              : item.name === 'POWER SOLUTION SWS'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
+              : item.name === 'PROBLEM CONTROL SERUM'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
+              : item.name === 'SOOTHING REPAIR POSTCREAM'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
+              : item.imageUrl 
+          }}
           style={styles.productImage}
           resizeMode="cover"
         />

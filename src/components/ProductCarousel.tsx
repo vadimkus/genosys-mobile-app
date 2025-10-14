@@ -59,7 +59,17 @@ export default function ProductCarousel({
     >
       <View style={styles.productImageContainer}>
         <Image 
-          source={{ uri: product.imageUrl || 'https://picsum.photos/300/300?random=0' }} 
+          source={{ 
+            uri: product.name === 'POWER SOLUTION PCS' 
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
+              : product.name === 'POWER SOLUTION SWS'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
+              : product.name === 'PROBLEM CONTROL SERUM'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
+              : product.name === 'SOOTHING REPAIR POSTCREAM'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
+              : product.imageUrl || 'https://picsum.photos/300/300?random=0' 
+          }} 
           style={styles.productImage}
           resizeMode="cover"
           onError={(error) => {

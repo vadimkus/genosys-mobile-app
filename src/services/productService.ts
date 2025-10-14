@@ -1514,6 +1514,18 @@ export class ProductService {
         // POWER SOLUTION AWS
         if (name.includes('power solution aws') || name.includes('POWER SOLUTION AWS')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75';
         
+        // POWER SOLUTION PCS
+        if (name.includes('power solution pcs') || name.includes('POWER SOLUTION PCS')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75';
+        
+        // POWER SOLUTION SWS
+        if (name.includes('power solution sws') || name.includes('POWER SOLUTION SWS')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75';
+        
+        // PROBLEM CONTROL SERUM
+        if (name.includes('problem control serum') || name.includes('PROBLEM CONTROL SERUM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75';
+        
+        // SOOTHING REPAIR POSTCREAM
+        if (name.includes('soothing repair postcream') || name.includes('SOOTHING REPAIR POSTCREAM')) return 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75';
+        
         // Use the working image as fallback for all products
         return 'https://genosys.ae/_next/image?url=%2Fimages%2Fin.png&w=1200&q=75';
       };
@@ -1533,6 +1545,14 @@ export class ProductService {
         finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75';
       } else if (product.name === 'POWER SOLUTION AWS') {
         finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FAWS.jpg&w=1200&q=75';
+      } else if (product.name === 'POWER SOLUTION PCS') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75';
+      } else if (product.name === 'POWER SOLUTION SWS') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75';
+      } else if (product.name === 'PROBLEM CONTROL SERUM') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75';
+      } else if (product.name === 'SOOTHING REPAIR POSTCREAM') {
+        finalImageUrl = 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75';
       } else {
         finalImageUrl = product.imageUrl || product.imageUrls?.[0] || getImageUrl(product.name);
       }

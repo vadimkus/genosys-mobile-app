@@ -122,6 +122,29 @@ export default function ProductDetailScreen() {
       return 580.00; // Fixed price for single size product
     }
     
+    // POWER SOLUTION PCS
+    if (name.includes('power solution pcs')) {
+      return 580.00; // Fixed price for single size product
+    }
+    
+    // POWER SOLUTION SWS
+    if (name.includes('power solution sws')) {
+      return 580.00; // Fixed price for single size product
+    }
+    
+    // PROBLEM CONTROL SERUM
+    if (name.includes('problem control serum')) {
+      return 330.00; // Fixed price for single size product
+    }
+    
+    // SOOTHING REPAIR POSTCREAM
+    if (name.includes('soothing repair postcream')) {
+      // Price varies by size: 20g = 204 AED, 100g = 440 AED
+      if (selectedSize === '20g') return 204.00;
+      if (selectedSize === '100g') return 440.00;
+      return 204.00; // Default to 20g price
+    }
+    
     // Microneedle Roller
     if (name.includes('microneedle roller')) {
       return 230.00;  // Fixed price for all needle sizes
@@ -363,6 +386,79 @@ export default function ProductDetailScreen() {
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially dry and aging skin</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced hydration and firming</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // POWER SOLUTION PCS
+    if (name.includes('power solution pcs')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional anti-blemish ampoule</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Microneedling treatments and anti-blemish care</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced anti-blemish formula with sebum control</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Oil and sebum control, blemish prevention, clear skin promotion, breakout prevention</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, blemish control</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially oily and acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced blemish control</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // POWER SOLUTION SWS
+    if (name.includes('power solution sws')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Professional anti-pigment ampoule</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 2ml x 10ea</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Microneedling treatments and pigmentation control</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced anti-pigment formula for skin brightening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Pigmentation improvement, even skin tone, skin brightening, clarity enhancement</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Professional treatments, pigmentation control</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially hyperpigmented and uneven skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply during microneedling treatments for enhanced brightening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Use:</Text> Licensed practitioners only</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // PROBLEM CONTROL SERUM
+    if (name.includes('problem control serum')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Anti-blemish serum</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 30ml</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Combination and oily acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Advanced sebum-regulating formula</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Sebum control, breakout prevention, texture refinement, oil regulation</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> Daily anti-blemish treatment, morning and evening</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> Combination and oily acne-prone skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply to clean skin, focus on problem areas</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested and clinically proven</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
+        </>
+      );
+    }
+    
+    // SOOTHING REPAIR POSTCREAM
+    if (name.includes('soothing repair postcream')) {
+      return (
+        <>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Form:</Text> Post-treatment regenerating cream</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Size:</Text> 20g (Homecare) / 100g (Professional)</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Target:</Text> Post-treatment skin recovery and healing</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Technology:</Text> Centella complex with peptide technology</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Key Benefits:</Text> Rapid recovery, redness reduction, erythema relief, edema reduction, skin regeneration</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Usage:</Text> As needed after professional treatments</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Type:</Text> All skin types, especially post-treatment sensitive skin</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Application:</Text> Apply thin layer to affected areas, massage gently</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Formulation:</Text> Centella asiatica complex with sh-Polypeptide-7</Text>
+          <Text style={styles.detailItem}><Text style={styles.detailLabel}>Testing:</Text> Dermatologically tested and clinically proven</Text>
           <Text style={styles.detailItem}><Text style={styles.detailLabel}>Country of Origin:</Text> South Korea</Text>
         </>
       );
@@ -1452,7 +1548,12 @@ export default function ProductDetailScreen() {
         console.log('Product name:', foundProduct.name);
         console.log('Size options length:', foundProduct.sizeOptions?.length);
         console.log('Size options array:', foundProduct.sizeOptions);
-        setSelectedSize(foundProduct.defaultSize || (foundProduct.sizeOptions && foundProduct.sizeOptions[0]) || '');
+        // Set default size for SOOTHING REPAIR POSTCREAM
+        if (foundProduct.name === 'SOOTHING REPAIR POSTCREAM') {
+          setSelectedSize('20g'); // Default to 20g size
+        } else {
+          setSelectedSize(foundProduct.defaultSize || (foundProduct.sizeOptions && foundProduct.sizeOptions[0]) || '');
+        }
       }
     }
     setLoading(false);
@@ -1530,7 +1631,17 @@ export default function ProductDetailScreen() {
       {/* Product Image */}
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: product.imageUrl }}
+          source={{ 
+            uri: product.name === 'POWER SOLUTION PCS' 
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
+              : product.name === 'POWER SOLUTION SWS'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
+              : product.name === 'PROBLEM CONTROL SERUM'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
+              : product.name === 'SOOTHING REPAIR POSTCREAM'
+              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
+              : product.imageUrl 
+          }}
           style={styles.productImage}
           resizeMode="cover"
         />
@@ -1719,6 +1830,26 @@ export default function ProductDetailScreen() {
             <Text style={styles.inStockText}>IN STOCK</Text>
           </View>
         )}
+        {product.name === 'POWER SOLUTION PCS' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'POWER SOLUTION SWS' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'PROBLEM CONTROL SERUM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
+        {product.name === 'SOOTHING REPAIR POSTCREAM' && (
+          <View style={styles.inStockBadge}>
+            <Text style={styles.inStockText}>IN STOCK</Text>
+          </View>
+        )}
       </View>
 
       {/* Size Selection */}
@@ -1728,11 +1859,21 @@ export default function ProductDetailScreen() {
         console.log('Size selection check - length:', product?.sizeOptions?.length);
         return null;
       })()}
-      {product.sizeOptions && product.sizeOptions.length > 0 && (
+      {(() => {
+        // Add size options for SOOTHING REPAIR POSTCREAM
+        const postCreamSizeOptions = product.name === 'SOOTHING REPAIR POSTCREAM' ? ['20g', '100g'] : null;
+        const finalSizeOptions = postCreamSizeOptions || product.sizeOptions;
+        return finalSizeOptions && finalSizeOptions.length > 0;
+      })() && (
         <View style={styles.sizeSelectionContainer}>
           <Text style={[styles.sizeSelectionTitle, { color: theme.colors.text }]}>Size</Text>
           <View style={styles.sizeOptionsContainer}>
-            {product.sizeOptions.map((size, index) => (
+            {(() => {
+              // Add size options for SOOTHING REPAIR POSTCREAM
+              const postCreamSizeOptions = product.name === 'SOOTHING REPAIR POSTCREAM' ? ['20g', '100g'] : null;
+              const finalSizeOptions = postCreamSizeOptions || product.sizeOptions;
+              return finalSizeOptions;
+            })()?.map((size, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -1820,6 +1961,10 @@ export default function ProductDetailScreen() {
             if (product.name === 'POWER SOLUTION CTS') return '2ml x 10ea';
             if (product.name === 'POWER SOLUTION CVS') return '2ml x 10ea';
             if (product.name === 'POWER SOLUTION HES') return '2ml x 10ea';
+            if (product.name === 'POWER SOLUTION PCS') return '2ml x 10ea';
+            if (product.name === 'POWER SOLUTION SWS') return '2ml x 10ea';
+            if (product.name === 'PROBLEM CONTROL SERUM') return '30ml';
+            if (product.name === 'SOOTHING REPAIR POSTCREAM') return '20g/100g';
             return '30ml';
           })()}
         </Text>
@@ -1922,6 +2067,14 @@ export default function ProductDetailScreen() {
       ? "POWER SOLUTION CVS is a professional skin revitalizing ampoule designed specifically for microneedling treatments. This advanced formula supplies essential nutrients to the skin while providing soothing and hydrating benefits to promote optimal healing and skin regeneration post-treatment."
       : product.name === 'POWER SOLUTION HES'
       ? "POWER SOLUTION HES is a professional hydrating and firming ampoule specifically formulated for microneedling treatments. This advanced formula combines powerful hydrating agents with firming peptides to provide long-lasting moisturizing and plumping effects while relieving skin irritation and promoting optimal healing post-treatment."
+      : product.name === 'POWER SOLUTION PCS'
+      ? "POWER SOLUTION PCS is a professional anti-blemish ampoule specifically formulated for microneedling treatments. This advanced formula controls excessive oil and sebum production while helping prevent skin breakouts and promoting clear, healthy skin post-treatment."
+      : product.name === 'POWER SOLUTION SWS'
+      ? "POWER SOLUTION SWS is a professional anti-pigment ampoule specifically formulated for microneedling treatments. This advanced formula helps improve pigmentation, even skin tone, and brighten the skin surface while promoting optimal healing and skin clarity post-treatment."
+      : product.name === 'PROBLEM CONTROL SERUM'
+      ? "PROBLEM CONTROL SERUM is a specialized anti-blemish serum designed for combination and oily acne-prone skin. This advanced formula helps fight skin breakouts by regulating excessive oil and sebum production while refining skin texture for a healthier, clearer complexion."
+      : product.name === 'SOOTHING REPAIR POSTCREAM'
+      ? "SOOTHING REPAIR POSTCREAM is a specialized regenerating cream designed for healthy skin recovery after professional treatments. This advanced formula helps irritated skin rapidly recover from redness, erythema, and edema while promoting healthy rejuvenation with centella complex and peptide technology."
       : product.name === 'Microneedle Roller'
       ? "The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Stimulates natural collagen production and improves skin texture. Manufactured in South Korea."
                 : isCollagenMask 
@@ -2154,6 +2307,62 @@ export default function ProductDetailScreen() {
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Growth Factor Technology:</Text> Contains sh-polypeptide-7, a human growth hormone-like peptide for enhanced skin regeneration.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin-Friendly Formulation:</Text> Free from harmful additives, parabens, ethanol, artificial fragrances, and sulfates for safe use.</Text>
               <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Advanced hydrating and firming formula with professional-grade ingredients.</Text>
+            </View>
+        </View>
+        )}
+
+        {/* Key Features Section for POWER SOLUTION PCS */}
+        {product.name === 'POWER SOLUTION PCS' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Anti-Blemish Formula:</Text> Specifically designed to target and prevent blemishes and skin breakouts.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Sebum Control:</Text> Controls excessive oil and sebum production for balanced, clear skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Breakout Prevention:</Text> Helps prevent skin breakouts and promotes clear, healthy complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Extracts:</Text> Contains witch hazel and houttuynia cordata extracts for natural blemish control.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Advanced anti-blemish formula with professional-grade ingredients.</Text>
+            </View>
+        </View>
+        )}
+
+        {/* Key Features Section for POWER SOLUTION SWS */}
+        {product.name === 'POWER SOLUTION SWS' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Anti-Pigment Formula:</Text> Specifically designed to target and reduce hyperpigmentation and dark spots.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Skin Brightening:</Text> Helps brighten and even skin tone for a more radiant, uniform complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Pigmentation Control:</Text> Targets existing pigmentation while preventing new dark spots from forming.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Brightening Agents:</Text> Contains arbutin and kojic acid for natural, effective skin brightening.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Professional Grade:</Text> Advanced anti-pigment formula with professional-grade ingredients.</Text>
+            </View>
+        </View>
+        )}
+
+        {/* Key Features Section for PROBLEM CONTROL SERUM */}
+        {product.name === 'PROBLEM CONTROL SERUM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Sebum Regulation:</Text> Advanced sebum-regulating technology that controls excessive oil production for balanced, healthy skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Anti-Blemish Formula:</Text> Specifically designed to target and prevent skin breakouts while promoting clear, healthy skin.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Texture Refinement:</Text> Helps refine and smooth skin texture for a healthier-looking, clearer complexion.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Natural Ingredients:</Text> Formulated with zinc PCA and willow bark extract for gentle yet effective blemish control.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Dermatologically Tested:</Text> Clinically proven formula safe for combination and oily skin types.</Text>
+            </View>
+        </View>
+        )}
+
+        {/* Key Features Section for SOOTHING REPAIR POSTCREAM */}
+        {product.name === 'SOOTHING REPAIR POSTCREAM' && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Features</Text>
+            <View style={styles.detailsList}>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Post-Treatment Recovery:</Text> Specifically formulated for skin recovery after professional dermatological operations and treatments.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Centella Complex:</Text> Powerful centella asiatica complex with asiaticoside, madecassic acid, and asiatic acid for healing.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Rapid Recovery:</Text> Helps skin rapidly recover from redness, erythema, and edema after professional treatments.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Peptide Technology:</Text> Advanced sh-Polypeptide-7 helps promote skin regeneration and healing processes.</Text>
+              <Text style={styles.detailItem}><Text style={styles.detailLabel}>Gentle Healing:</Text> Suitable for sensitive, post-treatment skin with dermatologically tested formula.</Text>
             </View>
         </View>
         )}
@@ -2685,6 +2894,42 @@ export default function ProductDetailScreen() {
                 <Text style={styles.benefitItem}>• Skin Regeneration - Stimulates cellular renewal and healing processes</Text>
                 <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade results for advanced skincare treatments</Text>
               </>
+            ) : product.name === 'POWER SOLUTION PCS' ? (
+              <>
+                <Text style={styles.benefitItem}>• Blemish Control - Targets and prevents blemishes</Text>
+                <Text style={styles.benefitItem}>• Sebum Regulation - Controls excessive oil production</Text>
+                <Text style={styles.benefitItem}>• Breakout Prevention - Helps prevent future skin breakouts</Text>
+                <Text style={styles.benefitItem}>• Clear Skin - Promotes clear, healthy complexion</Text>
+                <Text style={styles.benefitItem}>• Oil Balance - Restores natural oil balance for optimal skin health</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade blemish control for advanced treatments</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION SWS' ? (
+              <>
+                <Text style={styles.benefitItem}>• Pigmentation Reduction - Reduces hyperpigmentation</Text>
+                <Text style={styles.benefitItem}>• Skin Brightening - Helps brighten and even skin tone for radiant complexion</Text>
+                <Text style={styles.benefitItem}>• Even Skin Tone - Promotes uniform skin color and texture</Text>
+                <Text style={styles.benefitItem}>• Dark Spot Prevention - Helps prevent new pigmentation from forming</Text>
+                <Text style={styles.benefitItem}>• Enhanced Clarity - Improves overall skin clarity and brightness</Text>
+                <Text style={styles.benefitItem}>• Professional Results - Delivers clinical-grade brightening for advanced treatments</Text>
+              </>
+            ) : product.name === 'PROBLEM CONTROL SERUM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Breakout Prevention - Prevents control skin breakouts</Text>
+                <Text style={styles.benefitItem}>• Sebum Control - Regulates excessive oil production for balanced, healthy skin</Text>
+                <Text style={styles.benefitItem}>• Texture Improvement - Refines skin texture for smoother, healthier-looking skin</Text>
+                <Text style={styles.benefitItem}>• Oil Balance - Restores natural oil balance for optimal skin health</Text>
+                <Text style={styles.benefitItem}>• Gentle Formula - Suitable for combination and oily skin types</Text>
+                <Text style={styles.benefitItem}>• Clear Complexion - Promotes a healthier, clearer skin appearance</Text>
+              </>
+            ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
+              <>
+                <Text style={styles.benefitItem}>• Rapid Recovery - Helps skin quickly recover from professional treatment side effects</Text>
+                <Text style={styles.benefitItem}>• Redness Reduction - Soothes and reduces redness and inflammation</Text>
+                <Text style={styles.benefitItem}>• Erythema Relief - Helps alleviate erythema and skin irritation</Text>
+                <Text style={styles.benefitItem}>• Edema Reduction - Helps reduce swelling and edema after treatments</Text>
+                <Text style={styles.benefitItem}>• Skin Regeneration - Promotes healthy skin cell regeneration and renewal</Text>
+                <Text style={styles.benefitItem}>• Gentle Healing - Suitable for sensitive, post-treatment skin</Text>
+              </>
             ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.benefitItem}>• Enhanced Product Absorption - Increases absorption rate of active skincare ingredients by up to 300%</Text>
@@ -2863,6 +3108,42 @@ export default function ProductDetailScreen() {
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Copper Tripeptide-1:</Text> Healing peptide that promotes skin repair and reduces inflammation for faster recovery.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Soothing and hydrating ingredient that helps maintain skin barrier function and comfort.</Text>
                 <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Phytosphingosine:</Text> Natural lipid that supports skin barrier function and provides anti-inflammatory benefits.</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION PCS' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Human growth hormone-like peptide that stimulates skin regeneration and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Witch Hazel Extract:</Text> Natural astringent that helps control oil production and soothes irritated skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Houttuynia Cordata Extract:</Text> Natural anti-inflammatory ingredient that helps control blemishes and soothes skin.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Callus Culture Extracts:</Text> Rosa Damascena and Vitis Vinifera extracts provide antioxidant protection and nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Pine Bark Extract:</Text> Natural antioxidant that helps protect skin from environmental damage.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Advanced Peptides:</Text> Acetyl Hexapeptide-8, Palmitoyl Hexapeptide-12, and Palmitoyl Tripeptide-1 for skin health.</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION SWS' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Human growth hormone-like peptide that stimulates skin regeneration and healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Arbutin:</Text> Natural skin brightening agent that helps reduce hyperpigmentation and dark spots.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Kojic Acid:</Text> Powerful natural brightening ingredient that inhibits melanin production.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Licorice Root Extract:</Text> Natural anti-inflammatory and brightening ingredient that soothes and evens skin tone.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Botanical Callus Culture Extracts:</Text> Rosa Damascena and Vitis Vinifera extracts provide antioxidant protection and nourishment.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Fermented Extracts:</Text> Aspergillus/Saccharomyces/Glycyrrhiza Uralensis Root Extract Ferment for enhanced skin health.</Text>
+              </>
+            ) : product.name === 'PROBLEM CONTROL SERUM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Zinc PCA:</Text> Powerful sebum-regulating ingredient that controls oil production and helps prevent breakouts.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Willow Bark Extract:</Text> Natural salicylic acid source that gently exfoliates and helps clear clogged pores.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Trehalose:</Text> Natural sugar that provides hydration and helps maintain skin barrier function.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Soothing and hydrating ingredient that helps calm irritated skin and promote healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Allantoin:</Text> Gentle healing ingredient that soothes irritated skin and promotes skin regeneration.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Beta-Glucan:</Text> Natural immune-boosting ingredient that helps strengthen skin's natural defense mechanisms.</Text>
+              </>
+            ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
+              <>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Centella Asiatica Complex:</Text> Powerful healing complex with asiaticoside, madecassic acid, and asiatic acid for skin recovery.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>sh-Polypeptide-7:</Text> Advanced peptide that helps promote skin regeneration and healing processes.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Dipotassium Glycyrrhizate:</Text> Licorice root extract that provides anti-inflammatory and soothing benefits.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Panthenol:</Text> Vitamin B5 that helps soothe irritated skin and promote healing.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Plant Callus Extracts:</Text> Vitis Vinifera and Rosa Damascena callus culture extracts for enhanced healing properties.</Text>
+                <Text style={styles.ingredientItem}><Text style={styles.ingredientLabel}>Scutellaria Baicalensis:</Text> Chinese skullcap root extract with anti-inflammatory and antioxidant properties.</Text>
               </>
             ) : product.name === 'EyeCell EYE CONTOUR CREAM' ? (
               <>
@@ -3236,6 +3517,40 @@ export default function ProductDetailScreen() {
                 <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
                 <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
               </>
+            ) : product.name === 'POWER SOLUTION PCS' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and prepare for microneedling treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 1-2 ampoules during microneedling for optimal penetration</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Post-Treatment:</Text> Continue application for enhanced blemish control</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
+              </>
+            ) : product.name === 'POWER SOLUTION SWS' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and prepare for microneedling treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 1-2 ampoules during microneedling for optimal penetration</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Post-Treatment:</Text> Continue application for enhanced brightening results</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as directed by your skincare professional</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Storage:</Text> Store in cool, dry place and use within recommended timeframe</Text>
+              </>
+            ) : product.name === 'PROBLEM CONTROL SERUM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and apply toner if desired</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply 2-3 drops to face and neck, focusing on problem areas</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in upward motions until fully absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Follow-up:</Text> Apply moisturizer to lock in hydration</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Frequency:</Text> Use morning and evening for optimal results</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvements typically seen within 2-4 weeks of consistent use</Text>
+              </>
+            ) : product.name === 'SOOTHING REPAIR POSTCREAM' ? (
+              <>
+                <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin gently after professional treatment</Text>
+                <Text style={styles.usageItem}>2. <Text style={styles.usageLabel}>Application:</Text> Apply a thin layer to affected areas</Text>
+                <Text style={styles.usageItem}>3. <Text style={styles.usageLabel}>Massage:</Text> Gently massage in circular motions until absorbed</Text>
+                <Text style={styles.usageItem}>4. <Text style={styles.usageLabel}>Frequency:</Text> Use as needed for post-treatment recovery</Text>
+                <Text style={styles.usageItem}>5. <Text style={styles.usageLabel}>Duration:</Text> Continue until skin fully recovers from treatment</Text>
+                <Text style={styles.usageItem}>6. <Text style={styles.usageLabel}>Results:</Text> Visible improvement in redness and irritation within 24-48 hours</Text>
+              </>
             ) : product.name === 'Needle Pen-K' ? (
               <>
                 <Text style={styles.usageItem}>1. <Text style={styles.usageLabel}>Preparation:</Text> Cleanse skin thoroughly and ensure device is properly sterilized</Text>
@@ -3511,6 +3826,14 @@ export default function ProductDetailScreen() {
               ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
               : product.name === 'POWER SOLUTION HES'
               ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'POWER SOLUTION PCS'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'POWER SOLUTION SWS'
+              ? "This product is dermatologically tested and specifically formulated for professional use. For best results, use as directed by your skincare professional. Not recommended for home use without professional guidance. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'PROBLEM CONTROL SERUM'
+              ? "This product is dermatologically tested and specifically formulated for combination and oily skin types. For best results, use consistently as part of your daily skincare routine. Store in a cool, dry place away from direct sunlight."
+              : product.name === 'SOOTHING REPAIR POSTCREAM'
+              ? "This product is dermatologically tested and specifically formulated for post-treatment skin recovery. Use as directed by your skincare professional. Store in a cool, dry place away from direct sunlight."
               : product.name === 'Needle Pen-K'
               ? "This is a professional medical device. For best results and safety, use as directed by a skincare professional. Ensure proper sterilization and follow all safety guidelines. Not recommended for use on active acne or inflamed skin."
               : product.name === 'EyeCell EYE CONTOUR SERUM'
