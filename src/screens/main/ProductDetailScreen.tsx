@@ -163,6 +163,10 @@ export default function ProductDetailScreenRefactored() {
       return 'GENOSYS SKIN CARING BLEMISH BALM CUSHION is a BB cushion that can be used after professional treatment. More than 60% of the product is composed of moisture essence, which enables a natural and healthy glow. Various peptide complex 40% - helps calm the irritated skin. BB cushion with SPF 50. Natural coverage with skin protection and color selection options.';
     }
     
+    if (productName === 'Microneedle Roller') {
+      return 'The GENOSYS Microneedle Roller is a professional-grade microneedling device featuring the patented Diskneedle Therapy System (DTS) for enhanced skin rejuvenation. This advanced device utilizes 450 ultra-thin needles that are 25% thinner than competitors, ensuring superior product absorption with minimal skin trauma. Professional-grade microneedling device with patented DTS technology for enhanced skin rejuvenation.';
+    }
+    
     if (productName === 'BIO-FERMENT AGE DEFYING POWDER MASK') {
       return 'GENOSYS BIO-FERMENT AGE DEFYING POWDER MASK is an innovative fermented powder mask that combines traditional fermentation technology with modern skincare science. This unique powder-to-mask formula activates upon mixing with water, creating a powerful treatment that delivers concentrated nutrients and beneficial compounds directly to the skin for maximum anti-aging benefits. Bio-ferment powder mask with age-defying technology. Unique powder-to-mask formula for maximum benefits.';
     }
@@ -762,6 +766,47 @@ export default function ProductDetailScreenRefactored() {
       );
     }
 
+    // MICRONEEDLE ROLLER
+    if (name.includes('microneedle roller')) {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Type:</Text> Professional microneedle roller device
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Needle Count:</Text> 450 ultra-thin needles
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Needle Thickness:</Text> 25% thinner than competitors
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Patented Diskneedle Therapy System (DTS)
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Target:</Text> Skin rejuvenation and product absorption enhancement
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Enhanced product absorption, reduced skin trauma, professional-grade results
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Professional treatments by licensed practitioners
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Treatment Areas:</Text> Face, body, scalp applications
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Professional Use:</Text> Licensed practitioners only
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Safety:</Text> Medical-grade stainless steel needles
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
     // SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]
     if (name.includes('skin caring blemish balm cushion')) {
       return (
@@ -1174,6 +1219,63 @@ export default function ProductDetailScreenRefactored() {
           onSizeChange={handleSizeChange}
           onPriceChange={handlePriceChange}
         />
+
+        {/* Size Selection Section for Microneedle Roller */}
+        {product.name === 'Microneedle Roller' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: 'center' }]}>Select Size</Text>
+            <View style={styles.sizeSelectionContainer}>
+              {[
+                { size: '0.25mm', description: 'Ultra-fine for sensitive skin' },
+                { size: '0.5mm', description: 'Standard for general treatments' },
+                { size: '0.1mm', description: 'Extra-fine for very sensitive skin' },
+                { size: '0.15mm', description: 'Fine for mild treatments' },
+                { size: '0.2mm', description: 'Medium-fine for moderate treatments' }
+              ].map((option) => (
+                <TouchableOpacity
+                  key={option.size}
+                  style={[
+                    styles.sizeOption,
+                    {
+                      backgroundColor: selectedSize === option.size ? '#F0F9FF' : theme.colors.card,
+                      borderColor: selectedSize === option.size ? '#3B82F6' : '#E5E7EB',
+                      borderWidth: selectedSize === option.size ? 3 : 1,
+                      shadowColor: selectedSize === option.size ? '#3B82F6' : 'transparent',
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: selectedSize === option.size ? 0.2 : 0,
+                      shadowRadius: 4,
+                      elevation: selectedSize === option.size ? 4 : 1,
+                    },
+                  ]}
+                  onPress={() => handleSizeChange(option.size)}
+                >
+                  <View style={styles.sizeInfo}>
+                    <Text style={[
+                      styles.sizeLabel,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
+                    ]}>
+                      {option.size}
+                    </Text>
+                    <Text style={[
+                      styles.sizeDescription,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
+                    ]}>
+                      {option.description}
+                    </Text>
+                  </View>
+                  {selectedSize === option.size && (
+                    <View style={styles.selectionIndicator}>
+                      <Text style={styles.checkmark}>✓</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* Color Selection Section for SKIN CARING BLEMISH BALM CUSHION */}
         {product.name === 'SKIN CARING BLEMISH BALM CUSHION [SPF 50+ PA++++]' && (
@@ -2490,25 +2592,141 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Features</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>
-                    Patented DTS Technology:
-                  </Text>{' '}
-                  Diskneedle Therapy System ensures safe and effective
-                  treatments with reduced recovery time.
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Patented DTS Technology:</Text>{' '}
+                  Diskneedle Therapy System ensures safe and effective treatments with reduced recovery time
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Ultra-Thin Needles:</Text>{' '}
-                  450 needles per unit, 25% thinner than other brands for
-                  enhanced comfort and effectiveness.
+                  450 needles per unit, 25% thinner than other brands for enhanced comfort and effectiveness
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Professional Grade:</Text>{' '}
-                  Manufactured in South Korea with precision engineering for
-                  professional use.
+                  Manufactured in South Korea with precision engineering for professional use
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Medical-Grade Materials:</Text>{' '}
+                  High-quality stainless steel needles for safety and durability
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Versatile Applications:</Text>{' '}
+                  Suitable for face, body, and scalp treatments
                 </Text>
               </View>
             </View>
           )}
+
+          {/* Benefits Section for Microneedle Roller */}
+          {product.name === 'Microneedle Roller' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Benefits</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhanced Product Absorption:</Text>{' '}
+                  Creates microchannels for 300% better product penetration
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Natural Collagen Induction:</Text>{' '}
+                  Stimulates skin's healing response for firmer, younger-looking skin
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Reduced Fine Lines & Wrinkles:</Text>{' '}
+                  Promotes elastin production for improved skin texture
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Scar Reduction:</Text>{' '}
+                  Effective for treating acne scars, surgical scars, and stretch marks
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Pore Minimization:</Text>{' '}
+                  Helps reduce pore size and improve skin smoothness
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyperpigmentation Treatment:</Text>{' '}
+                  Aids in reducing dark spots and uneven skin tone
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Minimal Downtime:</Text>{' '}
+                  Less invasive than traditional treatments with faster recovery
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* How to Use Section for Microneedle Roller */}
+          {product.name === 'Microneedle Roller' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>How to Use</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>1. Preparation:</Text>{' '}
+                  Cleanse skin thoroughly and sanitize the roller
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>2. Application:</Text>{' '}
+                  Roll gently in vertical, horizontal, and diagonal directions
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>3. Coverage:</Text>{' '}
+                  Treat each area for 2-3 minutes with light pressure
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>4. Post-Treatment:</Text>{' '}
+                  Apply soothing serum or hyaluronic acid
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>5. Frequency:</Text>{' '}
+                  Use once every 4-6 weeks for optimal results
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>6. Maintenance:</Text>{' '}
+                  Clean and sanitize after each use
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Size Selection Section for Microneedle Roller */}
+          {product.name === 'Microneedle Roller' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Available Sizes</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>0.25mm:</Text>{' '}
+                  Ultra-fine needles for sensitive skin and delicate areas
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>0.5mm:</Text>{' '}
+                  Standard size for general facial treatments and product absorption
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>0.1mm:</Text>{' '}
+                  Extra-fine needles for very sensitive skin and gentle treatments
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>0.15mm:</Text>{' '}
+                  Fine needles for mild treatments and sensitive areas
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>0.2mm:</Text>{' '}
+                  Medium-fine needles for moderate treatments and product penetration
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Important Note Section for Microneedle Roller */}
+          {product.name === 'Microneedle Roller' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Professional Use Only:</Text>{' '}
+                  This device is intended for professional use by licensed practitioners. Consult with a qualified professional to determine the appropriate treatment protocol based on your individual skin needs and concerns.
+                </Text>
+              </View>
+            </View>
+          )}
+
         </View>
       </ScrollView>
 
@@ -2673,5 +2891,41 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  sizeSelectionContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    paddingHorizontal: 4,
+  },
+  sizeOption: {
+    width: '48%',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+    minHeight: 100,
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  sizeInfo: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  sizeLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+    textAlign: 'center',
+    minHeight: 20,
+  },
+  sizeDescription: {
+    fontSize: 12,
+    textAlign: 'center',
+    lineHeight: 16,
+    minHeight: 32,
+    flexWrap: 'wrap',
   },
 });
