@@ -8,7 +8,7 @@ import {
   Alert,
   Linking,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -18,7 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-type TrainingMaterialsScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type TrainingMaterialsScreenNavigationProp =
+  StackNavigationProp<RootStackParamList>;
 
 interface TrainingDocument {
   id: string;
@@ -40,251 +41,275 @@ export default function TrainingMaterialsScreen() {
       id: '1',
       title: 'Product Catalogue 2026',
       size: '235.5 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://u.pcloud.link/publink/show?code=XZ9wc15ZDTFcM6uvKg0snY1dEJwzwQgHsEF7',
       category: 'Training Documents',
-      description: 'Complete product catalogue with all Genosys products'
+      description: 'Complete product catalogue with all Genosys products',
     },
     {
       id: '2',
       title: 'Home Care Guide 2026',
       size: '9.8 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/documents/Genosys-Home-Care-Guide.pdf',
       category: 'Training Documents',
-      description: 'Comprehensive home care treatment guide'
+      description: 'Comprehensive home care treatment guide',
     },
     {
       id: '3',
       title: 'Professional Manual 2026',
       size: '10.4 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/documents/Genosys-Professional-Manual.pdf',
       category: 'Training Documents',
-      description: 'Professional treatment protocols and procedures'
+      description: 'Professional treatment protocols and procedures',
     },
     {
       id: '4',
       title: 'Facial Treatment Homecare 2026',
       size: '8.2 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/facial-treatment-homecare-2026.pdf',
       category: 'Training Documents',
-      description: 'Home facial treatment techniques and protocols'
+      description: 'Home facial treatment techniques and protocols',
     },
     {
       id: '5',
       title: 'Facial Treatment Professional 2026',
       size: '8.2 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/facial-treatment-professional-2026.pdf',
       category: 'Training Documents',
-      description: 'Professional facial treatment procedures'
+      description: 'Professional facial treatment procedures',
     },
     // Product Documentation
     {
       id: '6',
       title: 'MULTI VITA RADIANCE CREAM',
       size: '2.1 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/multi-vita-radiance-cream.pdf',
       category: 'Product Documentation',
-      description: 'Multi vitamin radiance cream documentation'
+      description: 'Multi vitamin radiance cream documentation',
     },
     {
       id: '7',
       title: 'EyeCell EYE ZONE CARE SYSTEM',
       size: '1.8 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/eyecell-eye-zone-care-system.pdf',
       category: 'Product Documentation',
-      description: 'Eye zone care system treatment guide'
+      description: 'Eye zone care system treatment guide',
     },
     {
       id: '8',
       title: 'EPI TURNOVER BOOSTING PEELING GEL',
       size: '3.8 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/epi-turnover-boosting-peeling-gel.pdf',
       category: 'Product Documentation',
-      description: 'Epi turnover boosting peeling gel protocols'
+      description: 'Epi turnover boosting peeling gel protocols',
     },
     {
       id: '9',
       title: 'MULTI VITA RADIANCE SERUM',
       size: '1.5 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/multi-vita-radiance-serum.pdf',
       category: 'Product Documentation',
-      description: 'Multi vitamin radiance serum documentation'
+      description: 'Multi vitamin radiance serum documentation',
     },
     {
       id: '10',
       title: 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER',
       size: '0.7 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/skin-defender-lip-eye-makeup-remover.pdf',
       category: 'Product Documentation',
-      description: 'Skin defender makeup remover guide'
+      description: 'Skin defender makeup remover guide',
     },
     {
       id: '11',
       title: 'MICROBIOME ENERGY INFUSING MIST',
       size: '0.8 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/microbiome-energy-infusing-mist.pdf',
       category: 'Product Documentation',
-      description: 'Microbiome energy infusing mist protocols'
+      description: 'Microbiome energy infusing mist protocols',
     },
     {
       id: '12',
       title: 'SKIN RESCUE OVERNIGHT CREAM MASK',
       size: '1.3 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/skin-rescue-overnight-cream-mask.pdf',
       category: 'Product Documentation',
-      description: 'Skin rescue overnight mask treatment guide'
+      description: 'Skin rescue overnight mask treatment guide',
     },
     {
       id: '13',
       title: 'INTENSIVE PROBLEM CONTROL TONER',
       size: '1.0 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/intensive-problem-control-toner.pdf',
       category: 'Product Documentation',
-      description: 'Intensive problem control toner protocols'
+      description: 'Intensive problem control toner protocols',
     },
     {
       id: '14',
       title: 'ULTRA SHIELD SUN CREAM',
       size: '0.6 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/ultra-shield-sun-cream.pdf',
       category: 'Product Documentation',
-      description: 'Ultra shield sun cream application guide'
+      description: 'Ultra shield sun cream application guide',
     },
     {
       id: '15',
       title: 'HR³ MATRIX SCALP SHAMPOO α',
       size: '2.3 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/hr3-matrix-scalp-shampoo-alpha.pdf',
       category: 'Product Documentation',
-      description: 'HR³ matrix scalp shampoo treatment protocols'
+      description: 'HR³ matrix scalp shampoo treatment protocols',
     },
     {
       id: '16',
       title: 'MOISTURE REPLENISHING HYALURON SERUM',
       size: '1.9 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/moisture-replenishing-hyaluron-serum.pdf',
       category: 'Product Documentation',
-      description: 'Moisture replenishing hyaluron serum guide'
+      description: 'Moisture replenishing hyaluron serum guide',
     },
     {
       id: '17',
       title: 'MOISTURE REPLENISHING HYALURON CREAM',
       size: '2.0 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/moisture-replenishing-hyaluron-cream.pdf',
       category: 'Product Documentation',
-      description: 'Moisture replenishing hyaluron cream protocols'
+      description: 'Moisture replenishing hyaluron cream protocols',
     },
     {
       id: '18',
       title: 'SKIN CARING BLEMISH BALM CUSHION',
       size: '1.2 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/skin-caring-blemish-balm-cushion.pdf',
       category: 'Product Documentation',
-      description: 'Skin caring blemish balm cushion application'
+      description: 'Skin caring blemish balm cushion application',
     },
     {
       id: '19',
       title: 'EyeCell EYE PEPTIDE GEL PATCH',
       size: '1.4 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/eyecell-eye-peptide-gel-patch.pdf',
       category: 'Product Documentation',
-      description: 'EyeCell eye peptide gel patch treatment'
+      description: 'EyeCell eye peptide gel patch treatment',
     },
     {
       id: '20',
       title: 'BIO-FERMENT AGE DEFYING POWDER MASK',
       size: '2.1 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/bio-ferment-age-defying-powder-mask.pdf',
       category: 'Product Documentation',
-      description: 'Bio-ferment age defying powder mask protocols'
+      description: 'Bio-ferment age defying powder mask protocols',
     },
     {
       id: '21',
       title: 'HAIR GENTRON',
       size: '1.8 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/hair-gentron.pdf',
       category: 'Product Documentation',
-      description: 'Hair Gentron device treatment guide'
+      description: 'Hair Gentron device treatment guide',
     },
     {
       id: '22',
       title: 'HR³ MATRIX HAIR SOLUTION α',
       size: '2.3 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/hr3-matrix-hair-solution-alpha.pdf',
       category: 'Product Documentation',
-      description: 'HR³ matrix hair solution treatment protocols'
+      description: 'HR³ matrix hair solution treatment protocols',
     },
     {
       id: '23',
       title: 'HR³ MATRIX HAIR TONIC α',
       size: '1.9 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/hr3-matrix-hair-tonic-alpha.pdf',
       category: 'Product Documentation',
-      description: 'HR³ matrix hair tonic application guide'
+      description: 'HR³ matrix hair tonic application guide',
     },
     {
       id: '24',
       title: 'HR³ MATRIX SCALP PEELING α',
       size: '2.1 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/hr3-matrix-scalp-peeling-alpha.pdf',
       category: 'Product Documentation',
-      description: 'HR³ matrix scalp peeling treatment protocols'
+      description: 'HR³ matrix scalp peeling treatment protocols',
     },
     {
       id: '25',
       title: 'GENO-LED IR II',
       size: '4.6 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/geno-led-ir-ii.pdf',
       category: 'Product Documentation',
-      description: 'Geno LED IR II device treatment guide'
+      description: 'Geno LED IR II device treatment guide',
     },
     {
       id: '26',
       title: 'SKIN REBOOT PDRN MASK PACK',
       size: '1.2 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/skin-reboot-pdrn-mask-pack.pdf',
       category: 'Product Documentation',
-      description: 'Skin reboot PDRN mask pack protocols'
+      description: 'Skin reboot PDRN mask pack protocols',
     },
     {
       id: '27',
       title: 'EZ CO₂ MASK KIT',
       size: '0.5 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/ez-co2-mask-kit.pdf',
       category: 'Product Documentation',
-      description: 'EZ CO₂ mask kit treatment guide'
+      description: 'EZ CO₂ mask kit treatment guide',
     },
     {
       id: '28',
       title: 'Microneedle Roller',
       size: '1.5 MB',
-      url: 'https://genosys.ae/training',
+      url: 'https://genosys.ae/training/microneedle-roller.pdf',
       category: 'Product Documentation',
-      description: 'Microneedle roller treatment protocols'
-    }
+      description: 'Microneedle roller treatment protocols',
+    },
   ];
 
   const handleDownload = async (document: TrainingDocument) => {
     setDownloading(document.id);
-    
+
     try {
-      const supported = await Linking.canOpenURL(document.url);
-      if (supported) {
-        await Linking.openURL(document.url);
-        Alert.alert(
-          'Download Started',
-          `${document.title} is being downloaded. Please check your browser downloads.`
-        );
+      // Check if this is a direct download link (like pCloud)
+      const isDirectLink =
+        document.url.includes('pcloud.link') || document.url.includes('.pdf');
+
+      if (isDirectLink) {
+        // Try to open the direct link first
+        const supported = await Linking.canOpenURL(document.url);
+        if (supported) {
+          await Linking.openURL(document.url);
+          Alert.alert(
+            'Opening Document',
+            `${document.title} (${document.size}) is opening in your browser.`,
+            [{ text: 'OK' }]
+          );
+        } else {
+          throw new Error('Cannot open direct link');
+        }
       } else {
+        // For other links, open the training page
+        await Linking.openURL('https://genosys.ae/training');
         Alert.alert(
-          'Download Error',
-          'Unable to open the download link. Please try again later.'
+          'Opening Training Page',
+          `Opening the Genosys training page. Look for "${document.title}" (${document.size}) in the available documents section.`,
+          [{ text: 'OK' }]
         );
       }
     } catch (error) {
-      Alert.alert(
-        'Download Error',
-        'An error occurred while trying to download the file.'
-      );
+      // Fallback to training page if direct link fails
+      try {
+        await Linking.openURL('https://genosys.ae/training');
+        Alert.alert(
+          'Opening Training Page',
+          `Could not open direct link. Opening the Genosys training page where you can find "${document.title}".`,
+          [{ text: 'OK' }]
+        );
+      } catch (fallbackError) {
+        Alert.alert(
+          'Error',
+          'Unable to open the document. Please check your internet connection and try again.',
+          [{ text: 'OK' }]
+        );
+      }
     } finally {
       setDownloading(null);
     }
@@ -312,71 +337,119 @@ export default function TrainingMaterialsScreen() {
     }
   };
 
-  const groupedDocuments = trainingDocuments.reduce((acc, doc) => {
-    if (!acc[doc.category]) {
-      acc[doc.category] = [];
-    }
-    acc[doc.category].push(doc);
-    return acc;
-  }, {} as Record<string, TrainingDocument[]>);
+  const groupedDocuments = trainingDocuments.reduce(
+    (acc, doc) => {
+      if (!acc[doc.category]) {
+        acc[doc.category] = [];
+      }
+      acc[doc.category].push(doc);
+      return acc;
+    },
+    {} as Record<string, TrainingDocument[]>
+  );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.card, borderBottomColor: theme.colors.border }]}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: theme.colors.card,
+            borderBottomColor: theme.colors.border,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          <Ionicons name='arrow-back' size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Training Materials</Text>
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+          Training Materials
+        </Text>
         <View style={styles.headerRight} />
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {Object.entries(groupedDocuments).map(([category, documents]) => (
           <View key={category} style={styles.categorySection}>
             <View style={styles.categoryHeader}>
-              <Ionicons 
-                name={getCategoryIcon(category) as any} 
-                size={20} 
-                color={getCategoryColor(category)} 
+              <Ionicons
+                name={getCategoryIcon(category) as any}
+                size={20}
+                color={getCategoryColor(category)}
               />
-              <Text style={[styles.categoryTitle, { color: theme.colors.text }]}>
+              <Text
+                style={[styles.categoryTitle, { color: theme.colors.text }]}
+              >
                 {category}
               </Text>
-              <Text style={[styles.categoryCount, { color: theme.colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.categoryCount,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
                 {documents.length} files
               </Text>
             </View>
 
-            {documents.map((document) => (
+            {documents.map(document => (
               <TouchableOpacity
                 key={document.id}
-                style={[styles.documentItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}
+                style={[
+                  styles.documentItem,
+                  {
+                    backgroundColor: theme.colors.card,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
                 onPress={() => handleDownload(document)}
                 disabled={downloading === document.id}
               >
                 <View style={styles.documentLeft}>
-                  <View style={[styles.documentIcon, { backgroundColor: getCategoryColor(category) + '20' }]}>
-                    <Ionicons 
-                      name="document-outline" 
-                      size={20} 
-                      color={getCategoryColor(category)} 
+                  <View
+                    style={[
+                      styles.documentIcon,
+                      { backgroundColor: getCategoryColor(category) + '20' },
+                    ]}
+                  >
+                    <Ionicons
+                      name='document-outline'
+                      size={20}
+                      color={getCategoryColor(category)}
                     />
                   </View>
                   <View style={styles.documentInfo}>
-                    <Text style={[styles.documentTitle, { color: theme.colors.text }]}>
+                    <Text
+                      style={[
+                        styles.documentTitle,
+                        { color: theme.colors.text },
+                      ]}
+                    >
                       {document.title}
                     </Text>
-                    <Text style={[styles.documentDescription, { color: theme.colors.textSecondary }]}>
+                    <Text
+                      style={[
+                        styles.documentDescription,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
                       {document.description}
                     </Text>
-                    <Text style={[styles.documentSize, { color: theme.colors.textSecondary }]}>
+                    <Text
+                      style={[
+                        styles.documentSize,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
                       {document.size}
                     </Text>
                   </View>
@@ -384,9 +457,13 @@ export default function TrainingMaterialsScreen() {
 
                 <View style={styles.documentRight}>
                   {downloading === document.id ? (
-                    <ActivityIndicator size="small" color="#dc2626" />
+                    <ActivityIndicator size='small' color='#dc2626' />
                   ) : (
-                    <Ionicons name="download-outline" size={20} color="#dc2626" />
+                    <Ionicons
+                      name='download-outline'
+                      size={20}
+                      color='#dc2626'
+                    />
                   )}
                 </View>
               </TouchableOpacity>
@@ -395,10 +472,14 @@ export default function TrainingMaterialsScreen() {
         ))}
 
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
+          <Text
+            style={[styles.footerText, { color: theme.colors.textSecondary }]}
+          >
             All training materials are provided by Genosys Middle East FZ-LLC
           </Text>
-          <Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
+          <Text
+            style={[styles.footerText, { color: theme.colors.textSecondary }]}
+          >
             Official Distributor in the UAE
           </Text>
         </View>

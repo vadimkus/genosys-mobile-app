@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Alert, 
-  ScrollView, 
-  Image, 
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
   Switch,
   ActivityIndicator,
   RefreshControl,
   Dimensions,
-  Linking
+  StatusBar,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -20,18 +19,17 @@ import { useStore } from '../../store/useStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
-export default function ProfileScreen() {
+export default function ProfileScreenNew() {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { user, logout, isLoading } = useStore();
   const { theme, isDark, toggleTheme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  // Refresh profile data when screen comes into focus (e.g., returning from EditProfile)
   useFocusEffect(
     React.useCallback(() => {
       console.log('ProfileScreen focused, current user:', user?.name);
@@ -39,28 +37,23 @@ export default function ProfileScreen() {
   );
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
         },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    // Simulate refresh
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -71,11 +64,15 @@ export default function ProfileScreen() {
   };
 
   const handleViewOrders = () => {
-    navigation.navigate('MainTabs', { screen: 'Orders' });
+    navigation.navigate('MainTabs', { screen: 'Training' });
   };
 
   const handleSettings = () => {
     navigation.navigate('Settings');
+  };
+
+  const handleAdvancedFeatures = () => {
+    navigation.navigate('AdvancedFeatures');
   };
 
   const handleHelp = () => {
@@ -83,160 +80,321 @@ export default function ProfileScreen() {
   };
 
   const handleAbout = () => {
-    Alert.alert('About Genosys', 'Genosys Mobile App v1.0.0\nPremium Korean Dermacosmetics');
-  };
-
-  const handleTraining = () => {
-    navigation.navigate('TrainingMaterials');
-  };
-
-  const handleDownloadCatalog = () => {
     Alert.alert(
-      'Product Catalogue 2026',
-      'Download the complete product catalogue (235.5 MB)',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Download', onPress: () => Linking.openURL('https://genosys.ae/training') }
-      ]
-    );
-  };
-
-  const handleDownloadHomeCareGuide = () => {
-    Alert.alert(
-      'Home Care Guide 2026',
-      'Download the home care guide (9.8 MB)',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Download', onPress: () => Linking.openURL('https://genosys.ae/training') }
-      ]
-    );
-  };
-
-  const handleDownloadProfessionalManual = () => {
-    Alert.alert(
-      'Professional Manual 2026',
-      'Download the professional manual (10.4 MB)',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Download', onPress: () => Linking.openURL('https://genosys.ae/training') }
-      ]
+      'About Genosys',
+      'Genosys Mobile App v1.0.0\nPremium Korean Dermacosmetics'
     );
   };
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#dc2626" />
-        <Text style={styles.loadingText}>Loading profile...</Text>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <ActivityIndicator size='large' color='#dc2626' />
+        <Text style={[styles.loadingText, { color: theme.colors.text }]}>
+          Loading profile...
+        </Text>
       </View>
     );
   }
 
   return (
-    <ScrollView 
+    <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-      showsVerticalScrollIndicator={false}
     >
-      {/* Header Section */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Profile</Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Manage your account and preferences</Text>
-        </View>
-        <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-          <Ionicons name="create-outline" size={20} color="#dc2626" />
-        </TouchableOpacity>
-      </View>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor='transparent'
+        translucent
+      />
 
-      {/* User Profile Card */}
-      {user && (
-        <>
-          <View style={[styles.profileCard, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+      <ScrollView
+        style={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header with Gradient */}
+        <View style={styles.headerGradient}>
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <Text style={styles.headerTitle}>Profile</Text>
+              <Text style={styles.headerSubtitle}>Manage your account</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={handleEditProfile}
+            >
+              <Ionicons name='create-outline' size={20} color='#ffffff' />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Profile Card */}
+        {user && (
+          <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>
                   {user.firstName?.charAt(0) || user.name?.charAt(0) || 'U'}
                 </Text>
               </View>
+              <View style={styles.avatarRing} />
               <TouchableOpacity style={styles.avatarEditButton}>
-                <Ionicons name="camera" size={16} color="#ffffff" />
+                <Ionicons name='camera' size={16} color='#ffffff' />
               </TouchableOpacity>
             </View>
-            
+
             <View style={styles.userInfo}>
-              <Text style={[styles.userName, { color: theme.colors.text }]}>{user.name}</Text>
-              <Text style={[styles.userEmail, { color: theme.colors.textSecondary }]}>{user.email}</Text>
+              <Text style={[styles.userName, { color: theme.colors.text }]}>
+                {user.name}
+              </Text>
+              <Text
+                style={[
+                  styles.userEmail,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {user.email}
+              </Text>
               <View style={styles.roleContainer}>
-                <View style={[styles.roleBadge, { backgroundColor: user.role === 'admin' ? '#dc2626' : '#10b981' }]}>
+                <View
+                  style={[
+                    styles.roleBadge,
+                    {
+                      backgroundColor:
+                        user.role === 'admin' ? '#dc2626' : '#10b981',
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={user.role === 'admin' ? 'shield-checkmark' : 'person'}
+                    size={12}
+                    color='#ffffff'
+                  />
                   <Text style={styles.roleText}>{user.role.toUpperCase()}</Text>
                 </View>
                 {user.emailVerified && (
                   <View style={styles.verifiedBadge}>
-                    <Ionicons name="checkmark-circle" size={16} color="#10b981" />
+                    <Ionicons
+                      name='checkmark-circle'
+                      size={16}
+                      color='#10b981'
+                    />
                     <Text style={styles.verifiedText}>Verified</Text>
                   </View>
                 )}
               </View>
             </View>
           </View>
+        )}
 
-          {/* Quick Stats */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Orders</Text>
+        {/* Stats Cards */}
+        <View style={styles.statsContainer}>
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.card }]}
+          >
+            <View style={styles.statIconContainer}>
+              <Ionicons name='receipt-outline' size={24} color='#dc2626' />
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Wishlist</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>AED 0</Text>
-              <Text style={styles.statLabel}>Spent</Text>
-            </View>
+            <Text style={[styles.statNumber, { color: theme.colors.text }]}>
+              0
+            </Text>
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              Orders
+            </Text>
           </View>
 
-          {/* Menu Sections */}
-          <View style={styles.menuSection}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Account</Text>
-            
-            <TouchableOpacity style={styles.menuItem} onPress={handleViewOrders}>
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.card }]}
+          >
+            <View style={styles.statIconContainer}>
+              <Ionicons name='heart-outline' size={24} color='#ef4444' />
+            </View>
+            <Text style={[styles.statNumber, { color: theme.colors.text }]}>
+              0
+            </Text>
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              Wishlist
+            </Text>
+          </View>
+
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.card }]}
+          >
+            <View style={styles.statIconContainer}>
+              <Ionicons name='wallet-outline' size={24} color='#10b981' />
+            </View>
+            <Text style={[styles.statNumber, { color: theme.colors.text }]}>
+              AED 0
+            </Text>
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              Spent
+            </Text>
+          </View>
+        </View>
+
+        {/* Menu Sections */}
+        <View style={styles.menuContainer}>
+          {/* Account Section */}
+          <View
+            style={[styles.menuSection, { backgroundColor: theme.colors.card }]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Account
+            </Text>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleViewOrders}
+            >
               <View style={styles.menuItemLeft}>
-                <Ionicons name="receipt-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>My Orders</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#dc2626' + '20' },
+                  ]}
+                >
+                  <Ionicons name='receipt-outline' size={20} color='#dc2626' />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    My Orders
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    View your order history
+                  </Text>
+                </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="heart-outline" size={24} color="#6b7280" />
-                <Text style={styles.menuItemText}>Wishlist</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#ef4444' + '20' },
+                  ]}
+                >
+                  <Ionicons name='heart-outline' size={20} color='#ef4444' />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Wishlist
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Your saved products
+                  </Text>
+                </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="location-outline" size={24} color="#6b7280" />
-                <Text style={styles.menuItemText}>Addresses</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#3b82f6' + '20' },
+                  ]}
+                >
+                  <Ionicons name='location-outline' size={20} color='#3b82f6' />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Addresses
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Manage delivery addresses
+                  </Text>
+                </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.menuSection}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Preferences</Text>
-            
+          {/* Preferences Section */}
+          <View
+            style={[styles.menuSection, { backgroundColor: theme.colors.card }]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Preferences
+            </Text>
+
             <View style={styles.menuItem}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="notifications-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Push Notifications</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#f59e0b' + '20' },
+                  ]}
+                >
+                  <Ionicons
+                    name='notifications-outline'
+                    size={20}
+                    color='#f59e0b'
+                  />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Push Notifications
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Get updates about your orders
+                  </Text>
+                </View>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -248,8 +406,29 @@ export default function ProfileScreen() {
 
             <View style={styles.menuItem}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="moon-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Dark Mode</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#6366f1' + '20' },
+                  ]}
+                >
+                  <Ionicons name='moon-outline' size={20} color='#6366f1' />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Dark Mode
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Switch between light and dark theme
+                  </Text>
+                </View>
               </View>
               <Switch
                 value={isDark}
@@ -260,181 +439,270 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <View style={styles.menuSection}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Professional Training</Text>
-            
-            <TouchableOpacity style={styles.menuItem} onPress={handleTraining}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="school-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Training Materials</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
+          {/* Support Section */}
+          <View
+            style={[styles.menuSection, { backgroundColor: theme.colors.card }]}
+          >
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Support
+            </Text>
 
-            <TouchableOpacity style={styles.menuItem} onPress={handleDownloadCatalog}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="document-text-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Product Catalogue 2026</Text>
-              </View>
-              <View style={styles.downloadContainer}>
-                <Text style={styles.fileSize}>235.5 MB</Text>
-                <Ionicons name="download-outline" size={16} color="#dc2626" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={handleDownloadHomeCareGuide}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="home-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Home Care Guide 2026</Text>
-              </View>
-              <View style={styles.downloadContainer}>
-                <Text style={styles.fileSize}>9.8 MB</Text>
-                <Ionicons name="download-outline" size={16} color="#dc2626" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={handleDownloadProfessionalManual}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="medical-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Professional Manual 2026</Text>
-              </View>
-              <View style={styles.downloadContainer}>
-                <Text style={styles.fileSize}>10.4 MB</Text>
-                <Ionicons name="download-outline" size={16} color="#dc2626" />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.menuSection}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Support</Text>
-            
             <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="settings-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Settings</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#6b7280' + '20' },
+                  ]}
+                >
+                  <Ionicons name='settings-outline' size={20} color='#6b7280' />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Settings
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    App preferences and configuration
+                  </Text>
+                </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleAdvancedFeatures}
+            >
+              <View style={styles.menuItemLeft}>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#3b82f6' + '20' },
+                  ]}
+                >
+                  <Ionicons name='rocket-outline' size={20} color='#3b82f6' />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Advanced Features
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Analytics, notifications, and offline support
+                  </Text>
+                </View>
+              </View>
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={handleHelp}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="help-circle-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Help & Support</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#10b981' + '20' },
+                  ]}
+                >
+                  <Ionicons
+                    name='help-circle-outline'
+                    size={20}
+                    color='#10b981'
+                  />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    Help & Support
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Get help and contact support
+                  </Text>
+                </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={handleAbout}>
               <View style={styles.menuItemLeft}>
-                <Ionicons name="information-circle-outline" size={24} color="#6b7280" />
-                <Text style={[styles.menuItemText, { color: theme.colors.text }]}>About</Text>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: '#8b5cf6' + '20' },
+                  ]}
+                >
+                  <Ionicons
+                    name='information-circle-outline'
+                    size={20}
+                    color='#8b5cf6'
+                  />
+                </View>
+                <View style={styles.menuTextContainer}>
+                  <Text
+                    style={[styles.menuItemText, { color: theme.colors.text }]}
+                  >
+                    About
+                  </Text>
+                  <Text
+                    style={[
+                      styles.menuItemSubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    App version and information
+                  </Text>
+                </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              <Ionicons
+                name='chevron-forward'
+                size={20}
+                color={theme.colors.textSecondary}
+              />
             </TouchableOpacity>
           </View>
 
           {/* Logout Button */}
-          <View style={styles.logoutSection}>
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Ionicons name="log-out-outline" size={18} color="#dc2626" />
-              <Text style={styles.logoutButtonText}>Logout</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-    </ScrollView>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Ionicons name='log-out-outline' size={20} color='#dc2626' />
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9fafb',
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
     color: '#6b7280',
   },
+  scrollContainer: {
+    flex: 1,
+  },
+  headerGradient: {
+    backgroundColor: '#dc2626',
+    paddingTop: 60,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    paddingTop: 50,
-    backgroundColor: '#ffffff',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   headerContent: {
     flex: 1,
   },
-  title: {
-    fontSize: 28,
+  headerTitle: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#ffffff',
     marginBottom: 4,
   },
-  subtitle: {
+  headerSubtitle: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#ffffff',
+    opacity: 0.9,
   },
   editButton: {
-    padding: 8,
-    backgroundColor: '#fef2f2',
-    borderRadius: 20,
+    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   profileCard: {
     backgroundColor: '#ffffff',
     margin: 20,
-    borderRadius: 16,
+    marginTop: -40,
+    borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 5,
+    alignItems: 'center',
   },
   avatarContainer: {
     alignItems: 'center',
     marginBottom: 20,
+    position: 'relative',
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
+  avatarRing: {
+    position: 'absolute',
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    borderWidth: 3,
+    borderColor: '#dc2626',
+    opacity: 0.2,
+  },
   avatarText: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#ffffff',
   },
   avatarEditButton: {
     position: 'absolute',
     bottom: 8,
-    right: width / 2 - 60,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    right: width / 2 - 70,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: '#ffffff',
   },
   userInfo: {
@@ -459,9 +727,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   roleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    gap: 4,
   },
   roleText: {
     fontSize: 12,
@@ -480,20 +751,30 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
+    paddingHorizontal: 20,
     marginBottom: 20,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  statItem: {
-    flex: 1,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f3f4f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   statNumber: {
     fontSize: 20,
@@ -504,22 +785,21 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 14,
     color: '#6b7280',
+    fontWeight: '500',
   },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#e5e7eb',
-    marginHorizontal: 16,
+  menuContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   menuSection: {
     backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    marginBottom: 16,
     borderRadius: 16,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
@@ -527,8 +807,6 @@ const styles = StyleSheet.create({
     color: '#1f2937',
     padding: 20,
     paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
   },
   menuItem: {
     flexDirection: 'row',
@@ -544,42 +822,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  menuIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  menuTextContainer: {
+    flex: 1,
+  },
   menuItemText: {
     fontSize: 16,
     color: '#374151',
-    marginLeft: 12,
     fontWeight: '500',
+    marginBottom: 2,
   },
-  logoutSection: {
-    margin: 20,
-    marginBottom: 40,
+  menuItemSubtext: {
+    fontSize: 14,
+    color: '#6b7280',
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 20,
     backgroundColor: '#fef2f2',
-    borderRadius: 8,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#fecaca',
-    alignSelf: 'center',
     gap: 8,
+    marginTop: 8,
   },
   logoutButtonText: {
     color: '#dc2626',
     fontSize: 16,
-    fontWeight: '500',
-  },
-  downloadContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  fileSize: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });

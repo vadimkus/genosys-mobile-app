@@ -8,16 +8,26 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, MainTabParamList } from '../../navigation/AppNavigator';
+import {
+  RootStackParamList,
+  MainTabParamList,
+} from '../../navigation/AppNavigator';
 import { useStore } from '../../store/useStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import { productService } from '../../services/productService';
 import { Product } from '../../types';
 import ProductCarousel from '../../components/ProductCarousel';
+import {
+  SkeletonLoader,
+  ProductCardSkeleton,
+} from '../../components/SkeletonLoader';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ProductCarousel as OptimizedProductCarousel } from '../../components/OptimizedList';
+import { trackScreenLoad } from '../../utils/performance';
 
 const { width } = Dimensions.get('window');
 
@@ -34,26 +44,36 @@ export default function HomeScreen() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    const endTracking = trackScreenLoad('HomeScreen');
     loadData();
+    return endTracking;
   }, []);
 
   const loadData = async () => {
     try {
       setLoading(true);
       console.log('🏠 Loading home screen data...');
-      
+
       const connected = await productService.initialize();
       setIsConnected(connected);
-      
+
       const featured = productService.getFeaturedProducts();
       const newProducts = productService.getNewProducts();
-      
+
       setFeaturedProducts(featured);
       setNewProducts(newProducts);
-      
-      console.log(`✅ Loaded ${featured.length} featured, ${newProducts.length} new products`);
-      console.log('⭐ Featured products:', featured.map(p => p.name));
-      console.log('🆕 New products:', newProducts.map(p => p.name));
+
+      console.log(
+        `✅ Loaded ${featured.length} featured, ${newProducts.length} new products`
+      );
+      console.log(
+        '⭐ Featured products:',
+        featured.map(p => p.name)
+      );
+      console.log(
+        '🆕 New products:',
+        newProducts.map(p => p.name)
+      );
     } catch (error) {
       console.error('❌ Error loading home data:', error);
     } finally {
@@ -67,18 +87,69 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#dc2626" />
-        <Text style={styles.loadingText}>Loading products...</Text>
+      <View
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View style={styles.greetingContainer}>
+              <SkeletonLoader
+                width={120}
+                height={24}
+                style={{ marginBottom: 8 }}
+              />
+              <SkeletonLoader width={200} height={16} />
+            </View>
+          </View>
+        </View>
+
+        {/* Featured Products Skeleton */}
+        <View style={styles.sectionContainer}>
+          <SkeletonLoader
+            width={200}
+            height={20}
+            style={{ marginBottom: 16 }}
+          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.carouselContainer}
+          >
+            {Array.from({ length: 3 }).map((_, index) => (
+              <View key={`featured-skeleton-${index}`} style={styles.skeletonCard}>
+                <ProductCardSkeleton />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* New Products Skeleton */}
+        <View style={styles.sectionContainer}>
+          <SkeletonLoader
+            width={150}
+            height={20}
+            style={{ marginBottom: 16 }}
+          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.carouselContainer}
+          >
+            {Array.from({ length: 3 }).map((_, index) => (
+              <View key={`new-skeleton-${index}`} style={styles.skeletonCard}>
+                <ProductCardSkeleton />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       </View>
     );
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -91,28 +162,38 @@ export default function HomeScreen() {
             <Text style={[styles.greeting, { color: theme.colors.text }]}>
               {user?.firstName || 'User'}
             </Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Premium dermacosmetics and products</Text>
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+            >
+              Premium dermacosmetics and products
+            </Text>
           </View>
         </View>
       </View>
 
-      {/* Featured Products Carousel */}
-      <ProductCarousel
-        products={featuredProducts}
-        title="🎁 Genosys Kits - active discount"
-        onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        onViewAllPress={() => navigation.navigate('MainTabs', { screen: 'Products', params: { featured: true } })}
+      {/* Featured Products Carousel - Optimized */}
+      <OptimizedProductCarousel
+        data={featuredProducts as any}
+        title='🎁 Genosys Kits - active discount'
+        onItemPress={product =>
+          navigation.navigate('ProductDetail', { productId: product.id })
+        }
+        onViewAllPress={() =>
+          navigation.navigate('MainTabs', {
+            screen: 'Products',
+            params: { featured: true },
+          })
+        }
       />
 
-      {/* New Products Carousel */}
-      <ProductCarousel
-        products={newProducts}
-        title="🆕 New Arrivals"
-        onProductPress={(productId) => navigation.navigate('ProductDetail', { productId })}
-        showViewAll={false}
-        showNewBadge={true}
+      {/* New Products Carousel - Optimized */}
+      <OptimizedProductCarousel
+        data={newProducts as any}
+        title='🆕 New Arrivals'
+        onItemPress={product =>
+          navigation.navigate('ProductDetail', { productId: product.id })
+        }
       />
-
     </ScrollView>
   );
 }
@@ -194,6 +275,17 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 24,
     paddingHorizontal: 20,
+  },
+  sectionContainer: {
+    marginTop: 24,
+    paddingHorizontal: 20,
+  },
+  carouselContainer: {
+    marginTop: 16,
+  },
+  skeletonCard: {
+    width: 200,
+    marginRight: 16,
   },
   sectionHeader: {
     flexDirection: 'row',

@@ -18,8 +18,10 @@ interface CategoryCarouselProps {
   onCategoryPress: (categoryName: string) => void;
 }
 
-
-export default function CategoryCarousel({ categories, onCategoryPress }: CategoryCarouselProps) {
+export default function CategoryCarousel({
+  categories,
+  onCategoryPress,
+}: CategoryCarouselProps) {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const renderCategoryCard = (category: Category, index: number) => {
@@ -28,7 +30,7 @@ export default function CategoryCarousel({ categories, onCategoryPress }: Catego
         key={category.name}
         style={[
           styles.categoryCard,
-          { marginLeft: index === 0 ? 0 : CATEGORY_SPACING }
+          { marginLeft: index === 0 ? 0 : CATEGORY_SPACING },
         ]}
         onPress={() => onCategoryPress(category.name)}
       >
@@ -36,9 +38,7 @@ export default function CategoryCarousel({ categories, onCategoryPress }: Catego
           <Text style={styles.categoryName} numberOfLines={1}>
             {category.name}
           </Text>
-          <Text style={styles.categoryCount}>
-            {category.count} items
-          </Text>
+          <Text style={styles.categoryCount}>{category.count} items</Text>
         </View>
       </TouchableOpacity>
     );
@@ -58,15 +58,17 @@ export default function CategoryCarousel({ categories, onCategoryPress }: Catego
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Category</Text>
-      
+
       <ScrollView
         ref={scrollViewRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.carouselContainer}
-        decelerationRate="fast"
+        decelerationRate='fast'
       >
-        {categories.map((category, index) => renderCategoryCard(category, index))}
+        {categories.map((category, index) =>
+          renderCategoryCard(category, index)
+        )}
       </ScrollView>
     </View>
   );

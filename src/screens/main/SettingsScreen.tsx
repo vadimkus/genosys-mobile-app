@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert, Switch } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  Alert,
+  Switch,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -9,14 +18,14 @@ export default function SettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
   const [marketingEnabled, setMarketingEnabled] = useState(false);
-  
+
   const handleEmailPress = () => {
     const email = 'sales@genosys.ae';
     const subject = 'Inquiry from Genosys Mobile App';
     const body = 'Hello,\n\nI would like to get in touch regarding...';
-    
+
     const emailUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
+
     Linking.openURL(emailUrl).catch(() => {
       Alert.alert(
         'Email Not Available',
@@ -59,38 +68,63 @@ export default function SettingsScreen() {
   };
 
   const handleLogoutPress = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: () => {
           // Handle logout logic here
           console.log('User logged out');
-        }}
-      ]
-    );
+        },
+      },
+    ]);
   };
-  
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>Settings</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Customize your experience</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          Settings
+        </Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          Customize your experience
+        </Text>
       </View>
 
       {/* Preferences Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Preferences</Text>
-        
-        <View style={[styles.settingItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Preferences
+        </Text>
+
+        <View
+          style={[
+            styles.settingItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
           <View style={styles.settingLeft}>
             <View style={styles.settingIcon}>
-              <Ionicons name="notifications" size={24} color="#dc2626" />
+              <Ionicons name='notifications' size={24} color='#dc2626' />
             </View>
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>Push Notifications</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Get updates about orders and promotions</Text>
+              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>
+                Push Notifications
+              </Text>
+              <Text
+                style={[
+                  styles.settingDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Get updates about orders and promotions
+              </Text>
             </View>
           </View>
           <Switch
@@ -101,14 +135,31 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={[styles.settingItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+        <View
+          style={[
+            styles.settingItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
           <View style={styles.settingLeft}>
             <View style={styles.settingIcon}>
-              <Ionicons name="moon" size={24} color="#dc2626" />
+              <Ionicons name='moon' size={24} color='#dc2626' />
             </View>
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>Dark Mode</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Switch between light and dark themes</Text>
+              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>
+                Dark Mode
+              </Text>
+              <Text
+                style={[
+                  styles.settingDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Switch between light and dark themes
+              </Text>
             </View>
           </View>
           <Switch
@@ -119,14 +170,31 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={[styles.settingItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+        <View
+          style={[
+            styles.settingItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
           <View style={styles.settingLeft}>
             <View style={styles.settingIcon}>
-              <Ionicons name="location" size={24} color="#dc2626" />
+              <Ionicons name='location' size={24} color='#dc2626' />
             </View>
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>Location Services</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Enable location for delivery tracking</Text>
+              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>
+                Location Services
+              </Text>
+              <Text
+                style={[
+                  styles.settingDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Enable location for delivery tracking
+              </Text>
             </View>
           </View>
           <Switch
@@ -140,16 +208,35 @@ export default function SettingsScreen() {
 
       {/* Privacy & Data Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Privacy & Data</Text>
-        
-        <View style={[styles.settingItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Privacy & Data
+        </Text>
+
+        <View
+          style={[
+            styles.settingItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
           <View style={styles.settingLeft}>
             <View style={styles.settingIcon}>
-              <Ionicons name="analytics" size={24} color="#dc2626" />
+              <Ionicons name='analytics' size={24} color='#dc2626' />
             </View>
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>Analytics</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Help improve the app experience</Text>
+              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>
+                Analytics
+              </Text>
+              <Text
+                style={[
+                  styles.settingDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Help improve the app experience
+              </Text>
             </View>
           </View>
           <Switch
@@ -160,14 +247,31 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={[styles.settingItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+        <View
+          style={[
+            styles.settingItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
           <View style={styles.settingLeft}>
             <View style={styles.settingIcon}>
-              <Ionicons name="megaphone" size={24} color="#dc2626" />
+              <Ionicons name='megaphone' size={24} color='#dc2626' />
             </View>
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>Marketing</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Receive promotional offers and updates</Text>
+              <Text style={[styles.settingLabel, { color: theme.colors.text }]}>
+                Marketing
+              </Text>
+              <Text
+                style={[
+                  styles.settingDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Receive promotional offers and updates
+              </Text>
             </View>
           </View>
           <Switch
@@ -181,83 +285,167 @@ export default function SettingsScreen() {
 
       {/* Support Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Support</Text>
-        
-        <TouchableOpacity 
-          style={[styles.actionItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Support
+        </Text>
+
+        <TouchableOpacity
+          style={[
+            styles.actionItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
           onPress={handleEmailPress}
         >
           <View style={styles.actionIcon}>
-            <Ionicons name="mail" size={24} color="#dc2626" />
+            <Ionicons name='mail' size={24} color='#dc2626' />
           </View>
           <View style={styles.actionInfo}>
-            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Contact Support</Text>
-            <Text style={[styles.actionDescription, { color: theme.colors.textSecondary }]}>sales@genosys.ae</Text>
+            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>
+              Contact Support
+            </Text>
+            <Text
+              style={[
+                styles.actionDescription,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              sales@genosys.ae
+            </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+          <Ionicons
+            name='chevron-forward'
+            size={20}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.actionItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}
+        <TouchableOpacity
+          style={[
+            styles.actionItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
           onPress={handleAboutPress}
         >
           <View style={styles.actionIcon}>
-            <Ionicons name="information-circle" size={24} color="#dc2626" />
+            <Ionicons name='information-circle' size={24} color='#dc2626' />
           </View>
           <View style={styles.actionInfo}>
-            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>About</Text>
-            <Text style={[styles.actionDescription, { color: theme.colors.textSecondary }]}>App version and information</Text>
+            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>
+              About
+            </Text>
+            <Text
+              style={[
+                styles.actionDescription,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              App version and information
+            </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+          <Ionicons
+            name='chevron-forward'
+            size={20}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
       </View>
 
       {/* Legal Section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Legal</Text>
-        
-        <TouchableOpacity 
-          style={[styles.actionItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Legal
+        </Text>
+
+        <TouchableOpacity
+          style={[
+            styles.actionItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
           onPress={handlePrivacyPress}
         >
           <View style={styles.actionIcon}>
-            <Ionicons name="shield-checkmark" size={24} color="#dc2626" />
+            <Ionicons name='shield-checkmark' size={24} color='#dc2626' />
           </View>
           <View style={styles.actionInfo}>
-            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Privacy Policy</Text>
-            <Text style={[styles.actionDescription, { color: theme.colors.textSecondary }]}>How we protect your data</Text>
+            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>
+              Privacy Policy
+            </Text>
+            <Text
+              style={[
+                styles.actionDescription,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              How we protect your data
+            </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+          <Ionicons
+            name='chevron-forward'
+            size={20}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.actionItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}
+        <TouchableOpacity
+          style={[
+            styles.actionItem,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
           onPress={handleTermsPress}
         >
           <View style={styles.actionIcon}>
-            <Ionicons name="document-text" size={24} color="#dc2626" />
+            <Ionicons name='document-text' size={24} color='#dc2626' />
           </View>
           <View style={styles.actionInfo}>
-            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Terms of Service</Text>
-            <Text style={[styles.actionDescription, { color: theme.colors.textSecondary }]}>App usage terms and conditions</Text>
+            <Text style={[styles.actionLabel, { color: theme.colors.text }]}>
+              Terms of Service
+            </Text>
+            <Text
+              style={[
+                styles.actionDescription,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              App usage terms and conditions
+            </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+          <Ionicons
+            name='chevron-forward'
+            size={20}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
       </View>
 
       {/* Account Section */}
       <View style={styles.section}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.logoutButton, { backgroundColor: '#dc2626' }]}
           onPress={handleLogoutPress}
         >
-          <Ionicons name="log-out" size={20} color="#ffffff" />
+          <Ionicons name='log-out' size={20} color='#ffffff' />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>Genosys Mobile App v1.0.0</Text>
+        <Text
+          style={[styles.footerText, { color: theme.colors.textSecondary }]}
+        >
+          Genosys Mobile App v1.0.0
+        </Text>
       </View>
     </ScrollView>
   );

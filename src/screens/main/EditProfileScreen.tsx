@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -28,16 +28,16 @@ export default function EditProfileScreen() {
   const navigation = useNavigation<EditProfileScreenNavigationProp>();
   const { user, updateProfile, isLoading } = useStore();
   const { theme } = useTheme();
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    name: ''
+    name: '',
   });
-  
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -47,13 +47,13 @@ export default function EditProfileScreen() {
         lastName: user.lastName || '',
         email: user.email || '',
         phone: user.phone || '',
-        name: user.name || ''
+        name: user.name || '',
       });
     }
   }, [user]);
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
@@ -69,7 +69,10 @@ export default function EditProfileScreen() {
       newErrors.email = 'Please enter a valid email';
     }
 
-    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+    if (
+      formData.phone &&
+      !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))
+    ) {
       newErrors.phone = 'Please enter a valid phone number';
     }
 
@@ -94,19 +97,21 @@ export default function EditProfileScreen() {
     try {
       const updatedData = {
         ...formData,
-        name: `${formData.firstName} ${formData.lastName}`.trim()
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
       };
-      
+
       console.log('Updating profile with data:', updatedData);
       const success = await updateProfile(updatedData);
       console.log('Profile update result:', success);
-      
+
       if (success) {
-        Alert.alert(
-          'Success',
-          'Profile updated successfully!',
-          [{ text: 'OK', onPress: () => navigation.navigate('MainTabs', { screen: 'Profile' }) }]
-        );
+        Alert.alert('Success', 'Profile updated successfully!', [
+          {
+            text: 'OK',
+            onPress: () =>
+              navigation.navigate('MainTabs', { screen: 'Profile' }),
+          },
+        ]);
       } else {
         Alert.alert('Error', 'Failed to update profile. Please try again.');
       }
@@ -124,46 +129,62 @@ export default function EditProfileScreen() {
       'Are you sure you want to discard your changes?',
       [
         { text: 'Keep Editing', style: 'cancel' },
-        { text: 'Discard', style: 'destructive', onPress: () => navigation.navigate('MainTabs', { screen: 'Profile' }) }
+        {
+          text: 'Discard',
+          style: 'destructive',
+          onPress: () => navigation.navigate('MainTabs', { screen: 'Profile' }),
+        },
       ]
     );
   };
 
   if (isLoading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
-        <ActivityIndicator size="large" color="#dc2626" />
-        <Text style={[styles.loadingText, { color: theme.colors.text }]}>Loading profile...</Text>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <ActivityIndicator size='large' color='#dc2626' />
+        <Text style={[styles.loadingText, { color: theme.colors.text }]}>
+          Loading profile...
+        </Text>
       </View>
     );
   }
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps='handled'
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() =>
+              navigation.navigate('MainTabs', { screen: 'Profile' })
+            }
           >
-            <Ionicons name="arrow-back" size={24} color="#1f2937" />
+            <Ionicons name='arrow-back' size={24} color='#1f2937' />
           </TouchableOpacity>
           <Text style={styles.title}>Edit Profile</Text>
-          <TouchableOpacity 
-            style={[styles.saveButton, isSubmitting && styles.saveButtonDisabled]}
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
+              isSubmitting && styles.saveButtonDisabled,
+            ]}
             onPress={handleSave}
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <ActivityIndicator size="small" color="#ffffff" />
+              <ActivityIndicator size='small' color='#ffffff' />
             ) : (
               <Text style={styles.saveButtonText}>Save</Text>
             )}
@@ -179,10 +200,12 @@ export default function EditProfileScreen() {
               </Text>
             </View>
             <TouchableOpacity style={styles.cameraButton}>
-              <Ionicons name="camera" size={20} color="#ffffff" />
+              <Ionicons name='camera' size={20} color='#ffffff' />
             </TouchableOpacity>
           </View>
-          <Text style={styles.profilePictureText}>Tap to change profile picture</Text>
+          <Text style={styles.profilePictureText}>
+            Tap to change profile picture
+          </Text>
         </View>
 
         {/* Form Fields */}
@@ -193,9 +216,9 @@ export default function EditProfileScreen() {
             <TextInput
               style={[styles.input, errors.firstName && styles.inputError]}
               value={formData.firstName}
-              onChangeText={(value) => handleInputChange('firstName', value)}
-              placeholder="Enter your first name"
-              placeholderTextColor="#9ca3af"
+              onChangeText={value => handleInputChange('firstName', value)}
+              placeholder='Enter your first name'
+              placeholderTextColor='#9ca3af'
             />
             {errors.firstName && (
               <Text style={styles.errorText}>{errors.firstName}</Text>
@@ -208,9 +231,9 @@ export default function EditProfileScreen() {
             <TextInput
               style={[styles.input, errors.lastName && styles.inputError]}
               value={formData.lastName}
-              onChangeText={(value) => handleInputChange('lastName', value)}
-              placeholder="Enter your last name"
-              placeholderTextColor="#9ca3af"
+              onChangeText={value => handleInputChange('lastName', value)}
+              placeholder='Enter your last name'
+              placeholderTextColor='#9ca3af'
             />
             {errors.lastName && (
               <Text style={styles.errorText}>{errors.lastName}</Text>
@@ -223,11 +246,11 @@ export default function EditProfileScreen() {
             <TextInput
               style={[styles.input, errors.email && styles.inputError]}
               value={formData.email}
-              onChangeText={(value) => handleInputChange('email', value)}
-              placeholder="Enter your email"
-              placeholderTextColor="#9ca3af"
-              keyboardType="email-address"
-              autoCapitalize="none"
+              onChangeText={value => handleInputChange('email', value)}
+              placeholder='Enter your email'
+              placeholderTextColor='#9ca3af'
+              keyboardType='email-address'
+              autoCapitalize='none'
             />
             {errors.email && (
               <Text style={styles.errorText}>{errors.email}</Text>
@@ -240,10 +263,10 @@ export default function EditProfileScreen() {
             <TextInput
               style={[styles.input, errors.phone && styles.inputError]}
               value={formData.phone}
-              onChangeText={(value) => handleInputChange('phone', value)}
-              placeholder="Enter your phone number"
-              placeholderTextColor="#9ca3af"
-              keyboardType="phone-pad"
+              onChangeText={value => handleInputChange('phone', value)}
+              placeholder='Enter your phone number'
+              placeholderTextColor='#9ca3af'
+              keyboardType='phone-pad'
             />
             {errors.phone && (
               <Text style={styles.errorText}>{errors.phone}</Text>
@@ -253,23 +276,23 @@ export default function EditProfileScreen() {
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity 
-            style={styles.cancelButton}
-            onPress={handleCancel}
-          >
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.saveButtonLarge, isSubmitting && styles.saveButtonDisabled]}
+
+          <TouchableOpacity
+            style={[
+              styles.saveButtonLarge,
+              isSubmitting && styles.saveButtonDisabled,
+            ]}
             onPress={handleSave}
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <ActivityIndicator size="small" color="#ffffff" />
+              <ActivityIndicator size='small' color='#ffffff' />
             ) : (
               <>
-                <Ionicons name="checkmark" size={20} color="#ffffff" />
+                <Ionicons name='checkmark' size={20} color='#ffffff' />
                 <Text style={styles.saveButtonText}>Save Changes</Text>
               </>
             )}

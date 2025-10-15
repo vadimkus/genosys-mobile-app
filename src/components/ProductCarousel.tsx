@@ -53,41 +53,49 @@ export default function ProductCarousel({
       key={product.id}
       style={[
         styles.productCard,
-        { marginLeft: index === 0 ? 0 : CARD_SPACING }
+        { marginLeft: index === 0 ? 0 : CARD_SPACING },
       ]}
       onPress={() => onProductPress(product.id)}
     >
       <View style={styles.productImageContainer}>
-        <Image 
-        source={{
-          uri: product.name === 'POWER SOLUTION PCS'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
-            : product.name === 'POWER SOLUTION SWS'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
-            : product.name === 'PROBLEM CONTROL SERUM'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
-            : product.name === 'SOOTHING REPAIR POSTCREAM'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
-            : product.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75'
-            : product.name === 'SNOW O₂ CLEANSER'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75'
-            : product.name === 'SNOW BOOSTER'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75'
-            : product.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75'
-            : product.name === 'SOOTHING BOMB SEA ALGAE MASK'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75'
-            : product.imageUrl || 'https://picsum.photos/300/300?random=0'
-        }}
+        <Image
+          source={{
+            uri:
+              product.name === 'POWER SOLUTION PCS'
+                ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
+                : product.name === 'POWER SOLUTION SWS'
+                  ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
+                  : product.name === 'PROBLEM CONTROL SERUM'
+                    ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
+                    : product.name === 'SOOTHING REPAIR POSTCREAM'
+                      ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
+                      : product.name ===
+                          'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
+                        ? 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75'
+                        : product.name === 'SNOW O₂ CLEANSER'
+                          ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75'
+                          : product.name === 'SNOW BOOSTER'
+                            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75'
+                            : product.name ===
+                                'SKIN RENEWAL PEELING SYSTEM (SRS)'
+                              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75'
+                              : product.name === 'SOOTHING BOMB SEA ALGAE MASK'
+                                ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75'
+                                : product.imageUrl ||
+                                  'https://picsum.photos/300/300?random=0',
+          }}
           style={styles.productImage}
-          resizeMode="cover"
-          onError={(error) => {
-            console.log(`❌ Image failed to load for ${product.name}: ${product.imageUrl}`);
+          resizeMode='cover'
+          onError={error => {
+            console.log(
+              `❌ Image failed to load for ${product.name}: ${product.imageUrl}`
+            );
             console.log('Error:', error.nativeEvent.error);
           }}
           onLoad={() => {
-            console.log(`✅ Image loaded successfully for ${product.name}: ${product.imageUrl}`);
+            console.log(
+              `✅ Image loaded successfully for ${product.name}: ${product.imageUrl}`
+            );
           }}
         />
         {product.isOnSale && (
@@ -101,22 +109,28 @@ export default function ProductCarousel({
           </View>
         )}
       </View>
-      
+
       <View style={styles.productInfo}>
         <Text style={styles.productName} numberOfLines={2}>
           Genosys {product.name}
         </Text>
         <Text style={styles.productBrand}>{product.brand}</Text>
-        
+
         <View style={styles.priceContainer}>
-          <Text style={styles.productPrice}>AED {product.price.toFixed(2)}</Text>
+          <Text style={styles.productPrice}>
+            AED {product.price.toFixed(2)}
+          </Text>
           {product.originalPrice && product.originalPrice > product.price && (
-            <Text style={styles.originalPrice}>AED {product.originalPrice.toFixed(2)}</Text>
+            <Text style={styles.originalPrice}>
+              AED {product.originalPrice.toFixed(2)}
+            </Text>
           )}
         </View>
-        
+
         <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>⭐⭐⭐⭐⭐ {product.averageRating.toFixed(1)}/5</Text>
+          <Text style={styles.rating}>
+            ⭐⭐⭐⭐⭐ {product.averageRating.toFixed(1)}/5
+          </Text>
           <Text style={styles.reviewCount}>({product.reviewCount})</Text>
         </View>
       </View>
@@ -130,7 +144,7 @@ export default function ProductCarousel({
           key={index}
           style={[
             styles.dot,
-            { backgroundColor: index === currentIndex ? '#dc2626' : '#d1d5db' }
+            { backgroundColor: index === currentIndex ? '#dc2626' : '#d1d5db' },
           ]}
           onPress={() => scrollToIndex(index)}
         />
@@ -159,7 +173,7 @@ export default function ProductCarousel({
           </TouchableOpacity>
         )}
       </View>
-      
+
       <ScrollView
         ref={scrollViewRef}
         horizontal
@@ -167,13 +181,13 @@ export default function ProductCarousel({
         onScroll={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={styles.carouselContainer}
-        decelerationRate="fast"
+        decelerationRate='fast'
         snapToInterval={CARD_WIDTH + CARD_SPACING}
-        snapToAlignment="start"
+        snapToAlignment='start'
       >
         {products.map((product, index) => renderProductCard(product, index))}
       </ScrollView>
-      
+
       {products.length > 2 && renderDots()}
     </View>
   );

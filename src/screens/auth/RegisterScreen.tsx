@@ -15,12 +15,15 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../../navigation/AppNavigator';
 
-type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
+type RegisterScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  'Register'
+>;
 
 export default function RegisterScreen() {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register, isLoading, error, clearError } = useStore();
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -37,7 +40,12 @@ export default function RegisterScreen() {
   };
 
   const validateForm = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password
+    ) {
       Alert.alert('Error', 'Please fill in all required fields');
       return false;
     }
@@ -60,7 +68,7 @@ export default function RegisterScreen() {
 
     clearError();
     const success = await register(formData);
-    
+
     if (!success && error) {
       Alert.alert('Registration Failed', error);
     }
@@ -71,7 +79,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
@@ -87,20 +95,20 @@ export default function RegisterScreen() {
               <Text style={styles.label}>First Name *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="First name"
+                placeholder='First name'
                 value={formData.firstName}
-                onChangeText={(value) => handleInputChange('firstName', value)}
-                autoCapitalize="words"
+                onChangeText={value => handleInputChange('firstName', value)}
+                autoCapitalize='words'
               />
             </View>
             <View style={[styles.inputContainer, styles.halfWidth]}>
               <Text style={styles.label}>Last Name *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Last name"
+                placeholder='Last name'
                 value={formData.lastName}
-                onChangeText={(value) => handleInputChange('lastName', value)}
-                autoCapitalize="words"
+                onChangeText={value => handleInputChange('lastName', value)}
+                autoCapitalize='words'
               />
             </View>
           </View>
@@ -109,11 +117,11 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Email *</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your email"
+              placeholder='Enter your email'
               value={formData.email}
-              onChangeText={(value) => handleInputChange('email', value)}
-              keyboardType="email-address"
-              autoCapitalize="none"
+              onChangeText={value => handleInputChange('email', value)}
+              keyboardType='email-address'
+              autoCapitalize='none'
               autoCorrect={false}
             />
           </View>
@@ -122,10 +130,10 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Phone</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your phone number"
+              placeholder='Enter your phone number'
               value={formData.phone}
-              onChangeText={(value) => handleInputChange('phone', value)}
-              keyboardType="phone-pad"
+              onChangeText={value => handleInputChange('phone', value)}
+              keyboardType='phone-pad'
             />
           </View>
 
@@ -133,10 +141,10 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Company</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your company name"
+              placeholder='Enter your company name'
               value={formData.company}
-              onChangeText={(value) => handleInputChange('company', value)}
-              autoCapitalize="words"
+              onChangeText={value => handleInputChange('company', value)}
+              autoCapitalize='words'
             />
           </View>
 
@@ -146,28 +154,33 @@ export default function RegisterScreen() {
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  formData.role === 'customer' && styles.roleButtonActive
+                  formData.role === 'customer' && styles.roleButtonActive,
                 ]}
                 onPress={() => handleInputChange('role', 'customer')}
               >
-                <Text style={[
-                  styles.roleButtonText,
-                  formData.role === 'customer' && styles.roleButtonTextActive
-                ]}>
+                <Text
+                  style={[
+                    styles.roleButtonText,
+                    formData.role === 'customer' && styles.roleButtonTextActive,
+                  ]}
+                >
                   Customer
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  formData.role === 'distributor' && styles.roleButtonActive
+                  formData.role === 'distributor' && styles.roleButtonActive,
                 ]}
                 onPress={() => handleInputChange('role', 'distributor')}
               >
-                <Text style={[
-                  styles.roleButtonText,
-                  formData.role === 'distributor' && styles.roleButtonTextActive
-                ]}>
+                <Text
+                  style={[
+                    styles.roleButtonText,
+                    formData.role === 'distributor' &&
+                      styles.roleButtonTextActive,
+                  ]}
+                >
                   Distributor
                 </Text>
               </TouchableOpacity>
@@ -178,11 +191,11 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Password *</Text>
             <TextInput
               style={styles.input}
-              placeholder="Create a password"
+              placeholder='Create a password'
               value={formData.password}
-              onChangeText={(value) => handleInputChange('password', value)}
+              onChangeText={value => handleInputChange('password', value)}
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
             />
           </View>
 
@@ -190,15 +203,17 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Confirm Password *</Text>
             <TextInput
               style={styles.input}
-              placeholder="Confirm your password"
+              placeholder='Confirm your password'
               value={formData.confirmPassword}
-              onChangeText={(value) => handleInputChange('confirmPassword', value)}
+              onChangeText={value =>
+                handleInputChange('confirmPassword', value)
+              }
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
             />
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.registerButton, isLoading && styles.disabledButton]}
             onPress={handleRegister}
             disabled={isLoading}

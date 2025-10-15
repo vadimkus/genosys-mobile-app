@@ -14,28 +14,80 @@ import { useStore } from '../../store/useStore';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../../navigation/AppNavigator';
+import {
+  validateEmail,
+  validatePassword,
+  sanitizeInput,
+} from '../../utils/validation';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
+type LoginScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  'Login'
+>;
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login, isLoading, error, clearError } = useStore();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string[];
+    password?: string[];
+  }>({});
+
+  const handleEmailChange = (text: string) => {
+    const sanitized = sanitizeInput(text);
+    setEmail(sanitized);
+
+    // Clear validation errors when user starts typing
+    if (validationErrors.email) {
+      setValidationErrors(prev => ({ ...prev, email: undefined }));
+    }
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+
+    // Clear validation errors when user starts typing
+    if (validationErrors.password) {
+      setValidationErrors(prev => ({ ...prev, password: undefined }));
+    }
+  };
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    // Validate inputs
+    const emailValidation = validateEmail(email);
+    const passwordValidation = validatePassword(password);
+
+    const errors: { email?: string[]; password?: string[] } = {};
+
+    if (!emailValidation.isValid) {
+      errors.email = emailValidation.errors;
+    }
+
+    if (!passwordValidation.isValid) {
+      errors.password = passwordValidation.errors;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      Alert.alert(
+        'Validation Error',
+        'Please fix the errors below and try again.'
+      );
       return;
     }
 
     console.log('LoginScreen - Starting login process');
     clearError();
+    setValidationErrors({});
+
     const success = await login(email, password);
     console.log('LoginScreen - Login result:', success);
     console.log('LoginScreen - Current error:', error);
-    
+
     if (!success && error) {
       Alert.alert('Login Failed', error);
     }
@@ -50,7 +102,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
@@ -64,36 +116,50 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
+              style={[
+                styles.input,
+                validationErrors.email && styles.inputError,
+              ]}
+              placeholder='Enter your email'
               value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
+              onChangeText={handleEmailChange}
+              keyboardType='email-address'
+              autoCapitalize='none'
               autoCorrect={false}
             />
+            {validationErrors.email && (
+              <Text style={styles.errorText}>{validationErrors.email[0]}</Text>
+            )}
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
             <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
+              style={[
+                styles.input,
+                validationErrors.password && styles.inputError,
+              ]}
+              placeholder='Enter your password'
               value={password}
-              onChangeText={setPassword}
+              onChangeText={handlePasswordChange}
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
             />
+            {validationErrors.password && (
+              <Text style={styles.errorText}>
+                {validationErrors.password[0]}
+              </Text>
+            )}
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.forgotPassword}
             onPress={handleForgotPassword}
           >
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.loginButton, isLoading && styles.disabledButton]}
             onPress={handleLogin}
             disabled={isLoading}
@@ -159,6 +225,16 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: '#ffffff',
+  },
+  inputError: {
+    borderColor: '#ef4444',
+    borderWidth: 2,
+  },
+  errorText: {
+    color: '#ef4444',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
   forgotPassword: {
     alignSelf: 'flex-end',

@@ -9,6 +9,8 @@ import { useStore } from './src/store/useStore';
 import { CartProvider } from './src/contexts/CartContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { productService } from './src/services/productService';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { ENV } from './src/config/environment';
 
 function AppContent() {
   const { isLoading, setLoading } = useStore();
@@ -19,6 +21,13 @@ function AppContent() {
     const initializeApp = async () => {
       setLoading(true);
       try {
+        // Log environment info in development
+        if (ENV.IS_DEVELOPMENT) {
+          console.log('🚀 Initializing Genosys Mobile App...');
+          console.log('Environment:', ENV.ENVIRONMENT);
+          console.log('API Base URL:', ENV.API_BASE_URL);
+        }
+
         // Initialize product service
         console.log('🔄 Initializing ProductService...');
         await productService.initialize();
@@ -45,10 +54,10 @@ function AppContent() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <AppNavigator />
       <StatusBar style={isDark ? "light" : "dark"} />
-    </>
+    </ErrorBoundary>
   );
 }
 

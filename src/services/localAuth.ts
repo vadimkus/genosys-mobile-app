@@ -18,22 +18,24 @@ interface AuthResponse {
 
 export class LocalAuthService {
   private static generateToken(): string {
-    return 'local-jwt-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+    return (
+      'local-jwt-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now()
+    );
   }
 
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
     console.log('🔐 LOCAL AUTH: Checking credentials for:', credentials.email);
-    
+
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const user = usersData.users.find(
       u => u.email === credentials.email && u.password === credentials.password
     );
-    
+
     if (user) {
       console.log('✅ LOCAL AUTH: Login successful for:', user.email);
-      
+
       const token = this.generateToken();
       const userData: User = {
         id: user.id,
@@ -46,23 +48,23 @@ export class LocalAuthService {
         isActive: user.isActive,
         emailVerified: user.emailVerified || true,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        updatedAt: user.updatedAt,
       };
-      
+
       return {
         success: true,
         data: {
           user: userData,
-          token: token
+          token: token,
         },
-        message: 'Login successful'
+        message: 'Login successful',
       };
     } else {
       console.log('❌ LOCAL AUTH: Invalid credentials');
       return {
         success: false,
         data: { user: {} as User, token: '' },
-        error: 'Invalid email or password'
+        error: 'Invalid email or password',
       };
     }
   }

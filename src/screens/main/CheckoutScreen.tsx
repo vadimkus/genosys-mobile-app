@@ -22,7 +22,7 @@ export default function CheckoutScreen() {
   const { user } = useStore();
   const { items, getTotalItems, getTotalPrice, clearCart } = useCart();
   const { theme } = useTheme();
-  
+
   const [shippingInfo, setShippingInfo] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
@@ -38,13 +38,20 @@ export default function CheckoutScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePlaceOrder = async () => {
-    if (!shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode) {
-      Alert.alert('Missing Information', 'Please fill in all required shipping details.');
+    if (
+      !shippingInfo.address ||
+      !shippingInfo.city ||
+      !shippingInfo.postalCode
+    ) {
+      Alert.alert(
+        'Missing Information',
+        'Please fill in all required shipping details.'
+      );
       return;
     }
 
     setIsProcessing(true);
-    
+
     // Simulate order processing
     setTimeout(() => {
       setIsProcessing(false);
@@ -57,8 +64,8 @@ export default function CheckoutScreen() {
             onPress: () => {
               clearCart();
               navigation.navigate('MainTabs', { screen: 'Orders' });
-            }
-          }
+            },
+          },
         ]
       );
     }, 2000);
@@ -66,12 +73,25 @@ export default function CheckoutScreen() {
 
   if (items.length === 0) {
     return (
-      <View style={[styles.emptyContainer, { backgroundColor: theme.colors.background }]}>
-        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Your cart is empty</Text>
-        <Text style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}>Add some products to checkout</Text>
-        <TouchableOpacity 
+      <View
+        style={[
+          styles.emptyContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+          Your cart is empty
+        </Text>
+        <Text
+          style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
+        >
+          Add some products to checkout
+        </Text>
+        <TouchableOpacity
           style={styles.shopButton}
-          onPress={() => navigation.navigate('MainTabs', { screen: 'Products' })}
+          onPress={() =>
+            navigation.navigate('MainTabs', { screen: 'Products' })
+          }
         >
           <Text style={styles.shopButtonText}>Continue Shopping</Text>
         </TouchableOpacity>
@@ -80,7 +100,9 @@ export default function CheckoutScreen() {
   }
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -100,11 +122,15 @@ export default function CheckoutScreen() {
         <Text style={styles.sectionTitle}>Order Summary</Text>
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryText}>Items: {getTotalItems()}</Text>
-          <Text style={styles.summaryText}>Subtotal: AED {getTotalPrice().toFixed(2)}</Text>
+          <Text style={styles.summaryText}>
+            Subtotal: AED {getTotalPrice().toFixed(2)}
+          </Text>
           <Text style={styles.summaryText}>Shipping: AED 0.00</Text>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total:</Text>
-            <Text style={styles.totalPrice}>AED {getTotalPrice().toFixed(2)}</Text>
+            <Text style={styles.totalPrice}>
+              AED {getTotalPrice().toFixed(2)}
+            </Text>
           </View>
         </View>
       </View>
@@ -112,87 +138,119 @@ export default function CheckoutScreen() {
       {/* Shipping Information */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Shipping Information</Text>
-        
+
         <View style={styles.inputRow}>
           <TextInput
             style={[styles.input, styles.halfInput]}
-            placeholder="First Name"
+            placeholder='First Name'
             value={shippingInfo.firstName}
-            onChangeText={(text) => setShippingInfo({...shippingInfo, firstName: text})}
+            onChangeText={text =>
+              setShippingInfo({ ...shippingInfo, firstName: text })
+            }
           />
           <TextInput
             style={[styles.input, styles.halfInput]}
-            placeholder="Last Name"
+            placeholder='Last Name'
             value={shippingInfo.lastName}
-            onChangeText={(text) => setShippingInfo({...shippingInfo, lastName: text})}
+            onChangeText={text =>
+              setShippingInfo({ ...shippingInfo, lastName: text })
+            }
           />
         </View>
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder='Email'
           value={shippingInfo.email}
-          onChangeText={(text) => setShippingInfo({...shippingInfo, email: text})}
-          keyboardType="email-address"
+          onChangeText={text =>
+            setShippingInfo({ ...shippingInfo, email: text })
+          }
+          keyboardType='email-address'
         />
 
         <TextInput
           style={styles.input}
-          placeholder="Phone Number"
+          placeholder='Phone Number'
           value={shippingInfo.phone}
-          onChangeText={(text) => setShippingInfo({...shippingInfo, phone: text})}
-          keyboardType="phone-pad"
+          onChangeText={text =>
+            setShippingInfo({ ...shippingInfo, phone: text })
+          }
+          keyboardType='phone-pad'
         />
 
         <TextInput
           style={styles.input}
-          placeholder="Address"
+          placeholder='Address'
           value={shippingInfo.address}
-          onChangeText={(text) => setShippingInfo({...shippingInfo, address: text})}
+          onChangeText={text =>
+            setShippingInfo({ ...shippingInfo, address: text })
+          }
           multiline
         />
 
         <View style={styles.inputRow}>
           <TextInput
             style={[styles.input, styles.halfInput]}
-            placeholder="City"
+            placeholder='City'
             value={shippingInfo.city}
-            onChangeText={(text) => setShippingInfo({...shippingInfo, city: text})}
+            onChangeText={text =>
+              setShippingInfo({ ...shippingInfo, city: text })
+            }
           />
           <TextInput
             style={[styles.input, styles.halfInput]}
-            placeholder="Postal Code"
+            placeholder='Postal Code'
             value={shippingInfo.postalCode}
-            onChangeText={(text) => setShippingInfo({...shippingInfo, postalCode: text})}
+            onChangeText={text =>
+              setShippingInfo({ ...shippingInfo, postalCode: text })
+            }
           />
         </View>
 
         <TextInput
           style={styles.input}
-          placeholder="Country"
+          placeholder='Country'
           value={shippingInfo.country}
-          onChangeText={(text) => setShippingInfo({...shippingInfo, country: text})}
+          onChangeText={text =>
+            setShippingInfo({ ...shippingInfo, country: text })
+          }
         />
       </View>
 
       {/* Payment Method */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Payment Method</Text>
-        
-        <TouchableOpacity 
-          style={[styles.paymentOption, paymentMethod === 'card' && styles.paymentOptionSelected]}
+
+        <TouchableOpacity
+          style={[
+            styles.paymentOption,
+            paymentMethod === 'card' && styles.paymentOptionSelected,
+          ]}
           onPress={() => setPaymentMethod('card')}
         >
-          <Text style={[styles.paymentText, paymentMethod === 'card' && styles.paymentTextSelected]}>
+          <Text
+            style={[
+              styles.paymentText,
+              paymentMethod === 'card' && styles.paymentTextSelected,
+            ]}
+          >
             💳 Credit/Debit Card
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.paymentOption, paymentMethod === 'cod' && styles.paymentOptionSelected]}
+        <TouchableOpacity
+          style={[
+            styles.paymentOption,
+            paymentMethod === 'cod' && styles.paymentOptionSelected,
+          ]}
           onPress={() => setPaymentMethod('cod')}
         >
-          <Text style={[styles.paymentText, paymentMethod === 'cod' && styles.paymentTextSelected]}>
+          <Text
+            style={[
+              styles.paymentText,
+              paymentMethod === 'cod' && styles.paymentTextSelected,
+            ]}
+          >
             💰 Cash on Delivery
           </Text>
         </TouchableOpacity>
@@ -200,13 +258,18 @@ export default function CheckoutScreen() {
 
       {/* Place Order Button */}
       <View style={styles.footer}>
-        <TouchableOpacity 
-          style={[styles.placeOrderButton, isProcessing && styles.placeOrderButtonDisabled]}
+        <TouchableOpacity
+          style={[
+            styles.placeOrderButton,
+            isProcessing && styles.placeOrderButtonDisabled,
+          ]}
           onPress={handlePlaceOrder}
           disabled={isProcessing}
         >
           <Text style={styles.placeOrderButtonText}>
-            {isProcessing ? 'Processing...' : `Place Order - AED ${getTotalPrice().toFixed(2)}`}
+            {isProcessing
+              ? 'Processing...'
+              : `Place Order - AED ${getTotalPrice().toFixed(2)}`}
           </Text>
         </TouchableOpacity>
       </View>

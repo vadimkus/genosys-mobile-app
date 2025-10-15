@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // API Configuration
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://genosys.ae/api';
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_BASE_URL || 'https://genosys.ae/api';
 
 // Create axios instance for database API calls
 const dbApi = axios.create({
@@ -45,7 +46,9 @@ export const getFeaturedProducts = async () => {
     const response = await dbApi.get('/products/featured');
     return response.data.data || response.data || [];
   } catch (error) {
-    console.log('⚠️ Featured products API not available, will use fallback data');
+    console.log(
+      '⚠️ Featured products API not available, will use fallback data'
+    );
     throw error;
   }
 };

@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Product, CartItem, Order, AppState, RegisterForm } from '../types';
+import {
+  User,
+  Product,
+  CartItem,
+  Order,
+  AppState,
+  RegisterForm,
+} from '../types';
 import { apiService } from '../services/api';
 
 interface StoreState extends AppState {
@@ -10,35 +17,35 @@ interface StoreState extends AppState {
   setAuthenticated: (authenticated: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // Auth actions
   login: (email: string, password: string) => Promise<boolean>;
   register: (userData: RegisterForm) => Promise<boolean>;
   forgotPassword: (email: string) => Promise<boolean>;
   logout: () => Promise<void>;
   updateProfile: (profileData: Partial<User>) => Promise<boolean>;
-  
+
   // Cart actions
   addToCart: (product: Product, quantity?: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateCartItem: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   getCart: () => Promise<void>;
-  
+
   // Wishlist actions
   addToWishlist: (productId: string) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   getWishlist: () => Promise<void>;
-  
+
   // Product actions
   fetchProducts: (filters?: any) => Promise<void>;
   fetchProduct: (id: string) => Promise<Product | null>;
   searchProducts: (query: string) => Promise<void>;
-  
+
   // Order actions
   fetchOrders: () => Promise<void>;
   createOrder: (orderData: any) => Promise<Order | null>;
-  
+
   // Utility actions
   clearError: () => void;
 }
@@ -57,10 +64,10 @@ export const useStore = create<StoreState>()(
       favorites: [],
 
       // Auth actions
-      setUser: (user) => set({ user }),
-      setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-      setLoading: (isLoading) => set({ isLoading }),
-      setError: (error) => set({ error }),
+      setUser: user => set({ user }),
+      setAuthenticated: isAuthenticated => set({ isAuthenticated }),
+      setLoading: isLoading => set({ isLoading }),
+      setError: error => set({ error }),
 
       login: async (email, password) => {
         // Prevent multiple simultaneous login attempts
@@ -80,59 +87,60 @@ export const useStore = create<StoreState>()(
           if (response.success && response.data) {
             const { user, token } = response.data;
             await AsyncStorage.setItem('authToken', token);
-            set({ 
-              user, 
-              isAuthenticated: true, 
-              isLoading: false, 
-              error: null 
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
             });
             console.log('Login successful, user:', user);
             return true;
           } else {
             console.log('Login failed:', response.error || 'Unknown error');
-            set({ 
-              isLoading: false, 
-              error: response.error || 'Login failed' 
+            set({
+              isLoading: false,
+              error: response.error || 'Login failed',
             });
             return false;
           }
         } catch (error: any) {
           console.error('Login error:', error);
           console.error('Error response:', error.response?.data);
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || error.message || 'Login failed' 
+          set({
+            isLoading: false,
+            error:
+              error.response?.data?.message || error.message || 'Login failed',
           });
           return false;
         }
       },
 
-      register: async (userData) => {
+      register: async userData => {
         set({ isLoading: true, error: null });
         try {
           const response = await apiService.register(userData);
           if (response.success) {
             const { user, token } = response.data;
             await AsyncStorage.setItem('authToken', token);
-            set({ 
-              user, 
-              isAuthenticated: true, 
-              isLoading: false, 
-              error: null 
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
             });
             return true;
           }
           return false;
         } catch (error: any) {
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || 'Registration failed' 
+          set({
+            isLoading: false,
+            error: error.response?.data?.message || 'Registration failed',
           });
           return false;
         }
       },
 
-      forgotPassword: async (email) => {
+      forgotPassword: async email => {
         set({ isLoading: true, error: null });
         try {
           const response = await apiService.forgotPassword(email);
@@ -140,12 +148,16 @@ export const useStore = create<StoreState>()(
             set({ isLoading: false, error: null });
             return true;
           }
-          set({ isLoading: false, error: response.error || 'Failed to send reset email' });
+          set({
+            isLoading: false,
+            error: response.error || 'Failed to send reset email',
+          });
           return false;
         } catch (error: any) {
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || 'Failed to send reset email' 
+          set({
+            isLoading: false,
+            error:
+              error.response?.data?.message || 'Failed to send reset email',
           });
           return false;
         }
@@ -158,52 +170,60 @@ export const useStore = create<StoreState>()(
           console.error('Logout error:', error);
         } finally {
           await AsyncStorage.removeItem('authToken');
-          set({ 
-            user: null, 
-            isAuthenticated: false, 
-            cart: [], 
+          set({
+            user: null,
+            isAuthenticated: false,
+            cart: [],
             cartCount: 0,
             wishlist: [],
-            favorites: []
+            favorites: [],
           });
         }
       },
 
-      updateProfile: async (profileData) => {
+      updateProfile: async profileData => {
         set({ isLoading: true, error: null });
         try {
           // Try API first
           const response = await apiService.updateProfile(profileData);
           if (response.success && response.data) {
-            set({ 
-              user: response.data, 
-              isLoading: false, 
-              error: null 
+            set({
+              user: response.data,
+              isLoading: false,
+              error: null,
             });
             return true;
           }
-          set({ isLoading: false, error: response.error || 'Failed to update profile' });
+          set({
+            isLoading: false,
+            error: response.error || 'Failed to update profile',
+          });
           return false;
         } catch (error: any) {
-          console.log('API update failed, updating local user data:', error.message);
+          console.log(
+            'API update failed, updating local user data:',
+            error.message
+          );
           // Fallback: Update local user data when API is not available
           const { user } = get();
           if (user) {
             const updatedUser = {
               ...user,
               ...profileData,
-              name: profileData.name || `${profileData.firstName || user.firstName} ${profileData.lastName || user.lastName}`.trim()
+              name:
+                profileData.name ||
+                `${profileData.firstName || user.firstName} ${profileData.lastName || user.lastName}`.trim(),
             };
-            set({ 
+            set({
               user: updatedUser,
-              isLoading: false, 
-              error: null 
+              isLoading: false,
+              error: null,
             });
             return true;
           }
-          set({ 
-            isLoading: false, 
-            error: 'Failed to update profile' 
+          set({
+            isLoading: false,
+            error: 'Failed to update profile',
           });
           return false;
         }
@@ -215,11 +235,13 @@ export const useStore = create<StoreState>()(
           await apiService.addToCart(product.id, quantity);
           await get().getCart();
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to add to cart' });
+          set({
+            error: error.response?.data?.message || 'Failed to add to cart',
+          });
         }
       },
 
-      removeFromCart: async (productId) => {
+      removeFromCart: async productId => {
         try {
           const cart = get().cart;
           const item = cart.find(item => item.productId === productId);
@@ -228,7 +250,10 @@ export const useStore = create<StoreState>()(
             await get().getCart();
           }
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to remove from cart' });
+          set({
+            error:
+              error.response?.data?.message || 'Failed to remove from cart',
+          });
         }
       },
 
@@ -241,7 +266,9 @@ export const useStore = create<StoreState>()(
             await get().getCart();
           }
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to update cart' });
+          set({
+            error: error.response?.data?.message || 'Failed to update cart',
+          });
         }
       },
 
@@ -250,7 +277,9 @@ export const useStore = create<StoreState>()(
           await apiService.clearCart();
           set({ cart: [], cartCount: 0 });
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to clear cart' });
+          set({
+            error: error.response?.data?.message || 'Failed to clear cart',
+          });
         }
       },
 
@@ -259,9 +288,9 @@ export const useStore = create<StoreState>()(
           const response = await apiService.getCart();
           if (response.success) {
             const cart = response.data;
-            set({ 
-              cart: cart.items || [], 
-              cartCount: cart.items?.length || 0 
+            set({
+              cart: cart.items || [],
+              cartCount: cart.items?.length || 0,
             });
           }
         } catch (error: any) {
@@ -270,23 +299,28 @@ export const useStore = create<StoreState>()(
       },
 
       // Wishlist actions
-      addToWishlist: async (productId) => {
+      addToWishlist: async productId => {
         try {
           await apiService.addToWishlist(productId);
           const { wishlist } = get();
           set({ wishlist: [...wishlist, productId] });
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to add to wishlist' });
+          set({
+            error: error.response?.data?.message || 'Failed to add to wishlist',
+          });
         }
       },
 
-      removeFromWishlist: async (productId) => {
+      removeFromWishlist: async productId => {
         try {
           await apiService.removeFromWishlist(productId);
           const { wishlist } = get();
           set({ wishlist: wishlist.filter(id => id !== productId) });
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to remove from wishlist' });
+          set({
+            error:
+              error.response?.data?.message || 'Failed to remove from wishlist',
+          });
         }
       },
 
@@ -302,21 +336,21 @@ export const useStore = create<StoreState>()(
       },
 
       // Product actions
-      fetchProducts: async (filters) => {
+      fetchProducts: async filters => {
         set({ isLoading: true, error: null });
         try {
           const response = await apiService.getProducts(filters);
           // You might want to store products in state here
           set({ isLoading: false });
         } catch (error: any) {
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || 'Failed to fetch products' 
+          set({
+            isLoading: false,
+            error: error.response?.data?.message || 'Failed to fetch products',
           });
         }
       },
 
-      fetchProduct: async (id) => {
+      fetchProduct: async id => {
         try {
           const response = await apiService.getProduct(id);
           if (response.success) {
@@ -324,21 +358,23 @@ export const useStore = create<StoreState>()(
           }
           return null;
         } catch (error: any) {
-          set({ error: error.response?.data?.message || 'Failed to fetch product' });
+          set({
+            error: error.response?.data?.message || 'Failed to fetch product',
+          });
           return null;
         }
       },
 
-      searchProducts: async (query) => {
+      searchProducts: async query => {
         set({ isLoading: true, error: null });
         try {
           const response = await apiService.searchProducts({ query });
           // You might want to store search results in state here
           set({ isLoading: false });
         } catch (error: any) {
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || 'Search failed' 
+          set({
+            isLoading: false,
+            error: error.response?.data?.message || 'Search failed',
           });
         }
       },
@@ -351,14 +387,14 @@ export const useStore = create<StoreState>()(
           // You might want to store orders in state here
           set({ isLoading: false });
         } catch (error: any) {
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || 'Failed to fetch orders' 
+          set({
+            isLoading: false,
+            error: error.response?.data?.message || 'Failed to fetch orders',
           });
         }
       },
 
-      createOrder: async (orderData) => {
+      createOrder: async orderData => {
         set({ isLoading: true, error: null });
         try {
           const response = await apiService.createOrder(orderData);
@@ -368,9 +404,9 @@ export const useStore = create<StoreState>()(
           }
           return null;
         } catch (error: any) {
-          set({ 
-            isLoading: false, 
-            error: error.response?.data?.message || 'Failed to create order' 
+          set({
+            isLoading: false,
+            error: error.response?.data?.message || 'Failed to create order',
           });
           return null;
         }
@@ -382,7 +418,7 @@ export const useStore = create<StoreState>()(
     {
       name: 'genosys-app-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         cart: state.cart,

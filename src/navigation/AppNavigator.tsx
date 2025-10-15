@@ -14,7 +14,6 @@ import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import HomeScreen from '../screens/main/HomeScreen';
 import ProductsScreen from '../screens/main/ProductsScreen';
 import CartScreen from '../screens/main/CartScreen';
-import OrdersScreen from '../screens/main/OrdersScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import EditProfileScreen from '../screens/main/EditProfileScreen';
 import ProductDetailScreen from '../screens/main/ProductDetailScreen';
@@ -22,6 +21,7 @@ import CheckoutScreen from '../screens/main/CheckoutScreen';
 import OrderDetailScreen from '../screens/main/OrderDetailScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import TrainingMaterialsScreen from '../screens/main/TrainingMaterialsScreen';
+import AdvancedFeaturesScreen from '../screens/main/AdvancedFeaturesScreen';
 
 // Navigation types
 export type RootStackParamList = {
@@ -34,6 +34,7 @@ export type RootStackParamList = {
   Settings: undefined;
   EditProfile: undefined;
   TrainingMaterials: undefined;
+  AdvancedFeatures: undefined;
 };
 
 export type AuthStackParamList = {
@@ -46,7 +47,7 @@ export type MainTabParamList = {
   Home: undefined;
   Products: undefined;
   Cart: undefined;
-  Orders: undefined;
+  Training: undefined;
   Profile: undefined;
 };
 
@@ -64,9 +65,12 @@ function AuthStackNavigator() {
         gestureDirection: 'horizontal',
       }}
     >
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Register" component={RegisterScreen} />
-      <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <AuthStack.Screen name='Login' component={LoginScreen} />
+      <AuthStack.Screen name='Register' component={RegisterScreen} />
+      <AuthStack.Screen
+        name='ForgotPassword'
+        component={ForgotPasswordScreen}
+      />
     </AuthStack.Navigator>
   );
 }
@@ -81,12 +85,19 @@ function MainStackNavigator() {
         gestureDirection: 'horizontal',
       }}
     >
-      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-      <Stack.Screen name="Checkout" component={CheckoutScreen} />
-      <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
-      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-      <Stack.Screen name="TrainingMaterials" component={TrainingMaterialsScreen} />
+      <Stack.Screen name='MainTabs' component={MainTabNavigator} />
+      <Stack.Screen name='ProductDetail' component={ProductDetailScreen} />
+      <Stack.Screen name='Checkout' component={CheckoutScreen} />
+      <Stack.Screen name='OrderDetail' component={OrderDetailScreen} />
+      <Stack.Screen name='EditProfile' component={EditProfileScreen} />
+      <Stack.Screen
+        name='TrainingMaterials'
+        component={TrainingMaterialsScreen}
+      />
+      <Stack.Screen
+        name='AdvancedFeatures'
+        component={AdvancedFeaturesScreen}
+      />
     </Stack.Navigator>
   );
 }
@@ -108,8 +119,8 @@ function MainTabNavigator() {
             iconName = focused ? 'grid' : 'grid-outline';
           } else if (route.name === 'Cart') {
             iconName = focused ? 'cart' : 'cart-outline';
-          } else if (route.name === 'Orders') {
-            iconName = focused ? 'receipt' : 'receipt-outline';
+          } else if (route.name === 'Training') {
+            iconName = focused ? 'school' : 'school-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -120,23 +131,27 @@ function MainTabNavigator() {
             return (
               <View style={{ position: 'relative' }}>
                 <Ionicons name={iconName} size={size} color={color} />
-                <View style={{
-                  position: 'absolute',
-                  right: -6,
-                  top: -3,
-                  backgroundColor: '#dc2626',
-                  borderRadius: 10,
-                  minWidth: 20,
-                  height: 20,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  paddingHorizontal: 4,
-                }}>
-                  <Text style={{
-                    color: 'white',
-                    fontSize: 12,
-                    fontWeight: 'bold',
-                  }}>
+                <View
+                  style={{
+                    position: 'absolute',
+                    right: -6,
+                    top: -3,
+                    backgroundColor: '#dc2626',
+                    borderRadius: 10,
+                    minWidth: 20,
+                    height: 20,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 4,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 12,
+                      fontWeight: 'bold',
+                    }}
+                  >
                     {cartItemCount > 99 ? '99+' : cartItemCount}
                   </Text>
                 </View>
@@ -151,28 +166,28 @@ function MainTabNavigator() {
         headerShown: false,
       })}
     >
-      <MainTab.Screen 
-        name="Home" 
+      <MainTab.Screen
+        name='Home'
         component={HomeScreen}
         options={{ tabBarLabel: 'Home' }}
       />
-      <MainTab.Screen 
-        name="Products" 
+      <MainTab.Screen
+        name='Products'
         component={ProductsScreen}
         options={{ tabBarLabel: 'Products' }}
       />
-      <MainTab.Screen 
-        name="Cart" 
+      <MainTab.Screen
+        name='Cart'
         component={CartScreen}
         options={{ tabBarLabel: 'Cart' }}
       />
-      <MainTab.Screen 
-        name="Orders" 
-        component={OrdersScreen}
-        options={{ tabBarLabel: 'Orders' }}
+      <MainTab.Screen
+        name='Training'
+        component={TrainingMaterialsScreen}
+        options={{ tabBarLabel: 'Training' }}
       />
-      <MainTab.Screen 
-        name="Profile" 
+      <MainTab.Screen
+        name='Profile'
         component={ProfileScreen}
         options={{ tabBarLabel: 'Profile' }}
       />
@@ -183,7 +198,14 @@ function MainTabNavigator() {
 // Loading Screen Component
 function LoadingScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+      }}
+    >
       <Text style={{ fontSize: 18, color: '#dc2626' }}>Loading...</Text>
     </View>
   );
@@ -193,7 +215,12 @@ function LoadingScreen() {
 export default function AppNavigator() {
   const { isAuthenticated, isLoading } = useStore();
 
-  console.log('AppNavigator - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
+  console.log(
+    'AppNavigator - isAuthenticated:',
+    isAuthenticated,
+    'isLoading:',
+    isLoading
+  );
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -210,11 +237,11 @@ export default function AppNavigator() {
       >
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="Main" component={MainStackNavigator} />
-            <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+            <Stack.Screen name='Main' component={MainStackNavigator} />
+            <Stack.Screen name='MainTabs' component={MainTabNavigator} />
           </>
         ) : (
-          <Stack.Screen name="Auth" component={AuthStackNavigator} />
+          <Stack.Screen name='Auth' component={AuthStackNavigator} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

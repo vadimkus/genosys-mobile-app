@@ -4,11 +4,17 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 export default function OrdersScreen() {
   const { theme } = useTheme();
-  
+
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>My Orders</Text>
-      <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Track your orders</Text>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        My Orders
+      </Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+        Track your orders
+      </Text>
     </View>
   );
 }

@@ -21,6 +21,8 @@ import { Product, Category } from '../../types';
 import { useCart } from '../../contexts/CartContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { ProductGrid } from '../../components/OptimizedList';
+import { trackScreenLoad } from '../../utils/performance';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 60) / 2; // 2 columns with padding
@@ -31,7 +33,7 @@ export default function ProductsScreen() {
   const navigation = useNavigation<ProductsScreenNavigationProp>();
   const { addToCart } = useCart();
   const { theme } = useTheme();
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,22 +45,26 @@ export default function ProductsScreen() {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    const endTracking = trackScreenLoad('ProductsScreen');
     loadProducts();
+    return endTracking;
   }, []);
 
   const loadProducts = async () => {
     try {
       setLoading(true);
       console.log('🛍️ Loading products...');
-      
+
       const connected = await productService.initialize();
       const allProducts = productService.getAllProducts();
       const allCategories = productService.getCategories();
-      
+
       setProducts(allProducts);
       setCategories(allCategories);
-      
-      console.log(`✅ Loaded ${allProducts.length} products, ${allCategories.length} categories`);
+
+      console.log(
+        `✅ Loaded ${allProducts.length} products, ${allCategories.length} categories`
+      );
     } catch (error) {
       console.error('❌ Error loading products:', error);
       Alert.alert('Error', 'Failed to load products. Please try again.');
@@ -93,34 +99,45 @@ export default function ProductsScreen() {
     if (searchQuery) {
       console.log('🔍 Searching for:', searchQuery);
       console.log('📦 Total products before search:', products.length);
-      
+
       filtered = filtered.filter(product => {
-        const nameMatch = product.name?.toLowerCase().includes(searchQuery.toLowerCase());
-        const brandMatch = product.brand?.toLowerCase().includes(searchQuery.toLowerCase());
-        const categoryMatch = product.category?.toLowerCase().includes(searchQuery.toLowerCase());
-        const descriptionMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-        
-        const isMatch = nameMatch || brandMatch || categoryMatch || descriptionMatch;
-        
+        const nameMatch = product.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const brandMatch = product.brand
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const categoryMatch = product.category
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const descriptionMatch = product.description
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+        const isMatch =
+          nameMatch || brandMatch || categoryMatch || descriptionMatch;
+
         if (isMatch) {
           console.log('✅ Found match:', product.name);
         }
-        
+
         return isMatch;
       });
-      
+
       console.log('📦 Products after search:', filtered.length);
     }
 
     // Category filter
     if (selectedCategory) {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      filtered = filtered.filter(
+        product => product.category === selectedCategory
+      );
     }
 
     // Sort products
     filtered.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'name':
           comparison = a.name.localeCompare(b.name);
@@ -132,7 +149,7 @@ export default function ProductsScreen() {
           comparison = a.averageRating - b.averageRating;
           break;
       }
-      
+
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
@@ -147,29 +164,30 @@ export default function ProductsScreen() {
     >
       <View style={styles.productImageContainer}>
         <Image
-        source={{
-          uri: item.name === 'POWER SOLUTION PCS'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
-            : item.name === 'POWER SOLUTION SWS'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
-            : item.name === 'PROBLEM CONTROL SERUM'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
-            : item.name === 'SOOTHING REPAIR POSTCREAM'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
-            : item.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75'
-            : item.name === 'SNOW O₂ CLEANSER'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75'
-            : item.name === 'SNOW BOOSTER'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75'
-            : item.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75'
-            : item.name === 'SOOTHING BOMB SEA ALGAE MASK'
-            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75'
-            : item.imageUrl
-        }}
+          source={{
+            uri:
+              item.name === 'POWER SOLUTION PCS'
+                ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPCS.jpg&w=1200&q=75'
+                : item.name === 'POWER SOLUTION SWS'
+                  ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSWS.jpg&w=1200&q=75'
+                  : item.name === 'PROBLEM CONTROL SERUM'
+                    ? 'https://genosys.ae/_next/image?url=%2Fimages%2FPRSS.jpg&w=1200&q=75'
+                    : item.name === 'SOOTHING REPAIR POSTCREAM'
+                      ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRC.jpg&w=1200&q=75'
+                      : item.name === 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER'
+                        ? 'https://genosys.ae/_next/image?url=%2Fimages%2FDEF.jpg&w=1200&q=75'
+                        : item.name === 'SNOW O₂ CLEANSER'
+                          ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSNOW.jpg&w=1200&q=75'
+                          : item.name === 'SNOW BOOSTER'
+                            ? 'https://genosys.ae/_next/image?url=%2Fimages%2FBOOS.jpg&w=1200&q=75'
+                            : item.name === 'SKIN RENEWAL PEELING SYSTEM (SRS)'
+                              ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSRS.jpg&w=1200&q=75'
+                              : item.name === 'SOOTHING BOMB SEA ALGAE MASK'
+                                ? 'https://genosys.ae/_next/image?url=%2Fimages%2FSEA.jpg&w=1200&q=75'
+                                : item.imageUrl,
+          }}
           style={styles.productImage}
-          resizeMode="cover"
+          resizeMode='cover'
         />
         {item.isOnSale && (
           <View style={styles.saleBadge}>
@@ -184,7 +202,10 @@ export default function ProductsScreen() {
         {item.inStock && (
           <View style={styles.inStockBadge}>
             <Text style={styles.inStockText}>
-              {(item.name === 'Hair-GENTRON Device' || item.name === 'HairGen Booster') ? 'ORDER' : 'IN STOCK'}
+              {item.name === 'Hair-GENTRON Device' ||
+              item.name === 'HairGen Booster'
+                ? 'ORDER'
+                : 'IN STOCK'}
             </Text>
           </View>
         )}
@@ -192,25 +213,29 @@ export default function ProductsScreen() {
           style={styles.addToCartButton}
           onPress={() => handleAddToCart(item)}
         >
-          <Ionicons name="add" size={20} color="#ffffff" />
+          <Ionicons name='add' size={20} color='#ffffff' />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.productInfo}>
         <Text style={styles.productBrand}>{item.brand}</Text>
         <Text style={styles.productName} numberOfLines={2}>
           Genosys {item.name}
         </Text>
-        
+
         <View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>⭐⭐⭐⭐⭐ {item.averageRating.toFixed(1)}/5</Text>
+          <Text style={styles.ratingText}>
+            ⭐⭐⭐⭐⭐ {item.averageRating.toFixed(1)}/5
+          </Text>
           <Text style={styles.reviewCount}>({item.reviewCount})</Text>
         </View>
-        
+
         <View style={styles.priceContainer}>
           <Text style={styles.price}>AED {item.price.toFixed(2)}</Text>
           {item.originalPrice && item.originalPrice > item.price && (
-            <Text style={styles.originalPrice}>AED {item.originalPrice.toFixed(2)}</Text>
+            <Text style={styles.originalPrice}>
+              AED {item.originalPrice.toFixed(2)}
+            </Text>
           )}
         </View>
       </View>
@@ -227,7 +252,7 @@ export default function ProductsScreen() {
         <Image
           source={{ uri: item.imageUrl }}
           style={styles.horizontalProductImage}
-          resizeMode="cover"
+          resizeMode='cover'
         />
         {item.isOnSale && (
           <View style={styles.saleBadge}>
@@ -242,7 +267,10 @@ export default function ProductsScreen() {
         {item.inStock && (
           <View style={styles.inStockBadge}>
             <Text style={styles.inStockText}>
-              {(item.name === 'Hair-GENTRON Device' || item.name === 'HairGen Booster') ? 'ORDER' : 'IN STOCK'}
+              {item.name === 'Hair-GENTRON Device' ||
+              item.name === 'HairGen Booster'
+                ? 'ORDER'
+                : 'IN STOCK'}
             </Text>
           </View>
         )}
@@ -250,25 +278,29 @@ export default function ProductsScreen() {
           style={styles.addToCartButton}
           onPress={() => handleAddToCart(item)}
         >
-          <Ionicons name="add" size={20} color="#ffffff" />
+          <Ionicons name='add' size={20} color='#ffffff' />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.horizontalProductInfo}>
         <Text style={styles.productBrand}>{item.brand}</Text>
         <Text style={styles.productName} numberOfLines={2}>
           Genosys {item.name}
         </Text>
-        
+
         <View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>⭐⭐⭐⭐⭐ {item.averageRating.toFixed(1)}/5</Text>
+          <Text style={styles.ratingText}>
+            ⭐⭐⭐⭐⭐ {item.averageRating.toFixed(1)}/5
+          </Text>
           <Text style={styles.reviewCount}>({item.reviewCount})</Text>
         </View>
-        
+
         <View style={styles.priceContainer}>
           <Text style={styles.price}>AED {item.price.toFixed(2)}</Text>
           {item.originalPrice && item.originalPrice > item.price && (
-            <Text style={styles.originalPrice}>AED {item.originalPrice.toFixed(2)}</Text>
+            <Text style={styles.originalPrice}>
+              AED {item.originalPrice.toFixed(2)}
+            </Text>
           )}
         </View>
       </View>
@@ -278,23 +310,33 @@ export default function ProductsScreen() {
   const renderCategoryFilter = () => (
     <View style={styles.categoryContainer}>
       <View style={styles.categoryContent}>
-      {categories.map((category) => (
-        <TouchableOpacity
-          key={category.id}
-          style={[
-            styles.categoryChip,
-            (selectedCategory === category.name || (!selectedCategory && category.name === 'All')) && styles.categoryChipActive
-          ]}
-          onPress={() => setSelectedCategory(category.name === 'All' ? null : category.name)}
-        >
-          <Text style={[
-            styles.categoryChipText,
-            (selectedCategory === category.name || (!selectedCategory && category.name === 'All')) && styles.categoryChipTextActive
-          ]}>
-            {category.name}
-          </Text>
-        </TouchableOpacity>
-      ))}
+        {categories.map(category => (
+          <TouchableOpacity
+            key={category.id}
+            style={[
+              styles.categoryChip,
+              (selectedCategory === category.name ||
+                (!selectedCategory && category.name === 'All')) &&
+                styles.categoryChipActive,
+            ]}
+            onPress={() =>
+              setSelectedCategory(
+                category.name === 'All' ? null : category.name
+              )
+            }
+          >
+            <Text
+              style={[
+                styles.categoryChipText,
+                (selectedCategory === category.name ||
+                  (!selectedCategory && category.name === 'All')) &&
+                  styles.categoryChipTextActive,
+              ]}
+            >
+              {category.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
     </View>
   );
@@ -304,68 +346,74 @@ export default function ProductsScreen() {
       <View style={styles.filterHeader}>
         <Text style={styles.filterTitle}>Sort & Filter</Text>
         <TouchableOpacity onPress={() => setShowFilters(false)}>
-          <Ionicons name="close" size={24} color="#6b7280" />
+          <Ionicons name='close' size={24} color='#6b7280' />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.filterSection}>
         <Text style={styles.filterSectionTitle}>Sort By</Text>
-        {['name', 'price', 'rating'].map((option) => (
+        {['name', 'price', 'rating'].map(option => (
           <TouchableOpacity
             key={option}
             style={[
               styles.filterOption,
-              sortBy === option && styles.filterOptionActive
+              sortBy === option && styles.filterOptionActive,
             ]}
             onPress={() => setSortBy(option as any)}
           >
-            <Text style={[
-              styles.filterOptionText,
-              sortBy === option && styles.filterOptionTextActive
-            ]}>
+            <Text
+              style={[
+                styles.filterOptionText,
+                sortBy === option && styles.filterOptionTextActive,
+              ]}
+            >
               {option.charAt(0).toUpperCase() + option.slice(1)}
             </Text>
             {sortBy === option && (
-              <Ionicons name="checkmark" size={20} color="#dc2626" />
+              <Ionicons name='checkmark' size={20} color='#dc2626' />
             )}
           </TouchableOpacity>
         ))}
       </View>
-      
+
       <View style={styles.filterSection}>
         <Text style={styles.filterSectionTitle}>Order</Text>
         <TouchableOpacity
           style={[
             styles.filterOption,
-            sortOrder === 'asc' && styles.filterOptionActive
+            sortOrder === 'asc' && styles.filterOptionActive,
           ]}
           onPress={() => setSortOrder('asc')}
         >
-          <Text style={[
-            styles.filterOptionText,
-            sortOrder === 'asc' && styles.filterOptionTextActive
-          ]}>
+          <Text
+            style={[
+              styles.filterOptionText,
+              sortOrder === 'asc' && styles.filterOptionTextActive,
+            ]}
+          >
             Ascending
           </Text>
           {sortOrder === 'asc' && (
-            <Ionicons name="checkmark" size={20} color="#dc2626" />
+            <Ionicons name='checkmark' size={20} color='#dc2626' />
           )}
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.filterOption,
-            sortOrder === 'desc' && styles.filterOptionActive
+            sortOrder === 'desc' && styles.filterOptionActive,
           ]}
           onPress={() => setSortOrder('desc')}
         >
-          <Text style={[
-            styles.filterOptionText,
-            sortOrder === 'desc' && styles.filterOptionTextActive
-          ]}>
+          <Text
+            style={[
+              styles.filterOptionText,
+              sortOrder === 'desc' && styles.filterOptionTextActive,
+            ]}
+          >
             Descending
           </Text>
           {sortOrder === 'desc' && (
-            <Ionicons name="checkmark" size={20} color="#dc2626" />
+            <Ionicons name='checkmark' size={20} color='#dc2626' />
           )}
         </TouchableOpacity>
       </View>
@@ -375,19 +423,25 @@ export default function ProductsScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#dc2626" />
+        <ActivityIndicator size='large' color='#dc2626' />
         <Text style={styles.loadingText}>Loading products...</Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Products</Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            Products
+          </Text>
+          <Text
+            style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+          >
             {filteredProducts.length} of {products.length} products
           </Text>
         </View>
@@ -395,24 +449,35 @@ export default function ProductsScreen() {
           style={styles.filterButton}
           onPress={() => setShowFilters(!showFilters)}
         >
-          <Ionicons name="options-outline" size={24} color="#dc2626" />
+          <Ionicons name='options-outline' size={24} color='#dc2626' />
         </TouchableOpacity>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Ionicons name="search" size={20} color="#9ca3af" style={styles.searchIcon} />
+          <Ionicons
+            name='search'
+            size={20}
+            color='#9ca3af'
+            style={styles.searchIcon}
+          />
           <TextInput
-            style={[styles.searchInput, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
-            placeholder="Search products..."
+            style={[
+              styles.searchInput,
+              {
+                backgroundColor: theme.colors.surface,
+                color: theme.colors.text,
+              },
+            ]}
+            placeholder='Search products...'
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholderTextColor={theme.colors.textSecondary}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#9ca3af" />
+              <Ionicons name='close-circle' size={20} color='#9ca3af' />
             </TouchableOpacity>
           )}
         </View>
@@ -426,22 +491,22 @@ export default function ProductsScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Browse Products</Text>
         </View>
-        
+
         <FlatList
           data={filteredProducts}
           renderItem={renderHorizontalProductCard}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.horizontalProductsList}
           scrollEnabled={true}
           bounces={true}
-          decelerationRate="fast"
+          decelerationRate='fast'
           snapToInterval={CARD_WIDTH + 16}
-          snapToAlignment="start"
+          snapToAlignment='start'
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="search" size={64} color="#d1d5db" />
+              <Ionicons name='search' size={64} color='#d1d5db' />
               <Text style={styles.emptyTitle}>No products found</Text>
               <Text style={styles.emptySubtitle}>
                 Try adjusting your search or filters
@@ -455,41 +520,25 @@ export default function ProductsScreen() {
       <View style={styles.verticalProductsSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All Products</Text>
-          <Text style={styles.sectionSubtitle}>Scroll vertically to see more</Text>
+          <Text style={styles.sectionSubtitle}>
+            Scroll vertically to see more
+          </Text>
         </View>
-        
-        <FlatList
-          data={filteredProducts}
-          renderItem={renderProductCard}
-          keyExtractor={(item) => item.id}
+
+        <ProductGrid
+          data={filteredProducts as any}
+          onItemPress={product => handleProductPress(product.id)}
+          onItemAddToCart={product => handleAddToCart(product as any)}
           numColumns={2}
-          contentContainerStyle={styles.productsList}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          scrollEnabled={true}
-          bounces={true}
-          nestedScrollEnabled={true}
-          horizontal={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="search" size={64} color="#d1d5db" />
-              <Text style={styles.emptyTitle}>No products found</Text>
-              <Text style={styles.emptySubtitle}>
-                Try adjusting your search or filters
-              </Text>
-            </View>
-          }
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          style={styles.productsList}
         />
       </View>
 
       {/* Filter Modal */}
       {showFilters && (
-        <View style={styles.filterOverlay}>
-          {renderFilterModal()}
-        </View>
+        <View style={styles.filterOverlay}>{renderFilterModal()}</View>
       )}
     </View>
   );

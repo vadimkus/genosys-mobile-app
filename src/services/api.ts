@@ -21,8 +21,12 @@ import {
 } from '../types';
 
 // API Configuration
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://genosys.ae/api';
-const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT || '10000', 10);
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_BASE_URL || 'https://genosys.ae/api';
+const API_TIMEOUT = parseInt(
+  process.env.EXPO_PUBLIC_API_TIMEOUT || '10000',
+  10
+);
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
@@ -30,13 +34,13 @@ const api: AxiosInstance = axios.create({
   timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
 });
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  async (config) => {
+  async config => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       if (token) {
@@ -47,15 +51,15 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  response => response,
+  async error => {
     if (error.response?.status === 401) {
       // Token expired or invalid
       await AsyncStorage.removeItem('authToken');
@@ -92,13 +96,13 @@ class GlobalRateLimiter {
 
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
       const delay = this.MIN_REQUEST_INTERVAL - timeSinceLastRequest;
       console.log(`Rate Limiter: waiting ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -122,7 +126,7 @@ class GlobalRateLimiter {
     }
 
     this.isProcessingQueue = true;
-    
+
     while (this.requestQueue.length > 0) {
       const request = this.requestQueue.shift();
       if (request) {
@@ -132,13 +136,15 @@ class GlobalRateLimiter {
           console.error('Global Rate Limiter: Queue processing error:', error);
         }
       }
-      
+
       // Wait between requests
       if (this.requestQueue.length > 0) {
-        await new Promise(resolve => setTimeout(resolve, this.MIN_REQUEST_INTERVAL));
+        await new Promise(resolve =>
+          setTimeout(resolve, this.MIN_REQUEST_INTERVAL)
+        );
       }
     }
-    
+
     this.isProcessingQueue = false;
   }
 
@@ -158,42 +164,45 @@ class GlobalRateLimiter {
 
 // API Service Class
 class ApiService {
-
   // Authentication - HYBRID APPROACH: API First, Local Fallback
-  async login(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
+  async login(
+    credentials: LoginForm
+  ): Promise<ApiResponse<{ user: User; token: string }>> {
     console.log('🔐 HYBRID LOGIN STARTING for:', credentials.email);
-    
+
     // Try API first (with minimal delay)
     try {
       console.log('🌐 Attempting API login...');
       await GlobalRateLimiter.delayIfNeeded();
-      
+
       const response = await api.post('/auth/login', credentials);
       console.log('✅ API login successful');
-      
+
       if (response.data && response.data.success) {
         return {
           success: true,
           data: response.data.data,
-          message: response.data.message || 'Login successful'
+          message: response.data.message || 'Login successful',
         };
       }
     } catch (error: any) {
       console.log('⚠️ API login failed:', error.message);
-      
+
       // If it's a rate limit error, fall back to local auth immediately
       if (error.response?.status === 429) {
         console.log('🔄 Rate limited - falling back to local authentication');
         return await this.fallbackToLocalAuth(credentials);
       }
     }
-    
+
     // Fallback to local authentication
     console.log('🏠 Using local authentication fallback');
     return await this.fallbackToLocalAuth(credentials);
   }
 
-  private async fallbackToLocalAuth(credentials: LoginForm): Promise<ApiResponse<{ user: User; token: string }>> {
+  private async fallbackToLocalAuth(
+    credentials: LoginForm
+  ): Promise<ApiResponse<{ user: User; token: string }>> {
     try {
       const result = await LocalAuthService.login(credentials);
       return result;
@@ -202,12 +211,14 @@ class ApiService {
       return {
         success: false,
         data: { user: {} as User, token: '' },
-        error: 'Authentication failed'
+        error: 'Authentication failed',
       };
     }
   }
 
-  async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {
+  async register(
+    userData: RegisterForm
+  ): Promise<ApiResponse<{ user: User; token: string }>> {
     const response = await api.post('/auth/register', userData);
     return response.data;
   }
@@ -222,8 +233,14 @@ class ApiService {
     return response.data;
   }
 
-  async resetPassword(token: string, password: string): Promise<ApiResponse<null>> {
-    const response = await api.post('/auth/reset-password', { token, password });
+  async resetPassword(
+    token: string,
+    password: string
+  ): Promise<ApiResponse<null>> {
+    const response = await api.post('/auth/reset-password', {
+      token,
+      password,
+    });
     return response.data;
   }
 
@@ -243,7 +260,10 @@ class ApiService {
     return response.data;
   }
 
-  async changePassword(currentPassword: string, newPassword: string): Promise<ApiResponse<null>> {
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<ApiResponse<null>> {
     const response = await api.put('/user/change-password', {
       currentPassword,
       newPassword,
@@ -252,7 +272,11 @@ class ApiService {
   }
 
   // Products
-  async getProducts(filters?: ProductFilters, page = 1, limit = 20): Promise<PaginatedResponse<Product>> {
+  async getProducts(
+    filters?: ProductFilters,
+    page = 1,
+    limit = 20
+  ): Promise<PaginatedResponse<Product>> {
     const params = {
       page,
       limit,
@@ -267,7 +291,9 @@ class ApiService {
     return response.data;
   }
 
-  async searchProducts(params: SearchParams): Promise<PaginatedResponse<Product>> {
+  async searchProducts(
+    params: SearchParams
+  ): Promise<PaginatedResponse<Product>> {
     const response = await api.get('/products/search', { params });
     return response.data;
   }
@@ -304,12 +330,18 @@ class ApiService {
     return response.data;
   }
 
-  async addToCart(productId: string, quantity: number): Promise<ApiResponse<Cart>> {
+  async addToCart(
+    productId: string,
+    quantity: number
+  ): Promise<ApiResponse<Cart>> {
     const response = await api.post('/cart/items', { productId, quantity });
     return response.data;
   }
 
-  async updateCartItem(itemId: string, quantity: number): Promise<ApiResponse<Cart>> {
+  async updateCartItem(
+    itemId: string,
+    quantity: number
+  ): Promise<ApiResponse<Cart>> {
     const response = await api.put(`/cart/items/${itemId}`, { quantity });
     return response.data;
   }
@@ -362,17 +394,29 @@ class ApiService {
   }
 
   // Reviews
-  async getProductReviews(productId: string, page = 1, limit = 20): Promise<PaginatedResponse<Review>> {
-    const response = await api.get(`/products/${productId}/reviews`, { params: { page, limit } });
+  async getProductReviews(
+    productId: string,
+    page = 1,
+    limit = 20
+  ): Promise<PaginatedResponse<Review>> {
+    const response = await api.get(`/products/${productId}/reviews`, {
+      params: { page, limit },
+    });
     return response.data;
   }
 
-  async createReview(productId: string, reviewData: {
-    rating: number;
-    title: string;
-    comment: string;
-  }): Promise<ApiResponse<Review>> {
-    const response = await api.post(`/products/${productId}/reviews`, reviewData);
+  async createReview(
+    productId: string,
+    reviewData: {
+      rating: number;
+      title: string;
+      comment: string;
+    }
+  ): Promise<ApiResponse<Review>> {
+    const response = await api.post(
+      `/products/${productId}/reviews`,
+      reviewData
+    );
     return response.data;
   }
 
@@ -388,12 +432,17 @@ class ApiService {
     return response.data;
   }
 
-  async createAddress(addressData: Omit<Address, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Address>> {
+  async createAddress(
+    addressData: Omit<Address, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<ApiResponse<Address>> {
     const response = await api.post('/addresses', addressData);
     return response.data;
   }
 
-  async updateAddress(id: string, addressData: Partial<Address>): Promise<ApiResponse<Address>> {
+  async updateAddress(
+    id: string,
+    addressData: Partial<Address>
+  ): Promise<ApiResponse<Address>> {
     const response = await api.put(`/addresses/${id}`, addressData);
     return response.data;
   }
