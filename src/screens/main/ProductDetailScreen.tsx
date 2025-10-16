@@ -137,7 +137,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'HR³ MATRIX HAIR TONIC α') {
-      return 'GENOSYS HR³ MATRIX HAIR TONIC α is a specialized hair tonic designed to complement the HR³ MATRIX treatment system. This advanced tonic provides essential nutrients to hair follicles, improves scalp circulation, and supports healthy hair growth through its carefully formulated blend of active ingredients. Specialized hair tonic for scalp health and hair growth support. Provides essential nutrients and improves circulation for optimal hair health.';
+      return 'GENOSYS HR³ MATRIX HAIR TONIC α is a specialized scalp and hair treatment designed to revitalize and strengthen hair follicles while providing essential nutrients for optimal hair growth. This advanced tonic combines peptide technology with botanical extracts to create a comprehensive solution for hair health and vitality.';
     }
     
     if (productName === 'HR³ MATRIX SCALP AMPOULE α') {
@@ -595,25 +595,25 @@ export default function ProductDetailScreenRefactored() {
       return (
         <>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Specialized hair tonic
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Premium hair and scalp tonic
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 100ml
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 70ml
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Target:</Text> Scalp health and hair growth support
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Target:</Text> Hair health and scalp revitalization
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Advanced ingredient complex for hair health
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Advanced peptide and botanical extract technology
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Scalp health, hair growth support, circulation improvement
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Hair strengthening, scalp health, circulation improvement
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
             <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Professional and home care
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>System:</Text> Part of HR³ MATRIX treatment protocol
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>System:</Text> Part of HR³ MATRIX MESOPECIA KIT
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
             <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
@@ -1484,6 +1484,13 @@ export default function ProductDetailScreenRefactored() {
         {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
           <View style={styles.sizeDisplayContainer}>
             <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 5ml*8pcs</Text>
+          </View>
+        )}
+
+        {/* Size Display for HR³ MATRIX HAIR TONIC α */}
+        {product.name === 'HR³ MATRIX HAIR TONIC α' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 70ml</Text>
           </View>
         )}
 
@@ -3551,28 +3558,144 @@ export default function ProductDetailScreenRefactored() {
           {/* Benefits Section for HR³ MATRIX HAIR TONIC α */}
           {product.name === 'HR³ MATRIX HAIR TONIC α' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Benefits</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Scalp Health:</Text>{' '}
-                  Provides essential nutrients to maintain healthy scalp condition
+                  • Strengthens Hair Follicles - Provides essential nutrients and peptides for stronger, healthier hair
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hair Growth Support:</Text>{' '}
-                  Supports healthy hair growth through advanced ingredient complex
+                  • Improves Scalp Health - Nourishes and revitalizes the scalp environment for optimal hair growth
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Circulation Improvement:</Text>{' '}
-                  Improves blood circulation in the scalp for better nutrient delivery
+                  • Enhances Blood Circulation - Increases nutrient delivery to hair follicles through improved blood flow
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Treatment Protocol:</Text>{' '}
-                  Part of comprehensive HR³ MATRIX treatment system
+                  • Prevents Hair Loss - Targets fundamental causes of hair thinning and provides protective benefits
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Professional & Home Use:</Text>{' '}
-                  Suitable for both professional treatments and daily home care
+                  • Promotes Hair Growth - Stimulates hair follicle activity and supports natural hair regrowth
                 </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Antioxidant Protection - Botanical extracts provide antioxidant benefits for scalp protection
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for HR³ MATRIX HAIR TONIC α */}
+          {product.name === 'HR³ MATRIX HAIR TONIC α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Peptide Complex:</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sh-polypeptide-71:</Text> Supports hair follicle health and growth stimulation
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Copper Tripeptide-1:</Text> Promotes collagen synthesis and hair strength
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Pentapeptide-20:</Text> Aids in hair growth and follicle nourishment
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Botanical Extracts:</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sophora Japonica Bud Extract:</Text> Antioxidant properties for scalp protection
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Portulaca Oleracea:</Text> Traditional herb for scalp nourishment
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Polygonum Multiflorum Root:</Text> Known for hair strengthening properties
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Angelica Gigas Root:</Text> Supports scalp health and circulation
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Active Components:</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Niacinamide:</Text> Improves blood circulation in the scalp
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Citrus Paradisi Seed Oil:</Text> Provides antimicrobial benefits for scalp health
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Usage Instructions Section for HR³ MATRIX HAIR TONIC α */}
+          {product.name === 'HR³ MATRIX HAIR TONIC α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Usage Instructions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  1. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Preparation:</Text> Cleanse scalp thoroughly with HR³ MATRIX SCALP PEELING
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  2. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Application:</Text> Apply the tonic evenly to the scalp and hair roots
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  3. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Massage:</Text> Gently massage into scalp for 2-3 minutes to enhance absorption
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  4. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhancement:</Text> Use with GENOSYS STAMP (ROLLER) for deeper penetration
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  5. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Frequency:</Text> Use 2-3 times per week for optimal results
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for HR³ MATRIX HAIR TONIC α */}
+          {product.name === 'HR³ MATRIX HAIR TONIC α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is designed for both professional and home use. For best results, use as part of the complete HR³ MATRIX MESOPECIA KIT system. Consult with a hair care professional for personalized treatment protocols.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for HR³ MATRIX HAIR TONIC α */}
+          {product.name === 'HR³ MATRIX HAIR TONIC α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 650 KB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20TONIC%20ALPHA.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -4257,6 +4380,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
+
 
 
 
