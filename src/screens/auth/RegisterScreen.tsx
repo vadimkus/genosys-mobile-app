@@ -78,6 +78,12 @@ export default function RegisterScreen() {
       return false;
     }
 
+    // Company is required only for distributors
+    if (formData.role === 'distributor' && !formData.company) {
+      Alert.alert('Error', 'Company name is required for distributors');
+      return false;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return false;
@@ -178,17 +184,6 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Company</Text>
-            <TextInput
-              style={styles.input}
-              placeholder='Enter your company name'
-              value={formData.company}
-              onChangeText={value => handleInputChange('company', value)}
-              autoCapitalize='words'
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
             <Text style={styles.label}>Account Type</Text>
             <View style={styles.roleContainer}>
               <TouchableOpacity
@@ -226,6 +221,19 @@ export default function RegisterScreen() {
               </TouchableOpacity>
             </View>
           </View>
+
+          {formData.role === 'distributor' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Company *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder='Enter your company name'
+                value={formData.company}
+                onChangeText={value => handleInputChange('company', value)}
+                autoCapitalize='words'
+              />
+            </View>
+          )}
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password *</Text>
