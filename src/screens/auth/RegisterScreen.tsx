@@ -127,7 +127,6 @@ export default function RegisterScreen() {
                 </Animated.View>
               </View>
               <Text style={styles.createAccountTitle}>Create Account</Text>
-              <Text style={styles.createAccountSubtitle}>Join Genosys today</Text>
             </View>
 
         <View style={styles.form}>
@@ -326,12 +325,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1f2937',
     marginTop: 20,
-    marginBottom: 8,
-  },
-  createAccountSubtitle: {
-    fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
     marginBottom: 20,
   },
   form: {
