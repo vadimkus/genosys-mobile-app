@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ImageBackground,
 } from 'react-native';
 import { useStore } from '../../store/useStore';
 import { useNavigation } from '@react-navigation/native';
@@ -102,94 +103,112 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <ImageBackground
+      source={require('../../../login/login.png')}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome to Genosys</Text>
-          <Text style={styles.subtitle}>Sign in to your account</Text>
-        </View>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.overlay}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Welcome to Genosys</Text>
+              <Text style={styles.subtitle}>Sign in to your account</Text>
+            </View>
 
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={[
-                styles.input,
-                validationErrors.email && styles.inputError,
-              ]}
-              placeholder='Enter your email'
-              value={email}
-              onChangeText={handleEmailChange}
-              keyboardType='email-address'
-              autoCapitalize='none'
-              autoCorrect={false}
-            />
-            {validationErrors.email && (
-              <Text style={styles.errorText}>{validationErrors.email[0]}</Text>
-            )}
+            <View style={styles.form}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    validationErrors.email && styles.inputError,
+                  ]}
+                  placeholder='Enter your email'
+                  value={email}
+                  onChangeText={handleEmailChange}
+                  keyboardType='email-address'
+                  autoCapitalize='none'
+                  autoCorrect={false}
+                />
+                {validationErrors.email && (
+                  <Text style={styles.errorText}>{validationErrors.email[0]}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Password</Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    validationErrors.password && styles.inputError,
+                  ]}
+                  placeholder='Enter your password'
+                  value={password}
+                  onChangeText={handlePasswordChange}
+                  secureTextEntry
+                  autoCapitalize='none'
+                />
+                {validationErrors.password && (
+                  <Text style={styles.errorText}>
+                    {validationErrors.password[0]}
+                  </Text>
+                )}
+              </View>
+
+              <TouchableOpacity
+                style={styles.forgotPassword}
+                onPress={handleForgotPassword}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.loginButton, isLoading && styles.disabledButton]}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
+                <Text style={styles.loginButtonText}>
+                  {isLoading ? 'Signing In...' : 'Sign In'}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.registerContainer}>
+                <Text style={styles.registerText}>Don't have an account? </Text>
+                <TouchableOpacity onPress={handleRegister}>
+                  <Text style={styles.registerLink}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[
-                styles.input,
-                validationErrors.password && styles.inputError,
-              ]}
-              placeholder='Enter your password'
-              value={password}
-              onChangeText={handlePasswordChange}
-              secureTextEntry
-              autoCapitalize='none'
-            />
-            {validationErrors.password && (
-              <Text style={styles.errorText}>
-                {validationErrors.password[0]}
-              </Text>
-            )}
-          </View>
-
-          <TouchableOpacity
-            style={styles.forgotPassword}
-            onPress={handleForgotPassword}
-          >
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.loginButton, isLoading && styles.disabledButton]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            <Text style={styles.loginButtonText}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={handleRegister}>
-              <Text style={styles.registerLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
+  },
+  overlay: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 16,
+    padding: 24,
+    margin: 16,
   },
   header: {
     alignItems: 'center',
