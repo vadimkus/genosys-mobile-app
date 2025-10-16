@@ -7,6 +7,7 @@ import {
   Alert,
   Text,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -1574,7 +1575,7 @@ export default function ProductDetailScreenRefactored() {
         </View>
         )}
 
-          {/* Key Features Section for ALL FOR SENSITIVE SERUM */}
+          {/* Benefits Section for ALL FOR SENSITIVE SERUM */}
           {product.name === 'ALL FOR SENSITIVE SERUM' && (
             <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
@@ -1639,6 +1640,31 @@ export default function ProductDetailScreenRefactored() {
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Beta-Glucan:</Text>{' '}
                   A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing in sensitive skin.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* How to Use Section for ALL FOR SENSITIVE SERUM */}
+          {product.name === 'ALL FOR SENSITIVE SERUM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>How to Use</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Application:</Text>{' '}
+                  Apply the serum to clean skin in the morning and evening
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Method:</Text>{' '}
+                  Gently pat with fingers until fully absorbed
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Frequency:</Text>{' '}
+                  Use as part of your daily skincare routine for sensitive skin care
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Best Results:</Text>{' '}
+                  Use consistently for optimal skin barrier repair and soothing benefits
                 </Text>
               </View>
             </View>
@@ -1736,6 +1762,31 @@ export default function ProductDetailScreenRefactored() {
                   <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
                   This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin.
                 </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for BIO-FERMENT AGE DEFYING POWDER MASK */}
+          {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <View style={styles.documentationContainer}>
+                  <View style={styles.documentationInfo}>
+                    <Text style={[styles.documentationTitle, { color: theme.colors.text }]}>📄 Product Manual</Text>
+                    <Text style={[styles.documentationDescription, { color: theme.colors.text }]}>Complete product manual and usage guide for professional application</Text>
+                    <Text style={[styles.documentationFileSize, { color: theme.colors.text }]}>File size: 2.1 MB</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf')
+                        .catch(err => Alert.alert('Error', 'Unable to open document'));
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -2927,5 +2978,56 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     minHeight: 32,
     flexWrap: 'wrap',
+  },
+  documentationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+  },
+  documentationInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  documentationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  documentationDescription: {
+    fontSize: 13,
+    opacity: 0.8,
+    marginBottom: 4,
+    lineHeight: 18,
+  },
+  documentationFileSize: {
+    fontSize: 12,
+    opacity: 0.6,
+    fontStyle: 'italic',
+  },
+  documentationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  documentationButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
