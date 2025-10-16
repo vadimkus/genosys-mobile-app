@@ -121,7 +121,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'HR³ MATRIX HAIR SOLUTION α') {
-      return 'GENOSYS HR³ MATRIX HAIR SOLUTION α is a premium scalp and hair care treatment specifically formulated to combat hair loss and promote healthy hair regrowth. This advanced solution addresses the fundamental causes of hair loss by accelerating angiogenesis, inhibiting hair loss substances, and providing essential nutrients to hair follicles for optimal growth and strength. Premium hair and scalp solution with advanced peptide technology. Prevents hair loss, promotes regrowth, and strengthens hair follicles with botanical extracts.';
+      return 'GENOSYS HR³ MATRIX HAIR SOLUTION α is a premium scalp and hair care treatment specifically formulated to combat hair loss and promote healthy hair regrowth. This advanced solution addresses the fundamental causes of hair loss by accelerating angiogenesis, inhibiting hair loss substances, and providing essential nutrients to hair follicles for optimal growth and strength.';
     }
     
     if (productName === 'HR³ MATRIX MESOPECIA KIT') {
@@ -1477,6 +1477,13 @@ export default function ProductDetailScreenRefactored() {
         {product.name === 'GENO-LED IR II' && (
           <View style={styles.sizeDisplayContainer}>
             <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 1 Device</Text>
+          </View>
+        )}
+
+        {/* Size Display for HR³ MATRIX HAIR SOLUTION α */}
+        {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 5ml*8pcs</Text>
           </View>
         )}
 
@@ -3370,28 +3377,144 @@ export default function ProductDetailScreenRefactored() {
           {/* Benefits Section for HR³ MATRIX HAIR SOLUTION α */}
           {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Benefits</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hair Loss Prevention:</Text>{' '}
-                  Targets root causes including 5α-reductase inhibition to suppress DHT conversion
+                  • Prevents Hair Loss - Targets fundamental causes of hair loss and inhibits substances responsible for hair thinning
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Stimulates Hair Growth:</Text>{' '}
-                  Supplies essential nutrients to hair follicles and promotes angiogenesis for new hair growth
+                  • Promotes Hair Regrowth - Accelerates angiogenesis and stimulates hair follicle activity for new growth
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Regulates Sebum Secretion:</Text>{' '}
-                  Controls excessive sebum production for balanced and healthy scalp environment
+                  • Strengthens Hair Follicles - Provides essential nutrients and peptides for stronger, healthier hair
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhanced Absorption:</Text>{' '}
-                  Designed to work with roller device for deeper penetration of active ingredients
+                  • Improves Scalp Health - Nourishes and revitalizes the scalp environment for optimal hair growth
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Comprehensive Treatment:</Text>{' '}
-                  Addresses all aspects of hair loss and scalp health
+                  • Enhances Blood Circulation - Increases nutrient delivery to hair follicles through improved blood flow
                 </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Antioxidant Protection - Sophora Japonica and other botanical extracts provide antioxidant benefits
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for HR³ MATRIX HAIR SOLUTION α */}
+          {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Peptide Complex:</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sh-polypeptide-71:</Text> Supports hair follicle health and growth stimulation
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Copper Tripeptide-1:</Text> Promotes collagen synthesis and hair strength
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Pentapeptide-20:</Text> Aids in hair growth and follicle nourishment
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Botanical Extracts:</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sophora Japonica Bud Extract:</Text> Antioxidant properties for scalp protection
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Portulaca Oleracea:</Text> Traditional herb for scalp nourishment
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Polygonum Multiflorum Root:</Text> Known for hair strengthening properties
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Angelica Gigas Root:</Text> Supports scalp health and circulation
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Active Components:</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Niacinamide:</Text> Improves blood circulation in the scalp
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Citrus Paradisi Seed Oil:</Text> Provides antimicrobial benefits for scalp health
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Usage Instructions Section for HR³ MATRIX HAIR SOLUTION α */}
+          {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Usage Instructions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  1. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Preparation:</Text> Cleanse scalp thoroughly with HR³ MATRIX SCALP PEELING
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  2. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Application:</Text> Apply the solution evenly to the scalp and hair roots
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  3. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Massage:</Text> Gently massage into scalp for 2-3 minutes to enhance absorption
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  4. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhancement:</Text> Use with GENOSYS STAMP (ROLLER) for deeper penetration
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  5. <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Frequency:</Text> Use 2-3 times per week for optimal results
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for HR³ MATRIX HAIR SOLUTION α */}
+          {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is designed for both professional and home use. For best results, use as part of the complete HR³ MATRIX MESOPECIA KIT system. Consult with a hair care professional for personalized treatment protocols.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for HR³ MATRIX HAIR SOLUTION α */}
+          {product.name === 'HR³ MATRIX HAIR SOLUTION α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 1.1 MB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20SOLUTION%20ALPHA.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -4134,5 +4257,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
 
 
