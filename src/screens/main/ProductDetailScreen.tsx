@@ -109,11 +109,11 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'EyeCell EYE ZONE CARE KIT') {
-      return "GENOSYS EyeCell EYE ZONE CARE KIT is a comprehensive professional-grade solution designed to address various concerns in the delicate eye area, including fine lines, dark circles, puffiness, and crow's feet. This advanced kit combines cosmeceuticals with a specialized micro-needle roller to enhance the absorption of active ingredients and stimulate collagen production for comprehensive eye rejuvenation. Professional eye zone care kit with serum, cream, patches, and micro-needle roller. Comprehensive solution for wrinkles, dark circles, and puffiness.";
+      return "GENOSYS EyeCell EYE ZONE CARE KIT is a comprehensive professional-grade solution designed to address various concerns in the delicate eye area, including fine lines, dark circles, puffiness, and crow's feet. This advanced kit combines cosmeceuticals with a specialized micro-needle roller to enhance the absorption of active ingredients and stimulate collagen production for comprehensive eye rejuvenation.";
     }
     
     if (productName === 'GENO-LED IR II') {
-      return 'GENOSYS GENO-LED IR II is an advanced LED therapy device that combines infrared and red light technology to provide professional-grade skin rejuvenation treatments. This innovative device utilizes specific wavelengths of light to stimulate cellular activity, promote collagen production, and enhance overall skin health for both professional and home use. Advanced LED therapy device with infrared and red light technology. Professional-grade skin rejuvenation for anti-aging, acne treatment, and skin healing.';
+      return 'GENOSYS GENO-LED IR II is an advanced LED therapy device that combines infrared and red light technology to provide professional-grade skin rejuvenation treatments. This innovative device utilizes specific wavelengths of light to stimulate cellular activity, promote collagen production, and enhance overall skin health for both professional and home use.';
     }
     
     if (productName === 'SKIN REBOOT PDRN MASK PACK') {
@@ -181,7 +181,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'EZ CO₂ MASK KIT') {
-      return "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients. Professional CO₂ therapy kit that delivers oxygen to skin through innovative Bohr Effect mechanism.";
+      return "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients.";
     }
     
     if (productName === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM') {
@@ -1150,6 +1150,9 @@ export default function ProductDetailScreenRefactored() {
             <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Eye contour cream
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 20g
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
             <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially mature and aging skin
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
@@ -1162,10 +1165,60 @@ export default function ProductDetailScreenRefactored() {
             <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Morning and evening
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Price:</Text> <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>AED {product.price.toFixed(2)}</Text>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'EyeCell EYE CONTOUR SERUM') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Eye contour serum
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 20g
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 10ml
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially mature and aging skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Advanced peptide and botanical callus culture technology
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Wrinkle reduction, dark circle diminishment, puffiness relief
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Morning and evening
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'EyeCell EYE PEPTIDE GEL PATCH') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Thermo-sensitive hydrogel patches
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 101g (60 patches)
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially mature and aging skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Patented thermo-sensitive hydrogel technology
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Puffiness reduction, dark circle lightening, fine line smoothing
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> 20-40 minutes per application
           </Text>
           <Text style={[styles.detailItem, { color: theme.colors.text }]}>
             <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
@@ -1396,6 +1449,34 @@ export default function ProductDetailScreenRefactored() {
         {product.name === 'EyeCell EYE CONTOUR CREAM' && (
           <View style={styles.sizeDisplayContainer}>
             <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 20g</Text>
+          </View>
+        )}
+
+        {/* Size Display for EyeCell EYE CONTOUR SERUM */}
+        {product.name === 'EyeCell EYE CONTOUR SERUM' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 10ml</Text>
+          </View>
+        )}
+
+        {/* Size Display for EyeCell EYE PEPTIDE GEL PATCH */}
+        {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 101g (60pcs)</Text>
+          </View>
+        )}
+
+        {/* Size Display for EyeCell EYE ZONE CARE KIT */}
+        {product.name === 'EyeCell EYE ZONE CARE KIT' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 1 Kit</Text>
+          </View>
+        )}
+
+        {/* Size Display for GENO-LED IR II */}
+        {product.name === 'GENO-LED IR II' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 1 Device</Text>
           </View>
         )}
 
@@ -2211,6 +2292,43 @@ export default function ProductDetailScreenRefactored() {
             </View>
           )}
 
+          {/* Product Documentation Section for EZ CO₂ MASK KIT */}
+          {product.name === 'EZ CO₂ MASK KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 1.2 MB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20EZ%20CO2%20MASK%20KIT.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
 
           {/* Benefits Section for EyeCell EYE CONTOUR CREAM */}
           {product.name === 'EyeCell EYE CONTOUR CREAM' && (
@@ -2307,6 +2425,244 @@ export default function ProductDetailScreenRefactored() {
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine.
                 </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Benefits Section for EyeCell EYE CONTOUR SERUM */}
+          {product.name === 'EyeCell EYE CONTOUR SERUM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Wrinkle Reduction - Stimulates collagen production and relaxes facial muscles for smoother skin
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Dark Circle Diminishment - Anti-dark circle complex strengthens skin and visibly reduces dark circles
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Puffiness Relief - Alleviates under-eye puffiness and swelling
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Hydration and Firmness - Deeply moisturizes and plumps skin, enhancing elasticity
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Antioxidant Protection - Botanical stem cell extracts provide soothing and whitening effects
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Skin Regeneration - Promotes cellular renewal and skin repair
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Professional Results - Delivers clinical-grade results for comprehensive eye care
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EyeCell EYE CONTOUR SERUM */}
+          {product.name === 'EyeCell EYE CONTOUR SERUM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Apply a small amount around the eye area in the morning and evening. Gently massage until fully absorbed using your ring finger for optimal absorption. For best results, use in conjunction with the Genosys EyeCell Eye Contour Cream as part of your daily eye care routine.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for EyeCell EYE CONTOUR SERUM */}
+          {product.name === 'EyeCell EYE CONTOUR SERUM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Palmitoyl Hexapeptide-12</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Stimulates fibroblast growth for firming effects and improved skin elasticity around the delicate eye area.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Copper Tripeptide-1</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Promotes collagen synthesis and skin regeneration, reducing fine lines and wrinkles for a more youthful appearance.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Acetyl Hexapeptide-8</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Acts as muscle relaxant, reducing wrinkle appearance and expression lines for smoother skin.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Anti-Dark Circle Complex (Haloxyl™)</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Specialized complex for dark circle reduction and skin strengthening, targeting under-eye discoloration.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Vitis Vinifera (Grape) Callus Culture Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Provides antioxidant and skin-renewing properties with anti-aging benefits for enhanced skin health.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Rosa Damascena Callus Culture Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Offers moisturizing, soothing, and whitening effects with anti-aging benefits, helping to brighten the eye area.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Adenosine</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Provides anti-aging and skin-soothing properties with wrinkle-reducing effects for improved skin texture.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Arbutin</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Natural skin brightening agent that helps even skin tone and reduce the appearance of dark spots.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for EyeCell EYE CONTOUR SERUM */}
+          {product.name === 'EyeCell EYE CONTOUR SERUM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Benefits Section for EyeCell EYE PEPTIDE GEL PATCH */}
+          {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Reduces Puffiness and Dark Circles - Effectively combats under-eye bags and dark circles for a refreshed appearance
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Smooths Fine Lines and Wrinkles - Peptide complex works to diminish the appearance of fine lines, promoting smoother skin
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Hydrates and Soothes - Deep hydration and soothing effect, reducing signs of fatigue and stress
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Improves Skin Elasticity - Advanced peptide technology enhances skin firmness and elasticity
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Anti-Aging Properties - Targets multiple signs of aging around the delicate eye area
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Professional Results - Delivers clinical-grade results for comprehensive eye care
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EyeCell EYE PEPTIDE GEL PATCH */}
+          {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Cleanse the face thoroughly. Apply the gel patches under the eyes, ensuring good contact with the skin. Leave on for 20-40 minutes, then remove and discard the patches. For optimal results, use regularly as part of your skincare routine.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for EyeCell EYE PEPTIDE GEL PATCH */}
+          {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Peptide Complex</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Includes Copper Tripeptide-1, Acetyl Hexapeptide-8, Palmitoyl Hexapeptide-12, Palmitoyl Oligopeptide, and Palmitoyl Tetrapeptide-7 to reduce fine lines and improve skin elasticity.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyaluronic Acid</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Increases skin moisture levels, plumping the eye area and providing deep hydration for a refreshed appearance.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Arbutin</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Natural skin brightening agent that helps reduce the appearance of dark circles and evens skin tone.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Retinyl Palmitate</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Vitamin A derivative that supports skin renewal and combats signs of aging around the eye area.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Botanical Extracts</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Chamomile, Lavender, Peppermint, and Rosemary extracts that soothe and revitalize the delicate eye area.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for EyeCell EYE PEPTIDE GEL PATCH */}
+          {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is dermatologically tested and safe for all skin types. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for EyeCell EYE PEPTIDE GEL PATCH */}
+          {product.name === 'EyeCell EYE PEPTIDE GEL PATCH' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 850 KB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -2475,28 +2831,46 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Comprehensive Eye Care:</Text>{' '}
-                  Multi-faceted approach addressing wrinkles, dark circles, and puffiness
+                  • Comprehensive Eye Care - Multi-faceted approach addressing wrinkles, dark circles, and puffiness
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Advanced Ingredients:</Text>{' '}
-                  Formulated with peptides, plant stem cell extracts, and hyaluronic acid
+                  • Advanced Ingredients - Formulated with peptides, plant stem cell extracts, and hyaluronic acid
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhanced Absorption:</Text>{' '}
-                  Micro-needle roller ensures deeper penetration of active ingredients
+                  • Enhanced Absorption - Micro-needle roller ensures deeper penetration of active ingredients
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Professional and Home Use:</Text>{' '}
-                  Suitable for both professional treatments and daily home care
+                  • Professional and Home Use - Suitable for both professional treatments and daily home care
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Complete System:</Text>{' '}
-                  All-in-one kit for comprehensive eye area rejuvenation
+                  • Complete System - All-in-one kit for comprehensive eye area rejuvenation
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Visible Results:</Text>{' '}
-                  Delivers a more youthful, vibrant, and refreshed appearance
+                  • Visible Results - Delivers a more youthful, vibrant, and refreshed appearance
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EyeCell EYE ZONE CARE KIT */}
+          {product.name === 'EyeCell EYE ZONE CARE KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  1. Cleansing: Begin by thoroughly cleansing the face and eye area
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  2. Serum Application: Apply the Eye Contour Serum gently around the eyes
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  3. Micro-Needling: Use the Eye Roller Dermaroller over the serum-treated area for approximately 2 minutes, avoiding excessive pressure
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  4. Patch Application: Place the Eye Peptide Gel Patches under the eyes and leave them on for 20-40 minutes
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  5. Cream Application: Finish by applying the Eye Contour Cream to the treated area
                 </Text>
               </View>
             </View>
@@ -2505,12 +2879,48 @@ export default function ProductDetailScreenRefactored() {
           {/* Note Section for EyeCell EYE ZONE CARE KIT */}
           {product.name === 'EyeCell EYE ZONE CARE KIT' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
                   This product is dermatologically tested and safe for all skin types. Regular use can lead to a more youthful, vibrant, and refreshed appearance around the eyes. For best results, use in conjunction with other Genosys EyeCell products as part of your daily eye care regimen.
                 </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for EyeCell EYE ZONE CARE KIT */}
+          {product.name === 'EyeCell EYE ZONE CARE KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 1.5 MB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -2542,28 +2952,22 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Stimulates Collagen Production:</Text>{' '}
-                  Red light therapy promotes natural collagen synthesis for firmer, younger-looking skin
+                  • Stimulates Collagen Production - Red light therapy promotes natural collagen synthesis for firmer, younger-looking skin
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Reduces Inflammation:</Text>{' '}
-                  Infrared light helps calm irritated skin and reduces redness and swelling
+                  • Reduces Inflammation - Infrared light helps calm irritated skin and reduces redness and swelling
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Improves Skin Texture:</Text>{' '}
-                  Regular use enhances skin smoothness and reduces fine lines and wrinkles
+                  • Improves Skin Texture - Regular use enhances skin smoothness and reduces fine lines and wrinkles
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Accelerates Healing:</Text>{' '}
-                  Promotes faster recovery from skin treatments and reduces downtime
+                  • Accelerates Healing - Promotes faster recovery from skin treatments and reduces downtime
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhances Circulation:</Text>{' '}
-                  Improves blood flow and oxygen delivery to skin cells
+                  • Enhances Circulation - Improves blood flow and oxygen delivery to skin cells
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Safe and Non-Invasive:</Text>{' '}
-                  Gentle, pain-free treatment suitable for all skin types
+                  • Safe and Non-Invasive - Gentle, pain-free treatment suitable for all skin types
                 </Text>
               </View>
             </View>
@@ -2575,24 +2979,19 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Treatment Applications</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Anti-Aging:</Text>{' '}
-                  Reduces fine lines, wrinkles, and age spots
+                  • Anti-Aging: Reduces fine lines, wrinkles, and age spots
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Acne Treatment:</Text>{' '}
-                  Helps control breakouts and reduces acne scarring
+                  • Acne Treatment: Helps control breakouts and reduces acne scarring
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Rejuvenation:</Text>{' '}
-                  Improves overall skin tone and texture
+                  • Skin Rejuvenation: Improves overall skin tone and texture
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Post-Treatment Care:</Text>{' '}
-                  Enhances recovery after professional treatments
+                  • Post-Treatment Care: Enhances recovery after professional treatments
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>General Maintenance:</Text>{' '}
-                  Regular use for ongoing skin health and vitality
+                  • General Maintenance: Regular use for ongoing skin health and vitality
                 </Text>
               </View>
             </View>
@@ -2601,12 +3000,48 @@ export default function ProductDetailScreenRefactored() {
           {/* Note Section for GENO-LED IR II */}
           {product.name === 'GENO-LED IR II' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
                   This device is designed for professional and home use. For best results, use consistently as part of your skincare routine. Consult with a skincare professional for personalized treatment protocols.
                 </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for GENO-LED IR II */}
+          {product.name === 'GENO-LED IR II' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 4.6 MB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENO-LED%20IR%20II_2025.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
