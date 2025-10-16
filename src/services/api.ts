@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LocalAuthService } from './localAuth';
+import { PrismaAuthService } from './prismaAuth';
 import {
   User,
   Product,
@@ -164,13 +165,26 @@ class GlobalRateLimiter {
 
 // API Service Class
 class ApiService {
-  // Authentication - HYBRID APPROACH: API First, Local Fallback
+  // Authentication - HYBRID APPROACH: Prisma First, API Second, Local Fallback
   async login(
     credentials: LoginForm
   ): Promise<ApiResponse<{ user: User; token: string }>> {
     console.log('🔐 HYBRID LOGIN STARTING for:', credentials.email);
 
-    // Try API first (with minimal delay)
+    // Try Prisma database first
+    try {
+      console.log('🗄️ Attempting Prisma database login...');
+      const result = await PrismaAuthService.login(credentials);
+      
+      if (result.success) {
+        console.log('✅ Prisma database login successful');
+        return result;
+      }
+    } catch (error: any) {
+      console.log('⚠️ Prisma database login failed:', error.message);
+    }
+
+    // Try API second (with minimal delay)
     try {
       console.log('🌐 Attempting API login...');
       await GlobalRateLimiter.delayIfNeeded();
@@ -219,8 +233,34 @@ class ApiService {
   async register(
     userData: RegisterForm
   ): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
+    console.log('🔐 HYBRID REGISTER STARTING for:', userData.email);
+
+    // Try Prisma database first
+    try {
+      console.log('🗄️ Attempting Prisma database registration...');
+      const result = await PrismaAuthService.register(userData);
+      
+      if (result.success) {
+        console.log('✅ Prisma database registration successful');
+        return result;
+      }
+    } catch (error: any) {
+      console.log('⚠️ Prisma database registration failed:', error.message);
+    }
+
+    // Fallback to API registration
+    try {
+      console.log('🌐 Attempting API registration...');
+      const response = await api.post('/auth/register', userData);
+      return response.data;
+    } catch (error: any) {
+      console.log('⚠️ API registration failed:', error.message);
+      return {
+        success: false,
+        data: { user: {} as User, token: '' },
+        error: 'Registration failed. Please try again.',
+      };
+    }
   }
 
   async logout(): Promise<ApiResponse<null>> {
