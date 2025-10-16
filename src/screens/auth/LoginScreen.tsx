@@ -115,8 +115,8 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.overlay}>
             <View style={styles.header}>
-              <Text style={styles.title}>Welcome to Genosys</Text>
-              <Text style={styles.subtitle}>Sign in to your account</Text>
+              <Text style={styles.title}>Genosys Middle East FZ-LLC</Text>
+              <Text style={styles.subtitle}>United Arab Emirates</Text>
             </View>
 
             <View style={styles.form}>
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
     marginBottom: 8,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: '#dc2626',
     borderRadius: 8,
-    padding: 16,
+    padding: 12,
     alignItems: 'center',
     marginBottom: 24,
   },
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   registerContainer: {
