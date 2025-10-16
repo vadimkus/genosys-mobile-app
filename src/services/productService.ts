@@ -292,10 +292,10 @@ export class ProductService {
               this.categories.map(c => `${c.name} (${c.count})`)
             );
 
-            // Filter out categories with 0 products, but keep Sun and Cushion BB categories even if 0
+            // Filter out categories with 0 products, but keep Sun, Cushion BB, and Eye Care categories even if 0
             this.categories = this.categories.filter(
               cat =>
-                cat.count > 0 || cat.name === 'Sun' || cat.name === 'Cushion BB'
+                cat.count > 0 || cat.name === 'Sun' || cat.name === 'Cushion BB' || cat.name === 'Eye Care'
             );
           } else {
             console.log('🏷️ Using API categories, transforming them');
@@ -1668,6 +1668,17 @@ export class ProductService {
       // Map product categories based on product names
       const getCategory = (productName: string) => {
         const name = productName.toLowerCase();
+
+        // Eye Care products (must come first to catch EyeCell products)
+        if (
+          name.includes('eyecell') ||
+          name.includes('eye contour') ||
+          name.includes('eye peptide') ||
+          name.includes('eye zone') ||
+          name.includes('eye care')
+        ) {
+          return 'Eye Care';
+        }
 
         // Sun protection products (only actual sun creams)
         if (

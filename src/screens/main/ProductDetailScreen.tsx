@@ -97,7 +97,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'EyeCell EYE CONTOUR CREAM') {
-      return "GENOSYS EyeCell EYE CONTOUR CREAM is a daily eye care product specifically designed to address multiple concerns around the delicate eye area. This advanced eye cream targets fine wrinkles, crow's feet, dark circles, and under-eye puffiness while promoting microcirculation to enhance overall skin health and provide comprehensive eye area care.";
+      return "GENOSYS EyeCell EYE CONTOUR CREAM is a daily eye care product specifically designed to address multiple concerns around the delicate eye area. This advanced eye cream targets fine wrinkles, crow's feet, dark circles, and under-eye puffiness while promoting microcirculation to enhance overall skin health and provide comprehensive eye area care. Daily eye cream that reduces fine lines, dark circles, and puffiness with advanced peptide technology.";
     }
     
     if (productName === 'EyeCell EYE CONTOUR SERUM') {
@@ -173,15 +173,15 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'EGF REPAIR OXYMASK CREAM') {
-      return "GENOSYS EGF REPAIR OXYMASK CREAM is a unique oxygen bubbling mask cream designed to rejuvenate dull and stressed skin. This innovative 'S.O.S' cream effectively addresses skin damage from various causes, providing immediate relief and long-term skin regeneration through advanced oxygen therapy and skin-regenerating ingredients.";
+      return "GENOSYS EGF REPAIR OXYMASK CREAM is a unique oxygen bubbling mask cream designed to rejuvenate dull and stressed skin. This innovative 'S.O.S' cream effectively addresses skin damage from various causes, providing immediate relief and long-term skin regeneration through advanced oxygen therapy and skin-regenerating ingredients. Oxygen bubbling mask cream with EGF technology that rejuvenates dull and stressed skin instantly.";
     }
     
     if (productName === 'EPI TURNOVER BOOSTING PEELING GEL') {
-      return 'GENOSYS EPI TURNOVER BOOSTING PEELING GEL is an enzyme-based exfoliating gel designed to gently remove dead skin cells without causing irritation. This innovative peeling gel utilizes natural enzymes and plant extracts to purify, nourish, and moisturize the skin, making it suitable for all skin types while promoting a smoother, more radiant complexion.';
+      return 'GENOSYS EPI TURNOVER BOOSTING PEELING GEL is an enzyme-based exfoliating gel designed to gently remove dead skin cells without causing irritation. This innovative peeling gel utilizes natural enzymes and plant extracts to purify, nourish, and moisturize the skin, making it suitable for all skin types while promoting a smoother, more radiant complexion. Gentle enzyme peeling gel that removes dead skin cells without irritation. Perfect for all skin types.';
     }
     
     if (productName === 'EZ CO₂ MASK KIT') {
-      return "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients.";
+      return "GENOSYS EZ CO₂ MASK KIT is a professional carboxy therapy system designed to deliver oxygen to the skin through the innovative 'Bohr Effect' mechanism. This advanced CO₂ therapy kit combines a specialized gel and sheet mask to accelerate oxygen delivery to skin tissues, providing firming, brightening, and anti-blemish effects while preparing the skin for optimal absorption of active ingredients. Professional CO₂ therapy kit that delivers oxygen to skin through innovative Bohr Effect mechanism.";
     }
     
     if (productName === 'MULTI FUNCTIONAL ANTI-WRINKLE SERUM') {
@@ -1143,6 +1143,180 @@ export default function ProductDetailScreenRefactored() {
       );
     }
 
+    if (product.name === 'EyeCell EYE CONTOUR CREAM') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Eye contour cream
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially mature and aging skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Advanced peptide and botanical callus culture technology
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Wrinkle reduction, dark circle diminishment, puffiness relief
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Morning and evening
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Price:</Text> <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>AED {product.price.toFixed(2)}</Text>
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 20g
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'ALL FOR SENSITIVE SERUM') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 30ml
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> Sensitive, reactive, and easily irritated skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Formulation:</Text> Gentle, non-irritating serum
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Barrier repair, anti-inflammatory, soothing
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'EGF REPAIR OXYMASK CREAM') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Oxygen bubbling mask cream
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 50g
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially damaged and stressed skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> EGF and oxygen therapy
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Skin regeneration, oxygen therapy, anti-inflammatory
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Morning and evening
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Special Feature:</Text> Unique oxygen bubbling effect
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Powder mask (activates with water)
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 300g
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially mature and aging skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Bio-fermentation process
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Age defying, skin renewal, deep hydration
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> 1-2 times per week
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'EPI TURNOVER BOOSTING PEELING GEL') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Enzyme-based peeling gel
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 100g
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, including sensitive skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Natural enzyme exfoliation
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Gentle exfoliation, radiance enhancement, pore purification
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> 1-2 times per week
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
+    if (product.name === 'EZ CO₂ MASK KIT') {
+      return (
+        <>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Professional carboxy therapy kit (Gel + Sheet Mask)
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 1 kit
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially dull and stressed skin
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> CO₂ therapy with Bohr Effect mechanism
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Oxygen therapy, skin firming, brightening, anti-blemish
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> 1-2 times per week
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Kit Contents:</Text> Gel 20g x 5ea, Mask 12g x 5ea, 1 Peptide Mask
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Special Feature:</Text> Catalytic mask for enhanced treatment absorption
+          </Text>
+          <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+            <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+          </Text>
+        </>
+      );
+    }
+
     // Default details for products not specifically listed
     return (
       <>
@@ -1151,6 +1325,9 @@ export default function ProductDetailScreenRefactored() {
         </Text>
         <Text style={[styles.detailItem, { color: theme.colors.text }]}>
           <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Brand:</Text> {product.brand}
+        </Text>
+        <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+          <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> {product.defaultSize || 'Standard'}
         </Text>
         <Text style={[styles.detailItem, { color: theme.colors.text }]}>
           <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Price:</Text> <Text style={{ color: '#DC2626', fontWeight: 'bold' }}>AED {product.price.toFixed(2)}</Text>
@@ -1214,6 +1391,48 @@ export default function ProductDetailScreenRefactored() {
         showsVerticalScrollIndicator={false}
       >
         <ProductImage product={product} />
+
+        {/* Size Display for EyeCell EYE CONTOUR CREAM */}
+        {product.name === 'EyeCell EYE CONTOUR CREAM' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 20g</Text>
+          </View>
+        )}
+
+        {/* Size Display for ALL FOR SENSITIVE SERUM */}
+        {product.name === 'ALL FOR SENSITIVE SERUM' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 30ml</Text>
+          </View>
+        )}
+
+        {/* Size Display for EGF REPAIR OXYMASK CREAM */}
+        {product.name === 'EGF REPAIR OXYMASK CREAM' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 50g</Text>
+          </View>
+        )}
+
+        {/* Size Display for BIO-FERMENT AGE DEFYING POWDER MASK */}
+        {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 300g</Text>
+          </View>
+        )}
+
+        {/* Size Display for EPI TURNOVER BOOSTING PEELING GEL */}
+        {product.name === 'EPI TURNOVER BOOSTING PEELING GEL' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 100g</Text>
+          </View>
+        )}
+
+        {/* Size Display for EZ CO₂ MASK KIT */}
+        {product.name === 'EZ CO₂ MASK KIT' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 1 Kit</Text>
+          </View>
+        )}
 
         <ProductPricing
           product={product}
@@ -1581,28 +1800,34 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Barrier Repair:</Text>{' '}
-                  Strengthens and rebuilds the skin's natural protective barrier
+                  • Skin Barrier Repair - Strengthens and rebuilds the skin's natural protective barrier
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Anti-Inflammatory:</Text>{' '}
-                  Reduces redness and calms irritated, sensitive skin
+                  • Anti-Inflammatory - Reduces redness and calms irritated, sensitive skin
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Soothing Relief:</Text>{' '}
-                  Provides immediate comfort for sensitized skin
+                  • Soothing Relief - Provides immediate comfort for sensitized skin
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Moisture Barrier:</Text>{' '}
-                  Creates a protective layer to prevent moisture loss
+                  • Moisture Barrier - Creates a protective layer to prevent moisture loss
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Gentle Formula:</Text>{' '}
-                  Specifically designed for sensitive and reactive skin
+                  • Gentle Formula - Specifically designed for sensitive and reactive skin
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Repair:</Text>{' '}
-                  Helps repair damaged skin and restore healthy function
+                  • Skin Repair - Helps repair damaged skin and restore healthy function
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for ALL FOR SENSITIVE SERUM */}
+          {product.name === 'ALL FOR SENSITIVE SERUM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Apply the serum to clean skin in the morning and evening. Gently pat with fingers until fully absorbed. Use as part of your daily skincare routine for sensitive skin care.
                 </Text>
               </View>
             </View>
@@ -1614,70 +1839,473 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>MultiEx BSASM® Plus:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>MultiEx BSASM® Plus</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   A patented complex that helps strengthen the skin barrier and provides long-lasting hydration while protecting sensitive skin from environmental stressors.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Phytolex SC:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Phytolex SC</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   A plant-derived ingredient that provides natural anti-inflammatory benefits and helps soothe irritated skin while supporting the skin's natural healing process.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyaluronic Acid:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyaluronic Acid</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   A powerful humectant that attracts and retains moisture, providing deep hydration without causing irritation or clogging pores.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Phytosphingosine:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Phytosphingosine</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   A natural lipid that helps restore the skin's barrier function and provides gentle antimicrobial protection while being suitable for sensitive skin.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Aloe Barbadensis Leaf Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Aloe Barbadensis Leaf Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Known for its soothing and healing properties, aloe vera helps calm irritated skin, reduce inflammation, and provide natural moisture to sensitive skin.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hamamelis Virginiana (Witch Hazel) Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hamamelis Virginiana (Witch Hazel) Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   A natural astringent that helps tighten pores, reduce inflammation, and provide gentle cleansing properties while being gentle on sensitive skin.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Beta-Glucan:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Beta-Glucan</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing in sensitive skin.
                 </Text>
               </View>
             </View>
           )}
 
-          {/* How to Use Section for ALL FOR SENSITIVE SERUM */}
+
+          {/* Note Section for ALL FOR SENSITIVE SERUM */}
           {product.name === 'ALL FOR SENSITIVE SERUM' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>How to Use</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Application:</Text>{' '}
-                  Apply the serum to clean skin in the morning and evening
-                </Text>
-                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Method:</Text>{' '}
-                  Gently pat with fingers until fully absorbed
-                </Text>
-                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Frequency:</Text>{' '}
-                  Use as part of your daily skincare routine for sensitive skin care
-                </Text>
-                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Best Results:</Text>{' '}
-                  Use consistently for optimal skin barrier repair and soothing benefits
+                  This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine.
                 </Text>
               </View>
             </View>
           )}
 
-          {/* Note Section for ALL FOR SENSITIVE SERUM */}
-          {product.name === 'ALL FOR SENSITIVE SERUM' && (
+          {/* Benefits Section for EGF REPAIR OXYMASK CREAM */}
+          {product.name === 'EGF REPAIR OXYMASK CREAM' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
-                  This product is dermatologically tested and specifically formulated for sensitive skin. For best results, use as part of your daily sensitive skin care routine.
+                  • Oxygen Therapy - Supplies oxygen to the skin, improving cellular metabolism
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Skin Regeneration - Accelerates healing process and reduces skin irritations
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Anti-Inflammatory - Provides soothing effects for sensitive and damaged skin
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Deep Hydration - Promotes intense moisture retention and skin plumping
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Collagen Stimulation - Enhances skin elasticity and firmness
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • EGF Technology - Advanced epidermal growth factor for cellular renewal
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Bubbling Action - Unique oxygen bubbling effect for enhanced penetration
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EGF REPAIR OXYMASK CREAM */}
+          {product.name === 'EGF REPAIR OXYMASK CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Apply a thin layer of the cream mask evenly on dry skin. Do not rub; wait for the oxygen bubbles to form and cover the face. Once the bubbles start popping (after 1-2 minutes), gently massage and tap for better absorption. Do not rinse off. Use in the morning and evening.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for EGF REPAIR OXYMASK CREAM */}
+          {product.name === 'EGF REPAIR OXYMASK CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>sh-Oligopeptide-1 (EGF)</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Epidermal Growth Factor stimulates cell proliferation and aids in wound healing, promoting faster skin recovery and regeneration.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Madecassoside</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Derived from Centella Asiatica, it combats redness, reduces itching, and soothes sensitive skin while providing anti-inflammatory benefits.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Copper Tripeptide-1</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Promotes collagen synthesis and has wound-healing properties, helping to improve skin texture and reduce signs of aging.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>SEPITONIC M3 (Mineral Complex)</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Enhances cellular metabolism and revitalizes the skin, providing essential minerals for optimal skin function and health.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Salmon Oil</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Rich in unsaturated fatty acids, it offers anti-inflammatory and wound-healing effects while providing deep nourishment to the skin.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Adenosine</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Provides anti-aging benefits by reducing the appearance of wrinkles and fine lines, promoting smoother, more youthful-looking skin.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for EGF REPAIR OXYMASK CREAM */}
+          {product.name === 'EGF REPAIR OXYMASK CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is dermatologically tested and suitable for all skin types. For optimal bubbling, avoid rubbing the product during application. For best results, incorporate it into your daily skincare routine.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Benefits Section for EPI TURNOVER BOOSTING PEELING GEL */}
+          {product.name === 'EPI TURNOVER BOOSTING PEELING GEL' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Gentle Exfoliation - Effectively removes dead skin cells, promoting smoother skin texture
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Radiance Enhancement - Helps correct skin tone, resulting in a brighter complexion
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Deep Moisturization - Provides hydration to the skin, preventing dryness
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Pore Purification - Cleanses and purifies pores, reducing the likelihood of breakouts
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Enzyme Technology - Natural enzyme-based exfoliation for gentle skin renewal
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • All Skin Types - Suitable for sensitive and all skin types
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Professional Results - Delivers salon-quality exfoliation at home
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EPI TURNOVER BOOSTING PEELING GEL */}
+          {product.name === 'EPI TURNOVER BOOSTING PEELING GEL' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Apply the gel to clean, dry skin and gently massage in a circular motion for up to one minute. Rinse off the clumped dead skin cells with lukewarm water. Use 1-2 times per week for optimal results.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for EPI TURNOVER BOOSTING PEELING GEL */}
+          {product.name === 'EPI TURNOVER BOOSTING PEELING GEL' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Natural Enzymes</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Facilitate gentle exfoliation by breaking down dead skin cells naturally, providing effective yet non-irritating skin renewal.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Retinol (Vitamin A)</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Promotes skin renewal and improves texture while supporting cellular turnover for a more youthful appearance.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Provitamin A</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Supports skin health and regeneration, providing essential nutrients for optimal skin function and recovery.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Vitamin E</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Provides antioxidant protection and moisturization, helping to protect the skin from environmental damage while maintaining hydration.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Vitamin C (Ascorbic Acid)</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Brightens the skin and boosts collagen production, helping to reduce signs of aging and improve skin radiance.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Allantoin</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Soothes and calms the skin, reducing irritation and providing gentle care for sensitive skin during exfoliation.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for EPI TURNOVER BOOSTING PEELING GEL */}
+          {product.name === 'EPI TURNOVER BOOSTING PEELING GEL' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve smoother, more radiant skin.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for EPI TURNOVER BOOSTING PEELING GEL */}
+          {product.name === 'EPI TURNOVER BOOSTING PEELING GEL' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <View style={styles.documentationContainer}>
+                  <View style={styles.documentationInfo}>
+                    <Text style={[styles.documentationTitle, { color: theme.colors.text }]}>📄 Product Manual</Text>
+                    <Text style={[styles.documentationDescription, { color: theme.colors.text }]}>Complete product manual and usage guide for professional application</Text>
+                    <Text style={[styles.documentationFileSize, { color: theme.colors.text }]}>File size: 1.8 MB</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20EPI%20TURNOVER%20BOOSTING%20PEELING%20GEL.pdf')
+                        .catch(err => Alert.alert('Error', 'Unable to open document'));
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Benefits Section for EZ CO₂ MASK KIT */}
+          {product.name === 'EZ CO₂ MASK KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Oxygen Therapy - Accelerates oxygen delivery to skin tissues through CO₂ therapy
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Skin Firming - Provides firming effects through improved cellular metabolism
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Brightening - Helps correct skin tone and reduce hyperpigmentation
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Anti-Blemish - Reduces blemishes and improves overall skin clarity
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Catalytic Effect - Prepares skin for optimal absorption of active ingredients
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Professional Results - Delivers salon-quality carboxy therapy at home
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Microneedling Enhancement - Acts as a catalytic mask for better treatment results
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EZ CO₂ MASK KIT */}
+          {product.name === 'EZ CO₂ MASK KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Apply the CO₂ gel evenly to clean skin, then place the sheet mask over the treated area. Leave on for 15-20 minutes to allow the CO₂ therapy to work. The fine particles of CO₂ generated by the contact between gel and mask will accelerate oxygen delivery to skin tissues. Remove mask and gently massage any remaining product into the skin.
+                </Text>
+              </View>
+            </View>
+          )}
+
+
+          {/* Key Ingredients Section for EZ CO₂ MASK KIT */}
+          {product.name === 'EZ CO₂ MASK KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>EZ CO₂ GEL Ingredients</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Lactic Acid:</Text> Gentle exfoliation and skin renewal
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Portulaca Oleracea Extract:</Text> Antioxidant and anti-inflammatory properties
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Rosemary Leaf Extract:</Text> Antimicrobial and circulation-boosting effects
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Chamomile Flower Extract:</Text> Soothing and anti-inflammatory benefits
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Licorice Root Extract:</Text> Skin brightening and anti-inflammatory properties
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Scutellaria Baicalensis Root Extract:</Text> Antioxidant and anti-aging benefits
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Centella Asiatica Extract:</Text> Wound healing and anti-inflammatory effects
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Green Tea Leaf Extract:</Text> Antioxidant protection and skin renewal
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for EZ CO₂ MASK KIT */}
+          {product.name === 'EZ CO₂ MASK KIT' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is dermatologically tested and safe for all skin types. The CO₂ therapy mechanism accelerates oxygen delivery to skin tissues, providing professional-grade results. For best results, use as part of your weekly skincare routine.
+                </Text>
+              </View>
+            </View>
+          )}
+
+
+          {/* Benefits Section for EyeCell EYE CONTOUR CREAM */}
+          {product.name === 'EyeCell EYE CONTOUR CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Fine Wrinkle Reduction - Targets and reduces fine lines around the eye area
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Crow's Feet Diminishing - Helps diminish the appearance of crow's feet
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Dark Circle Lightening - Lightens dark circles and under-eye discoloration
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Puffiness Relief - Alleviates under-eye puffiness and swelling
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Microcirculation Enhancement - Promotes blood circulation for healthier skin
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Firming Effects - Provides firming and lifting benefits
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Daily Care - Suitable for daily use in morning and evening routines
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for EyeCell EYE CONTOUR CREAM */}
+          {product.name === 'EyeCell EYE CONTOUR CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Apply the cream to pre-cleansed skin around the eyes in the morning and evening
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Gently pat the product around the eye contour area using your ring finger for optimal absorption
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • For best results, use in conjunction with other Genosys EyeCell products
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for EyeCell EYE CONTOUR CREAM */}
+          {product.name === 'EyeCell EYE CONTOUR CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Palmitoyl Hexapeptide-12</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Stimulates fibroblast cell growth, imparting firming effects and helping to improve skin elasticity around the delicate eye area.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Copper Tripeptide-1</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Promotes collagen synthesis in skin fibroblasts, aiding in skin regeneration and helping to reduce the appearance of fine lines and wrinkles.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Rosa Damascena Callus Culture Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Offers moisturizing, soothing, and whitening effects with anti-aging benefits, helping to brighten the eye area and reduce signs of aging.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Scutellaria Baicalensis Root Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Provides anti-inflammatory, antioxidant, antimicrobial, antifungal, antiviral, and free radical scavenging properties for comprehensive skin protection.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sodium Hyaluronate</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Hydrates the skin, reduces water loss, minimizes the appearance of wrinkles and fine lines, and improves skin elasticity for a more youthful appearance.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for EyeCell EYE CONTOUR CREAM */}
+          {product.name === 'EyeCell EYE CONTOUR CREAM' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is dermatologically tested and safe for all skin types. For optimal results, use in conjunction with other Genosys EyeCell products as part of your daily eye care routine.
                 </Text>
               </View>
             </View>
@@ -1689,32 +2317,46 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Age Defying:</Text>{' '}
-                  Reduces fine lines and wrinkles through advanced fermentation technology
+                  • Age Defying - Reduces fine lines and wrinkles through advanced fermentation technology
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Bio-Ferment Technology:</Text>{' '}
-                  Harnesses the power of beneficial microorganisms for skin health
+                  • Bio-Ferment Technology - Harnesses the power of beneficial microorganisms for skin health
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Deep Penetration:</Text>{' '}
-                  Powder-to-mask formula ensures maximum ingredient absorption
+                  • Deep Penetration - Powder-to-mask formula ensures maximum ingredient absorption
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Antioxidant Protection:</Text>{' '}
-                  Neutralizes free radicals and environmental damage
+                  • Antioxidant Protection - Neutralizes free radicals and environmental damage
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Renewal:</Text>{' '}
-                  Promotes cellular turnover for younger-looking skin
+                  • Skin Renewal - Promotes cellular turnover for younger-looking skin
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hydration Boost:</Text>{' '}
-                  Provides intense moisture and plumping effects
+                  • Hydration Boost - Provides intense moisture and plumping effects
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Firming Action:</Text>{' '}
-                  Improves skin elasticity and firmness
+                  • Firming Action - Improves skin elasticity and firmness
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for BIO-FERMENT AGE DEFYING POWDER MASK */}
+          {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Mix the powder with water or your preferred liquid to create a smooth paste
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Apply evenly to clean skin, avoiding the eye area
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Leave on for 15-20 minutes, then rinse thoroughly with lukewarm water
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Use 1-2 times per week for optimal results
                 </Text>
               </View>
             </View>
@@ -1726,27 +2368,39 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Bio-Fermented Extracts:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Bio-Fermented Extracts</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Advanced fermentation process creates beneficial compounds, peptides, and amino acids that enhance skin barrier function and provide anti-aging benefits through natural biological processes.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Rice Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Rice Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Rich in vitamins, minerals, and antioxidants, fermented rice provides gentle exfoliation and brightening effects while nourishing the skin with essential nutrients.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Soybean Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Soybean Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Contains isoflavones and peptides that help improve skin elasticity, reduce inflammation, and provide antioxidant protection against environmental stressors.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Green Tea Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Green Tea Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Enhanced antioxidant properties through fermentation, providing superior protection against free radicals and helping to reduce signs of aging and environmental damage.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Ginseng Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Fermented Ginseng Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Traditional Korean ingredient enhanced through fermentation, providing energizing and revitalizing effects while improving skin tone and reducing fatigue signs.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyaluronic Acid:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyaluronic Acid</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Provides intense hydration and plumping effects, helping to reduce the appearance of fine lines and wrinkles while maintaining optimal skin moisture levels.
                 </Text>
               </View>
@@ -1756,10 +2410,9 @@ export default function ProductDetailScreenRefactored() {
           {/* Note Section for BIO-FERMENT AGE DEFYING POWDER MASK */}
           {product.name === 'BIO-FERMENT AGE DEFYING POWDER MASK' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
                   This product is dermatologically tested and safe for all skin types. For best results, use as part of your weekly skincare routine to achieve youthful, radiant skin.
                 </Text>
               </View>
@@ -2979,6 +3632,21 @@ const styles = StyleSheet.create({
     minHeight: 32,
     flexWrap: 'wrap',
   },
+  sizeDisplayContainer: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  sizeDisplayLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333333',
+  },
   documentationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -3031,3 +3699,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
