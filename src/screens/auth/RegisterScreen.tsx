@@ -130,7 +130,7 @@ export default function RegisterScreen() {
               <View style={styles.subtitleContainer}>
                 <Text style={styles.subtitle}>United Arab Emirates</Text>
                 <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                  <Ionicons name="heart" size={14} color="#dc2626" style={styles.heartIcon} />
+                  <Ionicons name="heart" size={12} color="#dc2626" style={styles.heartIcon} />
                 </Animated.View>
               </View>
               <Text style={styles.createAccountTitle}>Register</Text>
@@ -311,10 +311,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1f2937',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitleContainer: {
     flexDirection: 'row',
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#6b7280',
     textAlign: 'center',
   },
@@ -330,11 +330,11 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   createAccountTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 16,
+    marginBottom: 16,
   },
   form: {
     width: '100%',
@@ -350,17 +350,17 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: '#d1d5db',
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    padding: 10,
+    fontSize: 14,
     backgroundColor: '#ffffff',
   },
   roleContainer: {
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   roleButton: {
     flex: 1,
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#d1d5db',
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     borderColor: '#dc2626',
   },
   roleButtonText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     color: '#6b7280',
   },
@@ -390,17 +390,17 @@ const styles = StyleSheet.create({
   registerButton: {
     backgroundColor: '#dc2626',
     borderRadius: 8,
-    padding: 16,
+    padding: 12,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   disabledButton: {
     backgroundColor: '#9ca3af',
   },
   registerButtonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   loginContainer: {
@@ -409,11 +409,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6b7280',
   },
   loginLink: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#dc2626',
     fontWeight: '600',
   },
