@@ -133,7 +133,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'HR³ MATRIX SCALP SHAMPOO α') {
-      return 'GENOSYS HR³ MATRIX SCALP SHAMPOO α is a functional shampoo specifically designed to improve hair loss conditions and promote scalp health. This KFDA-approved functional product helps control excess sebum, cools down scalp heat, and creates an optimal environment for healthy hair growth through its advanced ingredient complex. Professional functional shampoo for hair loss prevention and scalp health. KFDA-approved with advanced ingredient complex for optimal hair growth.';
+      return 'GENOSYS HR³ MATRIX SCALP SHAMPOO α is a functional shampoo specifically designed to improve hair loss conditions and promote scalp health. This KFDA-approved functional product helps control excess sebum, cools down scalp heat, and creates an optimal environment for healthy hair growth through its advanced ingredient complex.';
     }
     
     if (productName === 'HR³ MATRIX HAIR TONIC α') {
@@ -1505,6 +1505,13 @@ export default function ProductDetailScreenRefactored() {
         {product.name === 'HR³ MATRIX SCALP PEELING α' && (
           <View style={styles.sizeDisplayContainer}>
             <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 100ml</Text>
+          </View>
+        )}
+
+        {/* Size Display for HR³ MATRIX SCALP SHAMPOO α */}
+        {product.name === 'HR³ MATRIX SCALP SHAMPOO α' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 300ml</Text>
           </View>
         )}
 
@@ -3571,25 +3578,154 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hair Loss Prevention:</Text>{' '}
-                  KFDA-approved functional product designed to improve hair loss conditions
+                  • Hair Loss Prevention - KFDA-approved functional product for improving hair loss symptoms
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Scalp Cooling:</Text>{' '}
-                  Helps cool down scalp heat and provides refreshing sensation
+                  • Scalp Cooling Effect - Reduces scalp heat and provides refreshing sensation
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sebum Control:</Text>{' '}
-                  Controls excess sebum production for balanced scalp environment
+                  • Sebum Control - Effectively manages excess sebum production for balanced scalp
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Optimal Hair Growth:</Text>{' '}
-                  Creates an optimal environment for healthy hair growth
+                  • Scalp Health - Promotes healthy scalp environment for optimal hair growth
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Advanced Formula:</Text>{' '}
-                  Patented ingredient complex with proven effectiveness
+                  • Professional Quality - Advanced formulation with patented ingredients
                 </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  • Dermatologically Tested - Safe for regular use on all hair types
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Directions Section for HR³ MATRIX SCALP SHAMPOO α */}
+          {product.name === 'HR³ MATRIX SCALP SHAMPOO α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  1. Wet Hair: Thoroughly wet your hair with lukewarm water
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  2. Apply Shampoo: Take an appropriate amount and massage gently into scalp
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  3. Massage: Use fingertips to massage scalp for 2-3 minutes
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  4. Rinse: Rinse thoroughly with lukewarm water
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  5. Repeat if Needed: For best results, use twice weekly or as recommended
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  6. Follow-up: Use in conjunction with HR³ MATRIX treatment protocol
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Key Ingredients Section for HR³ MATRIX SCALP SHAMPOO α */}
+          {product.name === 'HR³ MATRIX SCALP SHAMPOO α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Patented Viscum Album Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  A patented extract that helps inhibit hair loss and promotes healthy hair growth by improving scalp circulation and nutrient delivery to hair follicles.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Patented HP-DCC Complex</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Advanced complex that targets the root causes of hair loss, providing comprehensive scalp care and promoting stronger, healthier hair growth.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Saccharomyces Cerevisiae Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Fermented yeast extract that provides essential nutrients for hair follicles, promoting healthy hair growth and improving scalp condition.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Acorus Calamus Root Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Traditional herbal extract known for its scalp-soothing properties and ability to improve blood circulation in the scalp area.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Piroctone Olamine</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Antimicrobial agent that helps maintain scalp health by preventing microbial growth and creating an optimal environment for hair growth.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Biotin</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Essential B-vitamin that supports healthy hair growth and strengthens hair structure, promoting thicker and more resilient hair.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Salicylic Acid</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Gentle exfoliant that removes dead skin cells and excess sebum from the scalp, preventing clogged hair follicles and promoting healthy hair growth.
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Menthol</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Provides a refreshing, cooling sensation that soothes the scalp and stimulates blood circulation for improved nutrient delivery to hair follicles.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Note Section for HR³ MATRIX SCALP SHAMPOO α */}
+          {product.name === 'HR³ MATRIX SCALP SHAMPOO α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  This product is KFDA approved as a functional product for improving hair loss symptoms. For best results, use as part of the complete HR³ MATRIX treatment protocol. Regular use helps maintain optimal scalp health and promotes healthy hair growth.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for HR³ MATRIX SCALP SHAMPOO α */}
+          {product.name === 'HR³ MATRIX SCALP SHAMPOO α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.detailItem, { color: theme.colors.text }]}>📄 File size: 1.2 MB</Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20SHAMPOO%20ALPHA.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={[styles.documentationButtonText, { color: theme.colors.background }]}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
