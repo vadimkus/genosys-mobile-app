@@ -1,18 +1,15 @@
 // Prisma client - only available in Node.js environments
 let prisma: any = null;
 
-// Try to import Prisma client (will fail in React Native)
+// Import Prisma client (server-side only)
 try {
-  if (typeof window === 'undefined') {
-    // Only import in Node.js environment
-    const { PrismaClient } = require('../generated/prisma');
-    prisma = new PrismaClient({
-      log: ['error'],
-      errorFormat: 'pretty',
-    });
-  }
+  const { PrismaClient } = require('../generated/prisma');
+  prisma = new PrismaClient({
+    log: ['error'],
+    errorFormat: 'pretty',
+  });
 } catch (error) {
-  console.log('⚠️ Prisma client not available in this environment');
+  console.log('⚠️ Prisma client not available:', error.message);
   prisma = null;
 }
 
