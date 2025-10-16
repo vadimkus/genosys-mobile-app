@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ImageBackground,
+  Animated,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store/useStore';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -34,6 +37,31 @@ export default function RegisterScreen() {
     company: '',
     role: 'customer' as 'customer' | 'distributor',
   });
+
+  // Heart animation
+  const heartScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const startHeartAnimation = () => {
+      Animated.sequence([
+        Animated.timing(heartScale, {
+          toValue: 1.3,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heartScale, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Repeat every 4 seconds
+        setTimeout(startHeartAnimation, 4000);
+      });
+    };
+
+    startHeartAnimation();
+  }, [heartScale]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -79,15 +107,28 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <ImageBackground
+      source={require('../../../login/login.png')}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join Genosys today</Text>
-        </View>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.overlay}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Genosys Middle East FZ-LLC</Text>
+              <View style={styles.subtitleContainer}>
+                <Text style={styles.subtitle}>United Arab Emirates</Text>
+                <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                  <Ionicons name="heart" size={14} color="#dc2626" style={styles.heartIcon} />
+                </Animated.View>
+              </View>
+              <Text style={styles.createAccountTitle}>Create Account</Text>
+              <Text style={styles.createAccountSubtitle}>Join Genosys today</Text>
+            </View>
 
         <View style={styles.form}>
           <View style={styles.row}>
@@ -230,35 +271,68 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   scrollContainer: {
     flexGrow: 1,
+    justifyContent: 'center',
     padding: 20,
-    paddingTop: 40,
+  },
+  overlay: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 16,
+    padding: 24,
+    margin: 16,
   },
   header: {
     alignItems: 'center',
     marginBottom: 30,
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
     marginBottom: 8,
+  },
+  subtitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#6b7280',
     textAlign: 'center',
+  },
+  heartIcon: {
+    marginLeft: 4,
+  },
+  createAccountTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  createAccountSubtitle: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   form: {
     width: '100%',
