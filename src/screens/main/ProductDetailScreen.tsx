@@ -125,7 +125,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'HR³ MATRIX MESOPECIA KIT') {
-      return 'GENOSYS HR³ MATRIX MESOPECIA KIT is a comprehensive hair and scalp treatment system designed to prevent hair loss and promote healthy hair regrowth by addressing the fundamental causes of hair loss. This advanced kit combines multiple treatment components to create a complete solution for hair health and vitality, suitable for both professional and home use. Complete hair and scalp treatment system with scalp peeling, hair solution, and roller device. Prevents hair loss, stimulates regrowth, and promotes scalp health.';
+      return 'GENOSYS HR³ MATRIX MESOPECIA KIT is a comprehensive hair and scalp treatment system designed to prevent hair loss and promote healthy hair regrowth by addressing the fundamental causes of hair loss. This advanced kit combines multiple treatment components to create a complete solution for hair health and vitality, suitable for both professional and home use.';
     }
     
     if (productName === 'HR³ MATRIX SCALP PEELING α') {
@@ -1491,6 +1491,13 @@ export default function ProductDetailScreenRefactored() {
         {product.name === 'HR³ MATRIX HAIR TONIC α' && (
           <View style={styles.sizeDisplayContainer}>
             <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 70ml</Text>
+          </View>
+        )}
+
+        {/* Size Display for HR³ MATRIX MESOPECIA KIT */}
+        {product.name === 'HR³ MATRIX MESOPECIA KIT' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 1 Kit</Text>
           </View>
         )}
 
@@ -3183,28 +3190,22 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Inhibits Hair Loss Causes:</Text>{' '}
-                  Targets root causes including 5α-reductase inhibition to suppress DHT conversion
+                  • Inhibits Hair Loss Causes - Targets root causes including 5α-reductase inhibition to suppress DHT conversion
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Stimulates Hair Growth:</Text>{' '}
-                  Supplies essential nutrients to hair follicles and promotes angiogenesis for new hair growth
+                  • Stimulates Hair Growth - Supplies essential nutrients to hair follicles and promotes angiogenesis for new hair growth
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Regulates Sebum Secretion:</Text>{' '}
-                  Controls excessive sebum production for balanced and healthy scalp environment
+                  • Regulates Sebum Secretion - Controls excessive sebum production for balanced and healthy scalp environment
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Deep Scalp Cleansing:</Text>{' '}
-                  Removes keratin, sebum, and impurities for optimal treatment absorption
+                  • Deep Scalp Cleansing - Removes keratin, sebum, and impurities for optimal treatment absorption
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhanced Absorption:</Text>{' '}
-                  Roller device ensures deeper penetration of active ingredients
+                  • Enhanced Absorption - Roller device ensures deeper penetration of active ingredients
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Comprehensive Treatment:</Text>{' '}
-                  Complete system addressing all aspects of hair loss and scalp health
+                  • Comprehensive Treatment - Complete system addressing all aspects of hair loss and scalp health
                 </Text>
               </View>
             </View>
@@ -3263,10 +3264,9 @@ export default function ProductDetailScreenRefactored() {
           {/* Note Section for HR³ MATRIX MESOPECIA KIT */}
           {product.name === 'HR³ MATRIX MESOPECIA KIT' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
                   This comprehensive kit is designed for both professional and home use. For best results, follow the complete treatment protocol and use in conjunction with HR³ MATRIX Shampoo and Tonic for optimal hair health maintenance.
                 </Text>
               </View>
