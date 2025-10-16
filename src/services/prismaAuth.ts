@@ -46,6 +46,16 @@ export class PrismaAuthService {
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
     console.log('🔐 PRISMA AUTH: Checking credentials for:', credentials.email);
 
+    // Check if Prisma is available
+    if (!prisma) {
+      console.log('⚠️ PRISMA AUTH: Prisma not available, skipping database auth');
+      return {
+        success: false,
+        data: { user: {} as User, token: '' },
+        error: 'Database authentication not available',
+      };
+    }
+
     try {
       // Find user by email
       const user = await prisma.user.findUnique({
@@ -113,6 +123,16 @@ export class PrismaAuthService {
 
   static async register(userData: RegisterData): Promise<AuthResponse> {
     console.log('🔐 PRISMA AUTH: Registering new user:', userData.email);
+
+    // Check if Prisma is available
+    if (!prisma) {
+      console.log('⚠️ PRISMA AUTH: Prisma not available, skipping database registration');
+      return {
+        success: false,
+        data: { user: {} as User, token: '' },
+        error: 'Database registration not available',
+      };
+    }
 
     try {
       // Check if user already exists
@@ -186,6 +206,11 @@ export class PrismaAuthService {
   }
 
   static async getUserById(id: string): Promise<User | null> {
+    if (!prisma) {
+      console.log('⚠️ PRISMA AUTH: Prisma not available');
+      return null;
+    }
+
     try {
       const user = await prisma.user.findUnique({
         where: { id },
@@ -213,6 +238,11 @@ export class PrismaAuthService {
   }
 
   static async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
+    if (!prisma) {
+      console.log('⚠️ PRISMA AUTH: Prisma not available');
+      return null;
+    }
+
     try {
       const updatedUser = await prisma.user.update({
         where: { id },

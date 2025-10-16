@@ -1,25 +1,30 @@
-import { PrismaClient } from '../generated/prisma';
+// Prisma client - only available in Node.js environments
+let prisma: any = null;
 
-// Global variable to store the Prisma client instance
-declare global {
-  var __prisma: PrismaClient | undefined;
-}
-
-// Create Prisma client instance
-const prisma = globalThis.__prisma || new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
-  errorFormat: 'pretty',
-});
-
-// In development, store the client on globalThis to prevent multiple instances
-if (process.env.NODE_ENV === 'development') {
-  globalThis.__prisma = prisma;
+// Try to import Prisma client (will fail in React Native)
+try {
+  if (typeof window === 'undefined') {
+    // Only import in Node.js environment
+    const { PrismaClient } = require('../generated/prisma');
+    prisma = new PrismaClient({
+      log: ['error'],
+      errorFormat: 'pretty',
+    });
+  }
+} catch (error) {
+  console.log('⚠️ Prisma client not available in this environment');
+  prisma = null;
 }
 
 export default prisma;
 
 // Database connection helper
 export const connectDatabase = async () => {
+  if (!prisma) {
+    console.log('⚠️ Prisma not available in this environment');
+    return false;
+  }
+  
   try {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
@@ -32,6 +37,8 @@ export const connectDatabase = async () => {
 
 // Database disconnection helper
 export const disconnectDatabase = async () => {
+  if (!prisma) return;
+  
   try {
     await prisma.$disconnect();
     console.log('✅ Database disconnected successfully');
@@ -42,6 +49,14 @@ export const disconnectDatabase = async () => {
 
 // Health check
 export const checkDatabaseHealth = async () => {
+  if (!prisma) {
+    return { 
+      status: 'unavailable', 
+      error: 'Prisma not available in this environment',
+      timestamp: new Date().toISOString() 
+    };
+  }
+  
   try {
     await prisma.$queryRaw`SELECT 1`;
     return { status: 'healthy', timestamp: new Date().toISOString() };
