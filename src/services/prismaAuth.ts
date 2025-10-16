@@ -1,4 +1,4 @@
-import { User, UserRole } from '../types';
+import { User } from '../types';
 import prisma from './prisma';
 import bcrypt from 'bcryptjs';
 
@@ -61,15 +61,8 @@ export class PrismaAuthService {
         };
       }
 
-      // Check if user is active
-      if (!user.isActive) {
-        console.log('❌ PRISMA AUTH: User account is inactive');
-        return {
-          success: false,
-          data: { user: {} as User, token: '' },
-          error: 'Account is inactive. Please contact support.',
-        };
-      }
+      // Check if user exists (no isActive field in existing schema)
+      // We'll assume all users are active
 
       // Verify password
       const isPasswordValid = await this.verifyPassword(credentials.password, user.password);
@@ -89,13 +82,13 @@ export class PrismaAuthService {
       const userData: User = {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.name.split(' ')[0] || '',
+        lastName: user.name.split(' ').slice(1).join(' ') || '',
         name: user.name,
         phone: user.phone || '',
-        role: user.role.toLowerCase() as 'customer' | 'distributor' | 'admin',
-        isActive: user.isActive,
-        emailVerified: user.emailVerified,
+        role: user.isAdmin ? 'admin' : 'customer',
+        isActive: true,
+        emailVerified: true,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       };
@@ -144,14 +137,10 @@ export class PrismaAuthService {
         data: {
           email: userData.email,
           password: hashedPassword,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
           name: `${userData.firstName} ${userData.lastName}`,
           phone: userData.phone,
-          company: userData.company,
-          role: userData.role?.toUpperCase() as UserRole || 'CUSTOMER',
-          isActive: true,
-          emailVerified: false,
+          isAdmin: userData.role === 'admin',
+          canSeePrices: userData.role === 'distributor' || userData.role === 'admin',
         },
       });
 
@@ -161,13 +150,13 @@ export class PrismaAuthService {
       const userDataResponse: User = {
         id: newUser.id,
         email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
+        firstName: newUser.name.split(' ')[0] || '',
+        lastName: newUser.name.split(' ').slice(1).join(' ') || '',
         name: newUser.name,
         phone: newUser.phone || '',
-        role: newUser.role.toLowerCase() as 'customer' | 'distributor' | 'admin',
-        isActive: newUser.isActive,
-        emailVerified: newUser.emailVerified,
+        role: newUser.isAdmin ? 'admin' : 'customer',
+        isActive: true,
+        emailVerified: true,
         createdAt: newUser.createdAt.toISOString(),
         updatedAt: newUser.updatedAt.toISOString(),
       };
@@ -207,13 +196,13 @@ export class PrismaAuthService {
       return {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.name.split(' ')[0] || '',
+        lastName: user.name.split(' ').slice(1).join(' ') || '',
         name: user.name,
         phone: user.phone || '',
-        role: user.role.toLowerCase() as 'customer' | 'distributor' | 'admin',
-        isActive: user.isActive,
-        emailVerified: user.emailVerified,
+        role: user.isAdmin ? 'admin' : 'customer',
+        isActive: true,
+        emailVerified: true,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       };
@@ -228,12 +217,10 @@ export class PrismaAuthService {
       const updatedUser = await prisma.user.update({
         where: { id },
         data: {
-          firstName: updateData.firstName,
-          lastName: updateData.lastName,
-          name: updateData.name,
+          name: updateData.name || `${updateData.firstName} ${updateData.lastName}`,
           phone: updateData.phone,
-          company: updateData.company,
-          role: updateData.role?.toUpperCase() as UserRole,
+          isAdmin: updateData.role === 'admin',
+          canSeePrices: updateData.role === 'distributor' || updateData.role === 'admin',
           updatedAt: new Date(),
         },
       });
@@ -241,13 +228,13 @@ export class PrismaAuthService {
       return {
         id: updatedUser.id,
         email: updatedUser.email,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
+        firstName: updatedUser.name.split(' ')[0] || '',
+        lastName: updatedUser.name.split(' ').slice(1).join(' ') || '',
         name: updatedUser.name,
         phone: updatedUser.phone || '',
-        role: updatedUser.role.toLowerCase() as 'customer' | 'distributor' | 'admin',
-        isActive: updatedUser.isActive,
-        emailVerified: updatedUser.emailVerified,
+        role: updatedUser.isAdmin ? 'admin' : 'customer',
+        isActive: true,
+        emailVerified: true,
         createdAt: updatedUser.createdAt.toISOString(),
         updatedAt: updatedUser.updatedAt.toISOString(),
       };
