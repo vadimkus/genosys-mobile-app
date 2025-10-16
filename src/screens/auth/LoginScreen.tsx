@@ -11,6 +11,7 @@ import {
   ScrollView,
   ImageBackground,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store/useStore';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -116,7 +117,10 @@ export default function LoginScreen() {
           <View style={styles.overlay}>
             <View style={styles.header}>
               <Text style={styles.title}>Genosys Middle East FZ-LLC</Text>
-              <Text style={styles.subtitle}>United Arab Emirates</Text>
+              <View style={styles.subtitleContainer}>
+                <Text style={styles.subtitle}>United Arab Emirates</Text>
+                <Ionicons name="heart" size={14} color="#6b7280" style={styles.heartIcon} />
+              </View>
             </View>
 
             <View style={styles.form}>
@@ -220,10 +224,18 @@ const styles = StyleSheet.create({
     color: '#1f2937',
     marginBottom: 8,
   },
+  subtitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   subtitle: {
     fontSize: 16,
     color: '#6b7280',
     textAlign: 'center',
+  },
+  heartIcon: {
+    marginLeft: 4,
   },
   form: {
     width: '100%',
