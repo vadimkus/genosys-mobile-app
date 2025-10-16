@@ -81,27 +81,9 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginBottom: 4,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
   productName: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginRight: 8,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 4,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
     textAlign: 'center',
   },
 });
