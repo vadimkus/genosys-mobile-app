@@ -132,7 +132,7 @@ export default function RegisterScreen() {
                   <Ionicons name="heart" size={14} color="#dc2626" style={styles.heartIcon} />
                 </Animated.View>
               </View>
-              <Text style={styles.createAccountTitle}>Create Account</Text>
+              <Text style={styles.createAccountTitle}>New Account</Text>
             </View>
 
         <View style={styles.form}>
@@ -267,7 +267,7 @@ export default function RegisterScreen() {
             disabled={isLoading}
           >
             <Text style={styles.registerButtonText}>
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? 'Creating Account...' : 'New Account'}
             </Text>
           </TouchableOpacity>
 
