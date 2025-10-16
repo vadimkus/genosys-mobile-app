@@ -72,6 +72,7 @@ export default function RegisterScreen() {
       !formData.firstName ||
       !formData.lastName ||
       !formData.email ||
+      !formData.phone ||
       !formData.password
     ) {
       Alert.alert('Error', 'Please fill in all required fields');
@@ -173,7 +174,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.label}>Phone *</Text>
             <TextInput
               style={styles.input}
               placeholder='Enter your phone number'
