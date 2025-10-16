@@ -129,7 +129,7 @@ export default function ProductDetailScreenRefactored() {
     }
     
     if (productName === 'HR³ MATRIX SCALP PEELING α') {
-      return 'GENOSYS HR³ MATRIX SCALP PEELING α is a gentle scalp peeling solution designed to cleanse and prepare the scalp for microneedling treatments. This advanced peeling formula effectively removes keratinized particles and impurities while providing a refreshing, cooling sensation that soothes the scalp and enhances treatment absorption. Gentle scalp peeling solution for microneedling treatment preparation. Removes keratinized particles, provides refreshing cooling sensation, and optimizes scalp condition for enhanced treatment absorption.';
+      return 'GENOSYS HR³ MATRIX SCALP PEELING α is a gentle scalp peeling solution designed to cleanse and prepare the scalp for microneedling treatments. This advanced peeling formula effectively removes keratinized particles and impurities while providing a refreshing, cooling sensation that soothes the scalp and enhances treatment absorption.';
     }
     
     if (productName === 'HR³ MATRIX SCALP SHAMPOO α') {
@@ -1498,6 +1498,13 @@ export default function ProductDetailScreenRefactored() {
         {product.name === 'HR³ MATRIX MESOPECIA KIT' && (
           <View style={styles.sizeDisplayContainer}>
             <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 1 Kit</Text>
+          </View>
+        )}
+
+        {/* Size Display for HR³ MATRIX SCALP PEELING α */}
+        {product.name === 'HR³ MATRIX SCALP PEELING α' && (
+          <View style={styles.sizeDisplayContainer}>
+            <Text style={[styles.sizeDisplayLabel, { color: theme.colors.text }]}>Size: 100ml</Text>
           </View>
         )}
 
@@ -3279,28 +3286,22 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Benefits</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Gentle Scalp Exfoliation:</Text>{' '}
-                  Effectively removes keratinized particles and dead skin cells
+                  • Gentle Scalp Exfoliation - Effectively removes keratinized particles and dead skin cells
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Refreshing Cooling Effect:</Text>{' '}
-                  Provides a soothing, cooling sensation for scalp comfort
+                  • Refreshing Cooling Effect - Provides a soothing, cooling sensation for scalp comfort
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Disinfecting Properties:</Text>{' '}
-                  Helps cleanse the scalp and prepare for treatment
+                  • Disinfecting Properties - Helps cleanse the scalp and prepare for treatment
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Anti-Inflammatory Action:</Text>{' '}
-                  Reduces inflammation and soothes irritated scalp
+                  • Anti-Inflammatory Action - Reduces inflammation and soothes irritated scalp
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Enhanced Blood Circulation:</Text>{' '}
-                  Stimulates blood flow to hair follicles
+                  • Enhanced Blood Circulation - Stimulates blood flow to hair follicles
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Treatment Preparation:</Text>{' '}
-                  Optimizes scalp condition for microneedling procedures
+                  • Treatment Preparation - Optimizes scalp condition for microneedling procedures
                 </Text>
               </View>
             </View>
@@ -3312,28 +3313,22 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>1. Scalp Preparation:</Text>{' '}
-                  Ensure the scalp is clean and dry before application
+                  1. Scalp Preparation: Ensure the scalp is clean and dry before application
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>2. Application:</Text>{' '}
-                  Apply a small amount of the peeling solution to the scalp
+                  2. Application: Apply a small amount of the peeling solution to the scalp
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>3. Massage:</Text>{' '}
-                  Gently massage the solution into the scalp using circular motions
+                  3. Massage: Gently massage the solution into the scalp using circular motions
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>4. Processing Time:</Text>{' '}
-                  Allow the solution to work for 2-3 minutes
+                  4. Processing Time: Allow the solution to work for 2-3 minutes
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>5. Rinse:</Text>{' '}
-                  Thoroughly rinse with lukewarm water
+                  5. Rinse: Thoroughly rinse with lukewarm water
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>6. Follow-up:</Text>{' '}
-                  Proceed with your regular microneedling treatment protocol
+                  6. Follow-up: Proceed with your regular microneedling treatment protocol
                 </Text>
               </View>
             </View>
@@ -3345,23 +3340,33 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Salicylic Acid:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Salicylic Acid</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Provides gentle exfoliation to remove dead skin cells and unclog hair follicles, promoting healthier scalp condition and improved treatment absorption.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Menthol:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Menthol</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Delivers a refreshing, cooling sensation that soothes the scalp and provides immediate comfort during and after application.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sophora Japonica Linn Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Sophora Japonica Linn Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Provides antioxidant properties and helps reduce inflammation, promoting scalp health and creating an optimal environment for hair growth.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Green Tea Extract:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Green Tea Extract</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Offers anti-inflammatory and antioxidant benefits, helping to soothe the scalp and protect against environmental damage.
                 </Text>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Grapefruit Seed Oil:</Text>{' '}
+                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Grapefruit Seed Oil</Text>
+                </Text>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                   Provides natural antimicrobial properties to help cleanse the scalp and maintain a healthy scalp environment.
                 </Text>
               </View>
@@ -3371,12 +3376,46 @@ export default function ProductDetailScreenRefactored() {
           {/* Note Section for HR³ MATRIX SCALP PEELING α */}
           {product.name === 'HR³ MATRIX SCALP PEELING α' && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Important Note</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
               <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
                 <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Note:</Text>{' '}
                   This product is designed for use in conjunction with microneedling treatments. For best results, use as part of the complete HR³ MATRIX treatment protocol. Avoid contact with eyes and discontinue use if irritation occurs.
                 </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Product Documentation Section for HR³ MATRIX SCALP PEELING α */}
+          {product.name === 'HR³ MATRIX SCALP PEELING α' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.detailItem, { color: theme.colors.text }]}>📄 File size: 900 KB</Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20PEELING%20ALPHA.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={[styles.documentationButtonText, { color: theme.colors.background }]}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
