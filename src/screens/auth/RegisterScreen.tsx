@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   title: {
     fontSize: 18,
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1f2937',
     marginTop: 16,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   form: {
     width: '100%',
