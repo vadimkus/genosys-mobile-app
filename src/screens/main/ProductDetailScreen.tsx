@@ -3273,43 +3273,6 @@ export default function ProductDetailScreenRefactored() {
             </View>
           )}
 
-          {/* Product Documentation Section for HR³ MATRIX MESOPECIA KIT */}
-          {product.name === 'HR³ MATRIX MESOPECIA KIT' && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
-              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
-                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                  Download the complete product manual and usage guide for professional application.
-                </Text>
-                <View style={styles.documentationContainer}>
-                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
-                    📄 File size: 1.2 MB
-                  </Text>
-                  <TouchableOpacity
-                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
-                    onPress={() => {
-                      Alert.alert(
-                        'Product Documentation',
-                        'This will open the product manual PDF. Continue?',
-                        [
-                          { text: 'Cancel', style: 'cancel' },
-                          {
-                            text: 'View PDF',
-                            onPress: () => {
-                              Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20PEELING%20ALPHA.pdf');
-                            },
-                          },
-                        ]
-                      );
-                    }}
-                  >
-                    <Text style={styles.documentationButtonText}>View PDF</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          )}
-
           {/* Benefits Section for HR³ MATRIX SCALP PEELING α */}
           {product.name === 'HR³ MATRIX SCALP PEELING α' && (
             <View style={styles.section}>
