@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   ImageBackground,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store/useStore';
@@ -38,6 +39,31 @@ export default function LoginScreen() {
     email?: string[];
     password?: string[];
   }>({});
+
+  // Heart animation
+  const heartScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const startHeartAnimation = () => {
+      Animated.sequence([
+        Animated.timing(heartScale, {
+          toValue: 1.3,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heartScale, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Repeat every 4 seconds
+        setTimeout(startHeartAnimation, 4000);
+      });
+    };
+
+    startHeartAnimation();
+  }, [heartScale]);
 
   const handleEmailChange = (text: string) => {
     const sanitized = sanitizeInput(text);
@@ -119,7 +145,9 @@ export default function LoginScreen() {
               <Text style={styles.title}>Genosys Middle East FZ-LLC</Text>
               <View style={styles.subtitleContainer}>
                 <Text style={styles.subtitle}>United Arab Emirates</Text>
-                <Ionicons name="heart" size={14} color="#6b7280" style={styles.heartIcon} />
+                <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                  <Ionicons name="heart" size={14} color="#dc2626" style={styles.heartIcon} />
+                </Animated.View>
               </View>
             </View>
 
