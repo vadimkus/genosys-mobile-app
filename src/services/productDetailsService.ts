@@ -29,6 +29,25 @@ export const PRODUCT_DETAILS_CONFIG: ProductDetailsConfig[] = [
     ],
   },
   {
+    productNamePattern: 'intensive problem control cream',
+    details: [
+      { label: 'Form', value: 'Specialized problem control cream' },
+      { label: 'Size', value: '50g (Homecare) 250g (Professional)' },
+      { label: 'Target', value: 'Problematic and acne-prone skin' },
+      {
+        label: 'Technology',
+        value: 'Advanced anti-microbial and anti-inflammatory formula',
+      },
+      {
+        label: 'Key Benefits',
+        value: 'Sebum control, anti-microbial, anti-inflammatory, soothing relief',
+      },
+      { label: 'Usage', value: 'Morning and evening skincare routine' },
+      { label: 'Skin Type', value: 'All skin types, especially problematic and acne-prone skin' },
+      { label: 'Country of Origin', value: 'South Korea' },
+    ],
+  },
+  {
     productNamePattern: 'multi functional anti-wrinkle cream',
     details: [
       { label: 'Form', value: 'Multi-functional anti-wrinkle cream' },
@@ -330,6 +349,19 @@ export const PRODUCT_DETAILS_CONFIG: ProductDetailsConfig[] = [
         label: 'Skin Type',
         value: 'All skin types, especially sensitive and post-treatment skin',
       },
+      { label: 'Country of Origin', value: 'South Korea' },
+    ],
+  },
+  {
+    productNamePattern: 'intensive problem control toner',
+    details: [
+      { label: 'Form', value: 'Intensive problem control toner' },
+      { label: 'Size', value: '200ml (Homecare) / 500ml (Professional)' },
+      { label: 'Target', value: 'Acne-prone, sensitive, and problematic skin' },
+      { label: 'Technology', value: 'Advanced active ingredient complex' },
+      { label: 'Key Benefits', value: 'Problem control, pore minimizing, skin soothing' },
+      { label: 'Usage', value: 'Professional and home care' },
+      { label: 'Skin Type', value: 'Problematic, acne-prone, sensitive skin' },
       { label: 'Country of Origin', value: 'South Korea' },
     ],
   },

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '../types';
+import { PricingService } from '../services/pricingService';
 
 export interface CartItem {
   product: Product;
@@ -45,17 +46,29 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         item => item.uniqueId === uniqueId
       );
 
+      // Calculate the correct price based on selected size
+      let finalPrice = product.price;
+      if (selectedSize) {
+        finalPrice = PricingService.getPriceForSize(product, selectedSize);
+      }
+
+      // Create a product copy with the correct price
+      const productWithCorrectPrice = {
+        ...product,
+        price: finalPrice
+      };
+
       if (existingItem) {
         // Update quantity if exact same variant already exists
         return prevItems.map(item =>
           item.uniqueId === uniqueId
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + quantity, product: productWithCorrectPrice }
             : item
         );
       } else {
-        // Add new item to cart with variant information
+        // Add new item to cart with variant information and correct price
         return [...prevItems, { 
-          product, 
+          product: productWithCorrectPrice, 
           quantity, 
           selectedColor, 
           selectedSize, 

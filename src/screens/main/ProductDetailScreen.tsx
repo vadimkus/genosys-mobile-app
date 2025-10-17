@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
@@ -1556,7 +1557,7 @@ export default function ProductDetailScreenRefactored() {
           onPriceChange={handlePriceChange}
           selectedSize={selectedSize}
           currentPrice={currentPrice}
-          hideSizeSelection={product.name === 'INTENSIVE HYDRO SOOTHING CREAM'}
+          hideSizeSelection={product.name === 'INTENSIVE HYDRO SOOTHING CREAM' || product.name === 'INTENSIVE PROBLEM CONTROL CREAM' || product.name === 'INTENSIVE PROBLEM CONTROL TONER'}
         />
 
         {/* Comprehensive Product Information */}
@@ -1801,6 +1802,376 @@ export default function ProductDetailScreenRefactored() {
               <Text style={[styles.detailItem, { color: theme.colors.text }]}>
                 This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed for additional hydration.
               </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 1: Size Selection */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: 'center' }]}>Select Size</Text>
+            <View style={styles.sizeSelectionContainer}>
+              {[
+                { size: '50g', description: 'Homecare size', price: '290 AED' },
+                { size: '250g', description: 'Professional size', price: '420 AED' }
+              ].map((option) => (
+                <TouchableOpacity
+                  key={option.size}
+                  style={[
+                    styles.sizeOption,
+                    {
+                      backgroundColor: selectedSize === option.size ? '#F0F9FF' : theme.colors.card,
+                      borderColor: selectedSize === option.size ? '#3B82F6' : '#E5E7EB',
+                      borderWidth: selectedSize === option.size ? 3 : 1,
+                      shadowColor: selectedSize === option.size ? '#3B82F6' : 'transparent',
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: selectedSize === option.size ? 0.2 : 0,
+                      shadowRadius: 4,
+                      elevation: selectedSize === option.size ? 4 : 1,
+                    },
+                  ]}
+                  onPress={() => handleSizeChange(option.size)}
+                >
+                  <View style={styles.sizeInfo}>
+                    <Text style={[
+                      styles.sizeLabel,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
+                    ]}>
+                      {option.size}
+                    </Text>
+                    <Text style={[
+                      styles.sizeDescription,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
+                    ]}>
+                      {option.description}
+                    </Text>
+                    <Text style={[
+                      styles.sizePrice,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.primary }
+                    ]}>
+                      {option.price}
+                    </Text>
+                  </View>
+                  {selectedSize === option.size && (
+                    <View style={styles.selectionIndicator}>
+                      <Text style={styles.checkmark}>✓</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 2: Product Description */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Description</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                INTENSIVE PROBLEM CONTROL CREAM is a specialized cream designed to address various skin concerns with powerful anti-microbial and anti-inflammatory properties. This advanced formula helps control sebum production while providing soothing relief for problematic skin.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 3: Product Details */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Details</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Specialized problem control cream
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 50g (Homecare) 250g (Professional)
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Target:</Text> Problematic and acne-prone skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Advanced anti-microbial and anti-inflammatory formula
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Sebum control, anti-microbial, anti-inflammatory, soothing relief
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Morning and evening skincare routine
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially problematic and acne-prone skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 4: Benefits */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Anti-microbial - Helps combat bacteria and prevent breakouts
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Anti-inflammatory - Reduces redness and calms irritated skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Sebum Control - Regulates oil production for balanced skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Soothing Relief - Provides comfort for problematic skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Skin Barrier Support - Strengthens the skin's natural defenses
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Moisture Retention - Keeps skin hydrated without clogging pores
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 5: Directions */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Apply a small amount to cleansed skin twice daily. Gently massage into the skin until fully absorbed. Use as part of your morning and evening skincare routine for best results.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 6: Key Ingredients */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Zinc PCA</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                A powerful sebum-regulating ingredient that helps control oil production and has antimicrobial properties to prevent breakouts and maintain clear skin.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Panthenol (Vitamin B5)</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Provides deep hydration and has anti-inflammatory properties that help soothe irritated skin while promoting healing and skin barrier function.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Beta-Glucan</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                A natural immune-boosting ingredient that helps strengthen the skin's defense mechanisms, reduce inflammation, and promote healing.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Allantoin</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                A gentle, soothing ingredient that helps calm irritated skin, reduce redness, and promote skin healing while being suitable for sensitive skin.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Lactobacillus/Pumpkin Ferment Extract</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                A probiotic ingredient that helps balance the skin's microbiome, providing natural antimicrobial benefits and supporting healthy skin flora.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Trehalose</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                A natural sugar that acts as a humectant, helping to retain moisture and protect the skin from environmental stressors while maintaining skin hydration.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL CREAM - Block 7: Note */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                This product is dermatologically tested and safe for all skin types. For best results, use as part of your daily skincare routine.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 1: Size Selection */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: 'center' }]}>Select Size</Text>
+            <View style={styles.sizeSelectionContainer}>
+              {[
+                { size: '200ml', description: 'Homecare size', price: '180 AED' },
+                { size: '500ml', description: 'Professional size', price: '320 AED' },
+              ].map((option) => (
+                <TouchableOpacity
+                  key={option.size}
+                  style={[
+                    styles.sizeOption,
+                    { borderColor: selectedSize === option.size ? theme.colors.primary : theme.colors.border }
+                  ]}
+                  onPress={() => handleSizeChange(option.size)}
+                >
+                  <View style={styles.sizeInfo}>
+                    <Text style={[
+                      styles.sizeLabel,
+                      { color: selectedSize === option.size ? theme.colors.primary : theme.colors.text }
+                    ]}>
+                      {option.size}
+                    </Text>
+                    <Text style={[
+                      styles.sizeDescription,
+                      { color: selectedSize === option.size ? theme.colors.primary : theme.colors.textSecondary }
+                    ]}>
+                      {option.description}
+                    </Text>
+                    <Text style={[
+                      styles.sizePrice,
+                      { color: selectedSize === option.size ? theme.colors.primary : theme.colors.text }
+                    ]}>
+                      {option.price}
+                    </Text>
+                  </View>
+                  {selectedSize === option.size && (
+                    <View style={styles.selectionIndicator}>
+                      <Text style={styles.checkmark}>✓</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 2: Product Description */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Description</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                GENOSYS INTENSIVE PROBLEM CONTROL TONER is a professional-grade toner specifically formulated to address problematic skin conditions and provide intensive care for acne-prone, sensitive, and irritated skin. This advanced toner combines powerful active ingredients with soothing botanical extracts to deliver comprehensive skin care benefits.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 3: Product Details */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Details</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Form:</Text> Intensive problem control toner{'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size:</Text> 200ml (Homecare) / 500ml (Professional){'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Target:</Text> Acne-prone, sensitive, and problematic skin{'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Technology:</Text> Advanced active ingredient complex{'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Problem control, pore minimizing, skin soothing{'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Professional and home care{'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> Problematic, acne-prone, sensitive skin{'\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 4: Benefits */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Intensive Problem Control - Targets acne, blemishes, and skin irritations effectively{'\n'}
+                • Pore Minimizing - Helps reduce pore size and tighten skin texture{'\n'}
+                • Skin Soothing - Calms irritated and sensitive skin with anti-inflammatory properties{'\n'}
+                • Dead Skin Cell Removal - Gently exfoliates and removes impurities for clearer skin{'\n'}
+                • pH Balancing - Restores optimal skin pH levels for healthy skin barrier{'\n'}
+                • Professional Results - Delivers clinical-grade benefits for problem skin management
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 5: Directions */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Directions</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Method 1 - Daily Cleansing:</Text>{'\n'}
+                Soak a cotton pad with toner and gently wipe along the skin texture to remove dead skin cells and residues after washing the face.{'\n\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Method 2 - Intensive Treatment:</Text>{'\n'}
+                Soak cotton pads with toner and apply them to the face. Leave them on for 5-10 minutes to enhance pore contraction effect and soothe the skin.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 6: Key Ingredients */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Salicylic Acid</Text>{'\n'}
+                Beta-hydroxy acid that penetrates pores to dissolve dead skin cells and excess oil, helping to prevent acne breakouts and improve skin texture.{'\n\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Witch Hazel Extract</Text>{'\n'}
+                Natural astringent that tightens pores, reduces inflammation, and provides soothing relief for irritated and sensitive skin.{'\n\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Tea Tree Extract</Text>{'\n'}
+                Powerful antimicrobial and anti-inflammatory agent that helps combat acne-causing bacteria while soothing irritated skin.{'\n\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Aloe Vera Extract</Text>{'\n'}
+                Soothing and healing ingredient that calms inflammation, reduces redness, and promotes skin healing for problem areas.{'\n\n'}
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Niacinamide</Text>{'\n'}
+                Vitamin B3 derivative that helps regulate sebum production, minimize pores, and improve skin barrier function for healthier skin.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 7: Note */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                This product is dermatologically tested and safe for all skin types. Particularly effective for problematic and acne-prone skin. For best results, use as part of your daily skincare routine and follow with appropriate moisturizer.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE PROBLEM CONTROL TONER - Block 8: Product Documentation */}
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && product.documentation && product.documentation.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Documentation</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Download the complete product manual and usage guide for professional application.
+              </Text>
+              {product.documentation.map((doc, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                  onPress={() => Linking.openURL(doc.url)}
+                >
+                  <Ionicons name="document-text" size={20} color="#ffffff" />
+                  <Text style={styles.documentationButtonText}>
+                    {doc.name}
+                  </Text>
+                  <Ionicons name="download" size={20} color="#ffffff" />
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         )}

@@ -20,6 +20,20 @@ export const PRICING_RULES: PricingRule[] = [
     },
   },
   {
+    productNamePattern: 'intensive problem control cream',
+    sizes: {
+      '50g': 290.0,
+      '250g': 420.0,
+    },
+  },
+  {
+    productNamePattern: 'intensive problem control toner',
+    sizes: {
+      '200ml': 180.0,
+      '500ml': 320.0,
+    },
+  },
+  {
     productNamePattern: 'ultra shield sun cream',
     sizes: {
       '50ml': 320.0,

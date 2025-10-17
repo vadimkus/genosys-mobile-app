@@ -1205,34 +1205,79 @@ export class ProductService {
       },
       {
         id: '15',
-        name: 'PEPTIDE GEL MASK',
+        name: 'INTENSIVE PROBLEM CONTROL TONER',
         description:
-          'Professional thermo-sensitive hydrogel mask for post-treatment care. Patented technology that transforms from gel to fluid at body temperature for instant cooling relief and deep hydration.',
-        price: 380.0,
-        originalPrice: 380.0,
+          'Professional anti-blemish toner for acne-prone skin with advanced sebum control technology. This advanced toner combines powerful active ingredients with soothing botanical extracts to deliver comprehensive skin care benefits.',
+        price: 180.0,
+        originalPrice: 180.0,
         discountPercentage: 0,
         imageUrl:
-          'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75',
+          'https://genosys.ae/_next/image?url=%2Fimages%2Ftoner.jpg&w=1200&q=75',
         imageUrls: [
-          'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75',
+          'https://genosys.ae/_next/image?url=%2Fimages%2Ftoner.jpg&w=1200&q=75',
         ],
-        category: 'Mask',
+        category: 'Toner/Mist',
         brand: 'Genosys',
         sku: 'GEN-015',
         images: [
-          'https://genosys.ae/_next/image?url=%2Fimages%2FPEP.jpg&w=1200&q=75',
+          'https://genosys.ae/_next/image?url=%2Fimages%2Ftoner.jpg&w=1200&q=75',
         ],
         inStock: true,
-        stockQuantity: 25,
+        stockQuantity: 50,
         isFeatured: false,
-        isNew: true,
-        isOnSale: true,
-        stock: 25,
-        rating: 5.0,
+        isNew: false,
+        isOnSale: false,
+        stock: 50,
+        rating: 4.8,
         averageRating: 4.8,
-        reviewCount: 34,
-        sizeOptions: undefined,
-        defaultSize: '38g x 5ea',
+        reviewCount: 24,
+        details: 'Professional anti-blemish toner for acne-prone skin with advanced sebum control technology. Form: Intensive problem control toner. Size: 200ml (Homecare) / 500ml (Professional). Target: Acne-prone, sensitive, and problematic skin. Technology: Advanced active ingredient complex. Key Benefits: Problem control, pore minimizing, skin soothing. Usage: Professional and home care. Skin Type: Problematic, acne-prone, sensitive skin. Country of Origin: South Korea.',
+        benefits: [
+          'Intensive Problem Control - Targets acne, blemishes, and skin irritations effectively',
+          'Pore Minimizing - Helps reduce pore size and tighten skin texture',
+          'Skin Soothing - Calms irritated and sensitive skin with anti-inflammatory properties',
+          'Dead Skin Cell Removal - Gently exfoliates and removes impurities for clearer skin',
+          'pH Balancing - Restores optimal skin pH levels for healthy skin barrier',
+          'Professional Results - Delivers clinical-grade benefits for problem skin management'
+        ],
+        directions: [
+          'Method 1 - Daily Cleansing: Soak a cotton pad with toner and gently wipe along the skin texture to remove dead skin cells and residues after washing the face.',
+          'Method 2 - Intensive Treatment: Soak cotton pads with toner and apply them to the face. Leave them on for 5-10 minutes to enhance pore contraction effect and soothe the skin.'
+        ],
+        keyIngredients: [
+          {
+            name: 'Salicylic Acid',
+            description: 'Beta-hydroxy acid that penetrates pores to dissolve dead skin cells and excess oil, helping to prevent acne breakouts and improve skin texture.'
+          },
+          {
+            name: 'Witch Hazel Extract',
+            description: 'Natural astringent that tightens pores, reduces inflammation, and provides soothing relief for irritated and sensitive skin.'
+          },
+          {
+            name: 'Tea Tree Extract',
+            description: 'Powerful antimicrobial and anti-inflammatory agent that helps combat acne-causing bacteria while soothing irritated skin.'
+          },
+          {
+            name: 'Aloe Vera Extract',
+            description: 'Soothing and healing ingredient that calms inflammation, reduces redness, and promotes skin healing for problem areas.'
+          },
+          {
+            name: 'Niacinamide',
+            description: 'Vitamin B3 derivative that helps regulate sebum production, minimize pores, and improve skin barrier function for healthier skin.'
+          }
+        ],
+        note: 'This product is dermatologically tested and safe for all skin types. Particularly effective for problematic and acne-prone skin. For best results, use as part of your daily skincare routine and follow with appropriate moisturizer.',
+        documentation: [
+          {
+            name: 'GENOSYS INTENSIVE PROBLEM CONTROL TONER Manual',
+            url: 'https://genosys.ae/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf',
+            type: 'PDF',
+            size: '2.1 MB'
+          }
+        ],
+        sizes: ['200ml', '500ml'],
+        sizeOptions: ['200ml', '500ml'],
+        defaultSize: '200ml',
         createdAt: '2024-02-29T10:00:00.000Z',
         updatedAt: '2024-02-29T10:00:00.000Z',
       },
@@ -1481,13 +1526,13 @@ export class ProductService {
         updatedAt: '2024-03-04T10:00:00.000Z',
       },
       {
-        id: '20',
+        id: '30',
         name: 'INTENSIVE PROBLEM CONTROL CREAM',
         description:
-          'Advanced problem control cream for targeted treatment of skin concerns and blemish control',
-        price: 99.99,
-        originalPrice: 129.99,
-        discountPercentage: 23,
+          'INTENSIVE PROBLEM CONTROL CREAM is a specialized cream designed to address various skin concerns with powerful anti-microbial and anti-inflammatory properties. This advanced formula helps control sebum production while providing soothing relief for problematic skin.',
+        price: 290.0,
+        originalPrice: 290.0,
+        discountPercentage: 0,
         imageUrl:
           'https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75',
         imageUrls: [
@@ -1495,7 +1540,51 @@ export class ProductService {
         ],
         category: 'Cream',
         brand: 'Genosys',
-        sku: 'GEN-020',
+        sku: 'GEN-030',
+        details: 'Specialized problem control cream with advanced anti-microbial and anti-inflammatory formula for problematic and acne-prone skin.',
+        benefits: [
+          'Anti-microbial - Helps combat bacteria and prevent breakouts',
+          'Anti-inflammatory - Reduces redness and calms irritated skin',
+          'Sebum Control - Regulates oil production for balanced skin',
+          'Soothing Relief - Provides comfort for problematic skin',
+          'Skin Barrier Support - Strengthens the skin\'s natural defenses',
+          'Moisture Retention - Keeps skin hydrated without clogging pores'
+        ],
+        directions: [
+          'Apply a small amount to cleansed skin twice daily',
+          'Gently massage into the skin until fully absorbed',
+          'Use as part of your morning and evening skincare routine for best results'
+        ],
+        keyIngredients: [
+          {
+            name: 'Zinc PCA',
+            description: 'A powerful sebum-regulating ingredient that helps control oil production and has antimicrobial properties to prevent breakouts and maintain clear skin.'
+          },
+          {
+            name: 'Panthenol (Vitamin B5)',
+            description: 'Provides deep hydration and has anti-inflammatory properties that help soothe irritated skin while promoting healing and skin barrier function.'
+          },
+          {
+            name: 'Beta-Glucan',
+            description: 'A natural immune-boosting ingredient that helps strengthen the skin\'s defense mechanisms, reduce inflammation, and promote healing.'
+          },
+          {
+            name: 'Allantoin',
+            description: 'A gentle, soothing ingredient that helps calm irritated skin, reduce redness, and promote skin healing while being suitable for sensitive skin.'
+          },
+          {
+            name: 'Lactobacillus/Pumpkin Ferment Extract',
+            description: 'A probiotic ingredient that helps balance the skin\'s microbiome, providing natural antimicrobial benefits and supporting healthy skin flora.'
+          },
+          {
+            name: 'Trehalose',
+            description: 'A natural sugar that acts as a humectant, helping to retain moisture and protect the skin from environmental stressors while maintaining skin hydration.'
+          }
+        ],
+        note: 'This product is dermatologically tested and safe for all skin types. For best results, use as part of your daily skincare routine.',
+        sizes: ['50g', '250g'],
+        sizeOptions: ['50g', '250g'],
+        defaultSize: '50g',
         images: [
           'https://genosys.ae/_next/image?url=%2Fimages%2FPRB.jpg&w=1200&q=75',
         ],
@@ -1508,8 +1597,6 @@ export class ProductService {
         rating: 5.0,
         averageRating: 5.0,
         reviewCount: 76,
-        sizeOptions: ['50g', '250g'],
-        defaultSize: '50g',
         createdAt: '2024-03-05T10:00:00.000Z',
         updatedAt: '2024-03-05T10:00:00.000Z',
       },
