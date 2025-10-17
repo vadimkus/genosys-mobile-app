@@ -1227,7 +1227,49 @@ export class ProductService {
         id: '48',
         name: 'Hair-GENTRON',
         description:
-          'Advanced LED helmet device for professional hair loss treatment and scalp therapy with multi-light technology.',
+          'Hair-GENTRON is an advanced LED helmet device designed for professional hair loss treatment and scalp therapy. This innovative device combines multiple light therapy technologies with massaging and heating functions to promote hair growth, improve scalp circulation, and provide comprehensive hair and scalp care. Patent No. 10-2151442, Bronze medal winner of 2020 Korea invention patent competition.',
+        details: 'LED helmet with massaging and heating functions. Type: LED helmet with massaging and heating functions. Size: 1 Device. Patent: No. 10-2151442 (Korea). Award: Bronze medal winner of 2020 Korea invention patent competition. Light Types: Infrared + Red + Blue LED combination. Features: Massaging, heating, music mode. Usage: Professional and home care. Country of Origin: South Korea.',
+        benefits: [
+          'Hair Growth Stimulation - Promotes natural hair growth through advanced light therapy',
+          'Improved Blood Circulation - Enhances scalp blood flow for better nutrient delivery to hair follicles',
+          'Non-Invasive Treatment - Safe and painless therapy without side effects',
+          'Professional & Home Use - Suitable for both professional clinics and home care',
+          'Stress Relief - Massaging function helps reduce tension and stress',
+          'Optimal Light Distance - Guaranteed proper distance from light source to scalp for maximum effectiveness'
+        ],
+        directions: [
+          'Light Therapy: Infrared, red, and blue LED lights stimulate hair follicles and improve scalp health',
+          'Massaging: Air pressure massaging improves blood circulation and enhances treatment effectiveness',
+          'Heating: Optional heating function increases blood flow and light penetration',
+          'Relaxation: Music mode and comfortable design ensure a pleasant treatment experience'
+        ],
+        keyIngredients: [
+          {
+            name: 'Multi-LED Light Therapy',
+            description: 'Infrared light + Red light + Blue light combination for comprehensive scalp treatment and hair follicle stimulation.'
+          },
+          {
+            name: 'Massaging Function',
+            description: 'Air pressure massaging system that can be used simultaneously with light therapy for enhanced treatment effectiveness.'
+          },
+          {
+            name: 'Heating Function',
+            description: 'Optional heating feature that can be added during treatment to improve blood circulation and enhance light penetration.'
+          },
+          {
+            name: 'Music Mode',
+            description: 'Built-in relaxation features to help users feel comfortable and relaxed during treatment sessions.'
+          }
+        ],
+        note: 'This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols.',
+        documentation: [
+          {
+            name: 'Hair-GENTRON Product Manual',
+            url: 'https://genosys.ae/documents/ppt/HAIR%20GENTRON.pdf',
+            type: 'PDF',
+            size: '650 KB'
+          }
+        ],
         price: 0, // Login to see price
         originalPrice: 0,
         discountPercentage: 0,
@@ -1251,8 +1293,10 @@ export class ProductService {
         rating: 5.0,
         averageRating: 4.8,
         reviewCount: 0,
+        sizes: ['1 Device'],
         sizeOptions: ['1 Device'],
         defaultSize: '1 Device',
+        colors: [],
         createdAt: '2024-03-12T10:00:00.000Z',
         updatedAt: '2024-03-12T10:00:00.000Z',
       },
@@ -1260,7 +1304,41 @@ export class ProductService {
         id: '3',
         name: 'HairGen BOOSTER',
         description:
-          'Advanced auto-microneedling LED device for comprehensive scalp treatment and hair growth stimulation.',
+          'HairGen BOOSTER is an advanced auto-microneedling LED device specifically designed for comprehensive scalp treatment and hair loss prevention. This innovative device combines microneedling technology with LED light therapy to enhance scalp health, promote hair growth, and deliver nutrients directly to hair follicles for optimal results.',
+        details: 'Auto-microneedling LED device for scalp treatment. Type: Auto-microneedling LED device for scalp treatment. Size: 1 Device. Technology: Microneedling + LED light therapy. Key Components: HR³ MATRIX HAIR SOLUTION α + HR³ MATRIX HAIR STAMP. Benefits: Hair growth stimulation, scalp health improvement, nutrient delivery. Usage: Professional and home care. Country of Origin: South Korea.',
+        benefits: [
+          'Enhanced Hair Growth - Stimulates hair follicles and promotes natural hair regrowth',
+          'Improved Scalp Health - Increases blood circulation and nutrient delivery to hair roots',
+          'Collagen Production - Promotes scalp regeneration and strengthens hair structure',
+          'Nutrient Absorption - Creates pathways for better penetration of hair care products',
+          'Professional Results - Advanced technology for both professional and home use',
+          'Non-Invasive Treatment - Safe and effective without side effects'
+        ],
+        directions: [
+          'Microneedling: Creates micro-channels in the scalp to enhance product absorption',
+          'LED Therapy: Light therapy stimulates hair follicles and improves scalp circulation',
+          'Nutrient Delivery: HR³ MATRIX HAIR SOLUTION α provides essential nutrients for hair growth',
+          'Regeneration: Natural wound healing process promotes collagen production and scalp health'
+        ],
+        keyIngredients: [
+          {
+            name: 'Auto-Microneedling Technology',
+            description: 'Automated microneedling system that creates micro-channels in the scalp to enhance nutrient absorption and stimulate natural healing processes.'
+          },
+          {
+            name: 'LED Light Therapy',
+            description: 'Advanced LED light system that stimulates hair follicles, improves scalp circulation, and promotes cellular regeneration for enhanced hair growth.'
+          },
+          {
+            name: 'HR³ MATRIX HAIR SOLUTION α',
+            description: 'Premium anti-hair loss solution that supplies essential nutrients to combat factors causing hair loss and promote healthy hair growth.'
+          },
+          {
+            name: 'HR³ MATRIX HAIR STAMP',
+            description: 'Patented delivery enhancer with microneedles that leads to scalp regeneration and collagen production through natural wound healing processes.'
+          }
+        ],
+        note: 'This device is designed for professional and home use. For best results, use consistently as part of your hair care routine. Consult with a hair care professional for personalized treatment protocols.',
         price: 0, // Login to see price
         originalPrice: 0,
         discountPercentage: 0,
@@ -1284,8 +1362,11 @@ export class ProductService {
         rating: 5.0,
         averageRating: 4.8,
         reviewCount: 0,
+        sizes: ['1 Device'],
         sizeOptions: ['1 Device'],
         defaultSize: '1 Device',
+        colors: [],
+        documentation: [],
         createdAt: '2024-03-13T10:00:00.000Z',
         updatedAt: '2024-03-13T10:00:00.000Z',
       },
@@ -1456,7 +1537,51 @@ export class ProductService {
         id: '35',
         name: 'HYDRO COOL MODELING MASK',
         description:
-          'Professional modeling mask with immediate cooling and soothing effects for post-treatment skin care. Provides instant cooling sensation, enhances hydration, and reduces pore size.',
+          'Professional modeling mask with immediate cooling and soothing effects for post-treatment skin care. This advanced mask is specifically designed to soothe skin after professional treatments, improve hydration, and reduce pore size while delivering a refreshing cooling sensation for optimal skin comfort.',
+        details: 'Professional modeling mask with advanced cooling and hydrating formula. Form: Professional modeling mask. Size: 1kg. Target: Post-treatment skin soothing and hydration. Technology: Advanced cooling and hydrating formula. Key Benefits: Cooling effect, hydration, pore minimizing, skin soothing. Usage: Professional and home care. Skin Type: All skin types. Country of Origin: South Korea.',
+        benefits: [
+          'Immediate Cooling Effect - Provides instant cooling and refreshing sensation',
+          'Post-Treatment Soothing - Calms and soothes skin after professional treatments',
+          'Enhanced Hydration - Delivers deep moisture and improves skin hydration',
+          'Pore Minimizing - Helps reduce pore size for smoother skin texture',
+          'Skin Barrier Support - Strengthens and enhances skin barrier function',
+          'Collagen Synthesis - Stimulates collagen production for firmer skin'
+        ],
+        directions: [
+          'Cleanse: Begin with thoroughly cleansed facial skin',
+          'Application: Apply the modeling mask evenly to the face',
+          'Processing Time: Leave the mask on for 15-20 minutes',
+          'Removal: Gently rub the residue into the skin for additional benefits',
+          'Rinse: Rinse off any remaining residue with lukewarm water',
+          'Follow-up: Continue with your regular skincare routine'
+        ],
+        keyIngredients: [
+          {
+            name: 'Centella Asiatica Extract',
+            description: 'Powerful botanical extract that increases collagen synthesis, enhances skin barrier function, and provides anti-inflammatory benefits for improved skin health and texture.'
+          },
+          {
+            name: 'Hyaluronic Acid',
+            description: 'Deep hydrating ingredient that attracts and retains moisture, providing intense hydration and plumping effects for smoother, more youthful-looking skin.'
+          },
+          {
+            name: 'Ceramide',
+            description: 'Essential lipid that strengthens the skin barrier, locks in moisture, and protects against environmental damage for healthier, more resilient skin.'
+          },
+          {
+            name: 'Allantoin',
+            description: 'Soothing and healing ingredient that calms irritated skin, promotes cell regeneration, and provides gentle exfoliation for improved skin texture.'
+          },
+          {
+            name: 'Mentha Piperita (Peppermint) Extract',
+            description: 'Natural cooling agent that provides refreshing sensation, soothes inflammation, and helps reduce skin redness and irritation.'
+          },
+          {
+            name: 'Chamaecyparis Obtusa Water',
+            description: 'Purified water extract that provides gentle hydration and soothing properties, helping to calm and refresh the skin naturally.'
+          }
+        ],
+        note: 'This product is dermatologically tested and safe for all skin types. Particularly beneficial after professional skin treatments. For best results, use as part of your regular skincare routine to maintain optimal skin health and comfort.',
         price: 0, // Login to see price
         originalPrice: 0,
         discountPercentage: 0,
@@ -1480,8 +1605,11 @@ export class ProductService {
         rating: 5.0,
         averageRating: 4.8,
         reviewCount: 0,
+        sizes: ['1kg'],
         sizeOptions: ['1kg'],
         defaultSize: '1kg',
+        colors: [],
+        documentation: [],
         createdAt: '2024-03-08T10:00:00.000Z',
         updatedAt: '2024-03-08T10:00:00.000Z',
       },

@@ -3572,6 +3572,43 @@ export default function ProductDetailScreenRefactored() {
             </View>
           )}
 
+          {/* Product Documentation Section for Hair-GENTRON */}
+          {product.name === 'Hair-GENTRON' && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>📄 Product Documentation</Text>
+              <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+                <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                  Download the complete product manual and usage guide for professional application.
+                </Text>
+                <View style={styles.documentationContainer}>
+                  <Text style={[styles.documentationInfo, { color: theme.colors.text }]}>
+                    📄 File size: 650 KB
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Product Documentation',
+                        'This will open the Hair-GENTRON product manual PDF. Continue?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'View PDF',
+                            onPress: () => {
+                              Linking.openURL('https://genosys.ae/documents/ppt/HAIR%20GENTRON.pdf');
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={styles.documentationButtonText}>View PDF</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
           {/* Benefits Section for HR³ MATRIX SCALP SHAMPOO α */}
           {product.name === 'HR³ MATRIX SCALP SHAMPOO α' && (
             <View style={styles.section}>

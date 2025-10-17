@@ -71,19 +71,41 @@ export default function CartScreen() {
   if (items.length === 0) {
     return (
       <View
-        style={[
-          styles.emptyContainer,
-          { backgroundColor: theme.colors.background },
-        ]}
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
       >
-        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-          Your cart is empty
-        </Text>
-        <Text
-          style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View style={styles.centerContainer}>
+              <Image
+                source={require('../../../login/Logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <Text
+                style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+              >
+                Cart
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View
+          style={[
+            styles.emptyContainer,
+            { backgroundColor: theme.colors.background },
+          ]}
         >
-          Add some products to get started
-        </Text>
+          <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+            Your cart is empty
+          </Text>
+          <Text
+            style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
+          >
+            Add some products to get started
+          </Text>
+        </View>
       </View>
     );
   }

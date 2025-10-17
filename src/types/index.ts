@@ -1,5 +1,6 @@
 // Core Types for Genosys Mobile App
 // Based on existing web app database schema
+// Updated with additional product properties including documentation
 
 export interface User {
   id: string;
@@ -44,6 +45,21 @@ export interface Product {
   benefits?: string[];
   usage?: string;
   warnings?: string;
+  details?: string;
+  directions?: string[];
+  keyIngredients?: Array<{
+    name: string;
+    description: string;
+  }>;
+  note?: string;
+  sizes?: string[];
+  colors?: string[];
+  documentation?: Array<{
+    name: string;
+    url: string;
+    type: string;
+    size?: string;
+  }>;
   isFeatured: boolean;
   isNew: boolean;
   isOnSale: boolean;

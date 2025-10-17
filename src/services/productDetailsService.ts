@@ -237,6 +237,81 @@ export const PRODUCT_DETAILS_CONFIG: ProductDetailsConfig[] = [
       { label: 'Country of Origin', value: 'South Korea' },
     ],
   },
+  {
+    productNamePattern: 'hydro cool modeling mask',
+    details: [
+      { label: 'Form', value: 'Professional modeling mask' },
+      { label: 'Size', value: '1kg' },
+      { label: 'Target', value: 'Post-treatment skin soothing and hydration' },
+      {
+        label: 'Technology',
+        value: 'Advanced cooling and hydrating formula',
+      },
+      {
+        label: 'Key Benefits',
+        value: 'Cooling effect, hydration, pore minimizing, skin soothing',
+      },
+      {
+        label: 'Usage',
+        value: 'Professional and home care',
+      },
+      {
+        label: 'Skin Type',
+        value: 'All skin types',
+      },
+      {
+        label: 'Application',
+        value: 'Apply evenly to face, leave for 15-20 minutes, then rinse',
+      },
+      { label: 'Country of Origin', value: 'South Korea' },
+    ],
+  },
+  {
+    productNamePattern: 'hair-gentron',
+    details: [
+      { label: 'Type', value: 'LED helmet with massaging and heating functions' },
+      { label: 'Size', value: '1 Device' },
+      { label: 'Patent', value: 'No. 10-2151442 (Korea)' },
+      { label: 'Award', value: 'Bronze medal winner of 2020 Korea invention patent competition' },
+      {
+        label: 'Light Types',
+        value: 'Infrared + Red + Blue LED combination',
+      },
+      {
+        label: 'Features',
+        value: 'Massaging, heating, music mode',
+      },
+      {
+        label: 'Usage',
+        value: 'Professional and home care',
+      },
+      { label: 'Country of Origin', value: 'South Korea' },
+    ],
+  },
+  {
+    productNamePattern: 'hairgen booster',
+    details: [
+      { label: 'Type', value: 'Auto-microneedling LED device for scalp treatment' },
+      { label: 'Size', value: '1 Device' },
+      {
+        label: 'Technology',
+        value: 'Microneedling + LED light therapy',
+      },
+      {
+        label: 'Key Components',
+        value: 'HR³ MATRIX HAIR SOLUTION α + HR³ MATRIX HAIR STAMP',
+      },
+      {
+        label: 'Benefits',
+        value: 'Hair growth stimulation, scalp health improvement, nutrient delivery',
+      },
+      {
+        label: 'Usage',
+        value: 'Professional and home care',
+      },
+      { label: 'Country of Origin', value: 'South Korea' },
+    ],
+  },
 ];
 
 export class ProductDetailsService {

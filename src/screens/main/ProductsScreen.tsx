@@ -448,6 +448,9 @@ export default function ProductsScreen() {
             >
               Products
             </Text>
+            <Text style={[styles.productCount, { color: theme.colors.textSecondary }]}>
+              {filteredProducts.length} of {products.length} products
+            </Text>
           </View>
         </View>
         <View style={styles.headerBottom}>
@@ -459,9 +462,6 @@ export default function ProductsScreen() {
               <Ionicons name='options-outline' size={24} color='#dc2626' />
             </TouchableOpacity>
           </View>
-          <Text style={[styles.productCount, { color: theme.colors.textSecondary }]}>
-            {filteredProducts.length} of {products.length} products
-          </Text>
           <View style={styles.filterButtonContainer} />
         </View>
       </View>
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
     textAlign: 'center',
-    flex: 1,
+    marginTop: 4,
   },
   filterButton: {
     padding: 8,
