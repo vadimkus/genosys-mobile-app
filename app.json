@@ -31,7 +31,9 @@
     "extra": {
       "eas": {
         "projectId": "genosys-mobile-app"
-      }
+      },
+      "supabaseUrl": "https://zpltdsnjvsdvoppgebjy.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbHRkc25qdnNkdm9wcGdlYmp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MjE0MzcsImV4cCI6MjA3NjE5NzQzN30.AXhr-ei348S1ZIlRgnOzwgFy5fyO5vc7ZMwT0bG7Xtc"
     }
   }
 }

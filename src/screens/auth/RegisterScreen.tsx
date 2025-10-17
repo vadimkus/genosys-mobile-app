@@ -79,6 +79,13 @@ export default function RegisterScreen() {
       return false;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return false;
+    }
+
     // Company is required only for distributors
     if (formData.role === 'distributor' && !formData.company) {
       Alert.alert('Error', 'Company name is required for distributors');

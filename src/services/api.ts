@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LocalAuthService } from './localAuth';
+import { SupabaseAuthService } from './supabaseAuth';
 import {
   User,
   Product,
@@ -164,35 +165,32 @@ class GlobalRateLimiter {
 
 // API Service Class
 class ApiService {
-  // Authentication - HYBRID APPROACH: API First, Local Fallback
+  // Authentication - SUPABASE FIRST, Local Fallback
   async login(
     credentials: LoginForm
   ): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('🔐 HYBRID LOGIN STARTING for:', credentials.email);
+    console.log('🔐 SUPABASE LOGIN STARTING for:', credentials.email);
 
-    // Try API first (with minimal delay)
+    // Try Supabase first
     try {
-      console.log('🌐 Attempting API login...');
-      await GlobalRateLimiter.delayIfNeeded();
-
-      const response = await api.post('/auth/login', credentials);
-      console.log('✅ API login successful');
-
-      if (response.data && response.data.success) {
+      console.log('🌐 Attempting Supabase login...');
+      const result = await SupabaseAuthService.login(credentials);
+      
+      if (result.success) {
+        console.log('✅ Supabase login successful');
+        // Store token for API requests
+        await AsyncStorage.setItem('authToken', result.data.token);
+        await AsyncStorage.setItem('user', JSON.stringify(result.data.user));
         return {
           success: true,
-          data: response.data.data,
-          message: response.data.message || 'Login successful',
+          data: result.data,
+          message: result.message || 'Login successful',
         };
+      } else {
+        console.log('⚠️ Supabase login failed:', result.error);
       }
     } catch (error: any) {
-      console.log('⚠️ API login failed:', error.message);
-
-      // If it's a rate limit error, fall back to local auth immediately
-      if (error.response?.status === 429) {
-        console.log('🔄 Rate limited - falling back to local authentication');
-        return await this.fallbackToLocalAuth(credentials);
-      }
+      console.log('⚠️ Supabase login error:', error.message);
     }
 
     // Fallback to local authentication
@@ -219,15 +217,33 @@ class ApiService {
   async register(
     userData: RegisterForm
   ): Promise<ApiResponse<{ user: User; token: string }>> {
-    console.log('🔐 HYBRID REGISTER STARTING for:', userData.email);
+    console.log('🔐 SUPABASE REGISTER STARTING for:', userData.email);
 
-    // Try API registration first
+    // Try Supabase registration first
     try {
-      console.log('🌐 Attempting API registration...');
-      const response = await api.post('/auth/register', userData);
-      return response.data;
+      console.log('🌐 Attempting Supabase registration...');
+      const result = await SupabaseAuthService.register(userData);
+      
+      if (result.success) {
+        console.log('✅ Supabase registration successful');
+        // Store token for API requests
+        await AsyncStorage.setItem('authToken', result.data.token);
+        await AsyncStorage.setItem('user', JSON.stringify(result.data.user));
+        return {
+          success: true,
+          data: result.data,
+          message: result.message || 'Registration successful',
+        };
+      } else {
+        console.log('⚠️ Supabase registration failed:', result.error);
+        return {
+          success: false,
+          data: { user: {} as User, token: '' },
+          error: result.error || 'Registration failed. Please try again.',
+        };
+      }
     } catch (error: any) {
-      console.log('⚠️ API registration failed:', error.message);
+      console.log('⚠️ Supabase registration error:', error.message);
       return {
         success: false,
         data: { user: {} as User, token: '' },
@@ -237,8 +253,27 @@ class ApiService {
   }
 
   async logout(): Promise<ApiResponse<null>> {
-    const response = await api.post('/auth/logout');
-    return response.data;
+    try {
+      // Logout from Supabase
+      const success = await SupabaseAuthService.logout();
+      
+      // Clear local storage
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('user');
+      
+      return {
+        success: true,
+        data: null,
+        message: 'Logout successful',
+      };
+    } catch (error: any) {
+      console.error('❌ Logout error:', error);
+      return {
+        success: false,
+        data: null,
+        error: 'Logout failed',
+      };
+    }
   }
 
   async forgotPassword(email: string): Promise<ApiResponse<null>> {

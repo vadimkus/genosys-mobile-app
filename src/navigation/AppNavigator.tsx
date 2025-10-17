@@ -19,6 +19,9 @@ import EditProfileScreen from '../screens/main/EditProfileScreen';
 import ProductDetailScreen from '../screens/main/ProductDetailScreen';
 import CheckoutScreen from '../screens/main/CheckoutScreen';
 import OrderDetailScreen from '../screens/main/OrderDetailScreen';
+import OrdersScreen from '../screens/main/OrdersScreen';
+import AddressesScreen from '../screens/main/AddressesScreen';
+import WishlistScreen from '../screens/main/WishlistScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import TrainingMaterialsScreen from '../screens/main/TrainingMaterialsScreen';
 import AdvancedFeaturesScreen from '../screens/main/AdvancedFeaturesScreen';
@@ -31,6 +34,9 @@ export type RootStackParamList = {
   ProductDetail: { productId: string };
   Checkout: undefined;
   OrderDetail: { orderId: string };
+  Orders: undefined;
+  Addresses: undefined;
+  Wishlist: undefined;
   Settings: undefined;
   EditProfile: undefined;
   TrainingMaterials: undefined;
@@ -89,6 +95,10 @@ function MainStackNavigator() {
       <Stack.Screen name='ProductDetail' component={ProductDetailScreen} />
       <Stack.Screen name='Checkout' component={CheckoutScreen} />
       <Stack.Screen name='OrderDetail' component={OrderDetailScreen} />
+      <Stack.Screen name='Orders' component={OrdersScreen} />
+      <Stack.Screen name='Addresses' component={AddressesScreen} />
+      <Stack.Screen name='Wishlist' component={WishlistScreen} />
+      <Stack.Screen name='Settings' component={SettingsScreen} />
       <Stack.Screen name='EditProfile' component={EditProfileScreen} />
       <Stack.Screen
         name='TrainingMaterials'
@@ -241,7 +251,12 @@ export default function AppNavigator() {
             <Stack.Screen name='MainTabs' component={MainTabNavigator} />
           </>
         ) : (
-          <Stack.Screen name='Auth' component={AuthStackNavigator} />
+          <>
+            <Stack.Screen name='Auth' component={AuthStackNavigator} />
+            <Stack.Screen name='Login' component={LoginScreen} />
+            <Stack.Screen name='Register' component={RegisterScreen} />
+            <Stack.Screen name='ForgotPassword' component={ForgotPasswordScreen} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

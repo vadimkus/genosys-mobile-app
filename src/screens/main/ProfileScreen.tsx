@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useStore } from '../../store/useStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { WishlistService } from '../../services/wishlistService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,10 +30,26 @@ export default function ProfileScreenNew() {
   const { theme, isDark, toggleTheme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  const loadWishlistCount = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const wishlistItems = await WishlistService.getWishlistItems(user.id);
+      setWishlistCount(wishlistItems.length);
+    } catch (error) {
+      console.error('Error loading wishlist count:', error);
+      setWishlistCount(0);
+    }
+  };
 
   useFocusEffect(
     React.useCallback(() => {
       console.log('ProfileScreen focused, current user:', user?.name);
+      if (user?.id) {
+        loadWishlistCount();
+      }
     }, [user])
   );
 
@@ -54,6 +71,7 @@ export default function ProfileScreenNew() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    await loadWishlistCount();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -64,7 +82,15 @@ export default function ProfileScreenNew() {
   };
 
   const handleViewOrders = () => {
-    navigation.navigate('MainTabs', { screen: 'Training' });
+    navigation.navigate('Orders');
+  };
+
+  const handleViewWishlist = () => {
+    navigation.navigate('Wishlist');
+  };
+
+  const handleViewAddresses = () => {
+    navigation.navigate('Addresses');
   };
 
   const handleSettings = () => {
@@ -168,16 +194,32 @@ export default function ProfileScreenNew() {
                     styles.roleBadge,
                     {
                       backgroundColor:
-                        user.role === 'admin' ? '#dc2626' : '#10b981',
+                        user.role === 'admin' 
+                          ? '#dc2626' 
+                          : user.role === 'distributor' 
+                          ? '#f59e0b' 
+                          : '#10b981',
                     },
                   ]}
                 >
                   <Ionicons
-                    name={user.role === 'admin' ? 'shield-checkmark' : 'person'}
+                    name={
+                      user.role === 'admin' 
+                        ? 'shield-checkmark' 
+                        : user.role === 'distributor'
+                        ? 'business'
+                        : 'person'
+                    }
                     size={12}
                     color='#ffffff'
                   />
-                  <Text style={styles.roleText}>{user.role.toUpperCase()}</Text>
+                  <Text style={styles.roleText}>
+                    {user.role === 'admin' 
+                      ? 'ADMIN' 
+                      : user.role === 'distributor' 
+                      ? 'DISTRIBUTOR' 
+                      : 'CUSTOMER'}
+                  </Text>
                 </View>
                 {user.emailVerified && (
                   <View style={styles.verifiedBadge}>
@@ -219,7 +261,7 @@ export default function ProfileScreenNew() {
               <Ionicons name='heart-outline' size={24} color='#ef4444' />
             </View>
             <Text style={[styles.statNumber, { color: theme.colors.text }]}>
-              0
+              {wishlistCount}
             </Text>
             <Text
               style={[styles.statLabel, { color: theme.colors.textSecondary }]}
@@ -291,7 +333,7 @@ export default function ProfileScreenNew() {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleViewWishlist}>
               <View style={styles.menuItemLeft}>
                 <View
                   style={[
@@ -324,7 +366,7 @@ export default function ProfileScreenNew() {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleViewAddresses}>
               <View style={styles.menuItemLeft}>
                 <View
                   style={[

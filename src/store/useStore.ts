@@ -129,12 +129,17 @@ export const useStore = create<StoreState>()(
               error: null,
             });
             return true;
+          } else {
+            set({
+              isLoading: false,
+              error: response.error || 'Registration failed',
+            });
+            return false;
           }
-          return false;
         } catch (error: any) {
           set({
             isLoading: false,
-            error: error.response?.data?.message || 'Registration failed',
+            error: error.response?.data?.message || error.message || 'Registration failed',
           });
           return false;
         }
