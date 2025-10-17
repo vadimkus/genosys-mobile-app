@@ -2013,33 +2013,45 @@ export default function ProductDetailScreenRefactored() {
             <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: 'center' }]}>Select Size</Text>
             <View style={styles.sizeSelectionContainer}>
               {[
-                { size: '200ml', description: 'Homecare size', price: '180 AED' },
-                { size: '500ml', description: 'Professional size', price: '320 AED' },
+                { size: '200ml', description: 'Homecare size', price: '260 AED' },
+                { size: '500ml', description: 'Professional size', price: '490 AED' }
               ].map((option) => (
                 <TouchableOpacity
                   key={option.size}
                   style={[
                     styles.sizeOption,
-                    { borderColor: selectedSize === option.size ? theme.colors.primary : theme.colors.border }
+                    {
+                      backgroundColor: selectedSize === option.size ? '#F0F9FF' : theme.colors.card,
+                      borderColor: selectedSize === option.size ? '#3B82F6' : '#E5E7EB',
+                      borderWidth: selectedSize === option.size ? 3 : 1,
+                      shadowColor: selectedSize === option.size ? '#3B82F6' : 'transparent',
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: selectedSize === option.size ? 0.2 : 0,
+                      shadowRadius: 4,
+                      elevation: selectedSize === option.size ? 4 : 1,
+                    },
                   ]}
                   onPress={() => handleSizeChange(option.size)}
                 >
                   <View style={styles.sizeInfo}>
                     <Text style={[
                       styles.sizeLabel,
-                      { color: selectedSize === option.size ? theme.colors.primary : theme.colors.text }
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
                     ]}>
                       {option.size}
                     </Text>
                     <Text style={[
                       styles.sizeDescription,
-                      { color: selectedSize === option.size ? theme.colors.primary : theme.colors.textSecondary }
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
                     ]}>
                       {option.description}
                     </Text>
                     <Text style={[
                       styles.sizePrice,
-                      { color: selectedSize === option.size ? theme.colors.primary : theme.colors.text }
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.primary }
                     ]}>
                       {option.price}
                     </Text>
@@ -2152,26 +2164,26 @@ export default function ProductDetailScreenRefactored() {
         )}
 
         {/* INTENSIVE PROBLEM CONTROL TONER - Block 8: Product Documentation */}
-        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && product.documentation && product.documentation.length > 0 && (
+        {product.name === 'INTENSIVE PROBLEM CONTROL TONER' && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Documentation</Text>
             <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
-              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
-                Download the complete product manual and usage guide for professional application.
-              </Text>
-              {product.documentation.map((doc, index) => (
+              <View style={styles.documentationContainer}>
+                <View style={styles.documentationInfo}>
+                  <Text style={[styles.documentationTitle, { color: theme.colors.text }]}>📄 Product Manual</Text>
+                  <Text style={[styles.documentationDescription, { color: theme.colors.text }]}>Complete product manual and usage guide for professional application</Text>
+                  <Text style={[styles.documentationFileSize, { color: theme.colors.text }]}>File size: 2.1 MB</Text>
+                </View>
                 <TouchableOpacity
-                  key={index}
                   style={[styles.documentationButton, { backgroundColor: theme.colors.primary }]}
-                  onPress={() => Linking.openURL(doc.url)}
+                  onPress={() => {
+                    Linking.openURL('https://genosys.ae/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf')
+                      .catch(err => Alert.alert('Error', 'Unable to open document'));
+                  }}
                 >
-                  <Ionicons name="document-text" size={20} color="#ffffff" />
-                  <Text style={styles.documentationButtonText}>
-                    {doc.name}
-                  </Text>
-                  <Ionicons name="download" size={20} color="#ffffff" />
+                  <Text style={styles.documentationButtonText}>View PDF</Text>
                 </TouchableOpacity>
-              ))}
+              </View>
             </View>
           </View>
         )}

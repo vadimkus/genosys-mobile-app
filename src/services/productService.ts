@@ -1208,8 +1208,8 @@ export class ProductService {
         name: 'INTENSIVE PROBLEM CONTROL TONER',
         description:
           'Professional anti-blemish toner for acne-prone skin with advanced sebum control technology. This advanced toner combines powerful active ingredients with soothing botanical extracts to deliver comprehensive skin care benefits.',
-        price: 180.0,
-        originalPrice: 180.0,
+        price: 260.0,
+        originalPrice: 260.0,
         discountPercentage: 0,
         imageUrl:
           'https://genosys.ae/_next/image?url=%2Fimages%2Ftoner.jpg&w=1200&q=75',

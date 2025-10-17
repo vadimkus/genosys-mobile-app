@@ -139,6 +139,42 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.topRow}>
+        <View style={styles.priceSection}>
+          <View style={styles.priceInfo}>
+            <Text style={[styles.priceLabel, { color: theme.colors.text }]}>
+              Total:
+            </Text>
+            <Text style={[styles.priceValue, { color: theme.colors.primary }]}>
+              AED {(currentPrice * quantity).toFixed(2)}
+            </Text>
+            <Text style={[styles.vatText, { color: theme.colors.textSecondary }]}>
+              (incl VAT 5%)
+            </Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.wishlistButton,
+            { 
+              borderColor: isInWishlist ? '#dc2626' : theme.colors.border,
+              backgroundColor: isInWishlist ? '#dc2626' : 'transparent',
+            },
+          ]}
+          onPress={handleToggleWishlist}
+          disabled={isTogglingWishlist}
+          accessibilityLabel={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          accessibilityRole='button'
+        >
+          <Ionicons
+            name={isInWishlist ? 'heart' : 'heart-outline'}
+            size={20}
+            color={isInWishlist ? '#ffffff' : theme.colors.text}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.quantityRow}>
         <View style={styles.quantityContainer}>
           <Text style={[styles.quantityLabel, { color: theme.colors.text }]}>
             Quantity:
@@ -187,26 +223,6 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
             </TouchableOpacity>
           </View>
         </View>
-
-        <TouchableOpacity
-          style={[
-            styles.wishlistButton,
-            { 
-              borderColor: isInWishlist ? '#dc2626' : theme.colors.border,
-              backgroundColor: isInWishlist ? '#dc2626' : 'transparent',
-            },
-          ]}
-          onPress={handleToggleWishlist}
-          disabled={isTogglingWishlist}
-          accessibilityLabel={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-          accessibilityRole='button'
-        >
-          <Ionicons
-            name={isInWishlist ? 'heart' : 'heart-outline'}
-            size={20}
-            color={isInWishlist ? '#ffffff' : theme.colors.text}
-          />
-        </TouchableOpacity>
       </View>
 
       <TouchableOpacity
@@ -244,16 +260,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 12,
+  },
+  priceSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  priceInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  priceLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginRight: 8,
+  },
+  priceValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginRight: 8,
+  },
+  vatText: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  quantityRow: {
+    marginBottom: 12,
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
   quantityLabel: {
     fontSize: 16,
     fontWeight: '500',
+    marginRight: 12,
   },
   quantityControls: {
     flexDirection: 'row',
@@ -279,7 +320,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
+    paddingHorizontal: 20,
     borderRadius: 12,
+    minWidth: 140,
   },
   disabledButton: {
     opacity: 0.6,
@@ -299,6 +342,5 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 16,
   },
 });

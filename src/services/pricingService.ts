@@ -29,8 +29,8 @@ export const PRICING_RULES: PricingRule[] = [
   {
     productNamePattern: 'intensive problem control toner',
     sizes: {
-      '200ml': 180.0,
-      '500ml': 320.0,
+      '200ml': 260.0,
+      '500ml': 490.0,
     },
   },
   {
