@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Appearance, ColorSchemeName } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { typography } from '../constants/typography';
 
 export interface Theme {
   isDark: boolean;
@@ -18,6 +19,7 @@ export interface Theme {
     warning: string;
     error: string;
   };
+  typography: typeof typography;
 }
 
 const lightTheme: Theme = {
@@ -36,6 +38,7 @@ const lightTheme: Theme = {
     warning: '#f59e0b',
     error: '#ef4444',
   },
+  typography,
 };
 
 const darkTheme: Theme = {
@@ -54,6 +57,7 @@ const darkTheme: Theme = {
     warning: '#f59e0b',
     error: '#ef4444',
   },
+  typography,
 };
 
 interface ThemeContextType {

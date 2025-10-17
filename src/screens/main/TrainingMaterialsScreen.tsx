@@ -9,12 +9,14 @@ import {
   Linking,
   ActivityIndicator,
   Dimensions,
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { typography } from '../../constants/typography';
 
 const { width } = Dimensions.get('window');
 
@@ -353,25 +355,21 @@ export default function TrainingMaterialsScreen() {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       {/* Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: theme.colors.card,
-            borderBottomColor: theme.colors.border,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name='arrow-back' size={24} color={theme.colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-          Training Materials
-        </Text>
-        <View style={styles.headerRight} />
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View style={styles.centerContainer}>
+            <Image
+              source={require('../../../login/Logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+            >
+              Training Materials
+            </Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView
@@ -494,25 +492,38 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    backgroundColor: '#ffffff',
     paddingTop: 50,
-    borderBottomWidth: 1,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  backButton: {
-    padding: 8,
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    flex: 1,
+  centerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 95,
+    height: 63,
+  },
+  subtitle: {
+    fontFamily: typography.fontFamily,
+    fontSize: 16,
+    color: '#6b7280',
+    lineHeight: 20,
     textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
+    marginTop: -8,
   },
   scrollView: {
     flex: 1,

@@ -21,6 +21,7 @@ import { Product, Category } from '../../types';
 import { useCart } from '../../contexts/CartContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { typography } from '../../constants/typography';
 import { ProductGrid } from '../../components/OptimizedList';
 import { trackScreenLoad } from '../../utils/performance';
 
@@ -435,22 +436,34 @@ export default function ProductsScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            Products
-          </Text>
-          <Text
-            style={[styles.subtitle, { color: theme.colors.textSecondary }]}
-          >
+        <View style={styles.headerTop}>
+          <View style={styles.centerContainer}>
+            <Image
+              source={require('../../../login/Logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+            >
+              Products
+            </Text>
+          </View>
+        </View>
+        <View style={styles.headerBottom}>
+          <View style={styles.filterButtonContainer}>
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={() => setShowFilters(!showFilters)}
+            >
+              <Ionicons name='options-outline' size={24} color='#dc2626' />
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.productCount, { color: theme.colors.textSecondary }]}>
             {filteredProducts.length} of {products.length} products
           </Text>
+          <View style={styles.filterButtonContainer} />
         </View>
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={() => setShowFilters(!showFilters)}
-        >
-          <Ionicons name='options-outline' size={24} color='#dc2626' />
-        </TouchableOpacity>
       </View>
 
       {/* Search Bar */}
@@ -561,12 +574,10 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 50,
     backgroundColor: '#ffffff',
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
@@ -575,18 +586,42 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  headerContent: {
-    flex: 1,
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
+  centerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 95,
+    height: 63,
   },
   subtitle: {
+    fontFamily: typography.fontFamily,
     fontSize: 16,
     color: '#6b7280',
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: -8,
+  },
+  headerBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  filterButtonContainer: {
+    width: 40,
+    alignItems: 'center',
+  },
+  productCount: {
+    fontSize: 14,
+    color: '#6b7280',
+    textAlign: 'center',
+    flex: 1,
   },
   filterButton: {
     padding: 8,
@@ -594,7 +629,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   searchContainer: {
-    padding: 20,
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     backgroundColor: '#ffffff',
   },
   searchInputContainer: {

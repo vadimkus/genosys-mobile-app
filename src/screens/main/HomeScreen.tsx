@@ -28,6 +28,7 @@ import {
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ProductCarousel as OptimizedProductCarousel } from '../../components/OptimizedList';
 import { trackScreenLoad } from '../../utils/performance';
+import { typography } from '../../constants/typography';
 
 const { width } = Dimensions.get('window');
 
@@ -94,11 +95,11 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View style={styles.greetingContainer}>
-              <SkeletonLoader
-                width={120}
-                height={24}
-                style={{ marginBottom: 8 }}
+            <View style={styles.centerContainer}>
+              <Image
+                source={require('../../../login/Logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
               />
               <SkeletonLoader width={200} height={16} />
             </View>
@@ -158,10 +159,12 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View style={styles.greetingContainer}>
-            <Text style={[styles.greeting, { color: theme.colors.text }]}>
-              {user?.firstName || 'User'}
-            </Text>
+          <View style={styles.centerContainer}>
+            <Image
+              source={require('../../../login/Logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
             <Text
               style={[styles.subtitle, { color: theme.colors.textSecondary }]}
             >
@@ -174,7 +177,7 @@ export default function HomeScreen() {
       {/* Featured Products Carousel - Optimized */}
       <OptimizedProductCarousel
         data={featuredProducts as any}
-        title='🎁 Genosys Kits - active discount'
+        title='Genosys Kits - discount'
         onItemPress={product =>
           navigation.navigate('ProductDetail', { productId: product.id })
         }
@@ -189,7 +192,7 @@ export default function HomeScreen() {
       {/* New Products Carousel - Optimized */}
       <OptimizedProductCarousel
         data={newProducts as any}
-        title='🆕 New Arrivals'
+        title='New Arrivals'
         onItemPress={product =>
           navigation.navigate('ProductDetail', { productId: product.id })
         }
@@ -229,15 +232,16 @@ const styles = StyleSheet.create({
   },
   headerTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    flexWrap: 'nowrap',
-    gap: 8,
   },
-  greetingContainer: {
-    flex: 1,
-    marginRight: 12,
-    minWidth: 200,
+  centerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 95,
+    height: 63,
   },
   greeting: {
     fontSize: 24,
@@ -247,9 +251,12 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   subtitle: {
-    fontSize: 14,
+    fontFamily: typography.fontFamily,
+    fontSize: 16,
     color: '#6b7280',
     lineHeight: 20,
+    textAlign: 'center',
+    marginTop: -8,
   },
   statusContainer: {
     flexDirection: 'row',

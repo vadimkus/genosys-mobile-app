@@ -13,6 +13,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useCart } from '../../contexts/CartContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { typography } from '../../constants/typography';
 
 type CartScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -91,29 +92,22 @@ export default function CartScreen() {
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
+      {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
-              Shopping Cart
-            </Text>
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>
-                {getTotalItems()} item{getTotalItems() !== 1 ? 's' : ''}
-              </Text>
-            </View>
-          </View>
-          
-          {items.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={handleClearCart}
+        <View style={styles.headerTop}>
+          <View style={styles.centerContainer}>
+            <Image
+              source={require('../../../login/Logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
             >
-              <Text style={styles.clearButtonText}>Clear All</Text>
-            </TouchableOpacity>
-          )}
+              Cart
+            </Text>
+          </View>
         </View>
-        
       </View>
 
       <ScrollView
@@ -238,55 +232,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     paddingTop: 50,
     paddingBottom: 20,
-    paddingHorizontal: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 3,
   },
-  headerContent: {
+  headerTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  headerLeft: {
-    flexDirection: 'row',
+  centerContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1e293b',
-    marginRight: 12,
+  logo: {
+    width: 95,
+    height: 63,
   },
-  cartBadge: {
-    backgroundColor: '#dc2626',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    minWidth: 24,
-    alignItems: 'center',
-  },
-  cartBadgeText: {
-    fontSize: 12,
-    color: '#ffffff',
-    fontWeight: '600',
-  },
-  clearButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f8fafc',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  clearButtonText: {
-    fontSize: 13,
-    color: '#64748b',
-    fontWeight: '600',
+  subtitle: {
+    fontFamily: typography.fontFamily,
+    fontSize: 16,
+    color: '#6b7280',
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: -8,
   },
   headerSummary: {
     paddingTop: 12,
