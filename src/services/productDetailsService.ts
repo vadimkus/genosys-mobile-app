@@ -312,6 +312,27 @@ export const PRODUCT_DETAILS_CONFIG: ProductDetailsConfig[] = [
       { label: 'Country of Origin', value: 'South Korea' },
     ],
   },
+  {
+    productNamePattern: 'intensive blemish balm cream',
+    details: [
+      { label: 'Type', value: 'Natural coverage cream with SPF protection' },
+      { label: 'Size', value: '50g' },
+      { label: 'SPF Rating', value: 'SPF 30 PA++' },
+      {
+        label: 'Coverage',
+        value: 'Natural to medium coverage',
+      },
+      {
+        label: 'Key Benefits',
+        value: 'Blemish coverage, sun protection, post-treatment care',
+      },
+      {
+        label: 'Skin Type',
+        value: 'All skin types, especially sensitive and post-treatment skin',
+      },
+      { label: 'Country of Origin', value: 'South Korea' },
+    ],
+  },
 ];
 
 export class ProductDetailsService {

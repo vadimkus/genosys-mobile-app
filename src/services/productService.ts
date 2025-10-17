@@ -1034,10 +1034,53 @@ export class ProductService {
         id: '28',
         name: 'INTENSIVE HYDRO SOOTHING CREAM',
         description:
-          'Intensive hydro soothing cream with aloe vera and snail secretion filtrate for deep hydration and skin comfort',
-        price: 79.99,
-        originalPrice: 99.99,
-        discountPercentage: 20,
+          'INTENSIVE HYDRO SOOTHING CREAM is a premium hydrating and soothing cream designed to provide intensive moisture and calm irritated skin. This advanced formula combines powerful natural ingredients including aloe vera, snail secretion filtrate, and hyaluronic acid to deliver long-lasting hydration and skin comfort.',
+        details: 'Intensive hydro soothing cream. Type: Intensive hydro soothing cream. Size Options: 50g (Homecare) / 250g (Professional). Key Benefits: Hydration, soothing, skin repair, barrier protection. Skin Type: All skin types, especially sensitive and irritated skin. Usage: Professional and home care. Country of Origin: South Korea.',
+        benefits: [
+          'Intensive Hydration - Provides long-lasting moisture for all skin types',
+          'Skin Soothing - Calms irritation and reduces redness and inflammation',
+          'Skin Repair - Promotes natural healing and skin regeneration',
+          'Barrier Protection - Strengthens skin\'s natural protective barrier',
+          'Gentle Care - Suitable for sensitive and irritated skin',
+          'Versatile Use - Perfect for both professional treatments and daily home care'
+        ],
+        directions: [
+          'Preparation: Cleanse your skin thoroughly before application',
+          'Application: Apply a generous amount to the face and neck area',
+          'Massage: Gently massage in circular motions until fully absorbed',
+          'Frequency: Use morning and evening for optimal results',
+          'Professional Use: Can be used as a treatment mask for enhanced benefits'
+        ],
+        keyIngredients: [
+          {
+            name: 'Aloe Barbadensis Leaf Extract',
+            description: 'Natural soothing and healing ingredient that calms irritated skin and provides gentle hydration.'
+          },
+          {
+            name: 'Snail Secretion Filtrate',
+            description: 'Premium ingredient rich in glycoproteins and growth factors that promote skin regeneration and healing.'
+          },
+          {
+            name: 'Hyaluronic Acid',
+            description: 'Powerful humectant that attracts and retains moisture, providing intense hydration and plumping effects.'
+          },
+          {
+            name: 'Lactobacillus/Pumpkin Ferment Extract',
+            description: 'Fermented ingredient that provides probiotics and nutrients for improved skin health and texture.'
+          },
+          {
+            name: 'Beta-Glucan',
+            description: 'Natural immune-boosting ingredient that enhances skin\'s defense mechanisms and promotes healing.'
+          },
+          {
+            name: 'Phytolex SC',
+            description: 'Advanced botanical complex that provides additional skin protection and soothing benefits.'
+          }
+        ],
+        note: 'This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed for additional hydration.',
+        price: 290.0, // 50g price
+        originalPrice: 0,
+        discountPercentage: 0,
         imageUrl:
           'https://genosys.ae/_next/image?url=%2Fimages%2FHSC.jpg&w=1200&q=75',
         imageUrls: [
@@ -1053,13 +1096,16 @@ export class ProductService {
         stockQuantity: 40,
         isFeatured: false,
         isNew: true,
-        isOnSale: true,
+        isOnSale: false,
         stock: 40,
         rating: 5.0,
         averageRating: 4.8,
         reviewCount: 156,
+        sizes: ['50g', '250g'],
         sizeOptions: ['50g', '250g'],
         defaultSize: '50g',
+        colors: [],
+        documentation: [],
         createdAt: '2024-02-25T10:00:00.000Z',
         updatedAt: '2024-02-25T10:00:00.000Z',
       },
@@ -1466,6 +1512,77 @@ export class ProductService {
         defaultSize: '50g',
         createdAt: '2024-03-05T10:00:00.000Z',
         updatedAt: '2024-03-05T10:00:00.000Z',
+      },
+      {
+        id: '42',
+        name: 'INTENSIVE BLEMISH BALM CREAM [SPF 30 PA++]',
+        description:
+          'INTENSIVE BLEMISH BALM CREAM is a premium natural coverage cream designed to provide comprehensive skin protection and flawless coverage. This advanced formula combines natural coverage technology with SPF 30 PA++ protection to cover redness, blemishes, and imperfections while protecting skin from harmful environmental factors.',
+        details: 'Natural coverage cream with SPF protection. Type: Natural coverage cream with SPF protection. Size: 50g. SPF Rating: SPF 30 PA++. Coverage: Natural to medium coverage. Key Benefits: Blemish coverage, sun protection, post-treatment care. Skin Type: All skin types, especially sensitive and post-treatment skin. Country of Origin: South Korea.',
+        benefits: [
+          'Natural Coverage - Provides flawless coverage while maintaining natural skin appearance',
+          'Sun Protection - SPF 30 PA++ shields skin from harmful UV rays and environmental damage',
+          'Blemish Concealing - Effectively covers redness, blemishes, and skin imperfections',
+          'Post-Treatment Care - Safe for use after dermatological procedures and treatments',
+          'Environmental Protection - Guards against harmful environmental factors and pollutants',
+          'Skin Tone Enhancement - Helps express and enhance your natural skin tone'
+        ],
+        directions: [
+          'Preparation: Cleanse and moisturize your skin before application',
+          'Application: Apply a small amount to areas needing coverage and blend gently',
+          'Blending: Use fingertips or a beauty sponge to blend for natural-looking coverage',
+          'Build Coverage: Layer for additional coverage on areas with more significant blemishes',
+          'Setting: Allow to set for a few minutes before applying additional makeup if desired'
+        ],
+        keyIngredients: [
+          {
+            name: 'Adenosine',
+            description: 'Anti-aging ingredient that helps reduce fine lines and wrinkles while promoting skin renewal.'
+          },
+          {
+            name: 'Allantoin',
+            description: 'Soothing and healing ingredient that calms irritated skin and promotes skin regeneration.'
+          },
+          {
+            name: 'Origanum Vulgare Leaf Extract',
+            description: 'Natural antioxidant extract that provides protection against environmental damage and free radicals.'
+          },
+          {
+            name: 'Phytolex SC',
+            description: 'Advanced botanical complex that enhances skin protection and provides natural coverage benefits.'
+          }
+        ],
+        note: 'This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed throughout the day.',
+        price: 0, // Login to see price
+        originalPrice: 0,
+        discountPercentage: 0,
+        imageUrl:
+          'https://genosys.ae/_next/image?url=%2Fimages%2FBLEM.jpg&w=1200&q=75',
+        imageUrls: [
+          'https://genosys.ae/_next/image?url=%2Fimages%2FBLEM.jpg&w=1200&q=75',
+        ],
+        category: 'Cushion BB',
+        brand: 'Genosys',
+        sku: 'GEN-042',
+        images: [
+          'https://genosys.ae/_next/image?url=%2Fimages%2FBLEM.jpg&w=1200&q=75',
+        ],
+        inStock: true,
+        stockQuantity: 25,
+        isFeatured: false,
+        isNew: true,
+        isOnSale: false,
+        stock: 25,
+        rating: 5.0,
+        averageRating: 4.8,
+        reviewCount: 0,
+        sizes: ['50g'],
+        sizeOptions: ['50g'],
+        defaultSize: '50g',
+        colors: [],
+        documentation: [],
+        createdAt: '2024-03-15T10:00:00.000Z',
+        updatedAt: '2024-03-15T10:00:00.000Z',
       },
       {
         id: '45',

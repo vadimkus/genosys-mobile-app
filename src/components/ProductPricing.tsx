@@ -9,6 +9,9 @@ interface ProductPricingProps {
   onSizeChange?: (size: string) => void;
   onPriceChange?: (price: number) => void;
   style?: any;
+  selectedSize?: string;
+  currentPrice?: number;
+  hideSizeSelection?: boolean;
 }
 
 export const ProductPricing: React.FC<ProductPricingProps> = ({
@@ -16,27 +19,36 @@ export const ProductPricing: React.FC<ProductPricingProps> = ({
   onSizeChange,
   onPriceChange,
   style,
+  selectedSize: externalSelectedSize,
+  currentPrice: externalCurrentPrice,
+  hideSizeSelection = false,
 }) => {
   const { theme } = useTheme();
   const [selectedSize, setSelectedSize] = useState('');
   const [currentPrice, setCurrentPrice] = useState(product.price);
+  
+  // Use external values if provided, otherwise use internal state
+  const displaySelectedSize = externalSelectedSize || selectedSize;
+  const displayCurrentPrice = externalCurrentPrice || currentPrice;
 
   const availableSizes = PricingService.getAvailableSizes(product);
   const hasSizeVariants = PricingService.hasSizeVariants(product);
 
   useEffect(() => {
-    if (hasSizeVariants && availableSizes.length > 0) {
-      const defaultSize = availableSizes[0];
-      setSelectedSize(defaultSize);
-      const price = PricingService.getPriceForSize(product, defaultSize);
-      setCurrentPrice(price);
-      onSizeChange?.(defaultSize);
-      onPriceChange?.(price);
-    } else {
-      setCurrentPrice(product.price);
-      onPriceChange?.(product.price);
+    if (!externalSelectedSize && !externalCurrentPrice) {
+      if (hasSizeVariants && availableSizes.length > 0) {
+        const defaultSize = availableSizes[0];
+        setSelectedSize(defaultSize);
+        const price = PricingService.getPriceForSize(product, defaultSize);
+        setCurrentPrice(price);
+        onSizeChange?.(defaultSize);
+        onPriceChange?.(price);
+      } else {
+        setCurrentPrice(product.price);
+        onPriceChange?.(product.price);
+      }
     }
-  }, [product, hasSizeVariants, availableSizes, onSizeChange, onPriceChange]);
+  }, [product, hasSizeVariants, availableSizes, onSizeChange, onPriceChange, externalSelectedSize, externalCurrentPrice]);
 
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
@@ -46,11 +58,11 @@ export const ProductPricing: React.FC<ProductPricingProps> = ({
     onPriceChange?.(price);
   };
 
-  if (!hasSizeVariants) {
+  if (!hasSizeVariants || hideSizeSelection) {
     return (
       <View style={[styles.container, style]}>
         <Text style={[styles.price, { color: '#DC2626' }]}>
-          AED {currentPrice.toFixed(2)}
+          AED {displayCurrentPrice.toFixed(2)}
         </Text>
       </View>
     );

@@ -1554,7 +1554,258 @@ export default function ProductDetailScreenRefactored() {
           product={product}
           onSizeChange={handleSizeChange}
           onPriceChange={handlePriceChange}
+          selectedSize={selectedSize}
+          currentPrice={currentPrice}
+          hideSizeSelection={product.name === 'INTENSIVE HYDRO SOOTHING CREAM'}
         />
+
+        {/* Comprehensive Product Information */}
+      <View style={styles.content}>
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 1: Size Selection */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: 'center' }]}>Select Size</Text>
+            <View style={styles.sizeSelectionContainer}>
+              {[
+                { size: '50g', description: 'Homecare size', price: '290 AED' },
+                { size: '250g', description: 'Professional size', price: '420 AED' }
+              ].map((option) => (
+                <TouchableOpacity
+                  key={option.size}
+                  style={[
+                    styles.sizeOption,
+                    {
+                      backgroundColor: selectedSize === option.size ? '#F0F9FF' : theme.colors.card,
+                      borderColor: selectedSize === option.size ? '#3B82F6' : '#E5E7EB',
+                      borderWidth: selectedSize === option.size ? 3 : 1,
+                      shadowColor: selectedSize === option.size ? '#3B82F6' : 'transparent',
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: selectedSize === option.size ? 0.2 : 0,
+                      shadowRadius: 4,
+                      elevation: selectedSize === option.size ? 4 : 1,
+                    },
+                  ]}
+                  onPress={() => handleSizeChange(option.size)}
+                >
+                  <View style={styles.sizeInfo}>
+                    <Text style={[
+                      styles.sizeLabel,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
+                    ]}>
+                      {option.size}
+                    </Text>
+                    <Text style={[
+                      styles.sizeDescription,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.text }
+                    ]}>
+                      {option.description}
+                    </Text>
+                    <Text style={[
+                      styles.sizePrice,
+                      { color: selectedSize === option.size ? '#1E40AF' : theme.colors.primary }
+                    ]}>
+                      {option.price}
+                    </Text>
+                  </View>
+                  {selectedSize === option.size && (
+                    <View style={styles.selectionIndicator}>
+                      <Text style={styles.checkmark}>✓</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 2: Product Description */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Description</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                INTENSIVE HYDRO SOOTHING CREAM is a premium hydrating and soothing cream designed to provide intensive moisture and calm irritated skin. This advanced formula combines powerful natural ingredients including aloe vera, snail secretion filtrate, and hyaluronic acid to deliver long-lasting hydration and skin comfort.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 3: Product Details */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Details</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Type:</Text> Intensive hydro soothing cream
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Size Options:</Text> 50g (Homecare) / 250g (Professional)
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Key Benefits:</Text> Hydration, soothing, skin repair, barrier protection
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Skin Type:</Text> All skin types, especially sensitive and irritated skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Usage:</Text> Professional and home care
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Country of Origin:</Text> South Korea
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 4: Key Features */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Features</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Intensive Hydration</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.textSecondary }]}>
+                Advanced hydrating formula that provides long-lasting moisture and helps maintain optimal skin hydration levels.
+              </Text>
+              
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Soothing Properties</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.textSecondary }]}>
+                Calms down skin irritation and provides relief for sensitive, stressed, or damaged skin.
+              </Text>
+              
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Natural Ingredients</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.textSecondary }]}>
+                Formulated with premium natural ingredients including aloe vera and snail secretion filtrate for gentle, effective care.
+              </Text>
+              
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Professional & Home Use</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.textSecondary }]}>
+                Available in both homecare (50g) and professional (250g) sizes for versatile application.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 5: Benefits */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Benefits</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Intensive Hydration - Provides long-lasting moisture for all skin types
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Skin Soothing - Calms irritation and reduces redness and inflammation
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Skin Repair - Promotes natural healing and skin regeneration
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Barrier Protection - Strengthens skin's natural protective barrier
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Gentle Care - Suitable for sensitive and irritated skin
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                • Versatile Use - Perfect for both professional treatments and daily home care
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 6: Key Ingredients */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Key Ingredients</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Aloe Barbadensis Leaf Extract</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Natural soothing and healing ingredient that calms irritated skin and provides gentle hydration.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Snail Secretion Filtrate</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Premium ingredient rich in glycoproteins and growth factors that promote skin regeneration and healing.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Hyaluronic Acid</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Powerful humectant that attracts and retains moisture, providing intense hydration and plumping effects.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Lactobacillus/Pumpkin Ferment Extract</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Fermented ingredient that provides probiotics and nutrients for improved skin health and texture.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Beta-Glucan</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Natural immune-boosting ingredient that enhances skin's defense mechanisms and promotes healing.
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>Phytolex SC</Text>
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                Advanced botanical complex that provides additional skin protection and soothing benefits.
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 7: How to Use */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>How to Use</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>1. Preparation:</Text> Cleanse your skin thoroughly before application
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>2. Application:</Text> Apply a generous amount to the face and neck area
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>3. Massage:</Text> Gently massage in circular motions until fully absorbed
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>4. Frequency:</Text> Use morning and evening for optimal results
+              </Text>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                <Text style={[styles.detailLabel, { color: theme.colors.text }]}>5. Professional Use:</Text> Can be used as a treatment mask for enhanced benefits
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* INTENSIVE HYDRO SOOTHING CREAM - Block 8: Note */}
+        {product.name === 'INTENSIVE HYDRO SOOTHING CREAM' && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Note</Text>
+            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.detailItem, { color: theme.colors.text }]}>
+                This product is dermatologically tested and safe for all skin types. Perfect for daily use and post-treatment care. For best results, use as part of your daily skincare routine and reapply as needed for additional hydration.
+              </Text>
+            </View>
+          </View>
+        )}
+
+      </View>
 
         {/* Size Selection Section for Microneedle Roller */}
         {product.name === 'Microneedle Roller' && (
@@ -1664,25 +1915,8 @@ export default function ProductDetailScreenRefactored() {
           </View>
         )}
 
-        <ProductDetails product={product} />
-        
         {/* Comprehensive Product Information */}
       <View style={styles.content}>
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Description</Text>
-            <View style={[styles.descriptionBlock, { backgroundColor: theme.colors.card }]}>
-              <Text style={[styles.description, { color: theme.colors.text }]}>
-                {getProductDescription(product.name)}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Product Details</Text>
-            <View style={[styles.detailsList, { backgroundColor: theme.colors.card }]}>
-              {getProductDetails(product)}
-            </View>
-          </View>
 
         {/* Key Features Section for SKIN REBOOT PDRN MASK PACK */}
         {product.name === 'SKIN REBOOT PDRN MASK PACK' && (
@@ -4524,6 +4758,12 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     minHeight: 32,
     flexWrap: 'wrap',
+  },
+  sizePrice: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 4,
   },
   sizeDisplayContainer: {
     backgroundColor: '#F5F5F5',

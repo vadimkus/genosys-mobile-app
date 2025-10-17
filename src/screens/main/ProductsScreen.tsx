@@ -448,21 +448,18 @@ export default function ProductsScreen() {
             >
               Products
             </Text>
-            <Text style={[styles.productCount, { color: theme.colors.textSecondary }]}>
-              {filteredProducts.length} of {products.length} products
-            </Text>
+            <View style={styles.productCountContainer}>
+              <Text style={[styles.productCount, { color: theme.colors.textSecondary }]}>
+                {filteredProducts.length} of {products.length} products
+              </Text>
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={() => setShowFilters(!showFilters)}
+              >
+                <Ionicons name='options-outline' size={20} color='#dc2626' />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={styles.headerBottom}>
-          <View style={styles.filterButtonContainer}>
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={() => setShowFilters(!showFilters)}
-            >
-              <Ionicons name='options-outline' size={24} color='#dc2626' />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.filterButtonContainer} />
         </View>
       </View>
 
@@ -607,26 +604,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: -8,
   },
-  headerBottom: {
+  productCountContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 16,
-  },
-  filterButtonContainer: {
-    width: 40,
-    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    gap: 12,
   },
   productCount: {
     fontSize: 14,
     color: '#6b7280',
     textAlign: 'center',
-    marginTop: 4,
   },
   filterButton: {
-    padding: 8,
+    padding: 6,
     backgroundColor: '#fef2f2',
-    borderRadius: 20,
+    borderRadius: 16,
   },
   searchContainer: {
     paddingTop: 10,
