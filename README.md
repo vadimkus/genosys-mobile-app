@@ -1,149 +1,80 @@
 # Genosys Mobile App
 
-A React Native mobile application for Genosys Middle East FZ-LLC, providing a complete e-commerce experience for premium Korean dermacosmetics.
+A high-fidelity iOS e-commerce app built with React Native (Expo) that mimics the Apple Store design system.
 
 ## 🚀 Features
 
-### Core E-commerce Features
-- **Product Catalog**: Browse and search premium Korean dermacosmetics
-- **User Authentication**: Secure login and registration
-- **Shopping Cart**: Add, remove, and manage cart items
-- **Checkout Process**: Complete order placement with validation
-- **Order Management**: Track order history and status
-- **User Profile**: Manage account settings and preferences
+- **Apple Store Design System**: Large typography, clean cards, and smooth animations
+- **Live API Integration**: Connects to Genosys Vercel API with secure authentication
+- **Parallax Product Details**: Hero images with zoom animations
+- **Glass-morphism Tab Bar**: Transparent blur effects for iOS
+- **File-based Routing**: Clean navigation with Expo Router
 
-### Technical Features
-- **TypeScript**: Full type safety and better development experience
-- **Modern React Native**: Latest Expo SDK with new architecture
-- **State Management**: Context API for global state
-- **Navigation**: React Navigation for smooth screen transitions
-- **API Integration**: RESTful API integration with genosys.ae
-- **Offline Support**: Basic offline functionality
-- **Performance**: Optimized for mobile devices
+## 📱 Tech Stack
 
-## 🛠️ Technical Stack
+- **Framework**: React Native (Expo SDK 50+)
+- **Router**: Expo Router (File-based routing)
+- **Styling**: StyleSheet (Standard React Native)
+- **Animations**: react-native-reanimated
+- **Blur Effects**: expo-blur
+- **Icons**: lucide-react-native
 
-- **Framework**: React Native + Expo SDK 52
-- **Language**: TypeScript
-- **State Management**: React Context API
-- **Navigation**: React Navigation v6
-- **Storage**: AsyncStorage
-- **API**: RESTful API integration
-- **Platforms**: iOS, Android, Web
+## 🛠 Installation
 
-## 📱 Getting Started
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm or yarn
-- Expo CLI
-- iOS Simulator (for iOS development)
-- Android Studio (for Android development)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/vadimkus/genosys-mobile-app.git
-   cd genosys-mobile-app
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm start
-   ```
-
-4. **Run on device/simulator**
-   - Scan QR code with Expo Go app (iOS/Android)
-   - Press 'i' for iOS simulator
-   - Press 'a' for Android emulator
-   - Press 'w' for web browser
-
-## 🏗️ Project Structure
-
-```
-genosys-mobile-app/
-├── src/
-│   ├── components/          # Reusable UI components
-│   ├── screens/            # App screens
-│   ├── navigation/         # Navigation configuration
-│   ├── contexts/           # React Context providers
-│   ├── services/           # API and external services
-│   ├── utils/              # Utility functions
-│   ├── types/              # TypeScript type definitions
-│   └── constants/          # App constants
-├── assets/                 # Images, fonts, and other assets
-├── App.tsx                 # Main app component
-├── app.json               # Expo configuration
-└── package.json           # Dependencies and scripts
+1. Install dependencies:
+```bash
+npm install
 ```
 
-## 🔧 Development
+2. Start the development server:
+```bash
+npm start
+```
 
-### Available Scripts
+3. Run on iOS simulator:
+```bash
+npm run ios
+```
 
-- `npm start` - Start Expo development server
-- `npm run android` - Run on Android device/emulator
-- `npm run ios` - Run on iOS device/simulator
-- `npm run web` - Run in web browser
-- `npm test` - Run tests
+## 📂 Project Structure
 
-### Development Workflow
+```
+app/
+├── _layout.js              # Root stack layout
+├── (tabs)/
+│   ├── _layout.js          # Transparent tab bar with blur
+│   ├── shop.js             # Main shop screen with live API
+│   └── bag.js              # Cart screen
+└── product/
+    └── [id].js             # Product detail with parallax
 
-1. **Feature Development**: Create feature branches for new functionality
-2. **Testing**: Test on multiple devices and platforms
-3. **Code Review**: Review code before merging
-4. **Deployment**: Deploy to app stores when ready
+components/
+├── HeroCard.js             # Horizontal scroll card
+├── ProductGridItem.js      # Grid item component
+└── ParallaxScrollView.js   # Custom parallax wrapper
 
-## 📊 API Integration
+services/
+└── api.js                  # Live API integration
+```
 
-The app integrates with the Genosys website API:
+## 🔗 API Integration
 
-- **Base URL**: `https://genosys.ae/api`
-- **Authentication**: JWT token-based authentication
-- **Products**: Product catalog and details
-- **Orders**: Order management and tracking
-- **User**: User profile and preferences
+The app connects to the live Genosys API at:
+- **Endpoint**: `https://www.genosys.ae/api/mobile/products`
+- **Authentication**: Custom header `x-api-key: genosys_secure_mobile_2025_v1`
 
-## 🔒 Security
+## 🎨 Design System
 
-- **API Keys**: Stored securely in environment variables
-- **User Data**: Encrypted with AsyncStorage
-- **Authentication**: JWT tokens for secure sessions
-- **HTTPS**: All API calls use secure connections
+- **Typography**: Large titles (34px), section headers (22px), body text (16px)
+- **Colors**: White background, grouped gray (#F5F5F7), accent red (#E74C3C)
+- **Cards**: 12px radius, soft shadows (0.08 opacity)
 
-## 📱 Supported Platforms
+## 📱 Screen Flow
 
-- **iOS**: 13.0+
-- **Android**: API 21+ (Android 5.0+)
-- **Web**: Modern browsers
+1. **Shop Screen**: Displays "New Arrivals" horizontally and "All Products" in a grid
+2. **Product Detail**: Parallax hero image with sticky "Add to Bag" footer
+3. **Bag Screen**: Cart functionality (placeholder for now)
 
-## 🤝 Contributing
+## 🧪 Testing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📞 Support
-
-For technical support or questions:
-
-- **Email**: sales@genosys.ae
-- **Phone**: +971 58 548 76 65
-- **Website**: https://genosys.ae
-
-## 📄 License
-
-This project is proprietary software of Genosys Middle East FZ-LLC.
-
----
-
-**Built with ❤️ for Genosys Middle East FZ-LLC**
+The app handles API errors gracefully - if the API is unavailable, it shows an empty state instead of crashing.
