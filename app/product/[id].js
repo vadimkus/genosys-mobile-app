@@ -14,12 +14,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { fetchProductById } from '../../services/api';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
+  const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -32,26 +35,21 @@ export default function ProductDetailScreen() {
 
   const loadProduct = async () => {
     try {
-      // Load all products and find the specific one
-      const response = await fetch('https://www.genosys.ae/api/mobile/products', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'genosys_secure_mobile_2025_v1',
-        },
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result && result.data && Array.isArray(result.data)) {
-          const foundProduct = result.data.find(p => p.id === id);
-          if (foundProduct) {
-            setProduct(foundProduct);
-          } else {
-            Alert.alert('Error', 'Product not found');
-            router.back();
-          }
+      console.log('🔍 Loading enhanced product with ID:', id);
+      
+      // Use enhanced fetchProductById with user context
+      const enhancedProduct = await fetchProductById(id, user);
+      
+      if (enhancedProduct) {
+        setProduct(enhancedProduct);
+        console.log('✅ Enhanced product loaded with badges:', enhancedProduct.badges?.length || 0);
+        
+        if (user?.discountPercentage && enhancedProduct.hasDiscount) {
+          console.log('💰 Product has user discount:', enhancedProduct.discountPercentage + '% ' + enhancedProduct.discountType);
         }
+      } else {
+        Alert.alert('Error', 'Product not found');
+        router.back();
       }
     } catch (error) {
       console.error('Error loading product:', error);

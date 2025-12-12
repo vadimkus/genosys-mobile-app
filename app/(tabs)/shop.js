@@ -14,11 +14,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { fetchProductCategories } from '../../services/api';
+import { fetchProductCategories, fetchProducts } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ShopScreen() {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,30 +31,32 @@ export default function ShopScreen() {
 
   const loadProducts = async () => {
     try {
-      const response = await fetch('https://www.genosys.ae/api/mobile/products', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'genosys_secure_mobile_2025_v1',
-        },
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+      console.log('🛍️ Loading enhanced products with user context...');
+      
+      // Use enhanced fetchProducts function with user context
+      const enhancedProducts = await fetchProducts(user);
+      
+      if (enhancedProducts && enhancedProducts.length > 0) {
+        setProducts(enhancedProducts);
+        setFilteredProducts(enhancedProducts);
+        console.log('✅ Enhanced products loaded:', enhancedProducts.length);
         
-        if (result && result.data && Array.isArray(result.data)) {
-          setProducts(result.data);
-          setFilteredProducts(result.data);
-          console.log('✅ Products loaded:', result.data.length);
-          
-          // Extract categories from products for immediate use
-          const uniqueCategories = [...new Set(result.data.map(product => product.category))];
-          const validCategories = uniqueCategories.filter(cat => cat && cat.trim() !== '');
-          const allCategories = ['All', ...validCategories];
-          
-          console.log('🏷️ Extracted categories:', allCategories);
-          setCategories(allCategories);
+        // Debug first few products
+        console.log('🔍 First 3 enhanced products badges:');
+        enhancedProducts.slice(0, 3).forEach(p => {
+          console.log(`  - ${p.name}: ${p.badges?.length || 0} badges`, p.badges?.map(b => b.text) || []);
+        });
+        
+        if (user?.discountPercentage) {
+          console.log('💰 User discount applied:', user.discountPercentage + '% ' + user.discountType);
         }
+        
+        // Extract categories from products
+        const uniqueCategories = [...new Set(enhancedProducts.map(product => product.category))];
+        const validCategories = uniqueCategories.filter(cat => cat && cat.trim() !== '');
+        const allCategories = ['All', ...validCategories];
+        
+        setCategories(allCategories);
       }
     } catch (error) {
       console.error('Error loading products:', error);
@@ -282,17 +286,66 @@ export default function ShopScreen() {
                         </Text>
                       </View>
                     )}
+                    
+                    {/* Badges */}
+                    {product.badges && product.badges.length > 0 && (
+                      <View style={styles.badgeContainer}>
+                        {product.badges.slice(0, 2).map((badge, badgeIndex) => (
+                          <View key={badgeIndex} style={[styles.badge, { backgroundColor: badge.color || '#007AFF' }]}>
+                            <Text style={styles.badgeText}>{badge.text}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                    
+                    {/* Stock Status */}
+                    {(product.status === 'out_of_stock' || product.stock === false) && (
+                      <View style={styles.stockOverlay}>
+                        <Text style={styles.stockOverlayText}>Out of Stock</Text>
+                      </View>
+                    )}
                   </View>
                   
                   <View style={styles.gridContent}>
-                    <Text style={styles.gridName} numberOfLines={2}>{product.name}</Text>
+                    <Text style={styles.gridName} numberOfLines={2}>
+                      {product.name} {product.badges?.length > 0 ? `🏷️(${product.badges.length})` : ''}
+                    </Text>
                     <Text style={styles.gridCategory}>{product.category}</Text>
+                    
+                    {/* Rating */}
+                    {product.rating && (
+                      <View style={styles.ratingContainer}>
+                        <Text style={styles.ratingText}>⭐ {product.rating}</Text>
+                      </View>
+                    )}
+                    
+                    {/* Badges in content */}
+                    {product.badges && product.badges.length > 0 && (
+                      <View style={styles.contentBadges}>
+                        {product.badges.slice(0, 3).map((badge, badgeIndex) => (
+                          <Text key={badgeIndex} style={[styles.contentBadge, { backgroundColor: badge.color || '#007AFF' }]}>
+                            {badge.text}
+                          </Text>
+                        ))}
+                      </View>
+                    )}
+                    
                     {product.description && (
                       <Text style={styles.gridDescription} numberOfLines={2}>
                         {product.description}
                       </Text>
                     )}
-                    <Text style={styles.gridPrice}>{product.price} AED</Text>
+                    
+                    {/* Enhanced Pricing */}
+                    {product.hasDiscount ? (
+                      <View style={styles.priceContainer}>
+                        <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
+                        <Text style={styles.discountedPrice}>{product.displayPrice.toFixed(2)} AED</Text>
+                        <Text style={styles.savings}>Save {product.discountAmount.toFixed(0)} AED</Text>
+                      </View>
+                    ) : (
+                      <Text style={styles.gridPrice}>{product.price} AED</Text>
+                    )}
                   </View>
                 </TouchableOpacity>
               ))}
@@ -381,7 +434,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 3,
-    overflow: 'hidden',
+    // Remove overflow: 'hidden' to allow badges to show
   },
   gridCardLeft: {
     marginRight: 8,
@@ -392,6 +445,8 @@ const styles = StyleSheet.create({
   gridImageContainer: {
     width: '100%',
     height: 140,
+    position: 'relative',
+    backgroundColor: '#F5F5F7',
   },
   gridImage: {
     width: '100%',
@@ -548,5 +603,101 @@ const styles = StyleSheet.create({
   activeCategoryButtonText: {
     color: '#ffffff',
     fontWeight: '600',
+  },
+  
+  // Badge Styles
+  badgeContainer: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    zIndex: 10,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginBottom: 4,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  badgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  
+  // Stock Overlay
+  stockOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingVertical: 6,
+    alignItems: 'center',
+  },
+  stockOverlayText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  
+  // Rating Styles
+  ratingContainer: {
+    marginBottom: 4,
+  },
+  ratingText: {
+    fontSize: 12,
+    color: '#FF9500',
+    fontWeight: '500',
+  },
+  
+  // Content Badge Styles
+  contentBadges: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 6,
+    gap: 4,
+  },
+  contentBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: '600',
+    overflow: 'hidden',
+  },
+  
+  // Enhanced Pricing Styles
+  priceContainer: {
+    alignItems: 'flex-start',
+  },
+  originalPrice: {
+    fontSize: 12,
+    color: '#86868B',
+    textDecorationLine: 'line-through',
+  },
+  discountedPrice: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#E74C3C',
+  },
+  savings: {
+    fontSize: 10,
+    color: '#E74C3C',
+    fontWeight: '600',
+    backgroundColor: '#E74C3C20',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginTop: 2,
   },
 });
