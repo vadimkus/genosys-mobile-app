@@ -35,7 +35,7 @@ export const fetchProducts = async () => {
     console.log('📦 Raw API response:', data);
     
     // Ensure we return an array even if API returns different structure
-    const products = Array.isArray(data) ? data : data.products || [];
+    const products = Array.isArray(data) ? data : data.data || data.products || [];
     console.log('✅ Processed products:', products.length, 'items');
     
     // If no products from API, return demo data for testing
@@ -84,6 +84,73 @@ const getDemoProducts = () => {
       image_url: 'https://via.placeholder.com/400x400/2ECC71/FFFFFF?text=Demo+Product+3'
     }
   ];
+};
+
+/**
+ * Fetches product categories from the database
+ * @returns {Promise<Array>} Array of unique categories
+ */
+export const fetchProductCategories = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+      },
+    });
+
+    if (!response.ok) {
+      console.log('Categories endpoint not available, extracting from products');
+      // If categories endpoint doesn't exist, extract from products
+      return extractCategoriesFromProducts();
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : data.categories || [];
+    
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+    // Fallback to extracting categories from products
+    return extractCategoriesFromProducts();
+  }
+};
+
+/**
+ * Extracts unique categories from products as fallback
+ * @returns {Promise<Array>} Array of unique categories
+ */
+const extractCategoriesFromProducts = async () => {
+  try {
+    console.log('🔄 Extracting categories from products...');
+    const products = await fetchProducts();
+    console.log('📦 Products for category extraction:', products.length);
+    
+    const categories = [...new Set(products.map(product => product.category))];
+    
+    const validCategories = categories.filter(category => category && category.trim() !== '');
+    console.log('✅ Valid categories extracted:', validCategories);
+    
+    return validCategories.length > 0 ? validCategories : [
+      'Professional Skincare',
+      'Cleansers', 
+      'Moisturizers',
+      'Serums',
+      'Treatments',
+      'Sun Protection'
+    ];
+  } catch (error) {
+    console.error('Failed to extract categories from products:', error);
+    // Return demo categories as last fallback
+    return [
+      'Professional Skincare',
+      'Cleansers',
+      'Moisturizers', 
+      'Serums',
+      'Treatments',
+      'Sun Protection'
+    ];
+  }
 };
 
 /**

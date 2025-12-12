@@ -117,7 +117,7 @@ export default function ProductDetailScreen() {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#E74C3C" />
-        <Text style={styles.loadingText}>Loading Product...</Text>
+        <Text style={styles.loadingText}>Loading product details...</Text>
       </SafeAreaView>
     );
   }
@@ -126,24 +126,27 @@ export default function ProductDetailScreen() {
     return (
       <SafeAreaView style={styles.errorContainer}>
         <Text style={styles.errorText}>Product not found</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>Go Back</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <SafeAreaView style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        
-        <View style={styles.headerActions}>
+    <SafeAreaView style={styles.container}>
+      {/* Fixed Header */}
+      <SafeAreaView style={styles.headerContainer}>
+        <View style={styles.headerButtons}>
           <TouchableOpacity
             style={styles.headerButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="chevron-back" size={22} color="#1D1D1F" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.headerButton, styles.headerButtonMiddle]}
             onPress={handleShare}
           >
             <Ionicons name="share-outline" size={22} color="#1D1D1F" />
@@ -266,37 +269,31 @@ export default function ProductDetailScreen() {
               </View>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Availability</Text>
-                <Text style={[styles.detailValue, { color: product.stock ? '#2ECC71' : '#E74C3C' }]}>
-                  {product.stock ? 'In Stock' : 'Out of Stock'}
-                </Text>
+                <Text style={styles.detailValue}>In Stock</Text>
               </View>
             </View>
           </View>
         </View>
       </ScrollView>
 
-      {/* Sticky Footer */}
-      <SafeAreaView style={styles.footer}>
-        <View style={styles.footerContent}>
-          <View style={styles.priceSection}>
-            <Text style={styles.footerPrice}>{product.price} AED</Text>
-            <Text style={styles.footerPriceLabel}>Total</Text>
-          </View>
-          
-          <TouchableOpacity
-            style={[styles.addToBagButton, !product.stock && styles.addToBagButtonDisabled]}
-            onPress={handleAddToBag}
-            activeOpacity={0.8}
-            disabled={!product.stock}
-          >
-            <Text style={styles.addToBagText}>
-              {!product.stock ? 'Out of Stock' : 
-               isInCart(product.id) ? `In Bag (${getItemQuantity(product.id)})` : 'Add to Bag'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    </View>
+      {/* Fixed Bottom Button */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          style={[styles.addToBagButton, isInCart(product.id) && styles.inCartButton]}
+          onPress={handleAddToBag}
+        >
+          <Ionicons 
+            name={isInCart(product.id) ? "checkmark" : "bag"} 
+            size={20} 
+            color="#ffffff" 
+            style={styles.buttonIcon}
+          />
+          <Text style={styles.addToBagText}>
+            {isInCart(product.id) ? `In Bag (${getItemQuantity(product.id)})` : 'Add to Bag'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -322,23 +319,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
   },
   errorText: {
     fontSize: 18,
-    color: '#86868B',
+    color: '#1D1D1F',
+    marginBottom: 20,
   },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    paddingHorizontal: 20,
+  backButton: {
+    backgroundColor: '#E74C3C',
+    paddingHorizontal: 24,
     paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  headerContainer: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  headerButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
   },
   headerButton: {
     width: 40,
@@ -353,11 +361,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  headerActions: {
-    flexDirection: 'row',
+  headerButtonMiddle: {
+    marginHorizontal: 16,
   },
   headerButtonLast: {
-    marginLeft: 12,
+    marginLeft: 0,
   },
   scrollView: {
     flex: 1,
@@ -365,6 +373,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: SCREEN_WIDTH,
     height: HEADER_HEIGHT,
+    backgroundColor: '#F5F5F7',
   },
   heroImage: {
     width: '100%',
@@ -379,17 +388,13 @@ const styles = StyleSheet.create({
   },
   heroPlaceholderText: {
     fontSize: 64,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#E74C3C',
   },
   contentContainer: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -24,
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 120,
+    paddingBottom: 100, // Space for bottom button
   },
   productInfo: {
     marginBottom: 32,
@@ -406,8 +411,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     color: '#1D1D1F',
-    marginBottom: 12,
     lineHeight: 34,
+    marginBottom: 12,
     letterSpacing: -0.5,
   },
   price: {
@@ -418,7 +423,7 @@ const styles = StyleSheet.create({
   },
   size: {
     fontSize: 16,
-    color: '#86868B',
+    color: '#6E6E73',
     fontWeight: '500',
   },
   section: {
@@ -434,78 +439,86 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     backgroundColor: '#F8F9FA',
     borderRadius: 12,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#E74C3C',
+    padding: 20,
   },
   description: {
     fontSize: 16,
-    color: '#1D1D1F',
     lineHeight: 24,
-    fontWeight: '400',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    gap: 2,
-  },
-  star: {
-    fontSize: 20,
-    color: '#FFD700',
-  },
-  ratingText: {
-    fontSize: 16,
-    color: '#86868B',
-    fontWeight: '500',
+    color: '#1D1D1F',
   },
   readMoreButton: {
     marginTop: 12,
     alignSelf: 'flex-start',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#E74C3C',
-    borderRadius: 8,
   },
   readMoreText: {
-    fontSize: 14,
-    color: '#ffffff',
+    fontSize: 16,
     fontWeight: '600',
+    color: '#E74C3C',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 20,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginRight: 16,
+  },
+  star: {
+    fontSize: 20,
+    color: '#FFD700',
+    marginRight: 4,
+  },
+  ratingText: {
+    fontSize: 16,
+    color: '#1D1D1F',
+    fontWeight: '500',
   },
   featureList: {
-    gap: 8,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 20,
   },
   feature: {
     fontSize: 16,
-    color: '#6E6E73',
-    lineHeight: 22,
+    lineHeight: 24,
+    color: '#1D1D1F',
+    marginBottom: 8,
   },
   detailGrid: {
-    gap: 16,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F7',
   },
   detailLabel: {
     fontSize: 16,
     color: '#6E6E73',
-    fontWeight: '500',
   },
   detailValue: {
     fontSize: 16,
+    fontWeight: '500',
     color: '#1D1D1F',
-    fontWeight: '600',
   },
-  footer: {
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingBottom: 34, // Safe area for home indicator
     borderTopWidth: 1,
     borderTopColor: '#F2F2F7',
     shadowColor: '#000',
@@ -514,39 +527,28 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 10,
   },
-  footerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 16,
-  },
-  priceSection: {
-    flex: 1,
-  },
-  footerPrice: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1D1D1F',
-  },
-  footerPriceLabel: {
-    fontSize: 14,
-    color: '#86868B',
-    marginTop: 2,
-  },
   addToBagButton: {
     backgroundColor: '#E74C3C',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
     borderRadius: 12,
-    minWidth: 140,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#E74C3C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  addToBagButtonDisabled: {
-    backgroundColor: '#86868B',
+  inCartButton: {
+    backgroundColor: '#27AE60',
+    shadowColor: '#27AE60',
+  },
+  buttonIcon: {
+    marginRight: 8,
   },
   addToBagText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
   },

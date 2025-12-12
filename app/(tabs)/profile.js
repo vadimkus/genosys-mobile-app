@@ -7,15 +7,25 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  Dimensions,
+  ActivityIndicator,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'expo-router';
+
+const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { clearCart, cartCount } = useCart();
+  const { user, logout } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -23,44 +33,79 @@ export default function ProfileScreen() {
       'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: () => {
-          clearCart();
-          Alert.alert('Signed Out', 'You have been signed out successfully.');
-        }}
+        { 
+          text: 'Sign Out', 
+          style: 'destructive', 
+          onPress: async () => {
+            setIsLoggingOut(true);
+            try {
+              clearCart();
+              const result = await logout();
+              if (result.success) {
+                // Navigation will be handled automatically by AuthWrapper
+                Alert.alert('Signed Out', 'You have been signed out successfully.');
+              } else {
+                Alert.alert('Error', result.error || 'Failed to sign out');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'Something went wrong while signing out');
+            } finally {
+              setIsLoggingOut(false);
+            }
+          }
+        }
       ]
     );
   };
 
   const handleEditProfile = () => {
-    Alert.alert('Edit Profile', 'Profile editing functionality coming soon!');
+    router.push('/profile/edit');
   };
 
   const handleContactSupport = () => {
-    Alert.alert('Contact Support', 'Email: support@genosys.ae\nPhone: +971 4 XXX XXXX');
+    router.push('/profile/contact');
   };
 
   const handleAbout = () => {
-    Alert.alert(
-      'About Genosys', 
-      'Genosys is a premium skincare brand offering innovative beauty solutions with clinically proven results.\n\nVersion 1.0.0'
-    );
+    router.push('/profile/about');
   };
 
-  const ProfileSection = ({ title, children }) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.sectionContent}>
-        {children}
+  // Quick Action Card Component (Genosys brand style)
+  const QuickActionCard = ({ icon, title, subtitle, onPress, color = "#E74C3C" }) => (
+    <TouchableOpacity style={styles.quickActionCard} onPress={onPress}>
+      <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
+        <Ionicons name={icon} size={24} color="#ffffff" />
       </View>
+      <Text style={styles.quickActionTitle}>{title}</Text>
+      <Text style={styles.quickActionSubtitle}>{subtitle}</Text>
+    </TouchableOpacity>
+  );
+
+  // Section List Item Component
+  const ProfileSection = ({ title, children, style }) => (
+    <View style={[styles.section, style]}>
+      {title && <Text style={styles.sectionTitle}>{title}</Text>}
+      {children}
     </View>
   );
 
-  const ProfileItem = ({ icon, title, subtitle, onPress, rightComponent, hasArrow = true }) => (
-    <TouchableOpacity style={styles.profileItem} onPress={onPress} disabled={!onPress}>
+  const ProfileItem = ({ icon, title, subtitle, onPress, rightComponent, hasArrow = true, style, isLast = false }) => (
+    <TouchableOpacity 
+      style={[
+        styles.profileItem, 
+        isLast && styles.profileItemLast,
+        style
+      ]} 
+      onPress={onPress} 
+      disabled={!onPress}
+      activeOpacity={0.6}
+    >
       <View style={styles.profileItemLeft}>
-        <View style={styles.iconContainer}>
-          <Ionicons name={icon} size={20} color="#E74C3C" />
-        </View>
+        {icon && (
+          <View style={styles.iconContainer}>
+            <Ionicons name={icon} size={22} color="#E74C3C" />
+          </View>
+        )}
         <View style={styles.profileItemText}>
           <Text style={styles.profileItemTitle}>{title}</Text>
           {subtitle && <Text style={styles.profileItemSubtitle}>{subtitle}</Text>}
@@ -74,147 +119,170 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        <Text style={styles.subtitle}>Manage your account</Text>
-      </View>
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* User Info */}
-        <View style={styles.userCard}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>G</Text>
-          </View>
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>Genosys User</Text>
-            <Text style={styles.userEmail}>user@genosys.ae</Text>
-            <TouchableOpacity onPress={handleEditProfile}>
-              <Text style={styles.editProfileText}>Edit Profile</Text>
-            </TouchableOpacity>
+        {/* Header with User Profile */}
+        <View style={styles.profileHeader}>
+          <View style={styles.profileHeaderContent}>
+            <View style={styles.avatarContainer}>
+              {user?.picture ? (
+                <Image 
+                  source={{ uri: user.picture }} 
+                  style={styles.avatarImage}
+                />
+              ) : (
+                <Text style={styles.avatarText}>
+                  {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'G'}
+                </Text>
+              )}
+            </View>
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>
+                {user?.name || 'Genosys User'}
+              </Text>
+              <Text style={styles.userEmail}>
+                {user?.email || 'user@genosys.ae'}
+              </Text>
+              <TouchableOpacity onPress={handleEditProfile} style={styles.editButton}>
+                <Text style={styles.editButtonText}>Edit</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        {/* Account Section */}
-        <ProfileSection title="Account">
-          <ProfileItem
-            icon="person-outline"
-            title="Personal Information"
-            subtitle="Update your details"
-            onPress={handleEditProfile}
-          />
-          <ProfileItem
-            icon="location-outline"
-            title="Addresses"
-            subtitle="Manage shipping addresses"
-            onPress={() => Alert.alert('Addresses', 'Address management coming soon!')}
-          />
-          <ProfileItem
-            icon="card-outline"
-            title="Payment Methods"
-            subtitle="Manage cards and payment"
-            onPress={() => Alert.alert('Payment', 'Payment methods coming soon!')}
-          />
-          <ProfileItem
-            icon="receipt-outline"
-            title="Order History"
-            subtitle="View past orders"
-            onPress={() => Alert.alert('Orders', 'Order history coming soon!')}
-          />
-        </ProfileSection>
-
-        {/* Preferences */}
-        <ProfileSection title="Preferences">
-          <ProfileItem
-            icon="notifications-outline"
-            title="Push Notifications"
-            subtitle="Get updates about orders and offers"
-            rightComponent={
-              <Switch
-                value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
-                trackColor={{ false: '#D1D1D6', true: '#E74C3C' }}
-                thumbColor="#ffffff"
-              />
-            }
-            hasArrow={false}
-          />
-          <ProfileItem
-            icon="finger-print-outline"
-            title="Biometric Login"
-            subtitle="Use Face ID or Touch ID"
-            rightComponent={
-              <Switch
-                value={biometricEnabled}
-                onValueChange={setBiometricEnabled}
-                trackColor={{ false: '#D1D1D6', true: '#E74C3C' }}
-                thumbColor="#ffffff"
-              />
-            }
-            hasArrow={false}
-          />
-          <ProfileItem
-            icon="language-outline"
-            title="Language"
-            subtitle="English"
-            onPress={() => Alert.alert('Language', 'Language selection coming soon!')}
-          />
-        </ProfileSection>
-
-        {/* Support */}
-        <ProfileSection title="Support & Legal">
-          <ProfileItem
-            icon="help-circle-outline"
-            title="Help Center"
-            subtitle="FAQs and support"
-            onPress={handleContactSupport}
-          />
-          <ProfileItem
-            icon="mail-outline"
-            title="Contact Us"
-            subtitle="Get in touch with support"
-            onPress={handleContactSupport}
-          />
-          <ProfileItem
-            icon="document-text-outline"
-            title="Terms & Conditions"
-            onPress={() => Alert.alert('Terms', 'Terms & Conditions coming soon!')}
-          />
-          <ProfileItem
-            icon="shield-outline"
-            title="Privacy Policy"
-            onPress={() => Alert.alert('Privacy', 'Privacy Policy coming soon!')}
-          />
-          <ProfileItem
-            icon="information-circle-outline"
-            title="About"
-            onPress={handleAbout}
-          />
-        </ProfileSection>
-
-        {/* Cart Info */}
-        {cartCount > 0 && (
-          <ProfileSection title="Shopping">
-            <ProfileItem
+        {/* Quick Actions - Genosys brand style cards */}
+        <ProfileSection style={styles.quickActionsSection}>
+          <View style={styles.quickActionsGrid}>
+            <QuickActionCard
+              icon="receipt-outline"
+              title="Orders"
+              subtitle="Track purchases"
+              color="#E74C3C"
+              onPress={() => Alert.alert('Orders', 'Order tracking coming soon!')}
+            />
+            <QuickActionCard
               icon="bag-outline"
-              title="Items in Bag"
-              subtitle={`${cartCount} ${cartCount === 1 ? 'item' : 'items'} ready for checkout`}
-              onPress={() => {}} // Navigation will be handled by tab
+              title="Bag"
+              subtitle={cartCount > 0 ? `${cartCount} items` : 'Empty'}
+              color="#27AE60"
+              onPress={() => {}} // Tab navigation will handle
+            />
+          </View>
+        </ProfileSection>
+
+        {/* Account & Settings */}
+        <ProfileSection title="Account">
+          <View style={styles.sectionContent}>
+            <ProfileItem
+              icon="person-outline"
+              title="Personal Information"
+              onPress={handleEditProfile}
+            />
+            <ProfileItem
+              icon="location-outline"
+              title="Addresses"
+              onPress={() => router.push('/profile/addresses')}
+            />
+            <ProfileItem
+              icon="card-outline"
+              title="Payment & Billing"
+              onPress={() => router.push('/profile/payment')}
+            />
+            <ProfileItem
+              icon="notifications-outline"
+              title="Notifications"
+              rightComponent={
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={setNotificationsEnabled}
+                  trackColor={{ false: '#E5E5EA', true: '#E74C3C' }}
+                  thumbColor="#ffffff"
+                  ios_backgroundColor="#E5E5EA"
+                />
+              }
+              hasArrow={false}
+              isLast={true}
+            />
+          </View>
+        </ProfileSection>
+
+        {/* Privacy & Security */}
+        <ProfileSection title="Privacy & Security">
+          <View style={styles.sectionContent}>
+            <ProfileItem
+              icon="finger-print-outline"
+              title="Face ID & Passcode"
+              rightComponent={
+                <Switch
+                  value={biometricEnabled}
+                  onValueChange={setBiometricEnabled}
+                  trackColor={{ false: '#E5E5EA', true: '#27AE60' }}
+                  thumbColor="#ffffff"
+                  ios_backgroundColor="#E5E5EA"
+                />
+              }
               hasArrow={false}
             />
-          </ProfileSection>
-        )}
+            <ProfileItem
+              icon="shield-outline"
+              title="Privacy Policy"
+              onPress={() => router.push('/profile/privacy')}
+            />
+            <ProfileItem
+              icon="document-text-outline"
+              title="Terms & Conditions"
+              onPress={() => router.push('/profile/terms')}
+              isLast={true}
+            />
+          </View>
+        </ProfileSection>
+
+        {/* General */}
+        <ProfileSection title="General">
+          <View style={styles.sectionContent}>
+            <ProfileItem
+              icon="language-outline"
+              title="Language"
+              subtitle="English"
+              onPress={() => Alert.alert('Language', 'Language selection coming soon!')}
+            />
+            <ProfileItem
+              icon="help-circle-outline"
+              title="Help & Support"
+              onPress={() => router.push('/profile/help')}
+            />
+            <ProfileItem
+              icon="mail-outline"
+              title="Contact Us"
+              onPress={handleContactSupport}
+            />
+            <ProfileItem
+              icon="information-circle-outline"
+              title="About Genosys"
+              onPress={handleAbout}
+              isLast={true}
+            />
+          </View>
+        </ProfileSection>
 
         {/* Sign Out */}
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Text style={styles.signOutText}>Sign Out</Text>
+        <ProfileSection>
+          <TouchableOpacity 
+            style={[styles.signOutButton, isLoggingOut && styles.signOutButtonDisabled]} 
+            onPress={handleSignOut}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? (
+              <ActivityIndicator color="#E74C3C" size="small" />
+            ) : (
+              <Text style={styles.signOutText}>Sign Out</Text>
+            )}
           </TouchableOpacity>
-        </View>
+        </ProfileSection>
 
-        {/* App Version */}
-        <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>Genosys Mobile v1.0.0</Text>
-          <Text style={styles.versionSubtext}>Built with love for premium skincare</Text>
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Genosys Mobile</Text>
+          <Text style={styles.footerVersion}>Version 1.0.0</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -224,105 +292,136 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F7',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
     backgroundColor: '#ffffff',
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: '#1D1D1F',
-    marginBottom: 4,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 17,
-    color: '#86868B',
-    fontWeight: '400',
   },
   scrollView: {
     flex: 1,
   },
-  userCard: {
+  
+  // Profile Header
+  profileHeader: {
     backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    marginTop: 20,
-    padding: 20,
-    borderRadius: 12,
+    paddingTop: 20,
+  },
+  profileHeaderContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   avatarContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: '#E74C3C',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
   avatarText: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '600',
     color: '#ffffff',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   userInfo: {
     flex: 1,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1D1D1F',
-    marginBottom: 4,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 2,
+    letterSpacing: -0.4,
   },
   userEmail: {
-    fontSize: 14,
-    color: '#86868B',
-    marginBottom: 8,
+    fontSize: 16,
+    color: '#8E8E93',
+    marginBottom: 12,
   },
-  editProfileText: {
-    fontSize: 14,
+  editButton: {
+    alignSelf: 'flex-start',
+  },
+  editButtonText: {
+    fontSize: 17,
     color: '#E74C3C',
-    fontWeight: '600',
+    fontWeight: '400',
   },
+
+  // Quick Actions
+  quickActionsSection: {
+    marginTop: 0,
+    paddingBottom: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#C6C6C8',
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  quickActionCard: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 16,
+    width: (width - 60) / 2,
+    alignItems: 'flex-start',
+  },
+  quickActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  quickActionTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#000000',
+    marginBottom: 2,
+  },
+  quickActionSubtitle: {
+    fontSize: 15,
+    color: '#8E8E93',
+  },
+
+  // Sections
   section: {
-    marginTop: 32,
-    marginHorizontal: 20,
+    paddingVertical: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1D1D1F',
-    marginBottom: 12,
-    letterSpacing: -0.3,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 8,
+    marginHorizontal: 20,
+    letterSpacing: -0.4,
   },
   sectionContent: {
-    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    backgroundColor: '#F2F2F7',
     borderRadius: 12,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
   },
+  
+  // Profile Items
   profileItem: {
+    backgroundColor: '#F2F2F7',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
+    paddingVertical: 12,
+    minHeight: 56,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#C6C6C8',
+  },
+  profileItemLast: {
+    borderBottomWidth: 0,
   },
   profileItemLeft: {
     flexDirection: 'row',
@@ -332,8 +431,8 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 32,
     height: 32,
-    borderRadius: 8,
-    backgroundColor: '#F5F5F7',
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -342,46 +441,53 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileItemTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1D1D1F',
-    marginBottom: 2,
+    fontSize: 17,
+    fontWeight: '400',
+    color: '#000000',
+    marginBottom: 1,
   },
   profileItemSubtitle: {
-    fontSize: 14,
-    color: '#86868B',
+    fontSize: 15,
+    color: '#8E8E93',
   },
   profileItemRight: {
-    marginLeft: 12,
-  },
-  signOutButton: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingVertical: 16,
+    marginLeft: 8,
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+  },
+
+  // Sign Out
+  signOutButton: {
+    backgroundColor: '#F2F2F7',
+    marginHorizontal: 20,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 56,
   },
   signOutText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '400',
     color: '#E74C3C',
   },
-  versionContainer: {
+  signOutButtonDisabled: {
+    opacity: 0.6,
+  },
+
+  // Footer
+  footer: {
     alignItems: 'center',
     paddingVertical: 32,
-    paddingBottom: 100, // Extra space for tab bar
+    paddingBottom: 100, // Space for tab bar
   },
-  versionText: {
-    fontSize: 14,
-    color: '#86868B',
-    fontWeight: '500',
+  footerText: {
+    fontSize: 15,
+    color: '#8E8E93',
+    fontWeight: '400',
   },
-  versionSubtext: {
-    fontSize: 12,
+  footerVersion: {
+    fontSize: 13,
     color: '#C7C7CC',
     marginTop: 4,
   },
