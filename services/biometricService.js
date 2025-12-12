@@ -1,0 +1,336 @@
+/**
+ * Biometric Authentication Service
+ * Handles Face ID, Touch ID, and fingerprint authentication
+ */
+
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
+import { Alert } from 'react-native';
+
+const BIOMETRIC_CREDENTIALS_KEY = 'biometric_credentials';
+const BIOMETRIC_ENABLED_KEY = 'biometric_enabled';
+
+/**
+ * Check if biometric authentication is available on device
+ * @returns {Promise<Object>} Availability info
+ */
+export const checkBiometricSupport = async () => {
+  try {
+    const isAvailable = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+    
+    const biometricTypes = supportedTypes.map(type => {
+      switch (type) {
+        case LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION:
+          return 'Face ID';
+        case LocalAuthentication.AuthenticationType.FINGERPRINT:
+          return 'Touch ID / Fingerprint';
+        case LocalAuthentication.AuthenticationType.IRIS:
+          return 'Iris Recognition';
+        default:
+          return 'Biometric';
+      }
+    });
+
+    return {
+      isAvailable,
+      isEnrolled,
+      supportedTypes: biometricTypes,
+      primaryType: biometricTypes[0] || 'Biometric',
+    };
+  } catch (error) {
+    console.error('Error checking biometric support:', error);
+    return {
+      isAvailable: false,
+      isEnrolled: false,
+      supportedTypes: [],
+      primaryType: null,
+    };
+  }
+};
+
+/**
+ * Get the biometric type name for UI display
+ * @returns {Promise<string>} Biometric type name
+ */
+export const getBiometricTypeName = async () => {
+  const support = await checkBiometricSupport();
+  return support.primaryType || 'Biometric Authentication';
+};
+
+/**
+ * Check if user has biometric authentication enabled
+ * @returns {Promise<boolean>} Whether biometric auth is enabled
+ */
+export const isBiometricEnabled = async () => {
+  try {
+    const enabled = await SecureStore.getItemAsync(BIOMETRIC_ENABLED_KEY);
+    return enabled === 'true';
+  } catch (error) {
+    console.error('Error checking if biometric is enabled:', error);
+    return false;
+  }
+};
+
+/**
+ * Enable biometric authentication for user
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise<Object>} Success result
+ */
+export const enableBiometricAuth = async (email, password) => {
+  try {
+    const support = await checkBiometricSupport();
+    
+    if (!support.isAvailable) {
+      return {
+        success: false,
+        error: 'Biometric authentication is not available on this device'
+      };
+    }
+
+    if (!support.isEnrolled) {
+      return {
+        success: false,
+        error: 'No biometric data is enrolled on this device. Please set up Face ID or Touch ID in Settings.'
+      };
+    }
+
+    // Authenticate user first to enable biometric
+    const authResult = await LocalAuthentication.authenticateAsync({
+      promptMessage: `Enable ${support.primaryType}`,
+      subtitle: 'Authenticate to enable biometric login',
+      fallbackLabel: 'Use Passcode',
+      cancelLabel: 'Cancel',
+    });
+
+    if (authResult.success) {
+      // Store credentials securely
+      const credentials = JSON.stringify({ email, password });
+      await SecureStore.setItemAsync(BIOMETRIC_CREDENTIALS_KEY, credentials);
+      await SecureStore.setItemAsync(BIOMETRIC_ENABLED_KEY, 'true');
+      
+      return {
+        success: true,
+        message: `${support.primaryType} enabled successfully`
+      };
+    } else {
+      return {
+        success: false,
+        error: authResult.error || 'Authentication failed'
+      };
+    }
+  } catch (error) {
+    console.error('Error enabling biometric auth:', error);
+    return {
+      success: false,
+      error: 'Failed to enable biometric authentication'
+    };
+  }
+};
+
+/**
+ * Disable biometric authentication
+ * @returns {Promise<Object>} Success result
+ */
+export const disableBiometricAuth = async () => {
+  try {
+    await SecureStore.deleteItemAsync(BIOMETRIC_CREDENTIALS_KEY);
+    await SecureStore.deleteItemAsync(BIOMETRIC_ENABLED_KEY);
+    
+    return {
+      success: true,
+      message: 'Biometric authentication disabled'
+    };
+  } catch (error) {
+    console.error('Error disabling biometric auth:', error);
+    return {
+      success: false,
+      error: 'Failed to disable biometric authentication'
+    };
+  }
+};
+
+/**
+ * Authenticate user with biometrics
+ * @returns {Promise<Object>} Authentication result with credentials
+ */
+export const authenticateWithBiometrics = async () => {
+  try {
+    const support = await checkBiometricSupport();
+    
+    if (!support.isAvailable || !support.isEnrolled) {
+      return {
+        success: false,
+        error: 'Biometric authentication not available'
+      };
+    }
+
+    // Check if biometric auth is enabled for user
+    const isEnabled = await isBiometricEnabled();
+    if (!isEnabled) {
+      return {
+        success: false,
+        error: 'Biometric authentication not enabled'
+      };
+    }
+
+    // Authenticate with biometrics
+    const authResult = await LocalAuthentication.authenticateAsync({
+      promptMessage: `Login with ${support.primaryType}`,
+      subtitle: 'Use biometric authentication to login',
+      fallbackLabel: 'Use Password',
+      cancelLabel: 'Cancel',
+    });
+
+    if (authResult.success) {
+      // Retrieve stored credentials
+      const credentialsString = await SecureStore.getItemAsync(BIOMETRIC_CREDENTIALS_KEY);
+      
+      if (credentialsString) {
+        const credentials = JSON.parse(credentialsString);
+        return {
+          success: true,
+          credentials,
+          message: 'Biometric authentication successful'
+        };
+      } else {
+        return {
+          success: false,
+          error: 'No stored credentials found'
+        };
+      }
+    } else {
+      return {
+        success: false,
+        error: authResult.error || 'Authentication cancelled'
+      };
+    }
+  } catch (error) {
+    console.error('Error authenticating with biometrics:', error);
+    return {
+      success: false,
+      error: 'Biometric authentication failed'
+    };
+  }
+};
+
+/**
+ * Show biometric authentication prompt with custom message
+ * @param {string} message - Custom prompt message
+ * @param {string} subtitle - Custom subtitle
+ * @returns {Promise<Object>} Authentication result
+ */
+export const promptBiometricAuth = async (message = 'Authenticate', subtitle = 'Use biometric authentication') => {
+  try {
+    const support = await checkBiometricSupport();
+    
+    if (!support.isAvailable || !support.isEnrolled) {
+      return {
+        success: false,
+        error: 'Biometric authentication not available'
+      };
+    }
+
+    const authResult = await LocalAuthentication.authenticateAsync({
+      promptMessage: message,
+      subtitle: subtitle,
+      fallbackLabel: 'Use Passcode',
+      cancelLabel: 'Cancel',
+    });
+
+    return {
+      success: authResult.success,
+      error: authResult.error || (authResult.success ? null : 'Authentication failed')
+    };
+  } catch (error) {
+    console.error('Error in biometric prompt:', error);
+    return {
+      success: false,
+      error: 'Biometric authentication failed'
+    };
+  }
+};
+
+/**
+ * Handle biometric setup flow with user prompts
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise<Object>} Setup result
+ */
+export const setupBiometricAuth = async (email, password) => {
+  try {
+    const support = await checkBiometricSupport();
+    
+    if (!support.isAvailable) {
+      Alert.alert(
+        'Not Available',
+        'Biometric authentication is not available on this device.',
+        [{ text: 'OK' }]
+      );
+      return { success: false };
+    }
+
+    if (!support.isEnrolled) {
+      Alert.alert(
+        'Setup Required',
+        `Please set up ${support.primaryType} in your device Settings first.`,
+        [{ text: 'OK' }]
+      );
+      return { success: false };
+    }
+
+    // Show confirmation dialog
+    return new Promise((resolve) => {
+      Alert.alert(
+        `Enable ${support.primaryType}?`,
+        `Would you like to enable ${support.primaryType} for quick and secure login?`,
+        [
+          {
+            text: 'Not Now',
+            style: 'cancel',
+            onPress: () => resolve({ success: false })
+          },
+          {
+            text: 'Enable',
+            onPress: async () => {
+              const result = await enableBiometricAuth(email, password);
+              if (result.success) {
+                Alert.alert(
+                  'Success!',
+                  `${support.primaryType} has been enabled for your account.`,
+                  [{ text: 'OK' }]
+                );
+              } else {
+                Alert.alert(
+                  'Error',
+                  result.error || 'Failed to enable biometric authentication',
+                  [{ text: 'OK' }]
+                );
+              }
+              resolve(result);
+            }
+          }
+        ]
+      );
+    });
+  } catch (error) {
+    console.error('Error in biometric setup:', error);
+    return {
+      success: false,
+      error: 'Failed to setup biometric authentication'
+    };
+  }
+};
+
+export default {
+  checkBiometricSupport,
+  getBiometricTypeName,
+  isBiometricEnabled,
+  enableBiometricAuth,
+  disableBiometricAuth,
+  authenticateWithBiometrics,
+  promptBiometricAuth,
+  setupBiometricAuth,
+};

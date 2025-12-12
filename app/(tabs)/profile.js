@@ -22,10 +22,18 @@ const { width } = Dimensions.get('window');
 export default function ProfileScreen() {
   const router = useRouter();
   const { clearCart, cartCount } = useCart();
-  const { user, logout } = useAuth();
+  const { 
+    user, 
+    logout,
+    biometricAvailable,
+    biometricEnabled,
+    biometricType,
+    enableBiometric,
+    disableBiometric
+  } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -68,6 +76,58 @@ export default function ProfileScreen() {
 
   const handleAbout = () => {
     router.push('/profile/about');
+  };
+
+  const handleBiometricToggle = async (value) => {
+    if (biometricLoading) return;
+    
+    setBiometricLoading(true);
+    
+    try {
+      if (value) {
+        // Enable biometric authentication
+        if (!user?.email) {
+          Alert.alert('Error', 'No user email found');
+          return;
+        }
+        
+        // We need the password to enable biometric auth
+        // For now, we'll show an alert asking user to re-login
+        Alert.alert(
+          `Enable ${biometricType}?`,
+          `To enable ${biometricType}, please log out and log back in with your password.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Log Out & Enable', 
+              style: 'default',
+              onPress: () => {
+                Alert.alert(
+                  'Instructions',
+                  `After logging out:\n\n1. Log back in with your email and password\n2. ${biometricType} setup will be offered automatically\n\nThis one-time setup allows secure biometric login.`,
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Continue', onPress: handleSignOut }
+                  ]
+                );
+              }
+            }
+          ]
+        );
+      } else {
+        // Disable biometric authentication
+        const result = await disableBiometric();
+        if (result.success) {
+          Alert.alert('Success', `${biometricType} has been disabled for your account.`);
+        } else {
+          Alert.alert('Error', result.error || 'Failed to disable biometric authentication');
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    } finally {
+      setBiometricLoading(false);
+    }
   };
 
   // Quick Action Card Component (Genosys brand style)
@@ -208,20 +268,32 @@ export default function ProfileScreen() {
         {/* Privacy & Security */}
         <ProfileSection title="Privacy & Security">
           <View style={styles.sectionContent}>
-            <ProfileItem
-              icon="finger-print-outline"
-              title="Face ID & Passcode"
-              rightComponent={
-                <Switch
-                  value={biometricEnabled}
-                  onValueChange={setBiometricEnabled}
-                  trackColor={{ false: '#E5E5EA', true: '#27AE60' }}
-                  thumbColor="#ffffff"
-                  ios_backgroundColor="#E5E5EA"
-                />
-              }
-              hasArrow={false}
-            />
+            {biometricAvailable ? (
+              <ProfileItem
+                icon={biometricType.includes('Face') ? 'scan-outline' : 'finger-print-outline'}
+                title={biometricType}
+                rightComponent={
+                  <Switch
+                    value={biometricEnabled}
+                    onValueChange={handleBiometricToggle}
+                    trackColor={{ false: '#E5E5EA', true: '#27AE60' }}
+                    thumbColor="#ffffff"
+                    ios_backgroundColor="#E5E5EA"
+                    disabled={biometricLoading}
+                  />
+                }
+                hasArrow={false}
+              />
+            ) : (
+              <ProfileItem
+                icon="scan-outline"
+                title="Biometric Authentication"
+                rightComponent={
+                  <Text style={styles.unavailableText}>Not Available</Text>
+                }
+                hasArrow={false}
+              />
+            )}
             <ProfileItem
               icon="shield-outline"
               title="Privacy Policy"
@@ -473,6 +545,11 @@ const styles = StyleSheet.create({
   },
   signOutButtonDisabled: {
     opacity: 0.6,
+  },
+  unavailableText: {
+    fontSize: 14,
+    color: '#86868B',
+    fontStyle: 'italic',
   },
 
   // Footer

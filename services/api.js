@@ -3,7 +3,7 @@
  * Connects to live Vercel API with secure authentication
  */
 
-const API_BASE_URL = 'https://www.genosys.ae/api/mobile';
+const API_BASE_URL = 'https://genosys.ae/api/mobile';
 const API_KEY = 'genosys_secure_mobile_2025_v1';
 
 /**

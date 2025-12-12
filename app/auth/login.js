@@ -28,7 +28,15 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  const { loginWithGoogle, loginWithEmail, register } = useAuth();
+  const { 
+    loginWithGoogle, 
+    loginWithEmail, 
+    loginWithBiometrics,
+    register,
+    biometricAvailable,
+    biometricEnabled,
+    biometricType
+  } = useAuth();
 
   const handleGoogleLogin = async () => {
     try {
@@ -39,10 +47,39 @@ export default function LoginScreen() {
         Alert.alert('Success', 'Logged in successfully!');
         // Navigation will be handled by the auth context automatically
       } else {
-        Alert.alert('Error', result.error || 'Google login failed');
+        // Show helpful error message with alternative
+        Alert.alert(
+          'Google Sign-In Issue', 
+          result.error || 'Google authentication is being configured. Please use email & password login for now, or try Google sign-in again later.',
+          [
+            { text: 'OK', style: 'default' },
+            { text: 'Use Email Login', style: 'default', onPress: () => {
+              // Focus on email input or scroll to email form
+              console.log('User chose email login alternative');
+            }}
+          ]
+        );
       }
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert('Error', 'Google authentication failed. Please use email & password login.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    try {
+      setLoading(true);
+      const result = await loginWithBiometrics();
+      
+      if (result.success) {
+        // Navigation will be handled by the auth context automatically
+        console.log('✅ Biometric login successful');
+      } else {
+        Alert.alert('Authentication Failed', result.error || 'Biometric login failed');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Biometric authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -124,6 +161,25 @@ export default function LoginScreen() {
               }
             </Text>
           </View>
+
+          {/* Biometric Login Button */}
+          {biometricAvailable && biometricEnabled && (
+            <TouchableOpacity
+              style={styles.biometricButton}
+              onPress={handleBiometricLogin}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              <View style={styles.biometricButtonContent}>
+                <Ionicons 
+                  name={biometricType.includes('Face') ? 'scan' : 'finger-print'} 
+                  size={24} 
+                  color="#ffffff" 
+                />
+                <Text style={styles.biometricButtonText}>Login with {biometricType}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
 
           {/* Google Login Button */}
           <TouchableOpacity
@@ -318,6 +374,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#1D1D1F',
+  },
+  biometricButton: {
+    backgroundColor: '#E74C3C',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    shadowColor: '#E74C3C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  biometricButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  biometricButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginLeft: 12,
   },
   divider: {
     flexDirection: 'row',
