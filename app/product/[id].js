@@ -16,6 +16,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchProductById } from '../../services/api';
+import ProductVariantSelector from '../../components/ProductVariantSelector';
+import { 
+  hasProductSizeVariants, 
+  hasProductColorVariants,
+  getSizeOptionsWithPrices, 
+  getProductColorOptions,
+  getDefaultSize,
+  getPriceForSize 
+} from '../../utils/productPricing';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
@@ -27,6 +36,9 @@ export default function ProductDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [currentPrice, setCurrentPrice] = useState(0);
   const { addToCart, isInCart, getItemQuantity } = useCart();
 
   useEffect(() => {
@@ -43,6 +55,22 @@ export default function ProductDetailScreen() {
       if (enhancedProduct) {
         setProduct(enhancedProduct);
         console.log('✅ Enhanced product loaded with badges:', enhancedProduct.badges?.length || 0);
+
+        // Set default size and color if product has variants
+        if (hasProductSizeVariants(enhancedProduct.id)) {
+          const defaultSize = getDefaultSize(enhancedProduct.id);
+          setSelectedSize(defaultSize);
+          setCurrentPrice(getPriceForSize(enhancedProduct, defaultSize));
+        } else {
+          setCurrentPrice(enhancedProduct.displayPrice || enhancedProduct.price);
+        }
+
+        if (hasProductColorVariants(enhancedProduct.id)) {
+          const colorOptions = getProductColorOptions(enhancedProduct.id);
+          if (colorOptions.length > 0) {
+            setSelectedColor(colorOptions[0].value);
+          }
+        }
 
         if (user?.discountPercentage && enhancedProduct.hasDiscount) {
           console.log('💰 Product has user discount:', enhancedProduct.discountPercentage + '% ' + enhancedProduct.discountType);
@@ -62,16 +90,43 @@ export default function ProductDetailScreen() {
 
   const handleAddToBag = () => {
     if (product) {
-      addToCart(product);
+      // Add product with selected variants
+      const productToAdd = {
+        ...product,
+        displayPrice: currentPrice, // Use current price based on size selection
+      };
+      
+      addToCart(productToAdd, 1, selectedColor, selectedSize);
+      
+      let message = `${product.name} has been added to your bag`;
+      if (selectedSize) {
+        message += `\nSize: ${selectedSize}`;
+      }
+      if (selectedColor) {
+        message += `\nColor: ${selectedColor}`;
+      }
+      
       Alert.alert(
         '🛍️ Added to Bag',
-        `${product.name} has been added to your bag`,
+        message,
         [
           { text: 'Continue Shopping', style: 'default' },
           { text: 'View Bag', style: 'default', onPress: () => router.push('/(tabs)/bag') }
         ]
       );
     }
+  };
+
+  const handleSizeChange = (size) => {
+    setSelectedSize(size);
+    const newPrice = getPriceForSize(product, size);
+    setCurrentPrice(newPrice);
+    console.log(`📐 Size changed to ${size}, price: ${newPrice} AED`);
+  };
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    console.log(`🎨 Color changed to ${color}`);
   };
 
   const handleWishlistToggle = () => {
@@ -187,11 +242,45 @@ export default function ProductDetailScreen() {
           <View style={styles.productInfo}>
             <Text style={styles.category}>{product.category}</Text>
             <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.price}>{product.price} AED</Text>
-            {product.size && (
-              <Text style={styles.size}>{product.size}</Text>
+            
+            {/* Size and Stock Info */}
+            {(product.size || hasProductSizeVariants(product.id)) && (
+              <View style={styles.sizeInfoContainer}>
+                <Text style={styles.sizeInfo}>
+                  {hasProductSizeVariants(product.id) 
+                    ? 'Multiple sizes available'
+                    : `Size: ${product.size}`}
+                </Text>
+                {product.inStock && (
+                  <Text style={styles.stockInfo}>✓ In Stock</Text>
+                )}
+              </View>
             )}
+            
+            <Text style={styles.price}>
+              {product.hasDiscount ? (
+                <Text>
+                  <Text style={styles.originalPrice}>{product.originalPrice} AED </Text>
+                  <Text style={styles.discountedPrice}>{currentPrice.toFixed(2)} AED</Text>
+                </Text>
+              ) : (
+                `${currentPrice.toFixed(2)} AED`
+              )}
+            </Text>
           </View>
+
+          {/* Product Variant Selector */}
+          {(hasProductSizeVariants(product.id) || hasProductColorVariants(product.id)) && (
+            <ProductVariantSelector
+              product={product}
+              selectedSize={selectedSize}
+              selectedColor={selectedColor}
+              availableSizes={getSizeOptionsWithPrices(product)}
+              availableColors={getProductColorOptions(product.id)}
+              onSizeChange={handleSizeChange}
+              onColorChange={handleColorChange}
+            />
+          )}
 
           {/* Full Description */}
           {product.description && (
@@ -549,5 +638,39 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
+  },
+  sizeInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+    flexWrap: 'wrap',
+  },
+  sizeInfo: {
+    fontSize: 14,
+    color: '#666666',
+    backgroundColor: '#F2F2F7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  stockInfo: {
+    fontSize: 12,
+    color: '#34C759',
+    fontWeight: '600',
+    backgroundColor: '#F0F9FF',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  originalPrice: {
+    fontSize: 14,
+    color: '#86868B',
+    textDecorationLine: 'line-through',
+  },
+  discountedPrice: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#E74C3C',
   },
 });

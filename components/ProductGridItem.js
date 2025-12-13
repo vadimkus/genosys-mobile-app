@@ -11,6 +11,7 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { hasProductSizeVariants, getProductSizeOptions } from '../utils/productPricing';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -85,6 +86,23 @@ export default function ProductGridItem({ product }) {
           {product.category}
         </Text>
         
+        {/* Size Badge */}
+        {(product.size || hasProductSizeVariants(product.id)) && (
+          <View style={styles.sizeBadgeContainer}>
+            <View style={styles.sizeBadge}>
+              <Text style={styles.sizeBadgeText}>
+                {hasProductSizeVariants(product.id) 
+                  ? `${getProductSizeOptions(product.id).length} sizes`
+                  : `Size: ${product.size}`}
+              </Text>
+            </View>
+            {product.inStock && (
+              <View style={styles.stockBadge}>
+                <Text style={styles.stockBadgeText}>In Stock</Text>
+              </View>
+            )}
+          </View>
+        )}
         
         {/* Enhanced Pricing with Beauty Box Logic */}
         <View style={styles.priceContainer}>
@@ -272,5 +290,37 @@ const styles = StyleSheet.create({
     color: '#27AE60',
     fontWeight: '600',
     marginTop: 2,
+  },
+  
+  // Size Badge Styles
+  sizeBadgeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginBottom: 6,
+  },
+  sizeBadge: {
+    backgroundColor: '#F2F2F7',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  sizeBadgeText: {
+    fontSize: 9,
+    color: '#666666',
+    fontWeight: '500',
+  },
+  stockBadge: {
+    backgroundColor: '#34C759',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  stockBadgeText: {
+    fontSize: 9,
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });

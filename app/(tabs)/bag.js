@@ -85,33 +85,57 @@ export default function BagScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <View>
-              <Text style={styles.title}>Bag</Text>
-              <Text style={styles.subtitle}>Loading...</Text>
+      <View style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => router.back()}
+              >
+                <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
+                <Text style={styles.backText}>Home</Text>
+              </TouchableOpacity>
+              
+              <View style={styles.headerCenter}>
+                <Text style={styles.title}>Bag</Text>
+                <Text style={styles.subtitle}>Loading...</Text>
+              </View>
+              
+              <View style={styles.headerRight} />
             </View>
           </View>
-        </View>
+        </SafeAreaView>
         <View style={styles.emptyContainer}>
           <Ionicons name="bag-outline" size={64} color="#D1D1D6" />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (items.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <View>
-              <Text style={styles.title}>Bag</Text>
-              <Text style={styles.subtitle}>Your selected products</Text>
+      <View style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => router.back()}
+              >
+                <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
+                <Text style={styles.backText}>Home</Text>
+              </TouchableOpacity>
+              
+              <View style={styles.headerCenter}>
+                <Text style={styles.title}>Bag</Text>
+                <Text style={styles.subtitle}>Your selected products</Text>
+              </View>
+              
+              <View style={styles.headerRight} />
             </View>
           </View>
-        </View>
+        </SafeAreaView>
         
         <View style={styles.emptyContainer}>
           <View style={styles.iconContainer}>
@@ -128,27 +152,41 @@ export default function BagScreen() {
             <Text style={styles.shopButtonText}>Start Shopping</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.title}>Bag</Text>
-            <Text style={styles.subtitle}>{cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'}</Text>
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >
+              <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
+              <Text style={styles.backText}>Home</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.headerCenter}>
+              <Text style={styles.title}>Bag</Text>
+              <Text style={styles.subtitle}>{cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'}</Text>
+            </View>
+            
+            <TouchableOpacity onPress={handleClearBag}>
+              <Text style={styles.clearText}>Clear</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={handleClearBag}>
-            <Text style={styles.clearText}>Clear</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
       
-      {/* Items Section - Takes up 50% of remaining space */}
-      <View style={styles.itemsSection}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      {/* Items List - Scrollable content with proper bottom padding */}
+      <ScrollView 
+        style={styles.itemsList} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Emirates Selection */}
         <TouchableOpacity 
           style={styles.emirateSelector}
@@ -258,12 +296,12 @@ export default function BagScreen() {
             </View>
           );
         })}
-        </ScrollView>
-      </View>
 
-      {/* Enhanced Checkout Footer with VAT - Takes up 50% of remaining space */}
-      <View style={styles.checkoutSection}>
-        <SafeAreaView style={styles.checkoutFooter}>
+      </ScrollView>
+
+      {/* Checkout Footer - Fixed at bottom */}
+      <View style={styles.checkoutFooter}>
+        <SafeAreaView edges={['bottom']}>
         <View style={styles.summaryContainer}>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal</Text>
@@ -346,13 +384,16 @@ export default function BagScreen() {
           />
         </SafeAreaView>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  safeArea: {
     backgroundColor: '#ffffff',
   },
   header: {
@@ -364,19 +405,43 @@ const styles = StyleSheet.create({
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    minHeight: 44,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingRight: 8,
+    flex: 1,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#1D1D1F',
+    fontWeight: '400',
+    marginLeft: 4,
+  },
+  headerCenter: {
+    flex: 2,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   title: {
-    fontSize: 34,
+    fontSize: 20,
     fontWeight: '700',
     color: '#1D1D1F',
-    marginBottom: 4,
-    letterSpacing: -0.5,
+    marginBottom: 2,
+    letterSpacing: -0.4,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 17,
+    fontSize: 14,
     color: '#86868B',
     fontWeight: '400',
+    textAlign: 'center',
   },
   clearText: {
     fontSize: 16,
@@ -384,17 +449,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   // Layout Sections
-  itemsSection: {
-    flex: 0.5, // Takes up 50% of remaining space after header
-  },
-  checkoutSection: {
-    flex: 0.5, // Takes up 50% of remaining space after header
-    justifyContent: 'flex-start',
-    paddingTop: 8,
-  },
-  scrollView: {
+  itemsList: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 20,
+    paddingBottom: 200, // Space for checkout footer (no tab bar now)
   },
   
   // Emirates Selection
@@ -587,19 +647,20 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   checkoutFooter: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#F2F2F7',
     paddingHorizontal: 20,
-    paddingTop: 4,
-    paddingBottom: 20,
+    paddingTop: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 10,
-    flex: 1,
-    justifyContent: 'flex-start',
   },
   
   // Enhanced Summary

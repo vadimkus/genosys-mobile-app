@@ -61,6 +61,7 @@ export default function TabLayout() {
         name="bag"
         options={{
           title: 'Bag',
+          tabBarStyle: { display: 'none' }, // Hide tab bar on bag page
           tabBarIcon: ({ color, size }) => (
             <View>
               <Ionicons name="bag" size={size} color={color} />
