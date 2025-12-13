@@ -101,7 +101,7 @@ export const enableBiometricAuth = async (email, password) => {
     const authResult = await LocalAuthentication.authenticateAsync({
       promptMessage: `Enable ${support.primaryType}`,
       subtitle: 'Authenticate to enable biometric login',
-      fallbackLabel: 'Use Passcode',
+      fallbackLabel: 'Use Password',
       cancelLabel: 'Cancel',
     });
 
@@ -236,7 +236,7 @@ export const promptBiometricAuth = async (message = 'Authenticate', subtitle = '
     const authResult = await LocalAuthentication.authenticateAsync({
       promptMessage: message,
       subtitle: subtitle,
-      fallbackLabel: 'Use Passcode',
+      fallbackLabel: 'Use Password',
       cancelLabel: 'Cancel',
     });
 
@@ -249,6 +249,79 @@ export const promptBiometricAuth = async (message = 'Authenticate', subtitle = '
     return {
       success: false,
       error: 'Biometric authentication failed'
+    };
+  }
+};
+
+/**
+ * Debug biometric status - helpful for troubleshooting
+ * @returns {Promise<Object>} Debug information
+ */
+export const debugBiometricStatus = async () => {
+  try {
+    const support = await checkBiometricSupport();
+    const enabled = await isBiometricEnabled();
+    const credentialsExist = await SecureStore.getItemAsync(BIOMETRIC_CREDENTIALS_KEY);
+    
+    return {
+      support,
+      enabled,
+      hasStoredCredentials: !!credentialsExist,
+      credentialsPreview: credentialsExist ? 'Present' : 'Missing'
+    };
+  } catch (error) {
+    return {
+      error: error.message,
+      support: null,
+      enabled: false,
+      hasStoredCredentials: false
+    };
+  }
+};
+
+/**
+ * Test biometric authentication without login
+ * Useful for debugging Face ID/Touch ID issues
+ * @returns {Promise<Object>} Test result
+ */
+export const testBiometricAuth = async () => {
+  try {
+    const support = await checkBiometricSupport();
+    
+    if (!support.isAvailable || !support.isEnrolled) {
+      return {
+        success: false,
+        error: 'Biometric authentication not available or not enrolled'
+      };
+    }
+
+    const authOptions = {
+      promptMessage: `Test ${support.primaryType}`,
+      subtitle: 'Testing biometric authentication functionality',
+      cancelLabel: 'Cancel',
+    };
+    
+    // For Face ID, we want to avoid any fallback that might trigger password
+    if (support.primaryType === 'Face ID') {
+      authOptions.disableDeviceFallback = true;
+    } else {
+      authOptions.fallbackLabel = 'Use Passcode';
+      authOptions.disableDeviceFallback = false;
+    }
+    
+    const authResult = await LocalAuthentication.authenticateAsync(authOptions);
+    
+    return {
+      success: authResult.success,
+      error: authResult.error || (authResult.success ? null : 'Authentication test failed'),
+      warning: authResult.warning,
+      biometricType: support.primaryType
+    };
+  } catch (error) {
+    console.error('Biometric test error:', error);
+    return {
+      success: false,
+      error: `Test failed: ${error.message}`
     };
   }
 };
@@ -333,4 +406,6 @@ export default {
   authenticateWithBiometrics,
   promptBiometricAuth,
   setupBiometricAuth,
+  debugBiometricStatus,
+  testBiometricAuth,
 };

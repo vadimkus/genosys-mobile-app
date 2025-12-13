@@ -6,8 +6,18 @@ import {
   registerUser as apiRegisterUser,
   processGoogleAuth as apiProcessGoogleAuth,
   validateSession as apiValidateSession,
+  updateUserProfile as apiUpdateUserProfile,
   logoutUser as apiLogoutUser
 } from '../services/authService';
+import {
+  updateUserProfile as dbUpdateUserProfile,
+  uploadProfilePicture,
+  getUserAddresses,
+  createAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress
+} from '../services/databaseService';
 import {
   checkBiometricSupport,
   getBiometricTypeName,
@@ -15,7 +25,9 @@ import {
   enableBiometricAuth,
   disableBiometricAuth,
   authenticateWithBiometrics,
-  setupBiometricAuth
+  setupBiometricAuth,
+  debugBiometricStatus,
+  testBiometricAuth
 } from '../services/biometricService';
 import { loginWithGoogleDirect } from '../services/googleAuthService';
 import AUTH_CONFIG from '../config/auth';
@@ -90,7 +102,14 @@ export const AuthProvider = ({ children }) => {
         if (userData.token) {
           const validation = await apiValidateSession(userData.token);
           if (validation.success) {
-            setUser(validation.user);
+            // IMPORTANT: Preserve the token when updating user data from server
+            const userWithToken = {
+              ...validation.user,
+              token: userData.token  // Keep the original token
+            };
+            setUser(userWithToken);
+            // Update stored data with token preserved
+            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(userWithToken));
             // Update biometric availability in case user logged in successfully
             await checkBiometricAvailability();
           } else {
@@ -293,6 +312,168 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const debugBiometric = async () => {
+    const debug = await debugBiometricStatus();
+    console.log('🔍 Biometric Debug Info:', debug);
+    return debug;
+  };
+
+  const testBiometric = async () => {
+    const test = await testBiometricAuth();
+    console.log('🔍 Biometric Test Result:', test);
+    return test;
+  };
+
+  const updateProfile = async (profileData) => {
+    try {
+      console.log('🔍 DEBUG: updateProfile called with user:', user);
+      console.log('🔍 DEBUG: user?.token exists:', !!user?.token);
+      console.log('🔍 DEBUG: profileData:', profileData);
+      
+      if (!user) {
+        console.error('❌ User is null/undefined - authentication required');
+        return { success: false, error: 'Please log in to update your profile' };
+      }
+      
+      if (!user.token) {
+        console.error('❌ User token is missing - re-authentication required');
+        // Try to get token from storage as fallback
+        try {
+          const storedUser = await AsyncStorage.getItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+          if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            if (userData.token) {
+              console.log('🔄 Found token in storage, attempting to restore session...');
+              // Update user with token and retry
+              const userWithToken = { ...user, token: userData.token };
+              setUser(userWithToken);
+              // Continue with the profile update
+            } else {
+              return { success: false, error: 'Authentication session expired. Please log in again.' };
+            }
+          } else {
+            return { success: false, error: 'Authentication session expired. Please log in again.' };
+          }
+        } catch (error) {
+          console.error('Failed to retrieve token from storage:', error);
+          return { success: false, error: 'Authentication session expired. Please log in again.' };
+        }
+      }
+
+      // Handle profile picture upload if present
+      let imageUrl = profileData.profilePicture;
+      if (profileData.profilePicture && profileData.profilePicture.startsWith('file://')) {
+        console.log('📤 Uploading profile picture...');
+        const uploadResult = await uploadProfilePicture(user.token, profileData.profilePicture);
+        if (uploadResult.success) {
+          imageUrl = uploadResult.imageUrl;
+        } else {
+          console.warn('⚠️ Profile picture upload failed, proceeding without image');
+          imageUrl = null;
+        }
+      }
+
+      // Update profile data with uploaded image URL
+      const updatedProfileData = {
+        ...profileData,
+        profilePicture: imageUrl
+      };
+
+      // Update profile in database
+      const result = await dbUpdateUserProfile(user.token, updatedProfileData);
+      
+      if (result.success) {
+        // Update user in context and storage, preserving the token
+        const updatedUser = { 
+          ...user, 
+          ...result.user, // Use result.user instead of result.data.user
+          token: user.token  // Always preserve the token
+        };
+        setUser(updatedUser);
+        await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(updatedUser));
+        console.log('✅ User profile updated in database, context and storage with token preserved');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Profile update error:', error);
+      return { success: false, error: 'Failed to update profile' };
+    }
+  };
+
+  // Address management functions
+  const getAddresses = async () => {
+    try {
+      if (!user?.token) {
+        return { success: false, error: 'No authentication token found' };
+      }
+      return await getUserAddresses(user.token);
+    } catch (error) {
+      console.error('Get addresses error:', error);
+      return { success: false, error: 'Failed to load addresses' };
+    }
+  };
+
+  const addAddress = async (addressData) => {
+    try {
+      if (!user?.token) {
+        return { success: false, error: 'No authentication token found' };
+      }
+      
+      const result = await createAddress(user.token, addressData);
+      console.log('📍 Address created in database:', result);
+      return result;
+    } catch (error) {
+      console.error('Add address error:', error);
+      return { success: false, error: 'Failed to add address' };
+    }
+  };
+
+  const editAddress = async (addressId, addressData) => {
+    try {
+      if (!user?.token) {
+        return { success: false, error: 'No authentication token found' };
+      }
+      
+      const result = await updateAddress(user.token, addressId, addressData);
+      console.log('📝 Address updated in database:', result);
+      return result;
+    } catch (error) {
+      console.error('Edit address error:', error);
+      return { success: false, error: 'Failed to update address' };
+    }
+  };
+
+  const removeAddress = async (addressId) => {
+    try {
+      if (!user?.token) {
+        return { success: false, error: 'No authentication token found' };
+      }
+      
+      const result = await deleteAddress(user.token, addressId);
+      console.log('🗑️ Address deleted from database:', result);
+      return result;
+    } catch (error) {
+      console.error('Remove address error:', error);
+      return { success: false, error: 'Failed to delete address' };
+    }
+  };
+
+  const setAddressAsDefault = async (addressId) => {
+    try {
+      if (!user?.token) {
+        return { success: false, error: 'No authentication token found' };
+      }
+      
+      const result = await setDefaultAddress(user.token, addressId);
+      console.log('🏠 Default address set in database:', result);
+      return result;
+    } catch (error) {
+      console.error('Set default address error:', error);
+      return { success: false, error: 'Failed to set default address' };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -309,6 +490,15 @@ export const AuthProvider = ({ children }) => {
     enableBiometric,
     disableBiometric,
     setupBiometricAfterLogin,
+    debugBiometric,
+    testBiometric,
+    updateProfile,
+    // Address management
+    getAddresses,
+    addAddress,
+    editAddress,
+    removeAddress,
+    setAddressAsDefault,
   };
 
   return (

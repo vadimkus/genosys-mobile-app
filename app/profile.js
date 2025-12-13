@@ -13,15 +13,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { clearCart, cartCount } = useCart();
+  const { clearCart, getTotalItems } = useCart();
+  const cartCount = getTotalItems();
   const { 
     user, 
     logout,
@@ -179,10 +180,26 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Navigation Header */}
+      <View style={styles.navHeader}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+        </TouchableOpacity>
+        
+        <Text style={styles.navTitle}>Account</Text>
+        
+        <View style={styles.headerSpacer} />
+      </View>
+      
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header with User Profile */}
+        {/* Apple Store Style Header */}
         <View style={styles.profileHeader}>
-          <View style={styles.profileHeaderContent}>
+          
+          <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
               {user?.picture ? (
                 <Image 
@@ -194,16 +211,22 @@ export default function ProfileScreen() {
                   {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'G'}
                 </Text>
               )}
+              <View style={styles.onlineDot} />
             </View>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>
-                {user?.name || 'Genosys User'}
+                {user?.name || 'Loading...'}
               </Text>
               <Text style={styles.userEmail}>
-                {user?.email || 'user@genosys.ae'}
+                {user?.email || 'Loading user data...'}
               </Text>
+              {user?.phone && (
+                <Text style={styles.userPhone}>
+                  {user.phone}
+                </Text>
+              )}
               <TouchableOpacity onPress={handleEditProfile} style={styles.editButton}>
-                <Text style={styles.editButtonText}>Edit</Text>
+                <Text style={styles.editButtonText}>View & Edit</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -224,7 +247,7 @@ export default function ProfileScreen() {
               title="Bag"
               subtitle={cartCount > 0 ? `${cartCount} items` : 'Empty'}
               color="#27AE60"
-              onPress={() => {}} // Tab navigation will handle
+              onPress={() => router.push('/(tabs)/bag')}
             />
           </View>
         </ProfileSection>
@@ -295,6 +318,12 @@ export default function ProfileScreen() {
               />
             )}
             <ProfileItem
+              icon="location-outline"
+              title="My Addresses"
+              subtitle="Manage delivery addresses"
+              onPress={() => router.push('/profile/addresses')}
+            />
+            <ProfileItem
               icon="shield-outline"
               title="Privacy Policy"
               onPress={() => router.push('/profile/privacy')}
@@ -364,22 +393,58 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F2F2F7',
   },
   scrollView: {
     flex: 1,
   },
   
-  // Profile Header
-  profileHeader: {
-    backgroundColor: '#ffffff',
-    paddingTop: 20,
-  },
-  profileHeaderContent: {
+  // Navigation Header
+  navHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 24,
+    paddingVertical: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  navTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000000',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  
+  // Apple Store Style Profile Header
+  profileHeader: {
+    backgroundColor: '#F2F2F7',
+    paddingTop: 20,
+    paddingBottom: 32,
+  },
+  profileCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   avatarContainer: {
     width: 80,
@@ -389,6 +454,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
+    position: 'relative',
   },
   avatarText: {
     fontSize: 32,
@@ -399,6 +465,17 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
+  },
+  onlineDot: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#34C759',
+    borderWidth: 3,
+    borderColor: '#ffffff',
   },
   userInfo: {
     flex: 1,
@@ -413,6 +490,11 @@ const styles = StyleSheet.create({
   userEmail: {
     fontSize: 16,
     color: '#8E8E93',
+    marginBottom: 4,
+  },
+  userPhone: {
+    fontSize: 14,
+    color: '#999999',
     marginBottom: 12,
   },
   editButton: {
@@ -420,7 +502,7 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#007AFF',
     fontWeight: '400',
   },
 

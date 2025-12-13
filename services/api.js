@@ -113,6 +113,16 @@ const getDemoProducts = () => {
       stock: true,
       description: 'Complete professional beauty kit with premium products.',
       image_url: 'https://via.placeholder.com/400x400/9B59B6/FFFFFF?text=Beauty+Kit'
+    },
+    {
+      id: 'demo-5',
+      name: 'Professional Microneedling Device',
+      category: 'Device',
+      price: 1299.99,
+      rating: 4.9,
+      stock: true,
+      description: 'Advanced microneedling device for professional treatments.',
+      image_url: 'https://via.placeholder.com/400x400/34495E/FFFFFF?text=Device'
     }
   ];
   
@@ -189,94 +199,67 @@ const extractCategoriesFromProducts = async () => {
 
 /**
  * Enhance product data with badges, status, and user-specific pricing
+ * Uses the new pricing and badge utilities from the website
  * @param {Object} product - Raw product data
  * @param {Object} user - User object with discount information
  * @returns {Object} Enhanced product object
  */
 const enhanceProductData = (product, user) => {
-  const enhanced = { ...product };
+  // Import utilities
+  const { calculateDiscountedPrice, getPriceForSize, hasProductSizeVariants, calculateVAT } = require('../utils/pricingUtils');
+  const { generateProductBadges, getProductStatus } = require('../utils/badgeUtils');
   
-  // Add badges based on product properties
-  enhanced.badges = [];
+  const enhanced = { ...product };
   
   console.log(`🏷️ Enhancing product: ${product.name} for user:`, user ? `${user.email} (${user.discountPercentage}% ${user.discountType})` : 'Guest');
   
-  // Stock status badge
-  if (!product.stock || product.stock === false) {
-    enhanced.badges.push({ 
-      text: 'Out of Stock', 
-      type: 'error', 
-      color: '#FF3B30' 
-    });
-    enhanced.status = 'out_of_stock';
-  } else {
-    enhanced.status = 'in_stock';
+  // Calculate pricing with discounts using website logic
+  const pricingInfo = calculateDiscountedPrice(product, user);
+  
+  // Apply pricing information
+  enhanced.originalPrice = pricingInfo.originalPrice;
+  enhanced.displayPrice = pricingInfo.discountedPrice;
+  enhanced.hasDiscount = pricingInfo.hasDiscount;
+  enhanced.discountAmount = pricingInfo.discountAmount;
+  enhanced.discountPercentage = pricingInfo.discountPercentage;
+  enhanced.isBlackFriday = pricingInfo.isBlackFriday;
+  enhanced.isBeautyBox = pricingInfo.isBeautyBox;
+  enhanced.vatAmount = pricingInfo.vatAmount;
+  
+  // Add VAT information
+  enhanced.priceExcludingVAT = Math.round((pricingInfo.discountedPrice / 1.05) * 100) / 100;
+  
+  // Set product status
+  enhanced.status = getProductStatus(product);
+  
+  // Generate badges using website logic
+  enhanced.badges = generateProductBadges(product, user, pricingInfo);
+  
+  // Add size variant information
+  enhanced.hasVariants = hasProductSizeVariants(product.id);
+  if (enhanced.hasVariants) {
+    const { getProductSizeOptions } = require('../utils/pricingUtils');
+    enhanced.sizeOptions = getProductSizeOptions(product.id);
   }
   
-  // Rating badge for high-rated products
-  if (product.rating >= 5) {
-    enhanced.badges.push({ 
-      text: '⭐ Top Rated', 
-      type: 'success', 
-      color: '#FF9500' 
-    });
+  // Add rating information if not present
+  if (!enhanced.rating && product.category) {
+    // Assign default ratings based on category for demo
+    const categoryRatings = {
+      'PRO Solution': 5.0,
+      'Serum': 4.8,
+      'Cream': 4.7,
+      'Cleanser': 4.6,
+      'Device': 4.9,
+      'Mask': 4.5,
+      'Eye care': 4.8,
+      'Beauty Boxes': 4.9
+    };
+    enhanced.rating = categoryRatings[product.category] || 4.5;
   }
   
-  // New product badge (products added in last 30 days)
-  // For now, we'll mark Beauty Boxes as new
-  if (product.category === 'Beauty Boxes') {
-    enhanced.badges.push({ 
-      text: 'New', 
-      type: 'info', 
-      color: '#007AFF' 
-    });
-  }
-  
-  // Kit/Bundle badge
-  if (product.name.toLowerCase().includes('kit') || product.name.toLowerCase().includes('box')) {
-    enhanced.badges.push({ 
-      text: 'Bundle', 
-      type: 'bundle', 
-      color: '#34C759' 
-    });
-  }
-  
-  // Professional/PRO badge
-  if (product.category === 'PRO Solution' || product.category === 'Device') {
-    enhanced.badges.push({ 
-      text: 'PRO', 
-      type: 'professional', 
-      color: '#E74C3C' 
-    });
-  }
-  
-  // Add pricing information with user-specific discounts
-  // Ensure price is a number
-  const basePrice = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
-  
-  enhanced.originalPrice = basePrice;
-  enhanced.displayPrice = basePrice;
-  enhanced.hasDiscount = false;
-  enhanced.discountAmount = 0;
-  enhanced.discountPercentage = 0;
-  
-  // Apply user-specific discount if user is logged in and has discount
-  if (user && user.discountPercentage && user.discountPercentage > 0) {
-    const discountAmount = (basePrice * user.discountPercentage) / 100;
-    enhanced.displayPrice = basePrice - discountAmount;
-    enhanced.hasDiscount = true;
-    enhanced.discountAmount = discountAmount;
-    enhanced.discountPercentage = user.discountPercentage;
-    enhanced.discountType = user.discountType || 'Discount';
-    
-    console.log(`💰 Applied ${user.discountPercentage}% discount to ${product.name}: ${basePrice} -> ${enhanced.displayPrice}`);
-    
-    // Add discount badge
-    enhanced.badges.push({ 
-      text: `-${user.discountPercentage}% ${enhanced.discountType}`, 
-      type: 'discount', 
-      color: '#E74C3C' 
-    });
+  if (pricingInfo.hasDiscount) {
+    console.log(`💰 Applied ${pricingInfo.discountPercentage}% discount to ${product.name}: ${pricingInfo.originalPrice} -> ${pricingInfo.discountedPrice} AED`);
   }
   
   console.log(`✨ Enhanced product ${product.name} with ${enhanced.badges.length} badges:`, enhanced.badges.map(b => b.text));

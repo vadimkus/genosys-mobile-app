@@ -43,13 +43,13 @@ export default function ProductDetailScreen() {
       if (enhancedProduct) {
         setProduct(enhancedProduct);
         console.log('✅ Enhanced product loaded with badges:', enhancedProduct.badges?.length || 0);
-        
+
         if (user?.discountPercentage && enhancedProduct.hasDiscount) {
           console.log('💰 Product has user discount:', enhancedProduct.discountPercentage + '% ' + enhancedProduct.discountType);
         }
-      } else {
-        Alert.alert('Error', 'Product not found');
-        router.back();
+          } else {
+            Alert.alert('Error', 'Product not found');
+            router.back();
       }
     } catch (error) {
       console.error('Error loading product:', error);
@@ -136,13 +136,13 @@ export default function ProductDetailScreen() {
       {/* Fixed Header */}
       <SafeAreaView style={styles.headerContainer}>
         <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => router.back()}
-          >
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => router.back()}
+        >
             <Ionicons name="chevron-back" size={22} color="#1D1D1F" />
-          </TouchableOpacity>
-          
+        </TouchableOpacity>
+        
           <TouchableOpacity
             style={[styles.headerButton, styles.headerButtonMiddle]}
             onPress={handleShare}
@@ -276,9 +276,9 @@ export default function ProductDetailScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity
+          <TouchableOpacity
           style={[styles.addToBagButton, isInCart(product.id) && styles.inCartButton]}
-          onPress={handleAddToBag}
+            onPress={handleAddToBag}
         >
           <Ionicons 
             name={isInCart(product.id) ? "checkmark" : "bag"} 
@@ -286,12 +286,12 @@ export default function ProductDetailScreen() {
             color="#ffffff" 
             style={styles.buttonIcon}
           />
-          <Text style={styles.addToBagText}>
+            <Text style={styles.addToBagText}>
             {isInCart(product.id) ? `In Bag (${getItemQuantity(product.id)})` : 'Add to Bag'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
   );
 }
 

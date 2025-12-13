@@ -14,7 +14,8 @@ function TabBarBadge({ count, color }) {
 }
 
 export default function TabLayout() {
-  const { cartCount } = useCart();
+  const { getTotalItems } = useCart();
+  const cartCount = getTotalItems();
 
   return (
     <Tabs
@@ -50,9 +51,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shop"
         options={{
-          title: 'Products',
+          title: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="storefront" size={size} color={color} />
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -65,15 +66,6 @@ export default function TabLayout() {
               <Ionicons name="bag" size={size} color={color} />
               <TabBarBadge count={cartCount} color="#E74C3C" />
             </View>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />

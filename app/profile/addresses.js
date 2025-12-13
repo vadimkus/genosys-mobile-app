@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AddressesScreen() {
   const router = useRouter();
+  const { user, getAddresses, removeAddress, setAddressAsDefault } = useAuth();
   const [addresses, setAddresses] = useState([
     {
       id: 1,
@@ -20,6 +24,7 @@ export default function AddressesScreen() {
       name: 'John Doe',
       address: 'Dubai Marina, Block A, Apt 1203',
       city: 'Dubai',
+      emirate: 'Dubai',
       country: 'United Arab Emirates',
       phone: '+971 50 123 4567',
       isDefault: true,
@@ -30,18 +35,54 @@ export default function AddressesScreen() {
       name: 'John Doe',
       address: 'Business Bay, Office Tower, Floor 15',
       city: 'Dubai',
+      emirate: 'Dubai',
       country: 'United Arab Emirates', 
       phone: '+971 50 123 4567',
       isDefault: false,
     },
   ]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleAddAddress = () => {
-    Alert.alert('Add Address', 'Address creation form coming soon!');
+  useEffect(() => {
+    loadAddresses();
+  }, []);
+
+  const loadAddresses = async () => {
+    try {
+      setLoading(true);
+      const result = await getAddresses();
+      if (result.success) {
+        setAddresses(result.data || []);
+      } else {
+        console.error('Failed to load addresses:', result.error);
+        // Keep demo data if API fails
+      }
+    } catch (error) {
+      console.error('Load addresses error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleEditAddress = (addressId) => {
-    Alert.alert('Edit Address', `Editing address ${addressId} coming soon!`);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadAddresses();
+    setRefreshing(false);
+  };
+
+  const handleAddAddress = () => {
+    router.push('/profile/add-address');
+  };
+
+  const handleEditAddress = (address) => {
+    router.push({
+      pathname: '/profile/add-address',
+      params: {
+        addressId: address.id,
+        addressData: JSON.stringify(address),
+      },
+    });
   };
 
   const handleDeleteAddress = (addressId) => {
@@ -53,19 +94,29 @@ export default function AddressesScreen() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            setAddresses(addresses.filter(addr => addr.id !== addressId));
+          onPress: async () => {
+            const result = await removeAddress(addressId);
+            if (result.success) {
+              setAddresses(addresses.filter(addr => addr.id !== addressId));
+            } else {
+              Alert.alert('Error', result.error || 'Failed to delete address');
+            }
           }
         }
       ]
     );
   };
 
-  const handleSetDefault = (addressId) => {
-    setAddresses(addresses.map(addr => ({
-      ...addr,
-      isDefault: addr.id === addressId
-    })));
+  const handleSetDefault = async (addressId) => {
+    const result = await setAddressAsDefault(addressId);
+    if (result.success) {
+      setAddresses(addresses.map(addr => ({
+        ...addr,
+        isDefault: addr.id === addressId
+      })));
+    } else {
+      Alert.alert('Error', result.error || 'Failed to set default address');
+    }
   };
 
   const AddressCard = ({ address }) => (
@@ -92,7 +143,7 @@ export default function AddressesScreen() {
               '',
               [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Edit', onPress: () => handleEditAddress(address.id) },
+                { text: 'Edit', onPress: () => handleEditAddress(address) },
                 !address.isDefault && { text: 'Set as Default', onPress: () => handleSetDefault(address.id) },
                 { text: 'Delete', style: 'destructive', onPress: () => handleDeleteAddress(address.id) }
               ].filter(Boolean)
@@ -106,7 +157,8 @@ export default function AddressesScreen() {
       <View style={styles.addressDetails}>
         <Text style={styles.addressName}>{address.name}</Text>
         <Text style={styles.addressText}>{address.address}</Text>
-        <Text style={styles.addressText}>{address.city}, {address.country}</Text>
+        <Text style={styles.addressText}>{address.city}, {address.emirate}</Text>
+        <Text style={styles.addressText}>{address.country}</Text>
         <Text style={styles.addressPhone}>{address.phone}</Text>
       </View>
     </View>
@@ -125,7 +177,17 @@ export default function AddressesScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="#E74C3C"
+          />
+        }
+      >
         {/* Info Section */}
         <View style={styles.infoSection}>
           <Text style={styles.infoText}>
@@ -134,11 +196,18 @@ export default function AddressesScreen() {
         </View>
 
         {/* Addresses List */}
-        <View style={styles.addressesList}>
-          {addresses.map((address) => (
-            <AddressCard key={address.id} address={address} />
-          ))}
-        </View>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#E74C3C" />
+            <Text style={styles.loadingText}>Loading addresses...</Text>
+          </View>
+        ) : (
+          <View style={styles.addressesList}>
+            {addresses.map((address) => (
+              <AddressCard key={address.id} address={address} />
+            ))}
+          </View>
+        )}
 
         {/* Add New Address Button */}
         <TouchableOpacity style={styles.addNewButton} onPress={handleAddAddress}>
@@ -335,5 +404,18 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
     lineHeight: 20,
+  },
+
+  // Loading
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#8E8E93',
+    marginTop: 12,
   },
 });

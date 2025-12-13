@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Genosys",
-    "slug": "genosys-mobile-app", 
+    "slug": "genosys-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -10,14 +10,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.genosys.mobile"
+      "bundleIdentifier": "com.genosys.mobile",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account."
+      }
     },
     "android": {
       "package": "com.genosys.mobile"
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

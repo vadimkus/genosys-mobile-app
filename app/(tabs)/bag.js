@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,40 +7,64 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
 
 export default function BagScreen() {
-  const { cartItems, cartCount, getCartTotal, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { user } = useAuth();
+  const { 
+    items, 
+    getTotalItems, 
+    updateQuantity, 
+    removeItem, 
+    clearCart, 
+    getCartSummary,
+    selectedEmirate,
+    setSelectedEmirate,
+    getAvailableEmirates,
+    isLoading
+  } = useCart();
+  
+  const [showEmirateModal, setShowEmirateModal] = useState(false);
+
+  const cartSummary = getCartSummary();
+  const emirates = getAvailableEmirates();
 
   const handleQuantityChange = (item, change) => {
     const newQuantity = item.quantity + change;
-    updateQuantity(item.id, newQuantity);
+    updateQuantity(item.product.id, newQuantity, item.selectedColor, item.selectedSize);
   };
 
   const handleRemoveItem = (item) => {
-    Alert.alert(
-      'Remove Item',
-      `Remove ${item.name} from your bag?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive', onPress: () => removeFromItem(item.id) }
-      ]
-    );
+    removeItem(item.product.id, item.selectedColor, item.selectedSize);
   };
 
   const handleCheckout = () => {
-    Alert.alert(
-      'Checkout',
-      `Proceed to checkout with ${cartCount} items for ${getCartTotal()} AED?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Proceed', style: 'default' }
-      ]
-    );
+    if (!user) {
+      Alert.alert(
+        'Login Required',
+        'Please login to proceed with checkout.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Login', onPress: () => router.push('/auth/login') }
+        ]
+      );
+      return;
+    }
+
+    if (items.length === 0) {
+      Alert.alert('Empty Cart', 'Please add some items to your cart before checkout.');
+      return;
+    }
+
+    // Navigate to checkout page
+    router.push('/checkout');
   };
 
   const handleClearBag = () => {
@@ -54,12 +78,39 @@ export default function BagScreen() {
     );
   };
 
-  if (cartItems.length === 0) {
+  const handleEmirateSelect = (emirate) => {
+    setSelectedEmirate(emirate.name);
+    setShowEmirateModal(false);
+  };
+
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Bag</Text>
-          <Text style={styles.subtitle}>Your selected products</Text>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.title}>Bag</Text>
+              <Text style={styles.subtitle}>Loading...</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="bag-outline" size={64} color="#D1D1D6" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.title}>Bag</Text>
+              <Text style={styles.subtitle}>Your selected products</Text>
+            </View>
+          </View>
         </View>
         
         <View style={styles.emptyContainer}>
@@ -87,7 +138,7 @@ export default function BagScreen() {
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.title}>Bag</Text>
-            <Text style={styles.subtitle}>{cartCount} {cartCount === 1 ? 'item' : 'items'}</Text>
+            <Text style={styles.subtitle}>{cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'}</Text>
           </View>
           <TouchableOpacity onPress={handleClearBag}>
             <Text style={styles.clearText}>Clear</Text>
@@ -95,73 +146,148 @@ export default function BagScreen() {
         </View>
       </View>
       
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {cartItems.map((item) => (
-          <View key={item.id} style={styles.cartItem}>
-            <TouchableOpacity 
-              style={styles.itemImageContainer}
-              onPress={() => router.push(`/product/${item.id}`)}
-            >
-              {item.image ? (
-                <Image 
-                  source={{ uri: `https://www.genosys.ae${item.image}` }} 
-                  style={styles.itemImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={styles.itemImagePlaceholder}>
-                  <Text style={styles.placeholderText}>
-                    {item.name?.charAt(0) || 'G'}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.itemDetails}>
-              <TouchableOpacity onPress={() => router.push(`/product/${item.id}`)}>
-                <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-              </TouchableOpacity>
-              <Text style={styles.itemCategory}>{item.category}</Text>
-              {item.size && (
-                <Text style={styles.itemSize}>{item.size}</Text>
-              )}
-              <Text style={styles.itemPrice}>{item.price} AED</Text>
-
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity
-                  style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
-                  onPress={() => handleQuantityChange(item, -1)}
-                  disabled={item.quantity <= 1}
-                >
-                  <Ionicons name="remove" size={16} color={item.quantity <= 1 ? "#D1D1D6" : "#1D1D1F"} />
-                </TouchableOpacity>
-                
-                <Text style={styles.quantityText}>{item.quantity}</Text>
-                
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => handleQuantityChange(item, 1)}
-                >
-                  <Ionicons name="add" size={16} color="#1D1D1F" />
-                </TouchableOpacity>
-              </View>
+      {/* Items Section - Takes up 50% of remaining space */}
+      <View style={styles.itemsSection}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Emirates Selection */}
+        <TouchableOpacity 
+          style={styles.emirateSelector}
+          onPress={() => setShowEmirateModal(true)}
+        >
+          <View style={styles.emirateSelectorContent}>
+            <View style={styles.emirateIcon}>
+              <Ionicons name="location-outline" size={20} color="#E74C3C" />
             </View>
-
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => removeFromCart(item.id)}
-            >
-              <Ionicons name="trash-outline" size={20} color="#E74C3C" />
-            </TouchableOpacity>
+            <View style={styles.emirateInfo}>
+              <Text style={styles.emirateLabel}>Delivery to</Text>
+              <Text style={styles.emirateValue}>{selectedEmirate}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#86868B" />
           </View>
-        ))}
-      </ScrollView>
+        </TouchableOpacity>
 
-      {/* Checkout Footer */}
-      <SafeAreaView style={styles.checkoutFooter}>
-        <View style={styles.totalContainer}>
-          <Text style={styles.totalLabel}>Total ({cartCount} {cartCount === 1 ? 'item' : 'items'})</Text>
-          <Text style={styles.totalAmount}>{getCartTotal().toFixed(2)} AED</Text>
+        {/* Free Shipping Banner */}
+        {cartSummary.amountForFreeShipping > 0 && (
+          <View style={styles.freeShippingBanner}>
+            <Text style={styles.freeShippingText}>
+              Add {cartSummary.amountForFreeShipping.toFixed(2)} AED more for FREE shipping!
+            </Text>
+          </View>
+        )}
+
+        {/* Cart Items */}
+        {items.map((item, index) => {
+          const itemKey = `${item.product.id}-${item.selectedColor}-${item.selectedSize}`;
+          const imageUrl = item.product.image ? `https://genosys.ae${item.product.image}` : null;
+          
+          return (
+            <View key={itemKey} style={styles.cartItem}>
+              <TouchableOpacity 
+                style={styles.itemImageContainer}
+                onPress={() => router.push(`/product/${item.product.id}`)}
+              >
+                {imageUrl ? (
+                  <Image 
+                    source={{ uri: imageUrl }} 
+                    style={styles.itemImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.itemImagePlaceholder}>
+                    <Text style={styles.placeholderText}>
+                      {item.product.name?.charAt(0) || 'G'}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.itemDetails}>
+                <TouchableOpacity onPress={() => router.push(`/product/${item.product.id}`)}>
+                  <Text style={styles.itemName} numberOfLines={2}>{item.product.name}</Text>
+                </TouchableOpacity>
+                <Text style={styles.itemCategory}>{item.product.category}</Text>
+                
+                {/* Variants Display */}
+                {(item.selectedSize || item.selectedColor) && (
+                  <View style={styles.variantsContainer}>
+                    {item.selectedSize && (
+                      <Text style={styles.variantText}>Size: {item.selectedSize}</Text>
+                    )}
+                    {item.selectedColor && (
+                      <Text style={styles.variantText}>Color: {item.selectedColor}</Text>
+                    )}
+                  </View>
+                )}
+
+                {/* Price with Discount Display */}
+                {item.product.hasDiscount ? (
+                  <View style={styles.itemPriceContainer}>
+                    <Text style={styles.itemOriginalPrice}>{item.product.originalPrice} AED</Text>
+                    <Text style={styles.itemDiscountedPrice}>{item.product.displayPrice.toFixed(2)} AED</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.itemPrice}>{item.product.displayPrice?.toFixed(2) || item.product.price} AED</Text>
+                )}
+
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity
+                    style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
+                    onPress={() => handleQuantityChange(item, -1)}
+                    disabled={item.quantity <= 1}
+                  >
+                    <Ionicons name="remove" size={16} color={item.quantity <= 1 ? "#D1D1D6" : "#1D1D1F"} />
+                  </TouchableOpacity>
+                  
+                  <Text style={styles.quantityText}>{item.quantity}</Text>
+                  
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => handleQuantityChange(item, 1)}
+                  >
+                    <Ionicons name="add" size={16} color="#1D1D1F" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => handleRemoveItem(item)}
+              >
+                <Ionicons name="trash-outline" size={20} color="#E74C3C" />
+              </TouchableOpacity>
+            </View>
+          );
+        })}
+        </ScrollView>
+      </View>
+
+      {/* Enhanced Checkout Footer with VAT - Takes up 50% of remaining space */}
+      <View style={styles.checkoutSection}>
+        <SafeAreaView style={styles.checkoutFooter}>
+        <View style={styles.summaryContainer}>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Subtotal</Text>
+            <Text style={styles.summaryValue}>{cartSummary.subtotal.toFixed(2)} AED</Text>
+          </View>
+          
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Shipping to {selectedEmirate}</Text>
+            <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
+              {cartSummary.hasFreeShipping ? 'FREE' : `${cartSummary.shippingCost.toFixed(2)} AED`}
+            </Text>
+          </View>
+          
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>VAT (5%)</Text>
+            <Text style={styles.summaryValue}>{cartSummary.vatAmount.toFixed(2)} AED</Text>
+          </View>
+          
+          <View style={styles.divider} />
+          
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Total ({cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'})</Text>
+            <Text style={styles.totalAmount}>{cartSummary.total.toFixed(2)} AED</Text>
+          </View>
         </View>
         
         <TouchableOpacity
@@ -170,7 +296,56 @@ export default function BagScreen() {
         >
           <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+        </SafeAreaView>
+      </View>
+
+      {/* Emirates Selection Modal */}
+      <Modal
+        visible={showEmirateModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Select Emirate</Text>
+            <TouchableOpacity 
+              onPress={() => setShowEmirateModal(false)}
+              style={styles.modalCloseButton}
+            >
+              <Ionicons name="close" size={24} color="#1D1D1F" />
+            </TouchableOpacity>
+          </View>
+          
+          <FlatList
+            data={emirates}
+            keyExtractor={(item) => item.name}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.emirateOption,
+                  selectedEmirate === item.name && styles.selectedEmirateOption
+                ]}
+                onPress={() => handleEmirateSelect(item)}
+              >
+                <View style={styles.emirateOptionContent}>
+                  <Text style={[
+                    styles.emirateOptionName,
+                    selectedEmirate === item.name && styles.selectedEmirateText
+                  ]}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.emirateShippingCost}>
+                    {item.shippingCost === 0 ? 'FREE shipping' : `${item.shippingCost} AED shipping`}
+                  </Text>
+                </View>
+                {selectedEmirate === item.name && (
+                  <Ionicons name="checkmark" size={20} color="#E74C3C" />
+                )}
+              </TouchableOpacity>
+            )}
+          />
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -208,9 +383,60 @@ const styles = StyleSheet.create({
     color: '#E74C3C',
     fontWeight: '600',
   },
+  // Layout Sections
+  itemsSection: {
+    flex: 0.5, // Takes up 50% of remaining space after header
+  },
+  checkoutSection: {
+    flex: 0.5, // Takes up 50% of remaining space after header
+    justifyContent: 'flex-start',
+    paddingTop: 8,
+  },
   scrollView: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  
+  // Emirates Selection
+  emirateSelector: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  emirateSelectorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  emirateIcon: {
+    marginRight: 12,
+  },
+  emirateInfo: {
+    flex: 1,
+  },
+  emirateLabel: {
+    fontSize: 12,
+    color: '#86868B',
+    marginBottom: 2,
+  },
+  emirateValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1D1D1F',
+  },
+  
+  // Free Shipping Banner
+  freeShippingBanner: {
+    backgroundColor: '#34C759',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  freeShippingText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   cartItem: {
     flexDirection: 'row',
@@ -273,6 +499,32 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1D1D1F',
     marginBottom: 12,
+  },
+  
+  // Variants Display
+  variantsContainer: {
+    marginBottom: 8,
+  },
+  variantText: {
+    fontSize: 12,
+    color: '#86868B',
+    marginBottom: 2,
+  },
+  
+  // Enhanced Price Display
+  itemPriceContainer: {
+    marginBottom: 12,
+  },
+  itemOriginalPrice: {
+    fontSize: 14,
+    color: '#86868B',
+    textDecorationLine: 'line-through',
+    marginBottom: 2,
+  },
+  itemDiscountedPrice: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#E74C3C',
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -339,18 +591,51 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F2F2F7',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 4,
+    paddingBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 10,
+    flex: 1,
+    justifyContent: 'flex-start',
   },
-  totalContainer: {
+  
+  // Enhanced Summary
+  summaryContainer: {
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingVertical: 6,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: '#86868B',
+    fontWeight: '500',
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1D1D1F',
+  },
+  freeText: {
+    color: '#34C759',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F2F2F7',
+    marginVertical: 8,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 8,
   },
   totalLabel: {
     fontSize: 16,
@@ -372,5 +657,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#ffffff',
+  },
+  
+  // Emirates Selection Modal
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F2F2F7',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1D1D1F',
+  },
+  modalCloseButton: {
+    padding: 4,
+  },
+  emirateOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F2F2F7',
+  },
+  selectedEmirateOption: {
+    backgroundColor: '#E74C3C10',
+  },
+  emirateOptionContent: {
+    flex: 1,
+  },
+  emirateOptionName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1D1D1F',
+    marginBottom: 2,
+  },
+  selectedEmirateText: {
+    color: '#E74C3C',
+  },
+  emirateShippingCost: {
+    fontSize: 14,
+    color: '#86868B',
   },
 });

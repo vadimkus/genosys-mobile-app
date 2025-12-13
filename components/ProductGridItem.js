@@ -6,14 +6,17 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useFavorites } from '../contexts/FavoritesContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
 
 export default function ProductGridItem({ product }) {
+  const { toggleFavorite, isFavorite } = useFavorites();
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
@@ -73,35 +76,29 @@ export default function ProductGridItem({ product }) {
       
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={2}>
-          {product.name} {product.badges?.length > 0 ? `🏷️(${product.badges.length})` : ''}
+          {product.name}
         </Text>
         
-        {/* Badges in content area */}
-        {product.badges && product.badges.length > 0 && (
-          <View style={styles.contentBadges}>
-            {product.badges.slice(0, 3).map((badge, index) => (
-              <Text key={index} style={[styles.contentBadge, { backgroundColor: badge.color || '#007AFF' }]}>
-                {badge.text}
-              </Text>
-            ))}
-          </View>
-        )}
+        {/* Badges removed from content area to avoid duplication - they show on image */}
         
         <Text style={styles.category} numberOfLines={1}>
           {product.category}
         </Text>
         
-        {/* Rating */}
-        {product.rating && (
-          <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={12} color="#FF9500" />
-            <Text style={styles.rating}>{product.rating}</Text>
-          </View>
-        )}
         
-        {/* Pricing with Discount */}
+        {/* Enhanced Pricing with Beauty Box Logic */}
         <View style={styles.priceContainer}>
-          {product.hasDiscount ? (
+          {product.category === 'Beauty Boxes' ? (
+            <View style={styles.beautyBoxPricing}>
+              <Text style={styles.discountedPrice}>
+                {product.displayPrice?.toFixed(2) || product.price} AED
+              </Text>
+              <Text style={styles.originalPrice}>
+                {((product.displayPrice || product.price) / 0.85).toFixed(2)} AED
+              </Text>
+              <Text style={styles.beautyBoxDiscount}>15% off (Bundle Discount)</Text>
+            </View>
+          ) : product.hasDiscount ? (
             <View style={styles.discountPricing}>
               <Text style={styles.originalPrice}>
                 {product.originalPrice} AED
@@ -117,7 +114,7 @@ export default function ProductGridItem({ product }) {
             </View>
           ) : (
             <Text style={styles.price}>
-              {product.price} AED
+              {product.displayPrice?.toFixed(2) || product.price} AED
             </Text>
           )}
         </View>
@@ -218,21 +215,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 12,
   },
-  contentBadges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginVertical: 4,
-    gap: 4,
-  },
-  contentBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-    fontSize: 10,
-    color: '#ffffff',
-    fontWeight: '600',
-    overflow: 'hidden',
-  },
   name: {
     fontSize: 14,
     fontWeight: '600',
@@ -245,17 +227,6 @@ const styles = StyleSheet.create({
     color: '#86868B',
     marginBottom: 6,
     textTransform: 'capitalize',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  rating: {
-    fontSize: 12,
-    color: '#86868B',
-    marginLeft: 4,
-    fontWeight: '500',
   },
   priceContainer: {
     alignItems: 'flex-start',
@@ -290,5 +261,16 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#ffffff',
     fontWeight: '600',
+  },
+  
+  // Beauty Box Pricing Styles
+  beautyBoxPricing: {
+    alignItems: 'flex-start',
+  },
+  beautyBoxDiscount: {
+    fontSize: 10,
+    color: '#27AE60',
+    fontWeight: '600',
+    marginTop: 2,
   },
 });

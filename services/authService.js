@@ -171,21 +171,33 @@ export const processGoogleAuth = async (idToken) => {
  */
 export const validateSession = async (token) => {
   try {
-    console.log('🔍 Validating user session');
+    console.log('🔍 Validating user session and fetching fresh user data from DB');
     
     const response = await fetch(`${API_BASE_URL}/auth/validate`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
         'x-api-key': API_KEY,
+        'Authorization': `Bearer ${token}`,
       },
     });
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Session validation successful');
-      return { success: true, user: result.user, valid: result.valid };
+      if (result.success && result.valid && result.user) {
+        console.log('✅ Session validation successful - fresh user data from DB received');
+        console.log('👤 User data from DB:', {
+          email: result.user.email,
+          name: result.user.name,
+          discountType: result.user.discountType,
+          discountPercentage: result.user.discountPercentage,
+          phone: result.user.phone,
+          address: result.user.address
+        });
+        return { success: true, user: result.user, valid: result.valid };
+      } else {
+        console.log('❌ Session validation failed:', result.error);
+        return { success: false, error: result.error || 'Session expired' };
+      }
     } else {
       console.log('❌ Session validation failed');
       return { success: false, error: 'Session expired' };
@@ -193,6 +205,44 @@ export const validateSession = async (token) => {
   } catch (error) {
     console.error('❌ Session validation error:', error);
     return { success: false, error: 'Network error' };
+  }
+};
+
+/**
+ * Update user profile information
+ * @param {string} token - User auth token
+ * @param {Object} profileData - Profile data to update
+ * @returns {Promise<Object>} Update result
+ */
+export const updateUserProfile = async (token, profileData) => {
+  try {
+    console.log('🔄 Updating user profile via API...');
+    
+    const response = await fetch(`${API_BASE_URL}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Profile update successful');
+      return { success: true, user: result.user, message: 'Profile updated successfully' };
+    } else {
+      const error = await response.json();
+      console.log('❌ Profile update failed:', error);
+      return { success: false, error: error.error || 'Failed to update profile' };
+    }
+  } catch (error) {
+    console.error('❌ Profile update error:', error);
+    return { 
+      success: false, 
+      error: 'Network error. Please check your connection and try again.' 
+    };
   }
 };
 
@@ -232,5 +282,6 @@ export default {
   registerUser,
   processGoogleAuth,
   validateSession,
+  updateUserProfile,
   logoutUser,
 };

@@ -4,7 +4,7 @@
  */
 
 export const AUTH_CONFIG = {
-  // Backend API Configuration
+  // Backend API Configuration - LIVE API NOW AVAILABLE! 🚀
   API_BASE_URL: 'https://genosys.ae/api/mobile',
   
   // Mobile App API Key - matches backend authentication

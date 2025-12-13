@@ -9,18 +9,23 @@ import {
   ActivityIndicator,
   RefreshControl,
   Dimensions,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchProductCategories, fetchProducts } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
+import { useFavorites } from '../../contexts/FavoritesContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ShopScreen() {
   const { user } = useAuth();
+  const { addItem } = useCart();
+  const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +33,7 @@ export default function ShopScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [addingProducts, setAddingProducts] = useState(new Set()); // Track which products are being added
 
   const loadProducts = async () => {
     try {
@@ -132,6 +138,54 @@ export default function ShopScreen() {
     }
   };
 
+  // Handle add to cart functionality
+  const handleAddToCart = async (product) => {
+    if (!user) {
+      Alert.alert(
+        'Login Required',
+        'Please login to add products to your bag.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Login', onPress: () => router.push('/auth/login') }
+        ]
+      );
+      return;
+    }
+
+    if (product.status === 'out_of_stock' || product.stock === false) {
+      Alert.alert('Out of Stock', 'This product is currently out of stock.');
+      return;
+    }
+
+    // Add to tracking set
+    setAddingProducts(prev => new Set([...prev, product.id]));
+
+    try {
+      await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
+      console.log(`✅ Added ${product.name} to cart`);
+    } catch (error) {
+      console.error('Failed to add product to cart:', error);
+      Alert.alert('Error', 'Failed to add product to bag. Please try again.');
+    } finally {
+      // Remove from tracking set after delay
+      setTimeout(() => {
+        setAddingProducts(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(product.id);
+          return newSet;
+        });
+      }, 500);
+    }
+  };
+
+  const handleToggleFavorite = (product) => {
+    const result = toggleFavorite(product);
+    console.log(result === 'added' 
+      ? `💖 ${product.name} added to favorites!`
+      : `💔 ${product.name} removed from favorites!`);
+  };
+
+
   // Use all filtered products for the grid
 
   if (loading) {
@@ -145,6 +199,67 @@ export default function ShopScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Fixed Header - Apple Store Style */}
+      <View style={styles.header}>
+        {/* Left Side Spacer */}
+        <View style={styles.headerSpacer} />
+        
+        {/* Centered Logo & Text with Heart */}
+        <View style={styles.headerCenter}>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={{ uri: 'https://genosys.ae/_next/image?url=%2Fimages%2Fprd_logo.png&w=512&q=75' }}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            {/* Favorites Heart Icon - Close to Logo */}
+            <TouchableOpacity 
+              style={styles.favoritesButton}
+              onPress={() => router.push('/favorites')}
+              activeOpacity={0.7}
+            >
+              <Ionicons 
+                name={getFavoritesCount() > 0 ? "heart" : "heart-outline"} 
+                size={24} 
+                color={getFavoritesCount() > 0 ? "#E74C3C" : "#C7C7CC"} 
+              />
+              {getFavoritesCount() > 0 && (
+                <View style={styles.favoritesBadge}>
+                  <Text style={styles.favoritesBadgeText}>
+                    {getFavoritesCount() > 99 ? '99+' : getFavoritesCount()}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.subtitle}>Premium Skincare & Beauty</Text>
+        </View>
+        
+        {/* Right Side Elements */}
+        <View style={styles.headerRight}>
+          
+          {/* User Avatar */}
+          <TouchableOpacity 
+            style={styles.userIndicator} 
+            onPress={() => router.push('/profile')}
+            activeOpacity={0.8}
+          >
+            {user ? (
+              <View style={styles.userAvatar}>
+                <Text style={styles.userInitials}>
+                  {(user.name?.charAt(0) || user.email?.charAt(0) || 'G').toUpperCase()}
+                </Text>
+                <View style={styles.onlineDot} />
+              </View>
+            ) : (
+              <View style={styles.guestAvatar}>
+                <Ionicons name="person-outline" size={18} color="#86868B" />
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+      
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -156,17 +271,7 @@ export default function ShopScreen() {
           />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image 
-              source={{ uri: 'https://genosys.ae/_next/image?url=%2Fimages%2Fprd_logo.png&w=512&q=75' }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={styles.subtitle}>Premium Skincare & Beauty</Text>
-          
+        <View style={styles.contentContainer}>
           {/* Search Field */}
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
@@ -202,7 +307,7 @@ export default function ShopScreen() {
                     key={category}
                     style={[
                       styles.categoryButton,
-                      selectedCategory === category && styles.activeCategoryButton,
+                      selectedCategory === category && styles.activeCategoryButton
                     ]}
                     onPress={() => handleCategoryPress(category)}
                     activeOpacity={0.7}
@@ -225,11 +330,9 @@ export default function ShopScreen() {
               </Text>
             </View>
           )}
-        </View>
 
-
-        {/* Products Grid */}
-        <View style={styles.section}>
+          {/* Products Grid */}
+          <View style={styles.section}>
           
           {filteredProducts.length === 0 && (searchQuery || selectedCategory !== 'All') ? (
             /* No Search/Filter Results */
@@ -298,6 +401,22 @@ export default function ShopScreen() {
                       </View>
                     )}
                     
+                    {/* Favorite Heart Button */}
+                    <TouchableOpacity 
+                      style={styles.favoriteHeart}
+                      onPress={(e) => {
+                        e.stopPropagation(); // Prevent product card press
+                        handleToggleFavorite(product);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons 
+                        name={isFavorite(product.id) ? "heart" : "heart-outline"} 
+                        size={20} 
+                        color={isFavorite(product.id) ? "#E74C3C" : "#ffffff"} 
+                      />
+                    </TouchableOpacity>
+                    
                     {/* Stock Status */}
                     {(product.status === 'out_of_stock' || product.stock === false) && (
                       <View style={styles.stockOverlay}>
@@ -308,27 +427,12 @@ export default function ShopScreen() {
                   
                   <View style={styles.gridContent}>
                     <Text style={styles.gridName} numberOfLines={2}>
-                      {product.name} {product.badges?.length > 0 ? `🏷️(${product.badges.length})` : ''}
+                      {product.name}
                     </Text>
                     <Text style={styles.gridCategory}>{product.category}</Text>
                     
-                    {/* Rating */}
-                    {product.rating && (
-                      <View style={styles.ratingContainer}>
-                        <Text style={styles.ratingText}>⭐ {product.rating}</Text>
-                      </View>
-                    )}
                     
-                    {/* Badges in content */}
-                    {product.badges && product.badges.length > 0 && (
-                      <View style={styles.contentBadges}>
-                        {product.badges.slice(0, 3).map((badge, badgeIndex) => (
-                          <Text key={badgeIndex} style={[styles.contentBadge, { backgroundColor: badge.color || '#007AFF' }]}>
-                            {badge.text}
-                          </Text>
-                        ))}
-                      </View>
-                    )}
+                    {/* Badges removed from content area to avoid duplication - they show on image */}
                     
                     {product.description && (
                       <Text style={styles.gridDescription} numberOfLines={2}>
@@ -336,21 +440,63 @@ export default function ShopScreen() {
                       </Text>
                     )}
                     
-                    {/* Enhanced Pricing */}
-                    {product.hasDiscount ? (
+                    {/* Enhanced Pricing with VAT and Beauty Box Logic */}
+                    {product.category === 'Beauty Boxes' ? (
+                      <View style={styles.priceContainer}>
+                        <View style={styles.beautyBoxPricing}>
+                          <Text style={styles.discountedPrice}>{product.displayPrice?.toFixed(2) || product.price} AED</Text>
+                          <Text style={styles.originalPrice}>{((product.displayPrice || product.price) / 0.85).toFixed(2)} AED</Text>
+                        </View>
+                        <Text style={styles.beautyBoxDiscount}>15% off (Bundle Discount)</Text>
+                        <Text style={styles.vatText}>VAT included</Text>
+                      </View>
+                    ) : product.hasDiscount ? (
                       <View style={styles.priceContainer}>
                         <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
                         <Text style={styles.discountedPrice}>{product.displayPrice.toFixed(2)} AED</Text>
-                        <Text style={styles.savings}>Save {product.discountAmount.toFixed(0)} AED</Text>
+                        <Text style={styles.userDiscount}>{product.discountPercentage}% off</Text>
+                        <Text style={styles.vatText}>VAT included</Text>
                       </View>
                     ) : (
-                      <Text style={styles.gridPrice}>{product.price} AED</Text>
+                      <View style={styles.priceContainer}>
+                        <Text style={styles.gridPrice}>{product.displayPrice?.toFixed(2) || product.price} AED</Text>
+                        <Text style={styles.vatText}>VAT included</Text>
+                      </View>
                     )}
+
+                    {/* Add to Cart Button */}
+                    <TouchableOpacity
+                      style={[
+                        styles.addToCartButton,
+                        (product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)) && styles.addToCartButtonDisabled
+                      ]}
+                      onPress={() => handleAddToCart(product)}
+                      disabled={product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons 
+                        name={addingProducts.has(product.id) ? "checkmark" : "bag-add"} 
+                        size={16} 
+                        color="#ffffff" 
+                        style={styles.addToCartIcon}
+                      />
+                      <Text style={styles.addToCartText}>
+                        {addingProducts.has(product.id) 
+                          ? 'Added!' 
+                          : (product.status === 'out_of_stock' || product.stock === false) 
+                            ? 'Out of Stock' 
+                            : user 
+                              ? 'Add to Bag' 
+                              : 'Login to Buy'
+                        }
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               ))}
             </View>
           )}
+        </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -377,26 +523,134 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  contentContainer: {
+    flex: 1,
+  },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingVertical: 16,
     backgroundColor: '#ffffff',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#E5E5EA',
+    zIndex: 10,
+  },
+  headerSpacer: {
+    flex: 1,
+  },
+  headerCenter: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    gap: 8,
+    marginBottom: 4,
+  },
+  headerRight: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 16,
   },
   logo: {
-    width: 120,
-    height: 40,
+    width: 110,
+    height: 36,
   },
   subtitle: {
-    fontSize: 17,
-    color: '#86868B',
-    fontWeight: '400',
-    marginBottom: 8,
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '500',
     textAlign: 'center',
+    letterSpacing: 0.2,
+  },
+  
+  // Elegant Favorites Heart Button - Bigger and Close to Logo
+  favoritesButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    backgroundColor: 'transparent',
+  },
+  favoritesBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#E74C3C',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#ffffff',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  favoritesBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  
+  // Elegant User Avatar
+  userIndicator: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#E74C3C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  userInitials: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  onlineDot: {
+    position: 'absolute',
+    bottom: -1,
+    right: -1,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#34C759',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  guestAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F8F9FA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0.5,
+    borderColor: '#E5E5EA',
   },
   productCount: {
     fontSize: 13,
@@ -493,7 +747,10 @@ const styles = StyleSheet.create({
 
   // Search Styles
   searchContainer: {
-    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+    backgroundColor: '#ffffff',
   },
   searchInputContainer: {
     flexDirection: 'row',
@@ -567,8 +824,9 @@ const styles = StyleSheet.create({
 
   // Categories Styles
   categoriesContainer: {
-    marginTop: 16,
     paddingHorizontal: 20,
+    paddingBottom: 12,
+    backgroundColor: '#ffffff',
   },
   categoriesGrid: {
     flexDirection: 'row',
@@ -633,6 +891,24 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   
+  // Favorite Heart Button
+  favoriteHeart: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  
   // Stock Overlay
   stockOverlay: {
     position: 'absolute',
@@ -649,32 +925,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   
-  // Rating Styles
-  ratingContainer: {
-    marginBottom: 4,
-  },
-  ratingText: {
-    fontSize: 12,
-    color: '#FF9500',
-    fontWeight: '500',
-  },
   
-  // Content Badge Styles
-  contentBadges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 6,
-    gap: 4,
-  },
-  contentBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-    fontSize: 10,
-    color: '#ffffff',
-    fontWeight: '600',
-    overflow: 'hidden',
-  },
+  // Content Badge Styles removed - badges now only show on image overlay
   
   // Enhanced Pricing Styles
   priceContainer: {
@@ -699,5 +951,57 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
     marginTop: 2,
+  },
+  vatText: {
+    fontSize: 9,
+    color: '#86868B',
+    fontStyle: 'italic',
+    marginTop: 2,
+  },
+  
+  // Beauty Box Pricing Styles
+  beautyBoxPricing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+  },
+  beautyBoxDiscount: {
+    fontSize: 10,
+    color: '#27AE60',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  userDiscount: {
+    fontSize: 10,
+    color: '#27AE60',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  
+  // Add to Cart Button Styles
+  addToCartButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E74C3C',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    minHeight: 36,
+  },
+  addToCartButtonDisabled: {
+    backgroundColor: '#95A5A6',
+    opacity: 0.6,
+  },
+  addToCartIcon: {
+    marginRight: 6,
+  },
+  addToCartText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

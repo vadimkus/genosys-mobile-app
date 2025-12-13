@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -27,6 +28,8 @@ export default function LoginScreen() {
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   
   const { 
     loginWithGoogle, 
@@ -39,12 +42,17 @@ export default function LoginScreen() {
   } = useAuth();
 
   const handleGoogleLogin = async () => {
+    // Check privacy consent
+    if (!privacyConsent) {
+      Alert.alert('Privacy Policy Required', 'Please read and accept our Privacy Policy to continue.');
+      return;
+    }
+
     try {
       setLoading(true);
       const result = await loginWithGoogle();
       
       if (result.success) {
-        Alert.alert('Success', 'Logged in successfully!');
         // Navigation will be handled by the auth context automatically
       } else {
         // Show helpful error message with alternative
@@ -68,6 +76,12 @@ export default function LoginScreen() {
   };
 
   const handleBiometricLogin = async () => {
+    // Check privacy consent
+    if (!privacyConsent) {
+      Alert.alert('Privacy Policy Required', 'Please read and accept our Privacy Policy to continue.');
+      return;
+    }
+
     try {
       setLoading(true);
       const result = await loginWithBiometrics();
@@ -101,6 +115,12 @@ export default function LoginScreen() {
       return;
     }
 
+    // Check privacy consent
+    if (!privacyConsent) {
+      Alert.alert('Privacy Policy Required', 'Please read and accept our Privacy Policy to continue.');
+      return;
+    }
+
     try {
       setLoading(true);
       let result;
@@ -112,7 +132,10 @@ export default function LoginScreen() {
       }
 
       if (result.success) {
-        Alert.alert('Success', isLogin ? 'Logged in successfully!' : 'Account created successfully!');
+        // Show success alert only for registration, not login
+        if (!isLogin) {
+          Alert.alert('Success', 'Account created successfully!');
+        }
         // Navigation will be handled by the auth context automatically
       } else {
         Alert.alert('Error', result.error || `${isLogin ? 'Login' : 'Registration'} failed`);
@@ -135,6 +158,11 @@ export default function LoginScreen() {
     setPassword('');
     setName('');
     setShowPassword(false);
+    setPrivacyConsent(false);
+  };
+
+  const handlePrivacyPolicyPress = () => {
+    setShowPrivacyModal(true);
   };
 
   return (
@@ -162,12 +190,24 @@ export default function LoginScreen() {
             </Text>
           </View>
 
+          {/* Privacy Policy Notice */}
+          {!privacyConsent && (
+            <View style={styles.privacyNotice}>
+              <Text style={styles.privacyNoticeText}>
+                To continue, please accept our Privacy Policy below.
+              </Text>
+            </View>
+          )}
+
           {/* Biometric Login Button */}
           {biometricAvailable && biometricEnabled && (
             <TouchableOpacity
-              style={styles.biometricButton}
+              style={[
+                styles.biometricButton,
+                !privacyConsent && styles.biometricButtonDisabled
+              ]}
               onPress={handleBiometricLogin}
-              disabled={loading}
+              disabled={loading || !privacyConsent}
               activeOpacity={0.8}
             >
               <View style={styles.biometricButtonContent}>
@@ -183,9 +223,12 @@ export default function LoginScreen() {
 
           {/* Google Login Button */}
           <TouchableOpacity
-            style={styles.googleButton}
+            style={[
+              styles.googleButton,
+              !privacyConsent && styles.googleButtonDisabled
+            ]}
             onPress={handleGoogleLogin}
-            disabled={loading}
+            disabled={loading || !privacyConsent}
             activeOpacity={0.8}
           >
             <View style={styles.googleButtonContent}>
@@ -260,11 +303,37 @@ export default function LoginScreen() {
             </View>
           </View>
 
+          {/* Privacy Policy Consent */}
+          <View style={styles.privacySection}>
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setPrivacyConsent(!privacyConsent)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked]}>
+                {privacyConsent && (
+                  <Ionicons name="checkmark" size={16} color="#ffffff" />
+                )}
+              </View>
+              <Text style={styles.privacyText}>
+                I agree to the{' '}
+                <Text style={styles.privacyLink} onPress={handlePrivacyPolicyPress}>
+                  Privacy Policy
+                </Text>{' '}
+                and consent to the collection and use of my personal information as described.
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Login/Register Button */}
           <TouchableOpacity
-            style={[styles.authButton, loading && styles.authButtonDisabled]}
+            style={[
+              styles.authButton, 
+              loading && styles.authButtonDisabled,
+              !privacyConsent && styles.authButtonDisabled
+            ]}
             onPress={handleEmailAuth}
-            disabled={loading}
+            disabled={loading || !privacyConsent}
             activeOpacity={0.8}
           >
             {loading ? (
@@ -296,6 +365,12 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Privacy Policy Modal */}
+      <PrivacyPolicyModal
+        visible={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -375,6 +450,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1D1D1F',
   },
+  googleButtonDisabled: {
+    opacity: 0.5,
+  },
   biometricButton: {
     backgroundColor: '#E74C3C',
     borderRadius: 12,
@@ -397,6 +475,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#ffffff',
     marginLeft: 12,
+  },
+  biometricButtonDisabled: {
+    opacity: 0.5,
   },
   divider: {
     flexDirection: 'row',
@@ -498,5 +579,59 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#E74C3C',
     fontWeight: '600',
+  },
+
+  // Privacy Policy Consent
+  privacySection: {
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#C7C7CC',
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    marginTop: 2,
+  },
+  checkboxChecked: {
+    backgroundColor: '#E74C3C',
+    borderColor: '#E74C3C',
+  },
+  privacyText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#3C3C43',
+    lineHeight: 20,
+  },
+  privacyLink: {
+    color: '#007AFF',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  
+  // Privacy Notice
+  privacyNotice: {
+    backgroundColor: '#FFF3CD',
+    borderWidth: 1,
+    borderColor: '#FFEAA7',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  privacyNoticeText: {
+    fontSize: 13,
+    color: '#856404',
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
