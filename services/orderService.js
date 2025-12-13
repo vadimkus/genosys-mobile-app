@@ -17,6 +17,10 @@ async function getCSRFToken() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': 'https://genosys.ae',
+        'Referer': 'https://genosys.ae/',
+        'X-Requested-With': 'XMLHttpRequest',
       },
     });
     
@@ -25,7 +29,15 @@ async function getCSRFToken() {
     }
     
     const data = await response.json();
-    return data.csrfToken;
+    const rawCookie = response.headers.get('set-cookie') || response.headers.get('Set-Cookie') || '';
+    // Split on commas that precede a new cookie name (not the comma inside Expires)
+    const cookieParts = rawCookie.split(/,(?=[^;, ]+=)/g).map(part => part.trim()).filter(Boolean);
+    const cookiePairs = cookieParts
+      .map(c => (c.split(';')[0] || '').trim())
+      .filter(Boolean);
+    const cookie = cookiePairs.join('; ');
+    console.log('🔐 CSRF token fetched. Cookie header:', cookie);
+    return { csrfToken: data.csrfToken, cookie };
   } catch (error) {
     console.error('❌ Failed to get CSRF token:', error);
     throw error;
@@ -42,7 +54,7 @@ export async function submitCODOrder(orderData) {
   
   try {
     // Get CSRF token
-    const csrfToken = await getCSRFToken();
+    const { csrfToken, cookie } = await getCSRFToken();
     console.log('🔐 Got CSRF token for order submission');
     
     // Prepare order payload matching website API expectations
@@ -82,7 +94,12 @@ export async function submitCODOrder(orderData) {
       headers: {
         'Content-Type': 'application/json',
         'x-csrf-token': csrfToken,
+        ...(cookie ? { Cookie: cookie } : {}),
         'User-Agent': 'GenosysMobileApp/1.0.0 (Mobile Order)',
+        'Origin': 'https://genosys.ae',
+        'Referer': 'https://genosys.ae/',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
       },
       body: JSON.stringify(orderPayload),
     });
@@ -128,7 +145,7 @@ export async function submitCardOrder(orderData) {
   
   try {
     // Get CSRF token
-    const csrfToken = await getCSRFToken();
+    const { csrfToken, cookie } = await getCSRFToken();
     console.log('🔐 Got CSRF token for card order submission');
     
     // Prepare order payload matching website API expectations
@@ -169,7 +186,12 @@ export async function submitCardOrder(orderData) {
       headers: {
         'Content-Type': 'application/json',
         'x-csrf-token': csrfToken,
+        ...(cookie ? { Cookie: cookie } : {}),
         'User-Agent': 'GenosysMobileApp/1.0.0 (Mobile Order)',
+        'Origin': 'https://genosys.ae',
+        'Referer': 'https://genosys.ae/',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
       },
       body: JSON.stringify(orderPayload),
     });
@@ -185,14 +207,16 @@ export async function submitCardOrder(orderData) {
     console.log('✅ Card order submitted successfully:', {
       success: result.success,
       orderNumber: result.orderNumber,
-      orderId: result.orderId
+      orderId: result.orderId,
+      paymentUrl: result.paymentUrl || result.paymentLink
     });
 
     return {
       success: true,
       orderId: result.orderId,
       orderNumber: result.orderNumber,
-      message: result.message || 'Order request submitted successfully'
+      message: result.message || 'Order request submitted successfully',
+      paymentUrl: result.paymentUrl || result.paymentLink || null,
     };
 
   } catch (error) {

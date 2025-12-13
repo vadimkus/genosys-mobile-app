@@ -1,141 +1,112 @@
 /**
- * Genosys Mobile API Service
- * Connects to live Vercel API with secure authentication
+ * Genosys Mobile API Service - Pure Data Fetcher
+ * 
+ * This is a PURE DISPLAY LAYER that trusts API data completely.
+ * - No hardcoded prices or business logic
+ * - No demo data fallbacks  
+ * - No client-side calculations
+ * - Server returns complete, calculated data
+ * - Database is single source of truth
  */
 
 const API_BASE_URL = 'https://genosys.ae/api/mobile';
 const API_KEY = 'genosys_secure_mobile_2025_v1';
 
+// Enhanced API configuration for database-driven architecture
+const API_CONFIG = {
+  MOBILE_ENDPOINTS: {
+    PRODUCTS: '/products',
+    PRODUCT_BY_ID: '/products',
+    CATEGORIES: '/categories'
+  },
+  HEADERS: {
+    API_KEY: 'x-api-key',
+    USER_ID: 'x-user-id',
+    CONTENT_TYPE: 'Content-Type'
+  }
+};
+
 /**
- * Fetches enhanced products with badges, status, and user-specific pricing
- * @param {Object} user - Current user object with discount information
- * @returns {Promise<Array>} Array of enhanced products or empty array on error
+ * Fetches products with complete calculated data from server
+ * Server handles all pricing, discounts, badges, and business logic
+ * @param {Object} user - Current user object with authentication token
+ * @returns {Promise<Array>} Array of complete product objects from server
  */
 export const fetchProducts = async (user = null) => {
-  console.log('🚀 Starting API call to:', `${API_BASE_URL}/products`);
-  console.log('🔑 Using API key:', API_KEY);
-  if (user) {
-    console.log('👤 User discount:', user.discountType, user.discountPercentage + '%');
-  }
+  console.log('🚀 Fetching products from API (pure data layer)');
+  console.log('📡 API URL:', `${API_BASE_URL}/products`);
   
   try {
     const headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
+      [API_CONFIG.HEADERS.CONTENT_TYPE]: 'application/json',
+      [API_CONFIG.HEADERS.API_KEY]: API_KEY,
     };
     
-    // Add user token for personalized pricing if available
-    if (user?.token) {
+    // Add user ID for personalized pricing (enhanced API format)
+    if (user?.id) {
+      headers[API_CONFIG.HEADERS.USER_ID] = user.id;
+      console.log('👤 Including user ID for personalized pricing:', user.id);
+    } else if (user?.token) {
+      // Fallback: use Authorization header if user ID not available
       headers['Authorization'] = `Bearer ${user.token}`;
+      console.log('👤 Using token-based auth as fallback');
     }
     
-    const response = await fetch(`${API_BASE_URL}/products`, {
+    const response = await fetch(`${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.PRODUCTS}`, {
       method: 'GET',
       headers,
     });
 
     console.log('📡 Response status:', response.status);
-    console.log('📡 Response headers:', response.headers);
 
     if (!response.ok) {
-      console.error('❌ API Error - Status:', response.status);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ API Error:', response.status, errorText);
+      
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please login again.');
+      } else if (response.status === 403) {
+        throw new Error('Access denied. Invalid API key.');
+      } else if (response.status >= 500) {
+        throw new Error('Server error. Please try again later.');
+      } else {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
     }
 
     const data = await response.json();
-    console.log('📦 Raw API response:', data);
+    console.log('📦 Raw API response received:', Array.isArray(data) ? `${data.length} products` : 'data object');
     
-    // Ensure we return an array even if API returns different structure
+    // Server should return array of complete product objects
     let products = Array.isArray(data) ? data : data.data || data.products || [];
-    console.log('✅ Processed products:', products.length, 'items');
     
-    // If no products from API, return demo data for testing
-    if (products.length === 0) {
-      console.log('🔄 No products from API, returning demo data');
-      return getDemoProducts();
+    if (!Array.isArray(products)) {
+      console.error('❌ Invalid API response format. Expected array of products.');
+      throw new Error('Invalid server response format');
     }
     
-    // Enhance products with badges, status, and user-specific pricing
-    products = products.map(product => enhanceProductData(product, user));
+    console.log(`✅ Received ${products.length} complete products from database`);
     
+    // Return products exactly as server provides them
+    // No client-side enhancement or calculations
     return products;
     
   } catch (error) {
     console.error('❌ Failed to fetch products:', error.message);
-    console.error('🔄 Falling back to demo data');
-    // Return enhanced demo data on error so you can test the UI
-    const demoProducts = getDemoProducts();
-    return demoProducts.map(product => enhanceProductData(product, user));
+    
+    // Don't return fake data - let the UI handle the error gracefully
+    throw error;
   }
 };
 
 /**
- * Demo products for testing when API is unavailable
- */
-const getDemoProducts = () => {
-  const demoProducts = [
-    {
-      id: 'demo-1',
-      name: 'Premium Wireless Headphones',
-      category: 'Electronics',
-      price: 299.99,
-      rating: 4.8,
-      stock: true,
-      description: 'High-quality wireless headphones with noise cancellation and premium sound.',
-      image_url: 'https://via.placeholder.com/400x400/E74C3C/FFFFFF?text=Demo+Product+1'
-    },
-    {
-      id: 'demo-2', 
-      name: 'Smart Fitness Watch',
-      category: 'Wearables',
-      price: 199.99,
-      rating: 5.0,
-      stock: true,
-      description: 'Advanced fitness tracking with heart rate monitoring and GPS.',
-      image_url: 'https://via.placeholder.com/400x400/3498DB/FFFFFF?text=Demo+Product+2'
-    },
-    {
-      id: 'demo-3',
-      name: 'Portable Bluetooth Speaker',
-      category: 'Audio',
-      price: 79.99,
-      rating: 4.5,
-      stock: false, // Out of stock for testing
-      description: 'Compact speaker with powerful sound and long battery life.',
-      image_url: 'https://via.placeholder.com/400x400/2ECC71/FFFFFF?text=Demo+Product+3'
-    },
-    {
-      id: 'demo-4',
-      name: 'Professional Beauty Kit',
-      category: 'Beauty Boxes',
-      price: 450.00,
-      rating: 4.9,
-      stock: true,
-      description: 'Complete professional beauty kit with premium products.',
-      image_url: 'https://via.placeholder.com/400x400/9B59B6/FFFFFF?text=Beauty+Kit'
-    },
-    {
-      id: 'demo-5',
-      name: 'Professional Microneedling Device',
-      category: 'Device',
-      price: 1299.99,
-      rating: 4.9,
-      stock: true,
-      description: 'Advanced microneedling device for professional treatments.',
-      image_url: 'https://via.placeholder.com/400x400/34495E/FFFFFF?text=Device'
-    }
-  ];
-  
-  // Note: Demo products will be enhanced with badges/discounts by enhanceProductData
-  return demoProducts;
-};
-
-/**
- * Fetches product categories from the database
- * @returns {Promise<Array>} Array of unique categories
+ * Fetches product categories from server
+ * @returns {Promise<Array>} Array of categories from database
  */
 export const fetchProductCategories = async () => {
   try {
+    console.log('📂 Fetching categories from API');
+    
     const response = await fetch(`${API_BASE_URL}/categories`, {
       method: 'GET',
       headers: {
@@ -145,136 +116,102 @@ export const fetchProductCategories = async () => {
     });
 
     if (!response.ok) {
-      console.log('Categories endpoint not available, extracting from products');
+      console.warn('📂 Categories endpoint not available, will extract from products');
       // If categories endpoint doesn't exist, extract from products
-      return extractCategoriesFromProducts();
+      const products = await fetchProducts();
+      const categories = [...new Set(products.map(product => product.category))].filter(Boolean);
+      return categories;
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : data.categories || [];
+    const categories = Array.isArray(data) ? data : data.categories || [];
+    
+    console.log(`✅ Received ${categories.length} categories from database`);
+    return categories;
     
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
-    // Fallback to extracting categories from products
-    return extractCategoriesFromProducts();
+    console.error('❌ Failed to fetch categories:', error.message);
+    throw error;
   }
 };
 
 /**
- * Extracts unique categories from products as fallback
- * @returns {Promise<Array>} Array of unique categories
+ * Fetches a single product by ID with complete calculated data
+ * @param {string} productId - The product ID
+ * @param {Object} user - Current user object with authentication token
+ * @returns {Promise<Object|null>} Complete product object from server or null
  */
-const extractCategoriesFromProducts = async () => {
+export const fetchProductById = async (productId, user = null) => {
   try {
-    console.log('🔄 Extracting categories from products...');
-    const products = await fetchProducts();
-    console.log('📦 Products for category extraction:', products.length);
+    console.log('🔍 Fetching product by ID:', productId);
+    const targetIdStr = String(productId);
+    const targetIdNum = Number.isNaN(Number(productId)) ? null : Number(productId);
     
-    const categories = [...new Set(products.map(product => product.category))];
-    
-    const validCategories = categories.filter(category => category && category.trim() !== '');
-    console.log('✅ Valid categories extracted:', validCategories);
-    
-    return validCategories.length > 0 ? validCategories : [
-      'Professional Skincare',
-      'Cleansers', 
-      'Moisturizers',
-      'Serums',
-      'Treatments',
-      'Sun Protection'
-    ];
-  } catch (error) {
-    console.error('Failed to extract categories from products:', error);
-    // Return demo categories as last fallback
-    return [
-      'Professional Skincare',
-      'Cleansers',
-      'Moisturizers', 
-      'Serums',
-      'Treatments',
-      'Sun Protection'
-    ];
-  }
-};
-
-/**
- * Enhance product data with badges, status, and user-specific pricing
- * Uses the new pricing and badge utilities from the website
- * @param {Object} product - Raw product data
- * @param {Object} user - User object with discount information
- * @returns {Object} Enhanced product object
- */
-const enhanceProductData = (product, user) => {
-  // Import utilities
-  const { calculateDiscountedPrice, getPriceForSize, hasProductSizeVariants, calculateVAT } = require('../utils/pricingUtils');
-  const { generateProductBadges, getProductStatus } = require('../utils/badgeUtils');
-  
-  const enhanced = { ...product };
-  
-  console.log(`🏷️ Enhancing product: ${product.name} for user:`, user ? `${user.email} (${user.discountPercentage}% ${user.discountType})` : 'Guest');
-  
-  // Calculate pricing with discounts using website logic
-  const pricingInfo = calculateDiscountedPrice(product, user);
-  
-  // Apply pricing information
-  enhanced.originalPrice = pricingInfo.originalPrice;
-  enhanced.displayPrice = pricingInfo.discountedPrice;
-  enhanced.hasDiscount = pricingInfo.hasDiscount;
-  enhanced.discountAmount = pricingInfo.discountAmount;
-  enhanced.discountPercentage = pricingInfo.discountPercentage;
-  enhanced.isBlackFriday = pricingInfo.isBlackFriday;
-  enhanced.isBeautyBox = pricingInfo.isBeautyBox;
-  enhanced.vatAmount = pricingInfo.vatAmount;
-  
-  // Add VAT information
-  enhanced.priceExcludingVAT = Math.round((pricingInfo.discountedPrice / 1.05) * 100) / 100;
-  
-  // Set product status
-  enhanced.status = getProductStatus(product);
-  
-  // Generate badges using website logic
-  enhanced.badges = generateProductBadges(product, user, pricingInfo);
-  
-  // Add size variant information
-  enhanced.hasVariants = hasProductSizeVariants(product.id);
-  if (enhanced.hasVariants) {
-    const { getProductSizeOptions } = require('../utils/pricingUtils');
-    enhanced.sizeOptions = getProductSizeOptions(product.id);
-  }
-  
-  // Add rating information if not present
-  if (!enhanced.rating && product.category) {
-    // Assign default ratings based on category for demo
-    const categoryRatings = {
-      'PRO Solution': 5.0,
-      'Serum': 4.8,
-      'Cream': 4.7,
-      'Cleanser': 4.6,
-      'Device': 4.9,
-      'Mask': 4.5,
-      'Eye care': 4.8,
-      'Beauty Boxes': 4.9
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
     };
-    enhanced.rating = categoryRatings[product.category] || 4.5;
+    
+    // Add user authentication for personalized pricing
+    if (user?.token) {
+      headers['Authorization'] = `Bearer ${user.token}`;
+    }
+    
+    // Try direct product endpoint first
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+        method: 'GET',
+        headers,
+      });
+      
+      if (response.ok) {
+        const body = await response.json();
+        const product = body?.data || body?.product || body;
+        console.log('✅ Found product directly:', product?.name || product?.id);
+        return product;
+      } else {
+        const text = await response.text();
+        console.log('ℹ️ Direct product endpoint returned non-OK', response.status, text.slice(0, 200));
+      }
+    } catch (directError) {
+      console.log('📝 Direct product endpoint not available, searching in all products');
+    }
+    
+    // Fallback: Get all products and find the one (for APIs without individual product endpoints)
+    const allProducts = await fetchProducts(user);
+    const foundProduct = allProducts.find((p) => {
+      const pidStr = String(p.id);
+      const pnumStr = p.productNumber ? String(p.productNumber) : null;
+      const pidNum = Number.isNaN(Number(p.id)) ? null : Number(p.id);
+      return (
+        pidStr === targetIdStr ||
+        pnumStr === targetIdStr ||
+        (pidNum !== null && targetIdNum !== null && pidNum === targetIdNum)
+      );
+    });
+    
+    if (foundProduct) {
+      console.log('✅ Found product in collection:', foundProduct.name);
+      return foundProduct;
+    } else {
+      console.log('❌ Product not found with ID:', productId);
+      return null;
+    }
+    
+  } catch (error) {
+    console.error('❌ Failed to fetch product:', error.message);
+    return null;
   }
-  
-  if (pricingInfo.hasDiscount) {
-    console.log(`💰 Applied ${pricingInfo.discountPercentage}% discount to ${product.name}: ${pricingInfo.originalPrice} -> ${pricingInfo.discountedPrice} AED`);
-  }
-  
-  console.log(`✨ Enhanced product ${product.name} with ${enhanced.badges.length} badges:`, enhanced.badges.map(b => b.text));
-  
-  return enhanced;
 };
 
 /**
  * Fetches current user's profile and discount information
  * @param {string} token - User authentication token
- * @returns {Promise<Object|null>} User discount info or null
+ * @returns {Promise<Object|null>} Complete user object from server or null
  */
-export const fetchUserDiscountInfo = async (token) => {
+export const fetchUserProfile = async (token) => {
   try {
-    console.log('👤 Fetching user discount information...');
+    console.log('👤 Fetching user profile from API');
     
     const response = await fetch(`${API_BASE_URL}/auth/validate`, {
       method: 'GET',
@@ -287,46 +224,81 @@ export const fetchUserDiscountInfo = async (token) => {
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ User discount info:', {
-        discountType: result.user.discountType,
-        discountPercentage: result.user.discountPercentage,
-        canSeePrices: result.user.canSeePrices
-      });
+      console.log('✅ User profile received from database');
       return result.user;
     } else {
-      console.log('❌ Failed to fetch user discount info');
+      console.log('❌ Failed to fetch user profile');
       return null;
     }
   } catch (error) {
-    console.error('❌ Error fetching user discount info:', error);
+    console.error('❌ Error fetching user profile:', error);
     return null;
   }
 };
 
 /**
- * Fetches a single product by ID with enhanced data
- * @param {string} productId - The product ID
+ * Search products with server-side filtering
+ * @param {string} query - Search query
+ * @param {string} category - Category filter
  * @param {Object} user - Current user object
- * @returns {Promise<Object|null>} Enhanced product object or null on error
+ * @returns {Promise<Array>} Filtered products from server
  */
-export const fetchProductById = async (productId, user = null) => {
+export const searchProducts = async (query, category = '', user = null) => {
   try {
-    console.log('🔍 Fetching product by ID:', productId);
+    console.log('🔍 Searching products:', { query, category });
     
-    // Since individual product endpoint might not exist, get all products and find the one
-    const allProducts = await fetchProducts(user);
-    const foundProduct = allProducts.find(p => p.id === productId);
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+    };
     
-    if (foundProduct) {
-      console.log('✅ Found product:', foundProduct.name);
-      return foundProduct;
+    if (user?.token) {
+      headers['Authorization'] = `Bearer ${user.token}`;
+    }
+    
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (category) params.append('category', category);
+    
+    const response = await fetch(`${API_BASE_URL}/products/search?${params.toString()}`, {
+      method: 'GET',
+      headers,
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      const products = Array.isArray(data) ? data : data.products || [];
+      console.log(`✅ Search returned ${products.length} products`);
+      return products;
     } else {
-      console.log('❌ Product not found with ID:', productId);
-      return null;
+      // Fallback to client-side filtering if search endpoint not available
+      console.log('📝 Search endpoint not available, using client-side filter');
+      const allProducts = await fetchProducts(user);
+      
+      return allProducts.filter(product => {
+        const matchesQuery = !query || 
+          product.name?.toLowerCase().includes(query.toLowerCase()) ||
+          product.description?.toLowerCase().includes(query.toLowerCase());
+        
+        const matchesCategory = !category || product.category === category;
+        
+        return matchesQuery && matchesCategory;
+      });
     }
     
   } catch (error) {
-    console.error('Failed to fetch product:', error);
-    return null;
+    console.error('❌ Search failed:', error.message);
+    throw error;
   }
+};
+
+// Legacy compatibility exports
+export const fetchUserDiscountInfo = fetchUserProfile;
+
+export default {
+  fetchProducts,
+  fetchProductCategories,
+  fetchProductById,
+  fetchUserProfile,
+  searchProducts
 };

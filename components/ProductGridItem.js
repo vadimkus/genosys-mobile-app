@@ -11,7 +11,6 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { hasProductSizeVariants, getProductSizeOptions } from '../utils/productPricing';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -24,6 +23,10 @@ export default function ProductGridItem({ product }) {
 
   const imageUrl = product.image_url || (product.image ? `https://genosys.ae${product.image}` : null);
   const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
+  const badges = (product.badges || []).filter((b) => {
+    const text = (b.text || '').toLowerCase();
+    return text !== 'best seller' && text !== 'limited edition' && text !== '50% off';
+  });
 
   // Debug log to see what badges we have
   console.log(`🔍 ProductGridItem: ${product.name}`, {
@@ -63,14 +66,23 @@ export default function ProductGridItem({ product }) {
           </View>
         )}
         
-        {/* Badges on Image */}
-        {product.badges && product.badges.length > 0 && (
+        {/* Enhanced Badges from Server */}
+        {badges.length > 0 && (
           <View style={styles.badgesContainer}>
-            {product.badges.slice(0, 2).map((badge, index) => (
-              <View key={index} style={[styles.badge, { backgroundColor: badge.color || '#007AFF' }]}>
-                <Text style={styles.badgeText}>{badge.text}</Text>
-              </View>
-            ))}
+            {badges
+              .sort((a, b) => (a.priority || 10) - (b.priority || 10))  // Sort by priority
+              .slice(0, 2)  // Show max 2 badges
+              .map((badge, index) => (
+                <View key={badge.type || index} style={[
+                  styles.badge, 
+                  { backgroundColor: badge.color || '#007AFF' }
+                ]}>
+                  <Text style={[styles.badgeText, { color: badge.textColor || '#FFFFFF' }]}>
+                    {badge.text}
+                  </Text>
+                </View>
+              ))
+            }
           </View>
         )}
       </View>
@@ -86,17 +98,19 @@ export default function ProductGridItem({ product }) {
           {product.category}
         </Text>
         
-        {/* Size Badge */}
-        {(product.size || hasProductSizeVariants(product.id)) && (
+        {/* Enhanced Size Information from Server */}
+        {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
           <View style={styles.sizeBadgeContainer}>
             <View style={styles.sizeBadge}>
               <Text style={styles.sizeBadgeText}>
-                {hasProductSizeVariants(product.id) 
-                  ? `${getProductSizeOptions(product.id).length} sizes`
-                  : `Size: ${product.size}`}
+                {product.variants && product.variants.length > 0
+                  ? `${product.variants.length} sizes`
+                  : product.hasVariants 
+                    ? 'Multiple sizes'
+                    : `Size: ${product.size}`}
               </Text>
             </View>
-            {product.inStock && (
+            {(product.stock || product.inStock) && (
               <View style={styles.stockBadge}>
                 <Text style={styles.stockBadgeText}>In Stock</Text>
               </View>
@@ -104,35 +118,48 @@ export default function ProductGridItem({ product }) {
           </View>
         )}
         
-        {/* Enhanced Pricing with Beauty Box Logic */}
+        {/* Enhanced Pricing from Server with Beauty Boxes Special Display */}
         <View style={styles.priceContainer}>
-          {product.category === 'Beauty Boxes' ? (
+          {(() => {
+            // EXTREME TEST: Make ALL products show as Beauty Boxes temporarily
+            console.log(`🚨 EXTREME TEST: Rendering product ${product.name}`);
+            const isBeautyBox = true; // Force ALL products to show Beauty Box styling for testing
+            if (isBeautyBox) {
+              console.log(`🎁 BEAUTY BOX DETECTED: ${product.name} | Category: ${product.category} | Display Price: ${product.displayPrice} | Price: ${product.price} | Original: ${product.originalPrice}`);
+            }
+            return isBeautyBox;
+          })() ? (
+            // Special pricing display for Beauty Boxes - show full price + 15% discount clearly
             <View style={styles.beautyBoxPricing}>
-              <Text style={styles.discountedPrice}>
-                {product.displayPrice?.toFixed(2) || product.price} AED
+              <Text style={styles.beautyBoxFullPrice}>
+                Full Price: {(product.originalPrice || product.displayPrice || product.price || 0).toFixed(2)} AED
               </Text>
-              <Text style={styles.originalPrice}>
-                {((product.displayPrice || product.price) / 0.85).toFixed(2)} AED
-              </Text>
-              <Text style={styles.beautyBoxDiscount}>15% off (Bundle Discount)</Text>
-            </View>
-          ) : product.hasDiscount ? (
-            <View style={styles.discountPricing}>
-              <Text style={styles.originalPrice}>
-                {product.originalPrice} AED
-              </Text>
-              <Text style={styles.discountedPrice}>
-                {product.displayPrice.toFixed(2)} AED
-              </Text>
-              <View style={styles.savingsContainer}>
-                <Text style={styles.savings}>
-                  Save {product.discountAmount.toFixed(0)} AED
+              <View style={styles.beautyBoxDiscountContainer}>
+                <Text style={styles.beautyBoxDiscount}>15% OFF (Bundle Discount)</Text>
+                <Text style={styles.beautyBoxFinalPrice}>
+                  Final: {(product.displayPrice || product.price || 0).toFixed(2)} AED
                 </Text>
               </View>
             </View>
+          ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
+            <View style={styles.discountPricing}>
+              <Text style={styles.originalPrice}>
+                {product.originalPrice.toFixed(2)} AED
+              </Text>
+              <Text style={styles.discountedPrice}>
+                {(product.displayPrice || product.price).toFixed(2)} AED
+              </Text>
+              {product.discountLabel && (
+                <View style={styles.savingsContainer}>
+                  <Text style={styles.savings}>
+                    {product.discountLabel}
+                  </Text>
+                </View>
+              )}
+            </View>
           ) : (
             <Text style={styles.price}>
-              {product.displayPrice?.toFixed(2) || product.price} AED
+              {(product.displayPrice || product.price).toFixed(2)} AED
             </Text>
           )}
         </View>
@@ -280,16 +307,38 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '600',
   },
-  
-  // Beauty Box Pricing Styles
+  // Beauty Boxes specific pricing styles
   beautyBoxPricing: {
-    alignItems: 'flex-start',
+    backgroundColor: '#FF0000', // BRIGHT RED for testing
+    padding: 8,
+    borderRadius: 6,
+    borderWidth: 5, // THICK border for testing
+    borderColor: '#00FF00', // BRIGHT GREEN border for testing
+  },
+  beautyBoxFullPrice: {
+    fontSize: 12,
+    color: '#2C3E50',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  beautyBoxDiscountContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   beautyBoxDiscount: {
-    fontSize: 10,
+    fontSize: 11,
+    color: '#E74C3C',
+    fontWeight: 'bold',
+    backgroundColor: '#FFE5E5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  beautyBoxFinalPrice: {
+    fontSize: 13,
     color: '#27AE60',
-    fontWeight: '600',
-    marginTop: 2,
+    fontWeight: 'bold',
   },
   
   // Size Badge Styles

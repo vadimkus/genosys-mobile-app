@@ -258,13 +258,13 @@ export default function BagScreen() {
                 )}
 
                 {/* Price with Discount Display */}
-                {item.product.hasDiscount ? (
+                {item.product.originalPrice && item.product.originalPrice !== (item.product.displayPrice || item.product.price) ? (
                   <View style={styles.itemPriceContainer}>
                     <Text style={styles.itemOriginalPrice}>{item.product.originalPrice} AED</Text>
-                    <Text style={styles.itemDiscountedPrice}>{item.product.displayPrice.toFixed(2)} AED</Text>
+                    <Text style={styles.itemDiscountedPrice}>{(item.product.displayPrice || item.product.price).toFixed(2)} AED</Text>
                   </View>
                 ) : (
-                  <Text style={styles.itemPrice}>{item.product.displayPrice?.toFixed(2) || item.product.price} AED</Text>
+                  <Text style={styles.itemPrice}>{(item.product.displayPrice || item.product.price).toFixed(2)} AED</Text>
                 )}
 
                 <View style={styles.quantityContainer}>
@@ -311,7 +311,7 @@ export default function BagScreen() {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Shipping to {selectedEmirate}</Text>
             <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
-              {cartSummary.hasFreeShipping ? 'FREE' : `${cartSummary.shippingCost.toFixed(2)} AED`}
+              {cartSummary.hasFreeShipping ? 'FREE' : `${(cartSummary.shippingCost || 0).toFixed(2)} AED`}
             </Text>
           </View>
           

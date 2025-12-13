@@ -193,25 +193,18 @@ export default function FavoritesScreen() {
                   <Text style={styles.gridCategory}>{product.category}</Text>
                   
                   {/* Pricing */}
-                  {product.category === 'Beauty Boxes' ? (
-                    <View style={styles.priceContainer}>
-                      <View style={styles.beautyBoxPricing}>
-                        <Text style={styles.discountedPrice}>{product.displayPrice?.toFixed(2) || product.price} AED</Text>
-                        <Text style={styles.originalPrice}>{((product.displayPrice || product.price) / 0.85).toFixed(2)} AED</Text>
-                      </View>
-                      <Text style={styles.beautyBoxDiscount}>15% off (Bundle Discount)</Text>
-                      <Text style={styles.vatText}>VAT included</Text>
-                    </View>
-                  ) : product.hasDiscount ? (
+                  {product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
                     <View style={styles.priceContainer}>
                       <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
-                      <Text style={styles.discountedPrice}>{product.displayPrice?.toFixed(2)} AED</Text>
-                      <Text style={styles.savings}>Save {(product.originalPrice - product.displayPrice).toFixed(0)} AED</Text>
+                      <Text style={styles.discountedPrice}>{(product.displayPrice || product.price).toFixed(2)} AED</Text>
+                      {product.discountLabel && (
+                        <Text style={styles.savings}>{product.discountLabel}</Text>
+                      )}
                       <Text style={styles.vatText}>VAT included</Text>
                     </View>
                   ) : (
                     <View style={styles.priceContainer}>
-                      <Text style={styles.gridPrice}>{product.displayPrice?.toFixed(2) || product.price} AED</Text>
+                      <Text style={styles.gridPrice}>{(product.displayPrice || product.price).toFixed(2)} AED</Text>
                       <Text style={styles.vatText}>VAT included</Text>
                     </View>
                   )}

@@ -12,17 +12,19 @@ export default function ProductVariantSelector({
   product,
   selectedSize,
   selectedColor,
-  availableSizes = [],
-  availableColors = [],
   onSizeChange,
   onColorChange,
 }) {
   const { user } = useAuth();
 
+  // Enhanced API provides complete variant data with calculated prices
+  const availableSizes = product.variants || [];
+  const availableColors = product.colorVariants || [];
+
   return (
     <View style={styles.container}>
-      {/* Color Selection - Only for product ID 41 */}
-      {product.id === '41' && availableColors.length > 0 && (
+      {/* Color Selection - Server determines if product has colors */}
+      {availableColors.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Color</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScroll}>
@@ -62,28 +64,35 @@ export default function ProductVariantSelector({
           <Text style={styles.sectionTitle}>Size</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScroll}>
             <View style={styles.sizeOptions}>
-              {availableSizes.map((option) => (
+              {availableSizes.map((variant) => (
                 <TouchableOpacity
-                  key={option.value}
-                  onPress={() => onSizeChange(option.value)}
+                  key={variant.size}
+                  onPress={() => onSizeChange(variant.size)}
                   style={[
                     styles.sizeOption,
-                    selectedSize === option.value && styles.selectedSizeOption
+                    selectedSize === variant.size && styles.selectedSizeOption,
+                    !variant.available && styles.sizeOptionDisabled
                   ]}
+                  disabled={!variant.available}
                 >
                   <Text style={[
                     styles.sizeLabel,
-                    selectedSize === option.value && styles.selectedSizeLabel
+                    selectedSize === variant.size && styles.selectedSizeLabel,
+                    !variant.available && styles.sizeLabelDisabled
                   ]}>
-                    {option.label}
+                    {variant.size}
                   </Text>
-                  {user && (
+                  {user && variant.price && (
                     <Text style={[
                       styles.sizePrice,
-                      selectedSize === option.value && styles.selectedSizePrice
+                      selectedSize === variant.size && styles.selectedSizePrice,
+                      !variant.available && styles.sizePriceDisabled
                     ]}>
-                      {option.price} AED
+                      {variant.price.toFixed(2)} AED
                     </Text>
+                  )}
+                  {!variant.available && (
+                    <Text style={styles.unavailableText}>Unavailable</Text>
                   )}
                 </TouchableOpacity>
               ))}
@@ -192,5 +201,23 @@ const styles = StyleSheet.create({
   selectedSizePrice: {
     color: '#E74C3C',
     fontWeight: '500',
+  },
+  
+  // Enhanced styles for availability states
+  sizeOptionDisabled: {
+    opacity: 0.5,
+    borderColor: '#D1D5DB',
+  },
+  sizeLabelDisabled: {
+    color: '#9CA3AF',
+  },
+  sizePriceDisabled: {
+    color: '#9CA3AF',
+  },
+  unavailableText: {
+    fontSize: 10,
+    color: '#EF4444',
+    fontWeight: '500',
+    marginTop: 2,
   },
 });

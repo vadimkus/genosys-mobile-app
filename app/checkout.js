@@ -9,12 +9,13 @@ import {
   Alert,
   ActivityIndicator,
   SafeAreaView,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
-import { calculateCartTotals, UAE_EMIRATES } from '../utils/pricingUtils';
+import { calculateCartTotals, UAE_EMIRATES } from '../utils/cartUtils';
 import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
 
 export default function CheckoutScreen() {
@@ -37,6 +38,10 @@ export default function CheckoutScreen() {
   // Calculate totals
   const cartSummary = getCartSummary();
   const totals = calculateCartTotals(items, user, selectedEmirate);
+  const safeSubtotal = Number(totals.subtotal) || 0;
+  const safeShipping = Number(totals.shipping) || 0;
+  const safeVat = Number(totals.vatAmount) || 0;
+  const safeTotal = Number(totals.total) || 0;
 
   // Pre-fill form with user data
   useEffect(() => {
@@ -138,7 +143,9 @@ export default function CheckoutScreen() {
         
         const successMessage = selectedPaymentMethod === 'cod' 
           ? `Your order ${orderNumber} has been placed successfully! You will receive a confirmation email shortly. Pay when your order is delivered.`
-          : `Your order request ${orderNumber} has been submitted! We will send you a secure payment link via email to complete your purchase.`;
+          : result.paymentUrl
+            ? `Secure payment link is ready.\n\nIf it does not open automatically, check your email for the payment link.`
+            : `Your order request ${orderNumber} has been submitted! We will send you a secure payment link via email to complete your purchase.`;
         
         Alert.alert(
           'Order Submitted Successfully!',
@@ -150,6 +157,15 @@ export default function CheckoutScreen() {
             }
           ]
         );
+
+        // If a payment link is provided, open it for the user
+        if (selectedPaymentMethod === 'card' && result.paymentUrl) {
+          try {
+            await Linking.openURL(result.paymentUrl);
+          } catch (e) {
+            console.warn('Could not open payment link, please check email.', e);
+          }
+        }
       } else {
         console.error('❌ Order submission failed:', result);
         Alert.alert(
@@ -400,19 +416,19 @@ export default function CheckoutScreen() {
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Subtotal ({getTotalItems()} items)</Text>
-              <Text style={styles.summaryValue}>AED {totals.subtotal.toFixed(2)}</Text>
+              <Text style={styles.summaryValue}>AED {safeSubtotal.toFixed(2)}</Text>
             </View>
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Shipping to {selectedEmirate}</Text>
               <Text style={styles.summaryValue}>
-                {totals.shippingCost === 0 ? 'FREE' : `AED ${totals.shippingCost.toFixed(2)}`}
+                {safeShipping === 0 ? 'FREE' : `AED ${safeShipping.toFixed(2)}`}
               </Text>
             </View>
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>VAT (5%)</Text>
-              <Text style={styles.summaryValue}>AED {totals.vatAmount.toFixed(2)}</Text>
+              <Text style={styles.summaryValue}>AED {safeVat.toFixed(2)}</Text>
             </View>
 
             {totals.subtotal >= 1000 && (
@@ -424,7 +440,7 @@ export default function CheckoutScreen() {
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>AED {totals.total.toFixed(2)}</Text>
+              <Text style={styles.totalValue}>AED {safeTotal.toFixed(2)}</Text>
             </View>
 
             <Text style={styles.vatNote}>*All prices are VAT inclusive (5%)</Text>
@@ -459,7 +475,7 @@ export default function CheckoutScreen() {
             <Ionicons name="bag-check" size={20} color="#ffffff" />
           )}
           <Text style={styles.placeOrderButtonText}>
-            {isProcessing ? 'Processing...' : `Place Order - AED ${totals.total.toFixed(2)}`}
+            {isProcessing ? 'Processing...' : `Place Order - AED ${safeTotal.toFixed(2)}`}
           </Text>
         </TouchableOpacity>
       </View>

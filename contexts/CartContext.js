@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
-import { calculateCartTotals, UAE_EMIRATES } from '../utils/pricingUtils';
+import { calculateCartTotals, UAE_EMIRATES } from '../utils/cartUtils';
 
 const CartContext = createContext();
 

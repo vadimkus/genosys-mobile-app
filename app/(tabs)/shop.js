@@ -22,6 +22,67 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// Allowed categories (order as desired in UI)
+const ALLOWED_CATEGORY_ORDER = [
+  'All',
+  'Microneedling',
+  'PRO Solution',
+  'Cleanser',
+  'Peeling',
+  'Toner/Mist',
+  'Serum',
+  'Cream',
+  'Mask',
+  'Sun',
+  'Cushion BB',
+  'Scalp/Hair',
+  'Eye Care',
+  'Device',
+  'Holiday Kits',
+  'Beauty Boxes',
+];
+
+// Map incoming category strings to the allowed display categories
+const CATEGORY_MAP = {
+  'microneedling': 'Microneedling',
+  'pro solution': 'PRO Solution',
+  'cleanser': 'Cleanser',
+  'peeling': 'Peeling',
+  'toner/mist': 'Toner/Mist',
+  'toner / mist': 'Toner/Mist',
+  'serum': 'Serum',
+  'cream': 'Cream',
+  'mask': 'Mask',
+  'sun': 'Sun',
+  'cushion bb': 'Cushion BB',
+  'cushion bb, sun': 'Cushion BB',
+  'cushion bb, sun, cream': 'Cushion BB',
+  'scalp/hair': 'Scalp/Hair',
+  'eye care': 'Eye Care',
+  'device': 'Device',
+  'holiday kits': 'Holiday Kits',
+  'kits': 'Holiday Kits',
+  'beauty boxes': 'Beauty Boxes',
+};
+
+const normalizeCategory = (cat) => {
+  if (!cat) return null;
+  const key = cat.trim().toLowerCase();
+  return CATEGORY_MAP[key] || null;
+};
+
+const buildAllowedCategoryList = (foundCategories = []) => {
+  const seen = new Set();
+  const list = ['All'];
+  ALLOWED_CATEGORY_ORDER.slice(1).forEach((allowed) => {
+    if (foundCategories.includes(allowed) && !seen.has(allowed)) {
+      seen.add(allowed);
+      list.push(allowed);
+    }
+  });
+  return list;
+};
+
 export default function ShopScreen() {
   const { user } = useAuth();
   const { addItem } = useCart();
@@ -57,12 +118,17 @@ export default function ShopScreen() {
           console.log('💰 User discount applied:', user.discountPercentage + '% ' + user.discountType);
         }
         
-        // Extract categories from products
-        const uniqueCategories = [...new Set(enhancedProducts.map(product => product.category))];
-        const validCategories = uniqueCategories.filter(cat => cat && cat.trim() !== '');
-        const allCategories = ['All', ...validCategories];
-        
-        setCategories(allCategories);
+        // Extract categories from products (normalized, unique, allowed)
+        const normalizedCats = [];
+        const seen = new Set();
+        enhancedProducts.forEach((product) => {
+          const mapped = normalizeCategory(product.category);
+          if (mapped && !seen.has(mapped)) {
+            seen.add(mapped);
+            normalizedCats.push(mapped);
+          }
+        });
+        setCategories(buildAllowedCategoryList(normalizedCats));
       }
     } catch (error) {
       console.error('Error loading products:', error);
@@ -79,12 +145,24 @@ export default function ShopScreen() {
       
       // Add "All" as the first option
       const allCategories = ['All', ...categoryData];
-      setCategories(allCategories);
-      console.log('✅ Categories set:', allCategories);
+      setCategories(prev => {
+        const normalized = [];
+        const seen = new Set();
+        allCategories.forEach((cat) => {
+          const mapped = normalizeCategory(cat);
+          if (mapped && !seen.has(mapped)) {
+            seen.add(mapped);
+            normalized.push(mapped);
+          }
+        });
+        const finalList = buildAllowedCategoryList(normalized);
+        console.log('✅ Categories set:', finalList);
+        return finalList;
+      });
     } catch (error) {
       console.error('❌ Error loading categories:', error);
-      // Fallback to demo categories
-      setCategories(['All', 'Professional Skincare', 'Cleansers', 'Moisturizers', 'Serums']);
+      // If categories already derived from products, keep them; otherwise minimal fallback
+      setCategories(prev => prev.length ? prev : ['All']);
     }
   };
 
@@ -393,7 +471,13 @@ export default function ShopScreen() {
                     {/* Badges */}
                     {product.badges && product.badges.length > 0 && (
                       <View style={styles.badgeContainer}>
-                        {product.badges.slice(0, 2).map((badge, badgeIndex) => (
+                        {product.badges
+                          .filter((badge) => {
+                            const text = (badge.text || '').toLowerCase();
+                            return text !== 'best seller' && text !== 'limited edition' && text !== '50% off';
+                          })
+                          .slice(0, 2)
+                          .map((badge, badgeIndex) => (
                           <View key={badgeIndex} style={[styles.badge, { backgroundColor: badge.color || '#007AFF' }]}>
                             <Text style={styles.badgeText}>{badge.text}</Text>
                           </View>
@@ -440,26 +524,34 @@ export default function ShopScreen() {
                       </Text>
                     )}
                     
-                    {/* Enhanced Pricing with VAT and Beauty Box Logic */}
-                    {product.category === 'Beauty Boxes' ? (
+                    {/* Beauty Boxes Special Pricing Display */}
+                    {(() => {
+                      const category = product.category;
+                      const name = product.name || '';
+                      const hasBeautyBoxInName = name.toUpperCase().includes('BEAUTY BOX');
+                      const isCategoryBeautyBoxes = category === 'Beauty Boxes';
+                      const isBeautyBox = isCategoryBeautyBoxes || hasBeautyBoxInName;
+                      
+                      return isBeautyBox;
+                    })() ? (
                       <View style={styles.priceContainer}>
-                        <View style={styles.beautyBoxPricing}>
-                          <Text style={styles.discountedPrice}>{product.displayPrice?.toFixed(2) || product.price} AED</Text>
-                          <Text style={styles.originalPrice}>{((product.displayPrice || product.price) / 0.85).toFixed(2)} AED</Text>
-                        </View>
-                        <Text style={styles.beautyBoxDiscount}>15% off (Bundle Discount)</Text>
+                        <Text style={styles.originalPrice}>{((product.displayPrice || product.price || 0) / 0.85).toFixed(2)} AED</Text>
+                        <Text style={styles.userDiscount}>15% OFF (Bundle Discount)</Text>
+                        <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
                         <Text style={styles.vatText}>VAT included</Text>
                       </View>
-                    ) : product.hasDiscount ? (
+                    ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
                       <View style={styles.priceContainer}>
                         <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
-                        <Text style={styles.discountedPrice}>{product.displayPrice.toFixed(2)} AED</Text>
-                        <Text style={styles.userDiscount}>{product.discountPercentage}% off</Text>
+                        <Text style={styles.discountedPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
+                        {product.discountLabel && (
+                          <Text style={styles.userDiscount}>{product.discountLabel}</Text>
+                        )}
                         <Text style={styles.vatText}>VAT included</Text>
                       </View>
                     ) : (
                       <View style={styles.priceContainer}>
-                        <Text style={styles.gridPrice}>{product.displayPrice?.toFixed(2) || product.price} AED</Text>
+                        <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
                         <Text style={styles.vatText}>VAT included</Text>
                       </View>
                     )}
@@ -831,7 +923,7 @@ const styles = StyleSheet.create({
   categoriesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -4, // Negative margin to account for item margins
+    marginHorizontal: -4,
   },
   categoryButton: {
     paddingHorizontal: 12,
@@ -847,7 +939,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
     minWidth: 60,
-    margin: 4, // Add margin to create spacing between buttons
+    margin: 4,
   },
   activeCategoryButton: {
     backgroundColor: '#E74C3C',
@@ -957,20 +1049,6 @@ const styles = StyleSheet.create({
     color: '#86868B',
     fontStyle: 'italic',
     marginTop: 2,
-  },
-  
-  // Beauty Box Pricing Styles
-  beautyBoxPricing: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 2,
-  },
-  beautyBoxDiscount: {
-    fontSize: 10,
-    color: '#27AE60',
-    fontWeight: '600',
-    marginBottom: 2,
   },
   userDiscount: {
     fontSize: 10,

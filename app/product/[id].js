@@ -9,6 +9,7 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -17,17 +18,133 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchProductById } from '../../services/api';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
-import { 
-  hasProductSizeVariants, 
-  hasProductColorVariants,
-  getSizeOptionsWithPrices, 
-  getProductColorOptions,
-  getDefaultSize,
-  getPriceForSize 
-} from '../../utils/productPricing';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
+
+// Safely format price values that may come as strings from the API
+const formatPrice = (value) => {
+  const num = Number(value);
+  if (Number.isFinite(num)) {
+    return num.toFixed(2);
+  }
+  return value ?? '—';
+};
+
+// Coerce any incoming value to a displayable string
+const asText = (value) => {
+  if (value === null || value === undefined) return '';
+  if (Array.isArray(value)) return value.filter(Boolean).join('\n');
+  if (typeof value === 'object') return Object.values(value || {}).join('\n');
+  return String(value);
+};
+
+const dedupeList = (arr = []) => {
+  const seen = new Set();
+  const out = [];
+  arr.forEach((raw) => {
+    const val = asText(raw).trim();
+    if (!val) return;
+    const key = val.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push(val);
+    }
+  });
+  return out;
+};
+
+// Helper to pick the first non-empty field from possible API keys
+const pickField = (product, keys) => {
+  if (!product) return '';
+  for (const key of keys) {
+    const value = product[key];
+    const text = asText(value);
+    if (text.trim().length > 0) return text;
+  }
+  return '';
+};
+
+// Try to parse JSON strings (arrays/objects); fall back to raw value
+const parseMaybeJSON = (value) => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'object') return value;
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
+  return value;
+};
+
+const getArrayField = (product, keys) => {
+  if (!product) return [];
+  for (const key of keys) {
+    const raw = product[key];
+    const parsed = parseMaybeJSON(raw);
+    if (Array.isArray(parsed)) {
+      const cleaned = parsed.map(asText).filter((t) => t.trim().length > 0);
+      if (cleaned.length) return dedupeList(cleaned);
+    } else if (typeof parsed === 'string') {
+      const t = parsed.trim();
+      if (t.startsWith('[') && t.endsWith(']')) {
+        try {
+          const arr = JSON.parse(t);
+          if (Array.isArray(arr)) {
+            const cleaned = arr.map(asText).filter((v) => v.trim().length > 0);
+            if (cleaned.length) return dedupeList(cleaned);
+          }
+        } catch {}
+      }
+      if (t.length) return [t];
+    }
+  }
+  return [];
+};
+
+const getObjectField = (product, keys) => {
+  if (!product) return null;
+  for (const key of keys) {
+    const parsed = parseMaybeJSON(product[key]);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
+  }
+  return null;
+};
+
+const deriveDiscountFromBadges = (product) => {
+  const badges = product?.badges || [];
+  for (const badge of badges) {
+    const text = (badge.text || '').toLowerCase();
+    const match = text.match(/(\d+)\s*%/);
+    if (match) {
+      const pct = Number(match[1]);
+      if (pct > 0 && pct < 100) {
+        const base = Number(product?.displayPrice ?? product?.price ?? 0);
+        if (Number.isFinite(base) && base > 0) {
+          const original = base / (1 - pct / 100);
+          return { percent: pct, original };
+        }
+        return { percent: pct, original: null };
+      }
+    }
+  }
+  return null;
+};
+
+// Spec fields mapping to support website-like details
+const SPEC_FIELDS = [
+  { label: 'Size', keys: ['size', 'volume', 'productSize'] },
+  { label: 'Skin Type', keys: ['skinType', 'skin_type', 'skinTypes'] },
+  { label: 'Formulation', keys: ['formulation', 'texture'] },
+  { label: 'Key Benefits', keys: ['keyBenefits', 'benefits', 'advantages'] },
+  { label: 'Origin', keys: ['origin', 'countryOfOrigin', 'madeIn'] },
+  { label: 'Usage', keys: ['usage'] },
+  { label: 'Age Group', keys: ['ageGroup'] },
+];
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -38,8 +155,7 @@ export default function ProductDetailScreen() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const [currentPrice, setCurrentPrice] = useState(0);
-  const { addToCart, isInCart, getItemQuantity } = useCart();
+  const { addItem, isInCart, getItemQuantity } = useCart();
 
   useEffect(() => {
     loadProduct();
@@ -54,26 +170,31 @@ export default function ProductDetailScreen() {
       
       if (enhancedProduct) {
         setProduct(enhancedProduct);
-        console.log('✅ Enhanced product loaded with badges:', enhancedProduct.badges?.length || 0);
+        console.log('✅ Product loaded from database:', enhancedProduct.name);
+        console.log('📋 Product data from server:', {
+          hasVariants: enhancedProduct.variants?.length || 0,
+          hasBadges: enhancedProduct.badges?.length || 0,
+          calculatedPrice: enhancedProduct.displayPrice || enhancedProduct.price
+        });
 
-        // Set default size and color if product has variants
-        if (hasProductSizeVariants(enhancedProduct.id)) {
-          const defaultSize = getDefaultSize(enhancedProduct.id);
-          setSelectedSize(defaultSize);
-          setCurrentPrice(getPriceForSize(enhancedProduct, defaultSize));
-        } else {
-          setCurrentPrice(enhancedProduct.displayPrice || enhancedProduct.price);
-        }
-
-        if (hasProductColorVariants(enhancedProduct.id)) {
-          const colorOptions = getProductColorOptions(enhancedProduct.id);
-          if (colorOptions.length > 0) {
-            setSelectedColor(colorOptions[0].value);
+        // Set default selections from enhanced API data
+        if (enhancedProduct.variants && enhancedProduct.variants.length > 0) {
+          // Find default variant or use first available one
+          const defaultVariant = enhancedProduct.variants.find(v => v.isDefault) || 
+                                  enhancedProduct.variants.find(v => v.available) ||
+                                  enhancedProduct.variants[0];
+          if (defaultVariant) {
+            setSelectedSize(defaultVariant.size);
           }
         }
 
-        if (user?.discountPercentage && enhancedProduct.hasDiscount) {
-          console.log('💰 Product has user discount:', enhancedProduct.discountPercentage + '% ' + enhancedProduct.discountType);
+        if (enhancedProduct.colorVariants && enhancedProduct.colorVariants.length > 0) {
+          // Use first available color variant
+          setSelectedColor(enhancedProduct.colorVariants[0].value);
+        }
+
+        if (user && enhancedProduct.originalPrice && enhancedProduct.originalPrice !== (enhancedProduct.displayPrice || enhancedProduct.price)) {
+          console.log('💰 User has discount applied server-side');
         }
           } else {
             Alert.alert('Error', 'Product not found');
@@ -90,13 +211,8 @@ export default function ProductDetailScreen() {
 
   const handleAddToBag = () => {
     if (product) {
-      // Add product with selected variants
-      const productToAdd = {
-        ...product,
-        displayPrice: currentPrice, // Use current price based on size selection
-      };
-      
-      addToCart(productToAdd, 1, selectedColor, selectedSize);
+      // Server provides complete product data, no client calculations needed
+      addItem(product, 1, selectedColor, selectedSize);
       
       let message = `${product.name} has been added to your bag`;
       if (selectedSize) {
@@ -119,9 +235,15 @@ export default function ProductDetailScreen() {
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
-    const newPrice = getPriceForSize(product, size);
-    setCurrentPrice(newPrice);
-    console.log(`📐 Size changed to ${size}, price: ${newPrice} AED`);
+    console.log(`📐 Size changed to ${size}`);
+    
+    // Find the selected variant for pricing display (enhanced API provides this)
+    if (product.variants) {
+      const selectedVariant = product.variants.find(v => v.size === size);
+      if (selectedVariant) {
+        console.log(`💰 Variant price: ${selectedVariant.price} AED`);
+      }
+    }
   };
 
   const handleColorChange = (color) => {
@@ -133,8 +255,23 @@ export default function ProductDetailScreen() {
     setIsWishlisted(!isWishlisted);
   };
 
-  const handleShare = () => {
-    Alert.alert('Share', 'Share functionality coming soon');
+  const handleShare = async () => {
+    if (!product) return;
+    const url = `https://genosys.ae/products/${product.id}`;
+    const message = `${asText(product.name)}\n${formatPrice(product.displayPrice || product.price)} AED\n${url}`;
+    try {
+      await Share.share(
+        {
+          title: asText(product.name) || 'Genosys Product',
+          message,
+          url,
+        },
+        { dialogTitle: 'Share product' }
+      );
+    } catch (error) {
+      console.error('Failed to share product', error);
+      Alert.alert('Error', 'Could not open share sheet. Please try again.');
+    }
   };
 
   const formatDescription = (text) => {
@@ -155,15 +292,88 @@ export default function ProductDetailScreen() {
 
   const getDisplayDescription = () => {
     if (!product?.description) return '';
-    
-    const formatted = formatDescription(product.description);
+
+    const formatted = formatDescription(asText(product.description));
     const isLong = formatted.length > 500;
-    
+
     if (isLong && !showFullDescription) {
       return formatted.substring(0, 500) + '...';
     }
-    
+
     return formatted;
+  };
+
+  const renderInfoSection = (title, content) => {
+    const text = asText(content);
+    if (!text || text.trim().length === 0) return null;
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.description}>{text}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderSpecs = () => {
+    if (!product) return null;
+    const rows = SPEC_FIELDS.map(({ label, keys }) => {
+      const value = pickField(product, keys);
+      return value ? { label, value: asText(value) } : null;
+    }).filter(Boolean);
+
+    if (!rows.length) return null;
+
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Product Details</Text>
+        <View style={styles.specList}>
+          {rows.map((row, idx) => (
+            <View key={row.label + idx} style={styles.specItem}>
+              <Text style={styles.specLabel}>{row.label}</Text>
+              <Text style={styles.specValue}>{row.value}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderListSection = (title, items) => {
+    if (!items || items.length === 0) return null;
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.listContainer}>
+          {items.map((item, idx) => (
+            <View key={idx} style={styles.listItem}>
+              <Text style={styles.listBullet}>•</Text>
+              <Text style={styles.listText}>{asText(item)}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderKeyValueSection = (title, obj) => {
+    if (!obj || typeof obj !== 'object') return null;
+    const entries = Object.entries(obj).filter(([k, v]) => asText(v).trim().length > 0);
+    if (!entries.length) return null;
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.specList}>
+          {entries.map(([k, v], idx) => (
+            <View key={k + idx} style={styles.specItem}>
+              <Text style={styles.specLabel}>{asText(k)}</Text>
+              <Text style={styles.specValue}>{asText(v)}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
   };
 
   if (loading) {
@@ -240,66 +450,123 @@ export default function ProductDetailScreen() {
         {/* Product Info */}
         <View style={styles.contentContainer}>
           <View style={styles.productInfo}>
-            <Text style={styles.category}>{product.category}</Text>
-            <Text style={styles.productName}>{product.name}</Text>
+            <Text style={styles.category}>{asText(product.category)}</Text>
+            <Text style={styles.productName}>{asText(product.name)}</Text>
             
-            {/* Size and Stock Info */}
-            {(product.size || hasProductSizeVariants(product.id)) && (
+            {/* Enhanced Size and Stock Info from Server */}
+            {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
               <View style={styles.sizeInfoContainer}>
                 <Text style={styles.sizeInfo}>
-                  {hasProductSizeVariants(product.id) 
-                    ? 'Multiple sizes available'
-                    : `Size: ${product.size}`}
+                  {product.variants && product.variants.length > 0
+                    ? `${product.variants.length} sizes available`
+                    : product.hasVariants 
+                      ? 'Multiple sizes available'
+                      : `Size: ${asText(product.size)}`}
                 </Text>
-                {product.inStock && (
+                {(product.stock || product.inStock) && (
                   <Text style={styles.stockInfo}>✓ In Stock</Text>
                 )}
               </View>
             )}
-            
-            <Text style={styles.price}>
-              {product.hasDiscount ? (
-                <Text>
-                  <Text style={styles.originalPrice}>{product.originalPrice} AED </Text>
-                  <Text style={styles.discountedPrice}>{currentPrice.toFixed(2)} AED</Text>
-                </Text>
+              
+              {/* Enhanced Pricing with Beauty Boxes Special Display */}
+              {product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box')) ? (
+                // Special pricing display for Beauty Boxes on detail page
+                <View style={styles.beautyBoxDetailPricing}>
+                  <Text style={styles.beautyBoxDetailFullPrice}>
+                    Full Price: {formatPrice(product.originalPrice || product.displayPrice || product.price || 0)} AED
+                  </Text>
+                  <View style={styles.beautyBoxDetailDiscountRow}>
+                    <Text style={styles.beautyBoxDetailDiscount}>15% OFF (Bundle Discount)</Text>
+                    <Text style={styles.beautyBoxDetailFinalPrice}>
+                      Final: {formatPrice(product.displayPrice || product.price || 0)} AED
+                    </Text>
+                  </View>
+                </View>
               ) : (
-                `${currentPrice.toFixed(2)} AED`
+                <Text style={styles.price}>
+                  {(() => {
+                    const base = product.displayPrice || product.price || 0;
+                    const derived = deriveDiscountFromBadges(product);
+                    const orig = product.originalPrice || (derived?.original || null);
+                    if (orig && orig > base) {
+                      return (
+                        <Text>
+                          <Text style={styles.originalPrice}>{formatPrice(orig)} AED </Text>
+                          <Text style={styles.discountedPrice}>{formatPrice(base)} AED</Text>
+                        </Text>
+                      );
+                    }
+                    return `${formatPrice(base)} AED`;
+                  })()}
+                </Text>
               )}
-            </Text>
           </View>
 
-          {/* Product Variant Selector */}
-          {(hasProductSizeVariants(product.id) || hasProductColorVariants(product.id)) && (
-            <ProductVariantSelector
-              product={product}
-              selectedSize={selectedSize}
-              selectedColor={selectedColor}
-              availableSizes={getSizeOptionsWithPrices(product)}
-              availableColors={getProductColorOptions(product.id)}
-              onSizeChange={handleSizeChange}
-              onColorChange={handleColorChange}
-            />
+            {/* Enhanced Product Variant Selector */}
+            {((product.variants && product.variants.length > 0) || 
+              (product.colorVariants && product.colorVariants.length > 0) ||
+              product.hasVariants) && (
+              <ProductVariantSelector
+                product={product}
+                selectedSize={selectedSize}
+                selectedColor={selectedColor}
+                onSizeChange={handleSizeChange}
+                onColorChange={handleColorChange}
+              />
+            )}
+
+          {/* Product content sections from API */}
+          {renderInfoSection(
+            'About this product',
+            pickField(product, ['details', 'productDetails', 'product_details', 'detail']) || getDisplayDescription()
           )}
 
-          {/* Full Description */}
-          {product.description && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>About this product</Text>
-              <View style={styles.descriptionContainer}>
-                <Text style={styles.description}>{getDisplayDescription()}</Text>
-                {product.description.length > 500 && (
-                  <TouchableOpacity 
-                    style={styles.readMoreButton}
-                    onPress={() => setShowFullDescription(!showFullDescription)}
-                  >
-                    <Text style={styles.readMoreText}>
-                      {showFullDescription ? 'Show Less' : 'Read More'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
+          {renderInfoSection(
+            'Benefits',
+            pickField(product, ['benefits', 'keyBenefits', 'benefit', 'advantages'])
+          )}
+
+          {renderInfoSection(
+            'Directions',
+            pickField(product, ['directions', 'howToUse', 'usage', 'application', 'how_to_use'])
+          )}
+
+          {renderInfoSection(
+            'Key Ingredients',
+            pickField(product, ['keyIngredients', 'ingredients', 'key_ingredients', 'composition'])
+          )}
+
+          {renderInfoSection(
+            'Note',
+            pickField(product, ['note', 'notes', 'warning', 'caution'])
+          )}
+
+          {renderSpecs()}
+
+          {renderListSection(
+            'Key Benefits',
+            getArrayField(product, ['keyBenefits', 'benefits', 'advantages', 'keyFeatures'])
+          )}
+
+          {renderListSection(
+            'Target Concerns',
+            getArrayField(product, ['targetConcerns', 'concerns'])
+          )}
+
+          {renderListSection(
+            'Ingredients',
+            getArrayField(product, ['ingredients'])
+          )}
+
+          {renderInfoSection(
+            'How to Use',
+            pickField(product, ['howToUse', 'directions', 'usage'])
+          )}
+
+          {renderKeyValueSection(
+            'Product Details',
+            getObjectField(product, ['productDetails'])
           )}
 
           {/* Rating Section */}
@@ -579,6 +846,51 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
+  listContainer: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 12,
+    gap: 8,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  listBullet: {
+    fontSize: 18,
+    color: '#E74C3C',
+    lineHeight: 22,
+  },
+  listText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1D1D1F',
+    lineHeight: 22,
+  },
+  specList: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 12,
+    gap: 8,
+  },
+  specItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  specLabel: {
+    fontSize: 15,
+    color: '#6E6E73',
+    fontWeight: '600',
+  },
+  specValue: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1D1D1F',
+    textAlign: 'right',
+  },
   detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -672,5 +984,39 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#E74C3C',
+  },
+  // Beauty Boxes detail page pricing styles
+  beautyBoxDetailPricing: {
+    backgroundColor: '#F8F9FA',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#E74C3C',
+    marginVertical: 8,
+  },
+  beautyBoxDetailFullPrice: {
+    fontSize: 16,
+    color: '#2C3E50',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  beautyBoxDetailDiscountRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  beautyBoxDetailDiscount: {
+    fontSize: 14,
+    color: '#E74C3C',
+    fontWeight: 'bold',
+    backgroundColor: '#FFE5E5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  beautyBoxDetailFinalPrice: {
+    fontSize: 18,
+    color: '#27AE60',
+    fontWeight: 'bold',
   },
 });
