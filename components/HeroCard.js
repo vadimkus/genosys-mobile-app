@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask } from '../utils/productRules';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.8;
@@ -16,6 +17,15 @@ export default function HeroCard({ product }) {
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
+
+  const isOutOfStock = product?.status === 'out_of_stock' || product?.stock === false;
+  const nameLower = (product?.name || '').trim().toLowerCase();
+  const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
+  const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
+  const shouldUseCanonical = hasFixedPriceOverride(product) || isHydroCoolMask(product);
+  const displayPrice = shouldUseCanonical
+    ? getCanonicalUnitPrice(product)
+    : Number(product?.displayPrice ?? product?.price ?? 0) || 0;
 
   return (
     <TouchableOpacity
@@ -44,8 +54,19 @@ export default function HeroCard({ product }) {
         </Text>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>
-            ${product.price}
+            {displayPrice.toFixed(2)} AED
           </Text>
+          {!isOutOfStock && !isHolidayKit && (
+            isMesopeciaKit ? (
+              <View style={styles.orderBadge}>
+                <Text style={styles.orderText}>Order</Text>
+              </View>
+            ) : (
+              <View style={styles.inStockBadge}>
+                <Text style={styles.inStockText}>In stock</Text>
+              </View>
+            )
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -116,5 +137,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#1D1D1F',
+  },
+  inStockBadge: {
+    backgroundColor: '#34C759',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  inStockText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  orderBadge: {
+    backgroundColor: '#FF9500',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  orderText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
   },
 });

@@ -240,7 +240,7 @@ export default function ProfileScreen() {
               title="Orders"
               subtitle="Track purchases"
               color="#E74C3C"
-              onPress={() => Alert.alert('Orders', 'Order tracking coming soon!')}
+              onPress={() => router.push('/profile/orders')}
             />
             <QuickActionCard
               icon="bag-outline"
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     width: (width - 60) / 2,
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   quickActionIcon: {
     width: 40,
@@ -538,10 +538,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000000',
     marginBottom: 2,
+    textAlign: 'center',
   },
   quickActionSubtitle: {
     fontSize: 15,
     color: '#8E8E93',
+    textAlign: 'center',
   },
 
   // Sections

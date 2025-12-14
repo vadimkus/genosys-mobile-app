@@ -19,6 +19,7 @@ import { fetchProductCategories, fetchProducts } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice, isBeautyBoxProduct } from '../../utils/productRules';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -270,7 +271,7 @@ export default function ShopScreen() {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#E74C3C" />
-        <Text style={styles.loadingText}>Loading Genosys Products...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </SafeAreaView>
     );
   }
@@ -469,21 +470,62 @@ export default function ShopScreen() {
                     )}
                     
                     {/* Badges */}
-                    {product.badges && product.badges.length > 0 && (
-                      <View style={styles.badgeContainer}>
-                        {product.badges
-                          .filter((badge) => {
-                            const text = (badge.text || '').toLowerCase();
-                            return text !== 'best seller' && text !== 'limited edition' && text !== '50% off';
-                          })
-                          .slice(0, 2)
-                          .map((badge, badgeIndex) => (
-                          <View key={badgeIndex} style={[styles.badge, { backgroundColor: badge.color || '#007AFF' }]}>
-                            <Text style={styles.badgeText}>{badge.text}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    )}
+                    {(() => {
+                      const nameLower = (product?.name || '').trim().toLowerCase();
+                      const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
+                      const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
+                      const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
+                      const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
+                      const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
+                      const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
+                      const isBeautyBox = isBeautyBoxProduct(product);
+
+                      const baseBadges = (product.badges || []).filter((badge) => {
+                        const text = (badge.text || '').toLowerCase().trim();
+                        if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
+                        // Remove "Bundle Offer" badge from Beauty Boxes
+                        if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
+                        // Remove "Professional" badge from specific products
+                        if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
+                        // Keep "New" only for PDRN mask
+                        if (text === 'new' && !(isPdrnMask || isBioFermentMask)) return false;
+                        return true;
+                      });
+
+                      const computedBadges = [];
+                      if (!isOutOfStock) {
+                        if (isMesopeciaKit) {
+                          computedBadges.push({ text: 'Order', color: '#FF9500', priority: 0 });
+                        } else if (!isHolidayKit) {
+                          computedBadges.push({ text: 'In stock', color: '#34C759', priority: 0 });
+                        }
+                      }
+
+                      // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
+                      const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
+                      if (isBioFermentMask && !hasNewBadge) {
+                        computedBadges.push({ text: 'New', color: '#007AFF', priority: 1 });
+                      }
+
+                      const badges = [...computedBadges, ...baseBadges]
+                        .sort((a, b) => (a.priority || 10) - (b.priority || 10))
+                        .slice(0, 2);
+
+                      if (!badges.length) return null;
+
+                      return (
+                        <View style={styles.badgeContainer}>
+                          {badges.map((badge, badgeIndex) => (
+                            <View
+                              key={`${badge.text || 'badge'}-${badgeIndex}`}
+                              style={[styles.badge, { backgroundColor: badge.color || '#007AFF' }]}
+                            >
+                              <Text style={styles.badgeText}>{badge.text}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      );
+                    })()}
                     
                     {/* Favorite Heart Button */}
                     <TouchableOpacity 
@@ -538,6 +580,11 @@ export default function ShopScreen() {
                         <Text style={styles.originalPrice}>{((product.displayPrice || product.price || 0) / 0.85).toFixed(2)} AED</Text>
                         <Text style={styles.userDiscount}>15% OFF (Bundle Discount)</Text>
                         <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
+                        <Text style={styles.vatText}>VAT included</Text>
+                      </View>
+                    ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
+                      <View style={styles.priceContainer}>
+                        <Text style={styles.gridPrice}>{getCanonicalUnitPrice(product).toFixed(2)} AED</Text>
                         <Text style={styles.vatText}>VAT included</Text>
                       </View>
                     ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (

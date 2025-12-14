@@ -11,6 +11,7 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -23,19 +24,61 @@ export default function ProductGridItem({ product }) {
 
   const imageUrl = product.image_url || (product.image ? `https://genosys.ae${product.image}` : null);
   const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
-  const badges = (product.badges || []).filter((b) => {
-    const text = (b.text || '').toLowerCase();
-    return text !== 'best seller' && text !== 'limited edition' && text !== '50% off';
+  const nameLower = (product?.name || '').trim().toLowerCase();
+  const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
+  const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
+  const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
+  const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
+  const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
+  const isBeautyBox = isBeautyBoxProduct(product);
+
+  const baseBadges = (product.badges || []).filter((b) => {
+    const text = (b.text || '').toLowerCase().trim();
+    if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
+    // Remove "Bundle Offer" badge from Beauty Boxes
+    if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
+    // Remove "Professional" badge from specific products
+    if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
+    // Keep "New" only for PDRN mask
+    if (text === 'new' && !(isPdrnMask || isBioFermentMask)) return false;
+    return true;
   });
 
-  // Debug log to see what badges we have
-  console.log(`🔍 ProductGridItem: ${product.name}`, {
-    hasBadges: !!product.badges,
-    badgeCount: product.badges?.length || 0,
-    badges: product.badges?.map(b => b.text) || [],
-    hasDiscount: !!product.hasDiscount,
-    rating: product.rating
-  });
+  // Add client-enforced stock badges for the Shop grid requirements
+  const computedBadges = [];
+  if (!isOutOfStock) {
+    if (isMesopeciaKit) {
+      computedBadges.push({
+        type: 'order',
+        text: 'Order',
+        color: '#FF9500',
+        textColor: '#FFFFFF',
+        priority: 0,
+      });
+    } else if (!isHolidayKit) {
+      computedBadges.push({
+        type: 'in_stock',
+        text: 'In stock',
+        color: '#34C759',
+        textColor: '#FFFFFF',
+        priority: 0,
+      });
+    }
+  }
+
+  // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
+  const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
+  if (isBioFermentMask && !hasNewBadge) {
+    computedBadges.push({
+      type: 'new',
+      text: 'New',
+      color: '#007AFF',
+      textColor: '#FFFFFF',
+      priority: 1,
+    });
+  }
+
+  const badges = [...computedBadges, ...baseBadges];
 
   return (
     <TouchableOpacity
@@ -121,13 +164,11 @@ export default function ProductGridItem({ product }) {
         {/* Enhanced Pricing from Server with Beauty Boxes Special Display */}
         <View style={styles.priceContainer}>
           {(() => {
-            // EXTREME TEST: Make ALL products show as Beauty Boxes temporarily
-            console.log(`🚨 EXTREME TEST: Rendering product ${product.name}`);
-            const isBeautyBox = true; // Force ALL products to show Beauty Box styling for testing
-            if (isBeautyBox) {
-              console.log(`🎁 BEAUTY BOX DETECTED: ${product.name} | Category: ${product.category} | Display Price: ${product.displayPrice} | Price: ${product.price} | Original: ${product.originalPrice}`);
-            }
-            return isBeautyBox;
+            const category = product?.category;
+            const name = product?.name || '';
+            const hasBeautyBoxInName = name.toUpperCase().includes('BEAUTY BOX');
+            const isCategoryBeautyBoxes = category === 'Beauty Boxes';
+            return isCategoryBeautyBoxes || hasBeautyBoxInName;
           })() ? (
             // Special pricing display for Beauty Boxes - show full price + 15% discount clearly
             <View style={styles.beautyBoxPricing}>
@@ -141,6 +182,10 @@ export default function ProductGridItem({ product }) {
                 </Text>
               </View>
             </View>
+          ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
+            <Text style={styles.price}>
+              {getCanonicalUnitPrice(product).toFixed(2)} AED
+            </Text>
           ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
             <View style={styles.discountPricing}>
               <Text style={styles.originalPrice}>

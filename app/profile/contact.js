@@ -56,10 +56,10 @@ export default function ContactScreen() {
     {
       id: 'whatsapp',
       title: 'WhatsApp',
-      value: '+971 50 123 4567',
+      value: '+971 58 548 76 65',
       icon: 'logo-whatsapp',
       description: 'Quick chat support',
-      action: () => Linking.openURL('https://wa.me/971501234567'),
+      action: () => Linking.openURL('https://wa.me/971585487665'),
     },
     {
       id: 'address',

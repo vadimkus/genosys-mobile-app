@@ -17,30 +17,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function AddressesScreen() {
   const router = useRouter();
   const { user, getAddresses, removeAddress, setAddressAsDefault } = useAuth();
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      type: 'Home',
-      name: 'John Doe',
-      address: 'Dubai Marina, Block A, Apt 1203',
-      city: 'Dubai',
-      emirate: 'Dubai',
-      country: 'United Arab Emirates',
-      phone: '+971 50 123 4567',
-      isDefault: true,
-    },
-    {
-      id: 2,
-      type: 'Work',
-      name: 'John Doe',
-      address: 'Business Bay, Office Tower, Floor 15',
-      city: 'Dubai',
-      emirate: 'Dubai',
-      country: 'United Arab Emirates', 
-      phone: '+971 50 123 4567',
-      isDefault: false,
-    },
-  ]);
+  const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -53,10 +30,11 @@ export default function AddressesScreen() {
       setLoading(true);
       const result = await getAddresses();
       if (result.success) {
-        setAddresses(result.data || []);
+        // Defensive: ensure the UI always gets an array
+        setAddresses(Array.isArray(result.data) ? result.data : []);
       } else {
         console.error('Failed to load addresses:', result.error);
-        // Keep demo data if API fails
+        // Keep existing list if API fails
       }
     } catch (error) {
       console.error('Load addresses error:', error);
@@ -97,7 +75,8 @@ export default function AddressesScreen() {
           onPress: async () => {
             const result = await removeAddress(addressId);
             if (result.success) {
-              setAddresses(addresses.filter(addr => addr.id !== addressId));
+              // Backend currently supports a single primary address; deleting clears it.
+              setAddresses([]);
             } else {
               Alert.alert('Error', result.error || 'Failed to delete address');
             }
@@ -203,9 +182,16 @@ export default function AddressesScreen() {
           </View>
         ) : (
           <View style={styles.addressesList}>
-            {addresses.map((address) => (
-              <AddressCard key={address.id} address={address} />
-            ))}
+            {Array.isArray(addresses) && addresses.length > 0 ? (
+              addresses.map((address) => (
+                <AddressCard key={address.id} address={address} />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyTitle}>No addresses yet</Text>
+                <Text style={styles.emptySubtitle}>Add a delivery address to speed up checkout.</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -269,6 +255,25 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  emptyState: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: '#E5E5EA',
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000000',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 20,
   },
 
   // Info Section

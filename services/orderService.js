@@ -7,41 +7,104 @@ import AUTH_CONFIG from '../config/auth';
 
 const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 
+function getToken(orderOrToken) {
+  if (!orderOrToken) return '';
+  if (typeof orderOrToken === 'string') return orderOrToken;
+  return orderOrToken?.userToken || orderOrToken?.token || orderOrToken?.accessToken || '';
+}
+
 /**
  * Get CSRF token for order submission
  * @returns {Promise<string>} CSRF token
  */
-async function getCSRFToken() {
-  try {
-    const response = await fetch('https://genosys.ae/api/csrf-token', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': 'https://genosys.ae',
-        'Referer': 'https://genosys.ae/',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to get CSRF token: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const rawCookie = response.headers.get('set-cookie') || response.headers.get('Set-Cookie') || '';
-    // Split on commas that precede a new cookie name (not the comma inside Expires)
-    const cookieParts = rawCookie.split(/,(?=[^;, ]+=)/g).map(part => part.trim()).filter(Boolean);
-    const cookiePairs = cookieParts
-      .map(c => (c.split(';')[0] || '').trim())
-      .filter(Boolean);
-    const cookie = cookiePairs.join('; ');
-    console.log('🔐 CSRF token fetched. Cookie header:', cookie);
-    return { csrfToken: data.csrfToken, cookie };
-  } catch (error) {
-    console.error('❌ Failed to get CSRF token:', error);
-    throw error;
+function getAuthHeader(orderData) {
+  const token = orderData?.userToken;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function getMobileHeaders(orderData) {
+  return {
+    'Content-Type': 'application/json',
+    'x-api-key': API_KEY,
+    ...getAuthHeader(orderData),
+  };
+}
+
+/**
+ * Attempt to get a Stripe payment URL for an existing (pending/unpaid) order.
+ *
+ * Expected backend behavior (recommended):
+ * - If order already has a paymentUrl/paymentLink, return it.
+ * - Otherwise create or reuse a Stripe session/payment-intent and return a URL.
+ *
+ * This function is defensive and tries a few common payload shapes.
+ *
+ * @param {Object} args
+ * @param {string} args.token - user auth token
+ * @param {string|number} [args.orderId]
+ * @param {string} [args.orderNumber]
+ * @param {Object} [args.order] - optional order object that may already include paymentUrl/paymentLink
+ */
+export async function getPaymentUrlForExistingOrder({ token, orderId, orderNumber, order } = {}) {
+  const t = getToken(token) || getToken(order);
+  if (!t) {
+    return { success: false, error: 'Login required to process payment.' };
   }
+
+  // If backend already provides the link, use it.
+  const existingUrl = order?.paymentUrl || order?.paymentLink || order?.payment_url || order?.payment_link || '';
+  if (existingUrl) {
+    return { success: true, paymentUrl: String(existingUrl) };
+  }
+
+  const id = orderId != null ? String(orderId) : (order?.id ? String(order.id) : '');
+  const num = orderNumber || order?.orderNumber || order?.order_number || order?.number || '';
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': API_KEY,
+    'Authorization': `Bearer ${t}`,
+  };
+
+  // Try a few likely endpoints/payloads (we can align backend to one canonical route).
+  const attempts = [
+    // Canonical (recommended backend): POST /checkout/stripe with orderId/orderNumber to resume payment
+    { url: `${API_BASE_URL}/checkout/stripe`, body: { orderId: id, orderNumber: String(num || ''), resume: true } },
+    { url: `${API_BASE_URL}/checkout/stripe`, body: { orderId: id, resume: true } },
+    { url: `${API_BASE_URL}/checkout/stripe`, body: { orderNumber: String(num || ''), resume: true } },
+
+    // Alternate: POST /orders/{id}/pay
+    ...(id ? [{ url: `${API_BASE_URL}/orders/${id}/pay`, body: { orderNumber: String(num || '') } }] : []),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      const res = await fetch(attempt.url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(attempt.body),
+      });
+
+      if (!res.ok) {
+        // Continue trying other shapes; keep last error in case all fail.
+        continue;
+      }
+
+      const json = await res.json().catch(() => ({}));
+      const paymentUrl = json?.paymentUrl || json?.paymentLink || json?.url || json?.data?.paymentUrl || '';
+      if (paymentUrl) {
+        return { success: true, paymentUrl: String(paymentUrl), raw: json };
+      }
+    } catch {
+      // continue
+    }
+  }
+
+  return {
+    success: false,
+    error:
+      'Could not start payment for this order yet. Please try again later, or contact support if the issue persists.',
+  };
 }
 
 /**
@@ -53,75 +116,87 @@ export async function submitCODOrder(orderData) {
   console.log('📦 Submitting COD order:', orderData.orderNumber);
   
   try {
-    // Get CSRF token
-    const { csrfToken, cookie } = await getCSRFToken();
-    console.log('🔐 Got CSRF token for order submission');
-    
-    // Prepare order payload matching website API expectations
+    // Mobile endpoint (no CSRF): requires Authorization token
     const orderPayload = {
       orderNumber: orderData.orderNumber,
       customerName: orderData.customerName,
       customerEmail: orderData.customerEmail,
       customerPhone: orderData.customerPhone,
       customerAddress: orderData.customerAddress,
+      // send emirate in multiple common fields to satisfy backend validators
       emirate: orderData.emirate,
-      items: orderData.items.map(item => ({
-        id: item.product?.id || item.id,
-        name: item.product?.name || item.name,
-        price: item.product?.displayPrice || item.product?.price || item.price,
-        quantity: item.quantity,
-        image: item.product?.image_url || item.product?.image || item.image,
-        size: item.selectedSize || item.size,
-        color: item.selectedColor || item.color,
-      })),
+      deliveryEmirate: orderData.emirate,
+      shippingEmirate: orderData.emirate,
+      customerEmirate: orderData.emirate,
+      customer: {
+        name: orderData.customerName,
+        email: orderData.customerEmail,
+        phone: orderData.customerPhone,
+        address: orderData.customerAddress,
+        emirate: orderData.emirate,
+        customerEmirate: orderData.emirate,
+      },
+      items: orderData.items.map(item => {
+        const productId = item.product?.id || item.id;
+        const rawPrice = item.product?.displayPrice ?? item.product?.price ?? item.price ?? 0;
+        const price = Number(rawPrice);
+        const quantity = Number(item.quantity) || 0;
+        const isPromo = item.isPromotionItem === true;
+        return {
+          // Required by backend
+          productId,
+          quantity,
+          price: Number.isFinite(price) ? price : 0,
+
+          // Keep compatibility fields (safe extras)
+          id: productId,
+          name: item.product?.name || item.name,
+          image: item.product?.image_url || item.product?.image || item.image,
+          size: isPromo ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
+          color: item.selectedColor || item.color,
+          isPromotionItem: isPromo,
+          promotionKey: item.promotionKey || null,
+        };
+      }),
       subtotal: orderData.subtotal,
       shippingCost: orderData.shippingCost,
       vatAmount: orderData.vatAmount,
       total: orderData.total,
-      locale: 'en', // Default to English
-      orderNotes: orderData.orderNotes || ''
+      paymentMethod: 'cod',
+      orderNotes: orderData.orderNotes || '',
+      source: 'mobile_app',
+      locale: 'en',
+      // Email/notification hints (backend may use these)
+      sendEmails: true,
+      notifyAdmin: true,
     };
 
-    console.log('📧 Sending COD order to website API:', {
-      orderNumber: orderPayload.orderNumber,
-      customerEmail: orderPayload.customerEmail,
-      total: orderPayload.total,
-      itemCount: orderPayload.items.length
-    });
-
-    const response = await fetch('https://genosys.ae/api/orders/cod-confirmation', {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken,
-        ...(cookie ? { Cookie: cookie } : {}),
-        'User-Agent': 'GenosysMobileApp/1.0.0 (Mobile Order)',
-        'Origin': 'https://genosys.ae',
-        'Referer': 'https://genosys.ae/',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: getMobileHeaders(orderData),
       body: JSON.stringify(orderPayload),
     });
 
     console.log('📡 COD order API response status:', response.status);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Order submission failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      const errorText = await response.text().catch(() => '');
+      let errorData = {};
+      try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
+      throw new Error(`Order submission failed: ${response.status} - ${errorData.error || errorData.message || errorText || 'Unknown error'}`);
     }
 
     const result = await response.json();
     console.log('✅ COD order submitted successfully:', {
       success: result.success,
-      orderNumber: result.orderNumber,
-      orderId: result.orderId
+      orderNumber: result.orderNumber || orderData.orderNumber,
+      orderId: result.orderId || result.id
     });
 
     return {
       success: true,
-      orderId: result.orderId,
-      orderNumber: result.orderNumber,
+      orderId: result.orderId || result.id,
+      orderNumber: result.orderNumber || orderData.orderNumber,
       message: result.message || 'Order placed successfully'
     };
 
@@ -144,17 +219,15 @@ export async function submitCardOrder(orderData) {
   console.log('💳 Submitting Card order:', orderData.orderNumber);
   
   try {
-    // Get CSRF token
-    const { csrfToken, cookie } = await getCSRFToken();
-    console.log('🔐 Got CSRF token for card order submission');
-    
-    // Prepare order payload matching website API expectations
+    // Mobile Stripe checkout endpoint (no CSRF): requires Authorization token
     const orderPayload = {
       orderNumber: orderData.orderNumber,
-      customerName: orderData.customerName,
-      customerEmail: orderData.customerEmail,
-      customerPhone: orderData.customerPhone,
-      customerAddress: orderData.customerAddress,
+      customer: {
+        name: orderData.customerName,
+        email: orderData.customerEmail,
+        phone: orderData.customerPhone,
+        address: orderData.customerAddress,
+      },
       emirate: orderData.emirate,
       items: orderData.items.map(item => ({
         id: item.product?.id || item.id,
@@ -162,59 +235,45 @@ export async function submitCardOrder(orderData) {
         price: item.product?.displayPrice || item.product?.price || item.price,
         quantity: item.quantity,
         image: item.product?.image_url || item.product?.image || item.image,
-        size: item.selectedSize || item.size,
+        size: item.isPromotionItem === true ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
         color: item.selectedColor || item.color,
-        total: (item.product?.displayPrice || item.product?.price || item.price) * item.quantity
+        isPromotionItem: item.isPromotionItem === true,
+        promotionKey: item.promotionKey || null,
       })),
-      subtotal: orderData.subtotal,
       shippingCost: orderData.shippingCost,
       vatAmount: orderData.vatAmount,
+      subtotal: orderData.subtotal,
       total: orderData.total,
-      locale: 'en', // Default to English
-      orderNotes: orderData.orderNotes || ''
+      orderNotes: orderData.orderNotes || '',
     };
 
-    console.log('💳 Sending card order to website API:', {
-      orderNumber: orderPayload.orderNumber,
-      customerEmail: orderPayload.customerEmail,
-      total: orderPayload.total,
-      itemCount: orderPayload.items.length
-    });
-
-    const response = await fetch('https://genosys.ae/api/orders/support-link', {
+    const response = await fetch(`${API_BASE_URL}/checkout/stripe`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken,
-        ...(cookie ? { Cookie: cookie } : {}),
-        'User-Agent': 'GenosysMobileApp/1.0.0 (Mobile Order)',
-        'Origin': 'https://genosys.ae',
-        'Referer': 'https://genosys.ae/',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: getMobileHeaders(orderData),
       body: JSON.stringify(orderPayload),
     });
 
     console.log('📡 Card order API response status:', response.status);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Card order submission failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      const errorText = await response.text().catch(() => '');
+      let errorData = {};
+      try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
+      throw new Error(`Card order submission failed: ${response.status} - ${errorData.error || errorData.message || errorText || 'Unknown error'}`);
     }
 
     const result = await response.json();
     console.log('✅ Card order submitted successfully:', {
       success: result.success,
-      orderNumber: result.orderNumber,
-      orderId: result.orderId,
+      orderNumber: result.orderNumber || orderData.orderNumber,
+      orderId: result.orderId || result.id,
       paymentUrl: result.paymentUrl || result.paymentLink
     });
 
     return {
       success: true,
-      orderId: result.orderId,
-      orderNumber: result.orderNumber,
+      orderId: result.orderId || result.id,
+      orderNumber: result.orderNumber || orderData.orderNumber,
       message: result.message || 'Order request submitted successfully',
       paymentUrl: result.paymentUrl || result.paymentLink || null,
     };
@@ -245,6 +304,7 @@ export function generateOrderNumber() {
 export default {
   submitCODOrder,
   submitCardOrder,
+  getPaymentUrlForExistingOrder,
   generateOrderNumber,
 };
 

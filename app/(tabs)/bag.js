@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
   TouchableOpacity,
   Image,
   Alert,
@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
+import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
 
 export default function BagScreen() {
   const { user } = useAuth();
@@ -28,13 +29,79 @@ export default function BagScreen() {
     selectedEmirate,
     setSelectedEmirate,
     getAvailableEmirates,
+    reloadShippingRates,
     isLoading
   } = useCart();
   
   const [showEmirateModal, setShowEmirateModal] = useState(false);
+  const [footerHeight, setFooterHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const cartSummary = getCartSummary();
   const emirates = getAvailableEmirates();
+  const paidItemCount = getTotalItems();
+
+  const isPromoItem = (item) => item?.isPromotionItem === true || item?.selectedSize === '__PROMO__';
+  const promoSubtotal = Number(cartSummary.subtotal) || 0;
+  const promoTier =
+    promoSubtotal >= 700 ? 'twoMasks'
+      : promoSubtotal >= 500 ? 'collagen'
+        : 'none';
+  const promo500Met = promoSubtotal >= 500;
+  const promo700Met = promoSubtotal >= 700;
+
+  const headerTranslateY = useMemo(() => {
+    const h = Math.max(1, headerHeight);
+    return scrollY.interpolate({
+      inputRange: [0, h],
+      outputRange: [0, -h],
+      extrapolate: 'clamp',
+    });
+  }, [scrollY, headerHeight]);
+
+  const scrollPaddingTop = Math.max(headerHeight, 160);
+
+  // Discount display in summary (e.g. user has 50% off)
+  const discountPct = Number(user?.discountPercentage);
+  const safeSubtotal = Number(cartSummary.subtotal) || 0;
+  const safeShipping = Number(cartSummary.shippingCost) || 0;
+  const safeVat = Number(cartSummary.vatAmount) || 0;
+  const safeTotal = Number(cartSummary.total) || 0;
+
+  const originalSubtotal = (() => {
+    if (!Number.isFinite(discountPct) || discountPct <= 0 || discountPct >= 100) return null;
+    const multiplier = 1 - discountPct / 100;
+    if (multiplier <= 0) return null;
+    const sum = items.reduce((acc, item) => {
+      const qty = Number(item.quantity) || 0;
+      const explicitOriginal = Number(item.product?.originalPrice);
+      const base = Number(item.product?.displayPrice ?? item.product?.price ?? 0) || 0;
+      // Discount-excluded products (Beauty Boxes, Hydro Cool Mask): ignore user discount
+      if (isUserDiscountExcludedProduct(item.product)) {
+        // Canonical-price products should always use canonical/base price (e.g. Hydro Cool, Devices)
+        if (isHydroCoolMask(item.product) || isDeviceProduct(item.product) || hasFixedPriceOverride(item.product)) {
+          return acc + getCanonicalUnitPrice(item.product) * qty;
+        }
+        return acc + base * qty;
+      }
+      const orig = Number.isFinite(explicitOriginal) && explicitOriginal > 0
+        ? explicitOriginal
+        : (base / multiplier);
+      return acc + (Number.isFinite(orig) ? orig : base) * qty;
+    }, 0);
+    return Number.isFinite(sum) ? sum : null;
+  })();
+
+  const discountAmount = originalSubtotal && originalSubtotal > safeSubtotal
+    ? Math.max(0, originalSubtotal - safeSubtotal)
+    : 0;
+
+  // Refresh DB-driven shipping rates when opening bag
+  useEffect(() => {
+    reloadShippingRates?.();
+  }, []);
 
   const handleQuantityChange = (item, change) => {
     const newQuantity = item.quantity + change;
@@ -158,34 +225,82 @@ export default function BagScreen() {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => router.back()}
-            >
-              <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-              <Text style={styles.backText}>Home</Text>
-            </TouchableOpacity>
-            
-            <View style={styles.headerCenter}>
-              <Text style={styles.title}>Bag</Text>
-              <Text style={styles.subtitle}>{cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'}</Text>
+      {/* Collapsible header: slides up as the user scrolls to free vertical space */}
+      <Animated.View
+        style={[styles.headerWrapper, { transform: [{ translateY: headerTranslateY }] }]}
+        onLayout={(e) => {
+          const h = e?.nativeEvent?.layout?.height;
+          if (typeof h === 'number' && Number.isFinite(h) && h > 0) setHeaderHeight(h);
+        }}
+      >
+        <SafeAreaView edges={['top']} style={styles.safeArea}>
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => router.back()}
+              >
+                <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
+                <Text style={styles.backText}>Home</Text>
+              </TouchableOpacity>
+
+              <View pointerEvents="none" style={styles.headerCenterAbsolute}>
+                <Text style={styles.titleInline}>
+                  Bag: {paidItemCount} {paidItemCount === 1 ? 'item' : 'items'}
+                </Text>
+              </View>
+
+              <TouchableOpacity onPress={handleClearBag} style={styles.clearButton}>
+                <Text style={styles.clearText}>Clear</Text>
+              </TouchableOpacity>
             </View>
-            
-            <TouchableOpacity onPress={handleClearBag}>
-              <Text style={styles.clearText}>Clear</Text>
-            </TouchableOpacity>
+
+            <View style={styles.promoHeaderBlock}>
+              <Text style={styles.promoTitle}>Free Mask Promotion</Text>
+              <View style={styles.promoRow}>
+                <Text style={styles.promoLine}>Spend 500 AED and get 1 free collagen mask</Text>
+                <Ionicons
+                  name={promo500Met ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={18}
+                  color={promo500Met ? '#27AE60' : '#C7C7CC'}
+                />
+              </View>
+              <View style={styles.promoRow}>
+                <Text style={styles.promoLine}>Spend 700 AED and 2 Free Masks (Sea Algae Mask + Collagen Mask)</Text>
+                <Ionicons
+                  name={promo700Met ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={18}
+                  color={promo700Met ? '#27AE60' : '#C7C7CC'}
+                />
+              </View>
+              {promoTier !== 'none' ? (
+                <Text style={styles.promoApplied}>
+                  {promoTier === 'twoMasks'
+                    ? 'Promotion applied: 2 free masks added to your bag.'
+                    : 'Promotion applied: 1 free mask added to your bag.'}
+                </Text>
+              ) : null}
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </Animated.View>
       
       {/* Items List - Scrollable content with proper bottom padding */}
-      <ScrollView 
+      <Animated.ScrollView 
         style={styles.itemsList} 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        contentContainerStyle={[
+          styles.scrollContent,
+          // Ensure scroll content starts below the collapsing header.
+          { paddingTop: scrollPaddingTop + 12 },
+          // Ensure last item can scroll above the fixed checkout footer on all devices.
+          { paddingBottom: Math.max(footerHeight + 24, 240) },
+        ]}
       >
         {/* Emirates Selection */}
         <TouchableOpacity 
@@ -217,12 +332,16 @@ export default function BagScreen() {
         {items.map((item, index) => {
           const itemKey = `${item.product.id}-${item.selectedColor}-${item.selectedSize}`;
           const imageUrl = item.product.image ? `https://genosys.ae${item.product.image}` : null;
+          const rawSizeLabel = item.selectedSize || item.product?.size || '';
+          const sizeLabel = rawSizeLabel === '__PROMO__' ? (item.product?.size || '') : rawSizeLabel;
+          const promo = isPromoItem(item);
           
           return (
             <View key={itemKey} style={styles.cartItem}>
               <TouchableOpacity 
                 style={styles.itemImageContainer}
-                onPress={() => router.push(`/product/${item.product.id}`)}
+                onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))}
+                disabled={promo}
               >
                 {imageUrl ? (
                   <Image 
@@ -237,16 +356,21 @@ export default function BagScreen() {
                     </Text>
                   </View>
                 )}
+                {!!sizeLabel && (
+                  <Text style={styles.itemImageSize} numberOfLines={1}>
+                    {sizeLabel}
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.itemDetails}>
-                <TouchableOpacity onPress={() => router.push(`/product/${item.product.id}`)}>
+                <TouchableOpacity onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))} disabled={promo}>
                   <Text style={styles.itemName} numberOfLines={2}>{item.product.name}</Text>
                 </TouchableOpacity>
                 <Text style={styles.itemCategory}>{item.product.category}</Text>
                 
                 {/* Variants Display */}
-                {(item.selectedSize || item.selectedColor) && (
+                {!promo && (item.selectedSize || item.selectedColor) && (
                   <View style={styles.variantsContainer}>
                     {item.selectedSize && (
                       <Text style={styles.variantText}>Size: {item.selectedSize}</Text>
@@ -258,73 +382,174 @@ export default function BagScreen() {
                 )}
 
                 {/* Price with Discount Display */}
-                {item.product.originalPrice && item.product.originalPrice !== (item.product.displayPrice || item.product.price) ? (
+                {promo ? (
                   <View style={styles.itemPriceContainer}>
-                    <Text style={styles.itemOriginalPrice}>{item.product.originalPrice} AED</Text>
-                    <Text style={styles.itemDiscountedPrice}>{(item.product.displayPrice || item.product.price).toFixed(2)} AED</Text>
+                    <Text style={styles.itemOriginalPrice}>
+                      {(Number(item.product?.originalPrice) || 0).toFixed(2)} AED
+                    </Text>
+                    <Text style={styles.itemDiscountLabel}>100% OFF</Text>
+                    <Text style={styles.promoTag}>Promotion</Text>
                   </View>
-                ) : (
-                  <Text style={styles.itemPrice}>{(item.product.displayPrice || item.product.price).toFixed(2)} AED</Text>
-                )}
+                ) : (() => {
+                  const pct = Number(user?.discountPercentage);
+                  const hasUserDiscount = Number.isFinite(pct) && pct > 0 && pct < 100;
+                  const isHydro = isHydroCoolMask(item.product);
+                  const isFixed = hasFixedPriceOverride(item.product);
+                  const isDevice = isDeviceProduct(item.product);
+                  const base = (isHydro || isDevice || isFixed)
+                    ? getCanonicalUnitPrice(item.product)
+                    : Number(item.product?.displayPrice || item.product?.price || 0);
+                  const original = Number(item.product?.originalPrice);
+                  const isBeautyBox = isBeautyBoxProduct(item.product);
 
-                <View style={styles.quantityContainer}>
-                  <TouchableOpacity
-                    style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
-                    onPress={() => handleQuantityChange(item, -1)}
-                    disabled={item.quantity <= 1}
-                  >
-                    <Ionicons name="remove" size={16} color={item.quantity <= 1 ? "#D1D1D6" : "#1D1D1F"} />
-                  </TouchableOpacity>
-                  
-                  <Text style={styles.quantityText}>{item.quantity}</Text>
-                  
-                  <TouchableOpacity
-                    style={styles.quantityButton}
-                    onPress={() => handleQuantityChange(item, 1)}
-                  >
-                    <Ionicons name="add" size={16} color="#1D1D1F" />
-                  </TouchableOpacity>
-                </View>
+                  // Beauty Boxes: show bundle discount (15%) explicitly, ignore user discount
+                  if (isBeautyBox && Number.isFinite(base) && base > 0) {
+                    const fullPrice = (Number.isFinite(original) && original > base)
+                      ? original
+                      : (base / 0.85); // bundle is 15% off
+
+                    return (
+                      <View style={styles.itemPriceContainer}>
+                        <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
+                        <Text style={styles.itemBundleLabel}>15% OFF (Bundle Discount)</Text>
+                        <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
+                      </View>
+                    );
+                  }
+
+                  // Hydro Cool Mask: ignore any user discount; keep base price as-is
+                  if (isHydro || isDevice || isFixed) {
+                    return (
+                      <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>
+                    );
+                  }
+
+                  const discounted = !isBeautyBox && hasUserDiscount && Number.isFinite(original) && original > 0
+                    ? original * (1 - pct / 100)
+                    : base;
+
+                  if (Number.isFinite(original) && original > 0 && Number.isFinite(discounted) && discounted > 0 && original !== discounted) {
+                    const pctFromPrices = original ? Math.round((1 - discounted / original) * 100) : null;
+                    const pctLabel =
+                      (Number.isFinite(pctFromPrices) && pctFromPrices > 0 && pctFromPrices < 100 && pctFromPrices) ||
+                      (hasUserDiscount ? Math.round(pct) : null);
+                    return (
+                  <View style={styles.itemPriceContainer}>
+                    <Text style={styles.itemOriginalPrice}>{original.toFixed(2)} AED</Text>
+                    {pctLabel ? (
+                      <Text style={styles.itemDiscountLabel}>{pctLabel}% OFF</Text>
+                    ) : null}
+                    <Text style={styles.itemDiscountedPrice}>{discounted.toFixed(2)} AED</Text>
+                  </View>
+                    );
+                  }
+
+                  return (
+                    <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>
+                  );
+                })()}
               </View>
 
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => handleRemoveItem(item)}
-              >
-                <Ionicons name="trash-outline" size={20} color="#E74C3C" />
-              </TouchableOpacity>
+              {promo ? (
+                <View style={styles.itemRightActions}>
+                  <Text style={styles.promoQtyRight}>Qty {item.quantity || 1}</Text>
+                  <Text style={styles.promoItemPriceRight}>FREE</Text>
+                </View>
+              ) : (
+                <View style={styles.itemRightActions}>
+                  <View style={styles.quantityContainer}>
+                    <TouchableOpacity
+                      style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
+                      onPress={() => handleQuantityChange(item, -1)}
+                      disabled={item.quantity <= 1}
+                    >
+                      <Ionicons name="remove" size={16} color="#000000" />
+                    </TouchableOpacity>
+                    
+                    <Text style={styles.quantityText}>{item.quantity}</Text>
+                    
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => handleQuantityChange(item, 1)}
+                    >
+                      <Ionicons name="add" size={16} color="#000000" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={() => handleRemoveItem(item)}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#E74C3C" />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           );
         })}
 
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Checkout Footer - Fixed at bottom */}
-      <View style={styles.checkoutFooter}>
+      <View
+        style={styles.checkoutFooter}
+        onLayout={(e) => {
+          const h = e?.nativeEvent?.layout?.height;
+          if (typeof h === 'number' && Number.isFinite(h) && h > 0) {
+            setFooterHeight(h);
+          }
+        }}
+      >
         <SafeAreaView edges={['bottom']}>
         <View style={styles.summaryContainer}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Subtotal</Text>
-            <Text style={styles.summaryValue}>{cartSummary.subtotal.toFixed(2)} AED</Text>
-          </View>
+          {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 && (
+            <>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Subtotal (before discount)</Text>
+                <Text style={[styles.summaryValue, styles.summaryOriginalValue]}>
+                  {Number(originalSubtotal).toFixed(2)} AED
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>
+                  Discount{' '}
+                  <Text style={styles.discountPctGreen}>{`(${discountPct}% OFF)`}</Text>
+                </Text>
+                <Text style={styles.summaryDiscountValue}>
+                  -{discountAmount.toFixed(2)} AED
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Subtotal</Text>
+                <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
+              </View>
+            </>
+          )}
+          
+          {!(Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01) && (
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Subtotal</Text>
+              <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
+            </View>
+          )}
           
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Shipping to {selectedEmirate}</Text>
             <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
-              {cartSummary.hasFreeShipping ? 'FREE' : `${(cartSummary.shippingCost || 0).toFixed(2)} AED`}
+              {cartSummary.hasFreeShipping ? 'FREE' : `${safeShipping.toFixed(2)} AED`}
             </Text>
           </View>
           
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>VAT (5%)</Text>
-            <Text style={styles.summaryValue}>{cartSummary.vatAmount.toFixed(2)} AED</Text>
+            <Text style={styles.summaryLabel}>VAT (included)</Text>
+            <Text style={styles.summaryValue}>{safeVat.toFixed(2)} AED</Text>
           </View>
           
           <View style={styles.divider} />
           
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total ({cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'})</Text>
-            <Text style={styles.totalAmount}>{cartSummary.total.toFixed(2)} AED</Text>
+            <Text style={styles.totalAmount}>{safeTotal.toFixed(2)} AED</Text>
           </View>
         </View>
         
@@ -396,6 +621,14 @@ const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: '#ffffff',
   },
+  headerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
+    backgroundColor: '#ffffff',
+  },
   header: {
     paddingHorizontal: 20,
     paddingTop: 20,
@@ -425,9 +658,27 @@ const styles = StyleSheet.create({
     flex: 2,
     alignItems: 'center',
   },
+  headerCenterAbsolute: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleInline: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    letterSpacing: -0.4,
+    textAlign: 'center',
+  },
   headerRight: {
     flex: 1,
     alignItems: 'flex-end',
+  },
+  clearButton: {
+    paddingVertical: 8,
+    paddingLeft: 8,
   },
   title: {
     fontSize: 20,
@@ -443,6 +694,36 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     textAlign: 'center',
   },
+  promoHeaderBlock: {
+    marginTop: 12,
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 12,
+  },
+  promoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 2,
+  },
+  promoTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    marginBottom: 6,
+  },
+  promoLine: {
+    flex: 1,
+    fontSize: 12,
+    color: '#3C3C43',
+  },
+  promoApplied: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#27AE60',
+    fontWeight: '700',
+  },
   clearText: {
     fontSize: 16,
     color: '#E74C3C',
@@ -454,7 +735,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 200, // Space for checkout footer (no tab bar now)
+    // paddingBottom is computed dynamically from the footer height (see ScrollView contentContainerStyle)
   },
   
   // Emirates Selection
@@ -512,13 +793,21 @@ const styles = StyleSheet.create({
   },
   itemImageContainer: {
     width: 80,
-    height: 80,
+    height: 96,
     marginRight: 16,
+    alignItems: 'center',
   },
   itemImage: {
     width: '100%',
-    height: '100%',
+    height: 80,
     borderRadius: 8,
+  },
+  itemImageSize: {
+    marginTop: 6,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1D1D1F',
+    textAlign: 'center',
   },
   itemImagePlaceholder: {
     width: '100%',
@@ -536,6 +825,11 @@ const styles = StyleSheet.create({
   itemDetails: {
     flex: 1,
     marginRight: 12,
+  },
+  itemRightActions: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
   },
   itemName: {
     fontSize: 16,
@@ -559,6 +853,29 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1D1D1F',
     marginBottom: 12,
+  },
+  promoItemPrice: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#27AE60',
+    marginBottom: 12,
+  },
+  promoItemPriceRight: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#27AE60',
+  },
+  promoQtyRight: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 6,
+  },
+  promoTag: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#27AE60',
+    marginTop: 2,
   },
   
   // Variants Display
@@ -585,6 +902,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#E74C3C',
+  },
+  itemBundleLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#27AE60',
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  itemDiscountLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#27AE60',
+    marginTop: 2,
+    marginBottom: 2,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -683,6 +1014,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1D1D1F',
+  },
+  summaryOriginalValue: {
+    textDecorationLine: 'line-through',
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  summaryDiscountValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#E74C3C',
+  },
+  discountPctGreen: {
+    color: '#27AE60',
+    fontWeight: '700',
   },
   freeText: {
     color: '#34C759',

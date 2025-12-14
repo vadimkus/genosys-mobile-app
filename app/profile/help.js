@@ -70,9 +70,9 @@ export default function HelpSupportScreen() {
       id: 'whatsapp',
       title: 'WhatsApp',
       subtitle: 'Chat on WhatsApp',
-      description: '+971 50 123 4567',
+      description: '+971 58 548 76 65',
       icon: 'logo-whatsapp',
-      action: () => Linking.openURL('https://wa.me/971501234567'),
+      action: () => Linking.openURL('https://wa.me/971585487665'),
     },
     {
       id: 'live-chat',

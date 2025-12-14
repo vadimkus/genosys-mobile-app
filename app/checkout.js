@@ -15,12 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
-import { calculateCartTotals, UAE_EMIRATES } from '../utils/cartUtils';
+import { calculateCartTotals } from '../utils/cartUtils';
 import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
+import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 
 export default function CheckoutScreen() {
   const { user } = useAuth();
-  const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart } = useCart();
+  const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
   
   // Form states
   const [firstName, setFirstName] = useState('');
@@ -34,14 +35,46 @@ export default function CheckoutScreen() {
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber] = useState(() => generateOrderNumber());
+  const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
 
   // Calculate totals
   const cartSummary = getCartSummary();
-  const totals = calculateCartTotals(items, user, selectedEmirate);
+  const totals = calculateCartTotals(items, user, selectedEmirate, getAvailableEmirates());
   const safeSubtotal = Number(totals.subtotal) || 0;
   const safeShipping = Number(totals.shipping) || 0;
   const safeVat = Number(totals.vatAmount) || 0;
   const safeTotal = Number(totals.total) || 0;
+
+  const isPromoItem = (item) => item?.isPromotionItem === true || item?.selectedSize === '__PROMO__';
+  const paidItems = items.filter((it) => !isPromoItem(it));
+  const promoItems = items.filter((it) => isPromoItem(it));
+
+  // Always refresh DB-driven shipping rates when opening checkout
+  useEffect(() => {
+    reloadShippingRates?.();
+  }, []);
+
+  // Load default payment method preference
+  useEffect(() => {
+    (async () => {
+      const saved = await getDefaultPaymentMethod();
+      setSelectedPaymentMethod(saved);
+    })();
+  }, []);
+
+  const selectPaymentMethod = async (method) => {
+    const safe =
+      method === PAYMENT_METHODS.CARD
+        ? PAYMENT_METHODS.CARD
+        : PAYMENT_METHODS.COD;
+    setSelectedPaymentMethod(safe);
+    // Persist for next checkout
+    try {
+      await setDefaultPaymentMethod(safe);
+    } catch {
+      // ignore preference save failures
+    }
+  };
 
   // Pre-fill form with user data
   useEffect(() => {
@@ -111,12 +144,13 @@ export default function CheckoutScreen() {
         customerAddress: address.trim(),
         emirate: selectedEmirate,
         items: items,
-        subtotal: totals.subtotal,
-        shippingCost: totals.shippingCost,
-        vatAmount: totals.vatAmount,
-        total: totals.total,
+        subtotal: safeSubtotal,
+        shippingCost: safeShipping,
+        vatAmount: safeVat,
+        total: safeTotal,
         paymentMethod: selectedPaymentMethod,
-        orderNotes: orderNotes.trim()
+        orderNotes: orderNotes.trim(),
+        userToken: user?.token || user?.accessToken || null,
       };
 
       console.log('📦 Submitting order to database and sending emails:', {
@@ -129,43 +163,43 @@ export default function CheckoutScreen() {
 
       // Submit order based on payment method
       let result;
-      if (selectedPaymentMethod === 'cod') {
+      if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
         result = await submitCODOrder(orderData);
       } else {
         result = await submitCardOrder(orderData);
       }
 
       if (result.success) {
-        console.log('✅ Order submitted successfully:', result);
-        
-        // Clear cart after successful submission
-        clearCart();
-        
-        const successMessage = selectedPaymentMethod === 'cod' 
-          ? `Your order ${orderNumber} has been placed successfully! You will receive a confirmation email shortly. Pay when your order is delivered.`
-          : result.paymentUrl
-            ? `Secure payment link is ready.\n\nIf it does not open automatically, check your email for the payment link.`
-            : `Your order request ${orderNumber} has been submitted! We will send you a secure payment link via email to complete your purchase.`;
-        
-        Alert.alert(
-          'Order Submitted Successfully!',
-          successMessage,
-          [
-            {
-              text: 'Continue Shopping',
-              onPress: () => router.replace('/(tabs)/shop')
-            }
-          ]
-        );
+        console.log('✅ Checkout step success:', result);
 
-        // If a payment link is provided, open it for the user
-        if (selectedPaymentMethod === 'card' && result.paymentUrl) {
-          try {
-            await Linking.openURL(result.paymentUrl);
-          } catch (e) {
-            console.warn('Could not open payment link, please check email.', e);
-          }
+        // COD: submit immediately (no payment step)
+        if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
+          clearCart();
+          Alert.alert(
+            'Order Submitted Successfully!',
+            `Your order ${orderNumber} has been placed successfully! You will receive a confirmation email shortly. Pay when your order is delivered.`,
+            [{ text: 'Continue Shopping', onPress: () => router.replace('/(tabs)/shop') }]
+          );
+          return;
         }
+
+        // Card (incl. Apple Pay / Google Pay): DO NOT claim success until payment is confirmed.
+        if (!result.paymentUrl) {
+          Alert.alert(
+            'Payment link unavailable',
+            'We could not start the payment flow. Please try again or contact support.'
+          );
+          return;
+        }
+
+        router.push({
+          pathname: '/payment/stripe',
+          params: {
+            orderId: String(result.orderId || ''),
+            orderNumber: String(orderNumber),
+            paymentUrl: String(result.paymentUrl),
+          },
+        });
       } else {
         console.error('❌ Order submission failed:', result);
         Alert.alert(
@@ -175,11 +209,15 @@ export default function CheckoutScreen() {
             { text: 'Try Again', style: 'default' },
             { 
               text: 'Contact Support', 
-              onPress: () => {
+              onPress: async () => {
                 const phoneNumber = '971585487665';
                 const message = `Hi! I need help with placing order ${orderNumber}. Payment method: ${selectedPaymentMethod}. Can you assist me?`;
                 const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                console.log('Opening WhatsApp for support:', whatsappUrl);
+                try {
+                  await Linking.openURL(whatsappUrl);
+                } catch {
+                  Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+                }
               }
             }
           ]
@@ -195,11 +233,15 @@ export default function CheckoutScreen() {
           { text: 'Try Again', style: 'default' },
           { 
             text: 'Contact Support', 
-            onPress: () => {
+            onPress: async () => {
               const phoneNumber = '971585487665';
               const message = `Hi! I encountered an error while placing order ${orderNumber}. Can you help me?`;
               const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-              console.log('Opening WhatsApp for support:', whatsappUrl);
+              try {
+                await Linking.openURL(whatsappUrl);
+              } catch {
+                Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+              }
             }
           }
         ]
@@ -213,8 +255,9 @@ export default function CheckoutScreen() {
     const phoneNumber = '971585487665';
     const message = `Hi! I need help with my order ${orderNumber}. Can you assist me?`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    // In React Native, you'd use Linking.openURL(whatsappUrl)
-    console.log('Opening WhatsApp:', whatsappUrl);
+    Linking.openURL(whatsappUrl).catch(() => {
+      Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+    });
   };
 
   if (items.length === 0) {
@@ -246,9 +289,77 @@ export default function CheckoutScreen() {
         <View style={styles.content}>
           
           {/* Order Summary Header */}
-          <View style={styles.orderHeader}>
-            <Text style={styles.orderNumber}>Order {orderNumber}</Text>
-            <Text style={styles.itemCount}>{getTotalItems()} items</Text>
+          <View style={styles.orderHeaderCard}>
+            <TouchableOpacity
+              style={styles.orderHeader}
+              onPress={() => setOrderSummaryExpanded((v) => !v)}
+              activeOpacity={0.85}
+            >
+              <View style={styles.orderHeaderLeft}>
+                <Text style={styles.orderNumber}>Order {orderNumber}</Text>
+                <Text style={styles.itemCount}>{getTotalItems()} items</Text>
+              </View>
+              <Ionicons
+                name={orderSummaryExpanded ? 'chevron-up' : 'chevron-down'}
+                size={20}
+                color="#ffffff"
+              />
+            </TouchableOpacity>
+
+            {orderSummaryExpanded ? (
+              <View style={styles.orderSummaryBody}>
+                <Text style={styles.orderSummaryTitle}>Order Summary</Text>
+
+                {paidItems.map((it, idx) => {
+                  const name = it.product?.name || 'Item';
+                  const qty = Number(it.quantity) || 0;
+                  const size = it.selectedSize ? String(it.selectedSize) : '';
+                  const color = it.selectedColor ? String(it.selectedColor) : '';
+                  const extras = [size && `Size: ${size}`, color && `Color: ${color}`].filter(Boolean).join(' • ');
+                  const price = Number(it.product?.displayPrice ?? it.product?.price ?? 0) || 0;
+                  return (
+                    <Text key={`${it.product?.id || name}-${idx}`} style={styles.orderSummaryLine}>
+                      {qty}× {name}{extras ? ` — ${extras}` : ''} — AED {price.toFixed(2)}
+                    </Text>
+                  );
+                })}
+
+                {promoItems.length ? (
+                  <>
+                    <Text style={styles.orderSummarySection}>Promotion</Text>
+                    {promoItems.map((it, idx) => {
+                      const name = it.product?.name || 'Promo item';
+                      const qty = Number(it.quantity) || 1;
+                      const size = it.product?.size ? String(it.product.size) : '';
+                      return (
+                        <Text key={`${it.product?.id || name}-promo-${idx}`} style={styles.orderSummaryLine}>
+                          {qty}× {name}{size ? ` — ${size}` : ''} — FREE
+                        </Text>
+                      );
+                    })}
+                  </>
+                ) : null}
+
+                <View style={styles.orderSummaryDivider} />
+                <Text style={styles.orderSummarySection}>Totals</Text>
+                <View style={styles.orderTotalsRow}>
+                  <Text style={styles.orderTotalsLabel}>Subtotal</Text>
+                  <Text style={styles.orderTotalsValue}>AED {safeSubtotal.toFixed(2)}</Text>
+                </View>
+                <View style={styles.orderTotalsRow}>
+                  <Text style={styles.orderTotalsLabel}>Shipping to {selectedEmirate}</Text>
+                  <Text style={styles.orderTotalsValue}>{safeShipping === 0 ? 'FREE' : `AED ${safeShipping.toFixed(2)}`}</Text>
+                </View>
+                <View style={styles.orderTotalsRow}>
+                  <Text style={styles.orderTotalsLabel}>VAT (included)</Text>
+                  <Text style={styles.orderTotalsValue}>AED {safeVat.toFixed(2)}</Text>
+                </View>
+                <View style={styles.orderTotalsRow}>
+                  <Text style={styles.orderTotalsLabelStrong}>Total</Text>
+                  <Text style={styles.orderTotalsValueStrong}>AED {safeTotal.toFixed(2)}</Text>
+                </View>
+              </View>
+            ) : null}
           </View>
 
           {/* Shipping Information */}
@@ -320,7 +431,7 @@ export default function CheckoutScreen() {
             <View style={styles.formGroup}>
               <Text style={styles.label}>Emirate *</Text>
               <View style={styles.emirateGrid}>
-                {UAE_EMIRATES.map((emirate) => (
+                {getAvailableEmirates().map((emirate) => (
                   <TouchableOpacity
                     key={emirate.name}
                     style={[
@@ -358,15 +469,15 @@ export default function CheckoutScreen() {
               <TouchableOpacity
                 style={[
                   styles.paymentOption,
-                  selectedPaymentMethod === 'cod' && styles.paymentOptionSelected
+                  selectedPaymentMethod === PAYMENT_METHODS.COD && styles.paymentOptionSelected
                 ]}
-                onPress={() => setSelectedPaymentMethod('cod')}
+                onPress={() => selectPaymentMethod(PAYMENT_METHODS.COD)}
               >
                 <View style={styles.paymentOptionHeader}>
                   <Ionicons 
-                    name={selectedPaymentMethod === 'cod' ? "radio-button-on" : "radio-button-off"} 
+                    name={selectedPaymentMethod === PAYMENT_METHODS.COD ? "radio-button-on" : "radio-button-off"} 
                     size={20} 
-                    color={selectedPaymentMethod === 'cod' ? "#E74C3C" : "#C7C7CC"} 
+                    color={selectedPaymentMethod === PAYMENT_METHODS.COD ? "#E74C3C" : "#C7C7CC"} 
                   />
                   <Text style={styles.paymentTitle}>Cash on Delivery</Text>
                 </View>
@@ -376,19 +487,19 @@ export default function CheckoutScreen() {
               <TouchableOpacity
                 style={[
                   styles.paymentOption,
-                  selectedPaymentMethod === 'card' && styles.paymentOptionSelected
+                  selectedPaymentMethod === PAYMENT_METHODS.CARD && styles.paymentOptionSelected
                 ]}
-                onPress={() => setSelectedPaymentMethod('card')}
+                onPress={() => selectPaymentMethod(PAYMENT_METHODS.CARD)}
               >
                 <View style={styles.paymentOptionHeader}>
                   <Ionicons 
-                    name={selectedPaymentMethod === 'card' ? "radio-button-on" : "radio-button-off"} 
+                    name={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "radio-button-on" : "radio-button-off"} 
                     size={20} 
-                    color={selectedPaymentMethod === 'card' ? "#E74C3C" : "#C7C7CC"} 
+                    color={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "#E74C3C" : "#C7C7CC"} 
                   />
                   <Text style={styles.paymentTitle}>Card Payment</Text>
                 </View>
-                <Text style={styles.paymentDescription}>Secure online payment with Visa, Mastercard</Text>
+                <Text style={styles.paymentDescription}>Pay securely with Card • Apple Pay • Google Pay (Stripe)</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -427,7 +538,7 @@ export default function CheckoutScreen() {
             </View>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>VAT (5%)</Text>
+              <Text style={styles.summaryLabel}>VAT (included)</Text>
               <Text style={styles.summaryValue}>AED {safeVat.toFixed(2)}</Text>
             </View>
 
@@ -443,7 +554,7 @@ export default function CheckoutScreen() {
               <Text style={styles.totalValue}>AED {safeTotal.toFixed(2)}</Text>
             </View>
 
-            <Text style={styles.vatNote}>*All prices are VAT inclusive (5%)</Text>
+            <Text style={styles.vatNote}>*All prices are VAT inclusive</Text>
           </View>
 
           {/* Support */}
@@ -522,14 +633,24 @@ const styles = StyleSheet.create({
   },
   
   // Order Header
+  orderHeaderCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
   orderHeader: {
     backgroundColor: '#E74C3C',
     padding: 16,
-    borderRadius: 12,
-    marginBottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  orderHeaderLeft: {
+    flex: 1,
+    paddingRight: 12,
   },
   orderNumber: {
     fontSize: 18,
@@ -541,6 +662,63 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#ffffff',
     opacity: 0.9,
+  },
+  orderSummaryBody: {
+    backgroundColor: '#F2F2F7',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
+    padding: 14,
+    paddingTop: 12,
+  },
+  orderSummaryTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1D1D1F',
+    marginBottom: 8,
+  },
+  orderSummarySection: {
+    marginTop: 10,
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#1D1D1F',
+  },
+  orderSummaryLine: {
+    fontSize: 12,
+    color: '#3C3C43',
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+  orderSummaryDivider: {
+    height: 1,
+    backgroundColor: '#E5E5EA',
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  orderTotalsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  orderTotalsLabel: {
+    fontSize: 12,
+    color: '#3C3C43',
+    fontWeight: '600',
+  },
+  orderTotalsValue: {
+    fontSize: 12,
+    color: '#1D1D1F',
+    fontWeight: '700',
+  },
+  orderTotalsLabelStrong: {
+    fontSize: 13,
+    color: '#1D1D1F',
+    fontWeight: '800',
+  },
+  orderTotalsValueStrong: {
+    fontSize: 13,
+    color: '#1D1D1F',
+    fontWeight: '900',
   },
 
   // Section

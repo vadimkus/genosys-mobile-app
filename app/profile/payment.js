@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,128 +10,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../../services/paymentPreferences';
 
 export default function PaymentScreen() {
   const router = useRouter();
-  const [paymentMethods, setPaymentMethods] = useState([
-    {
-      id: 1,
-      type: 'card',
-      brand: 'visa',
-      last4: '4567',
-      expiryMonth: '12',
-      expiryYear: '25',
-      isDefault: true,
-      holderName: 'John Doe'
-    },
-    {
-      id: 2,
-      type: 'card',
-      brand: 'mastercard',
-      last4: '8901',
-      expiryMonth: '08',
-      expiryYear: '26',
-      isDefault: false,
-      holderName: 'John Doe'
+  const [defaultMethod, setDefaultMethodState] = useState(PAYMENT_METHODS.COD);
+
+  useEffect(() => {
+    (async () => {
+      const method = await getDefaultPaymentMethod();
+      setDefaultMethodState(method);
+    })();
+  }, []);
+
+  const selectDefault = async (method) => {
+    try {
+      const saved = await setDefaultPaymentMethod(method);
+      setDefaultMethodState(saved);
+    } catch (e) {
+      Alert.alert('Error', 'Could not save payment preference. Please try again.');
     }
-  ]);
-
-  const handleAddPaymentMethod = () => {
-    Alert.alert('Add Payment Method', 'Payment method setup coming soon!');
-  };
-
-  const handleEditPaymentMethod = (methodId) => {
-    Alert.alert('Edit Payment Method', `Editing payment method ${methodId} coming soon!`);
-  };
-
-  const handleDeletePaymentMethod = (methodId) => {
-    Alert.alert(
-      'Remove Payment Method',
-      'Are you sure you want to remove this payment method?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            setPaymentMethods(methods => methods.filter(method => method.id !== methodId));
-          }
-        }
-      ]
-    );
-  };
-
-  const handleSetDefault = (methodId) => {
-    setPaymentMethods(methods => 
-      methods.map(method => ({
-        ...method,
-        isDefault: method.id === methodId
-      }))
-    );
-  };
-
-  const getCardIcon = (brand) => {
-    switch (brand.toLowerCase()) {
-      case 'visa':
-        return { name: 'card', color: '#1A1F71' };
-      case 'mastercard':
-        return { name: 'card', color: '#EB001B' };
-      case 'amex':
-        return { name: 'card', color: '#006FCF' };
-      default:
-        return { name: 'card-outline', color: '#8E8E93' };
-    }
-  };
-
-  const PaymentMethodCard = ({ method }) => {
-    const cardIcon = getCardIcon(method.brand);
-    
-    return (
-      <View style={styles.paymentCard}>
-        <View style={styles.paymentHeader}>
-          <View style={styles.paymentInfo}>
-            <View style={styles.cardIconContainer}>
-              <Ionicons name={cardIcon.name} size={24} color={cardIcon.color} />
-            </View>
-            <View style={styles.cardDetails}>
-              <Text style={styles.cardBrand}>{method.brand.toUpperCase()}</Text>
-              <Text style={styles.cardNumber}>•••• {method.last4}</Text>
-              <Text style={styles.cardExpiry}>Expires {method.expiryMonth}/{method.expiryYear}</Text>
-            </View>
-          </View>
-          {method.isDefault && (
-            <View style={styles.defaultBadge}>
-              <Text style={styles.defaultText}>Default</Text>
-            </View>
-          )}
-        </View>
-        
-        <View style={styles.cardActions}>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => handleEditPaymentMethod(method.id)}
-          >
-            <Text style={styles.actionButtonText}>Edit</Text>
-          </TouchableOpacity>
-          
-          {!method.isDefault && (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.setDefaultButton]}
-              onPress={() => handleSetDefault(method.id)}
-            >
-              <Text style={[styles.actionButtonText, styles.setDefaultText]}>Set Default</Text>
-            </TouchableOpacity>
-          )}
-          
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.removeButton]}
-            onPress={() => handleDeletePaymentMethod(method.id)}
-          >
-            <Text style={[styles.actionButtonText, styles.removeText]}>Remove</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
   };
 
   return (
@@ -142,36 +40,66 @@ export default function PaymentScreen() {
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payment & Billing</Text>
-        <TouchableOpacity onPress={handleAddPaymentMethod} style={styles.addButton}>
-          <Ionicons name="add" size={24} color="#E74C3C" />
-        </TouchableOpacity>
+        <View style={styles.addButton} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Info Section */}
         <View style={styles.infoSection}>
           <Text style={styles.infoText}>
-            Manage your payment methods for secure and fast checkout
+            Choose your default payment method for faster checkout
           </Text>
         </View>
 
         {/* Payment Methods */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Payment Methods</Text>
-          {paymentMethods.map((method) => (
-            <PaymentMethodCard key={method.id} method={method} />
-          ))}
+          <Text style={styles.sectionTitle}>Default Payment Method</Text>
+
+          <TouchableOpacity
+            style={[styles.methodRow, defaultMethod === PAYMENT_METHODS.COD && styles.methodRowSelected]}
+            onPress={() => selectDefault(PAYMENT_METHODS.COD)}
+            activeOpacity={0.85}
+          >
+            <View style={styles.methodLeft}>
+              <Ionicons name="cash-outline" size={22} color="#27AE60" />
+              <View style={styles.methodText}>
+                <Text style={styles.methodTitle}>Cash on Delivery</Text>
+                <Text style={styles.methodSubtitle}>Pay when your order is delivered</Text>
+              </View>
+            </View>
+            <Ionicons
+              name={defaultMethod === PAYMENT_METHODS.COD ? 'radio-button-on' : 'radio-button-off'}
+              size={22}
+              color={defaultMethod === PAYMENT_METHODS.COD ? '#E74C3C' : '#C7C7CC'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.methodRow, defaultMethod === PAYMENT_METHODS.CARD && styles.methodRowSelected]}
+            onPress={() => selectDefault(PAYMENT_METHODS.CARD)}
+            activeOpacity={0.85}
+          >
+            <View style={styles.methodLeft}>
+              <Ionicons name="card-outline" size={22} color="#1D1D1F" />
+              <View style={styles.methodText}>
+                <Text style={styles.methodTitle}>Card (Visa / Mastercard)</Text>
+                <Text style={styles.methodSubtitle}>Apple Pay / Google Pay supported (Stripe)</Text>
+              </View>
+            </View>
+            <Ionicons
+              name={defaultMethod === PAYMENT_METHODS.CARD ? 'radio-button-on' : 'radio-button-off'}
+              size={22}
+              color={defaultMethod === PAYMENT_METHODS.CARD ? '#E74C3C' : '#C7C7CC'}
+            />
+          </TouchableOpacity>
         </View>
 
-        {/* Add New Payment Method */}
-        <TouchableOpacity style={styles.addNewButton} onPress={handleAddPaymentMethod}>
-          <View style={styles.addNewContent}>
-            <View style={styles.addIconContainer}>
-              <Ionicons name="add" size={24} color="#E74C3C" />
-            </View>
-            <Text style={styles.addNewText}>Add New Payment Method</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.noteBox}>
+          <Ionicons name="lock-closed" size={18} color="#27AE60" />
+          <Text style={styles.noteText}>
+            For security, we don’t store your card details in the app. Card payments are completed via a secure Stripe link during checkout.
+          </Text>
+        </View>
 
         {/* Billing Information */}
         <View style={styles.section}>
@@ -291,125 +219,58 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
 
-  // Payment Method Cards
-  paymentCard: {
+  methodRow: {
     backgroundColor: '#F2F2F7',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-  },
-  paymentHeader: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#F2F2F7',
   },
-  paymentInfo: {
+  methodRowSelected: {
+    borderColor: '#E74C3C',
+  },
+  methodLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    paddingRight: 12,
+  },
+  methodText: {
     flex: 1,
   },
-  cardIconContainer: {
-    width: 48,
-    height: 32,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  cardDetails: {
-    flex: 1,
-  },
-  cardBrand: {
+  methodTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
     marginBottom: 2,
   },
-  cardNumber: {
-    fontSize: 15,
-    color: '#8E8E93',
-    marginBottom: 2,
-  },
-  cardExpiry: {
+  methodSubtitle: {
     fontSize: 13,
     color: '#8E8E93',
   },
-  defaultBadge: {
-    backgroundColor: '#27AE60',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  defaultText: {
-    fontSize: 12,
-    color: '#ffffff',
-    fontWeight: '600',
-  },
-  
-  // Card Actions
-  cardActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#E74C3C',
-  },
-  setDefaultButton: {
-    backgroundColor: '#E74C3C',
-  },
-  setDefaultText: {
-    color: '#ffffff',
-  },
-  removeButton: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#E74C3C',
-  },
-  removeText: {
-    color: '#E74C3C',
-  },
 
-  // Add New Button
-  addNewButton: {
+  noteBox: {
     marginHorizontal: 20,
     marginBottom: 20,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#F8F9FA',
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E5E5EA',
-    borderStyle: 'dashed',
-  },
-  addNewContent: {
+    padding: 14,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
+    gap: 10,
+    alignItems: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
-  addIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  addNewText: {
-    fontSize: 17,
-    color: '#E74C3C',
-    fontWeight: '500',
+  noteText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
   },
 
   // Billing Information

@@ -21,6 +21,20 @@ export const FavoritesProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
+  const extractWishlistArray = (payload) => {
+    if (!payload) return [];
+    if (Array.isArray(payload)) return payload;
+    // common shapes
+    if (Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload.wishlist)) return payload.wishlist;
+    if (Array.isArray(payload.items)) return payload.items;
+    // nested shapes
+    if (payload.data && Array.isArray(payload.data.data)) return payload.data.data;
+    if (payload.data && Array.isArray(payload.data.wishlist)) return payload.data.wishlist;
+    if (payload.data && Array.isArray(payload.data.items)) return payload.data.items;
+    return [];
+  };
+
   // Load favorites from storage and database on mount
   useEffect(() => {
     loadFavorites();
@@ -79,16 +93,52 @@ export const FavoritesProvider = ({ children }) => {
       const result = await getUserWishlist(user.token);
       
       if (result.success) {
-        const dbFavorites = result.data || [];
+        // databaseService returns `{ success: true, data: <json> }`
+        // where `<json>` could be:
+        // - `[{...}]`
+        // - `{ success: true, data: [{...}] }`
+        // - `{ data: [{...}] }`
+        const dbFavorites = extractWishlistArray(result.data);
         
         // Convert database format to local format
-        const convertedFavorites = dbFavorites.map(item => ({
-          id: item.product_id,
-          name: item.current_product_name || item.product_name, // Use current data if available
-          image: item.current_image || item.product_image,
-          price: item.current_price || item.product_price,
-          addedAt: item.added_at,
-        }));
+        const convertedFavorites = dbFavorites
+          .map((item) => {
+            const id =
+              item?.product_id ??
+              item?.productId ??
+              item?.id ??
+              item?.product?.id ??
+              null;
+            if (id == null) return null;
+            return {
+              id,
+              name:
+                item?.current_product_name ??
+                item?.product_name ??
+                item?.productName ??
+                item?.name ??
+                item?.product?.name ??
+                '',
+              image:
+                item?.current_image ??
+                item?.product_image ??
+                item?.productImage ??
+                item?.image ??
+                item?.product?.image ??
+                item?.product?.image_url ??
+                '',
+              price:
+                item?.current_price ??
+                item?.product_price ??
+                item?.productPrice ??
+                item?.price ??
+                item?.product?.price ??
+                item?.product?.displayPrice ??
+                0,
+              addedAt: item?.added_at ?? item?.addedAt ?? item?.createdAt ?? item?.created_at ?? null,
+            };
+          })
+          .filter(Boolean);
         
         setFavorites(convertedFavorites);
         await saveFavorites(convertedFavorites);

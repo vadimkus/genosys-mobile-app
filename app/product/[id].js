@@ -18,6 +18,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchProductById } from '../../services/api';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../../utils/productRules';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
@@ -37,6 +38,14 @@ const asText = (value) => {
   if (Array.isArray(value)) return value.filter(Boolean).join('\n');
   if (typeof value === 'object') return Object.values(value || {}).join('\n');
   return String(value);
+};
+
+const normalizeForCompare = (value) => {
+  return asText(value)
+    .replace(/\s+/g, ' ')
+    .replace(/[\u2022•·]/g, ' ')
+    .trim()
+    .toLowerCase();
 };
 
 const dedupeList = (arr = []) => {
@@ -71,12 +80,99 @@ const parseMaybeJSON = (value) => {
   if (typeof value === 'object') return value;
   if (typeof value === 'string') {
     try {
-      return JSON.parse(value);
+      return JSON.parse(value.trim());
     } catch {
       return value;
     }
   }
   return value;
+};
+
+const asStringList = (value) => {
+  const parsed = parseMaybeJSON(value);
+  if (Array.isArray(parsed)) return dedupeList(parsed.map(asText));
+  const txt = asText(parsed).trim();
+  if (!txt) return [];
+  if (txt.includes('\n')) {
+    return dedupeList(
+      txt
+        .split('\n')
+        .map((s) => s.replace(/^\s*[-*•]\s*/, '').trim())
+        .filter(Boolean)
+    );
+  }
+  return [txt];
+};
+
+const asKeyValueObject = (value) => {
+  const parsed = parseMaybeJSON(value);
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+  return null;
+};
+
+const toHowToSteps = (value) => {
+  const parsed = parseMaybeJSON(value);
+  if (!Array.isArray(parsed)) return [];
+
+  const steps = parsed
+    .map((x) => {
+      if (!x) return null;
+      if (typeof x === 'string') return { title: '', body: x };
+      if (typeof x === 'object') {
+        const title = asText(x.step || x.title || '').trim();
+        const body = asText(x.instruction || x.description || x.body || '').trim();
+        const fallback = asText(x).trim();
+        return { title, body: body || (!title ? fallback : '') };
+      }
+      return { title: '', body: asText(x).trim() };
+    })
+    .filter(Boolean)
+    .filter((s) => (s.title || s.body).trim().length > 0);
+
+  const seen = new Set();
+  const out = [];
+  for (const s of steps) {
+    const key = normalizeForCompare(s.body || s.title);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(s);
+  }
+  return out;
+};
+
+const toIngredients = (value) => {
+  const parsed = parseMaybeJSON(value);
+  if (!parsed) return [];
+
+  if (Array.isArray(parsed)) {
+    const seen = new Set();
+    const out = [];
+    for (const item of parsed) {
+      if (!item) continue;
+      if (typeof item === 'string') {
+        const name = item.trim();
+        const key = normalizeForCompare(name);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push({ name, description: '' });
+        continue;
+      }
+      if (typeof item === 'object') {
+        const name = asText(item.name || item.title || '').trim();
+        const description = asText(item.description || item.details || '').trim();
+        const fallback = asText(item).trim();
+        const finalName = name || fallback;
+        if (!finalName) continue;
+        const key = normalizeForCompare(finalName);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push({ name: finalName, description });
+      }
+    }
+    return out;
+  }
+
+  return asStringList(parsed).map((name) => ({ name, description: '' }));
 };
 
 const getArrayField = (product, keys) => {
@@ -140,11 +236,37 @@ const SPEC_FIELDS = [
   { label: 'Size', keys: ['size', 'volume', 'productSize'] },
   { label: 'Skin Type', keys: ['skinType', 'skin_type', 'skinTypes'] },
   { label: 'Formulation', keys: ['formulation', 'texture'] },
-  { label: 'Key Benefits', keys: ['keyBenefits', 'benefits', 'advantages'] },
   { label: 'Origin', keys: ['origin', 'countryOfOrigin', 'madeIn'] },
-  { label: 'Usage', keys: ['usage'] },
-  { label: 'Age Group', keys: ['ageGroup'] },
 ];
+
+// Website-style "Product Details" order (prefers values from product.productDetails when present)
+const WEBSITE_DETAILS_ORDER = [
+  { label: 'Form', keys: ['form'] },
+  { label: 'Size', keys: ['size'] },
+  { label: 'Target', keys: ['target'] },
+  { label: 'Technology', keys: ['technology'] },
+  { label: 'Key Benefits', keys: ['keyBenefits', 'key benefits'] },
+  { label: 'Usage', keys: ['usage'] },
+  { label: 'Skin Type', keys: ['skinType', 'skin type'] },
+  { label: 'Application', keys: ['application'] },
+  { label: 'Formulation', keys: ['formulation'] },
+  { label: 'Origin', keys: ['origin'] },
+  { label: 'Note', keys: ['note', 'notes'] },
+];
+
+const getObjValueCaseInsensitive = (obj, keys) => {
+  if (!obj || typeof obj !== 'object') return '';
+  const entries = Object.entries(obj);
+  for (const wanted of keys) {
+    const w = normalizeForCompare(wanted);
+    for (const [k, v] of entries) {
+      if (normalizeForCompare(k) === w) {
+        return asText(v).trim();
+      }
+    }
+  }
+  return '';
+};
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -211,8 +333,24 @@ export default function ProductDetailScreen() {
 
   const handleAddToBag = () => {
     if (product) {
-      // Server provides complete product data, no client calculations needed
-      addItem(product, 1, selectedColor, selectedSize);
+      // Ensure selected size variant pricing is respected in bag/checkout
+      const unitPrice = (() => {
+        if (selectedSize && Array.isArray(product.variants) && product.variants.length > 0) {
+          const v = product.variants.find((vv) => String(vv.size) === String(selectedSize));
+          const vp = Number(v?.price);
+          if (Number.isFinite(vp) && vp > 0) return vp;
+        }
+        const base = Number(product.displayPrice ?? product.price ?? 0);
+        return Number.isFinite(base) ? base : 0;
+      })();
+
+      const productForCart = {
+        ...product,
+        displayPrice: unitPrice,
+        price: unitPrice,
+      };
+
+      addItem(productForCart, 1, selectedColor, selectedSize);
       
       let message = `${product.name} has been added to your bag`;
       if (selectedSize) {
@@ -244,6 +382,17 @@ export default function ProductDetailScreen() {
         console.log(`💰 Variant price: ${selectedVariant.price} AED`);
       }
     }
+  };
+
+  const getSelectedUnitPrice = () => {
+    if (!product) return 0;
+    if (selectedSize && Array.isArray(product.variants) && product.variants.length > 0) {
+      const v = product.variants.find((vv) => String(vv.size) === String(selectedSize));
+      const vp = Number(v?.price);
+      if (Number.isFinite(vp) && vp > 0) return vp;
+    }
+    const base = Number(product.displayPrice ?? product.price ?? 0);
+    return Number.isFinite(base) ? base : 0;
   };
 
   const handleColorChange = (color) => {
@@ -318,21 +467,98 @@ export default function ProductDetailScreen() {
 
   const renderSpecs = () => {
     if (!product) return null;
-    const rows = SPEC_FIELDS.map(({ label, keys }) => {
+
+    const productDetailsObj =
+      asKeyValueObject(product?.productDetails) || getObjectField(product, ['productDetails']);
+
+    // 1) Build website-style rows from productDetails (exact strings/labels from website)
+    const websiteRows = (productDetailsObj
+      ? WEBSITE_DETAILS_ORDER.map(({ label, keys }) => {
+          const v = getObjValueCaseInsensitive(productDetailsObj, keys);
+          return v ? { label, value: v } : null;
+        }).filter(Boolean)
+      : []);
+
+    const usedLabels = new Set(websiteRows.map((r) => normalizeForCompare(r.label)));
+
+    // 2) Add remaining SPEC_FIELDS as fallback (only if not already provided by productDetails)
+    const fallbackRows = SPEC_FIELDS.map(({ label, keys }) => {
+      if (usedLabels.has(normalizeForCompare(label))) return null;
+      if (label === 'Size') {
+        const value = (selectedSize || pickField(product, keys)).trim();
+        return value ? { label, value: asText(value) } : null;
+      }
       const value = pickField(product, keys);
       return value ? { label, value: asText(value) } : null;
     }).filter(Boolean);
 
+    // 3) Add any remaining productDetails key/values not covered above
+    const extraRows = [];
+    if (productDetailsObj) {
+      const usedKeys = new Set();
+      WEBSITE_DETAILS_ORDER.forEach(({ keys }) =>
+        keys.forEach((k) => usedKeys.add(normalizeForCompare(k)))
+      );
+      for (const [k, v] of Object.entries(productDetailsObj)) {
+        const nk = normalizeForCompare(k);
+        if (!nk || usedKeys.has(nk)) continue;
+        const tv = asText(v).trim();
+        if (!tv) continue;
+        extraRows.push({ label: asText(k).trim(), value: tv });
+      }
+    }
+
+    const rows = [...websiteRows, ...fallbackRows, ...extraRows];
+
     if (!rows.length) return null;
+
+    const renderSpecValue = (label, value) => {
+      const txt = asText(value).trim();
+      if (!txt) return null;
+
+      const nlabel = normalizeForCompare(label);
+
+      // Website-style field: keyBenefits is usually a comma-separated list; render as bullets.
+      if (nlabel === normalizeForCompare('Key Benefits')) {
+        // Prefer a single <Text> with newlines to avoid layout quirks (some devices render bullet rows but hide text).
+        const parsed = parseMaybeJSON(txt);
+        const parts =
+          Array.isArray(parsed) ? dedupeList(parsed.map(asText)) : dedupeList(txt.split(',').map((s) => s.trim()).filter(Boolean));
+
+        if (parts.length) {
+          const capFirst = (s) => {
+            const t = asText(s).trim();
+            if (!t) return '';
+            const first = t[0];
+            if (!first) return t;
+            const upper = first.toUpperCase();
+            return upper + t.slice(1);
+          };
+          return (
+            <Text style={styles.specValueText}>
+              {parts.map((p) => `• ${capFirst(p)}`).join('\n')}
+            </Text>
+          );
+        }
+      }
+
+      return <Text style={styles.specValueText}>{txt}</Text>;
+    };
 
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Product Details</Text>
         <View style={styles.specList}>
           {rows.map((row, idx) => (
-            <View key={row.label + idx} style={styles.specItem}>
+            <View
+              key={row.label + idx}
+              style={[
+                styles.specItem,
+                idx === rows.length - 1 ? styles.specItemLast : null,
+              ]}
+            >
               <Text style={styles.specLabel}>{row.label}</Text>
-              <Text style={styles.specValue}>{row.value}</Text>
+              <View style={styles.specValueContainer}>{renderSpecValue(row.label, row.value)}</View>
             </View>
           ))}
         </View>
@@ -375,6 +601,49 @@ export default function ProductDetailScreen() {
       </View>
     );
   };
+
+  const renderStepsSection = (title, steps) => {
+    if (!steps || steps.length === 0) return null;
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.listContainer}>
+          {steps.map((s, idx) => (
+            <View key={`${idx}-${s.title}`} style={styles.listItem}>
+              <Text style={styles.listBullet}>{idx + 1}.</Text>
+              <Text style={styles.listText}>
+                {s.title ? `${s.title}: ` : ''}
+                {s.body}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderIngredientsSection = (title, items) => {
+    if (!items || items.length === 0) return null;
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.listContainer}>
+          {items.map((it, idx) => (
+            <View key={`${idx}-${it.name}`} style={styles.listItem}>
+              <Text style={styles.listBullet}>•</Text>
+              <Text style={styles.listText}>
+                <Text style={{ fontWeight: '700', color: '#1D1D1F' }}>{it.name}</Text>
+                {it.description ? ` — ${it.description}` : ''}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  // NOTE: buildExtraProductDetails() was replaced by website-first rendering inside renderSpecs()
+  // to ensure cleanser (and other products) show the same ordered fields as the website.
 
   if (loading) {
     return (
@@ -484,22 +753,62 @@ export default function ProductDetailScreen() {
                   </View>
                 </View>
               ) : (
-                <Text style={styles.price}>
+                <View style={styles.priceBlock}>
                   {(() => {
-                    const base = product.displayPrice || product.price || 0;
-                    const derived = deriveDiscountFromBadges(product);
-                    const orig = product.originalPrice || (derived?.original || null);
-                    if (orig && orig > base) {
-                      return (
-                        <Text>
-                          <Text style={styles.originalPrice}>{formatPrice(orig)} AED </Text>
-                          <Text style={styles.discountedPrice}>{formatPrice(base)} AED</Text>
-                        </Text>
-                      );
+                    // Canonical-price / no-user-discount products: show canonical/base price only.
+                    if (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) {
+                      return <Text style={styles.price}>{`${formatPrice(getCanonicalUnitPrice(product))} AED`}</Text>;
                     }
-                    return `${formatPrice(base)} AED`;
+
+                    const base = Number(getSelectedUnitPrice() || 0);
+                    const userPct = Number(user?.discountPercentage);
+                    const derived = deriveDiscountFromBadges(product);
+                    const serverOrig = Number(product?.originalPrice);
+                    const serverBase = Number(product?.displayPrice ?? product?.price);
+                    const serverHasDiscount =
+                      Number.isFinite(serverOrig) &&
+                      Number.isFinite(serverBase) &&
+                      serverOrig > 0 &&
+                      serverOrig > serverBase;
+
+                    const pctFromServer =
+                      serverHasDiscount && serverOrig
+                        ? Math.round((1 - serverBase / serverOrig) * 100)
+                        : null;
+
+                    const pct =
+                      (Number.isFinite(pctFromServer) && pctFromServer > 0 && pctFromServer < 100 && pctFromServer) ||
+                      (Number.isFinite(derived?.percent) && derived.percent) ||
+                      (Number.isFinite(userPct) && userPct > 0 && userPct < 100 && userPct) ||
+                      null;
+
+                    // If backend provided originalPrice/discount, treat base as already discounted.
+                    // Otherwise, if user has a discount %, show computed before/after as a fallback.
+                    const showDiscount =
+                      (serverHasDiscount && Number.isFinite(pct) && pct > 0) ||
+                      (!serverHasDiscount && Number.isFinite(userPct) && userPct > 0 && userPct < 100);
+
+                    if (!showDiscount) {
+                      return <Text style={styles.price}>{`${formatPrice(base)} AED`}</Text>;
+                    }
+
+                    const effectivePct = pct || userPct;
+                    const discounted = serverHasDiscount ? base : base * (1 - effectivePct / 100);
+                    const original = serverHasDiscount ? base / (1 - effectivePct / 100) : base;
+
+                    return (
+                      <View>
+                        <Text style={styles.originalPrice}>{formatPrice(original)} AED</Text>
+                        <View style={styles.discountRow}>
+                          <Text style={styles.discountedPrice}>{formatPrice(discounted)} AED</Text>
+                          <View style={styles.discountBadge}>
+                            <Text style={styles.discountBadgeText}>{`${Math.round(effectivePct)}% OFF`}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
                   })()}
-                </Text>
+                </View>
               )}
           </View>
 
@@ -517,57 +826,49 @@ export default function ProductDetailScreen() {
             )}
 
           {/* Product content sections from API */}
-          {renderInfoSection(
-            'About this product',
-            pickField(product, ['details', 'productDetails', 'product_details', 'detail']) || getDisplayDescription()
-          )}
+          {renderInfoSection('About this product', getDisplayDescription())}
 
-          {renderInfoSection(
-            'Benefits',
-            pickField(product, ['benefits', 'keyBenefits', 'benefit', 'advantages'])
-          )}
-
-          {renderInfoSection(
-            'Directions',
-            pickField(product, ['directions', 'howToUse', 'usage', 'application', 'how_to_use'])
-          )}
-
-          {renderInfoSection(
-            'Key Ingredients',
-            pickField(product, ['keyIngredients', 'ingredients', 'key_ingredients', 'composition'])
-          )}
-
-          {renderInfoSection(
-            'Note',
-            pickField(product, ['note', 'notes', 'warning', 'caution'])
-          )}
-
+          {/* Required website-like sections (deduped + formatted) */}
           {renderSpecs()}
 
-          {renderListSection(
-            'Key Benefits',
-            getArrayField(product, ['keyBenefits', 'benefits', 'advantages', 'keyFeatures'])
-          )}
+          {(() => {
+            const benefits = dedupeList([
+              ...asStringList(product?.benefits),
+              ...asStringList(product?.keyBenefits),
+              ...(() => {
+                const parsed = parseMaybeJSON(product?.keyFeatures);
+                if (!Array.isArray(parsed)) return [];
+                return parsed
+                  .map((x) => {
+                    if (!x) return '';
+                    if (typeof x === 'string') return x;
+                    const t = asText(x.title || '').trim();
+                    const d = asText(x.description || '').trim();
+                    return `${t}${t && d ? ' — ' : ''}${d}`.trim();
+                  })
+                  .filter(Boolean);
+              })(),
+            ]);
 
-          {renderListSection(
-            'Target Concerns',
-            getArrayField(product, ['targetConcerns', 'concerns'])
-          )}
+            if (benefits.length === 1 && benefits[0].length > 200 && !benefits[0].includes(' — ')) {
+              return renderInfoSection('Benefits', benefits[0]);
+            }
+            return renderListSection('Benefits', benefits);
+          })()}
 
-          {renderListSection(
-            'Ingredients',
-            getArrayField(product, ['ingredients'])
-          )}
+          {(() => {
+            const steps = toHowToSteps(product?.howToUse);
+            const directionsText = pickField(product, ['directions', 'application', 'how_to_use']);
+            if (steps.length) return renderStepsSection('Directions', steps);
+            return renderInfoSection('Directions', directionsText || pickField(product, ['usage']));
+          })()}
 
-          {renderInfoSection(
-            'How to Use',
-            pickField(product, ['howToUse', 'directions', 'usage'])
-          )}
+          {renderIngredientsSection('Key Ingredients', toIngredients(product?.ingredients || product?.keyIngredients))}
 
-          {renderKeyValueSection(
-            'Product Details',
-            getObjectField(product, ['productDetails'])
-          )}
+          {renderInfoSection('Note', pickField(product, ['note', 'notes', 'warning', 'caution']))}
+
+          {/* Optional helpful section */}
+          {renderListSection('Target Concerns', getArrayField(product, ['targetConcerns', 'concerns']))}
 
           {/* Rating Section */}
           {product.rating && (
@@ -585,48 +886,6 @@ export default function ProductDetailScreen() {
               </View>
             </View>
           )}
-
-          {/* Features */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Features</Text>
-            <View style={styles.featureList}>
-              <Text style={styles.feature}>• Premium quality ingredients</Text>
-              <Text style={styles.feature}>• Clinically tested formula</Text>
-              <Text style={styles.feature}>• Dermatologist recommended</Text>
-              <Text style={styles.feature}>• Suitable for all skin types</Text>
-              <Text style={styles.feature}>• Fast and secure delivery</Text>
-              <Text style={styles.feature}>• 30-day return policy</Text>
-            </View>
-          </View>
-
-          {/* Product Details */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Product Details</Text>
-            <View style={styles.detailGrid}>
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>Brand</Text>
-                <Text style={styles.detailValue}>Genosys</Text>
-              </View>
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>Category</Text>
-                <Text style={styles.detailValue}>{product.category}</Text>
-              </View>
-              {product.size && (
-                <View style={styles.detailItem}>
-                  <Text style={styles.detailLabel}>Size</Text>
-                  <Text style={styles.detailValue}>{product.size}</Text>
-                </View>
-              )}
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>SKU</Text>
-                <Text style={styles.detailValue}>GS-{product.id}</Text>
-              </View>
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>Availability</Text>
-                <Text style={styles.detailValue}>In Stock</Text>
-              </View>
-            </View>
-          </View>
         </View>
       </ScrollView>
 
@@ -775,6 +1034,29 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
     marginBottom: 8,
   },
+  priceBlock: {
+    marginBottom: 8,
+  },
+  discountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  discountBadge: {
+    backgroundColor: '#27AE6020',
+    borderColor: '#27AE60',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  discountBadgeText: {
+    color: '#27AE60',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
   size: {
     fontSize: 16,
     color: '#6E6E73',
@@ -871,25 +1153,35 @@ const styles = StyleSheet.create({
   specList: {
     backgroundColor: '#F8F9FA',
     borderRadius: 12,
-    padding: 12,
-    gap: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
   specItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ECEEF0',
+  },
+  specItemLast: {
+    borderBottomWidth: 0,
   },
   specLabel: {
-    fontSize: 15,
+    width: 110,
+    fontSize: 14,
     color: '#6E6E73',
     fontWeight: '600',
+    lineHeight: 20,
   },
-  specValue: {
+  specValueContainer: {
     flex: 1,
+    alignItems: 'flex-start',
+  },
+  specValueText: {
     fontSize: 15,
     color: '#1D1D1F',
-    textAlign: 'right',
+    lineHeight: 22,
   },
   detailItem: {
     flexDirection: 'row',
@@ -960,7 +1252,7 @@ const styles = StyleSheet.create({
   },
   sizeInfo: {
     fontSize: 14,
-    color: '#666666',
+    color: '#1D1D1F',
     backgroundColor: '#F2F2F7',
     paddingHorizontal: 8,
     paddingVertical: 4,

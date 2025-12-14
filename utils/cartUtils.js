@@ -5,6 +5,8 @@
  * Server should handle final pricing calculations during checkout.
  */
 
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isUserDiscountExcludedProduct, isDeviceProduct } from './productRules';
+
 // UAE Emirates for shipping - minimal data needed for cart
 export const UAE_EMIRATES = [
   { name: 'Dubai', shippingCost: 0 },
@@ -16,55 +18,117 @@ export const UAE_EMIRATES = [
   { name: 'Umm Al Quwain', shippingCost: 30 }
 ];
 
+const DEFAULT_FREE_SHIPPING_THRESHOLD = 1000;
+
 /**
  * Calculate basic cart totals for display purposes
  * Note: Server should recalculate final totals during checkout
  * @param {Array} items - Cart items 
  * @param {Object} user - User object (for display purposes)
  * @param {string} selectedEmirate - Selected emirate name
+ * @param {Array|Object|null} emiratesOverrideOrConfig - emirates array or config object { emirates, freeShippingThreshold, vatRate }
  * @returns {Object} Cart totals for UI display
  */
-export function calculateCartTotals(items, user, selectedEmirate) {
+export function calculateCartTotals(items, user, selectedEmirate, emiratesOverrideOrConfig = null) {
   console.log('🧮 Calculating cart totals (client-side for display only)');
   
   if (!items || items.length === 0) {
     return {
       subtotal: 0,
       shipping: 0,
+      shippingCost: 0,
       total: 0,
       itemCount: 0,
       vatAmount: 0,
-      totalWithVat: 0
+      totalWithVat: 0,
+      freeShippingThreshold: DEFAULT_FREE_SHIPPING_THRESHOLD,
+      amountForFreeShipping: DEFAULT_FREE_SHIPPING_THRESHOLD,
+      hasFreeShipping: false,
     };
   }
 
-  // Calculate subtotal using server-provided prices
+  const config =
+    emiratesOverrideOrConfig && !Array.isArray(emiratesOverrideOrConfig) && typeof emiratesOverrideOrConfig === 'object'
+      ? emiratesOverrideOrConfig
+      : null;
+  const emiratesOverride = Array.isArray(emiratesOverrideOrConfig)
+    ? emiratesOverrideOrConfig
+    : Array.isArray(config?.emirates)
+      ? config.emirates
+      : null;
+
+  // Calculate subtotal for display:
+  // - User-discount excluded products (Beauty Boxes, Hydro Cool Mask): NEVER apply user discount; use server-provided/base pricing.
+  // - Other products: if user has a percentage discount and product.originalPrice is present, compute discounted price from originalPrice.
+  // - Otherwise, use server-provided displayPrice/price.
   const subtotal = items.reduce((sum, item) => {
-    const rawPrice = item.product?.displayPrice ?? item.product?.price ?? item.price ?? 0;
-    const itemPrice = Number(rawPrice);
+    const discountPct = Number(user?.discountPercentage);
+    const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+    const excludedFromUserDiscount = isUserDiscountExcludedProduct(item.product);
+    const forceCanonicalPrice =
+      isHydroCoolMask(item.product) || isDeviceProduct(item.product) || hasFixedPriceOverride(item.product);
+
+    const rawDisplay =
+      item.product?.displayPrice ??
+      item.product?.price ??
+      item.product?.priceIncludingVat ??
+      item.product?.price_including_vat ??
+      item.price ??
+      0;
+
+    const original = Number(item.product?.originalPrice);
+    const itemPrice = forceCanonicalPrice
+      ? getCanonicalUnitPrice(item.product)
+      : (!excludedFromUserDiscount && hasUserDiscount && Number.isFinite(original) && original > 0
+      ? original * (1 - discountPct / 100)
+      : Number(rawDisplay));
     const qty = Number(item.quantity) || 0;
     return sum + (Number.isFinite(itemPrice) ? itemPrice * qty : 0);
   }, 0);
 
   // Get shipping cost for selected emirate
-  const emirate = UAE_EMIRATES.find(e => e.name === selectedEmirate);
-  const shipping = emirate ? Number(emirate.shippingCost) || 0 : 0;
+  const list = (Array.isArray(emiratesOverride) && emiratesOverride.length) ? emiratesOverride : UAE_EMIRATES;
+  const targetKey = String(selectedEmirate || '').trim().toLowerCase();
+  const emirate = list.find(e => String(e.name || '').trim().toLowerCase() === targetKey);
+  const baseShipping = emirate ? Number(emirate.shippingCost) || 0 : 0;
 
-  // Basic VAT calculation (5% UAE VAT)
-  const vatRate = 0.05;
-  const vatAmount = Number.isFinite(subtotal) ? subtotal * vatRate : 0;
-  const totalWithVat = (Number.isFinite(subtotal) ? subtotal : 0) + vatAmount + shipping;
+  // Free delivery rule: all emirates are FREE for subtotal >= 1000 AED.
+  // Prefer server-provided threshold if present; fallback to 1000.
+  const freeShippingThresholdRaw = config?.freeShippingThreshold;
+  const freeShippingThreshold =
+    (Number.isFinite(Number(freeShippingThresholdRaw)) && Number(freeShippingThresholdRaw) > 0)
+      ? Number(freeShippingThresholdRaw)
+      : DEFAULT_FREE_SHIPPING_THRESHOLD;
+
+  const qualifiesForFreeShipping = Number.isFinite(subtotal) && subtotal >= freeShippingThreshold;
+  const shipping = qualifiesForFreeShipping ? 0 : baseShipping;
+  const amountForFreeShipping = qualifiesForFreeShipping
+    ? 0
+    : Math.max(0, freeShippingThreshold - (Number.isFinite(subtotal) ? subtotal : 0));
+
+  // VAT is INCLUDED in product prices. Compute the included portion for display only.
+  const vatRateRaw = config?.vatRate;
+  const vatRate =
+    (Number.isFinite(Number(vatRateRaw)) && Number(vatRateRaw) >= 0)
+      ? Number(vatRateRaw)
+      : 0.05;
+  const vatAmount = Number.isFinite(subtotal) ? (subtotal * vatRate) / (1 + vatRate) : 0;
+  const totalWithVat = (Number.isFinite(subtotal) ? subtotal : 0) + shipping;
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const totals = {
     subtotal,
     shipping,
+    shippingCost: shipping, // alias for UI compatibility
     total: totalWithVat,
     itemCount,
     vatAmount,
     totalWithVat,
-    selectedEmirate
+    selectedEmirate,
+    freeShippingThreshold,
+    amountForFreeShipping,
+    hasFreeShipping: shipping === 0,
   };
 
   console.log('💰 Cart totals calculated:', totals);

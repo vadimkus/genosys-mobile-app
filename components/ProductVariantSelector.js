@@ -7,6 +7,40 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { isCushionBB } from '../utils/productRules';
+
+const parseMaybeJSON = (value) => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'object') return value;
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value.trim());
+    } catch {
+      return value;
+    }
+  }
+  return value;
+};
+
+const getSingleSizeLabel = (product) => {
+  // Cushion BB: force exact label requested for the size block.
+  if (isCushionBB(product)) return '15g (includees replacement refill)';
+
+  const obj = parseMaybeJSON(product?.productDetails);
+  if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+    const direct = obj.size;
+    if (typeof direct === 'string' && direct.trim()) return direct.trim();
+    // case-insensitive fallback
+    for (const [k, v] of Object.entries(obj)) {
+      if (String(k).toLowerCase().trim() === 'size') {
+        const txt = String(v ?? '').trim();
+        if (txt) return txt;
+      }
+    }
+  }
+  const fallback = String(product?.size ?? '').trim();
+  return fallback || '';
+};
 
 export default function ProductVariantSelector({
   product,
@@ -18,8 +52,9 @@ export default function ProductVariantSelector({
   const { user } = useAuth();
 
   // Enhanced API provides complete variant data with calculated prices
-  const availableSizes = product.variants || [];
+  const availableSizes = (product.variants || []).filter((v) => v && v.size);
   const availableColors = product.colorVariants || [];
+  const singleSizeLabel = getSingleSizeLabel(product);
 
   return (
     <View style={styles.container}>
@@ -64,9 +99,9 @@ export default function ProductVariantSelector({
           <Text style={styles.sectionTitle}>Size</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScroll}>
             <View style={styles.sizeOptions}>
-              {availableSizes.map((variant) => (
+              {availableSizes.map((variant, idx) => (
                 <TouchableOpacity
-                  key={variant.size}
+                  key={`${variant.size}-${variant.id || idx}`}
                   onPress={() => onSizeChange(variant.size)}
                   style={[
                     styles.sizeOption,
@@ -100,6 +135,18 @@ export default function ProductVariantSelector({
           </ScrollView>
         </View>
       )}
+
+      {/* Single Size (no selectable size variants) */}
+      {availableSizes.length === 0 && singleSizeLabel ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Size</Text>
+          <View style={styles.sizeOptions}>
+            <View style={[styles.sizeOption, styles.singleSizeOption, styles.singleSizeStaticOption]}>
+              <Text style={[styles.sizeLabel, styles.singleSizeStaticLabel]}>{singleSizeLabel}</Text>
+            </View>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -168,6 +215,14 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 2,
   },
+  singleSizeOption: {
+    paddingHorizontal: 18,
+  },
+  singleSizeStaticOption: {
+    // Keep it non-interactive but visually readable (black text, no "disabled" fade).
+    borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+  },
   sizeOption: {
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -210,6 +265,10 @@ const styles = StyleSheet.create({
   },
   sizeLabelDisabled: {
     color: '#9CA3AF',
+  },
+  singleSizeStaticLabel: {
+    color: '#000000',
+    fontWeight: '500',
   },
   sizePriceDisabled: {
     color: '#9CA3AF',

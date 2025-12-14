@@ -3,21 +3,58 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
 import { calculateCartTotals, UAE_EMIRATES } from '../utils/cartUtils';
+import { fetchShippingRates } from '../services/api';
+import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
 
 const CartContext = createContext();
 
 const CART_STORAGE_KEY = 'genosys_cart';
 const EMIRATE_STORAGE_KEY = 'genosys_selected_emirate';
+const SHIPPING_RATES_STORAGE_KEY = 'genosys_shipping_rates';
+
+// Free mask promotion config:
+// - Spend >= 500 AED: 1 free collagen mask
+// - Spend >= 700 AED: 2 free masks (sea algae + collagen)
+const PROMO_VARIANT_SIZE = '__PROMO__';
+const PROMO_PRODUCTS = {
+  collagen: {
+    id: 'cmgj9ifoi00008o07p4eqmfb7',
+    name: 'INTENSIVE REPAIR COLLAGEN MASK',
+    image: '/images/in.png',
+    originalPrice: 36,
+    size: '1 Sheet (23g)',
+  },
+  seaAlgae: {
+    id: '36',
+    name: 'SOOTHING BOMB SEA ALGAE MASK',
+    image: '/images/SEA.jpg',
+    originalPrice: 36,
+    size: '1 sheet (23g)',
+  },
+};
+const PROMO_THRESHOLDS = {
+  collagen: 500,
+  twoMasks: 700,
+};
+
+const isPromotionItem = (item) => item?.isPromotionItem === true || item?.selectedSize === PROMO_VARIANT_SIZE;
 
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [selectedEmirate, setSelectedEmirateState] = useState('Dubai');
   const [isLoading, setIsLoading] = useState(true);
+  const [shippingRates, setShippingRates] = useState(null);
+  const [emirates, setEmirates] = useState(UAE_EMIRATES);
 
   // Load cart and emirate from storage on mount
   useEffect(() => {
     loadCartFromStorage();
+  }, []);
+
+  // Load shipping rates from API (DB-driven), fallback to storage/hardcoded
+  useEffect(() => {
+    loadShippingRates();
   }, []);
 
   // Save cart to storage whenever items change
@@ -34,11 +71,103 @@ export const CartProvider = ({ children }) => {
     }
   }, [selectedEmirate, isLoading]);
 
+  // Auto-apply Free Mask Promotion based on cart subtotal (excludes existing promo items).
+  // This keeps promo items visible in Bag + included in checkout payload, while not affecting pricing totals.
+  useEffect(() => {
+    if (isLoading) return;
+
+    const nonPromoItems = items.filter((it) => !isPromotionItem(it));
+    const totals = calculateCartTotals(nonPromoItems, user, selectedEmirate, {
+      emirates,
+      freeShippingThreshold: shippingRates?.freeShippingThreshold,
+      vatRate: shippingRates?.vatRate,
+    });
+    const subtotal = Number(totals?.subtotal) || 0;
+
+    const desiredKeys = [];
+    if (subtotal >= PROMO_THRESHOLDS.twoMasks) {
+      desiredKeys.push('collagen', 'seaAlgae');
+    } else if (subtotal >= PROMO_THRESHOLDS.collagen) {
+      desiredKeys.push('collagen');
+    }
+
+    setItems((prev) => {
+      const prevNonPromo = prev.filter((it) => !isPromotionItem(it));
+      const prevPromo = prev.filter((it) => isPromotionItem(it));
+
+      const currentKeys = new Set(
+        prevPromo
+          .map((it) => String(it?.promotionKey || '').trim())
+          .filter(Boolean)
+      );
+
+      const wantKeys = new Set(desiredKeys);
+
+      // Remove promos that should no longer exist
+      const keptPromo = prevPromo.filter((it) => {
+        const k = String(it?.promotionKey || '').trim();
+        return k && wantKeys.has(k);
+      });
+
+      // Add missing promos
+      const toAdd = [];
+      for (const key of desiredKeys) {
+        if (currentKeys.has(key)) continue;
+        const p = PROMO_PRODUCTS[key];
+        if (!p?.id) continue;
+        toAdd.push({
+          product: {
+            id: p.id,
+            name: p.name,
+            category: 'Promotion',
+            image: p.image || null,
+            size: p.size || null,
+            price: 0,
+            displayPrice: 0,
+            originalPrice: Number(p.originalPrice) || null,
+            discountLabel: '100% OFF',
+          },
+          quantity: 1,
+          selectedColor: '',
+          selectedSize: PROMO_VARIANT_SIZE,
+          addedAt: new Date().toISOString(),
+          isPromotionItem: true,
+          promotionKey: key,
+        });
+      }
+
+      const next = [...prevNonPromo, ...keptPromo, ...toAdd];
+
+      // Avoid state churn if nothing changed
+      if (next.length === prev.length) {
+        let same = true;
+        for (let i = 0; i < next.length; i++) {
+          const a = next[i];
+          const b = prev[i];
+          if (
+            a?.product?.id !== b?.product?.id ||
+            a?.quantity !== b?.quantity ||
+            a?.selectedSize !== b?.selectedSize ||
+            a?.selectedColor !== b?.selectedColor ||
+            a?.isPromotionItem !== b?.isPromotionItem
+          ) {
+            same = false;
+            break;
+          }
+        }
+        if (same) return prev;
+      }
+
+      return next;
+    });
+  }, [items, user, selectedEmirate, emirates, shippingRates, isLoading]);
+
   const loadCartFromStorage = async () => {
     try {
-      const [cartData, emirateData] = await Promise.all([
+      const [cartData, emirateData, shippingRatesData] = await Promise.all([
         AsyncStorage.getItem(CART_STORAGE_KEY),
-        AsyncStorage.getItem(EMIRATE_STORAGE_KEY)
+        AsyncStorage.getItem(EMIRATE_STORAGE_KEY),
+        AsyncStorage.getItem(SHIPPING_RATES_STORAGE_KEY),
       ]);
 
       if (cartData) {
@@ -49,10 +178,33 @@ export const CartProvider = ({ children }) => {
       if (emirateData) {
         setSelectedEmirateState(emirateData);
       }
+
+      if (shippingRatesData) {
+        const parsed = JSON.parse(shippingRatesData);
+        if (parsed?.emirates && Array.isArray(parsed.emirates)) {
+          setShippingRates(parsed);
+          setEmirates(parsed.emirates);
+        }
+      }
     } catch (error) {
       console.error('Error loading cart from storage:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadShippingRates = async () => {
+    try {
+      const rates = await fetchShippingRates();
+      setShippingRates(rates);
+      if (Array.isArray(rates.emirates) && rates.emirates.length) {
+        setEmirates(rates.emirates);
+      }
+      await AsyncStorage.setItem(SHIPPING_RATES_STORAGE_KEY, JSON.stringify(rates));
+      console.log('✅ Shipping rates loaded from API');
+    } catch (error) {
+      console.warn('⚠️ Could not load shipping rates from API, using fallback:', error.message);
+      // keep whatever we have from storage or hardcoded
     }
   };
 
@@ -78,11 +230,28 @@ export const CartProvider = ({ children }) => {
   const addItem = (product, quantity = 1, selectedColor = '', selectedSize = '') => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
+
+    // Ensure special products are stored in cart with canonical pricing fields
+    // (so UI + order payloads stay consistent).
+    const normalizedProduct = (() => {
+      const needsCanonical = isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
+      if (!needsCanonical) return product;
+      const base = getCanonicalUnitPrice(product);
+      return {
+        ...product,
+        price: base,
+        displayPrice: base,
+        // Remove discount-looking fields to avoid strikethrough/discount UI in cart screens
+        originalPrice: null,
+        discountLabel: null,
+      };
+    })();
     
     const existingItemIndex = items.findIndex(item => 
-      item.product.id === product.id && 
+      item.product.id === normalizedProduct.id && 
       item.selectedColor === normalizedColor && 
-      item.selectedSize === normalizedSize
+      item.selectedSize === normalizedSize &&
+      !isPromotionItem(item)
     );
 
     if (existingItemIndex >= 0) {
@@ -93,7 +262,7 @@ export const CartProvider = ({ children }) => {
     } else {
       // Add new item
       const newItem = {
-        product,
+        product: normalizedProduct,
         quantity,
         selectedColor: normalizedColor,
         selectedSize: normalizedSize,
@@ -102,7 +271,7 @@ export const CartProvider = ({ children }) => {
       setItems(prev => [...prev, newItem]);
     }
 
-    console.log(`➕ Added ${quantity}x ${product.name} to cart`);
+    console.log(`➕ Added ${quantity}x ${normalizedProduct.name} to cart`);
   };
 
   /**
@@ -112,11 +281,15 @@ export const CartProvider = ({ children }) => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
     
-    setItems(prev => prev.filter(item => 
-      !(item.product.id === productId && 
+    setItems(prev => prev.filter(item => {
+      // Never remove promotion items via this method
+      if (isPromotionItem(item)) return true;
+      return !(
+        item.product.id === productId && 
         item.selectedColor === normalizedColor && 
-        item.selectedSize === normalizedSize)
-    ));
+        item.selectedSize === normalizedSize
+      );
+    }));
 
     console.log(`➖ Removed product ${productId} from cart`);
   };
@@ -137,7 +310,7 @@ export const CartProvider = ({ children }) => {
       item.product.id === productId && 
       item.selectedColor === normalizedColor && 
       item.selectedSize === normalizedSize
-        ? { ...item, quantity }
+        ? (isPromotionItem(item) ? item : { ...item, quantity })
         : item
     ));
 
@@ -233,8 +406,10 @@ export const CartProvider = ({ children }) => {
           quantity: item.quantity,
           image: item.product.image,
           selectedColor: item.selectedColor || null,
-          selectedSize: item.selectedSize || null,
+          selectedSize: isPromotionItem(item) ? null : (item.selectedSize || null),
           discount: item.product.discount || 0,
+          isPromotionItem: isPromotionItem(item),
+          promotionKey: item.promotionKey || null,
         }))
       };
       
@@ -259,7 +434,8 @@ export const CartProvider = ({ children }) => {
    * Get total number of items in cart
    */
   const getTotalItems = () => {
-    return items.reduce((total, item) => total + item.quantity, 0);
+    // Do not count promotion items towards the "Bag: X items" header.
+    return items.filter((it) => !isPromotionItem(it)).reduce((total, item) => total + item.quantity, 0);
   };
 
   /**
@@ -270,6 +446,7 @@ export const CartProvider = ({ children }) => {
     const normalizedSize = selectedSize || '';
     
     return items.some(item => 
+      !isPromotionItem(item) &&
       item.product.id === productId && 
       item.selectedColor === normalizedColor && 
       item.selectedSize === normalizedSize
@@ -284,6 +461,7 @@ export const CartProvider = ({ children }) => {
     const normalizedSize = selectedSize || '';
     
     const item = items.find(item => 
+      !isPromotionItem(item) &&
       item.product.id === productId && 
       item.selectedColor === normalizedColor && 
       item.selectedSize === normalizedSize
@@ -296,10 +474,13 @@ export const CartProvider = ({ children }) => {
    * Set selected emirate
    */
   const setSelectedEmirate = (emirate) => {
-    const validEmirate = UAE_EMIRATES.find(e => e.name === emirate);
+    const list = emirates?.length ? emirates : UAE_EMIRATES;
+    const targetKey = String(emirate || '').trim().toLowerCase();
+    const validEmirate = list.find(e => String(e.name || '').trim().toLowerCase() === targetKey);
     if (validEmirate) {
-      setSelectedEmirateState(emirate);
-      console.log(`📍 Selected emirate: ${emirate}`);
+      // store the canonical emirate name from the rates list
+      setSelectedEmirateState(validEmirate.name);
+      console.log(`📍 Selected emirate: ${validEmirate.name}`);
     } else {
       console.error(`Invalid emirate: ${emirate}`);
     }
@@ -309,7 +490,11 @@ export const CartProvider = ({ children }) => {
    * Get cart totals with VAT, shipping, and discounts
    */
   const getCartTotals = () => {
-    return calculateCartTotals(items, user, selectedEmirate);
+    return calculateCartTotals(items, user, selectedEmirate, {
+      emirates,
+      freeShippingThreshold: shippingRates?.freeShippingThreshold,
+      vatRate: shippingRates?.vatRate,
+    });
   };
 
   /**
@@ -322,12 +507,12 @@ export const CartProvider = ({ children }) => {
     return {
       itemCount,
       subtotal: totals.subtotal,
-      shippingCost: totals.shippingCost,
+      shippingCost: totals.shippingCost ?? totals.shipping ?? 0,
       vatAmount: totals.vatAmount,
       total: totals.total,
       freeShippingThreshold: totals.freeShippingThreshold,
       amountForFreeShipping: totals.amountForFreeShipping,
-      hasFreeShipping: totals.shippingCost === 0
+      hasFreeShipping: (totals.shippingCost ?? totals.shipping ?? 0) === 0
     };
   };
 
@@ -335,7 +520,7 @@ export const CartProvider = ({ children }) => {
    * Get available emirates for shipping
    */
   const getAvailableEmirates = () => {
-    return UAE_EMIRATES;
+    return emirates?.length ? emirates : UAE_EMIRATES;
   };
 
   const value = {
@@ -360,6 +545,10 @@ export const CartProvider = ({ children }) => {
     getCartTotals,
     getCartSummary,
     getAvailableEmirates,
+
+    // Shipping rates (DB-driven)
+    shippingRates,
+    reloadShippingRates: loadShippingRates,
   };
 
   return (
