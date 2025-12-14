@@ -39,6 +39,7 @@ export default function BagScreen() {
   const [showEmirateModal, setShowEmirateModal] = useState(false);
   const [footerHeight, setFooterHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [footerCollapsed, setFooterCollapsed] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -72,6 +73,12 @@ export default function BagScreen() {
   const safeShipping = Number(cartSummary.shippingCost) || 0;
   const safeVat = Number(cartSummary.vatAmount) || 0;
   const safeTotal = Number(cartSummary.total) || 0;
+
+  const deliveryEtaText =
+    String(selectedEmirate || '').trim().toLowerCase() === 'dubai'
+      ? t('checkout.deliveryEtaDubai')
+      : t('checkout.deliveryEtaOther');
+  const deliveryCostText = cartSummary.hasFreeShipping ? t('common.free') : `${safeShipping.toFixed(2)} AED`;
 
   const originalSubtotal = (() => {
     if (!Number.isFinite(discountPct) || discountPct <= 0 || discountPct >= 100) return null;
@@ -320,6 +327,10 @@ export default function BagScreen() {
             <View style={styles.emirateInfo}>
               <Text style={styles.emirateLabel}>{t('bag.deliveryTo')}</Text>
               <Text style={styles.emirateValue}>{selectedEmirate}</Text>
+              <Text style={styles.deliveryInfoLine}>{deliveryEtaText}</Text>
+              <Text style={styles.deliveryInfoLine}>
+                {t('bag.deliveryCostLabel')}: <Text style={styles.deliveryCostValue}>{deliveryCostText}</Text>
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#86868B" />
           </View>
@@ -510,51 +521,65 @@ export default function BagScreen() {
       >
         <SafeAreaView edges={['bottom']}>
         <View style={styles.summaryContainer}>
-          {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 && (
+          <TouchableOpacity
+            style={styles.footerChevronBtn}
+            onPress={() => setFooterCollapsed((v) => !v)}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name={footerCollapsed ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#86868B"
+            />
+          </TouchableOpacity>
+
+          {!footerCollapsed ? (
             <>
+              {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 ? (
+                <>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>{t('bag.subtotalBeforeDiscount')}</Text>
+                    <Text style={[styles.summaryValue, styles.summaryOriginalValue]}>
+                      {Number(originalSubtotal).toFixed(2)} AED
+                    </Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>
+                      {t('bag.discountLabel')}{' '}
+                      <Text style={styles.discountPctGreen}>{`(${discountPct}% OFF)`}</Text>
+                    </Text>
+                    <Text style={styles.summaryDiscountValue}>
+                      -{discountAmount.toFixed(2)} AED
+                    </Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
+                    <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
+                  </View>
+                </>
+              ) : (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
+                  <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
+                </View>
+              )}
+
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>{t('bag.subtotalBeforeDiscount')}</Text>
-                <Text style={[styles.summaryValue, styles.summaryOriginalValue]}>
-                  {Number(originalSubtotal).toFixed(2)} AED
+                <Text style={styles.summaryLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
+                <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
+                  {cartSummary.hasFreeShipping ? t('common.free') : `${safeShipping.toFixed(2)} AED`}
                 </Text>
               </View>
+
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>
-                  Discount{' '}
-                  <Text style={styles.discountPctGreen}>{`(${discountPct}% OFF)`}</Text>
-                </Text>
-                <Text style={styles.summaryDiscountValue}>
-                  -{discountAmount.toFixed(2)} AED
-                </Text>
+                <Text style={styles.summaryLabel}>{t('checkout.vatIncluded')}</Text>
+                <Text style={styles.summaryValue}>{safeVat.toFixed(2)} AED</Text>
               </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
-                <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
-              </View>
+
+              <View style={styles.divider} />
             </>
-          )}
-          
-          {!(Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01) && (
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
-              <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
-            </View>
-          )}
-          
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Shipping to {selectedEmirate}</Text>
-            <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
-              {cartSummary.hasFreeShipping ? 'FREE' : `${safeShipping.toFixed(2)} AED`}
-            </Text>
-          </View>
-          
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>{t('bag.vatIncluded')}</Text>
-            <Text style={styles.summaryValue}>{safeVat.toFixed(2)} AED</Text>
-          </View>
-          
-          <View style={styles.divider} />
-          
+          ) : null}
+
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total ({cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'})</Text>
             <Text style={styles.totalAmount}>{safeTotal.toFixed(2)} AED</Text>
@@ -762,6 +787,16 @@ const styles = StyleSheet.create({
   },
   emirateInfo: {
     flex: 1,
+  },
+  deliveryInfoLine: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#86868B',
+    fontWeight: '600',
+  },
+  deliveryCostValue: {
+    color: '#1D1D1F',
+    fontWeight: '800',
   },
   emirateLabel: {
     fontSize: 12,
@@ -1008,6 +1043,15 @@ const styles = StyleSheet.create({
   summaryContainer: {
     marginTop: 4,
     marginBottom: 16,
+    position: 'relative',
+    paddingRight: 40,
+  },
+  footerChevronBtn: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    padding: 8,
+    zIndex: 10,
   },
   summaryRow: {
     flexDirection: 'row',

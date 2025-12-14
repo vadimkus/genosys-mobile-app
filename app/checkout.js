@@ -47,50 +47,49 @@ function isValidEmail(value) {
   return emailRegex.test(email);
 }
 
-function normalizeUaePhone(raw) {
+// Phone UX (UAE fixed)
+function normalizeUaeToNationalDigits(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
   if (!digits) return '';
 
-  // 05XXXXXXXX -> +9715XXXXXXXX
-  if (digits.startsWith('05') && digits.length === 10) {
-    return `+971${digits.slice(1)}`;
-  }
-
-  // 5XXXXXXXX -> +9715XXXXXXXX
-  if (digits.startsWith('5') && digits.length === 9) {
-    return `+971${digits}`;
-  }
-
-  // 9715XXXXXXXX -> +9715XXXXXXXX
+  // +9715XXXXXXXX / 9715XXXXXXXX
   if (digits.startsWith('971')) {
-    return `+${digits}`;
+    return digits.slice(3, 12); // max 9 digits
   }
 
-  // Already has + but we stripped it, handle UAE numbers entered as 971...
-  return `+${digits}`;
+  // 05XXXXXXXX -> 5XXXXXXXX
+  if (digits.startsWith('05')) {
+    return digits.slice(1, 10);
+  }
+
+  // 5XXXXXXXX
+  if (digits.startsWith('5')) {
+    return digits.slice(0, 9);
+  }
+
+  // Fallback: keep last 9 digits (useful for paste)
+  return digits.slice(-9);
 }
 
-function isValidUaeMobilePhone(raw) {
-  const normalized = normalizeUaePhone(raw);
-  const digits = normalized.replace(/\D/g, '');
-  // UAE mobile: +9715XXXXXXXX (12 digits including 971)
-  return digits.startsWith('9715') && digits.length === 12;
+function formatUaeNationalForInput(nationalDigitsRaw) {
+  const d = String(nationalDigitsRaw || '').replace(/\D/g, '').slice(0, 9);
+  if (!d) return '';
+  // Format: 5X XXX XXXX
+  const p1 = d.slice(0, 2);
+  const p2 = d.slice(2, 5);
+  const p3 = d.slice(5, 9);
+  return [p1, p2, p3].filter(Boolean).join(' ').trim();
 }
 
-function formatUaePhoneForInput(raw) {
-  const normalized = normalizeUaePhone(raw);
-  if (!normalized) return '';
+function isValidUaeMobileNational(nationalDigitsRaw) {
+  const d = String(nationalDigitsRaw || '').replace(/\D/g, '');
+  return d.length === 9 && d.startsWith('5');
+}
 
-  const digits = normalized.replace(/\D/g, '');
-  if (!digits.startsWith('971')) return normalized;
-
-  const rest = digits.slice(3); // after 971
-  // Format as: +971 5X XXX XXXX
-  const p1 = rest.slice(0, 2);
-  const p2 = rest.slice(2, 5);
-  const p3 = rest.slice(5, 9);
-  const parts = [`+971`, p1, p2, p3].filter(Boolean);
-  return parts.join(' ').trim();
+function toE164UaePhone(nationalDigitsRaw) {
+  const d = String(nationalDigitsRaw || '').replace(/\D/g, '');
+  if (!d) return '';
+  return `+971${d.slice(0, 9)}`;
 }
 
 function getDeliveryEtaInfo(selectedEmirate) {
@@ -181,13 +180,21 @@ export default function CheckoutScreen() {
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
   const { t } = useLocalization();
   const scrollRef = useRef(null);
+  const fieldLayoutsRef = useRef({});
+  const sectionLayoutsRef = useRef({ delivery: 0, payment: 0, review: 0 });
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const phoneRef = useRef(null);
+  const addressRef = useRef(null);
   
   // Form states
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneNational, setPhoneNational] = useState('');
   const [address, setAddress] = useState('');
+  const [landmark, setLandmark] = useState('');
   const [addressDetails, setAddressDetails] = useState(null);
   const [orderNotes, setOrderNotes] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
@@ -200,6 +207,7 @@ export default function CheckoutScreen() {
     address: false,
   });
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [activeStep, setActiveStep] = useState('delivery'); // delivery | payment | review
   
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
@@ -225,11 +233,11 @@ export default function CheckoutScreen() {
     if (!lastName.trim()) next.lastName = t('checkout.lastNameRequired');
     if (!email.trim()) next.email = t('checkout.emailRequired');
     else if (!isValidEmail(email)) next.email = t('checkout.validationInvalidEmail');
-    if (!phone.trim()) next.phone = t('checkout.phoneRequired');
-    else if (!isValidUaeMobilePhone(phone)) next.phone = t('addAddress.validationInvalidUaePhone');
+    if (!String(phoneNational || '').trim()) next.phone = t('checkout.phoneRequired');
+    else if (!isValidUaeMobileNational(phoneNational)) next.phone = t('addAddress.validationInvalidUaePhone');
     if (!address.trim()) next.address = t('checkout.addressRequired');
     return next;
-  }, [firstName, lastName, email, phone, address, t]);
+  }, [firstName, lastName, email, phoneNational, address, t]);
 
   const showError = (field) => {
     return !!errors[field] && (submitAttempted || touched[field]);
@@ -287,16 +295,17 @@ export default function CheckoutScreen() {
       setFirstName(nameParts[0] || '');
       setLastName(nameParts.slice(1).join(' ') || '');
       setEmail(user.email || '');
-      setPhone(user.phone || '');
+      // phone: prefer user.phone, else addressDetails.phone (both may be in different formats)
+      const phoneRaw = String(user.phone || '').trim() || '';
       const parsed = parseGenosysAddress(user.address || '');
       setAddressDetails(parsed);
       // Show only the clean address line in the text input (no GENOSYS_ADDR_V1 payload)
       setAddress(getAddressLine(parsed || (user.address || '')));
 
       // If the saved address contains a phone, use it only when profile phone is empty
-      if (!String(user.phone || '').trim() && parsed?.phone) {
-        setPhone(String(parsed.phone));
-      }
+      const addrPhoneRaw = !phoneRaw && parsed?.phone ? String(parsed.phone) : '';
+      const national = normalizeUaeToNationalDigits(phoneRaw || addrPhoneRaw);
+      setPhoneNational(national);
 
       // If saved address contains emirate, pre-select it when possible
       if (parsed?.emirate && typeof setSelectedEmirate === 'function') {
@@ -305,6 +314,63 @@ export default function CheckoutScreen() {
       }
     }
   }, [user]);
+
+  const registerFieldLayout = (field) => (e) => {
+    const y = e?.nativeEvent?.layout?.y;
+    if (typeof y === 'number' && Number.isFinite(y)) {
+      fieldLayoutsRef.current[field] = y;
+    }
+  };
+
+  const registerSectionLayout = (sectionKey) => (e) => {
+    const y = e?.nativeEvent?.layout?.y;
+    if (typeof y === 'number' && Number.isFinite(y)) {
+      sectionLayoutsRef.current[sectionKey] = y;
+    }
+  };
+
+  const focusFirstInvalidField = async () => {
+    const order = ['firstName', 'lastName', 'email', 'phone', 'address'];
+    const firstInvalid = order.find((k) => !!errors[k]);
+    if (!firstInvalid) return;
+
+    const y = Number(fieldLayoutsRef.current[firstInvalid]);
+    if (Number.isFinite(y)) {
+      try {
+        scrollRef.current?.scrollTo?.({ y: Math.max(0, y - 24), animated: true });
+      } catch {
+        // ignore
+      }
+    }
+
+    const refMap = {
+      firstName: firstNameRef,
+      lastName: lastNameRef,
+      email: emailRef,
+      phone: phoneRef,
+      address: addressRef,
+    };
+    const targetRef = refMap[firstInvalid];
+    setTimeout(() => {
+      try {
+        targetRef?.current?.focus?.();
+      } catch {
+        // ignore
+      }
+    }, 250);
+  };
+
+  const triggerEmirateHaptic = async () => {
+    if (Platform.OS !== 'ios') return;
+    try {
+      const Haptics = await import('expo-haptics');
+      if (Haptics?.impactAsync && Haptics?.ImpactFeedbackStyle) {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+    } catch {
+      // ignore if module not available
+    }
+  };
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -341,16 +407,11 @@ export default function CheckoutScreen() {
       !firstName.trim() ||
       !lastName.trim() ||
       !isValidEmail(email) ||
-      !isValidUaeMobilePhone(phone) ||
+      !isValidUaeMobileNational(phoneNational) ||
       !address.trim();
 
     if (hasErrors) {
-      // Scroll user to the top of the form so they see the first highlighted field.
-      try {
-        scrollRef.current?.scrollTo?.({ y: 0, animated: true });
-      } catch {
-        // ignore
-      }
+      await focusFirstInvalidField();
       return;
     }
 
@@ -371,8 +432,10 @@ export default function CheckoutScreen() {
         orderNumber,
         customerName: `${firstName.trim()} ${lastName.trim()}`,
         customerEmail: email.trim(),
-        customerPhone: normalizeUaePhone(phone),
-        customerAddress: addressFromV1,
+        customerPhone: toE164UaePhone(phoneNational),
+        customerAddress: landmark.trim()
+          ? `${addressFromV1}\nLandmark: ${landmark.trim()}`
+          : addressFromV1,
         emirate: selectedEmirate,
         items: items,
         subtotal: safeSubtotal,
@@ -501,8 +564,24 @@ export default function CheckoutScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
-        
-        <Text style={styles.headerTitle}>{t('checkout.title')}</Text>
+
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>{t('checkout.title')}</Text>
+          <View style={styles.stepsRow}>
+            {(['delivery', 'payment', 'review']).map((k) => (
+              <View key={k} style={styles.stepItem}>
+                <Text style={[styles.stepText, activeStep === k && styles.stepTextActive]}>
+                  {k === 'delivery'
+                    ? t('checkout.stepDelivery')
+                    : k === 'payment'
+                      ? t('checkout.stepPayment')
+                      : t('checkout.stepReview')}
+                </Text>
+                {activeStep === k ? <View style={styles.stepUnderline} /> : <View style={styles.stepUnderlineSpacer} />}
+              </View>
+            ))}
+          </View>
+        </View>
         
         <View style={styles.headerSpacer} />
       </View>
@@ -511,6 +590,29 @@ export default function CheckoutScreen() {
         ref={scrollRef}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={(e) => {
+          const y = Number(e?.nativeEvent?.contentOffset?.y) || 0;
+          const viewportH = Number(e?.nativeEvent?.layoutMeasurement?.height) || 0;
+          const contentH = Number(e?.nativeEvent?.contentSize?.height) || 0;
+          const deliveryY = Number(sectionLayoutsRef.current.delivery) || 0;
+          const paymentY = Number(sectionLayoutsRef.current.payment) || 0;
+          const reviewY = Number(sectionLayoutsRef.current.review) || 0;
+
+          // Activate next step slightly before the section top (feels smoother)
+          const bias = 80;
+          const pos = y + bias;
+
+          let next = 'delivery';
+          // If user is near the bottom, always show Review (matches "order summary at the bottom").
+          const nearBottom = contentH > 0 && viewportH > 0 && (y + viewportH >= contentH - 120);
+          if (nearBottom) next = 'review';
+          else if (pos >= reviewY) next = 'review';
+          else if (pos >= paymentY) next = 'payment';
+          else if (pos >= deliveryY) next = 'delivery';
+
+          if (next !== activeStep) setActiveStep(next);
+        }}
       >
         <View style={styles.content}>
           
@@ -594,14 +696,14 @@ export default function CheckoutScreen() {
           </View>
 
           {/* Shipping Information */}
-          <View style={styles.section}>
+          <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
             <View style={styles.sectionHeader}>
               <Ionicons name="location" size={20} color="#E74C3C" />
               <Text style={styles.sectionTitle}>{t('checkout.shippingInformation')}</Text>
             </View>
 
             <View style={styles.formRow}>
-              <View style={styles.formHalf}>
+              <View style={styles.formHalf} onLayout={registerFieldLayout('firstName')}>
                 <Text style={styles.label}>{t('checkout.firstName')} *</Text>
                 <TextInput
                   style={[styles.input, showError('firstName') && styles.inputError]}
@@ -610,10 +712,13 @@ export default function CheckoutScreen() {
                   placeholder={t('checkout.enterFirstName')}
                   autoCapitalize="words"
                   onBlur={() => setTouched((p) => ({ ...p, firstName: true }))}
+                  ref={firstNameRef}
+                  returnKeyType="next"
+                  onSubmitEditing={() => lastNameRef.current?.focus?.()}
                 />
                 {showError('firstName') ? <Text style={styles.helperError}>{errors.firstName}</Text> : null}
               </View>
-              <View style={styles.formHalf}>
+              <View style={styles.formHalf} onLayout={registerFieldLayout('lastName')}>
                 <Text style={styles.label}>{t('checkout.lastName')} *</Text>
                 <TextInput
                   style={[styles.input, showError('lastName') && styles.inputError]}
@@ -622,12 +727,15 @@ export default function CheckoutScreen() {
                   placeholder={t('checkout.enterLastName')}
                   autoCapitalize="words"
                   onBlur={() => setTouched((p) => ({ ...p, lastName: true }))}
+                  ref={lastNameRef}
+                  returnKeyType="next"
+                  onSubmitEditing={() => emailRef.current?.focus?.()}
                 />
                 {showError('lastName') ? <Text style={styles.helperError}>{errors.lastName}</Text> : null}
               </View>
             </View>
 
-            <View style={styles.formGroup}>
+            <View style={styles.formGroup} onLayout={registerFieldLayout('email')}>
               <Text style={styles.label}>{t('checkout.emailAddress')} *</Text>
               <View style={styles.inputWrap}>
                 <TextInput
@@ -642,6 +750,9 @@ export default function CheckoutScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                  ref={emailRef}
+                  returnKeyType="next"
+                  onSubmitEditing={() => phoneRef.current?.focus?.()}
                 />
                 {isValidEmail(email) ? (
                   <View style={styles.inputRightIcon}>
@@ -652,31 +763,39 @@ export default function CheckoutScreen() {
               {showError('email') ? <Text style={styles.helperError}>{errors.email}</Text> : null}
             </View>
 
-            <View style={styles.formGroup}>
+            <View style={styles.formGroup} onLayout={registerFieldLayout('phone')}>
               <Text style={styles.label}>{t('checkout.phoneNumber')} *</Text>
-              <View style={styles.inputWrap}>
-                <TextInput
-                  style={[
-                    styles.input,
-                    styles.inputWithRightIcon,
-                    showError('phone') && styles.inputError,
-                  ]}
-                  value={phone}
-                  onChangeText={(text) => setPhone(formatUaePhoneForInput(text))}
-                  placeholder={t('checkout.enterPhone')}
-                  keyboardType="phone-pad"
-                  onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
-                />
-                {isValidUaeMobilePhone(phone) ? (
-                  <View style={styles.inputRightIcon}>
-                    <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
-                  </View>
-                ) : null}
+              <View style={styles.phoneRow}>
+                <View style={styles.phonePrefix}>
+                  <Text style={styles.phonePrefixText}>+971</Text>
+                </View>
+                <View style={[styles.inputWrap, { flex: 1 }]}>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      styles.inputWithRightIcon,
+                      showError('phone') && styles.inputError,
+                    ]}
+                    value={formatUaeNationalForInput(phoneNational)}
+                    onChangeText={(text) => setPhoneNational(normalizeUaeToNationalDigits(text))}
+                    placeholder={t('checkout.enterPhone')}
+                    keyboardType="phone-pad"
+                    onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
+                    ref={phoneRef}
+                    returnKeyType="next"
+                    onSubmitEditing={() => addressRef.current?.focus?.()}
+                  />
+                  {isValidUaeMobileNational(phoneNational) ? (
+                    <View style={styles.inputRightIcon}>
+                      <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
+                    </View>
+                  ) : null}
+                </View>
               </View>
               {showError('phone') ? <Text style={styles.helperError}>{errors.phone}</Text> : null}
             </View>
 
-            <View style={styles.formGroup}>
+            <View style={styles.formGroup} onLayout={registerFieldLayout('address')}>
               <Text style={styles.label}>{t('checkout.deliveryAddress')} *</Text>
               <TextInput
                 style={[styles.input, styles.textArea, showError('address') && styles.inputError]}
@@ -687,6 +806,7 @@ export default function CheckoutScreen() {
                 numberOfLines={3}
                 textAlignVertical="top"
                 onBlur={() => setTouched((p) => ({ ...p, address: true }))}
+                ref={addressRef}
               />
               {showError('address') ? <Text style={styles.helperError}>{errors.address}</Text> : null}
 
@@ -699,6 +819,17 @@ export default function CheckoutScreen() {
                 <Ionicons name="location-outline" size={16} color="#007AFF" />
                 <Text style={styles.pinRowButtonText}>{t('checkout.pinOnMap')}</Text>
               </TouchableOpacity>
+
+              <View style={styles.landmarkWrap}>
+                <Text style={styles.label}>{t('checkout.landmarkOptional')}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={landmark}
+                  onChangeText={setLandmark}
+                  placeholder={t('checkout.landmarkPlaceholder')}
+                  returnKeyType="done"
+                />
+              </View>
             </View>
 
             <View style={styles.formGroup}>
@@ -712,7 +843,10 @@ export default function CheckoutScreen() {
                       styles.emirateOption,
                       selectedEmirate === emirate.name && styles.emirateOptionSelected
                     ]}
-                    onPress={() => setSelectedEmirate(emirate.name)}
+                    onPress={async () => {
+                      await triggerEmirateHaptic();
+                      setSelectedEmirate(emirate.name);
+                    }}
                   >
                     <View style={styles.emirateTopRow}>
                       <View style={styles.emirateTopLeft}>
@@ -733,7 +867,7 @@ export default function CheckoutScreen() {
                       ) : null}
                     </View>
                     <View style={styles.emirateBottomRow}>
-                      {Number(emirate.shippingCost) === 0 ? (
+                      {(!!totals?.hasFreeShipping || Number(emirate.shippingCost) === 0) ? (
                         <View style={styles.freeBadge}>
                           <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
                         </View>
@@ -748,7 +882,7 @@ export default function CheckoutScreen() {
           </View>
 
           {/* Payment Method */}
-          <View style={styles.section}>
+          <View style={styles.section} onLayout={registerSectionLayout('payment')}>
             <View style={styles.sectionHeader}>
               <Ionicons name="card" size={20} color="#27AE60" />
               <Text style={styles.sectionTitle}>{t('checkout.paymentMethod')}</Text>
@@ -804,6 +938,7 @@ export default function CheckoutScreen() {
               <Ionicons name="lock-closed" size={14} color="#6B7280" />
               <Text style={styles.trustText}>{t('checkout.trustStripe')}</Text>
             </View>
+            <Text style={styles.trustTextSecondary}>{t('checkout.trustStripeSecondary')}</Text>
           </View>
 
           {/* Order Notes */}
@@ -821,7 +956,7 @@ export default function CheckoutScreen() {
           </View>
 
           {/* Order Summary */}
-          <View style={styles.section}>
+          <View style={styles.section} onLayout={registerSectionLayout('review')}>
             <View style={styles.sectionHeader}>
               <Ionicons name="receipt" size={20} color="#007AFF" />
               <Text style={styles.sectionTitle}>{t('checkout.orderSummary')}</Text>
@@ -853,6 +988,18 @@ export default function CheckoutScreen() {
               </View>
             )}
 
+            {(() => {
+              const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
+              if (!freeMaskCount) return null;
+              const msg = freeMaskCount >= 2 ? t('bag.promoApplied2') : t('bag.promoApplied1');
+              return (
+                <View style={styles.freeShippingBanner}>
+                  <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+                  <Text style={styles.freeShippingText}>{msg}</Text>
+                </View>
+              );
+            })()}
+
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>{t('checkout.total')}</Text>
               <Text style={styles.totalValue}>AED {safeTotal.toFixed(2)}</Text>
@@ -866,6 +1013,19 @@ export default function CheckoutScreen() {
 
       {/* Bottom Action */}
       <View style={styles.bottomContainer}>
+        <View style={styles.reviewRow}>
+          <Text style={styles.reviewText} numberOfLines={1} ellipsizeMode="tail">
+            {t('checkout.reviewLine', {
+              emirate: selectedEmirate,
+              payment:
+                selectedPaymentMethod === PAYMENT_METHODS.CARD
+                  ? t('checkout.cardPayment')
+                  : t('checkout.cashOnDelivery'),
+              total: safeTotal.toFixed(2),
+            })}
+          </Text>
+        </View>
+
         <View style={styles.stickySummaryRow}>
           <View style={styles.stickySummaryLeft}>
             <View style={styles.etaPill}>
@@ -926,11 +1086,54 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    flex: 1,
     fontSize: 18,
     fontWeight: '600',
     color: '#000000',
     textAlign: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  headerSteps: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  stepsRow: {
+    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 14,
+  },
+  stepItem: {
+    alignItems: 'center',
+  },
+  stepText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '700',
+  },
+  stepTextActive: {
+    color: '#111827',
+  },
+  stepUnderline: {
+    marginTop: 4,
+    height: 3,
+    width: 26,
+    borderRadius: 999,
+    backgroundColor: '#16A34A',
+  },
+  stepUnderlineSpacer: {
+    marginTop: 4,
+    height: 3,
+    width: 26,
+    borderRadius: 999,
+    backgroundColor: 'transparent',
   },
   headerSpacer: {
     width: 40,
@@ -1086,6 +1289,26 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
     backgroundColor: '#ffffff',
   },
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  phonePrefix: {
+    height: 48,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    justifyContent: 'center',
+  },
+  phonePrefixText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#1D1D1F',
+    letterSpacing: 0.2,
+  },
   inputWrap: {
     position: 'relative',
   },
@@ -1149,6 +1372,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#007AFF',
+  },
+  landmarkWrap: {
+    marginTop: 12,
   },
 
   // Emirates
@@ -1275,6 +1501,13 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontWeight: '600',
   },
+  trustTextSecondary: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '600',
+    marginLeft: 22,
+  },
 
   // Summary
   summaryRow: {
@@ -1346,6 +1579,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 10,
     elevation: 12,
+  },
+  reviewRow: {
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F2F2F7',
+    marginBottom: 12,
+  },
+  reviewText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '700',
   },
   stickySummaryRow: {
     marginBottom: 12,
