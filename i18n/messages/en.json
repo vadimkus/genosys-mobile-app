@@ -66,6 +66,7 @@
     "emailRequired": "Please enter your email address.",
     "phoneRequired": "Please enter your phone number.",
     "addressRequired": "Please enter your delivery address.",
+    "validationInvalidEmail": "Please enter a valid email address.",
     "orderSubmittedTitle": "Order Submitted Successfully!",
     "orderSubmittedMessageCOD": "Your order {orderNumber} has been placed successfully! You will receive a confirmation email shortly. Pay when your order is delivered.",
     "paymentLinkUnavailableTitle": "Payment link unavailable",
@@ -107,7 +108,15 @@
     "needHelp": "Need Help?",
     "haveQuestions": "Have questions about your order?",
     "freeShippingApplied": "Free shipping applied!",
-    "allPricesVatInclusive": "All prices are VAT inclusive"
+    "allPricesVatInclusive": "All prices are VAT inclusive",
+    "deliveryEtaDubai": "Delivered today • 1–2 hours",
+    "deliveryEtaOther": "Delivered tomorrow • 24–36 hours",
+    "defaultPaymentMethod": "Default payment method",
+    "tapToChange": "tap to change",
+    "trustStripe": "Secure payments by Stripe • Cards not stored",
+    "pinOnMap": "Pin on map",
+    "couldNotOpenMaps": "Could not open Maps. Please try again.",
+    "youSave": "You save"
   },
   "product": {
     "about": "About this product",

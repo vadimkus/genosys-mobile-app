@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Linking,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
@@ -20,6 +21,103 @@ import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../service
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
+
+function isValidEmail(value) {
+  const email = String(value || '').trim();
+  if (!email) return false;
+  // Stricter (still simple) email validation:
+  // - must have local@domain.tld
+  // - TLD at least 2 chars
+  // - no trailing dot
+  // - no spaces
+  if (email.includes(' ')) return false;
+  if (email.endsWith('.')) return false;
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  const [local, domain] = parts;
+  if (!local || !domain) return false;
+  if (local.length < 1) return false;
+  if (domain.length < 3) return false;
+  const domainParts = domain.split('.');
+  if (domainParts.length < 2) return false;
+  const tld = domainParts[domainParts.length - 1];
+  if (!tld || tld.length < 2) return false;
+  // Basic allowed characters check (keeps it practical for UI validation).
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  return emailRegex.test(email);
+}
+
+function normalizeUaePhone(raw) {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  // 05XXXXXXXX -> +9715XXXXXXXX
+  if (digits.startsWith('05') && digits.length === 10) {
+    return `+971${digits.slice(1)}`;
+  }
+
+  // 5XXXXXXXX -> +9715XXXXXXXX
+  if (digits.startsWith('5') && digits.length === 9) {
+    return `+971${digits}`;
+  }
+
+  // 9715XXXXXXXX -> +9715XXXXXXXX
+  if (digits.startsWith('971')) {
+    return `+${digits}`;
+  }
+
+  // Already has + but we stripped it, handle UAE numbers entered as 971...
+  return `+${digits}`;
+}
+
+function isValidUaeMobilePhone(raw) {
+  const normalized = normalizeUaePhone(raw);
+  const digits = normalized.replace(/\D/g, '');
+  // UAE mobile: +9715XXXXXXXX (12 digits including 971)
+  return digits.startsWith('9715') && digits.length === 12;
+}
+
+function formatUaePhoneForInput(raw) {
+  const normalized = normalizeUaePhone(raw);
+  if (!normalized) return '';
+
+  const digits = normalized.replace(/\D/g, '');
+  if (!digits.startsWith('971')) return normalized;
+
+  const rest = digits.slice(3); // after 971
+  // Format as: +971 5X XXX XXXX
+  const p1 = rest.slice(0, 2);
+  const p2 = rest.slice(2, 5);
+  const p3 = rest.slice(5, 9);
+  const parts = [`+971`, p1, p2, p3].filter(Boolean);
+  return parts.join(' ').trim();
+}
+
+function getDeliveryEtaInfo(selectedEmirate) {
+  const emirate = String(selectedEmirate || '').trim();
+  const isDubai = emirate.toLowerCase() === 'dubai';
+  return {
+    isDubai,
+    // Dubai: today 1–2 hours; others: tomorrow 24–36 hours
+    etaLabel: isDubai ? 'today' : 'tomorrow',
+    etaWindow: isDubai ? '1–2 hours' : '24–36 hours',
+  };
+}
+
+function computeSavingsAED(items, totalsSubtotal) {
+  const paid = (items || []).filter((it) => !(it?.isPromotionItem === true || it?.selectedSize === '__PROMO__'));
+
+  const originalSubtotal = paid.reduce((sum, it) => {
+    const qty = Number(it?.quantity) || 0;
+    const original = Number(it?.product?.originalPrice);
+    const current = Number(it?.product?.displayPrice ?? it?.product?.price ?? 0);
+    const unit = Number.isFinite(original) && original > 0 ? original : (Number.isFinite(current) ? current : 0);
+    return sum + unit * qty;
+  }, 0);
+
+  const savings = (Number(originalSubtotal) || 0) - (Number(totalsSubtotal) || 0);
+  return Math.max(0, savings);
+}
 
 function EmirateFlagIcon({ name }) {
   const emirate = String(name || '').trim();
@@ -82,6 +180,7 @@ export default function CheckoutScreen() {
   const { user } = useAuth();
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
   const { t } = useLocalization();
+  const scrollRef = useRef(null);
   
   // Form states
   const [firstName, setFirstName] = useState('');
@@ -92,6 +191,15 @@ export default function CheckoutScreen() {
   const [addressDetails, setAddressDetails] = useState(null);
   const [orderNotes, setOrderNotes] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
+
+  const [touched, setTouched] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    phone: false,
+    address: false,
+  });
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
@@ -105,6 +213,41 @@ export default function CheckoutScreen() {
   const safeShipping = Number(totals.shipping) || 0;
   const safeVat = Number(totals.vatAmount) || 0;
   const safeTotal = Number(totals.total) || 0;
+  const savingsAED = computeSavingsAED(items, safeSubtotal);
+  const etaInfo = getDeliveryEtaInfo(selectedEmirate);
+  const deliveryEtaText = etaInfo.isDubai
+    ? t('checkout.deliveryEtaDubai')
+    : t('checkout.deliveryEtaOther');
+
+  const errors = useMemo(() => {
+    const next = {};
+    if (!firstName.trim()) next.firstName = t('checkout.firstNameRequired');
+    if (!lastName.trim()) next.lastName = t('checkout.lastNameRequired');
+    if (!email.trim()) next.email = t('checkout.emailRequired');
+    else if (!isValidEmail(email)) next.email = t('checkout.validationInvalidEmail');
+    if (!phone.trim()) next.phone = t('checkout.phoneRequired');
+    else if (!isValidUaeMobilePhone(phone)) next.phone = t('addAddress.validationInvalidUaePhone');
+    if (!address.trim()) next.address = t('checkout.addressRequired');
+    return next;
+  }, [firstName, lastName, email, phone, address, t]);
+
+  const showError = (field) => {
+    return !!errors[field] && (submitAttempted || touched[field]);
+  };
+
+  const openAddressInMaps = async () => {
+    const query = String(address || '').trim();
+    if (!query) return;
+    const url =
+      Platform.OS === 'ios'
+        ? `http://maps.apple.com/?q=${encodeURIComponent(query)}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert(t('common.error'), t('checkout.couldNotOpenMaps'));
+    }
+  };
 
   const isPromoItem = (item) => item?.isPromotionItem === true || item?.selectedSize === '__PROMO__';
   const paidItems = items.filter((it) => !isPromoItem(it));
@@ -185,25 +328,29 @@ export default function CheckoutScreen() {
   }, [user]);
 
   const handleSubmit = async () => {
-    // Validation
-    if (!firstName.trim()) {
-      Alert.alert(t('common.error') || 'Error', t('checkout.firstNameRequired'));
-      return;
-    }
-    if (!lastName.trim()) {
-      Alert.alert(t('common.error') || 'Error', t('checkout.lastNameRequired'));
-      return;
-    }
-    if (!email.trim()) {
-      Alert.alert(t('common.error') || 'Error', t('checkout.emailRequired'));
-      return;
-    }
-    if (!phone.trim()) {
-      Alert.alert(t('common.error') || 'Error', t('checkout.phoneRequired'));
-      return;
-    }
-    if (!address.trim()) {
-      Alert.alert(t('common.error') || 'Error', t('checkout.addressRequired'));
+    setSubmitAttempted(true);
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      address: true,
+    });
+
+    const hasErrors =
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !isValidEmail(email) ||
+      !isValidUaeMobilePhone(phone) ||
+      !address.trim();
+
+    if (hasErrors) {
+      // Scroll user to the top of the form so they see the first highlighted field.
+      try {
+        scrollRef.current?.scrollTo?.({ y: 0, animated: true });
+      } catch {
+        // ignore
+      }
       return;
     }
 
@@ -224,7 +371,7 @@ export default function CheckoutScreen() {
         orderNumber,
         customerName: `${firstName.trim()} ${lastName.trim()}`,
         customerEmail: email.trim(),
-        customerPhone: phone.trim(),
+        customerPhone: normalizeUaePhone(phone),
         customerAddress: addressFromV1,
         emirate: selectedEmirate,
         items: items,
@@ -335,15 +482,6 @@ export default function CheckoutScreen() {
     }
   };
 
-  const contactWhatsApp = () => {
-    const phoneNumber = '971585487665';
-    const message = `Hi! I need help with my order ${orderNumber}. Can you assist me?`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    Linking.openURL(whatsappUrl).catch(() => {
-      Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
-    });
-  };
-
   if (items.length === 0) {
     return null; // Will redirect via useEffect
   }
@@ -369,7 +507,11 @@ export default function CheckoutScreen() {
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollRef}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.content}>
           
           {/* Order Summary Header */}
@@ -462,63 +604,106 @@ export default function CheckoutScreen() {
               <View style={styles.formHalf}>
                 <Text style={styles.label}>{t('checkout.firstName')} *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, showError('firstName') && styles.inputError]}
                   value={firstName}
                   onChangeText={setFirstName}
                   placeholder={t('checkout.enterFirstName')}
                   autoCapitalize="words"
+                  onBlur={() => setTouched((p) => ({ ...p, firstName: true }))}
                 />
+                {showError('firstName') ? <Text style={styles.helperError}>{errors.firstName}</Text> : null}
               </View>
               <View style={styles.formHalf}>
                 <Text style={styles.label}>{t('checkout.lastName')} *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, showError('lastName') && styles.inputError]}
                   value={lastName}
                   onChangeText={setLastName}
                   placeholder={t('checkout.enterLastName')}
                   autoCapitalize="words"
+                  onBlur={() => setTouched((p) => ({ ...p, lastName: true }))}
                 />
+                {showError('lastName') ? <Text style={styles.helperError}>{errors.lastName}</Text> : null}
               </View>
             </View>
 
             <View style={styles.formGroup}>
               <Text style={styles.label}>{t('checkout.emailAddress')} *</Text>
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                placeholder={t('checkout.enterEmail')}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+              <View style={styles.inputWrap}>
+                <TextInput
+                  style={[
+                    styles.input,
+                    styles.inputWithRightIcon,
+                    showError('email') && styles.inputError,
+                  ]}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder={t('checkout.enterEmail')}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                />
+                {isValidEmail(email) ? (
+                  <View style={styles.inputRightIcon}>
+                    <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
+                  </View>
+                ) : null}
+              </View>
+              {showError('email') ? <Text style={styles.helperError}>{errors.email}</Text> : null}
             </View>
 
             <View style={styles.formGroup}>
               <Text style={styles.label}>{t('checkout.phoneNumber')} *</Text>
-              <TextInput
-                style={styles.input}
-                value={phone}
-                onChangeText={setPhone}
-                placeholder={t('checkout.enterPhone')}
-                keyboardType="phone-pad"
-              />
+              <View style={styles.inputWrap}>
+                <TextInput
+                  style={[
+                    styles.input,
+                    styles.inputWithRightIcon,
+                    showError('phone') && styles.inputError,
+                  ]}
+                  value={phone}
+                  onChangeText={(text) => setPhone(formatUaePhoneForInput(text))}
+                  placeholder={t('checkout.enterPhone')}
+                  keyboardType="phone-pad"
+                  onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
+                />
+                {isValidUaeMobilePhone(phone) ? (
+                  <View style={styles.inputRightIcon}>
+                    <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
+                  </View>
+                ) : null}
+              </View>
+              {showError('phone') ? <Text style={styles.helperError}>{errors.phone}</Text> : null}
             </View>
 
             <View style={styles.formGroup}>
               <Text style={styles.label}>{t('checkout.deliveryAddress')} *</Text>
               <TextInput
-                style={[styles.input, styles.textArea]}
+                style={[styles.input, styles.textArea, showError('address') && styles.inputError]}
                 value={address}
                 onChangeText={setAddress}
                 placeholder={t('checkout.enterAddress')}
                 multiline
                 numberOfLines={3}
                 textAlignVertical="top"
+                onBlur={() => setTouched((p) => ({ ...p, address: true }))}
               />
+              {showError('address') ? <Text style={styles.helperError}>{errors.address}</Text> : null}
+
+              <TouchableOpacity
+                style={[styles.pinRowButton, !String(address || '').trim() && styles.pinButtonDisabled]}
+                onPress={openAddressInMaps}
+                disabled={!String(address || '').trim()}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="location-outline" size={16} color="#007AFF" />
+                <Text style={styles.pinRowButtonText}>{t('checkout.pinOnMap')}</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.formGroup}>
               <Text style={styles.label}>{t('checkout.emirate')} *</Text>
+              <Text style={styles.deliveryEtaHint}>{deliveryEtaText}</Text>
               <View style={styles.emirateGrid}>
                 {getAvailableEmirates().map((emirate) => (
                   <TouchableOpacity
@@ -530,24 +715,32 @@ export default function CheckoutScreen() {
                     onPress={() => setSelectedEmirate(emirate.name)}
                   >
                     <View style={styles.emirateTopRow}>
-                      <EmirateFlagIcon name={emirate.name} />
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={[
-                        styles.emirateText,
-                        selectedEmirate === emirate.name && styles.emirateTextSelected
-                      ]}
-                      >
-                        {emirate.name}
-                      </Text>
+                      <View style={styles.emirateTopLeft}>
+                        <EmirateFlagIcon name={emirate.name} />
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={[
+                            styles.emirateText,
+                            selectedEmirate === emirate.name && styles.emirateTextSelected,
+                          ]}
+                        >
+                          {emirate.name}
+                        </Text>
+                      </View>
+                      {selectedEmirate === emirate.name ? (
+                        <Ionicons name="checkmark" size={16} color="#E74C3C" />
+                      ) : null}
                     </View>
-                    <Text style={[
-                      styles.emirateShipping,
-                      selectedEmirate === emirate.name && styles.emirateTextSelected
-                    ]}>
-                      AED {emirate.shippingCost}
-                    </Text>
+                    <View style={styles.emirateBottomRow}>
+                      {Number(emirate.shippingCost) === 0 ? (
+                        <View style={styles.freeBadge}>
+                          <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
+                        </View>
+                      ) : (
+                        <Text style={styles.emirateShipping}>AED {emirate.shippingCost}</Text>
+                      )}
+                    </View>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -560,6 +753,14 @@ export default function CheckoutScreen() {
               <Ionicons name="card" size={20} color="#27AE60" />
               <Text style={styles.sectionTitle}>{t('checkout.paymentMethod')}</Text>
             </View>
+
+            <Text style={styles.paymentHint}>
+              {t('checkout.defaultPaymentMethod')}:{' '}
+              <Text style={styles.paymentHintStrong}>
+                {selectedPaymentMethod === PAYMENT_METHODS.CARD ? t('checkout.cardPayment') : t('checkout.cashOnDelivery')}
+              </Text>
+              {' '}• {t('checkout.tapToChange')}
+            </Text>
 
             <View style={styles.paymentOptions}>
               <TouchableOpacity
@@ -597,6 +798,11 @@ export default function CheckoutScreen() {
                 </View>
                 <Text style={styles.paymentDescription}>{t('checkout.paySecurelyStripe')}</Text>
               </TouchableOpacity>
+            </View>
+
+            <View style={styles.trustRow}>
+              <Ionicons name="lock-closed" size={14} color="#6B7280" />
+              <Text style={styles.trustText}>{t('checkout.trustStripe')}</Text>
             </View>
           </View>
 
@@ -655,24 +861,30 @@ export default function CheckoutScreen() {
             <Text style={styles.vatNote}>*{t('checkout.allPricesVatInclusive')}</Text>
           </View>
 
-          {/* Support */}
-          <View style={styles.supportSection}>
-            <View style={styles.supportHeader}>
-              <Ionicons name="chatbubble" size={20} color="#25D366" />
-              <Text style={styles.supportTitle}>{t('checkout.needHelp')}</Text>
-            </View>
-            <Text style={styles.supportText}>{t('checkout.haveQuestions')}</Text>
-            <TouchableOpacity style={styles.whatsappButton} onPress={contactWhatsApp}>
-              <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
-              <Text style={styles.whatsappButtonText}>{t('checkout.contactSupport')}</Text>
-            </TouchableOpacity>
-          </View>
-
         </View>
       </ScrollView>
 
       {/* Bottom Action */}
       <View style={styles.bottomContainer}>
+        <View style={styles.stickySummaryRow}>
+          <View style={styles.stickySummaryLeft}>
+            <View style={styles.etaPill}>
+              <Ionicons name="time-outline" size={14} color="#6B7280" />
+              <Text style={styles.etaPillText} numberOfLines={1} ellipsizeMode="tail">
+                {deliveryEtaText}
+              </Text>
+            </View>
+            {savingsAED > 0.5 ? (
+              <View style={styles.savingsPill}>
+                <Ionicons name="pricetag-outline" size={14} color="#16A34A" />
+                <Text style={styles.savingsPillText}>
+                  {t('checkout.youSave')} AED {savingsAED.toFixed(2)}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        </View>
+
         <TouchableOpacity
           style={[styles.placeOrderButton, isProcessing && styles.placeOrderButtonDisabled]}
           onPress={handleSubmit}
@@ -684,7 +896,7 @@ export default function CheckoutScreen() {
             <Ionicons name="bag-check" size={20} color="#ffffff" />
           )}
           <Text style={styles.placeOrderButtonText}>
-            {isProcessing ? t('checkout.processing') : `${t('checkout.placeOrder')} - AED ${safeTotal.toFixed(2)}`}
+            {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -822,14 +1034,11 @@ const styles = StyleSheet.create({
   // Section
   section: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 16,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -838,8 +1047,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#1D1D1F',
   },
 
@@ -856,24 +1065,90 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#3C3C43',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 6,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: '#D1D1D6',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
     color: '#1D1D1F',
     backgroundColor: '#ffffff',
+  },
+  inputWrap: {
+    position: 'relative',
+  },
+  inputWithRightIcon: {
+    paddingRight: 44,
+  },
+  inputRightIcon: {
+    position: 'absolute',
+    right: 12,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputError: {
+    borderColor: '#E74C3C',
+    backgroundColor: '#FFF5F5',
+  },
+  helperError: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#E74C3C',
+    fontWeight: '600',
   },
   textArea: {
     minHeight: 80,
     paddingTop: 10,
+  },
+  pinButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  pinRowButton: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  pinButtonDisabled: {
+    opacity: 0.5,
+  },
+  pinButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#007AFF',
+  },
+  pinRowButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#007AFF',
   },
 
   // Emirates
@@ -886,7 +1161,14 @@ const styles = StyleSheet.create({
   emirateTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  emirateTopLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
+    flex: 1,
+    paddingRight: 8,
   },
   emirateOption: {
     width: '48%',
@@ -910,10 +1192,34 @@ const styles = StyleSheet.create({
   emirateTextSelected: {
     color: '#E74C3C',
   },
+  emirateBottomRow: {
+    marginTop: 6,
+    alignItems: 'flex-end',
+  },
   emirateShipping: {
     fontSize: 12,
     color: '#8E8E93',
+    fontWeight: '600',
+  },
+  freeBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+  },
+  freeBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#16A34A',
+  },
+  deliveryEtaHint: {
     marginTop: 2,
+    marginBottom: 8,
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
   },
 
   // Payment
@@ -946,6 +1252,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8E8E93',
     marginLeft: 32,
+  },
+  paymentHint: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+    marginTop: -6,
+    marginBottom: 10,
+  },
+  paymentHintStrong: {
+    color: '#1D1D1F',
+    fontWeight: '800',
+  },
+  trustRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+  },
+  trustText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
   },
 
   // Summary
@@ -1005,54 +1333,65 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // Support
-  supportSection: {
-    backgroundColor: '#F0FDF4',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-    marginBottom: 20,
-  },
-  supportHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  supportTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#166534',
-  },
-  supportText: {
-    fontSize: 14,
-    color: '#166534',
-    marginBottom: 12,
-  },
-  whatsappButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#25D366',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  whatsappButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#ffffff',
-  },
-
   // Bottom Action
   bottomContainer: {
     backgroundColor: '#ffffff',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 12,
     paddingBottom: 34, // Safe area
     borderTopWidth: 0.5,
     borderTopColor: '#E5E5EA',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  stickySummaryRow: {
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  stickySummaryLeft: {
+    flex: 1,
+    gap: 8,
+    alignItems: 'center',
+  },
+  savingsPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+  },
+  savingsPillText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#16A34A',
+  },
+  etaPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  etaPillText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#6B7280',
+    textAlign: 'right',
+    flexShrink: 1,
   },
   placeOrderButton: {
     flexDirection: 'row',
@@ -1060,7 +1399,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#E74C3C',
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     gap: 8,
     shadowColor: '#E74C3C',
     shadowOffset: { width: 0, height: 4 },

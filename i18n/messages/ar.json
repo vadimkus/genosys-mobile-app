@@ -66,6 +66,7 @@
     "emailRequired": "يرجى إدخال البريد الإلكتروني.",
     "phoneRequired": "يرجى إدخال رقم الهاتف.",
     "addressRequired": "يرجى إدخال عنوان التوصيل.",
+    "validationInvalidEmail": "يرجى إدخال بريد إلكتروني صالح.",
     "orderSubmittedTitle": "تم إرسال الطلب بنجاح!",
     "orderSubmittedMessageCOD": "تم تقديم طلبك {orderNumber} بنجاح! ستتلقى رسالة تأكيد قريباً. ادفع عند الاستلام.",
     "paymentLinkUnavailableTitle": "رابط الدفع غير متوفر",
@@ -107,7 +108,15 @@
     "needHelp": "هل تحتاج مساعدة؟",
     "haveQuestions": "هل لديك أسئلة حول طلبك؟",
     "freeShippingApplied": "تم تطبيق الشحن المجاني!",
-    "allPricesVatInclusive": "جميع الأسعار تشمل ضريبة القيمة المضافة"
+    "allPricesVatInclusive": "جميع الأسعار تشمل ضريبة القيمة المضافة",
+    "deliveryEtaDubai": "التوصيل اليوم • 1–2 ساعة",
+    "deliveryEtaOther": "التوصيل غداً • 24–36 ساعة",
+    "defaultPaymentMethod": "طريقة الدفع الافتراضية",
+    "tapToChange": "اضغط للتغيير",
+    "trustStripe": "مدفوعات آمنة عبر Stripe • لا نخزن بيانات البطاقة",
+    "pinOnMap": "تحديد على الخريطة",
+    "couldNotOpenMaps": "تعذر فتح الخرائط. يرجى المحاولة مرة أخرى.",
+    "youSave": "وفرت"
   },
   "product": {
     "about": "عن المنتج",

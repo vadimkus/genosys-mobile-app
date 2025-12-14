@@ -66,6 +66,7 @@
     "emailRequired": "Введите email.",
     "phoneRequired": "Введите номер телефона.",
     "addressRequired": "Введите адрес доставки.",
+    "validationInvalidEmail": "Введите корректный email.",
     "orderSubmittedTitle": "Заказ успешно оформлен!",
     "orderSubmittedMessageCOD": "Ваш заказ {orderNumber} успешно оформлен! Вы получите письмо с подтверждением. Оплата при доставке.",
     "paymentLinkUnavailableTitle": "Ссылка на оплату недоступна",
@@ -107,7 +108,15 @@
     "needHelp": "Нужна помощь?",
     "haveQuestions": "Есть вопросы по заказу?",
     "freeShippingApplied": "Бесплатная доставка применена!",
-    "allPricesVatInclusive": "Все цены включают НДС"
+    "allPricesVatInclusive": "Все цены включают НДС",
+    "deliveryEtaDubai": "Доставка сегодня • 1–2 часа",
+    "deliveryEtaOther": "Доставка завтра • 24–36 часов",
+    "defaultPaymentMethod": "Способ оплаты по умолчанию",
+    "tapToChange": "нажмите, чтобы изменить",
+    "trustStripe": "Безопасная оплата через Stripe • Данные карт не храним",
+    "pinOnMap": "Показать на карте",
+    "couldNotOpenMaps": "Не удалось открыть карты. Попробуйте ещё раз.",
+    "youSave": "Вы экономите"
   },
   "product": {
     "about": "О продукте",
