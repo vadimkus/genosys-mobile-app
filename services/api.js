@@ -66,7 +66,7 @@ export const fetchShippingRates = async () => {
  * @param {Object} user - Current user object with authentication token
  * @returns {Promise<Array>} Array of complete product objects from server
  */
-export const fetchProducts = async (user = null) => {
+export const fetchProducts = async (user = null, options = {}) => {
   console.log('🚀 Fetching products from API (pure data layer)');
   console.log('📡 API URL:', `${API_BASE_URL}/products`);
   
@@ -75,6 +75,11 @@ export const fetchProducts = async (user = null) => {
       [API_CONFIG.HEADERS.CONTENT_TYPE]: 'application/json',
       [API_CONFIG.HEADERS.API_KEY]: API_KEY,
     };
+
+    // Optional locale for localized product fields (server may return localizedName/Description)
+    if (options?.locale) {
+      headers['x-locale'] = String(options.locale);
+    }
     
     // Add user ID for personalized pricing (enhanced API format)
     if (user?.id) {
@@ -182,7 +187,7 @@ export const fetchProductCategories = async () => {
  * @param {Object} user - Current user object with authentication token
  * @returns {Promise<Object|null>} Complete product object from server or null
  */
-export const fetchProductById = async (productId, user = null) => {
+export const fetchProductById = async (productId, user = null, options = {}) => {
   try {
     console.log('🔍 Fetching product by ID:', productId);
     const targetIdStr = String(productId);
@@ -192,6 +197,12 @@ export const fetchProductById = async (productId, user = null) => {
       'Content-Type': 'application/json',
       'x-api-key': API_KEY,
     };
+
+    // Optional locale header for localized product fields
+    const locale = options?.locale || user?.locale;
+    if (locale) {
+      headers['x-locale'] = String(locale);
+    }
     
     // Add user context for personalized pricing (match fetchProducts behavior)
     if (user?.id) {
@@ -223,7 +234,7 @@ export const fetchProductById = async (productId, user = null) => {
     }
     
     // Fallback: Get all products and find the one (for APIs without individual product endpoints)
-    const allProducts = await fetchProducts(user);
+    const allProducts = await fetchProducts(user, { locale: options?.locale || user?.locale });
     const foundProduct = allProducts.find((p) => {
       const pidStr = String(p.id);
       const pnumStr = p.productNumber ? String(p.productNumber) : null;

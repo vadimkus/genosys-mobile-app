@@ -13,10 +13,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 export default function AddressesScreen() {
   const router = useRouter();
   const { user, getAddresses, removeAddress, setAddressAsDefault } = useAuth();
+  const { t } = useLocalization();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -78,7 +80,7 @@ export default function AddressesScreen() {
               // Backend currently supports a single primary address; deleting clears it.
               setAddresses([]);
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete address');
+              Alert.alert(t('common.error'), result.error || t('addresses.deleteFailed'));
             }
           }
         }
@@ -94,7 +96,7 @@ export default function AddressesScreen() {
         isDefault: addr.id === addressId
       })));
     } else {
-      Alert.alert('Error', result.error || 'Failed to set default address');
+      Alert.alert(t('common.error'), result.error || t('addresses.setDefaultFailed'));
     }
   };
 
@@ -110,7 +112,7 @@ export default function AddressesScreen() {
           <Text style={styles.addressType}>{address.type}</Text>
           {address.isDefault && (
             <View style={styles.defaultBadge}>
-              <Text style={styles.defaultText}>Default</Text>
+              <Text style={styles.defaultText}>{t('addresses.default')}</Text>
             </View>
           )}
         </View>
@@ -150,7 +152,7 @@ export default function AddressesScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Addresses</Text>
+        <Text style={styles.headerTitle}>{t('addresses.title')}</Text>
         <TouchableOpacity onPress={handleAddAddress} style={styles.addButton}>
           <Ionicons name="add" size={24} color="#E74C3C" />
         </TouchableOpacity>
@@ -178,7 +180,7 @@ export default function AddressesScreen() {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#E74C3C" />
-            <Text style={styles.loadingText}>Loading addresses...</Text>
+            <Text style={styles.loadingText}>{t('addresses.loading')}</Text>
           </View>
         ) : (
           <View style={styles.addressesList}>
@@ -188,8 +190,8 @@ export default function AddressesScreen() {
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyTitle}>No addresses yet</Text>
-                <Text style={styles.emptySubtitle}>Add a delivery address to speed up checkout.</Text>
+                <Text style={styles.emptyTitle}>{t('addresses.emptyTitle')}</Text>
+                <Text style={styles.emptySubtitle}>{t('addresses.emptySubtitle')}</Text>
               </View>
             )}
           </View>
@@ -201,25 +203,25 @@ export default function AddressesScreen() {
             <View style={styles.addIconContainer}>
               <Ionicons name="add" size={24} color="#E74C3C" />
             </View>
-            <Text style={styles.addNewText}>Add New Address</Text>
+            <Text style={styles.addNewText}>{t('addresses.addNew')}</Text>
           </View>
         </TouchableOpacity>
 
         {/* Tips Section */}
         <View style={styles.tipsSection}>
-          <Text style={styles.tipsTitle}>Delivery Tips</Text>
+          <Text style={styles.tipsTitle}>{t('addresses.deliveryTips')}</Text>
           <View style={styles.tipsList}>
             <View style={styles.tipItem}>
               <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.tipText}>Set a default address for faster checkout</Text>
+              <Text style={styles.tipText}>{t('addresses.tipDefault')}</Text>
             </View>
             <View style={styles.tipItem}>
               <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.tipText}>Include apartment/office numbers for accurate delivery</Text>
+              <Text style={styles.tipText}>{t('addresses.tipApt')}</Text>
             </View>
             <View style={styles.tipItem}>
               <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.tipText}>Provide a phone number for delivery coordination</Text>
+              <Text style={styles.tipText}>{t('addresses.tipPhone')}</Text>
             </View>
           </View>
         </View>

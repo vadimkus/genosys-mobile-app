@@ -6,6 +6,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchUserOrderById, fetchUserOrders } from '../../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
+import { useLocalization } from '../../../contexts/LocalizationContext';
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -35,6 +36,7 @@ export default function OrderDetailScreen() {
 
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
+  const { t } = useLocalization();
 
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
@@ -64,7 +66,7 @@ export default function OrderDetailScreen() {
 
       setOrder(match);
     } catch (e) {
-      Alert.alert('Could not load order', e?.message || 'Please try again.');
+      Alert.alert(t('common.error'), e?.message || 'Please try again.');
     } finally {
       setLoading(false);
     }
@@ -119,7 +121,7 @@ export default function OrderDetailScreen() {
         params: { orderId, orderNumber: orderNum, paymentUrl: String(res.paymentUrl), fromOrders: '1' },
       });
     } catch (e) {
-      Alert.alert('Could not start payment', e?.message || 'Please try again.');
+      Alert.alert(t('ordersDetailAlerts.couldNotStartPaymentTitle'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
       setPaying(false);
     }
@@ -130,7 +132,7 @@ export default function OrderDetailScreen() {
     const message = `Hi! I need help with order ${String(orderNumber)}. Can you assist me?`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(whatsappUrl).catch(() => {
-      Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+      Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
     });
   };
 
@@ -149,12 +151,12 @@ export default function OrderDetailScreen() {
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#E74C3C" />
-          <Text style={styles.loadingText}>Loading…</Text>
+          <Text style={styles.loadingText}>{t('ordersDetail.loading')}</Text>
         </View>
       ) : !order ? (
         <View style={styles.center}>
-          <Text style={styles.emptyTitle}>Order not found</Text>
-          <Text style={styles.emptyText}>Please pull to refresh or go back to Orders.</Text>
+          <Text style={styles.emptyTitle}>{t('ordersDetail.notFound')}</Text>
+          <Text style={styles.emptyText}>{t('ordersDetail.notFoundHint')}</Text>
         </View>
       ) : (
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -164,26 +166,26 @@ export default function OrderDetailScreen() {
             </Text>
 
             <View style={styles.row}>
-              <Text style={styles.label}>Subtotal</Text>
+              <Text style={styles.label}>{t('ordersDetail.subtotal')}</Text>
               <Text style={styles.value}>AED {formatAED(subtotal)}</Text>
             </View>
             <View style={styles.row}>
-              <Text style={styles.label}>Shipping</Text>
+              <Text style={styles.label}>{t('ordersDetail.shipping')}</Text>
               <Text style={styles.value}>{freeShipping ? 'FREE' : `AED ${formatAED(shipping)}`}</Text>
             </View>
             <View style={styles.row}>
-              <Text style={styles.label}>VAT (included)</Text>
+              <Text style={styles.label}>{t('ordersDetail.vatIncluded')}</Text>
               <Text style={styles.value}>AED {formatAED(vat)}</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.row}>
-              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalLabel}>{t('ordersDetail.total')}</Text>
               <Text style={styles.totalValue}>AED {formatAED(total)}</Text>
             </View>
 
             <View style={styles.divider} />
 
-            <Text style={styles.sectionTitle}>Items</Text>
+            <Text style={styles.sectionTitle}>{t('ordersDetail.items')}</Text>
             {(Array.isArray(order.items) ? order.items : []).map((it, idx) => {
               const qty = Number(it?.quantity) || 0;
               const name = it?.name || it?.productName || `Item ${idx + 1}`;
@@ -211,7 +213,7 @@ export default function OrderDetailScreen() {
 
             <TouchableOpacity style={styles.supportButton} onPress={onSupport} activeOpacity={0.85}>
               <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
-              <Text style={styles.supportButtonText}>Support via WhatsApp</Text>
+              <Text style={styles.supportButtonText}>{t('ordersDetail.supportWhatsapp')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

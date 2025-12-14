@@ -13,9 +13,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 export default function AddEditAddressScreen() {
   const router = useRouter();
+  const { t } = useLocalization();
   const { user, addAddress, editAddress } = useAuth();
   const params = useLocalSearchParams();
   
@@ -24,23 +26,23 @@ export default function AddEditAddressScreen() {
   const addressData = params.addressData ? JSON.parse(params.addressData) : null;
   
   const [formData, setFormData] = useState({
-    type: addressData?.type || 'Home',
+    type: addressData?.type || t('addAddress.typeHome'),
     name: addressData?.name || user?.name || '',
     phone: addressData?.phone || user?.phone || '',
     address: addressData?.address || '',
-    city: addressData?.city || 'Dubai',
-    emirate: addressData?.emirate || 'Dubai',
-    country: addressData?.country || 'United Arab Emirates',
+    city: addressData?.city || t('addAddress.defaultCity'),
+    emirate: addressData?.emirate || t('addAddress.defaultEmirate'),
+    country: addressData?.country || t('addAddress.defaultCountry'),
     isDefault: addressData?.isDefault || false,
   });
   const [isSaving, setIsSaving] = useState(false);
 
   const emirates = [
-    'Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 
+    'Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman',
     'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'
   ];
 
-  const addressTypes = ['Home', 'Work', 'Other'];
+  const addressTypes = [t('addAddress.typeHome'), t('addAddress.typeWork'), t('addAddress.typeOther')];
 
   const updateField = useCallback((field, value) => {
     setFormData(prevData => ({...prevData, [field]: value}));
@@ -49,14 +51,14 @@ export default function AddEditAddressScreen() {
   const handleSave = async () => {
     // Validate form
     if (!formData.name.trim() || !formData.phone.trim() || !formData.address.trim()) {
-      Alert.alert('Error', 'Please fill in all required fields.');
+      Alert.alert(t('common.error'), t('addAddress.validationMissingFields'));
       return;
     }
 
     // Phone validation (UAE format)
     const phoneRegex = /^(\+971|0)[0-9]{8,9}$/;
     if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      Alert.alert('Error', 'Please enter a valid UAE phone number.');
+      Alert.alert(t('common.error'), t('addAddress.validationInvalidUaePhone'));
       return;
     }
 
@@ -72,21 +74,21 @@ export default function AddEditAddressScreen() {
       
       if (result.success) {
         Alert.alert(
-          'Success', 
-          isEditing ? 'Address updated successfully!' : 'Address added successfully!',
+          t('addAddress.successTitle'),
+          isEditing ? t('addAddress.updated') : t('addAddress.added'),
           [
             {
-              text: 'OK',
+              text: t('contact.ok'),
               onPress: () => router.back()
             }
           ]
         );
       } else {
-        Alert.alert('Error', result.error || 'Failed to save address. Please try again.');
+        Alert.alert(t('common.error'), result.error || t('addAddress.saveFailed'));
       }
     } catch (error) {
       console.error('Address save error:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert(t('common.error'), t('addAddress.genericError'));
     } finally {
       setIsSaving(false);
     }
@@ -95,11 +97,11 @@ export default function AddEditAddressScreen() {
   const handleCancel = () => {
     if (JSON.stringify(formData) !== JSON.stringify(addressData)) {
       Alert.alert(
-        'Discard Changes?',
-        'Are you sure you want to discard your changes?',
+        t('addAddress.discardTitle'),
+        t('addAddress.discardMessage'),
         [
-          { text: 'Keep Editing', style: 'cancel' },
-          { text: 'Discard', style: 'destructive', onPress: () => router.back() }
+          { text: t('addAddress.keepEditing'), style: 'cancel' },
+          { text: t('addAddress.discard'), style: 'destructive', onPress: () => router.back() }
         ]
       );
     } else {
@@ -112,10 +114,10 @@ export default function AddEditAddressScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('addAddress.cancel')}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {isEditing ? 'Edit Address' : 'Add Address'}
+          {isEditing ? t('addAddress.editTitle') : t('addAddress.addTitle')}
         </Text>
         <TouchableOpacity 
           onPress={handleSave} 
@@ -123,7 +125,7 @@ export default function AddEditAddressScreen() {
           disabled={isSaving}
         >
           <Text style={[styles.saveText, isSaving && styles.saveTextDisabled]}>
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? t('addAddress.saving') : t('addAddress.save')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -136,7 +138,7 @@ export default function AddEditAddressScreen() {
       >
         {/* Address Type */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Address Type</Text>
+          <Text style={styles.sectionTitle}>{t('addAddress.addressType')}</Text>
           <View style={styles.formContent}>
             <View style={styles.typeContainer}>
               {addressTypes.map((type) => (
@@ -149,7 +151,7 @@ export default function AddEditAddressScreen() {
                   onPress={() => updateField('type', type)}
                 >
                   <Ionicons 
-                    name={type === 'Home' ? 'home' : type === 'Work' ? 'business' : 'location'} 
+                    name={type === t('addAddress.typeHome') ? 'home' : type === t('addAddress.typeWork') ? 'business' : 'location'} 
                     size={20} 
                     color={formData.type === type ? '#ffffff' : '#E74C3C'} 
                   />
@@ -167,18 +169,18 @@ export default function AddEditAddressScreen() {
 
         {/* Contact Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Contact Information</Text>
+          <Text style={styles.sectionTitle}>{t('addAddress.contactInfo')}</Text>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                Full Name
+                {t('addAddress.fullName')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.name}
                 onChangeText={(text) => updateField('name', text)}
-                placeholder="Enter full name"
+                placeholder={t('addAddress.enterFullName')}
                 autoCapitalize="words"
                 autoCorrect={false}
                 returnKeyType="next"
@@ -189,14 +191,14 @@ export default function AddEditAddressScreen() {
 
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                Phone Number
+                {t('addAddress.phoneNumber')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.phone}
                 onChangeText={(text) => updateField('phone', text)}
-                placeholder="+971 50 123 4567"
+                placeholder={t('addAddress.phonePlaceholder')}
                 keyboardType="phone-pad"
                 autoCorrect={false}
                 returnKeyType="next"
@@ -209,18 +211,18 @@ export default function AddEditAddressScreen() {
 
         {/* Address Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Address Details</Text>
+          <Text style={styles.sectionTitle}>{t('addAddress.addressDetails')}</Text>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                Street Address
+                {t('addAddress.streetAddress')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={[styles.textInput, styles.multilineInput]}
                 value={formData.address}
                 onChangeText={(text) => updateField('address', text)}
-                placeholder="Building name, street name, apartment/villa number"
+                placeholder={t('addAddress.enterAddressLine')}
                 multiline={true}
                 numberOfLines={3}
                 autoCapitalize="words"
@@ -232,12 +234,12 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>City</Text>
+              <Text style={styles.fieldLabel}>{t('addAddress.city')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.city}
                 onChangeText={(text) => updateField('city', text)}
-                placeholder="Dubai"
+                placeholder={t('addAddress.defaultCity')}
                 autoCapitalize="words"
                 autoCorrect={false}
                 returnKeyType="next"
@@ -247,7 +249,7 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>Emirate</Text>
+              <Text style={styles.fieldLabel}>{t('addAddress.emirate')}</Text>
               <View style={styles.pickerContainer}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {emirates.map((emirate) => (
@@ -272,12 +274,12 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>Country</Text>
+              <Text style={styles.fieldLabel}>{t('addAddress.country')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.country}
                 onChangeText={(text) => updateField('country', text)}
-                placeholder="United Arab Emirates"
+                placeholder={t('addAddress.defaultCountry')}
                 autoCapitalize="words"
                 autoCorrect={false}
                 returnKeyType="done"
@@ -290,12 +292,12 @@ export default function AddEditAddressScreen() {
 
         {/* Default Address */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
+          <Text style={styles.sectionTitle}>{t('addAddress.preferences')}</Text>
           <View style={styles.formContent}>
             <View style={styles.switchContainer}>
               <View style={styles.switchLabel}>
-                <Text style={styles.fieldLabel}>Set as Default Address</Text>
-                <Text style={styles.switchSubtext}>Use this address for all future orders by default</Text>
+                <Text style={styles.fieldLabel}>{t('addAddress.setAsDefault')}</Text>
+                <Text style={styles.switchSubtext}>{t('addAddress.setAsDefaultHint')}</Text>
               </View>
               <Switch
                 value={formData.isDefault}
@@ -312,7 +314,7 @@ export default function AddEditAddressScreen() {
         <View style={styles.deliveryNote}>
           <Ionicons name="information-circle-outline" size={16} color="#8E8E93" />
           <Text style={styles.deliveryNoteText}>
-            Please provide accurate address details including building/villa number and any landmarks to ensure smooth delivery.
+            {t('addAddress.deliveryNote')}
           </Text>
         </View>
       </ScrollView>

@@ -17,11 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function LoginScreen() {
+  const { t } = useLocalization();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,7 +46,7 @@ export default function LoginScreen() {
   const handleGoogleLogin = async () => {
     // Check privacy consent
     if (!privacyConsent) {
-      Alert.alert('Privacy Policy Required', 'Please read and accept our Privacy Policy to continue.');
+      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
 
@@ -69,7 +71,7 @@ export default function LoginScreen() {
         );
       }
     } catch (error) {
-      Alert.alert('Error', 'Google authentication failed. Please use email & password login.');
+      Alert.alert(t('common.error'), t('authScreen.googleAuthFailed'));
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ export default function LoginScreen() {
   const handleBiometricLogin = async () => {
     // Check privacy consent
     if (!privacyConsent) {
-      Alert.alert('Privacy Policy Required', 'Please read and accept our Privacy Policy to continue.');
+      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
 
@@ -90,10 +92,10 @@ export default function LoginScreen() {
         // Navigation will be handled by the auth context automatically
         console.log('✅ Biometric login successful');
       } else {
-        Alert.alert('Authentication Failed', result.error || 'Biometric login failed');
+        Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.biometricLoginFailed'));
       }
     } catch (error) {
-      Alert.alert('Error', 'Biometric authentication failed. Please try again.');
+      Alert.alert(t('common.error'), t('authScreen.biometricAuthFailed'));
     } finally {
       setLoading(false);
     }
@@ -101,23 +103,23 @@ export default function LoginScreen() {
 
   const handleEmailAuth = async () => {
     if (!email || !password || (!isLogin && !name)) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('common.error'), t('authScreen.fillAllFields'));
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Alert.alert(t('common.error'), t('authScreen.invalidEmail'));
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long');
+      Alert.alert(t('common.error'), t('authScreen.passwordMinLength'));
       return;
     }
 
     // Check privacy consent
     if (!privacyConsent) {
-      Alert.alert('Privacy Policy Required', 'Please read and accept our Privacy Policy to continue.');
+      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
 
@@ -134,14 +136,14 @@ export default function LoginScreen() {
       if (result.success) {
         // Show success alert only for registration, not login
         if (!isLogin) {
-          Alert.alert('Success', 'Account created successfully!');
+          Alert.alert(t('authScreen.accountCreatedTitle'), t('authScreen.accountCreatedMessage'));
         }
         // Navigation will be handled by the auth context automatically
       } else {
-        Alert.alert('Error', result.error || `${isLogin ? 'Login' : 'Registration'} failed`);
+        Alert.alert(t('common.error'), result.error || (isLogin ? t('authScreen.loginFailed') : t('authScreen.registrationFailed')));
       }
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert(t('common.error'), t('authScreen.genericError'));
     } finally {
       setLoading(false);
     }
@@ -179,15 +181,11 @@ export default function LoginScreen() {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.title}>
-              {isLogin ? 'Welcome Back' : 'Create Account'}
-            </Text>
-            <Text style={styles.subtitle}>
-              {isLogin 
-                ? 'Sign in to continue to your Genosys account'
-                : 'Join Genosys for premium skincare experience'
-              }
-            </Text>
+            <View style={styles.uaeRow}>
+              <Text style={styles.uaeFlag}>🇦🇪</Text>
+              <Text style={styles.title}>{t('authScreen.uaeLine')}</Text>
+              <Ionicons name="heart" size={12} color="#E74C3C" style={styles.uaeHeart} />
+            </View>
           </View>
 
           {/* Privacy Policy Notice */}
@@ -253,7 +251,7 @@ export default function LoginScreen() {
                 <Text style={styles.inputLabel}>Full Name</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="Enter your full name"
+                  placeholder={t('authScreen.fullNamePlaceholder')}
                   value={name}
                   onChangeText={setName}
                   autoCapitalize="words"
@@ -267,7 +265,7 @@ export default function LoginScreen() {
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Enter your email"
+                placeholder={t('authScreen.emailPlaceholder')}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -282,7 +280,7 @@ export default function LoginScreen() {
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
-                  placeholder="Enter your password"
+                  placeholder={t('authScreen.passwordPlaceholder')}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -347,8 +345,12 @@ export default function LoginScreen() {
 
           {/* Forgot Password (Login only) */}
           {isLogin && (
-            <TouchableOpacity style={styles.forgotPassword} activeOpacity={0.7}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              activeOpacity={0.7}
+              onPress={() => router.push('/auth/forgot-password')}
+            >
+              <Text style={styles.forgotPasswordText}>{t('authScreen.forgotPassword')}</Text>
             </TouchableOpacity>
           )}
 
@@ -391,19 +393,34 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 28,
   },
   logo: {
     width: 150,
     height: 50,
-    marginBottom: 24,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '400',
     color: '#1D1D1F',
-    marginBottom: 8,
+    marginBottom: 0,
     textAlign: 'center',
+  },
+  uaeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -2,
+  },
+  uaeFlag: {
+    fontSize: 14,
+    marginRight: 6,
+    marginTop: -1,
+  },
+  uaeHeart: {
+    marginLeft: 6,
+    marginTop: -1,
   },
   subtitle: {
     fontSize: 16,

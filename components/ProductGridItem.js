@@ -12,12 +12,15 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
+import { useLocalization } from '../contexts/LocalizationContext';
+import { getLocalizedProductName, getCategoryTranslationKey } from '../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
 
 export default function ProductGridItem({ product }) {
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { t, locale } = useLocalization();
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
@@ -105,7 +108,7 @@ export default function ProductGridItem({ product }) {
         {/* Stock Status Overlay */}
         {isOutOfStock && (
           <View style={styles.stockOverlay}>
-            <Text style={styles.stockOverlayText}>Out of Stock</Text>
+            <Text style={styles.stockOverlayText}>{t('stock.outOfStock')}</Text>
           </View>
         )}
         
@@ -132,13 +135,13 @@ export default function ProductGridItem({ product }) {
       
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={2}>
-          {product.name}
+          {getLocalizedProductName(product, locale) || product.name}
         </Text>
         
         {/* Badges removed from content area to avoid duplication - they show on image */}
         
         <Text style={styles.category} numberOfLines={1}>
-          {product.category}
+          {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
         </Text>
         
         {/* Enhanced Size Information from Server */}
@@ -155,7 +158,7 @@ export default function ProductGridItem({ product }) {
             </View>
             {(product.stock || product.inStock) && (
               <View style={styles.stockBadge}>
-                <Text style={styles.stockBadgeText}>In Stock</Text>
+                <Text style={styles.stockBadgeText}>{t('stock.inStock')}</Text>
               </View>
             )}
           </View>
@@ -176,7 +179,7 @@ export default function ProductGridItem({ product }) {
                 Full Price: {(product.originalPrice || product.displayPrice || product.price || 0).toFixed(2)} AED
               </Text>
               <View style={styles.beautyBoxDiscountContainer}>
-                <Text style={styles.beautyBoxDiscount}>15% OFF (Bundle Discount)</Text>
+                <Text style={styles.beautyBoxDiscount}>{t('bag.bundleDiscount15')}</Text>
                 <Text style={styles.beautyBoxFinalPrice}>
                   Final: {(product.displayPrice || product.price || 0).toFixed(2)} AED
                 </Text>

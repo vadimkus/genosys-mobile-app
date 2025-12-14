@@ -19,6 +19,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { fetchProductById } from '../../services/api';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../../utils/productRules';
+import { useLocalization } from '../../contexts/LocalizationContext';
+import { getLocalizedProductName, getLocalizedProductDescription } from '../../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
@@ -231,6 +233,12 @@ const deriveDiscountFromBadges = (product) => {
   return null;
 };
 
+const isBeautyBoxProduct = (product) => {
+  const cat = String(product?.category || '').toLowerCase();
+  const name = String(product?.name || '').toLowerCase();
+  return cat === 'beauty boxes' || name.includes('beauty box');
+};
+
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
   { label: 'Size', keys: ['size', 'volume', 'productSize'] },
@@ -271,6 +279,7 @@ const getObjValueCaseInsensitive = (obj, keys) => {
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
+  const { t, locale } = useLocalization();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -288,7 +297,7 @@ export default function ProductDetailScreen() {
       console.log('🔍 Loading enhanced product with ID:', id);
       
       // Use enhanced fetchProductById with user context
-      const enhancedProduct = await fetchProductById(id, user);
+      const enhancedProduct = await fetchProductById(id, user, { locale });
       
       if (enhancedProduct) {
         setProduct(enhancedProduct);
@@ -319,12 +328,12 @@ export default function ProductDetailScreen() {
           console.log('💰 User has discount applied server-side');
         }
           } else {
-            Alert.alert('Error', 'Product not found');
+            Alert.alert(t('product.error'), t('product.productNotFound'));
             router.back();
       }
     } catch (error) {
       console.error('Error loading product:', error);
-      Alert.alert('Error', 'Failed to load product');
+      Alert.alert(t('product.error'), t('product.failedToLoad'));
       router.back();
     } finally {
       setLoading(false);
@@ -352,20 +361,20 @@ export default function ProductDetailScreen() {
 
       addItem(productForCart, 1, selectedColor, selectedSize);
       
-      let message = `${product.name} has been added to your bag`;
+      let message = `${getLocalizedProductName(product, locale) || product.name} has been added to your bag`;
       if (selectedSize) {
-        message += `\nSize: ${selectedSize}`;
+        message += `\n${t('common.size')}: ${selectedSize}`;
       }
       if (selectedColor) {
-        message += `\nColor: ${selectedColor}`;
+        message += `\n${t('common.color')}: ${selectedColor}`;
       }
       
       Alert.alert(
-        '🛍️ Added to Bag',
+        t('product.addedToBagTitle'),
         message,
         [
-          { text: 'Continue Shopping', style: 'default' },
-          { text: 'View Bag', style: 'default', onPress: () => router.push('/(tabs)/bag') }
+          { text: t('product.continueShopping'), style: 'default' },
+          { text: t('product.viewBag'), style: 'default', onPress: () => router.push('/(tabs)/bag') }
         ]
       );
     }
@@ -407,19 +416,19 @@ export default function ProductDetailScreen() {
   const handleShare = async () => {
     if (!product) return;
     const url = `https://genosys.ae/products/${product.id}`;
-    const message = `${asText(product.name)}\n${formatPrice(product.displayPrice || product.price)} AED\n${url}`;
+    const message = `${asText(getLocalizedProductName(product, locale) || product.name)}\n${formatPrice(product.displayPrice || product.price)} AED\n${url}`;
     try {
       await Share.share(
         {
-          title: asText(product.name) || 'Genosys Product',
+          title: asText(getLocalizedProductName(product, locale) || product.name) || 'Genosys Product',
           message,
           url,
         },
-        { dialogTitle: 'Share product' }
+        { dialogTitle: t('product.share') }
       );
     } catch (error) {
       console.error('Failed to share product', error);
-      Alert.alert('Error', 'Could not open share sheet. Please try again.');
+      Alert.alert(t('product.error'), t('product.shareError'));
     }
   };
 
@@ -439,10 +448,111 @@ export default function ProductDetailScreen() {
       .trim();
   };
 
+  const parseBeautyBoxDescription = (rawText) => {
+    const text = asText(rawText || '').trim();
+    if (!text) {
+      return { description: '', pricingLine: '', title: '', items: [] };
+    }
+
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 0);
+    const idxPricing = lines.findIndex((l) => /^regular price:/i.test(l));
+    const idxTitle = lines.findIndex((l) => /beauty box\s*:/i.test(l));
+    const idxKit = lines.findIndex((l) => /^kit includes:?/i.test(l));
+
+    const descriptionLines = (idxPricing > 0 ? lines.slice(0, idxPricing) : lines.slice(0, Math.min(lines.length, 3)));
+    const description = descriptionLines.join('\n\n').trim();
+    const pricingLine = idxPricing >= 0 ? lines[idxPricing] : '';
+    const titleLine = idxTitle >= 0 ? lines[idxTitle] : '';
+    const title = titleLine
+      .replace(/^❤️\s*/i, '')
+      .replace(/^beauty box\s*:\s*/i, '')
+      .trim();
+
+    const startItems = idxKit >= 0 ? idxKit + 1 : (idxTitle >= 0 ? idxTitle + 1 : (idxPricing >= 0 ? idxPricing + 1 : 0));
+    const itemLines = startItems > 0 ? lines.slice(startItems) : [];
+
+    const items = [];
+    let current = null;
+
+    const flush = () => {
+      if (!current) return;
+      const body = current.body.join('\n').trim();
+      items.push({
+        index: current.index,
+        header: current.header.trim(),
+        body,
+      });
+      current = null;
+    };
+
+    for (const l of itemLines) {
+      const m = l.match(/^(\d+)\.\s*(.+)$/);
+      if (m) {
+        flush();
+        current = { index: Number(m[1]), header: m[2], body: [] };
+        continue;
+      }
+      if (!current) {
+        // Ignore stray lines before first item
+        continue;
+      }
+      current.body.push(l);
+    }
+    flush();
+
+    return { description, pricingLine, title, items };
+  };
+
+  const renderBeautyBoxDetails = () => {
+    if (!product) return null;
+    const localizedDescription = getLocalizedProductDescription(product, locale) || product.description;
+    const shouldParse = String(locale || 'en').toLowerCase().startsWith('en');
+    const parsed = shouldParse ? parseBeautyBoxDescription(product.description) : null;
+    const safeParsed = parsed || { description: '', pricingLine: '', title: '', items: [] };
+
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('product.productDescription')}</Text>
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.description}>{safeParsed.description || asText(localizedDescription)}</Text>
+        </View>
+
+        {safeParsed.pricingLine ? (
+          <View style={styles.beautyBoxPriceLineWrap}>
+            <Text style={styles.beautyBoxPriceLine}>{safeParsed.pricingLine}</Text>
+          </View>
+        ) : null}
+
+        {Array.isArray(safeParsed.items) && safeParsed.items.length > 0 ? (
+          <>
+            {/* Show this block only when we actually have parsed kit items (EN parsing). */}
+            <View style={styles.beautyBoxTitleRow}>
+              <Text style={styles.beautyBoxTitleHeart}>❤️</Text>
+              <Text style={styles.beautyBoxTitleText}>
+                {`Beauty Box: ${(safeParsed.title || asText(getLocalizedProductName(product, locale) || product.name).replace(/beauty box/i, '').trim())}`}
+              </Text>
+            </View>
+
+            <Text style={styles.beautyBoxKitTitle}>{t('product.kitIncludes')}</Text>
+
+            <View style={styles.beautyBoxKitList}>
+              {safeParsed.items.map((it) => (
+                <View key={`${it.index}-${it.header}`} style={styles.beautyBoxKitItem}>
+                  <Text style={styles.beautyBoxKitHeader}>{`${it.index}. ${it.header}`}</Text>
+                  {it.body ? <Text style={styles.beautyBoxKitBody}>{it.body}</Text> : null}
+                </View>
+              ))}
+            </View>
+          </>
+        ) : null}
+      </View>
+    );
+  };
+
   const getDisplayDescription = () => {
     if (!product?.description) return '';
 
-    const formatted = formatDescription(asText(product.description));
+    const formatted = formatDescription(asText(getLocalizedProductDescription(product, locale) || product.description));
     const isLong = formatted.length > 500;
 
     if (isLong && !showFullDescription) {
@@ -547,7 +657,7 @@ export default function ProductDetailScreen() {
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Product Details</Text>
+        <Text style={styles.sectionTitle}>{t('product.productDetails')}</Text>
         <View style={styles.specList}>
           {rows.map((row, idx) => (
             <View
@@ -649,7 +759,7 @@ export default function ProductDetailScreen() {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#E74C3C" />
-        <Text style={styles.loadingText}>Loading product details...</Text>
+        <Text style={styles.loadingText}>{t('productScreen.loadingDetails')}</Text>
       </SafeAreaView>
     );
   }
@@ -657,9 +767,9 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <SafeAreaView style={styles.errorContainer}>
-        <Text style={styles.errorText}>Product not found</Text>
+        <Text style={styles.errorText}>{t('productScreen.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Go Back</Text>
+          <Text style={styles.backButtonText}>{t('productScreen.goBack')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -720,20 +830,20 @@ export default function ProductDetailScreen() {
         <View style={styles.contentContainer}>
           <View style={styles.productInfo}>
             <Text style={styles.category}>{asText(product.category)}</Text>
-            <Text style={styles.productName}>{asText(product.name)}</Text>
+            <Text style={styles.productName}>{asText(getLocalizedProductName(product, locale) || product.name)}</Text>
             
             {/* Enhanced Size and Stock Info from Server */}
             {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
               <View style={styles.sizeInfoContainer}>
                 <Text style={styles.sizeInfo}>
                   {product.variants && product.variants.length > 0
-                    ? `${product.variants.length} sizes available`
+                    ? t('product.sizesAvailable', { count: product.variants.length })
                     : product.hasVariants 
-                      ? 'Multiple sizes available'
-                      : `Size: ${asText(product.size)}`}
+                      ? t('product.multipleSizesAvailable')
+                      : t('product.sizeLine', { size: asText(product.size) })}
                 </Text>
                 {(product.stock || product.inStock) && (
-                  <Text style={styles.stockInfo}>✓ In Stock</Text>
+                  <Text style={styles.stockInfo}>{t('product.inStock')}</Text>
                 )}
               </View>
             )}
@@ -743,12 +853,12 @@ export default function ProductDetailScreen() {
                 // Special pricing display for Beauty Boxes on detail page
                 <View style={styles.beautyBoxDetailPricing}>
                   <Text style={styles.beautyBoxDetailFullPrice}>
-                    Full Price: {formatPrice(product.originalPrice || product.displayPrice || product.price || 0)} AED
+                    {t('product.fullPrice', { price: formatPrice(product.originalPrice || product.displayPrice || product.price || 0) })}
                   </Text>
                   <View style={styles.beautyBoxDetailDiscountRow}>
-                    <Text style={styles.beautyBoxDetailDiscount}>15% OFF (Bundle Discount)</Text>
+                    <Text style={styles.beautyBoxDetailDiscount}>{t('product.bundleDiscount')}</Text>
                     <Text style={styles.beautyBoxDetailFinalPrice}>
-                      Final: {formatPrice(product.displayPrice || product.price || 0)} AED
+                      {t('product.finalPrice', { price: formatPrice(product.displayPrice || product.price || 0) })}
                     </Text>
                   </View>
                 </View>
@@ -826,66 +936,57 @@ export default function ProductDetailScreen() {
             )}
 
           {/* Product content sections from API */}
-          {renderInfoSection('About this product', getDisplayDescription())}
+          {isBeautyBoxProduct(product) ? (
+            renderBeautyBoxDetails()
+          ) : (
+            <>
+              {renderInfoSection(t('product.about'), getDisplayDescription())}
 
-          {/* Required website-like sections (deduped + formatted) */}
-          {renderSpecs()}
+              {/* Required website-like sections (deduped + formatted) */}
+              {renderSpecs()}
 
-          {(() => {
-            const benefits = dedupeList([
-              ...asStringList(product?.benefits),
-              ...asStringList(product?.keyBenefits),
-              ...(() => {
-                const parsed = parseMaybeJSON(product?.keyFeatures);
-                if (!Array.isArray(parsed)) return [];
-                return parsed
-                  .map((x) => {
-                    if (!x) return '';
-                    if (typeof x === 'string') return x;
-                    const t = asText(x.title || '').trim();
-                    const d = asText(x.description || '').trim();
-                    return `${t}${t && d ? ' — ' : ''}${d}`.trim();
-                  })
-                  .filter(Boolean);
-              })(),
-            ]);
+              {(() => {
+                const benefits = dedupeList([
+                  ...asStringList(product?.benefits),
+                  ...asStringList(product?.keyBenefits),
+                  ...(() => {
+                    const parsed = parseMaybeJSON(product?.keyFeatures);
+                    if (!Array.isArray(parsed)) return [];
+                    return parsed
+                      .map((x) => {
+                        if (!x) return '';
+                        if (typeof x === 'string') return x;
+                        const t = asText(x.title || '').trim();
+                        const d = asText(x.description || '').trim();
+                        return `${t}${t && d ? ' — ' : ''}${d}`.trim();
+                      })
+                      .filter(Boolean);
+                  })(),
+                ]);
 
-            if (benefits.length === 1 && benefits[0].length > 200 && !benefits[0].includes(' — ')) {
-              return renderInfoSection('Benefits', benefits[0]);
-            }
-            return renderListSection('Benefits', benefits);
-          })()}
+                if (benefits.length === 1 && benefits[0].length > 200 && !benefits[0].includes(' — ')) {
+                  return renderInfoSection(t('product.benefits'), benefits[0]);
+                }
+                return renderListSection(t('product.benefits'), benefits);
+              })()}
 
-          {(() => {
-            const steps = toHowToSteps(product?.howToUse);
-            const directionsText = pickField(product, ['directions', 'application', 'how_to_use']);
-            if (steps.length) return renderStepsSection('Directions', steps);
-            return renderInfoSection('Directions', directionsText || pickField(product, ['usage']));
-          })()}
+              {(() => {
+                const steps = toHowToSteps(product?.howToUse);
+                const directionsText = pickField(product, ['directions', 'application', 'how_to_use']);
+                if (steps.length) return renderStepsSection(t('product.directions'), steps);
+                return renderInfoSection(t('product.directions'), directionsText || pickField(product, ['usage']));
+              })()}
 
-          {renderIngredientsSection('Key Ingredients', toIngredients(product?.ingredients || product?.keyIngredients))}
+              {renderIngredientsSection(t('product.keyIngredients'), toIngredients(product?.ingredients || product?.keyIngredients))}
 
-          {renderInfoSection('Note', pickField(product, ['note', 'notes', 'warning', 'caution']))}
+              {renderInfoSection(t('product.note'), pickField(product, ['note', 'notes', 'warning', 'caution']))}
 
-          {/* Optional helpful section */}
-          {renderListSection('Target Concerns', getArrayField(product, ['targetConcerns', 'concerns']))}
-
-          {/* Rating Section */}
-          {product.rating && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Customer Rating</Text>
-              <View style={styles.ratingContainer}>
-                <View style={styles.starsContainer}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Text key={star} style={styles.star}>
-                      {star <= product.rating ? '★' : '☆'}
-                    </Text>
-                  ))}
-                </View>
-                <Text style={styles.ratingText}>{product.rating}/5 stars</Text>
-              </View>
-            </View>
+              {/* Optional helpful section */}
+              {renderListSection(t('product.targetConcerns'), getArrayField(product, ['targetConcerns', 'concerns']))}
+            </>
           )}
+
+          {/* Rating Section removed (not needed for now) */}
         </View>
       </ScrollView>
 
@@ -902,7 +1003,7 @@ export default function ProductDetailScreen() {
             style={styles.buttonIcon}
           />
             <Text style={styles.addToBagText}>
-            {isInCart(product.id) ? `In Bag (${getItemQuantity(product.id)})` : 'Add to Bag'}
+            {isInCart(product.id) ? t('product.inBag', { count: getItemQuantity(product.id) }) : t('product.addToBag')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -1072,6 +1173,64 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     letterSpacing: -0.3,
   },
+  beautyBoxPriceLineWrap: {
+    marginTop: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  beautyBoxPriceLine: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    lineHeight: 22,
+  },
+  beautyBoxTitleRow: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  beautyBoxTitleHeart: {
+    fontSize: 16,
+  },
+  beautyBoxTitleText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  beautyBoxKitTitle: {
+    marginTop: 14,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  beautyBoxKitList: {
+    marginTop: 12,
+    gap: 14,
+  },
+  beautyBoxKitItem: {
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+  },
+  beautyBoxKitHeader: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1D1D1F',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  beautyBoxKitBody: {
+    fontSize: 13,
+    color: '#1D1D1F',
+    lineHeight: 19,
+  },
   descriptionContainer: {
     backgroundColor: '#F8F9FA',
     borderRadius: 12,
@@ -1091,27 +1250,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#E74C3C',
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 20,
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    marginRight: 16,
-  },
-  star: {
-    fontSize: 20,
-    color: '#FFD700',
-    marginRight: 4,
-  },
-  ratingText: {
-    fontSize: 16,
-    color: '#1D1D1F',
-    fontWeight: '500',
-  },
+  // Rating styles removed (rating section not used)
   featureList: {
     backgroundColor: '#F8F9FA',
     borderRadius: 12,

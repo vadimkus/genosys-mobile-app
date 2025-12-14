@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 function TabBarBadge({ count, color }) {
   if (!count || count === 0) return null;
@@ -16,6 +17,7 @@ function TabBarBadge({ count, color }) {
 export default function TabLayout() {
   const { getTotalItems } = useCart();
   const cartCount = getTotalItems();
+  const { t } = useLocalization();
 
   return (
     <Tabs
@@ -51,7 +53,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shop"
         options={{
-          title: 'Home',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -60,7 +62,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="bag"
         options={{
-          title: 'Bag',
+          title: t('tabs.bag'),
           tabBarStyle: { display: 'none' }, // Hide tab bar on bag page
           tabBarIcon: ({ color, size }) => (
             <View>

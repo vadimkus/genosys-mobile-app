@@ -18,10 +18,70 @@ import { router } from 'expo-router';
 import { calculateCartTotals } from '../utils/cartUtils';
 import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
+import { useLocalization } from '../contexts/LocalizationContext';
+import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
+
+function EmirateFlagIcon({ name }) {
+  const emirate = String(name || '').trim();
+
+  // UAE national flag (used for Fujairah per requirement)
+  const UAE = () => (
+    <View style={flagStyles.flagBox}>
+      <View style={flagStyles.uaeRed} />
+      <View style={flagStyles.uaeRight}>
+        <View style={[flagStyles.uaeStripe, { backgroundColor: '#00732F' }]} />
+        <View style={[flagStyles.uaeStripe, { backgroundColor: '#FFFFFF' }]} />
+        <View style={[flagStyles.uaeStripe, { backgroundColor: '#000000' }]} />
+      </View>
+    </View>
+  );
+
+  // Abu Dhabi: red field with a small white canton in the upper hoist corner
+  const AbuDhabi = () => (
+    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
+      <View style={flagStyles.abuDhabiCanton} />
+    </View>
+  );
+
+  // Dubai / Ajman: red field with a vertical white stripe at the hoist
+  const DubaiAjman = () => (
+    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
+      <View style={flagStyles.hoistWhiteStripe} />
+    </View>
+  );
+
+  // Sharjah / Ras Al Khaimah: red rectangle on a white field
+  const SharjahRas = () => (
+    <View style={[flagStyles.flagBox, { backgroundColor: '#FFFFFF' }]}>
+      <View style={flagStyles.centerRedRect} />
+    </View>
+  );
+
+  // Umm Al Quwain: red field with a vertical white stripe at hoist and a white crescent + star
+  const UmmAlQuwain = () => (
+    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
+      <View style={flagStyles.hoistWhiteStripe} />
+      {/* Crescent (approx) */}
+      <View style={flagStyles.uaqCrescentOuter} />
+      <View style={flagStyles.uaqCrescentInner} />
+      {/* Star */}
+      <Text style={flagStyles.uaqStar}>★</Text>
+    </View>
+  );
+
+  if (emirate === 'Fujairah') return <UAE />;
+  if (emirate === 'Abu Dhabi') return <AbuDhabi />;
+  if (emirate === 'Dubai' || emirate === 'Ajman') return <DubaiAjman />;
+  if (emirate === 'Sharjah' || emirate === 'Ras Al Khaimah') return <SharjahRas />;
+  if (emirate === 'Umm Al Quwain') return <UmmAlQuwain />;
+
+  return <UAE />;
+}
 
 export default function CheckoutScreen() {
   const { user } = useAuth();
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
+  const { t } = useLocalization();
   
   // Form states
   const [firstName, setFirstName] = useState('');
@@ -29,6 +89,7 @@ export default function CheckoutScreen() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [addressDetails, setAddressDetails] = useState(null);
   const [orderNotes, setOrderNotes] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
   
@@ -84,7 +145,21 @@ export default function CheckoutScreen() {
       setLastName(nameParts.slice(1).join(' ') || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
-      setAddress(user.address || '');
+      const parsed = parseGenosysAddress(user.address || '');
+      setAddressDetails(parsed);
+      // Show only the clean address line in the text input (no GENOSYS_ADDR_V1 payload)
+      setAddress(getAddressLine(parsed || (user.address || '')));
+
+      // If the saved address contains a phone, use it only when profile phone is empty
+      if (!String(user.phone || '').trim() && parsed?.phone) {
+        setPhone(String(parsed.phone));
+      }
+
+      // If saved address contains emirate, pre-select it when possible
+      if (parsed?.emirate && typeof setSelectedEmirate === 'function') {
+        const next = String(parsed.emirate);
+        setSelectedEmirate(next);
+      }
     }
   }, [user]);
 
@@ -99,10 +174,10 @@ export default function CheckoutScreen() {
   useEffect(() => {
     if (!user) {
       Alert.alert(
-        'Login Required',
-        'Please log in to complete your order.',
+        t('checkout.loginRequiredTitle'),
+        t('checkout.loginRequiredMessage'),
         [
-          { text: 'Cancel', style: 'cancel', onPress: () => router.back() },
+          { text: t('common.cancel'), style: 'cancel', onPress: () => router.back() },
           { text: 'Login', onPress: () => router.push('/auth/login') }
         ]
       );
@@ -112,36 +187,45 @@ export default function CheckoutScreen() {
   const handleSubmit = async () => {
     // Validation
     if (!firstName.trim()) {
-      Alert.alert('Error', 'Please enter your first name.');
+      Alert.alert(t('common.error') || 'Error', t('checkout.firstNameRequired'));
       return;
     }
     if (!lastName.trim()) {
-      Alert.alert('Error', 'Please enter your last name.');
+      Alert.alert(t('common.error') || 'Error', t('checkout.lastNameRequired'));
       return;
     }
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email address.');
+      Alert.alert(t('common.error') || 'Error', t('checkout.emailRequired'));
       return;
     }
     if (!phone.trim()) {
-      Alert.alert('Error', 'Please enter your phone number.');
+      Alert.alert(t('common.error') || 'Error', t('checkout.phoneRequired'));
       return;
     }
     if (!address.trim()) {
-      Alert.alert('Error', 'Please enter your delivery address.');
+      Alert.alert(t('common.error') || 'Error', t('checkout.addressRequired'));
       return;
     }
 
     setIsProcessing(true);
 
     try {
+      const cleanedAddress = address.trim();
+      const addressFromV1 =
+        addressDetails &&
+        cleanedAddress &&
+        String(addressDetails.address || '').trim() &&
+        cleanedAddress === String(addressDetails.address || '').trim()
+          ? formatAddressForDisplay(addressDetails)
+          : cleanedAddress;
+
       // Prepare order data
       const orderData = {
         orderNumber,
         customerName: `${firstName.trim()} ${lastName.trim()}`,
         customerEmail: email.trim(),
         customerPhone: phone.trim(),
-        customerAddress: address.trim(),
+        customerAddress: addressFromV1,
         emirate: selectedEmirate,
         items: items,
         subtotal: safeSubtotal,
@@ -176,9 +260,9 @@ export default function CheckoutScreen() {
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
           clearCart();
           Alert.alert(
-            'Order Submitted Successfully!',
-            `Your order ${orderNumber} has been placed successfully! You will receive a confirmation email shortly. Pay when your order is delivered.`,
-            [{ text: 'Continue Shopping', onPress: () => router.replace('/(tabs)/shop') }]
+            t('checkout.orderSubmittedTitle'),
+            t('checkout.orderSubmittedMessageCOD', { orderNumber }),
+            [{ text: t('checkout.continueShopping'), onPress: () => router.replace('/(tabs)/shop') }]
           );
           return;
         }
@@ -186,8 +270,8 @@ export default function CheckoutScreen() {
         // Card (incl. Apple Pay / Google Pay): DO NOT claim success until payment is confirmed.
         if (!result.paymentUrl) {
           Alert.alert(
-            'Payment link unavailable',
-            'We could not start the payment flow. Please try again or contact support.'
+            t('checkout.paymentLinkUnavailableTitle'),
+            t('checkout.paymentLinkUnavailableMessage')
           );
           return;
         }
@@ -203,12 +287,12 @@ export default function CheckoutScreen() {
       } else {
         console.error('❌ Order submission failed:', result);
         Alert.alert(
-          'Order Submission Failed',
-          result.error || 'Failed to submit order. Please try again or contact support.',
+          t('checkout.orderSubmissionFailedTitle'),
+          result.error || t('checkout.orderProcessingErrorMessage'),
           [
-            { text: 'Try Again', style: 'default' },
+            { text: t('checkout.tryAgain'), style: 'default' },
             { 
-              text: 'Contact Support', 
+              text: t('checkout.contactSupport'), 
               onPress: async () => {
                 const phoneNumber = '971585487665';
                 const message = `Hi! I need help with placing order ${orderNumber}. Payment method: ${selectedPaymentMethod}. Can you assist me?`;
@@ -216,7 +300,7 @@ export default function CheckoutScreen() {
                 try {
                   await Linking.openURL(whatsappUrl);
                 } catch {
-                  Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+                  Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
                 }
               }
             }
@@ -227,12 +311,12 @@ export default function CheckoutScreen() {
     } catch (error) {
       console.error('❌ Order processing error:', error);
       Alert.alert(
-        'Order Processing Error',
-        'An unexpected error occurred. Please try again or contact support.',
+        t('checkout.orderProcessingErrorTitle'),
+        t('checkout.orderProcessingErrorMessage'),
         [
-          { text: 'Try Again', style: 'default' },
+          { text: t('checkout.tryAgain'), style: 'default' },
           { 
-            text: 'Contact Support', 
+            text: t('checkout.contactSupport'), 
             onPress: async () => {
               const phoneNumber = '971585487665';
               const message = `Hi! I encountered an error while placing order ${orderNumber}. Can you help me?`;
@@ -240,7 +324,7 @@ export default function CheckoutScreen() {
               try {
                 await Linking.openURL(whatsappUrl);
               } catch {
-                Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+                Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
               }
             }
           }
@@ -256,7 +340,7 @@ export default function CheckoutScreen() {
     const message = `Hi! I need help with my order ${orderNumber}. Can you assist me?`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(whatsappUrl).catch(() => {
-      Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+      Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
     });
   };
 
@@ -280,7 +364,7 @@ export default function CheckoutScreen() {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
         
-        <Text style={styles.headerTitle}>Checkout</Text>
+        <Text style={styles.headerTitle}>{t('checkout.title')}</Text>
         
         <View style={styles.headerSpacer} />
       </View>
@@ -297,7 +381,7 @@ export default function CheckoutScreen() {
             >
               <View style={styles.orderHeaderLeft}>
                 <Text style={styles.orderNumber}>Order {orderNumber}</Text>
-                <Text style={styles.itemCount}>{getTotalItems()} items</Text>
+                <Text style={styles.itemCount}>{t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })}</Text>
               </View>
               <Ionicons
                 name={orderSummaryExpanded ? 'chevron-up' : 'chevron-down'}
@@ -308,14 +392,19 @@ export default function CheckoutScreen() {
 
             {orderSummaryExpanded ? (
               <View style={styles.orderSummaryBody}>
-                <Text style={styles.orderSummaryTitle}>Order Summary</Text>
+                <Text style={styles.orderSummaryTitle}>{t('checkout.orderSummary')}</Text>
 
                 {paidItems.map((it, idx) => {
                   const name = it.product?.name || 'Item';
                   const qty = Number(it.quantity) || 0;
                   const size = it.selectedSize ? String(it.selectedSize) : '';
                   const color = it.selectedColor ? String(it.selectedColor) : '';
-                  const extras = [size && `Size: ${size}`, color && `Color: ${color}`].filter(Boolean).join(' • ');
+                  const extras = [
+                    size && `${t('common.size')}: ${size}`,
+                    color && `${t('common.color')}: ${color}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' • ');
                   const price = Number(it.product?.displayPrice ?? it.product?.price ?? 0) || 0;
                   return (
                     <Text key={`${it.product?.id || name}-${idx}`} style={styles.orderSummaryLine}>
@@ -326,14 +415,14 @@ export default function CheckoutScreen() {
 
                 {promoItems.length ? (
                   <>
-                    <Text style={styles.orderSummarySection}>Promotion</Text>
+                    <Text style={styles.orderSummarySection}>{t('checkout.promotion')}</Text>
                     {promoItems.map((it, idx) => {
                       const name = it.product?.name || 'Promo item';
                       const qty = Number(it.quantity) || 1;
                       const size = it.product?.size ? String(it.product.size) : '';
                       return (
                         <Text key={`${it.product?.id || name}-promo-${idx}`} style={styles.orderSummaryLine}>
-                          {qty}× {name}{size ? ` — ${size}` : ''} — FREE
+                          {qty}× {name}{size ? ` — ${size}` : ''} — {t('common.free')}
                         </Text>
                       );
                     })}
@@ -341,21 +430,21 @@ export default function CheckoutScreen() {
                 ) : null}
 
                 <View style={styles.orderSummaryDivider} />
-                <Text style={styles.orderSummarySection}>Totals</Text>
+                <Text style={styles.orderSummarySection}>{t('checkout.totals')}</Text>
                 <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabel}>Subtotal</Text>
+                  <Text style={styles.orderTotalsLabel}>{t('checkout.subtotal')}</Text>
                   <Text style={styles.orderTotalsValue}>AED {safeSubtotal.toFixed(2)}</Text>
                 </View>
                 <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabel}>Shipping to {selectedEmirate}</Text>
-                  <Text style={styles.orderTotalsValue}>{safeShipping === 0 ? 'FREE' : `AED ${safeShipping.toFixed(2)}`}</Text>
+                  <Text style={styles.orderTotalsLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
+                  <Text style={styles.orderTotalsValue}>{safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}</Text>
                 </View>
                 <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabel}>VAT (included)</Text>
+                  <Text style={styles.orderTotalsLabel}>{t('checkout.vatIncluded')}</Text>
                   <Text style={styles.orderTotalsValue}>AED {safeVat.toFixed(2)}</Text>
                 </View>
                 <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabelStrong}>Total</Text>
+                  <Text style={styles.orderTotalsLabelStrong}>{t('checkout.total')}</Text>
                   <Text style={styles.orderTotalsValueStrong}>AED {safeTotal.toFixed(2)}</Text>
                 </View>
               </View>
@@ -366,62 +455,62 @@ export default function CheckoutScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="location" size={20} color="#E74C3C" />
-              <Text style={styles.sectionTitle}>Shipping Information</Text>
+              <Text style={styles.sectionTitle}>{t('checkout.shippingInformation')}</Text>
             </View>
 
             <View style={styles.formRow}>
               <View style={styles.formHalf}>
-                <Text style={styles.label}>First Name *</Text>
+                <Text style={styles.label}>{t('checkout.firstName')} *</Text>
                 <TextInput
                   style={styles.input}
                   value={firstName}
                   onChangeText={setFirstName}
-                  placeholder="Enter first name"
+                  placeholder={t('checkout.enterFirstName')}
                   autoCapitalize="words"
                 />
               </View>
               <View style={styles.formHalf}>
-                <Text style={styles.label}>Last Name *</Text>
+                <Text style={styles.label}>{t('checkout.lastName')} *</Text>
                 <TextInput
                   style={styles.input}
                   value={lastName}
                   onChangeText={setLastName}
-                  placeholder="Enter last name"
+                  placeholder={t('checkout.enterLastName')}
                   autoCapitalize="words"
                 />
               </View>
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Email Address *</Text>
+              <Text style={styles.label}>{t('checkout.emailAddress')} *</Text>
               <TextInput
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="Enter email address"
+                placeholder={t('checkout.enterEmail')}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Phone Number *</Text>
+              <Text style={styles.label}>{t('checkout.phoneNumber')} *</Text>
               <TextInput
                 style={styles.input}
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="Enter phone number"
+                placeholder={t('checkout.enterPhone')}
                 keyboardType="phone-pad"
               />
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Delivery Address *</Text>
+              <Text style={styles.label}>{t('checkout.deliveryAddress')} *</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={address}
                 onChangeText={setAddress}
-                placeholder="Enter your complete delivery address"
+                placeholder={t('checkout.enterAddress')}
                 multiline
                 numberOfLines={3}
                 textAlignVertical="top"
@@ -429,7 +518,7 @@ export default function CheckoutScreen() {
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Emirate *</Text>
+              <Text style={styles.label}>{t('checkout.emirate')} *</Text>
               <View style={styles.emirateGrid}>
                 {getAvailableEmirates().map((emirate) => (
                   <TouchableOpacity
@@ -440,12 +529,19 @@ export default function CheckoutScreen() {
                     ]}
                     onPress={() => setSelectedEmirate(emirate.name)}
                   >
-                    <Text style={[
-                      styles.emirateText,
-                      selectedEmirate === emirate.name && styles.emirateTextSelected
-                    ]}>
-                      {emirate.name}
-                    </Text>
+                    <View style={styles.emirateTopRow}>
+                      <EmirateFlagIcon name={emirate.name} />
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={[
+                        styles.emirateText,
+                        selectedEmirate === emirate.name && styles.emirateTextSelected
+                      ]}
+                      >
+                        {emirate.name}
+                      </Text>
+                    </View>
                     <Text style={[
                       styles.emirateShipping,
                       selectedEmirate === emirate.name && styles.emirateTextSelected
@@ -462,7 +558,7 @@ export default function CheckoutScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="card" size={20} color="#27AE60" />
-              <Text style={styles.sectionTitle}>Payment Method</Text>
+              <Text style={styles.sectionTitle}>{t('checkout.paymentMethod')}</Text>
             </View>
 
             <View style={styles.paymentOptions}>
@@ -479,9 +575,9 @@ export default function CheckoutScreen() {
                     size={20} 
                     color={selectedPaymentMethod === PAYMENT_METHODS.COD ? "#E74C3C" : "#C7C7CC"} 
                   />
-                  <Text style={styles.paymentTitle}>Cash on Delivery</Text>
+                  <Text style={styles.paymentTitle}>{t('checkout.cashOnDelivery')}</Text>
                 </View>
-                <Text style={styles.paymentDescription}>Pay when your order is delivered</Text>
+                <Text style={styles.paymentDescription}>{t('checkout.payWhenDelivered')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -497,21 +593,21 @@ export default function CheckoutScreen() {
                     size={20} 
                     color={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "#E74C3C" : "#C7C7CC"} 
                   />
-                  <Text style={styles.paymentTitle}>Card Payment</Text>
+                  <Text style={styles.paymentTitle}>{t('checkout.cardPayment')}</Text>
                 </View>
-                <Text style={styles.paymentDescription}>Pay securely with Card • Apple Pay • Google Pay (Stripe)</Text>
+                <Text style={styles.paymentDescription}>{t('checkout.paySecurelyStripe')}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Order Notes */}
           <View style={styles.section}>
-            <Text style={styles.label}>Order Notes (Optional)</Text>
+            <Text style={styles.label}>{t('checkout.orderNotesOptional')}</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
               value={orderNotes}
               onChangeText={setOrderNotes}
-              placeholder="Any special instructions for your order..."
+              placeholder={t('checkout.orderNotesPlaceholder')}
               multiline
               numberOfLines={2}
               textAlignVertical="top"
@@ -522,51 +618,53 @@ export default function CheckoutScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="receipt" size={20} color="#007AFF" />
-              <Text style={styles.sectionTitle}>Order Summary</Text>
+              <Text style={styles.sectionTitle}>{t('checkout.orderSummary')}</Text>
             </View>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotal ({getTotalItems()} items)</Text>
+              <Text style={styles.summaryLabel}>
+                {t('checkout.subtotal')} ({t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })})
+              </Text>
               <Text style={styles.summaryValue}>AED {safeSubtotal.toFixed(2)}</Text>
             </View>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Shipping to {selectedEmirate}</Text>
+              <Text style={styles.summaryLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
               <Text style={styles.summaryValue}>
-                {safeShipping === 0 ? 'FREE' : `AED ${safeShipping.toFixed(2)}`}
+                {safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}
               </Text>
             </View>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>VAT (included)</Text>
+              <Text style={styles.summaryLabel}>{t('checkout.vatIncluded')}</Text>
               <Text style={styles.summaryValue}>AED {safeVat.toFixed(2)}</Text>
             </View>
 
             {totals.subtotal >= 1000 && (
               <View style={styles.freeShippingBanner}>
                 <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-                <Text style={styles.freeShippingText}>Free shipping applied!</Text>
+                <Text style={styles.freeShippingText}>{t('checkout.freeShippingApplied')}</Text>
               </View>
             )}
 
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalLabel}>{t('checkout.total')}</Text>
               <Text style={styles.totalValue}>AED {safeTotal.toFixed(2)}</Text>
             </View>
 
-            <Text style={styles.vatNote}>*All prices are VAT inclusive</Text>
+            <Text style={styles.vatNote}>*{t('checkout.allPricesVatInclusive')}</Text>
           </View>
 
           {/* Support */}
           <View style={styles.supportSection}>
             <View style={styles.supportHeader}>
               <Ionicons name="chatbubble" size={20} color="#25D366" />
-              <Text style={styles.supportTitle}>Need Help?</Text>
+              <Text style={styles.supportTitle}>{t('checkout.needHelp')}</Text>
             </View>
-            <Text style={styles.supportText}>Have questions about your order?</Text>
+            <Text style={styles.supportText}>{t('checkout.haveQuestions')}</Text>
             <TouchableOpacity style={styles.whatsappButton} onPress={contactWhatsApp}>
               <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
-              <Text style={styles.whatsappButtonText}>Contact Support via WhatsApp</Text>
+              <Text style={styles.whatsappButtonText}>{t('checkout.contactSupport')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -586,7 +684,7 @@ export default function CheckoutScreen() {
             <Ionicons name="bag-check" size={20} color="#ffffff" />
           )}
           <Text style={styles.placeOrderButtonText}>
-            {isProcessing ? 'Processing...' : `Place Order - AED ${safeTotal.toFixed(2)}`}
+            {isProcessing ? t('checkout.processing') : `${t('checkout.placeOrder')} - AED ${safeTotal.toFixed(2)}`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -783,10 +881,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    justifyContent: 'space-between',
+  },
+  emirateTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   emirateOption: {
-    flex: 1,
-    minWidth: '45%',
+    width: '48%',
+    minHeight: 56,
     padding: 12,
     borderWidth: 1,
     borderColor: '#D1D1D6',
@@ -801,6 +905,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#3C3C43',
+    flexShrink: 1,
   },
   emirateTextSelected: {
     color: '#E74C3C',
@@ -972,6 +1077,98 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
+  },
+});
+
+const flagStyles = StyleSheet.create({
+  flagBox: {
+    width: 26,
+    height: 18,
+    borderRadius: 3,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+    position: 'relative',
+  },
+
+  // UAE
+  uaeRed: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: '24%',
+    backgroundColor: '#CE1126',
+  },
+  uaeRight: {
+    position: 'absolute',
+    left: '24%',
+    top: 0,
+    bottom: 0,
+    right: 0,
+  },
+  uaeStripe: {
+    flex: 1,
+  },
+
+  // Abu Dhabi
+  abuDhabiCanton: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: '40%',
+    height: '45%',
+    backgroundColor: '#FFFFFF',
+  },
+
+  // Dubai / Ajman / UAQ hoist stripe
+  hoistWhiteStripe: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: '18%',
+    backgroundColor: '#FFFFFF',
+  },
+
+  // Sharjah / Ras Al Khaimah
+  centerRedRect: {
+    position: 'absolute',
+    left: '16%',
+    top: '18%',
+    width: '68%',
+    height: '64%',
+    backgroundColor: '#D81E05',
+  },
+
+  // Umm Al Quwain (approx crescent + star)
+  uaqCrescentOuter: {
+    position: 'absolute',
+    left: '46%',
+    top: '30%',
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#FFFFFF',
+  },
+  uaqCrescentInner: {
+    position: 'absolute',
+    left: '50%',
+    top: '30%',
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#D81E05',
+  },
+  uaqStar: {
+    position: 'absolute',
+    left: '58%',
+    top: '28%',
+    fontSize: 8,
+    color: '#FFFFFF',
+    fontWeight: '700',
+    backgroundColor: 'transparent',
   },
 });
 

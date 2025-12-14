@@ -209,6 +209,77 @@ export const validateSession = async (token) => {
 };
 
 /**
+ * Request a password reset email (mobile)
+ * POST /api/mobile/auth/forgot-password
+ * @param {string} email
+ */
+export const requestPasswordReset = async (email) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const json = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: (json && (json.error || json.message)) || 'Could not request password reset',
+      };
+    }
+
+    return {
+      success: true,
+      message: (json && (json.message || json.success)) || 'Reset email sent',
+    };
+  } catch (error) {
+    console.error('❌ Forgot password error:', error);
+    return { success: false, error: 'Network error. Please try again.' };
+  }
+};
+
+/**
+ * Reset password using a token (mobile)
+ * POST /api/mobile/auth/reset-password
+ * @param {string} token
+ * @param {string} newPassword
+ */
+export const resetPasswordWithToken = async (token, newPassword) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+      },
+      body: JSON.stringify({ token, newPassword }),
+    });
+
+    const json = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: (json && (json.error || json.message)) || 'Could not reset password',
+      };
+    }
+
+    return {
+      success: true,
+      message: (json && (json.message || json.success)) || 'Password reset',
+    };
+  } catch (error) {
+    console.error('❌ Reset password error:', error);
+    return { success: false, error: 'Network error. Please try again.' };
+  }
+};
+
+/**
  * Update user profile information
  * @param {string} token - User auth token
  * @param {Object} profileData - Profile data to update

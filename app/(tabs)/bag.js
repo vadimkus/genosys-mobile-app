@@ -16,9 +16,12 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
 import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
+import { useLocalization } from '../../contexts/LocalizationContext';
+import { getLocalizedProductName, getCategoryTranslationKey } from '../../utils/productLocalization';
 
 export default function BagScreen() {
   const { user } = useAuth();
+  const { t, locale } = useLocalization();
   const { 
     items, 
     getTotalItems, 
@@ -126,7 +129,7 @@ export default function BagScreen() {
     }
 
     if (items.length === 0) {
-      Alert.alert('Empty Cart', 'Please add some items to your cart before checkout.');
+      Alert.alert(t('bag.emptyCartTitle'), t('bag.emptyCartMessage'));
       return;
     }
 
@@ -136,11 +139,11 @@ export default function BagScreen() {
 
   const handleClearBag = () => {
     Alert.alert(
-      'Clear Bag',
-      'Remove all items from your bag?',
+      t('bag.clearBagTitle'),
+      t('bag.clearBagMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Clear', style: 'destructive', onPress: clearCart }
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('bag.clear'), style: 'destructive', onPress: clearCart }
       ]
     );
   };
@@ -161,12 +164,12 @@ export default function BagScreen() {
                 onPress={() => router.back()}
               >
                 <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-                <Text style={styles.backText}>Home</Text>
+                <Text style={styles.backText}>{t('tabs.home')}</Text>
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
-                <Text style={styles.title}>Bag</Text>
-                <Text style={styles.subtitle}>Loading...</Text>
+                <Text style={styles.title}>{t('bag.title')}</Text>
+                <Text style={styles.subtitle}>{t('bag.loading')}</Text>
               </View>
               
               <View style={styles.headerRight} />
@@ -191,12 +194,12 @@ export default function BagScreen() {
                 onPress={() => router.back()}
               >
                 <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-                <Text style={styles.backText}>Home</Text>
+                <Text style={styles.backText}>{t('tabs.home')}</Text>
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
-                <Text style={styles.title}>Bag</Text>
-                <Text style={styles.subtitle}>Your selected products</Text>
+                <Text style={styles.title}>{t('bag.title')}</Text>
+                <Text style={styles.subtitle}>{t('bag.selectedProducts')}</Text>
               </View>
               
               <View style={styles.headerRight} />
@@ -208,15 +211,15 @@ export default function BagScreen() {
           <View style={styles.iconContainer}>
             <Ionicons name="bag-outline" size={64} color="#D1D1D6" />
           </View>
-          <Text style={styles.emptyTitle}>Your bag is empty</Text>
+          <Text style={styles.emptyTitle}>{t('bag.emptyTitle')}</Text>
           <Text style={styles.emptyText}>
-            When you add products, they'll appear here
+            {t('bag.emptyText')}
           </Text>
           <TouchableOpacity 
             style={styles.shopButton}
             onPress={() => router.push('/(tabs)/shop')}
           >
-            <Text style={styles.shopButtonText}>Start Shopping</Text>
+            <Text style={styles.shopButtonText}>{t('bag.startShopping')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -241,24 +244,27 @@ export default function BagScreen() {
                 onPress={() => router.back()}
               >
                 <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-                <Text style={styles.backText}>Home</Text>
+                <Text style={styles.backText}>{t('tabs.home')}</Text>
               </TouchableOpacity>
 
               <View pointerEvents="none" style={styles.headerCenterAbsolute}>
                 <Text style={styles.titleInline}>
-                  Bag: {paidItemCount} {paidItemCount === 1 ? 'item' : 'items'}
+                  {t('bag.header', {
+                    count: paidItemCount,
+                    label: paidItemCount === 1 ? t('bag.item') : t('bag.items'),
+                  })}
                 </Text>
               </View>
 
               <TouchableOpacity onPress={handleClearBag} style={styles.clearButton}>
-                <Text style={styles.clearText}>Clear</Text>
+                <Text style={styles.clearText}>{t('bag.clear')}</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.promoHeaderBlock}>
-              <Text style={styles.promoTitle}>Free Mask Promotion</Text>
+              <Text style={styles.promoTitle}>{t('bag.freeMaskPromotion')}</Text>
               <View style={styles.promoRow}>
-                <Text style={styles.promoLine}>Spend 500 AED and get 1 free collagen mask</Text>
+                <Text style={styles.promoLine}>{t('bag.promo500')}</Text>
                 <Ionicons
                   name={promo500Met ? 'checkmark-circle' : 'ellipse-outline'}
                   size={18}
@@ -266,7 +272,7 @@ export default function BagScreen() {
                 />
               </View>
               <View style={styles.promoRow}>
-                <Text style={styles.promoLine}>Spend 700 AED and 2 Free Masks (Sea Algae Mask + Collagen Mask)</Text>
+                <Text style={styles.promoLine}>{t('bag.promo700')}</Text>
                 <Ionicons
                   name={promo700Met ? 'checkmark-circle' : 'ellipse-outline'}
                   size={18}
@@ -276,8 +282,8 @@ export default function BagScreen() {
               {promoTier !== 'none' ? (
                 <Text style={styles.promoApplied}>
                   {promoTier === 'twoMasks'
-                    ? 'Promotion applied: 2 free masks added to your bag.'
-                    : 'Promotion applied: 1 free mask added to your bag.'}
+                    ? t('bag.promoApplied2')
+                    : t('bag.promoApplied1')}
                 </Text>
               ) : null}
             </View>
@@ -312,7 +318,7 @@ export default function BagScreen() {
               <Ionicons name="location-outline" size={20} color="#E74C3C" />
             </View>
             <View style={styles.emirateInfo}>
-              <Text style={styles.emirateLabel}>Delivery to</Text>
+              <Text style={styles.emirateLabel}>{t('bag.deliveryTo')}</Text>
               <Text style={styles.emirateValue}>{selectedEmirate}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#86868B" />
@@ -365,9 +371,11 @@ export default function BagScreen() {
 
               <View style={styles.itemDetails}>
                 <TouchableOpacity onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))} disabled={promo}>
-                  <Text style={styles.itemName} numberOfLines={2}>{item.product.name}</Text>
+                  <Text style={styles.itemName} numberOfLines={2}>{getLocalizedProductName(item.product, locale) || item.product.name}</Text>
                 </TouchableOpacity>
-                <Text style={styles.itemCategory}>{item.product.category}</Text>
+                <Text style={styles.itemCategory}>
+                  {getCategoryTranslationKey(item.product.category) ? t(getCategoryTranslationKey(item.product.category)) : item.product.category}
+                </Text>
                 
                 {/* Variants Display */}
                 {!promo && (item.selectedSize || item.selectedColor) && (
@@ -387,8 +395,8 @@ export default function BagScreen() {
                     <Text style={styles.itemOriginalPrice}>
                       {(Number(item.product?.originalPrice) || 0).toFixed(2)} AED
                     </Text>
-                    <Text style={styles.itemDiscountLabel}>100% OFF</Text>
-                    <Text style={styles.promoTag}>Promotion</Text>
+                    <Text style={styles.itemDiscountLabel}>{t('bag.discount100')}</Text>
+                    <Text style={styles.promoTag}>{t('bag.promotionTag')}</Text>
                   </View>
                 ) : (() => {
                   const pct = Number(user?.discountPercentage);
@@ -411,7 +419,7 @@ export default function BagScreen() {
                     return (
                       <View style={styles.itemPriceContainer}>
                         <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
-                        <Text style={styles.itemBundleLabel}>15% OFF (Bundle Discount)</Text>
+                        <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
                         <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
                       </View>
                     );
@@ -453,7 +461,7 @@ export default function BagScreen() {
               {promo ? (
                 <View style={styles.itemRightActions}>
                   <Text style={styles.promoQtyRight}>Qty {item.quantity || 1}</Text>
-                  <Text style={styles.promoItemPriceRight}>FREE</Text>
+                  <Text style={styles.promoItemPriceRight}>{t('common.free')}</Text>
                 </View>
               ) : (
                 <View style={styles.itemRightActions}>
@@ -505,7 +513,7 @@ export default function BagScreen() {
           {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 && (
             <>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Subtotal (before discount)</Text>
+                <Text style={styles.summaryLabel}>{t('bag.subtotalBeforeDiscount')}</Text>
                 <Text style={[styles.summaryValue, styles.summaryOriginalValue]}>
                   {Number(originalSubtotal).toFixed(2)} AED
                 </Text>
@@ -520,7 +528,7 @@ export default function BagScreen() {
                 </Text>
               </View>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Subtotal</Text>
+                <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
                 <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
               </View>
             </>
@@ -528,7 +536,7 @@ export default function BagScreen() {
           
           {!(Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01) && (
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotal</Text>
+              <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
               <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
             </View>
           )}
@@ -541,7 +549,7 @@ export default function BagScreen() {
           </View>
           
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>VAT (included)</Text>
+            <Text style={styles.summaryLabel}>{t('bag.vatIncluded')}</Text>
             <Text style={styles.summaryValue}>{safeVat.toFixed(2)} AED</Text>
           </View>
           
@@ -557,7 +565,7 @@ export default function BagScreen() {
           style={styles.checkoutButton}
           onPress={handleCheckout}
         >
-          <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+          <Text style={styles.checkoutButtonText}>{t('bag.proceedToCheckout')}</Text>
         </TouchableOpacity>
         </SafeAreaView>
       </View>
@@ -570,7 +578,7 @@ export default function BagScreen() {
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select Emirate</Text>
+            <Text style={styles.modalTitle}>{t('bag.selectEmirate')}</Text>
             <TouchableOpacity 
               onPress={() => setShowEmirateModal(false)}
               style={styles.modalCloseButton}
@@ -768,14 +776,16 @@ const styles = StyleSheet.create({
   
   // Free Shipping Banner
   freeShippingBanner: {
-    backgroundColor: '#34C759',
+    backgroundColor: '#F2F2F7',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
   freeShippingText: {
-    color: '#ffffff',
+    color: '#1D1D1F',
     fontSize: 14,
     fontWeight: '600',
   },

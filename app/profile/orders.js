@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../services/orderService';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -69,6 +70,7 @@ export default function OrdersScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
+  const { t } = useLocalization();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -198,7 +200,7 @@ export default function OrdersScreen() {
         },
       });
     } catch (e) {
-      Alert.alert('Could not start payment', e?.message || 'Please try again.');
+      Alert.alert(t('orders.couldNotStartPayment'), e?.message || 'Please try again.');
     } finally {
       setPayingOrderId('');
     }
@@ -210,7 +212,7 @@ export default function OrdersScreen() {
     const message = `Hi! I need help with order ${String(orderNumber)}. Can you assist me?`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(whatsappUrl).catch(() => {
-      Alert.alert('Could not open WhatsApp', 'Please install WhatsApp or try again.');
+      Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
     });
   };
 
@@ -218,11 +220,11 @@ export default function OrdersScreen() {
     const orderId = String(order?.id || order?.orderId || '').trim();
     const orderNumber = order?.orderNumber || order?.order_number || order?.number || order?.id || '';
     if (!orderId) {
-      Alert.alert('Cannot delete', 'This order cannot be deleted from the app. Please contact support.');
+      Alert.alert(t('ordersScreen.cannotDeleteTitle'), t('ordersScreen.cannotDeleteMessage1'));
       return;
     }
     if (!isDeletableByUser(order)) {
-      Alert.alert('Cannot delete', 'This order can no longer be deleted. Please contact support if you need help.');
+      Alert.alert(t('ordersScreen.cannotDeleteTitle'), t('ordersScreen.cannotDeleteMessage2'));
       return;
     }
 
@@ -240,7 +242,7 @@ export default function OrdersScreen() {
               setOrders((prev) => prev.filter((o) => String(o?.id || o?.orderId || '') !== orderId));
               setExpandedOrderKey((prev) => (prev === orderId ? '' : prev));
             } catch (e) {
-              Alert.alert('Delete failed', e?.message || 'Please try again.');
+              Alert.alert(t('ordersScreen.deleteFailedTitle'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
             }
           },
         },
@@ -260,12 +262,13 @@ export default function OrdersScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="chevron-back" size={24} color="#E74C3C" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Orders</Text>
+          <Text style={styles.headerTitle}>{t('orders.title')}</Text>
+          <Text style={styles.headerTitle}>{t('orders.title')}</Text>
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.center}>
-          <Text style={styles.emptyTitle}>Login required</Text>
-          <Text style={styles.emptyText}>Please login to view your orders.</Text>
+          <Text style={styles.emptyTitle}>{t('ordersScreen.loginRequired')}</Text>
+          <Text style={styles.emptyText}>{t('ordersScreen.loginRequiredText')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -277,7 +280,7 @@ export default function OrdersScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Orders</Text>
+        <Text style={styles.headerTitle}>{t('orders.title')}</Text>
         <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
           <Ionicons name="refresh" size={20} color="#8E8E93" />
         </TouchableOpacity>
@@ -291,17 +294,17 @@ export default function OrdersScreen() {
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color="#E74C3C" />
-            <Text style={styles.loadingText}>Loading your orders...</Text>
+            <Text style={styles.loadingText}>{t('ordersScreen.loading')}</Text>
           </View>
         ) : error ? (
           <View style={styles.center}>
-            <Text style={styles.emptyTitle}>Couldn’t load orders</Text>
+            <Text style={styles.emptyTitle}>{t('ordersScreen.couldNotLoad')}</Text>
             <Text style={styles.emptyText}>{error}</Text>
           </View>
         ) : sortedOrders.length === 0 ? (
           <View style={styles.center}>
-            <Text style={styles.emptyTitle}>No orders yet</Text>
-            <Text style={styles.emptyText}>Your orders will appear here after checkout.</Text>
+            <Text style={styles.emptyTitle}>{t('ordersScreen.noOrdersYet')}</Text>
+            <Text style={styles.emptyText}>{t('ordersScreen.noOrdersHint')}</Text>
           </View>
         ) : (
           <View style={styles.list}>
@@ -349,7 +352,7 @@ export default function OrdersScreen() {
                         activeOpacity={0.85}
                         style={styles.detailsPill}
                       >
-                        <Text style={styles.detailsPillText}>Details</Text>
+                        <Text style={styles.detailsPillText}>{t('ordersScreen.details')}</Text>
                         <Ionicons name="chevron-forward" size={14} color="#8E8E93" />
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -384,7 +387,7 @@ export default function OrdersScreen() {
 
                   {isExpanded ? (
                     <View style={styles.orderSummaryBody}>
-                      <Text style={styles.orderSummaryTitle}>Order Summary</Text>
+                      <Text style={styles.orderSummaryTitle}>{t('ordersScreen.orderSummary')}</Text>
 
                       {(Array.isArray(o.items) ? o.items : []).map((it, idx) => {
                         const qty = Number(it?.quantity) || 0;
@@ -403,19 +406,19 @@ export default function OrdersScreen() {
 
                       <View style={styles.orderSummaryDivider} />
                       <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabel}>Subtotal</Text>
+                        <Text style={styles.orderTotalsLabel}>{t('ordersScreen.subtotal')}</Text>
                         <Text style={styles.orderTotalsValue}>AED {formatAED(subtotal)}</Text>
                       </View>
                       <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabel}>Shipping</Text>
+                        <Text style={styles.orderTotalsLabel}>{t('ordersScreen.shipping')}</Text>
                         <Text style={styles.orderTotalsValue}>{freeShipping ? 'FREE' : `AED ${formatAED(shipping)}`}</Text>
                       </View>
                       <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabel}>VAT (included)</Text>
+                        <Text style={styles.orderTotalsLabel}>{t('ordersScreen.vatIncluded')}</Text>
                         <Text style={styles.orderTotalsValue}>AED {formatAED(vat)}</Text>
                       </View>
                       <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabelStrong}>Total</Text>
+                        <Text style={styles.orderTotalsLabelStrong}>{t('ordersScreen.total')}</Text>
                         <Text style={styles.orderTotalsValueStrong}>AED {formatAED(total)}</Text>
                       </View>
                     </View>
@@ -429,7 +432,7 @@ export default function OrdersScreen() {
                       activeOpacity={0.85}
                     >
                       <Ionicons name="card-outline" size={16} color="#ffffff" />
-                      <Text style={styles.payButtonText}>{isPaying ? 'Starting payment…' : 'Pay now'}</Text>
+                      <Text style={styles.payButtonText}>{isPaying ? t('orders.startingPayment') : t('orders.payNow')}</Text>
                     </TouchableOpacity>
                   ) : null}
 
@@ -439,7 +442,7 @@ export default function OrdersScreen() {
                     activeOpacity={0.85}
                   >
                     <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
-                    <Text style={styles.supportButtonText}>Support via WhatsApp</Text>
+                    <Text style={styles.supportButtonText}>{t('ordersScreen.supportWhatsapp')}</Text>
                   </TouchableOpacity>
                 </View>
               );

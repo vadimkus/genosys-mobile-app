@@ -11,9 +11,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../../services/paymentPreferences';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 export default function PaymentScreen() {
   const router = useRouter();
+  const { t } = useLocalization();
   const [defaultMethod, setDefaultMethodState] = useState(PAYMENT_METHODS.COD);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function PaymentScreen() {
       const saved = await setDefaultPaymentMethod(method);
       setDefaultMethodState(saved);
     } catch (e) {
-      Alert.alert('Error', 'Could not save payment preference. Please try again.');
+      Alert.alert(t('common.error'), t('paymentSettings.saveError'));
     }
   };
 
@@ -39,21 +41,19 @@ export default function PaymentScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Payment & Billing</Text>
+        <Text style={styles.headerTitle}>{t('paymentSettings.title')}</Text>
         <View style={styles.addButton} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Info Section */}
         <View style={styles.infoSection}>
-          <Text style={styles.infoText}>
-            Choose your default payment method for faster checkout
-          </Text>
+          <Text style={styles.infoText}>{t('paymentSettings.info')}</Text>
         </View>
 
         {/* Payment Methods */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Default Payment Method</Text>
+          <Text style={styles.sectionTitle}>{t('paymentSettings.defaultMethod')}</Text>
 
           <TouchableOpacity
             style={[styles.methodRow, defaultMethod === PAYMENT_METHODS.COD && styles.methodRowSelected]}
@@ -63,8 +63,8 @@ export default function PaymentScreen() {
             <View style={styles.methodLeft}>
               <Ionicons name="cash-outline" size={22} color="#27AE60" />
               <View style={styles.methodText}>
-                <Text style={styles.methodTitle}>Cash on Delivery</Text>
-                <Text style={styles.methodSubtitle}>Pay when your order is delivered</Text>
+                <Text style={styles.methodTitle}>{t('paymentSettings.cod')}</Text>
+                <Text style={styles.methodSubtitle}>{t('paymentSettings.codSubtitle')}</Text>
               </View>
             </View>
             <Ionicons
@@ -82,8 +82,8 @@ export default function PaymentScreen() {
             <View style={styles.methodLeft}>
               <Ionicons name="card-outline" size={22} color="#1D1D1F" />
               <View style={styles.methodText}>
-                <Text style={styles.methodTitle}>Card (Visa / Mastercard)</Text>
-                <Text style={styles.methodSubtitle}>Apple Pay / Google Pay supported (Stripe)</Text>
+                <Text style={styles.methodTitle}>{t('paymentSettings.card')}</Text>
+                <Text style={styles.methodSubtitle}>{t('paymentSettings.cardSubtitle')}</Text>
               </View>
             </View>
             <Ionicons
@@ -97,43 +97,43 @@ export default function PaymentScreen() {
         <View style={styles.noteBox}>
           <Ionicons name="lock-closed" size={18} color="#27AE60" />
           <Text style={styles.noteText}>
-            For security, we don’t store your card details in the app. Card payments are completed via a secure Stripe link during checkout.
+            {t('paymentSettings.note')}
           </Text>
         </View>
 
         {/* Billing Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Billing Information</Text>
+          <Text style={styles.sectionTitle}>{t('paymentSettings.billingInfo')}</Text>
           <View style={styles.billingCard}>
             <View style={styles.billingRow}>
-              <Text style={styles.billingLabel}>Billing Address</Text>
+              <Text style={styles.billingLabel}>{t('paymentSettings.billingAddress')}</Text>
               <TouchableOpacity>
-                <Text style={styles.billingLink}>Update</Text>
+                <Text style={styles.billingLink}>{t('paymentSettings.update')}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.billingAddress}>Same as shipping address</Text>
+            <Text style={styles.billingAddress}>{t('paymentSettings.sameAsShipping')}</Text>
             
             <View style={[styles.billingRow, { marginTop: 16 }]}>
-              <Text style={styles.billingLabel}>Tax Information</Text>
+              <Text style={styles.billingLabel}>{t('paymentSettings.taxInfo')}</Text>
               <TouchableOpacity>
-                <Text style={styles.billingLink}>Manage</Text>
+                <Text style={styles.billingLink}>{t('paymentSettings.manage')}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.billingAddress}>VAT Number: Not provided</Text>
+            <Text style={styles.billingAddress}>{t('paymentSettings.vatNumberMissing')}</Text>
           </View>
         </View>
 
         {/* Security Information */}
         <View style={styles.securitySection}>
-          <Text style={styles.securityTitle}>Security & Privacy</Text>
+          <Text style={styles.securityTitle}>{t('paymentSettings.securityPrivacy')}</Text>
           <View style={styles.securityCard}>
             <View style={styles.securityItem}>
               <View style={styles.securityIcon}>
                 <Ionicons name="shield-checkmark" size={20} color="#27AE60" />
               </View>
               <View style={styles.securityInfo}>
-                <Text style={styles.securityItemTitle}>Secure Payments</Text>
-                <Text style={styles.securityItemText}>All transactions are encrypted and secure</Text>
+                <Text style={styles.securityItemTitle}>{t('paymentSettings.securePayments')}</Text>
+                <Text style={styles.securityItemText}>{t('paymentSettings.securePaymentsText')}</Text>
               </View>
             </View>
             
@@ -142,8 +142,8 @@ export default function PaymentScreen() {
                 <Ionicons name="lock-closed" size={20} color="#27AE60" />
               </View>
               <View style={styles.securityInfo}>
-                <Text style={styles.securityItemTitle}>Data Protection</Text>
-                <Text style={styles.securityItemText}>Your payment data is never stored on our servers</Text>
+                <Text style={styles.securityItemTitle}>{t('paymentSettings.dataProtection')}</Text>
+                <Text style={styles.securityItemText}>{t('paymentSettings.dataProtectionText')}</Text>
               </View>
             </View>
             
@@ -152,8 +152,8 @@ export default function PaymentScreen() {
                 <Ionicons name="card" size={20} color="#27AE60" />
               </View>
               <View style={styles.securityInfo}>
-                <Text style={styles.securityItemTitle}>PCI Compliance</Text>
-                <Text style={styles.securityItemText}>We follow industry-standard security practices</Text>
+                <Text style={styles.securityItemTitle}>{t('paymentSettings.pci')}</Text>
+                <Text style={styles.securityItemText}>{t('paymentSettings.pciText')}</Text>
               </View>
             </View>
           </View>

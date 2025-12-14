@@ -1,11 +1,12 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Stack, Redirect, usePathname } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import LoginScreen from './auth/login';
 
 export default function AuthWrapper() {
   const { isAuthenticated, loading } = useAuth();
+  const pathname = usePathname();
 
   if (loading) {
     return (
@@ -16,7 +17,30 @@ export default function AuthWrapper() {
   }
 
   if (!isAuthenticated) {
-    return <LoginScreen />;
+    // Prevent access to non-auth routes when logged out
+    if (pathname && !pathname.startsWith('/auth')) {
+      return <Redirect href="/auth/login" />;
+    }
+
+    return (
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+        }}
+      >
+        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/forgot-password" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
+
+  // Prevent access to auth routes when logged in
+  if (pathname && pathname.startsWith('/auth')) {
+    return <Redirect href="/(tabs)/shop" />;
   }
 
   return (

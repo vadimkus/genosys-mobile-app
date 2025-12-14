@@ -20,6 +20,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice, isBeautyBoxProduct } from '../../utils/productRules';
+import { useLocalization } from '../../contexts/LocalizationContext';
+import { getLocalizedProductName, getLocalizedProductDescription, getCategoryTranslationKey } from '../../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -41,6 +43,19 @@ const ALLOWED_CATEGORY_ORDER = [
   'Device',
   'Holiday Kits',
   'Beauty Boxes',
+];
+
+// RU: preferred visual grouping/order so long labels wrap nicely.
+// (Matches desired lines: "Все товары + Уход за областью вокруг глаз", etc.)
+const RU_CATEGORY_PRIORITY_ORDER = [
+  'All',
+  'Eye Care',
+  'PRO Solution',
+  'Sun',
+  'Peeling',
+  'Scalp/Hair',
+  'Cream',
+  'Mask',
 ];
 
 // Map incoming category strings to the allowed display categories
@@ -72,6 +87,28 @@ const normalizeCategory = (cat) => {
   return CATEGORY_MAP[key] || null;
 };
 
+// Some products should appear in multiple category tabs (UX expectation).
+// Example: Cushion BB + Blemish Balm should also be shown under "Sun".
+const getCategoryTagsForProduct = (product) => {
+  const tags = new Set();
+  const normalized = normalizeCategory(product?.category);
+  if (normalized) tags.add(normalized);
+
+  const rawCat = String(product?.category || '').toLowerCase();
+  const name = String(product?.name || '').toLowerCase();
+
+  // If backend category explicitly includes "sun" (e.g. "Cushion BB, Sun") treat as Sun too.
+  if (rawCat.includes('sun')) tags.add('Sun');
+
+  // Cushion BB products should also be part of Sun.
+  if (normalized === 'Cushion BB') tags.add('Sun');
+
+  // Blemish Balm should also be part of Sun even if categorized differently.
+  if (name.includes('blemish balm')) tags.add('Sun');
+
+  return Array.from(tags);
+};
+
 const buildAllowedCategoryList = (foundCategories = []) => {
   const seen = new Set();
   const list = ['All'];
@@ -86,6 +123,7 @@ const buildAllowedCategoryList = (foundCategories = []) => {
 
 export default function ShopScreen() {
   const { user } = useAuth();
+  const { t, locale } = useLocalization();
   const { addItem } = useCart();
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const [products, setProducts] = useState([]);
@@ -102,7 +140,7 @@ export default function ShopScreen() {
       console.log('🛍️ Loading enhanced products with user context...');
       
       // Use enhanced fetchProducts function with user context
-      const enhancedProducts = await fetchProducts(user);
+      const enhancedProducts = await fetchProducts(user, { locale });
       
       if (enhancedProducts && enhancedProducts.length > 0) {
         setProducts(enhancedProducts);
@@ -112,7 +150,7 @@ export default function ShopScreen() {
         // Debug first few products
         console.log('🔍 First 3 enhanced products badges:');
         enhancedProducts.slice(0, 3).forEach(p => {
-          console.log(`  - ${p.name}: ${p.badges?.length || 0} badges`, p.badges?.map(b => b.text) || []);
+          console.log(`  - ${getLocalizedProductName(p, locale) || p.name}: ${p.badges?.length || 0} badges`, p.badges?.map(b => b.text) || []);
         });
         
         if (user?.discountPercentage) {
@@ -123,11 +161,13 @@ export default function ShopScreen() {
         const normalizedCats = [];
         const seen = new Set();
         enhancedProducts.forEach((product) => {
-          const mapped = normalizeCategory(product.category);
-          if (mapped && !seen.has(mapped)) {
-            seen.add(mapped);
-            normalizedCats.push(mapped);
-          }
+          const tags = getCategoryTagsForProduct(product);
+          tags.forEach((tag) => {
+            if (tag && !seen.has(tag)) {
+              seen.add(tag);
+              normalizedCats.push(tag);
+            }
+          });
         });
         setCategories(buildAllowedCategoryList(normalizedCats));
       }
@@ -186,17 +226,39 @@ export default function ShopScreen() {
     // Apply category filter
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(product => 
-        product.category === selectedCategory
+        getCategoryTagsForProduct(product).includes(selectedCategory)
       );
     }
 
     // Apply search filter
     if (searchQuery.trim()) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+      const norm = (s) => String(s || '').toLowerCase().normalize('NFKD');
+      const q = norm(searchQuery).trim();
+      filtered = filtered.filter((product) => {
+        const canonical = normalizeCategory(product?.category) || '';
+        const canonicalKey = canonical ? getCategoryTranslationKey(canonical) : null;
+        const canonicalLabel = canonicalKey ? t(canonicalKey) : canonical;
+
+        const tagLabels = getCategoryTagsForProduct(product).map((tag) => {
+          const k = getCategoryTranslationKey(tag);
+          return k ? t(k) : tag;
+        });
+
+        const haystack = [
+          getLocalizedProductName(product, locale),
+          product?.name,
+          getLocalizedProductDescription(product, locale),
+          product?.description,
+          product?.category,
+          canonical,
+          canonicalLabel,
+          ...tagLabels,
+        ]
+          .map(norm)
+          .join(' ');
+
+        return haystack.includes(q);
+      });
     }
 
     setFilteredProducts(filtered);
@@ -232,7 +294,7 @@ export default function ShopScreen() {
     }
 
     if (product.status === 'out_of_stock' || product.stock === false) {
-      Alert.alert('Out of Stock', 'This product is currently out of stock.');
+      Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
       return;
     }
 
@@ -241,10 +303,10 @@ export default function ShopScreen() {
 
     try {
       await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
-      console.log(`✅ Added ${product.name} to cart`);
+      console.log(`✅ Added ${(getLocalizedProductName(product, locale) || product.name)} to cart`);
     } catch (error) {
       console.error('Failed to add product to cart:', error);
-      Alert.alert('Error', 'Failed to add product to bag. Please try again.');
+      Alert.alert(t('common.error'), t('shop.addToBagFailed'));
     } finally {
       // Remove from tracking set after delay
       setTimeout(() => {
@@ -260,8 +322,8 @@ export default function ShopScreen() {
   const handleToggleFavorite = (product) => {
     const result = toggleFavorite(product);
     console.log(result === 'added' 
-      ? `💖 ${product.name} added to favorites!`
-      : `💔 ${product.name} removed from favorites!`);
+      ? `💖 ${(getLocalizedProductName(product, locale) || product.name)} added to favorites!`
+      : `💔 ${(getLocalizedProductName(product, locale) || product.name)} removed from favorites!`);
   };
 
 
@@ -271,7 +333,7 @@ export default function ShopScreen() {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#E74C3C" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>{t('shop.loading')}</Text>
       </SafeAreaView>
     );
   }
@@ -311,7 +373,7 @@ export default function ShopScreen() {
               )}
             </TouchableOpacity>
           </View>
-          <Text style={styles.subtitle}>Premium Skincare & Beauty</Text>
+          <Text style={styles.subtitle}>{t('shop.subtitle')}</Text>
         </View>
         
         {/* Right Side Elements */}
@@ -359,7 +421,7 @@ export default function ShopScreen() {
               </View>
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search products..."
+                placeholder={t('shop.searchPlaceholder')}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 placeholderTextColor="#86868B"
@@ -381,11 +443,33 @@ export default function ShopScreen() {
           {categories.length > 0 && (
             <View style={styles.categoriesContainer}>
               <View style={styles.categoriesGrid}>
-                {categories.map((category, index) => (
+                {(() => {
+                  const list = Array.isArray(categories) ? [...categories] : [];
+                  if (locale !== 'ru') return list;
+
+                  // 1) Put preferred RU categories first in the exact order.
+                  const picked = [];
+                  const remaining = new Set(list);
+                  RU_CATEGORY_PRIORITY_ORDER.forEach((cat) => {
+                    if (remaining.has(cat)) {
+                      picked.push(cat);
+                      remaining.delete(cat);
+                    }
+                  });
+
+                  // 2) Append whatever else exists, sorted by translated label length (short -> long).
+                  const getLabel = (cat) =>
+                    getCategoryTranslationKey(cat) ? t(getCategoryTranslationKey(cat)) : cat;
+                  const rest = Array.from(remaining);
+                  rest.sort((a, b) => String(getLabel(a)).length - String(getLabel(b)).length);
+
+                  return [...picked, ...rest];
+                })().map((category) => (
                   <TouchableOpacity
                     key={category}
                     style={[
                       styles.categoryButton,
+                      locale === 'ru' && styles.ruCategoryButton,
                       selectedCategory === category && styles.activeCategoryButton
                     ]}
                     onPress={() => handleCategoryPress(category)}
@@ -393,9 +477,10 @@ export default function ShopScreen() {
                   >
                     <Text style={[
                       styles.categoryButtonText,
+                      locale === 'ru' && styles.ruCategoryButtonText,
                       selectedCategory === category && styles.activeCategoryButtonText
                     ]}>
-                      {category}
+                      {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -403,9 +488,9 @@ export default function ShopScreen() {
               
               {/* Product Count under Categories */}
               <Text style={styles.productCount}>
-                {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
-                {selectedCategory !== 'All' && ` in ${selectedCategory}`}
-                {searchQuery && ` found for "${searchQuery}"`}
+                {filteredProducts.length} {t(filteredProducts.length === 1 ? 'shop.product' : 'shop.products')}
+                {selectedCategory !== 'All' && ` ${t('shop.in')} ${(getCategoryTranslationKey(selectedCategory) ? t(getCategoryTranslationKey(selectedCategory)) : selectedCategory)}`}
+                {searchQuery && ` ${t('shop.foundFor', { query: searchQuery })}`}
               </Text>
             </View>
           )}
@@ -416,13 +501,13 @@ export default function ShopScreen() {
           {filteredProducts.length === 0 && (searchQuery || selectedCategory !== 'All') ? (
             /* No Search/Filter Results */
             <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsTitle}>No products found</Text>
+              <Text style={styles.noResultsTitle}>{t('shop.noResults')}</Text>
               <Text style={styles.noResultsText}>
                 {searchQuery && selectedCategory !== 'All' 
-                  ? `No products found for "${searchQuery}" in ${selectedCategory} category.`
+                  ? t('shop.noResultsForQueryCategory', { query: searchQuery, category: selectedCategory })
                   : searchQuery 
-                    ? `No products found for "${searchQuery}". Try different keywords.`
-                    : `No products found in ${selectedCategory} category.`
+                    ? t('shop.noResultsForQuery', { query: searchQuery })
+                    : t('shop.noResultsInCategory', { category: selectedCategory })
                 }
               </Text>
               <View style={styles.clearButtonsContainer}>
@@ -431,7 +516,7 @@ export default function ShopScreen() {
                     style={[styles.clearSearchButton, styles.clearButton]}
                     onPress={() => setSearchQuery('')}
                   >
-                    <Text style={styles.clearSearchText}>Clear Search</Text>
+                    <Text style={styles.clearSearchText}>{t('shop.clearSearch')}</Text>
                   </TouchableOpacity>
                 )}
                 {selectedCategory !== 'All' && (
@@ -439,7 +524,7 @@ export default function ShopScreen() {
                     style={[styles.clearSearchButton, styles.clearButton]}
                     onPress={() => setSelectedCategory('All')}
                   >
-                    <Text style={styles.clearSearchText}>Show All</Text>
+                    <Text style={styles.clearSearchText}>{t('shop.showAll')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -546,30 +631,32 @@ export default function ShopScreen() {
                     {/* Stock Status */}
                     {(product.status === 'out_of_stock' || product.stock === false) && (
                       <View style={styles.stockOverlay}>
-                        <Text style={styles.stockOverlayText}>Out of Stock</Text>
+                        <Text style={styles.stockOverlayText}>{t('stock.outOfStock')}</Text>
                       </View>
                     )}
                   </View>
                   
                   <View style={styles.gridContent}>
                     <Text style={styles.gridName} numberOfLines={2}>
-                      {product.name}
+                      {getLocalizedProductName(product, locale) || product.name}
                     </Text>
-                    <Text style={styles.gridCategory}>{product.category}</Text>
+                    <Text style={styles.gridCategory}>
+                      {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+                    </Text>
                     
                     
                     {/* Badges removed from content area to avoid duplication - they show on image */}
                     
-                    {product.description && (
+                    {(getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description) && (
                       <Text style={styles.gridDescription} numberOfLines={2}>
-                        {product.description}
+                        {getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description}
                       </Text>
                     )}
                     
                     {/* Beauty Boxes Special Pricing Display */}
                     {(() => {
                       const category = product.category;
-                      const name = product.name || '';
+                      const name = getLocalizedProductName(product, locale) || product.name || '';
                       const hasBeautyBoxInName = name.toUpperCase().includes('BEAUTY BOX');
                       const isCategoryBeautyBoxes = category === 'Beauty Boxes';
                       const isBeautyBox = isCategoryBeautyBoxes || hasBeautyBoxInName;
@@ -578,14 +665,14 @@ export default function ShopScreen() {
                     })() ? (
                       <View style={styles.priceContainer}>
                         <Text style={styles.originalPrice}>{((product.displayPrice || product.price || 0) / 0.85).toFixed(2)} AED</Text>
-                        <Text style={styles.userDiscount}>15% OFF (Bundle Discount)</Text>
+                        <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
                         <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-                        <Text style={styles.vatText}>VAT included</Text>
+                        <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                       </View>
                     ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
                       <View style={styles.priceContainer}>
                         <Text style={styles.gridPrice}>{getCanonicalUnitPrice(product).toFixed(2)} AED</Text>
-                        <Text style={styles.vatText}>VAT included</Text>
+                        <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                       </View>
                     ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
                       <View style={styles.priceContainer}>
@@ -594,12 +681,12 @@ export default function ShopScreen() {
                         {product.discountLabel && (
                           <Text style={styles.userDiscount}>{product.discountLabel}</Text>
                         )}
-                        <Text style={styles.vatText}>VAT included</Text>
+                        <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                       </View>
                     ) : (
                       <View style={styles.priceContainer}>
                         <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-                        <Text style={styles.vatText}>VAT included</Text>
+                        <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                       </View>
                     )}
 
@@ -621,12 +708,12 @@ export default function ShopScreen() {
                       />
                       <Text style={styles.addToCartText}>
                         {addingProducts.has(product.id) 
-                          ? 'Added!' 
+                          ? t('shop.added')
                           : (product.status === 'out_of_stock' || product.stock === false) 
-                            ? 'Out of Stock' 
+                            ? t('stock.outOfStock')
                             : user 
-                              ? 'Add to Bag' 
-                              : 'Login to Buy'
+                              ? t('shop.addToBag')
+                              : t('shop.loginToBuy')
                         }
                       </Text>
                     </TouchableOpacity>
@@ -988,6 +1075,11 @@ const styles = StyleSheet.create({
     minWidth: 60,
     margin: 4,
   },
+  ruCategoryButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    minWidth: 0,
+  },
   activeCategoryButton: {
     backgroundColor: '#E74C3C',
     borderColor: '#E74C3C',
@@ -996,6 +1088,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#1D1D1F',
+  },
+  ruCategoryButtonText: {
+    fontSize: 13,
   },
   activeCategoryButtonText: {
     color: '#ffffff',

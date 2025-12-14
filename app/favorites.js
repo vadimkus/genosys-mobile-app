@@ -16,11 +16,14 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
+import { useLocalization } from '../contexts/LocalizationContext';
+import { getLocalizedProductName, getCategoryTranslationKey } from '../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function FavoritesScreen() {
   const { user } = useAuth();
+  const { t, locale } = useLocalization();
   const { addItem } = useCart();
   const { favorites, toggleFavorite, getFavoritesCount } = useFavorites();
   const [addingProducts, setAddingProducts] = useState(new Set());
@@ -46,7 +49,7 @@ export default function FavoritesScreen() {
     }
 
     if (product.status === 'out_of_stock' || product.stock === false) {
-      Alert.alert('Out of Stock', 'This product is currently out of stock.');
+      Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
       return;
     }
 
@@ -55,10 +58,10 @@ export default function FavoritesScreen() {
 
     try {
       await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
-      console.log(`✅ Added ${product.name} to bag from favorites`);
+      console.log(`✅ Added ${(getLocalizedProductName(product, locale) || product.name)} to bag from favorites`);
     } catch (error) {
       console.error('Failed to add product to cart:', error);
-      Alert.alert('Error', 'Failed to add item to bag. Please try again.');
+      Alert.alert(t('common.error'), t('favorites.addToBagFailed'));
     } finally {
       // Remove from tracking set after delay
       setTimeout(() => {
@@ -73,7 +76,7 @@ export default function FavoritesScreen() {
 
   const handleRemoveFromFavorites = (product) => {
     toggleFavorite(product);
-    console.log(`💔 ${product.name} removed from favorites`);
+    console.log(`💔 ${(getLocalizedProductName(product, locale) || product.name)} removed from favorites`);
   };
 
   if (favorites.length === 0) {
@@ -89,7 +92,7 @@ export default function FavoritesScreen() {
           </TouchableOpacity>
           
           <View style={styles.headerCenter}>
-            <Text style={styles.title}>Favorites</Text>
+          <Text style={styles.title}>{t('favorites.title')}</Text>
           </View>
           
           <View style={styles.headerSpacer} />
@@ -98,7 +101,7 @@ export default function FavoritesScreen() {
         <View style={styles.emptyContainer}>
           <View style={styles.emptyContent}>
             <Ionicons name="heart-outline" size={80} color="#E5E5EA" />
-            <Text style={styles.emptyTitle}>No Favorites Yet</Text>
+            <Text style={styles.emptyTitle}>{t('favorites.emptyTitle')}</Text>
             <Text style={styles.emptySubtitle}>
               Products you love will appear here. Tap the heart on any product to save it!
             </Text>
@@ -106,7 +109,7 @@ export default function FavoritesScreen() {
               style={styles.browseButton}
               onPress={() => router.back()}
             >
-              <Text style={styles.browseButtonText}>Browse Products</Text>
+              <Text style={styles.browseButtonText}>{t('favorites.browseProducts')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -126,7 +129,7 @@ export default function FavoritesScreen() {
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
-          <Text style={styles.title}>Favorites</Text>
+          <Text style={styles.title}>{t('favorites.title')}</Text>
           <View style={styles.headerRight}>
             <Ionicons name="heart" size={20} color="#E74C3C" />
             <Text style={styles.countText}>({getFavoritesCount()})</Text>
@@ -157,7 +160,7 @@ export default function FavoritesScreen() {
                   ) : (
                     <View style={styles.gridImagePlaceholder}>
                       <Text style={styles.gridPlaceholderText}>
-                        {product.name?.charAt(0) || 'G'}
+                        {(getLocalizedProductName(product, locale) || product.name || '').charAt(0) || 'G'}
                       </Text>
                     </View>
                   )}
@@ -236,15 +239,17 @@ export default function FavoritesScreen() {
                 
                 <View style={styles.gridContent}>
                   <Text style={styles.gridName} numberOfLines={2}>
-                    {product.name}
+                    {getLocalizedProductName(product, locale) || product.name}
                   </Text>
-                  <Text style={styles.gridCategory}>{product.category}</Text>
+                  <Text style={styles.gridCategory}>
+                    {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+                  </Text>
                   
                   {/* Pricing */}
                   {(hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
                     <View style={styles.priceContainer}>
                       <Text style={styles.gridPrice}>{getCanonicalUnitPrice(product).toFixed(2)} AED</Text>
-                      <Text style={styles.vatText}>VAT included</Text>
+                      <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                     </View>
                   ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
                     <View style={styles.priceContainer}>
@@ -253,12 +258,12 @@ export default function FavoritesScreen() {
                       {product.discountLabel && (
                         <Text style={styles.savings}>{product.discountLabel}</Text>
                       )}
-                      <Text style={styles.vatText}>VAT included</Text>
+                      <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                     </View>
                   ) : (
                     <View style={styles.priceContainer}>
                       <Text style={styles.gridPrice}>{(product.displayPrice || product.price).toFixed(2)} AED</Text>
-                      <Text style={styles.vatText}>VAT included</Text>
+                      <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                     </View>
                   )}
                 </View>

@@ -19,9 +19,12 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useLocalization } from '../../contexts/LocalizationContext';
+import { getAddressLine, parseGenosysAddress } from '../../utils/addressUtils';
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const { t } = useLocalization();
   const { user, updateProfile, isAuthenticated } = useAuth();
   
   // Check authentication immediately
@@ -35,11 +38,11 @@ export default function EditProfileScreen() {
     
     if (!isAuthenticated || !user) {
       Alert.alert(
-        'Authentication Required',
-        'Please log in to edit your profile.',
+        t('editProfile.authRequiredTitle'),
+        t('editProfile.pleaseLoginToEdit'),
         [
           {
-            text: 'OK',
+            text: t('contact.ok'),
             onPress: () => router.back()
           }
         ]
@@ -54,7 +57,7 @@ export default function EditProfileScreen() {
     email: '',
     phone: '',
     dateOfBirth: '',
-    gender: 'Prefer not to say',
+    gender: t('editProfile.preferNotToSay'),
     address: '',
     profilePicture: null,
   });
@@ -70,14 +73,16 @@ export default function EditProfileScreen() {
     if (user) {
       console.log('📝 Populating profile form with user data:', user);
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
+      const parsedAddr = parseGenosysAddress(user.address || '');
       setFormData({
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
         email: user.email || '',
         phone: user.phone || '',
         dateOfBirth: user.dateOfBirth || '',
-        gender: user.gender || 'Prefer not to say',
-        address: user.address || '',
+        gender: user.gender || t('editProfile.preferNotToSay'),
+        // Don't show GENOSYS_ADDR_V1 payload in the input
+        address: getAddressLine(parsedAddr || (user.address || '')),
         profilePicture: user.profilePicture || null,
       });
       
@@ -117,10 +122,10 @@ export default function EditProfileScreen() {
         }
       );
     } else {
-      Alert.alert('Select Profile Picture', 'Choose an option:', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Take Photo', onPress: takePhoto },
-        { text: 'Choose from Library', onPress: pickImage },
+        Alert.alert(t('editProfile.selectProfilePictureTitle'), t('editProfile.chooseOption'), [
+        { text: t('editProfile.cancel'), style: 'cancel' },
+        { text: t('editProfile.takePhoto'), onPress: takePhoto },
+        { text: t('editProfile.chooseFromLibrary'), onPress: pickImage },
       ]);
     }
   };
@@ -128,7 +133,7 @@ export default function EditProfileScreen() {
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Camera permission is required to take photos');
+      Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.cameraPermission'));
       return;
     }
 
@@ -147,7 +152,7 @@ export default function EditProfileScreen() {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Photo library permission is required to select images');
+      Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.libraryPermission'));
       return;
     }
 
@@ -191,7 +196,12 @@ export default function EditProfileScreen() {
   };
 
   // Gender Selection Functions
-  const genderOptions = ['Male', 'Female', 'Other', 'Prefer not to say'];
+  const genderOptions = [
+    t('editProfile.genderMale'),
+    t('editProfile.genderFemale'),
+    t('editProfile.genderOther'),
+    t('editProfile.preferNotToSay'),
+  ];
 
   const handleGenderSelect = (selectedGender) => {
     updateField('gender', selectedGender);
@@ -209,14 +219,14 @@ export default function EditProfileScreen() {
     
     // Validate form
     if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.address.trim()) {
-      Alert.alert('Error', 'Please fill in all required fields including address for delivery.');
+      Alert.alert(t('common.error'), t('editProfile.validationMissingFields'));
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
+      Alert.alert(t('common.error'), t('editProfile.validationInvalidEmail'));
       return;
     }
 
@@ -249,21 +259,21 @@ export default function EditProfileScreen() {
       
       if (result.success) {
         Alert.alert(
-          'Success', 
-          'Your profile has been updated successfully!',
+          t('editProfile.successTitle'),
+          t('editProfile.successMessage'),
           [
             {
-              text: 'OK',
+              text: t('contact.ok'),
               onPress: () => router.back()
             }
           ]
         );
       } else {
-        Alert.alert('Error', result.error || 'Failed to update profile. Please try again.');
+        Alert.alert(t('common.error'), result.error || t('editProfile.updateFailed'));
       }
     } catch (error) {
       console.error('Profile save error:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert(t('common.error'), t('editProfile.genericError'));
     } finally {
       setIsSaving(false);
     }
@@ -271,11 +281,11 @@ export default function EditProfileScreen() {
 
   const handleCancel = () => {
     Alert.alert(
-      'Discard Changes?',
-      'Are you sure you want to discard your changes?',
+      t('editProfile.discardTitle'),
+      t('editProfile.discardMessage'),
       [
-        { text: 'Keep Editing', style: 'cancel' },
-        { text: 'Discard', style: 'destructive', onPress: () => router.back() }
+        { text: t('editProfile.keepEditing'), style: 'cancel' },
+        { text: t('editProfile.discard'), style: 'destructive', onPress: () => router.back() }
       ]
     );
   };
@@ -292,16 +302,16 @@ export default function EditProfileScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('editProfile.cancel')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit Profile</Text>
+        <Text style={styles.headerTitle}>{t('editProfile.headerTitle')}</Text>
         <TouchableOpacity 
           onPress={handleSave} 
           style={[styles.headerButton, isSaving && styles.headerButtonDisabled]}
           disabled={isSaving}
         >
           <Text style={[styles.saveText, isSaving && styles.saveTextDisabled]}>
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? t('editProfile.saving') : t('editProfile.save')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -313,7 +323,7 @@ export default function EditProfileScreen() {
         keyboardDismissMode="on-drag"
       >
         {/* Profile Picture Section */}
-        <FormSection title="Profile Picture">
+        <FormSection title={t('editProfile.profilePicture')}>
           <View style={styles.formContent}>
             <TouchableOpacity style={styles.profilePictureContainer} onPress={handleProfilePicturePress}>
               <View style={styles.profilePictureWrapper}>
@@ -328,24 +338,24 @@ export default function EditProfileScreen() {
                   <Ionicons name="camera" size={16} color="#ffffff" />
                 </View>
               </View>
-              <Text style={styles.profilePictureText}>Tap to change photo</Text>
+              <Text style={styles.profilePictureText}>{t('editProfile.tapToChangePhoto')}</Text>
             </TouchableOpacity>
           </View>
         </FormSection>
 
         {/* Personal Information */}
-        <FormSection title="Personal Information">
+        <FormSection title={t('editProfile.personalInfo')}>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                First Name
+                {t('editProfile.firstName')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.firstName}
                 onChangeText={(text) => updateField('firstName', text)}
-                placeholder="Enter your first name"
+                placeholder={t('editProfile.enterFirstName')}
                 autoCapitalize="words"
                 autoCorrect={false}
                 autoComplete="name-given"
@@ -357,14 +367,14 @@ export default function EditProfileScreen() {
             
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                Last Name
+                {t('editProfile.lastName')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.lastName}
                 onChangeText={(text) => updateField('lastName', text)}
-                placeholder="Enter your last name"
+                placeholder={t('editProfile.enterLastName')}
                 autoCapitalize="words"
                 autoCorrect={false}
                 autoComplete="name-family"
@@ -376,14 +386,14 @@ export default function EditProfileScreen() {
             
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                Email Address
+                {t('editProfile.emailAddress')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.email}
                 onChangeText={(text) => updateField('email', text)}
-                placeholder="Enter your email"
+                placeholder={t('editProfile.enterEmail')}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -395,12 +405,12 @@ export default function EditProfileScreen() {
             </View>
             
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>Phone Number</Text>
+              <Text style={styles.fieldLabel}>{t('editProfile.phoneNumber')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.phone}
                 onChangeText={(text) => updateField('phone', text)}
-                placeholder="Enter your phone number"
+                placeholder={t('editProfile.enterPhone')}
                 keyboardType="phone-pad"
                 autoCorrect={false}
                 autoComplete="tel"
@@ -416,7 +426,7 @@ export default function EditProfileScreen() {
         <FormSection title="Additional Information">
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>Date of Birth</Text>
+              <Text style={styles.fieldLabel}>{t('editProfile.dateOfBirth')}</Text>
               <TouchableOpacity style={styles.selectField} onPress={showDatePickerModal}>
                 <Text style={[styles.selectFieldText, !formData.dateOfBirth && styles.placeholderText]}>
                   {formatDisplayDate(formData.dateOfBirth) || 'Select date of birth'}
@@ -425,7 +435,7 @@ export default function EditProfileScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>Gender</Text>
+              <Text style={styles.fieldLabel}>{t('editProfile.gender')}</Text>
               <TouchableOpacity style={styles.selectField} onPress={showGenderSelector}>
                 <Text style={styles.selectFieldText}>{formData.gender}</Text>
                 <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
@@ -441,7 +451,7 @@ export default function EditProfileScreen() {
                 style={[styles.textInput, styles.multilineInput]}
                 value={formData.address}
                 onChangeText={(text) => updateField('address', text)}
-                placeholder="Enter your delivery address"
+                placeholder={t('editProfile.enterAddress')}
                 multiline={true}
                 numberOfLines={3}
                 autoCapitalize="words"
@@ -459,8 +469,8 @@ export default function EditProfileScreen() {
           <View style={styles.formContent}>
             <View style={styles.switchContainer}>
               <View style={styles.switchLabel}>
-                <Text style={styles.fieldLabel}>Email Notifications</Text>
-                <Text style={styles.switchSubtext}>Receive updates via email</Text>
+                <Text style={styles.fieldLabel}>{t('editProfile.emailNotifications')}</Text>
+                <Text style={styles.switchSubtext}>{t('editProfile.emailNotificationsHint')}</Text>
               </View>
               <Switch
                 value={emailNotifications}
@@ -472,8 +482,8 @@ export default function EditProfileScreen() {
             </View>
             <View style={styles.switchContainer}>
               <View style={styles.switchLabel}>
-                <Text style={styles.fieldLabel}>SMS Notifications</Text>
-                <Text style={styles.switchSubtext}>Receive updates via SMS</Text>
+                <Text style={styles.fieldLabel}>{t('editProfile.smsNotifications')}</Text>
+                <Text style={styles.switchSubtext}>{t('editProfile.smsNotificationsHint')}</Text>
               </View>
               <Switch
                 value={smsNotifications}
@@ -517,7 +527,7 @@ export default function EditProfileScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Gender</Text>
+              <Text style={styles.modalTitle}>{t('editProfile.selectGender')}</Text>
               <TouchableOpacity onPress={() => setShowGenderModal(false)}>
                 <Ionicons name="close" size={24} color="#000" />
               </TouchableOpacity>

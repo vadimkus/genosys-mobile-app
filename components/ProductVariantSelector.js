@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocalization } from '../contexts/LocalizationContext';
 import { isCushionBB } from '../utils/productRules';
 
 const parseMaybeJSON = (value) => {
@@ -50,6 +51,7 @@ export default function ProductVariantSelector({
   onColorChange,
 }) {
   const { user } = useAuth();
+  const { t } = useLocalization();
 
   // Enhanced API provides complete variant data with calculated prices
   const availableSizes = (product.variants || []).filter((v) => v && v.size);
@@ -61,7 +63,7 @@ export default function ProductVariantSelector({
       {/* Color Selection - Server determines if product has colors */}
       {availableColors.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Color</Text>
+          <Text style={styles.sectionTitle}>{t('variant.color')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScroll}>
             <View style={styles.colorOptions}>
               {availableColors.map((color) => (
@@ -96,7 +98,7 @@ export default function ProductVariantSelector({
       {/* Size Selection */}
       {availableSizes.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Size</Text>
+          <Text style={styles.sectionTitle}>{t('variant.size')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsScroll}>
             <View style={styles.sizeOptions}>
               {availableSizes.map((variant, idx) => (
@@ -127,7 +129,7 @@ export default function ProductVariantSelector({
                     </Text>
                   )}
                   {!variant.available && (
-                    <Text style={styles.unavailableText}>Unavailable</Text>
+                    <Text style={styles.unavailableText}>{t('variant.unavailable')}</Text>
                   )}
                 </TouchableOpacity>
               ))}
@@ -139,7 +141,7 @@ export default function ProductVariantSelector({
       {/* Single Size (no selectable size variants) */}
       {availableSizes.length === 0 && singleSizeLabel ? (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Size</Text>
+          <Text style={styles.sectionTitle}>{t('variant.size')}</Text>
           <View style={styles.sizeOptions}>
             <View style={[styles.sizeOption, styles.singleSizeOption, styles.singleSizeStaticOption]}>
               <Text style={[styles.sizeLabel, styles.singleSizeStaticLabel]}>{singleSizeLabel}</Text>

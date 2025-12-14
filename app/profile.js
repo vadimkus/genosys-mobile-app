@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
+import { useLocalization } from '../contexts/LocalizationContext';
 
 const { width } = Dimensions.get('window');
 
@@ -32,18 +33,25 @@ export default function ProfileScreen() {
     enableBiometric,
     disableBiometric
   } = useAuth();
+  const { locale, t } = useLocalization();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
 
+  const profileImageUri =
+    (typeof user?.profilePicture === 'string' && user.profilePicture.trim()) ? user.profilePicture.trim()
+    : (typeof user?.profile_picture === 'string' && user.profile_picture.trim()) ? user.profile_picture.trim()
+    : (typeof user?.picture === 'string' && user.picture.trim()) ? user.picture.trim()
+    : '';
+
   const handleSignOut = () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
+      t('profile.signOutTitle'),
+      t('profile.signOutConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Sign Out', 
+          text: t('profile.signOut'), 
           style: 'destructive', 
           onPress: async () => {
             setIsLoggingOut(true);
@@ -52,12 +60,12 @@ export default function ProfileScreen() {
               const result = await logout();
               if (result.success) {
                 // Navigation will be handled automatically by AuthWrapper
-                Alert.alert('Signed Out', 'You have been signed out successfully.');
+                Alert.alert(t('profile.signedOutTitle'), t('profile.signedOutMessage'));
               } else {
-                Alert.alert('Error', result.error || 'Failed to sign out');
+                Alert.alert(t('common.error'), result.error || t('profile.signOutFailed'));
               }
             } catch (error) {
-              Alert.alert('Error', 'Something went wrong while signing out');
+              Alert.alert(t('common.error'), t('profile.signOutGenericError'));
             } finally {
               setIsLoggingOut(false);
             }
@@ -88,27 +96,27 @@ export default function ProfileScreen() {
       if (value) {
         // Enable biometric authentication
         if (!user?.email) {
-          Alert.alert('Error', 'No user email found');
+          Alert.alert(t('common.error'), t('profile.noUserEmailFound'));
           return;
         }
         
         // We need the password to enable biometric auth
         // For now, we'll show an alert asking user to re-login
         Alert.alert(
-          `Enable ${biometricType}?`,
-          `To enable ${biometricType}, please log out and log back in with your password.`,
+          t('profile.enableBiometricTitle', { biometricType }),
+          t('profile.enableBiometricMessage', { biometricType }),
           [
-            { text: 'Cancel', style: 'cancel' },
+            { text: t('common.cancel'), style: 'cancel' },
             { 
-              text: 'Log Out & Enable', 
+              text: t('profile.logOutAndEnable'), 
               style: 'default',
               onPress: () => {
                 Alert.alert(
-                  'Instructions',
-                  `After logging out:\n\n1. Log back in with your email and password\n2. ${biometricType} setup will be offered automatically\n\nThis one-time setup allows secure biometric login.`,
+                  t('profile.instructionsTitle'),
+                  t('profile.instructionsMessage', { biometricType }),
                   [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Continue', onPress: handleSignOut }
+                    { text: t('common.cancel'), style: 'cancel' },
+                    { text: t('common.continue'), onPress: handleSignOut }
                   ]
                 );
               }
@@ -119,13 +127,13 @@ export default function ProfileScreen() {
         // Disable biometric authentication
         const result = await disableBiometric();
         if (result.success) {
-          Alert.alert('Success', `${biometricType} has been disabled for your account.`);
+          Alert.alert(t('profile.successTitle'), t('profile.biometricDisabled', { biometricType }));
         } else {
-          Alert.alert('Error', result.error || 'Failed to disable biometric authentication');
+          Alert.alert(t('common.error'), result.error || t('profile.disableBiometricFailed'));
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert(t('common.error'), t('profile.genericError'));
     } finally {
       setBiometricLoading(false);
     }
@@ -190,7 +198,7 @@ export default function ProfileScreen() {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
         
-        <Text style={styles.navTitle}>Account</Text>
+        <Text style={styles.navTitle}>{t('profile.accountTitle')}</Text>
         
         <View style={styles.headerSpacer} />
       </View>
@@ -201,9 +209,9 @@ export default function ProfileScreen() {
           
           <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
-              {user?.picture ? (
+              {profileImageUri ? (
                 <Image 
-                  source={{ uri: user.picture }} 
+                  source={{ uri: profileImageUri }} 
                   style={styles.avatarImage}
                 />
               ) : (
@@ -215,10 +223,10 @@ export default function ProfileScreen() {
             </View>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>
-                {user?.name || 'Loading...'}
+                {user?.name || t('common.loading')}
               </Text>
               <Text style={styles.userEmail}>
-                {user?.email || 'Loading user data...'}
+                {user?.email || t('profile.loadingUserData')}
               </Text>
               {user?.phone && (
                 <Text style={styles.userPhone}>
@@ -226,7 +234,7 @@ export default function ProfileScreen() {
                 </Text>
               )}
               <TouchableOpacity onPress={handleEditProfile} style={styles.editButton}>
-                <Text style={styles.editButtonText}>View & Edit</Text>
+                <Text style={styles.editButtonText}>{t('profile.viewAndEdit')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -237,15 +245,15 @@ export default function ProfileScreen() {
           <View style={styles.quickActionsGrid}>
             <QuickActionCard
               icon="receipt-outline"
-              title="Orders"
-              subtitle="Track purchases"
+              title={t('profile.orders')}
+              subtitle={t('profile.trackPurchases')}
               color="#E74C3C"
               onPress={() => router.push('/profile/orders')}
             />
             <QuickActionCard
               icon="bag-outline"
-              title="Bag"
-              subtitle={cartCount > 0 ? `${cartCount} items` : 'Empty'}
+              title={t('profile.bag')}
+              subtitle={cartCount > 0 ? t('profile.itemsCount', { count: cartCount }) : t('profile.empty')}
               color="#27AE60"
               onPress={() => router.push('/(tabs)/bag')}
             />
@@ -253,26 +261,26 @@ export default function ProfileScreen() {
         </ProfileSection>
 
         {/* Account & Settings */}
-        <ProfileSection title="Account">
+        <ProfileSection title={t('profile.accountSection')}>
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="person-outline"
-              title="Personal Information"
+              title={t('profile.personalInformation')}
               onPress={handleEditProfile}
             />
             <ProfileItem
               icon="location-outline"
-              title="Addresses"
+              title={t('profile.addresses')}
               onPress={() => router.push('/profile/addresses')}
             />
             <ProfileItem
               icon="card-outline"
-              title="Payment & Billing"
+              title={t('profile.paymentAndBilling')}
               onPress={() => router.push('/profile/payment')}
             />
             <ProfileItem
               icon="notifications-outline"
-              title="Notifications"
+              title={t('profile.notifications')}
               rightComponent={
                 <Switch
                   value={notificationsEnabled}
@@ -289,7 +297,7 @@ export default function ProfileScreen() {
         </ProfileSection>
 
         {/* Privacy & Security */}
-        <ProfileSection title="Privacy & Security">
+        <ProfileSection title={t('profile.privacyAndSecurity')}>
           <View style={styles.sectionContent}>
             {biometricAvailable ? (
               <ProfileItem
@@ -310,27 +318,27 @@ export default function ProfileScreen() {
             ) : (
               <ProfileItem
                 icon="scan-outline"
-                title="Biometric Authentication"
+                title={t('profile.biometricAuthentication')}
                 rightComponent={
-                  <Text style={styles.unavailableText}>Not Available</Text>
+                  <Text style={styles.unavailableText}>{t('profile.notAvailable')}</Text>
                 }
                 hasArrow={false}
               />
             )}
             <ProfileItem
               icon="location-outline"
-              title="My Addresses"
-              subtitle="Manage delivery addresses"
+              title={t('profile.myAddresses')}
+              subtitle={t('profile.manageDeliveryAddresses')}
               onPress={() => router.push('/profile/addresses')}
             />
             <ProfileItem
               icon="shield-outline"
-              title="Privacy Policy"
+              title={t('profile.privacyPolicy')}
               onPress={() => router.push('/profile/privacy')}
             />
             <ProfileItem
               icon="document-text-outline"
-              title="Terms & Conditions"
+              title={t('profile.termsAndConditions')}
               onPress={() => router.push('/profile/terms')}
               isLast={true}
             />
@@ -338,27 +346,27 @@ export default function ProfileScreen() {
         </ProfileSection>
 
         {/* General */}
-        <ProfileSection title="General">
+        <ProfileSection title={t('profile.general')}>
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="language-outline"
-              title="Language"
-              subtitle="English"
-              onPress={() => Alert.alert('Language', 'Language selection coming soon!')}
+              title={t('profile.language')}
+              subtitle={locale === 'ru' ? t('profile.russian') : locale === 'ar' ? t('profile.arabic') : t('profile.english')}
+              onPress={() => router.push('/profile/language')}
             />
             <ProfileItem
               icon="help-circle-outline"
-              title="Help & Support"
+              title={t('profile.helpAndSupport')}
               onPress={() => router.push('/profile/help')}
             />
             <ProfileItem
               icon="mail-outline"
-              title="Contact Us"
+              title={t('profile.contactUs')}
               onPress={handleContactSupport}
             />
             <ProfileItem
               icon="information-circle-outline"
-              title="About Genosys"
+              title={t('profile.aboutGenosys')}
               onPress={handleAbout}
               isLast={true}
             />
@@ -375,15 +383,15 @@ export default function ProfileScreen() {
             {isLoggingOut ? (
               <ActivityIndicator color="#E74C3C" size="small" />
             ) : (
-              <Text style={styles.signOutText}>Sign Out</Text>
+              <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
             )}
           </TouchableOpacity>
         </ProfileSection>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Genosys Mobile</Text>
-          <Text style={styles.footerVersion}>Version 1.0.0</Text>
+          <Text style={styles.footerText}>{t('profile.appName')}</Text>
+          <Text style={styles.footerVersion}>{t('profile.version', { version: '1.0.0' })}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -393,7 +401,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   scrollView: {
     flex: 1,
@@ -429,7 +437,7 @@ const styles = StyleSheet.create({
   
   // Apple Store Style Profile Header
   profileHeader: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
     paddingTop: 20,
     paddingBottom: 32,
   },
@@ -519,7 +527,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   quickActionCard: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     width: (width - 60) / 2,
@@ -560,14 +568,14 @@ const styles = StyleSheet.create({
   },
   sectionContent: {
     marginHorizontal: 20,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     overflow: 'hidden',
   },
   
   // Profile Items
   profileItem: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,

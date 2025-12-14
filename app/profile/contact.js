@@ -12,9 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 export default function ContactScreen() {
   const router = useRouter();
+  const { t } = useLocalization();
   const [formData, setFormData] = useState({
     subject: '',
     message: '',
@@ -23,15 +25,15 @@ export default function ContactScreen() {
 
   const handleSendMessage = () => {
     if (!formData.subject.trim() || !formData.message.trim()) {
-      Alert.alert('Missing Information', 'Please fill in both subject and message fields.');
+      Alert.alert(t('contact.missingInfoTitle'), t('contact.missingInfoMessage'));
       return;
     }
 
     Alert.alert(
-      'Message Sent',
-      'Thank you for contacting us! We will get back to you within 24 hours.',
+      t('contact.messageSentTitle'),
+      t('contact.messageSentText'),
       [
-        { text: 'OK', onPress: () => router.back() }
+        { text: t('contact.ok'), onPress: () => router.back() }
       ]
     );
   };
@@ -92,7 +94,7 @@ export default function ContactScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Contact Us</Text>
+        <Text style={styles.headerTitle}>{t('contact.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -102,7 +104,7 @@ export default function ContactScreen() {
           <View style={styles.heroIcon}>
             <Ionicons name="chatbubbles" size={48} color="#E74C3C" />
           </View>
-          <Text style={styles.heroTitle}>Get in Touch</Text>
+          <Text style={styles.heroTitle}>{t('contact.hero')}</Text>
           <Text style={styles.heroSubtitle}>
             We're here to help with any questions about our skincare products and services
           </Text>
@@ -110,7 +112,7 @@ export default function ContactScreen() {
 
         {/* Contact Methods */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Contact Methods</Text>
+          <Text style={styles.sectionTitle}>{t('contact.contactMethods')}</Text>
           {contactMethods.map((method) => (
             <ContactMethodCard key={method.id} method={method} />
           ))}
@@ -118,15 +120,15 @@ export default function ContactScreen() {
 
         {/* Contact Form */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Send us a Message</Text>
+          <Text style={styles.sectionTitle}>{t('contact.sendMessage')}</Text>
           <View style={styles.formContainer}>
             <View style={styles.formField}>
-              <Text style={styles.fieldLabel}>Your Email</Text>
+              <Text style={styles.fieldLabel}>{t('contact.yourEmail')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.email}
                 onChangeText={(text) => setFormData({...formData, email: text})}
-                placeholder="Enter your email"
+                placeholder={t('contact.emailPlaceholder')}
                 keyboardType="email-address"
                 editable={false}
                 placeholderTextColor="#C7C7CC"
@@ -134,23 +136,23 @@ export default function ContactScreen() {
             </View>
 
             <View style={styles.formField}>
-              <Text style={styles.fieldLabel}>Subject *</Text>
+              <Text style={styles.fieldLabel}>{t('contact.subjectRequired')}</Text>
               <TextInput
                 style={styles.textInput}
                 value={formData.subject}
                 onChangeText={(text) => setFormData({...formData, subject: text})}
-                placeholder="What can we help you with?"
+                placeholder={t('contact.subjectPlaceholder')}
                 placeholderTextColor="#C7C7CC"
               />
             </View>
 
             <View style={styles.formField}>
-              <Text style={styles.fieldLabel}>Message *</Text>
+              <Text style={styles.fieldLabel}>{t('contact.messageRequired')}</Text>
               <TextInput
                 style={[styles.textInput, styles.messageInput]}
                 value={formData.message}
                 onChangeText={(text) => setFormData({...formData, message: text})}
-                placeholder="Tell us more about your question or concern..."
+                placeholder={t('contact.messagePlaceholder')}
                 multiline
                 numberOfLines={6}
                 textAlignVertical="top"
@@ -159,37 +161,37 @@ export default function ContactScreen() {
             </View>
 
             <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-              <Text style={styles.sendButtonText}>Send Message</Text>
+              <Text style={styles.sendButtonText}>{t('contact.send')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Office Information */}
         <View style={styles.officeSection}>
-          <Text style={styles.sectionTitle}>Our Office</Text>
+          <Text style={styles.sectionTitle}>{t('contact.office')}</Text>
           <View style={styles.officeCard}>
             <View style={styles.officeHeader}>
-              <Text style={styles.officeTitle}>Genosys Headquarters</Text>
+              <Text style={styles.officeTitle}>{t('contact.hq')}</Text>
               <TouchableOpacity 
                 style={styles.mapButton}
                 onPress={() => Linking.openURL('https://maps.google.com/?q=Dubai+Marina,UAE')}
               >
-                <Text style={styles.mapButtonText}>View Map</Text>
+                <Text style={styles.mapButtonText}>{t('contact.viewMap')}</Text>
               </TouchableOpacity>
             </View>
             
             <View style={styles.officeDetails}>
               <View style={styles.officeItem}>
                 <Ionicons name="location" size={16} color="#8E8E93" />
-                <Text style={styles.officeText}>Dubai Marina, UAE</Text>
+                <Text style={styles.officeText}>{t('contact.officeLocation')}</Text>
               </View>
               <View style={styles.officeItem}>
                 <Ionicons name="time" size={16} color="#8E8E93" />
-                <Text style={styles.officeText}>Mon-Fri: 9AM-6PM, Sat: 10AM-4PM</Text>
+                <Text style={styles.officeText}>{t('contact.officeHours')}</Text>
               </View>
               <View style={styles.officeItem}>
                 <Ionicons name="car" size={16} color="#8E8E93" />
-                <Text style={styles.officeText}>Paid parking available</Text>
+                <Text style={styles.officeText}>{t('contact.parking')}</Text>
               </View>
             </View>
           </View>
@@ -205,8 +207,8 @@ export default function ContactScreen() {
               <Ionicons name="help-circle" size={24} color="#27AE60" />
             </View>
             <View style={styles.faqDetails}>
-              <Text style={styles.faqTitle}>Check our FAQ</Text>
-              <Text style={styles.faqSubtitle}>Find quick answers to common questions</Text>
+              <Text style={styles.faqTitle}>{t('contact.checkFaq')}</Text>
+              <Text style={styles.faqSubtitle}>{t('contact.faqSubtitle')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
           </TouchableOpacity>

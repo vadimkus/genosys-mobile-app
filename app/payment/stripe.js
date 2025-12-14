@@ -6,7 +6,9 @@ import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
-import { fetchUserOrders } from '../../services/api';
+import { fetchUserOrderById, fetchUserOrders } from '../../services/api';
+import AUTH_CONFIG from '../../config/auth';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 const isPaidLike = (order) => {
   const s = String(order?.status || '').toLowerCase();
@@ -14,10 +16,19 @@ const isPaidLike = (order) => {
   return s === 'paid' || s === 'confirmed' || ps === 'paid' || ps === 'confirmed';
 };
 
+const extractStripeSessionIdFromUrl = (url) => {
+  const u = String(url || '');
+  // Stripe Checkout "session.url" commonly looks like:
+  // https://checkout.stripe.com/c/pay/cs_test_...
+  const m = u.match(/\/c\/pay\/(cs_[A-Za-z0-9_]+)/);
+  return m?.[1] || '';
+};
+
 export default function StripePaymentScreen() {
   const { user } = useAuth();
   const { clearCart } = useCart();
   const token = user?.token || user?.accessToken || '';
+  const { t } = useLocalization();
 
   const params = useLocalSearchParams();
   const paymentUrl = String(params.paymentUrl || '');
@@ -36,11 +47,20 @@ export default function StripePaymentScreen() {
     if (!canCheck) return;
     setChecking(true);
     try {
-      const list = await fetchUserOrders(token, orderId ? { orderId } : { page: 1, limit: 50 });
-      const orders = Array.isArray(list) ? list : [];
-      const match = orderId
-        ? orders.find((o) => String(o?.id || o?.orderId || '') === orderId) || orders[0]
-        : orders.find((o) => String(o?.orderNumber || o?.order_number || o?.number || '') === orderNumber);
+      // Prefer canonical detail endpoint (it returns a single order object).
+      let match = null;
+      if (orderId) {
+        try {
+          match = await fetchUserOrderById(token, orderId);
+        } catch {
+          match = null;
+        }
+      }
+      if (!match && orderNumber) {
+        const list = await fetchUserOrders(token, { page: 1, limit: 50 });
+        const orders = Array.isArray(list) ? list : [];
+        match = orders.find((o) => String(o?.orderNumber || o?.order_number || o?.number || '') === orderNumber) || null;
+      }
 
       if (!match) {
         setStatusText('Could not find the order yet. Please try again in a few seconds.');
@@ -48,8 +68,33 @@ export default function StripePaymentScreen() {
         return;
       }
 
-      const label = String(match?.status || match?.paymentStatus || match?.payment_status || 'PENDING');
-      setStatusText(`Current status: ${label}`);
+      // If not paid yet, optionally trigger a server-side Stripe session refresh.
+      // This helps when Stripe webhook is delayed.
+      if (!isPaidLike(match)) {
+        const sessionId = extractStripeSessionIdFromUrl(paymentUrl);
+        if (sessionId) {
+          try {
+            const apiRoot = String(AUTH_CONFIG.API_BASE_URL || '').replace(/\/mobile\/?$/, '');
+            const statusUrl = `${apiRoot}/stripe/payment-status?session_id=${encodeURIComponent(sessionId)}`;
+            await fetch(statusUrl, { method: 'GET' }).catch(() => null);
+          } catch {
+            // ignore
+          }
+          // Re-fetch after refresh attempt
+          if (orderId) {
+            try {
+              match = await fetchUserOrderById(token, orderId);
+            } catch {
+              // ignore
+            }
+          }
+        }
+      }
+
+      const s = String(match?.status || '');
+      const ps = String(match?.paymentStatus || match?.payment_status || '');
+      const label = ps || s || 'PENDING';
+      setStatusText(t('payment.currentStatus', { status: label }));
 
       if (isPaidLike(match)) {
         setPaid(true);
@@ -57,7 +102,7 @@ export default function StripePaymentScreen() {
         setPaid(false);
       }
     } catch (e) {
-      setStatusText(e?.message || 'Failed to check payment status.');
+      setStatusText(e?.message || t('payment.checkStatusFailed'));
       setPaid(false);
     } finally {
       setChecking(false);
@@ -66,7 +111,7 @@ export default function StripePaymentScreen() {
 
   const openPayment = useCallback(async () => {
     if (!paymentUrl) {
-      Alert.alert('Payment link missing', 'We could not open the payment link. Please try again.');
+      Alert.alert(t('payment.paymentLinkMissingTitle'), t('payment.paymentLinkMissingMessage'));
       return;
     }
     setOpening(true);
@@ -83,7 +128,7 @@ export default function StripePaymentScreen() {
       }
     } catch (e) {
       console.warn('Failed to open Stripe payment link:', e);
-      Alert.alert('Could not open payment', 'Please try again.');
+      Alert.alert(t('payment.couldNotOpenPaymentTitle'), t('payment.pleaseTryAgain'));
     } finally {
       setOpening(false);
     }
@@ -99,11 +144,11 @@ export default function StripePaymentScreen() {
   useEffect(() => {
     if (!paid) return;
     Alert.alert(
-      'Payment received',
-      `Your payment was successful${orderNumber ? ` for order ${orderNumber}` : ''}.`,
+      t('payment.paymentReceivedTitle'),
+      orderNumber ? t('payment.paymentSuccessMessageWithOrder', { orderNumber }) : t('payment.paymentSuccessMessage'),
       [
         {
-          text: fromOrders ? 'Back to Orders' : 'Continue Shopping',
+          text: fromOrders ? t('payment.backToOrders') : t('common.continueShopping'),
           onPress: () => {
             if (!fromOrders) {
               clearCart();
@@ -116,7 +161,7 @@ export default function StripePaymentScreen() {
         ...(fromOrders
           ? [
               {
-                text: 'Continue Shopping',
+                text: t('common.continueShopping'),
                 onPress: () => router.replace('/(tabs)/shop'),
               },
             ]
@@ -142,9 +187,9 @@ export default function StripePaymentScreen() {
 
       <View style={styles.content}>
         <View style={styles.card}>
-          <Text style={styles.title}>Stripe Payment</Text>
+          <Text style={styles.title}>{t('payment.stripeTitle')}</Text>
           <Text style={styles.subtitle}>
-            Complete your payment in the secure window. When you return, tap “Check payment status”.
+            {t('payment.completeInWindow')}
           </Text>
 
           {statusText ? <Text style={styles.status}>{statusText}</Text> : null}
@@ -156,7 +201,7 @@ export default function StripePaymentScreen() {
             activeOpacity={0.85}
           >
             {opening ? <ActivityIndicator color="#fff" /> : <Ionicons name="open-outline" size={18} color="#fff" />}
-            <Text style={styles.primaryButtonText}>{opening ? 'Opening…' : 'Open Stripe Payment'}</Text>
+            <Text style={styles.primaryButtonText}>{opening ? t('common.opening') : t('payment.openStripePayment')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -166,7 +211,7 @@ export default function StripePaymentScreen() {
             activeOpacity={0.85}
           >
             {checking ? <ActivityIndicator color="#E74C3C" /> : <Ionicons name="refresh" size={18} color="#E74C3C" />}
-            <Text style={styles.secondaryButtonText}>{checking ? 'Checking…' : 'Check payment status'}</Text>
+            <Text style={styles.secondaryButtonText}>{checking ? t('payment.checking') : t('payment.checkPaymentStatus')}</Text>
           </TouchableOpacity>
 
           <Text style={styles.note}>
@@ -179,7 +224,7 @@ export default function StripePaymentScreen() {
           onPress={() => router.replace('/profile/orders')}
           activeOpacity={0.85}
         >
-          <Text style={styles.linkText}>{fromOrders ? 'Back to Orders' : 'View Orders'}</Text>
+          <Text style={styles.linkText}>{fromOrders ? t('payment.backToOrders') : t('payment.viewOrders')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
