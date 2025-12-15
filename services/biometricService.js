@@ -10,6 +10,11 @@ import { Alert } from 'react-native';
 const BIOMETRIC_CREDENTIALS_KEY = 'biometric_credentials';
 const BIOMETRIC_ENABLED_KEY = 'biometric_enabled';
 
+// Stored payload versions:
+// - v1: { email, password } (legacy)
+// - v2: { email, token } (preferred; avoids breaking Face ID after password changes)
+const BIOMETRIC_PAYLOAD_VERSION = 2;
+
 /**
  * Check if biometric authentication is available on device
  * @returns {Promise<Object>} Availability info
@@ -79,8 +84,20 @@ export const isBiometricEnabled = async () => {
  * @param {string} password - User password
  * @returns {Promise<Object>} Success result
  */
-export const enableBiometricAuth = async (email, password) => {
+export const enableBiometricAuth = async (emailOrPayload, password) => {
   try {
+    const payload =
+      emailOrPayload && typeof emailOrPayload === 'object'
+        ? emailOrPayload
+        : { email: emailOrPayload, password };
+    const email = String(payload?.email || '').trim();
+    const token = payload?.token ? String(payload.token) : '';
+    const pwd = payload?.password ? String(payload.password) : '';
+
+    if (!email) {
+      return { success: false, error: 'Email is required to enable biometric authentication' };
+    }
+
     const support = await checkBiometricSupport();
     
     if (!support.isAvailable) {
@@ -106,8 +123,12 @@ export const enableBiometricAuth = async (email, password) => {
     });
 
     if (authResult.success) {
-      // Store credentials securely
-      const credentials = JSON.stringify({ email, password });
+      // Store payload securely (prefer token to avoid password drift).
+      const credentials = JSON.stringify(
+        token
+          ? { v: BIOMETRIC_PAYLOAD_VERSION, email, token }
+          : { v: 1, email, password: pwd }
+      );
       await SecureStore.setItemAsync(BIOMETRIC_CREDENTIALS_KEY, credentials);
       await SecureStore.setItemAsync(BIOMETRIC_ENABLED_KEY, 'true');
       
@@ -368,7 +389,10 @@ export const setupBiometricAuth = async (email, password) => {
           {
             text: 'Enable',
             onPress: async () => {
-              const result = await enableBiometricAuth(email, password);
+              // Prefer storing token-based auth if provided via object payload.
+              const result = await enableBiometricAuth(
+                email && typeof email === 'object' ? email : { email, password }
+              );
               if (result.success) {
                 Alert.alert(
                   'Success!',

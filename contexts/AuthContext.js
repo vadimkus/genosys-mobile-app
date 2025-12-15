@@ -175,7 +175,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      const result = await apiLoginWithEmail(email, password);
+      const result = await apiLoginWithEmail(String(email || '').trim(), password);
       
       if (result.success) {
         await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));
@@ -185,7 +185,7 @@ export const AuthProvider = ({ children }) => {
         if (biometricAvailable && !biometricEnabled) {
           // Don't await this - let it run in background
           setTimeout(() => {
-            setupBiometricAfterLogin(email, password);
+            setupBiometricAfterLogin(email, password, result.user?.token);
           }, 1000); // Wait 1 second after login
         }
         
@@ -205,7 +205,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      const result = await apiRegisterUser(name, email, password);
+      const result = await apiRegisterUser(name, String(email || '').trim(), password);
       
       if (result.success) {
         await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));
@@ -229,16 +229,49 @@ export const AuthProvider = ({ children }) => {
       const result = await authenticateWithBiometrics();
       
       if (result.success) {
-        // Use stored credentials to login with backend
-        const loginResult = await apiLoginWithEmail(result.credentials.email, result.credentials.password);
-        
-        if (loginResult.success) {
-          await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(loginResult.user));
-          setUser(loginResult.user);
-          return { success: true };
-        } else {
-          return { success: false, error: loginResult.error };
+        const creds = result.credentials || {};
+
+        // Preferred: token-based biometric unlock (survives password changes)
+        if (creds.token) {
+          const token = String(creds.token);
+          const validation = await apiValidateSession(token);
+          if (validation.success) {
+            const userWithToken = { ...validation.user, token };
+            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(userWithToken));
+            setUser(userWithToken);
+            return { success: true };
+          }
+
+          // Token expired/invalid: require manual login + re-enroll biometrics
+          await disableBiometricAuth();
+          setBiometricEnabled(false);
+          return {
+            success: false,
+            error: 'Session expired. Please sign in with password and enable Face ID again.',
+          };
         }
+
+        // Legacy: email/password stored (may fail if password changed)
+        if (creds.email && creds.password) {
+          const loginResult = await apiLoginWithEmail(creds.email, creds.password);
+          if (loginResult.success) {
+            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(loginResult.user));
+            setUser(loginResult.user);
+            return { success: true };
+          }
+
+          // Disable biometrics to avoid repeated failure loops
+          await disableBiometricAuth();
+          setBiometricEnabled(false);
+          return {
+            success: false,
+            error: 'Face ID needs to be re-enabled. Please sign in with password and enable Face ID again.',
+          };
+        }
+
+        await disableBiometricAuth();
+        setBiometricEnabled(false);
+        return { success: false, error: 'Biometric login is not configured. Please sign in and enable Face ID.' };
       } else {
         return { success: false, error: result.error };
       }
@@ -276,11 +309,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const setupBiometricAfterLogin = async (email, password) => {
+  const setupBiometricAfterLogin = async (email, password, token) => {
     try {
       // Only offer setup if biometrics are available but not enabled
       if (biometricAvailable && !biometricEnabled) {
-        const result = await setupBiometricAuth(email, password);
+        // Prefer token-based storage; keep password only as a legacy fallback.
+        const payload = token ? { email, token } : { email, password };
+        const result = await setupBiometricAuth(payload, password);
         if (result.success) {
           setBiometricEnabled(true);
         }

@@ -15,7 +15,8 @@ const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
  */
 export const loginWithEmail = async (email, password) => {
   try {
-    console.log('🔐 Logging in with email:', email);
+    const normalizedEmail = String(email || '').trim();
+    console.log('🔐 Logging in with email:', normalizedEmail);
     
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -24,7 +25,7 @@ export const loginWithEmail = async (email, password) => {
         'x-api-key': API_KEY,
       },
       body: JSON.stringify({ 
-        email, 
+        email: normalizedEmail, 
         password
       }),
     });
@@ -43,11 +44,17 @@ export const loginWithEmail = async (email, password) => {
         }
       };
     } else {
-      const error = await response.json();
-      console.log('❌ Login failed:', error);
+      const errorText = await response.text();
+      let errorJson = null;
+      try { errorJson = errorText ? JSON.parse(errorText) : null; } catch {}
+      const message =
+        (errorJson && (errorJson.error || errorJson.message)) ||
+        (errorText && errorText.slice(0, 200)) ||
+        'Login failed';
+      console.log('❌ Login failed:', { status: response.status, message });
       return { 
         success: false, 
-        error: error.error || 'Invalid credentials' 
+        error: message
       };
     }
   } catch (error) {
