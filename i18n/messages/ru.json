@@ -546,7 +546,15 @@
     "keepEditing": "Продолжить редактирование",
     "discard": "Сбросить",
     "updateFailed": "Не удалось обновить профиль. Попробуйте ещё раз.",
-    "genericError": "Что-то пошло не так. Попробуйте ещё раз."
+    "genericError": "Что-то пошло не так. Попробуйте ещё раз.",
+    "dangerZoneTitle": "Опасная зона",
+    "deleteAccountButton": "Удалить аккаунт",
+    "deleteAccountTitle": "Удалить аккаунт?",
+    "deleteAccountMessage": "Аккаунт будет удалён из приложения. Вы можете потерять доступ к истории и сохранённым данным. Это действие нельзя отменить.",
+    "deleteAccountConfirm": "Удалить",
+    "deleteAccountSuccessTitle": "Аккаунт удалён",
+    "deleteAccountSuccessMessage": "Ваш аккаунт успешно удалён.",
+    "deleteAccountFailed": "Не удалось удалить аккаунт. Попробуйте ещё раз."
   },
   "addAddress": {
     "addTitle": "Добавить адрес",
@@ -765,6 +773,7 @@
     "privacyNotice": "Чтобы продолжить, примите Политику конфиденциальности ниже.",
     "loginWithBiometrics": "Войти с помощью {biometricType}",
     "continueWithGoogle": "Продолжить с Google",
+    "continueWithApple": "Продолжить с Apple",
     "or": "или",
     "fullNameLabel": "Полное имя",
     "forgotPassword": "Забыли пароль?",
@@ -791,6 +800,8 @@
     "privacyRequiredTitle": "Требуется согласие",
     "privacyRequiredMessage": "Пожалуйста, прочитайте и примите Политику конфиденциальности, чтобы продолжить.",
     "googleAuthFailed": "Не удалось войти через Google. Используйте вход по email и паролю.",
+    "appleAuthFailed": "Не удалось войти через Apple. Попробуйте ещё раз.",
+    "appleNoToken": "Не удалось запустить Apple Sign‑In. Попробуйте ещё раз.",
     "authFailedTitle": "Ошибка аутентификации",
     "biometricLoginFailed": "Не удалось войти по биометрии",
     "biometricAuthFailed": "Биометрическая аутентификация не удалась. Попробуйте ещё раз.",

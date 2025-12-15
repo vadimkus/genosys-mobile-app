@@ -175,6 +175,58 @@ export const processGoogleAuth = async (idToken) => {
 };
 
 /**
+ * Apple Sign-In (iOS)
+ * POST /api/mobile/auth/apple
+ * @param {string} identityToken - Apple identity token (JWT)
+ * @param {{ fullName?: string }} meta
+ */
+export const processAppleAuth = async (identityToken, meta = {}) => {
+  try {
+    log.debug('Processing Apple Sign-In');
+
+    const response = await fetch(`${API_BASE_URL}/auth/apple`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+      },
+      body: JSON.stringify({
+        identityToken,
+        fullName: meta?.fullName || '',
+      }),
+    });
+
+    log.debug('Apple auth response status', { status: response.status });
+
+    if (response.ok) {
+      const result = await response.json();
+      log.debug('Apple authentication successful');
+      return {
+        success: true,
+        user: {
+          ...result.user,
+          authType: 'apple',
+          token: result.token,
+        },
+      };
+    } else {
+      const errorText = await response.text().catch(() => '');
+      let errorJson = null;
+      try { errorJson = errorText ? JSON.parse(errorText) : null; } catch {}
+      const message =
+        (errorJson && (errorJson.error || errorJson.message)) ||
+        (errorText && errorText.slice(0, 200)) ||
+        'Apple authentication failed';
+      log.warn('Apple auth failed', { status: response.status, message });
+      return { success: false, error: message };
+    }
+  } catch (error) {
+    log.error('Apple auth error', error?.message || error);
+    return { success: false, error: 'Network error. Please check your connection and try again.' };
+  }
+};
+
+/**
  * Validate user session with server
  * @param {string} token - User auth token
  * @returns {Promise<Object>} Validation result
@@ -362,11 +414,49 @@ export const logoutUser = async (token) => {
   }
 };
 
+/**
+ * Delete / anonymize user account
+ * DELETE /api/mobile/user/account
+ * @param {string} token
+ */
+export const deleteUserAccount = async (token) => {
+  try {
+    log.debug('Deleting user account');
+
+    const response = await fetch(`${API_BASE_URL}/user/account`, {
+      method: 'DELETE',
+      headers: {
+        'x-api-key': API_KEY,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      return { success: true };
+    }
+
+    const errorText = await response.text().catch(() => '');
+    let errorJson = null;
+    try { errorJson = errorText ? JSON.parse(errorText) : null; } catch {}
+    const message =
+      (errorJson && (errorJson.error || errorJson.message)) ||
+      (errorText && errorText.slice(0, 200)) ||
+      'Could not delete account';
+    log.warn('Delete account failed', { status: response.status, message });
+    return { success: false, error: message };
+  } catch (error) {
+    log.error('Delete account error', error?.message || error);
+    return { success: false, error: 'Network error. Please try again.' };
+  }
+};
+
 export default {
   loginWithEmail,
   registerUser,
   processGoogleAuth,
+  processAppleAuth,
   validateSession,
   updateUserProfile,
   logoutUser,
+  deleteUserAccount,
 };

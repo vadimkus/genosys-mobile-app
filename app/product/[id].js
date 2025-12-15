@@ -40,6 +40,7 @@ import {
   getObjectField,
   deriveDiscountFromBadges,
 } from '../../utils/productDetailUtils';
+import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
@@ -585,7 +586,13 @@ export default function ProductDetailScreen() {
         {/* Product Info */}
         <View style={styles.contentContainer}>
           <View style={styles.productInfo}>
-            <Text style={styles.category}>{asText(product.category)}</Text>
+            <Text style={styles.category}>
+              {(() => {
+                const canon = normalizeCategoryCanonical(product.category) || asText(product.category);
+                const key = getCategoryTranslationKey(canon);
+                return key ? t(key) : canon;
+              })()}
+            </Text>
             <Text style={styles.productName}>{asText(getLocalizedProductName(product, locale) || product.name)}</Text>
             
             {/* Enhanced Size and Stock Info from Server */}

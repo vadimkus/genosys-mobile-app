@@ -21,6 +21,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 const log = createLogger('Login');
 
@@ -39,6 +40,7 @@ export default function LoginScreen() {
   
   const { 
     loginWithGoogle, 
+    loginWithApple,
     loginWithEmail, 
     loginWithBiometrics,
     register,
@@ -76,6 +78,43 @@ export default function LoginScreen() {
       }
     } catch (error) {
       Alert.alert(t('common.error'), t('authScreen.googleAuthFailed'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    if (!privacyConsent) {
+      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
+      return;
+    }
+    try {
+      setLoading(true);
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      const identityToken = credential?.identityToken;
+      const fullName = credential?.fullName
+        ? [credential.fullName.givenName, credential.fullName.familyName].filter(Boolean).join(' ').trim()
+        : '';
+
+      if (!identityToken) {
+        Alert.alert(t('authScreen.authFailedTitle'), t('authScreen.appleNoToken'));
+        return;
+      }
+
+      const result = await loginWithApple({ identityToken, fullName });
+      if (!result.success) {
+        Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.appleAuthFailed'));
+      }
+    } catch (error) {
+      // User cancelled is common; don't show scary error.
+      if (error && String(error?.code || '').toLowerCase().includes('canceled')) return;
+      Alert.alert(t('common.error'), t('authScreen.appleAuthFailed'));
     } finally {
       setLoading(false);
     }
@@ -242,6 +281,21 @@ export default function LoginScreen() {
               <Text style={styles.googleButtonText}>{t('authScreen.continueWithGoogle')}</Text>
             </View>
           </TouchableOpacity>
+
+          {/* Apple Login Button (iOS only) */}
+          {Platform.OS === 'ios' && (
+            <TouchableOpacity
+              style={[styles.appleButton, !privacyConsent && styles.appleButtonDisabled]}
+              onPress={handleAppleLogin}
+              disabled={loading || !privacyConsent}
+              activeOpacity={0.8}
+            >
+              <View style={styles.appleButtonContent}>
+                <Ionicons name="logo-apple" size={18} color="#ffffff" style={{ marginRight: 10 }} />
+                <Text style={styles.appleButtonText}>{t('authScreen.continueWithApple')}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
 
           {/* Divider */}
           <View style={styles.divider}>
@@ -474,6 +528,31 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
   },
   googleButtonDisabled: {
+    opacity: 0.5,
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  appleButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  appleButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  appleButtonDisabled: {
     opacity: 0.5,
   },
   biometricButton: {

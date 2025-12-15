@@ -546,7 +546,15 @@
     "keepEditing": "Keep Editing",
     "discard": "Discard",
     "updateFailed": "Failed to update profile. Please try again.",
-    "genericError": "Something went wrong. Please try again."
+    "genericError": "Something went wrong. Please try again.",
+    "dangerZoneTitle": "Danger Zone",
+    "deleteAccountButton": "Delete account",
+    "deleteAccountTitle": "Delete account?",
+    "deleteAccountMessage": "This will delete your account from the app. You may lose access to your account history and saved data. This action cannot be undone.",
+    "deleteAccountConfirm": "Delete",
+    "deleteAccountSuccessTitle": "Account deleted",
+    "deleteAccountSuccessMessage": "Your account has been deleted successfully.",
+    "deleteAccountFailed": "Could not delete your account. Please try again."
   },
   "addAddress": {
     "addTitle": "Add Address",
@@ -782,6 +790,7 @@
     "privacyNotice": "To continue, please accept our Privacy Policy below.",
     "loginWithBiometrics": "Login with {biometricType}",
     "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
     "or": "or",
     "fullNameLabel": "Full Name",
     "forgotPassword": "Forgot Password?",
@@ -808,6 +817,8 @@
     "privacyRequiredTitle": "Privacy Policy Required",
     "privacyRequiredMessage": "Please read and accept our Privacy Policy to continue.",
     "googleAuthFailed": "Google authentication failed. Please use email & password login.",
+    "appleAuthFailed": "Apple authentication failed. Please try again.",
+    "appleNoToken": "Could not start Apple Sign-In. Please try again.",
     "authFailedTitle": "Authentication Failed",
     "biometricLoginFailed": "Biometric login failed",
     "biometricAuthFailed": "Biometric authentication failed. Please try again.",

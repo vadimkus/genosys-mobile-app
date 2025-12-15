@@ -17,7 +17,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
 import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { getLocalizedProductName, getCategoryTranslationKey } from '../../utils/productLocalization';
+import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import AUTH_CONFIG from '../../config/auth';
 
 export default function BagScreen() {
@@ -207,9 +207,11 @@ export default function BagScreen() {
               </Text>
             </TouchableOpacity>
             <Text style={styles.itemCategory}>
-              {getCategoryTranslationKey(item.product.category)
-                ? t(getCategoryTranslationKey(item.product.category))
-                : item.product.category}
+              {(() => {
+                const canon = normalizeCategoryCanonical(item.product.category) || item.product.category;
+                const key = getCategoryTranslationKey(canon);
+                return key ? t(key) : canon;
+              })()}
             </Text>
 
             {/* Variants Display */}

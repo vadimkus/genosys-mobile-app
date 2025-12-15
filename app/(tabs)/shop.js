@@ -21,7 +21,13 @@ import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice, isBeautyBoxProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { getLocalizedProductName, getLocalizedProductDescription, getCategoryTranslationKey } from '../../utils/productLocalization';
+import {
+  getLocalizedProductName,
+  getLocalizedProductDescription,
+  getCategoryTranslationKey,
+  normalizeCategoryCanonical,
+  getCategoryTagsForProduct,
+} from '../../utils/productLocalization';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 
@@ -61,57 +67,6 @@ const RU_CATEGORY_PRIORITY_ORDER = [
   'Cream',
   'Mask',
 ];
-
-// Map incoming category strings to the allowed display categories
-const CATEGORY_MAP = {
-  'microneedling': 'Microneedling',
-  'pro solution': 'PRO Solution',
-  'cleanser': 'Cleanser',
-  'peeling': 'Peeling',
-  'toner/mist': 'Toner/Mist',
-  'toner / mist': 'Toner/Mist',
-  'serum': 'Serum',
-  'cream': 'Cream',
-  'mask': 'Mask',
-  'sun': 'Sun',
-  'cushion bb': 'Cushion BB',
-  'cushion bb, sun': 'Cushion BB',
-  'cushion bb, sun, cream': 'Cushion BB',
-  'scalp/hair': 'Scalp/Hair',
-  'eye care': 'Eye Care',
-  'device': 'Device',
-  'holiday kits': 'Holiday Kits',
-  'kits': 'Holiday Kits',
-  'beauty boxes': 'Beauty Boxes',
-};
-
-const normalizeCategory = (cat) => {
-  if (!cat) return null;
-  const key = cat.trim().toLowerCase();
-  return CATEGORY_MAP[key] || null;
-};
-
-// Some products should appear in multiple category tabs (UX expectation).
-// Example: Cushion BB + Blemish Balm should also be shown under "Sun".
-const getCategoryTagsForProduct = (product) => {
-  const tags = new Set();
-  const normalized = normalizeCategory(product?.category);
-  if (normalized) tags.add(normalized);
-
-  const rawCat = String(product?.category || '').toLowerCase();
-  const name = String(product?.name || '').toLowerCase();
-
-  // If backend category explicitly includes "sun" (e.g. "Cushion BB, Sun") treat as Sun too.
-  if (rawCat.includes('sun')) tags.add('Sun');
-
-  // Cushion BB products should also be part of Sun.
-  if (normalized === 'Cushion BB') tags.add('Sun');
-
-  // Blemish Balm should also be part of Sun even if categorized differently.
-  if (name.includes('blemish balm')) tags.add('Sun');
-
-  return Array.from(tags);
-};
 
 const buildAllowedCategoryList = (foundCategories = []) => {
   const seen = new Set();
@@ -194,7 +149,7 @@ export default function ShopScreen() {
         const normalized = [];
         const seen = new Set();
         allCategories.forEach((cat) => {
-          const mapped = normalizeCategory(cat);
+          const mapped = normalizeCategoryCanonical(cat);
           if (mapped && !seen.has(mapped)) {
             seen.add(mapped);
             normalized.push(mapped);

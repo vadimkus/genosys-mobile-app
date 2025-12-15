@@ -5,18 +5,34 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.genosys.mobile",
+      "buildNumber": "1",
+      "icon": "./assets/icon.png",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account."
+        "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account.",
+        "NSCameraUsageDescription": "Genosys uses the camera to take a profile photo.",
+        "NSPhotoLibraryUsageDescription": "Genosys uses your photo library to let you choose a profile photo.",
+        "NSPhotoLibraryAddUsageDescription": "Genosys can save your profile photo to your photo library."
       }
     },
     "android": {
-      "package": "com.genosys.mobile"
+      "package": "com.genosys.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      }
     },
     "plugins": [
       "expo-router",
@@ -27,6 +43,10 @@
       "typedRoutes": true
     },
     "scheme": "genosys",
+    "extra": {
+      "supportUrl": "https://genosys.ae",
+      "privacyPolicyUrl": "https://genosys.ae/privacy-policy"
+    },
     "sdkVersion": "54.0.0"
   }
 }

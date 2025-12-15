@@ -72,7 +72,7 @@ export default function CheckoutScreen() {
   
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderNumber] = useState(() => generateOrderNumber());
+  const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
 
@@ -325,6 +325,7 @@ export default function CheckoutScreen() {
       }
 
       if (result.success) {
+        const finalOrderNumber = String(result.orderNumber || orderNumber);
         log.debug('Checkout step success', { success: true, hasPaymentUrl: !!result.paymentUrl });
 
         // COD: submit immediately (no payment step)
@@ -332,7 +333,7 @@ export default function CheckoutScreen() {
           clearCart();
           Alert.alert(
             t('checkout.orderSubmittedTitle'),
-            t('checkout.orderSubmittedMessageCOD', { orderNumber }),
+            t('checkout.orderSubmittedMessageCOD', { orderNumber: finalOrderNumber }),
             [{ text: t('checkout.continueShopping'), onPress: () => router.replace('/(tabs)/shop') }]
           );
           return;
@@ -351,7 +352,7 @@ export default function CheckoutScreen() {
           pathname: '/payment/stripe',
           params: {
             orderId: String(result.orderId || ''),
-            orderNumber: String(orderNumber),
+            orderNumber: String(finalOrderNumber),
             paymentUrl: String(result.paymentUrl),
           },
         });

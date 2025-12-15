@@ -546,7 +546,15 @@
     "keepEditing": "متابعة التعديل",
     "discard": "تجاهل",
     "updateFailed": "تعذر تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
-    "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "dangerZoneTitle": "منطقة حساسة",
+    "deleteAccountButton": "حذف الحساب",
+    "deleteAccountTitle": "حذف الحساب؟",
+    "deleteAccountMessage": "سيتم حذف حسابك من التطبيق. قد تفقد الوصول إلى السجل والبيانات المحفوظة. لا يمكن التراجع عن هذا الإجراء.",
+    "deleteAccountConfirm": "حذف",
+    "deleteAccountSuccessTitle": "تم حذف الحساب",
+    "deleteAccountSuccessMessage": "تم حذف حسابك بنجاح.",
+    "deleteAccountFailed": "تعذر حذف الحساب. يرجى المحاولة مرة أخرى."
   },
   "addAddress": {
     "addTitle": "إضافة عنوان",
@@ -765,6 +773,7 @@
     "privacyNotice": "للمتابعة، يرجى الموافقة على سياسة الخصوصية أدناه.",
     "loginWithBiometrics": "تسجيل الدخول باستخدام {biometricType}",
     "continueWithGoogle": "المتابعة مع Google",
+    "continueWithApple": "المتابعة مع Apple",
     "or": "أو",
     "fullNameLabel": "الاسم الكامل",
     "forgotPassword": "هل نسيت كلمة المرور؟",
@@ -791,6 +800,8 @@
     "privacyRequiredTitle": "سياسة الخصوصية مطلوبة",
     "privacyRequiredMessage": "يرجى قراءة سياسة الخصوصية والموافقة عليها للمتابعة.",
     "googleAuthFailed": "فشل تسجيل الدخول عبر Google. يرجى استخدام تسجيل الدخول عبر البريد وكلمة المرور.",
+    "appleAuthFailed": "فشل تسجيل الدخول عبر Apple. يرجى المحاولة مرة أخرى.",
+    "appleNoToken": "تعذر بدء Apple Sign‑In. يرجى المحاولة مرة أخرى.",
     "authFailedTitle": "فشل التحقق",
     "biometricLoginFailed": "فشل تسجيل الدخول بالبصمة",
     "biometricAuthFailed": "فشلت المصادقة البيومترية. يرجى المحاولة مرة أخرى.",

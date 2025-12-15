@@ -190,16 +190,27 @@ export async function submitCODOrder(orderData) {
     }
 
     const result = await response.json();
+    const orderNumberFromApi =
+      result?.orderNumber ||
+      result?.data?.orderNumber ||
+      result?.data?.order?.orderNumber ||
+      '';
+    const orderIdFromApi =
+      result?.orderId ||
+      result?.id ||
+      result?.data?.id ||
+      result?.data?.orderId ||
+      '';
     log.debug('COD order submitted successfully', {
       success: result.success,
-      orderNumber: result.orderNumber || orderData.orderNumber,
-      orderId: result.orderId || result.id
+      orderNumber: orderNumberFromApi || orderData.orderNumber,
+      orderId: orderIdFromApi
     });
 
     return {
       success: true,
-      orderId: result.orderId || result.id,
-      orderNumber: result.orderNumber || orderData.orderNumber,
+      orderId: orderIdFromApi,
+      orderNumber: orderNumberFromApi || orderData.orderNumber,
       message: result.message || 'Order placed successfully'
     };
 

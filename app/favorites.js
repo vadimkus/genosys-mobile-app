@@ -17,7 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { getLocalizedProductName, getCategoryTranslationKey } from '../utils/productLocalization';
+import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import { createLogger } from '../utils/logger';
 import AUTH_CONFIG from '../config/auth';
 
@@ -246,7 +246,11 @@ export default function FavoritesScreen() {
                     {getLocalizedProductName(product, locale) || product.name}
                   </Text>
                   <Text style={styles.gridCategory}>
-                    {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+                    {(() => {
+                      const canon = normalizeCategoryCanonical(product.category) || product.category;
+                      const key = getCategoryTranslationKey(canon);
+                      return key ? t(key) : canon;
+                    })()}
                   </Text>
                   
                   {/* Pricing */}

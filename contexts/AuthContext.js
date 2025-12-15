@@ -5,9 +5,11 @@ import {
   loginWithEmail as apiLoginWithEmail, 
   registerUser as apiRegisterUser,
   processGoogleAuth as apiProcessGoogleAuth,
+  processAppleAuth as apiProcessAppleAuth,
   validateSession as apiValidateSession,
   updateUserProfile as apiUpdateUserProfile,
-  logoutUser as apiLogoutUser
+  logoutUser as apiLogoutUser,
+  deleteUserAccount as apiDeleteUserAccount
 } from '../services/authService';
 import {
   updateUserProfile as dbUpdateUserProfile,
@@ -171,6 +173,24 @@ export const AuthProvider = ({ children }) => {
         success: false, 
         error: 'Google authentication failed. Please try email & password login.' 
       };
+    }
+  };
+
+  const loginWithApple = async ({ identityToken, fullName } = {}) => {
+    try {
+      setLoading(true);
+      const result = await apiProcessAppleAuth(identityToken, { fullName });
+      if (result.success) {
+        await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));
+        setUser(result.user);
+        return { success: true };
+      }
+      return { success: false, error: result.error };
+    } catch (error) {
+      log.error('Apple login error', error?.message || error);
+      return { success: false, error: 'Apple authentication failed. Please try again.' };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -357,6 +377,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      if (!user?.token) return { success: false, error: 'Unauthorized' };
+      setLoading(true);
+      const result = await apiDeleteUserAccount(user.token);
+      // Always log out locally after successful delete.
+      if (result.success) {
+        await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+        setUser(null);
+      }
+      return result;
+    } catch (error) {
+      log.error('Delete account error', error?.message || error);
+      return { success: false, error: 'Could not delete account' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const debugBiometric = async () => {
     const debug = await debugBiometricStatus();
     log.debug('Biometric debug info', debug);
@@ -521,10 +560,12 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     loginWithGoogle,
+    loginWithApple,
     loginWithEmail,
     loginWithBiometrics,
     register,
     logout,
+    deleteAccount,
     isAuthenticated: !!user,
     // Biometric authentication
     biometricAvailable,

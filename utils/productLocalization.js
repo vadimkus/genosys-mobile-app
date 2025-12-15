@@ -18,6 +18,93 @@ const pickFirstNonEmpty = (...values) => {
   return '';
 };
 
+/**
+ * Categories coming from the backend are intended to be canonical English values, but in practice
+ * they can arrive with inconsistent casing and/or composite values like "Cushion BB, Sun".
+ *
+ * We centralize normalization here so all screens behave consistently (filtering, search labels, i18n).
+ */
+const CATEGORY_CANONICAL_BY_KEY = {
+  all: 'All',
+  microneedling: 'Microneedling',
+  'pro solution': 'PRO Solution',
+  cleanser: 'Cleanser',
+  peeling: 'Peeling',
+  'toner/mist': 'Toner/Mist',
+  'toner / mist': 'Toner/Mist',
+  serum: 'Serum',
+  cream: 'Cream',
+  mask: 'Mask',
+  sun: 'Sun',
+  'cushion bb': 'Cushion BB',
+  'scalp/hair': 'Scalp/Hair',
+  'scalp / hair': 'Scalp/Hair',
+  'eye care': 'Eye Care',
+  'eye zone': 'Eye Care',
+  device: 'Device',
+  devices: 'Device',
+  'holiday kits': 'Holiday Kits',
+  kits: 'Holiday Kits',
+  'beauty boxes': 'Beauty Boxes',
+  'beauty box': 'Beauty Boxes',
+};
+
+export const normalizeCategoryCanonical = (rawCategory) => {
+  if (!rawCategory) return null;
+  const key = String(rawCategory).trim().toLowerCase();
+  return CATEGORY_CANONICAL_BY_KEY[key] || null;
+};
+
+/**
+ * Parse a raw category value into canonical category tags.
+ * - Supports composite strings like "Cushion BB, Sun"
+ * - Dedupes and preserves canonical casing
+ */
+export const getCanonicalCategoryTagsFromRaw = (rawCategory) => {
+  if (!rawCategory) return [];
+  const raw = String(rawCategory);
+  const parts = raw
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const tags = new Set();
+  if (parts.length) {
+    parts.forEach((p) => {
+      const canon = normalizeCategoryCanonical(p);
+      if (canon) tags.add(canon);
+    });
+  } else {
+    const canon = normalizeCategoryCanonical(raw);
+    if (canon) tags.add(canon);
+  }
+  return Array.from(tags);
+};
+
+/**
+ * Some products should appear in multiple category tabs (UX expectation).
+ * Example: Cushion BB + Blemish Balm should also be shown under "Sun".
+ */
+export const getCategoryTagsForProduct = (product) => {
+  const tags = new Set();
+  const rawCat = String(product?.category || '');
+  getCanonicalCategoryTagsFromRaw(rawCat).forEach((t) => tags.add(t));
+
+  const rawCatLower = rawCat.toLowerCase();
+  const nameLower = String(product?.name || '').toLowerCase();
+
+  // If backend category explicitly includes "sun" (e.g. "Cushion BB, Sun") treat as Sun too.
+  if (rawCatLower.includes('sun')) tags.add('Sun');
+
+  // Cushion BB products should also be part of Sun.
+  if (tags.has('Cushion BB')) tags.add('Sun');
+
+  // Blemish Balm should also be part of Sun even if categorized differently.
+  if (nameLower.includes('blemish balm')) tags.add('Sun');
+
+  return Array.from(tags);
+};
+
 export const getLocalizedProductName = (product, locale) => {
   const l = normLocale(locale);
   if (!product) return '';
@@ -85,7 +172,11 @@ export const getLocalizedProductDescription = (product, locale) => {
  * This helper returns a translation key for a given canonical category.
  */
 export const getCategoryTranslationKey = (category) => {
-  const c = String(category || '').trim();
+  const c =
+    normalizeCategoryCanonical(category) ||
+    // Fallback for composite categories: use first canonical tag, if any
+    getCanonicalCategoryTagsFromRaw(category)?.[0] ||
+    String(category || '').trim();
   switch (c) {
     case 'All':
       return 'categories.all';

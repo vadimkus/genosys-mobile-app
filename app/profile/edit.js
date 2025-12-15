@@ -28,7 +28,7 @@ const log = createLogger('EditProfile');
 export default function EditProfileScreen() {
   const router = useRouter();
   const { t } = useLocalization();
-  const { user, updateProfile, isAuthenticated } = useAuth();
+  const { user, updateProfile, deleteAccount, isAuthenticated } = useAuth();
   
   // Check authentication immediately
   useEffect(() => {
@@ -275,6 +275,39 @@ export default function EditProfileScreen() {
     );
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t('editProfile.deleteAccountTitle'),
+      t('editProfile.deleteAccountMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('editProfile.deleteAccountConfirm'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsSaving(true);
+              const result = await deleteAccount();
+              if (result?.success) {
+                Alert.alert(
+                  t('editProfile.deleteAccountSuccessTitle'),
+                  t('editProfile.deleteAccountSuccessMessage'),
+                  [{ text: t('common.ok'), onPress: () => router.replace('/auth/login') }]
+                );
+              } else {
+                Alert.alert(t('common.error'), result?.error || t('editProfile.deleteAccountFailed'));
+              }
+            } catch (e) {
+              Alert.alert(t('common.error'), t('editProfile.deleteAccountFailed'));
+            } finally {
+              setIsSaving(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const FormSection = memo(({ title, children }) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -480,6 +513,20 @@ export default function EditProfileScreen() {
             </View>
           </View>
         </FormSection>
+
+        {/* Danger Zone */}
+        <View style={styles.dangerZone}>
+          <Text style={styles.dangerTitle}>{t('editProfile.dangerZoneTitle')}</Text>
+          <TouchableOpacity
+            style={[styles.deleteAccountButton, isSaving && styles.deleteAccountButtonDisabled]}
+            onPress={handleDeleteAccount}
+            disabled={isSaving}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="trash-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+            <Text style={styles.deleteAccountText}>{t('editProfile.deleteAccountButton')}</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Privacy Note */}
         <View style={styles.privacyNote}>
@@ -719,6 +766,37 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     lineHeight: 20,
     textAlign: 'center',
+  },
+
+  dangerZone: {
+    marginTop: 8,
+    marginHorizontal: 20,
+    paddingTop: 16,
+    borderTopWidth: 0.5,
+    borderTopColor: '#C6C6C8',
+  },
+  dangerTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#8E8E93',
+    marginBottom: 12,
+  },
+  deleteAccountButton: {
+    backgroundColor: '#E74C3C',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteAccountButtonDisabled: {
+    opacity: 0.6,
+  },
+  deleteAccountText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffff',
   },
 
   // Profile Picture Styles

@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { getLocalizedProductName, getCategoryTranslationKey } from '../utils/productLocalization';
+import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -144,7 +144,11 @@ export default function ProductGridItem({ product }) {
         {/* Badges removed from content area to avoid duplication - they show on image */}
         
         <Text style={styles.category} numberOfLines={1}>
-          {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+          {(() => {
+            const canon = normalizeCategoryCanonical(product.category) || product.category;
+            const key = getCategoryTranslationKey(canon);
+            return key ? t(key) : canon;
+          })()}
         </Text>
         
         {/* Enhanced Size Information from Server */}
