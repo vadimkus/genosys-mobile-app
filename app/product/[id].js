@@ -81,11 +81,12 @@ const getObjValueCaseInsensitive = (obj, keys) => {
   return '';
 };
 
+const log = createLogger('ProductDetail');
+
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
   const { t, locale, dir } = useLocalization();
-  const log = useMemo(() => createLogger('ProductDetail'), []);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
