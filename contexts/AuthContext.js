@@ -31,8 +31,10 @@ import {
 } from '../services/biometricService';
 import { loginWithGoogleDirect } from '../services/googleAuthService';
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
 
 const AuthContext = createContext({});
+const log = createLogger('Auth');
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -71,14 +73,14 @@ export const AuthProvider = ({ children }) => {
       setBiometricEnabled(enabled);
       setBiometricType(typeName);
       
-      console.log('🔐 Biometric Support:', {
+      log.debug('Biometric support', {
         available: support.isAvailable,
         enrolled: support.isEnrolled,
-        enabled: enabled,
-        type: typeName
+        enabled,
+        type: typeName,
       });
     } catch (error) {
-      console.error('Error checking biometric availability:', error);
+      log.error('Error checking biometric availability', error?.message || error);
     }
   };
 
@@ -89,7 +91,7 @@ export const AuthProvider = ({ children }) => {
       // First, check if biometric auth is enabled and try auto-login
       const biometricEnabled = await isBiometricEnabled();
       if (biometricEnabled) {
-        console.log('🔐 Attempting biometric auto-login...');
+        log.debug('Attempting biometric auto-login...');
         // Don't show biometric prompt on app start, just check for stored session
         // User can manually use biometric login from login screen
       }
@@ -101,28 +103,29 @@ export const AuthProvider = ({ children }) => {
         // Validate session with server if we have a token
         if (userData.token) {
           const validation = await apiValidateSession(userData.token);
-          if (validation.success) {
-            // IMPORTANT: Preserve the token when updating user data from server
-            const userWithToken = {
-              ...validation.user,
-              token: userData.token  // Keep the original token
-            };
-            setUser(userWithToken);
-            // Update stored data with token preserved
-            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(userWithToken));
-            // Update biometric availability in case user logged in successfully
+          if (validation.success && validation.valid) {
+            // If the endpoint is unavailable (or network issue), keep the stored user/token.
+            // If the server returned a fresh user, merge it but always preserve the token.
+            const mergedUser = validation.user
+              ? { ...validation.user, token: userData.token }
+              : userData;
+            setUser(mergedUser);
+            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(mergedUser));
             await checkBiometricAvailability();
-          } else {
+          } else if (validation.success && validation.valid === false) {
             // Session expired, clear stored data
             await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
             setUser(null);
+          } else {
+            // Validation failed for other reasons: keep stored session to avoid forced logout loops.
+            setUser(userData);
           }
         } else {
           setUser(userData);
         }
       }
     } catch (error) {
-      console.error('Error checking stored auth:', error);
+      log.error('Error checking stored auth', error?.message || error);
       await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY); // Clear corrupted data
     } finally {
       setLoading(false);
@@ -132,14 +135,14 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogle = async () => {
     try {
-      console.log('🔐 Starting direct Google OAuth (production setup)...');
+      log.debug('Starting direct Google OAuth...');
       
       // Use direct Google OAuth (bypasses Expo development proxy)
       // This will show "Genosys Middle East FZ-LLC" instead of "Expo"
       const result = await loginWithGoogleDirect();
       
       if (result.success) {
-        console.log('✅ Got Google ID token, authenticating with backend...');
+        log.debug('Got Google ID token; authenticating with backend...');
         
         // Process with your existing backend using ID token
         const authResult = await apiProcessGoogleAuth(result.idToken);
@@ -149,9 +152,9 @@ export const AuthProvider = ({ children }) => {
           setUser(authResult.user);
           
           if (authResult.isNewUser) {
-            console.log('✅ New Google user created successfully');
+            log.debug('New Google user created successfully');
           } else {
-            console.log('✅ Existing Google user logged in');
+            log.debug('Existing Google user logged in');
           }
           
           return { success: true };
@@ -162,7 +165,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: result.error };
       }
     } catch (error) {
-      console.error('❌ Google login error:', error);
+      log.error('Google login error', error?.message || error);
       
       return { 
         success: false, 
@@ -194,7 +197,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: result.error };
       }
     } catch (error) {
-      console.error('Email login error:', error);
+      log.error('Email login error', error?.message || error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
       setLoading(false);
@@ -215,7 +218,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: result.error };
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      log.error('Registration error', error?.message || error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
       setLoading(false);
@@ -235,8 +238,15 @@ export const AuthProvider = ({ children }) => {
         if (creds.token) {
           const token = String(creds.token);
           const validation = await apiValidateSession(token);
-          if (validation.success) {
-            const userWithToken = { ...validation.user, token };
+          if (validation.success && validation.valid) {
+            const baseUser = validation.user && typeof validation.user === 'object' ? validation.user : {};
+            const userWithToken = {
+              ...baseUser,
+              token,
+              // ensure we keep an email if biometric v2 stored it
+              email: baseUser.email || creds.email || baseUser.userEmail || '',
+              authType: baseUser.authType || 'biometric',
+            };
             await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(userWithToken));
             setUser(userWithToken);
             return { success: true };
@@ -276,7 +286,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: result.error };
       }
     } catch (error) {
-      console.error('Biometric login error:', error);
+      log.error('Biometric login error', error?.message || error);
       return { success: false, error: 'Biometric authentication failed' };
     } finally {
       setLoading(false);
@@ -291,7 +301,7 @@ export const AuthProvider = ({ children }) => {
       }
       return result;
     } catch (error) {
-      console.error('Enable biometric error:', error);
+      log.error('Enable biometric error', error?.message || error);
       return { success: false, error: 'Failed to enable biometric authentication' };
     }
   };
@@ -304,7 +314,7 @@ export const AuthProvider = ({ children }) => {
       }
       return result;
     } catch (error) {
-      console.error('Disable biometric error:', error);
+      log.error('Disable biometric error', error?.message || error);
       return { success: false, error: 'Failed to disable biometric authentication' };
     }
   };
@@ -323,7 +333,7 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, error: 'Biometric setup not available' };
     } catch (error) {
-      console.error('Biometric setup error:', error);
+      log.error('Biometric setup error', error?.message || error);
       return { success: false, error: 'Failed to setup biometric authentication' };
     }
   };
@@ -339,7 +349,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       return { success: true };
     } catch (error) {
-      console.error('Logout error:', error);
+      log.error('Logout error', error?.message || error);
       // Still complete logout locally even if server logout fails
       await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
       setUser(null);
@@ -349,36 +359,34 @@ export const AuthProvider = ({ children }) => {
 
   const debugBiometric = async () => {
     const debug = await debugBiometricStatus();
-    console.log('🔍 Biometric Debug Info:', debug);
+    log.debug('Biometric debug info', debug);
     return debug;
   };
 
   const testBiometric = async () => {
     const test = await testBiometricAuth();
-    console.log('🔍 Biometric Test Result:', test);
+    log.debug('Biometric test result', test);
     return test;
   };
 
   const updateProfile = async (profileData) => {
     try {
-      console.log('🔍 DEBUG: updateProfile called with user:', user);
-      console.log('🔍 DEBUG: user?.token exists:', !!user?.token);
-      console.log('🔍 DEBUG: profileData:', profileData);
+      log.debug('updateProfile called', { hasUser: !!user, hasToken: !!user?.token });
       
       if (!user) {
-        console.error('❌ User is null/undefined - authentication required');
+        log.error('User is null/undefined - authentication required');
         return { success: false, error: 'Please log in to update your profile' };
       }
       
       if (!user.token) {
-        console.error('❌ User token is missing - re-authentication required');
+        log.error('User token is missing - re-authentication required');
         // Try to get token from storage as fallback
         try {
           const storedUser = await AsyncStorage.getItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
           if (storedUser) {
             const userData = JSON.parse(storedUser);
             if (userData.token) {
-              console.log('🔄 Found token in storage, attempting to restore session...');
+              log.debug('Found token in storage, attempting to restore session...');
               // Update user with token and retry
               const userWithToken = { ...user, token: userData.token };
               setUser(userWithToken);
@@ -390,7 +398,7 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: 'Authentication session expired. Please log in again.' };
           }
         } catch (error) {
-          console.error('Failed to retrieve token from storage:', error);
+          log.error('Failed to retrieve token from storage', error?.message || error);
           return { success: false, error: 'Authentication session expired. Please log in again.' };
         }
       }
@@ -398,12 +406,12 @@ export const AuthProvider = ({ children }) => {
       // Handle profile picture upload if present
       let imageUrl = profileData.profilePicture;
       if (profileData.profilePicture && profileData.profilePicture.startsWith('file://')) {
-        console.log('📤 Uploading profile picture...');
+        log.debug('Uploading profile picture...');
         const uploadResult = await uploadProfilePicture(user.token, profileData.profilePicture);
         if (uploadResult.success) {
           imageUrl = uploadResult.imageUrl;
         } else {
-          console.warn('⚠️ Profile picture upload failed, proceeding without image');
+          log.warn('Profile picture upload failed, proceeding without image');
           imageUrl = null;
         }
       }
@@ -426,12 +434,12 @@ export const AuthProvider = ({ children }) => {
         };
         setUser(updatedUser);
         await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(updatedUser));
-        console.log('✅ User profile updated in database, context and storage with token preserved');
+        log.debug('User profile updated (token preserved)');
       }
       
       return result;
     } catch (error) {
-      console.error('Profile update error:', error);
+      log.error('Profile update error', error?.message || error);
       return { success: false, error: 'Failed to update profile' };
     }
   };
@@ -444,7 +452,7 @@ export const AuthProvider = ({ children }) => {
       }
       return await getUserAddresses(user.token);
     } catch (error) {
-      console.error('Get addresses error:', error);
+      log.error('Get addresses error', error?.message || error);
       return { success: false, error: 'Failed to load addresses' };
     }
   };
@@ -456,10 +464,10 @@ export const AuthProvider = ({ children }) => {
       }
       
       const result = await createAddress(user.token, addressData);
-      console.log('📍 Address created in database:', result);
+      log.debug('Address created');
       return result;
     } catch (error) {
-      console.error('Add address error:', error);
+      log.error('Add address error', error?.message || error);
       return { success: false, error: 'Failed to add address' };
     }
   };
@@ -471,10 +479,10 @@ export const AuthProvider = ({ children }) => {
       }
       
       const result = await updateAddress(user.token, addressId, addressData);
-      console.log('📝 Address updated in database:', result);
+      log.debug('Address updated');
       return result;
     } catch (error) {
-      console.error('Edit address error:', error);
+      log.error('Edit address error', error?.message || error);
       return { success: false, error: 'Failed to update address' };
     }
   };
@@ -486,10 +494,10 @@ export const AuthProvider = ({ children }) => {
       }
       
       const result = await deleteAddress(user.token, addressId);
-      console.log('🗑️ Address deleted from database:', result);
+      log.debug('Address deleted');
       return result;
     } catch (error) {
-      console.error('Remove address error:', error);
+      log.error('Remove address error', error?.message || error);
       return { success: false, error: 'Failed to delete address' };
     }
   };
@@ -501,10 +509,10 @@ export const AuthProvider = ({ children }) => {
       }
       
       const result = await setDefaultAddress(user.token, addressId);
-      console.log('🏠 Default address set in database:', result);
+      log.debug('Default address set');
       return result;
     } catch (error) {
-      console.error('Set default address error:', error);
+      log.error('Set default address error', error?.message || error);
       return { success: false, error: 'Failed to set default address' };
     }
   };

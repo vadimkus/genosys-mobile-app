@@ -19,6 +19,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
+import { createLogger } from '../../utils/logger';
+import AUTH_CONFIG from '../../config/auth';
+
+const log = createLogger('Login');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -59,13 +63,13 @@ export default function LoginScreen() {
       } else {
         // Show helpful error message with alternative
         Alert.alert(
-          'Google Sign-In Issue', 
-          result.error || 'Google authentication is being configured. Please use email & password login for now, or try Google sign-in again later.',
+          t('authScreen.googleSignInIssueTitle'), 
+          result.error || t('authScreen.googleSignInIssueMessage'),
           [
-            { text: 'OK', style: 'default' },
-            { text: 'Use Email Login', style: 'default', onPress: () => {
+            { text: t('common.ok'), style: 'default' },
+            { text: t('authScreen.useEmailLogin'), style: 'default', onPress: () => {
               // Focus on email input or scroll to email form
-              console.log('User chose email login alternative');
+              log.debug('User chose email login alternative');
             }}
           ]
         );
@@ -90,7 +94,7 @@ export default function LoginScreen() {
       
       if (result.success) {
         // Navigation will be handled by the auth context automatically
-        console.log('✅ Biometric login successful');
+        log.debug('Biometric login successful');
       } else {
         Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.biometricLoginFailed'));
       }
@@ -177,7 +181,7 @@ export default function LoginScreen() {
           {/* Header with Logo */}
           <View style={styles.header}>
             <Image 
-              source={{ uri: 'https://genosys.ae/_next/image?url=%2Fimages%2Fprd_logo.png&w=512&q=75' }}
+              source={{ uri: AUTH_CONFIG.LOGO_URL }}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -192,7 +196,7 @@ export default function LoginScreen() {
           {!privacyConsent && (
             <View style={styles.privacyNotice}>
               <Text style={styles.privacyNoticeText}>
-                To continue, please accept our Privacy Policy below.
+                {t('authScreen.privacyNotice')}
               </Text>
             </View>
           )}
@@ -214,7 +218,9 @@ export default function LoginScreen() {
                   size={24} 
                   color="#ffffff" 
                 />
-                <Text style={styles.biometricButtonText}>Login with {biometricType}</Text>
+                <Text style={styles.biometricButtonText}>
+                  {t('authScreen.loginWithBiometrics', { biometricType })}
+                </Text>
               </View>
             </TouchableOpacity>
           )}
@@ -233,14 +239,14 @@ export default function LoginScreen() {
               <View style={styles.googleIcon}>
                 <Text style={styles.googleIconText}>G</Text>
               </View>
-              <Text style={styles.googleButtonText}>Continue with Google</Text>
+              <Text style={styles.googleButtonText}>{t('authScreen.continueWithGoogle')}</Text>
             </View>
           </TouchableOpacity>
 
           {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
+            <Text style={styles.dividerText}>{t('authScreen.or')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -248,7 +254,7 @@ export default function LoginScreen() {
           <View style={styles.form}>
             {!isLogin && (
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Full Name</Text>
+                <Text style={styles.inputLabel}>{t('authScreen.fullNameLabel')}</Text>
                 <TextInput
                   style={styles.textInput}
                   placeholder={t('authScreen.fullNamePlaceholder')}
@@ -262,7 +268,7 @@ export default function LoginScreen() {
             )}
             
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
+              <Text style={styles.inputLabel}>{t('authScreen.emailLabel')}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder={t('authScreen.emailPlaceholder')}
@@ -276,7 +282,7 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Password</Text>
+              <Text style={styles.inputLabel}>{t('authScreen.passwordLabel')}</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
@@ -314,11 +320,11 @@ export default function LoginScreen() {
                 )}
               </View>
               <Text style={styles.privacyText}>
-                I agree to the{' '}
+                {t('authScreen.privacyConsentPrefix')}{' '}
                 <Text style={styles.privacyLink} onPress={handlePrivacyPolicyPress}>
-                  Privacy Policy
+                  {t('authScreen.privacyPolicyLink')}
                 </Text>{' '}
-                and consent to the collection and use of my personal information as described.
+                {t('authScreen.privacyConsentSuffix')}
               </Text>
             </TouchableOpacity>
           </View>

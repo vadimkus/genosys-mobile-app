@@ -20,7 +20,7 @@ export default function ContactScreen() {
   const [formData, setFormData] = useState({
     subject: '',
     message: '',
-    email: 'user@genosys.ae',
+    email: 'sales@genosys.ae',
   });
 
   const handleSendMessage = () => {
@@ -41,34 +41,34 @@ export default function ContactScreen() {
   const contactMethods = [
     {
       id: 'phone',
-      title: 'Phone',
-      value: '+971 4 123 4567',
+      title: t('contact.methodPhoneTitle'),
+      value: '+971 58 548 76 65',
       icon: 'call',
-      description: 'Mon-Fri 9AM-6PM, Sat 10AM-4PM',
-      action: () => Linking.openURL('tel:+97141234567'),
+      description: t('contact.methodPhoneDesc'),
+      action: () => Linking.openURL('tel:+971585487665'),
     },
     {
       id: 'email',
-      title: 'Email',
-      value: 'support@genosys.ae',
+      title: t('contact.methodEmailTitle'),
+      value: 'sales@genosys.ae',
       icon: 'mail',
-      description: 'We respond within 24 hours',
-      action: () => Linking.openURL('mailto:support@genosys.ae'),
+      description: t('contact.methodEmailDesc'),
+      action: () => Linking.openURL('mailto:sales@genosys.ae'),
     },
     {
       id: 'whatsapp',
-      title: 'WhatsApp',
+      title: t('contact.methodWhatsappTitle'),
       value: '+971 58 548 76 65',
       icon: 'logo-whatsapp',
-      description: 'Quick chat support',
+      description: t('contact.methodWhatsappDesc'),
       action: () => Linking.openURL('https://wa.me/971585487665'),
     },
     {
       id: 'address',
-      title: 'Visit Us',
-      value: 'Dubai Marina, UAE',
+      title: t('contact.methodVisitTitle'),
+      value: t('contact.methodVisitValue'),
       icon: 'location',
-      description: 'By appointment only',
+      description: t('contact.methodVisitDesc'),
       action: () => Linking.openURL('https://maps.google.com/?q=Dubai+Marina,UAE'),
     },
   ];
@@ -106,7 +106,7 @@ export default function ContactScreen() {
           </View>
           <Text style={styles.heroTitle}>{t('contact.hero')}</Text>
           <Text style={styles.heroSubtitle}>
-            We're here to help with any questions about our skincare products and services
+            {t('contact.heroSubtitle')}
           </Text>
         </View>
 
@@ -217,7 +217,7 @@ export default function ContactScreen() {
         {/* Response Time Notice */}
         <View style={styles.responseNotice}>
           <Text style={styles.responseText}>
-            💬 We typically respond to messages within 24 hours during business days
+            {t('contact.responseTimeNote')}
           </Text>
         </View>
       </ScrollView>

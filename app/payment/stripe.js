@@ -9,6 +9,9 @@ import { useCart } from '../../contexts/CartContext';
 import { fetchUserOrderById, fetchUserOrders } from '../../services/api';
 import AUTH_CONFIG from '../../config/auth';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('StripePayment');
 
 const isPaidLike = (order) => {
   const s = String(order?.status || '').toLowerCase();
@@ -63,7 +66,7 @@ export default function StripePaymentScreen() {
       }
 
       if (!match) {
-        setStatusText('Could not find the order yet. Please try again in a few seconds.');
+        setStatusText(t('payment.couldNotFindOrderYet'));
         setPaid(false);
         return;
       }
@@ -127,7 +130,7 @@ export default function StripePaymentScreen() {
         await checkPayment();
       }
     } catch (e) {
-      console.warn('Failed to open Stripe payment link:', e);
+      log.warn('Failed to open Stripe payment link', e?.message || e);
       Alert.alert(t('payment.couldNotOpenPaymentTitle'), t('payment.pleaseTryAgain'));
     } finally {
       setOpening(false);
@@ -171,9 +174,9 @@ export default function StripePaymentScreen() {
   }, [paid, orderNumber, clearCart, fromOrders]);
 
   const title = useMemo(() => {
-    if (orderNumber) return `Pay for Order ${orderNumber}`;
-    return 'Complete Payment';
-  }, [orderNumber]);
+    if (orderNumber) return t('payment.payForOrderTitle', { orderNumber });
+    return t('payment.completePaymentTitle');
+  }, [orderNumber, t]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -215,7 +218,7 @@ export default function StripePaymentScreen() {
           </TouchableOpacity>
 
           <Text style={styles.note}>
-            If payment is not completed yet, your order will stay pending until the payment is confirmed.
+            {t('payment.pendingNote')}
           </Text>
         </View>
 

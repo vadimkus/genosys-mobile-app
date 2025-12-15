@@ -18,6 +18,10 @@ import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey } from '../utils/productLocalization';
+import { createLogger } from '../utils/logger';
+import AUTH_CONFIG from '../config/auth';
+
+const log = createLogger('FavoritesScreen');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -38,11 +42,11 @@ export default function FavoritesScreen() {
   const handleAddToCart = async (product) => {
     if (!user) {
       Alert.alert(
-        'Login Required',
-        'Please log in to add items to your bag.',
+        t('favorites.loginRequiredTitle'),
+        t('favorites.loginRequiredMessage'),
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Login', onPress: () => router.push('/auth/login') }
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.login'), onPress: () => router.push('/auth/login') }
         ]
       );
       return;
@@ -58,9 +62,9 @@ export default function FavoritesScreen() {
 
     try {
       await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
-      console.log(`✅ Added ${(getLocalizedProductName(product, locale) || product.name)} to bag from favorites`);
+      log.debug('Added to bag from favorites', { productId: product?.id });
     } catch (error) {
-      console.error('Failed to add product to cart:', error);
+      log.error('Failed to add product to cart', error?.message || error);
       Alert.alert(t('common.error'), t('favorites.addToBagFailed'));
     } finally {
       // Remove from tracking set after delay
@@ -76,7 +80,7 @@ export default function FavoritesScreen() {
 
   const handleRemoveFromFavorites = (product) => {
     toggleFavorite(product);
-    console.log(`💔 ${(getLocalizedProductName(product, locale) || product.name)} removed from favorites`);
+    log.debug('Removed from favorites', { productId: product?.id });
   };
 
   if (favorites.length === 0) {
@@ -103,7 +107,7 @@ export default function FavoritesScreen() {
             <Ionicons name="heart-outline" size={80} color="#E5E5EA" />
             <Text style={styles.emptyTitle}>{t('favorites.emptyTitle')}</Text>
             <Text style={styles.emptySubtitle}>
-              Products you love will appear here. Tap the heart on any product to save it!
+              {t('favorites.emptySubtitle')}
             </Text>
             <TouchableOpacity 
               style={styles.browseButton}
@@ -153,7 +157,7 @@ export default function FavoritesScreen() {
                 <View style={styles.gridImageContainer}>
                   {product.image ? (
                     <Image 
-                      source={{ uri: `https://www.genosys.ae${product.image}` }} 
+                      source={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` }} 
                       style={styles.gridImage}
                       resizeMode="cover"
                     />
@@ -287,12 +291,12 @@ export default function FavoritesScreen() {
                 />
                 <Text style={styles.addToCartText}>
                   {addingProducts.has(product.id) 
-                    ? 'Added!' 
+                    ? t('favorites.added')
                     : (product.status === 'out_of_stock' || product.stock === false) 
-                      ? 'Out of Stock' 
+                      ? t('favorites.outOfStock')
                       : user 
-                        ? 'Add to Bag' 
-                        : 'Login to Buy'
+                        ? t('favorites.addToBag')
+                        : t('favorites.loginToBuy')
                   }
                 </Text>
               </TouchableOpacity>

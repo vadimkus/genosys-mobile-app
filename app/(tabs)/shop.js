@@ -22,6 +22,10 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice, isBeautyBoxProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription, getCategoryTranslationKey } from '../../utils/productLocalization';
+import { createLogger } from '../../utils/logger';
+import AUTH_CONFIG from '../../config/auth';
+
+const log = createLogger('Shop');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -137,7 +141,7 @@ export default function ShopScreen() {
 
   const loadProducts = async () => {
     try {
-      console.log('🛍️ Loading enhanced products with user context...');
+      log.debug('Loading products with user context...');
       
       // Use enhanced fetchProducts function with user context
       const enhancedProducts = await fetchProducts(user, { locale });
@@ -145,16 +149,16 @@ export default function ShopScreen() {
       if (enhancedProducts && enhancedProducts.length > 0) {
         setProducts(enhancedProducts);
         setFilteredProducts(enhancedProducts);
-        console.log('✅ Enhanced products loaded:', enhancedProducts.length);
+        log.debug('Products loaded', { count: enhancedProducts.length });
         
         // Debug first few products
-        console.log('🔍 First 3 enhanced products badges:');
+        log.debug('First 3 products badges (debug)');
         enhancedProducts.slice(0, 3).forEach(p => {
-          console.log(`  - ${getLocalizedProductName(p, locale) || p.name}: ${p.badges?.length || 0} badges`, p.badges?.map(b => b.text) || []);
+          log.debug('Product badges', { name: getLocalizedProductName(p, locale) || p.name, count: p.badges?.length || 0 });
         });
         
         if (user?.discountPercentage) {
-          console.log('💰 User discount applied:', user.discountPercentage + '% ' + user.discountType);
+          log.debug('User discount applied', { discountPercentage: user.discountPercentage, discountType: user.discountType });
         }
         
         // Extract categories from products (normalized, unique, allowed)
@@ -172,7 +176,7 @@ export default function ShopScreen() {
         setCategories(buildAllowedCategoryList(normalizedCats));
       }
     } catch (error) {
-      console.error('Error loading products:', error);
+      log.error('Error loading products', error?.message || error);
     } finally {
       setLoading(false);
     }
@@ -180,9 +184,9 @@ export default function ShopScreen() {
 
   const loadCategories = async () => {
     try {
-      console.log('🏷️ Loading categories from API...');
+      log.debug('Loading categories from API...');
       const categoryData = await fetchProductCategories();
-      console.log('📦 Categories received:', categoryData);
+      log.debug('Categories received', { hasData: !!categoryData });
       
       // Add "All" as the first option
       const allCategories = ['All', ...categoryData];
@@ -197,11 +201,11 @@ export default function ShopScreen() {
           }
         });
         const finalList = buildAllowedCategoryList(normalized);
-        console.log('✅ Categories set:', finalList);
+        log.debug('Categories set', { count: finalList.length });
         return finalList;
       });
     } catch (error) {
-      console.error('❌ Error loading categories:', error);
+      log.error('Error loading categories', error?.message || error);
       // If categories already derived from products, keep them; otherwise minimal fallback
       setCategories(prev => prev.length ? prev : ['All']);
     }
@@ -283,11 +287,11 @@ export default function ShopScreen() {
   const handleAddToCart = async (product) => {
     if (!user) {
       Alert.alert(
-        'Login Required',
-        'Please login to add products to your bag.',
+        t('checkout.loginRequiredTitle'),
+        t('checkout.loginRequiredMessage'),
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Login', onPress: () => router.push('/auth/login') }
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.login'), onPress: () => router.push('/auth/login') }
         ]
       );
       return;
@@ -303,9 +307,9 @@ export default function ShopScreen() {
 
     try {
       await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
-      console.log(`✅ Added ${(getLocalizedProductName(product, locale) || product.name)} to cart`);
+      log.debug('Added to cart', { productId: product?.id });
     } catch (error) {
-      console.error('Failed to add product to cart:', error);
+      log.error('Failed to add product to cart', error?.message || error);
       Alert.alert(t('common.error'), t('shop.addToBagFailed'));
     } finally {
       // Remove from tracking set after delay
@@ -321,9 +325,11 @@ export default function ShopScreen() {
 
   const handleToggleFavorite = (product) => {
     const result = toggleFavorite(product);
-    console.log(result === 'added' 
-      ? `💖 ${(getLocalizedProductName(product, locale) || product.name)} added to favorites!`
-      : `💔 ${(getLocalizedProductName(product, locale) || product.name)} removed from favorites!`);
+    log.debug(
+      result === 'added'
+        ? `favorite_added:${String(product?.id || '')}`
+        : `favorite_removed:${String(product?.id || '')}`
+    );
   };
 
 
@@ -349,7 +355,7 @@ export default function ShopScreen() {
         <View style={styles.headerCenter}>
           <View style={styles.logoContainer}>
             <Image 
-              source={{ uri: 'https://genosys.ae/_next/image?url=%2Fimages%2Fprd_logo.png&w=512&q=75' }}
+              source={{ uri: AUTH_CONFIG.LOGO_URL }}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -542,7 +548,7 @@ export default function ShopScreen() {
                   <View style={styles.gridImageContainer}>
                     {product.image ? (
                       <Image 
-                        source={{ uri: `https://www.genosys.ae${product.image}` }} 
+                        source={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` }} 
                         style={styles.gridImage}
                         resizeMode="cover"
                       />

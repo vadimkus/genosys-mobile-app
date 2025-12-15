@@ -4,6 +4,9 @@
  */
 
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('databaseService');
 
 const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 
@@ -15,7 +18,7 @@ const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
  */
 const apiRequest = async (endpoint, options = {}) => {
   try {
-    console.log(`🌐 API Request: ${API_BASE_URL}${endpoint}`);
+    log.debug('API request', { endpoint });
 
     // IMPORTANT: don't let `options.headers` overwrite our required headers.
     // In the previous implementation, spreading `...options` after `headers` replaced the merged headers object,
@@ -31,8 +34,11 @@ const apiRequest = async (endpoint, options = {}) => {
       },
     });
 
-    console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
-    console.log(`📋 Content-Type: ${response.headers.get('content-type')}`);
+    log.debug('API response', {
+      endpoint,
+      status: response.status,
+      contentType: response.headers.get('content-type'),
+    });
 
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
@@ -43,13 +49,13 @@ const apiRequest = async (endpoint, options = {}) => {
       try {
         data = await response.json();
       } catch (parseError) {
-        console.error(`❌ JSON Parse Error for ${endpoint}:`, parseError);
+        log.error(`JSON parse error for ${endpoint}`, parseError?.message || parseError);
         return { success: false, error: 'Invalid JSON response from server' };
       }
     } else {
       // Handle non-JSON responses (like HTML error pages)
       const textResponse = await response.text();
-      console.warn(`⚠️ Non-JSON response from ${endpoint}:`, textResponse.substring(0, 200));
+      log.warn(`Non-JSON response from ${endpoint}`, textResponse.substring(0, 200));
       
       if (response.status === 404) {
         return { success: false, error: 'API endpoint not found (404)' };
@@ -61,14 +67,14 @@ const apiRequest = async (endpoint, options = {}) => {
     }
     
     if (response.ok) {
-      console.log(`✅ API Success: ${endpoint}`);
+      log.debug('API success', { endpoint });
       return { success: true, data };
     } else {
-      console.warn(`⚠️ API Error: ${endpoint} - ${data.error || 'Request failed'}`);
+      log.warn('API error', { endpoint, error: data?.error || 'Request failed', status: response.status });
       return { success: false, error: data.error || `HTTP ${response.status}: ${response.statusText}` };
     }
   } catch (error) {
-    console.error(`❌ Network Error (${endpoint}):`, error.message);
+    log.error(`Network error (${endpoint})`, error?.message || error);
     return { success: false, error: 'Network error - please check your connection' };
   }
 };
@@ -82,7 +88,7 @@ const apiRequest = async (endpoint, options = {}) => {
  * @returns {Promise<Object>} Update result
  */
 export const updateUserProfile = async (token, profileData) => {
-  console.log('💾 Updating user profile via API:', profileData);
+  log.debug('Updating user profile');
   
   return await apiRequest('/user/profile', {
     method: 'PUT',
@@ -139,7 +145,7 @@ export const uploadProfilePicture = async (token, imageUri) => {
       return { success: false, error: result.error || 'Upload failed' };
     }
   } catch (error) {
-    console.error('Profile picture upload error:', error);
+    log.error('Profile picture upload error', error?.message || error);
     return { success: false, error: 'Upload failed' };
   }
 };
@@ -223,7 +229,7 @@ export const getUserAddresses = async (token) => {
  * @returns {Promise<Object>} Creation result
  */
 export const createAddress = async (token, addressData) => {
-  console.log('📍 Creating new address via API:', addressData);
+  log.debug('Creating address');
 
   // Website currently supports a single "primary" address stored as a string.
   // We store a structured payload in a string so the mobile UI can round-trip all fields.
@@ -260,7 +266,7 @@ export const createAddress = async (token, addressData) => {
  * @returns {Promise<Object>} Update result
  */
 export const updateAddress = async (token, addressId, addressData) => {
-  console.log('📝 Updating address in database:', { addressId, addressData });
+  log.debug('Updating address', { addressId });
 
   // Website does NOT support PUT /user/addresses/:id.
   // Use POST /user/addresses which performs add/update of the single primary address.
@@ -296,7 +302,7 @@ export const updateAddress = async (token, addressId, addressData) => {
  * @returns {Promise<Object>} Delete result
  */
 export const deleteAddress = async (token, addressId) => {
-  console.log('🗑️ Deleting address via API:', addressId);
+  log.debug('Deleting address');
 
   // Website supports DELETE /user/addresses (clears primary address).
   return await apiRequest('/user/addresses', {
@@ -314,7 +320,7 @@ export const deleteAddress = async (token, addressId) => {
  * @returns {Promise<Object>} Update result
  */
 export const setDefaultAddress = async (token, addressId) => {
-  console.log('🏠 Setting default address via API:', addressId);
+  log.debug('Setting default address');
 
   // Website currently supports only one address which is always default.
   // Keep this as a no-op success to avoid breaking the UI.
@@ -344,7 +350,7 @@ export const getUserWishlist = async (token) => {
  * @returns {Promise<Object>} Add result
  */
 export const addToWishlist = async (token, productData) => {
-  console.log('💖 Adding to wishlist via API:', productData);
+  log.debug('Adding to wishlist');
   
   return await apiRequest('/user/wishlist', {
     method: 'POST',
@@ -367,7 +373,7 @@ export const addToWishlist = async (token, productData) => {
  * @returns {Promise<Object>} Remove result
  */
 export const removeFromWishlist = async (token, productId) => {
-  console.log('💔 Removing from wishlist via API:', productId);
+  log.debug('Removing from wishlist', { productId: String(productId) });
   
   return await apiRequest(`/user/wishlist/${productId}`, {
     method: 'DELETE',
@@ -386,7 +392,7 @@ export const removeFromWishlist = async (token, productId) => {
  * @returns {Promise<Object>} Save result
  */
 export const saveOrder = async (token, orderData) => {
-  console.log('🛒 Saving order via API:', orderData);
+  log.debug('Saving order');
   
   return await apiRequest('/orders', {
     method: 'POST',
@@ -435,7 +441,7 @@ export const getOrderDetails = async (token, orderId) => {
  * @returns {Promise<Object>} Update result
  */
 export const updateUserSettings = async (token, settings) => {
-  console.log('⚙️ Saving user settings via API:', settings);
+  log.debug('Saving user settings');
   
   return await apiRequest('/user/settings', {
     method: 'PUT',

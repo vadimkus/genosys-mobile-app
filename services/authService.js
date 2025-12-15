@@ -4,6 +4,9 @@
  */
 
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('authService');
 
 const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 
@@ -16,7 +19,7 @@ const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 export const loginWithEmail = async (email, password) => {
   try {
     const normalizedEmail = String(email || '').trim();
-    console.log('🔐 Logging in with email:', normalizedEmail);
+    log.debug('Logging in with email');
     
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -30,11 +33,11 @@ export const loginWithEmail = async (email, password) => {
       }),
     });
 
-    console.log('📡 Login response status:', response.status);
+    log.debug('Login response status', { status: response.status });
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Login successful');
+      log.debug('Login successful');
       return { 
         success: true, 
         user: {
@@ -51,14 +54,14 @@ export const loginWithEmail = async (email, password) => {
         (errorJson && (errorJson.error || errorJson.message)) ||
         (errorText && errorText.slice(0, 200)) ||
         'Login failed';
-      console.log('❌ Login failed:', { status: response.status, message });
+      log.warn('Login failed', { status: response.status, message });
       return { 
         success: false, 
         error: message
       };
     }
   } catch (error) {
-    console.error('❌ Login error:', error);
+    log.error('Login error', error?.message || error);
     return { 
       success: false, 
       error: 'Network error. Please check your connection and try again.' 
@@ -75,7 +78,7 @@ export const loginWithEmail = async (email, password) => {
  */
 export const registerUser = async (name, email, password) => {
   try {
-    console.log('📝 Registering new user:', email);
+    log.debug('Registering new user');
     
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
@@ -90,11 +93,11 @@ export const registerUser = async (name, email, password) => {
       }),
     });
 
-    console.log('📡 Registration response status:', response.status);
+    log.debug('Registration response status', { status: response.status });
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Registration successful');
+      log.debug('Registration successful');
       return { 
         success: true, 
         user: {
@@ -105,14 +108,14 @@ export const registerUser = async (name, email, password) => {
       };
     } else {
       const error = await response.json();
-      console.log('❌ Registration failed:', error);
+      log.warn('Registration failed', error);
       return { 
         success: false, 
         error: error.error || 'Registration failed' 
       };
     }
   } catch (error) {
-    console.error('❌ Registration error:', error);
+    log.error('Registration error', error?.message || error);
     return { 
       success: false, 
       error: 'Network error. Please check your connection and try again.' 
@@ -127,7 +130,7 @@ export const registerUser = async (name, email, password) => {
  */
 export const processGoogleAuth = async (idToken) => {
   try {
-    console.log('🔐 Processing Google OAuth with ID token');
+    log.debug('Processing Google OAuth with ID token');
     
     const response = await fetch(`${API_BASE_URL}/auth/google`, {
       method: 'POST',
@@ -140,11 +143,11 @@ export const processGoogleAuth = async (idToken) => {
       }),
     });
 
-    console.log('📡 Google auth response status:', response.status);
+    log.debug('Google auth response status', { status: response.status });
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Google authentication successful');
+      log.debug('Google authentication successful');
       return { 
         success: true, 
         user: {
@@ -156,14 +159,14 @@ export const processGoogleAuth = async (idToken) => {
       };
     } else {
       const error = await response.json();
-      console.log('❌ Google auth failed:', error);
+      log.warn('Google auth failed', error);
       return { 
         success: false, 
         error: error.error || 'Google authentication failed' 
       };
     }
   } catch (error) {
-    console.error('❌ Google auth error:', error);
+    log.error('Google auth error', error?.message || error);
     return { 
       success: false, 
       error: 'Network error. Please check your connection and try again.' 
@@ -178,7 +181,7 @@ export const processGoogleAuth = async (idToken) => {
  */
 export const validateSession = async (token) => {
   try {
-    console.log('🔍 Validating user session and fetching fresh user data from DB');
+    log.debug('Validating user session');
     
     const response = await fetch(`${API_BASE_URL}/auth/validate`, {
       method: 'GET',
@@ -191,27 +194,31 @@ export const validateSession = async (token) => {
     if (response.ok) {
       const result = await response.json();
       if (result.success && result.valid && result.user) {
-        console.log('✅ Session validation successful - fresh user data from DB received');
-        console.log('👤 User data from DB:', {
-          email: result.user.email,
-          name: result.user.name,
-          discountType: result.user.discountType,
-          discountPercentage: result.user.discountPercentage,
-          phone: result.user.phone,
-          address: result.user.address
-        });
+        log.debug('Session validation successful');
         return { success: true, user: result.user, valid: result.valid };
       } else {
-        console.log('❌ Session validation failed:', result.error);
+        log.warn('Session validation failed', result?.error);
         return { success: false, error: result.error || 'Session expired' };
       }
     } else {
-      console.log('❌ Session validation failed');
+      // If the validate route isn't deployed yet, Next.js will return a 404 HTML page.
+      // Do NOT treat this as session expiration; keep the stored session.
+      if (response.status === 404) {
+        const txt = await response.text().catch(() => '');
+        log.warn('Session validation endpoint unavailable (404), skipping validation', {
+          status: response.status,
+          bodySnippet: String(txt || '').slice(0, 120),
+        });
+        return { success: true, valid: true, user: null, skipped: true };
+      }
+
+      log.warn('Session validation failed', { status: response.status });
       return { success: false, error: 'Session expired' };
     }
   } catch (error) {
-    console.error('❌ Session validation error:', error);
-    return { success: false, error: 'Network error' };
+    log.error('Session validation error', error?.message || error);
+    // Network errors: keep stored session; the app can recover on next request.
+    return { success: true, valid: true, user: null, skipped: true, error: 'Network error' };
   }
 };
 
@@ -245,7 +252,7 @@ export const requestPasswordReset = async (email) => {
       message: (json && (json.message || json.success)) || 'Reset email sent',
     };
   } catch (error) {
-    console.error('❌ Forgot password error:', error);
+    log.error('Forgot password error', error?.message || error);
     return { success: false, error: 'Network error. Please try again.' };
   }
 };
@@ -281,7 +288,7 @@ export const resetPasswordWithToken = async (token, newPassword) => {
       message: (json && (json.message || json.success)) || 'Password reset',
     };
   } catch (error) {
-    console.error('❌ Reset password error:', error);
+    log.error('Reset password error', error?.message || error);
     return { success: false, error: 'Network error. Please try again.' };
   }
 };
@@ -294,7 +301,7 @@ export const resetPasswordWithToken = async (token, newPassword) => {
  */
 export const updateUserProfile = async (token, profileData) => {
   try {
-    console.log('🔄 Updating user profile via API...');
+    log.debug('Updating user profile via API...');
     
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
       method: 'PUT',
@@ -308,15 +315,15 @@ export const updateUserProfile = async (token, profileData) => {
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Profile update successful');
+      log.debug('Profile update successful');
       return { success: true, user: result.user, message: 'Profile updated successfully' };
     } else {
       const error = await response.json();
-      console.log('❌ Profile update failed:', error);
+      log.warn('Profile update failed', error);
       return { success: false, error: error.error || 'Failed to update profile' };
     }
   } catch (error) {
-    console.error('❌ Profile update error:', error);
+    log.error('Profile update error', error?.message || error);
     return { 
       success: false, 
       error: 'Network error. Please check your connection and try again.' 
@@ -331,7 +338,7 @@ export const updateUserProfile = async (token, profileData) => {
  */
 export const logoutUser = async (token) => {
   try {
-    console.log('🚪 Logging out user');
+    log.debug('Logging out user');
     
     const response = await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
@@ -343,14 +350,14 @@ export const logoutUser = async (token) => {
     });
 
     if (response.ok) {
-      console.log('✅ Logout successful');
+      log.debug('Logout successful');
       return { success: true };
     } else {
-      console.log('⚠️ Logout failed on server, but continuing locally');
+      log.warn('Logout failed on server, but continuing locally');
       return { success: true }; // Still allow local logout
     }
   } catch (error) {
-    console.error('❌ Logout error:', error);
+    log.error('Logout error', error?.message || error);
     return { success: true }; // Still allow local logout
   }
 };

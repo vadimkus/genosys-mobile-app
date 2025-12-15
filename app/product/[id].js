@@ -19,225 +19,30 @@ import { useAuth } from '../../contexts/AuthContext';
 import { fetchProductById } from '../../services/api';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../../utils/productRules';
+import { isBeautyBoxProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription } from '../../utils/productLocalization';
+import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
+import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
+import { createLogger } from '../../utils/logger';
+import AUTH_CONFIG from '../../config/auth';
+import {
+  formatPrice,
+  asText,
+  normalizeForCompare,
+  dedupeList,
+  pickField,
+  parseMaybeJSON,
+  asStringList,
+  asKeyValueObject,
+  toHowToSteps,
+  toIngredients,
+  getObjectField,
+  deriveDiscountFromBadges,
+} from '../../utils/productDetailUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
-
-// Safely format price values that may come as strings from the API
-const formatPrice = (value) => {
-  const num = Number(value);
-  if (Number.isFinite(num)) {
-    return num.toFixed(2);
-  }
-  return value ?? '—';
-};
-
-// Coerce any incoming value to a displayable string
-const asText = (value) => {
-  if (value === null || value === undefined) return '';
-  if (Array.isArray(value)) return value.filter(Boolean).join('\n');
-  if (typeof value === 'object') return Object.values(value || {}).join('\n');
-  return String(value);
-};
-
-const normalizeForCompare = (value) => {
-  return asText(value)
-    .replace(/\s+/g, ' ')
-    .replace(/[\u2022•·]/g, ' ')
-    .trim()
-    .toLowerCase();
-};
-
-const dedupeList = (arr = []) => {
-  const seen = new Set();
-  const out = [];
-  arr.forEach((raw) => {
-    const val = asText(raw).trim();
-    if (!val) return;
-    const key = val.toLowerCase();
-    if (!seen.has(key)) {
-      seen.add(key);
-      out.push(val);
-    }
-  });
-  return out;
-};
-
-// Helper to pick the first non-empty field from possible API keys
-const pickField = (product, keys) => {
-  if (!product) return '';
-  for (const key of keys) {
-    const value = product[key];
-    const text = asText(value);
-    if (text.trim().length > 0) return text;
-  }
-  return '';
-};
-
-// Try to parse JSON strings (arrays/objects); fall back to raw value
-const parseMaybeJSON = (value) => {
-  if (value === null || value === undefined) return null;
-  if (typeof value === 'object') return value;
-  if (typeof value === 'string') {
-    try {
-      return JSON.parse(value.trim());
-    } catch {
-      return value;
-    }
-  }
-  return value;
-};
-
-const asStringList = (value) => {
-  const parsed = parseMaybeJSON(value);
-  if (Array.isArray(parsed)) return dedupeList(parsed.map(asText));
-  const txt = asText(parsed).trim();
-  if (!txt) return [];
-  if (txt.includes('\n')) {
-    return dedupeList(
-      txt
-        .split('\n')
-        .map((s) => s.replace(/^\s*[-*•]\s*/, '').trim())
-        .filter(Boolean)
-    );
-  }
-  return [txt];
-};
-
-const asKeyValueObject = (value) => {
-  const parsed = parseMaybeJSON(value);
-  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
-  return null;
-};
-
-const toHowToSteps = (value) => {
-  const parsed = parseMaybeJSON(value);
-  if (!Array.isArray(parsed)) return [];
-
-  const steps = parsed
-    .map((x) => {
-      if (!x) return null;
-      if (typeof x === 'string') return { title: '', body: x };
-      if (typeof x === 'object') {
-        const title = asText(x.step || x.title || '').trim();
-        const body = asText(x.instruction || x.description || x.body || '').trim();
-        const fallback = asText(x).trim();
-        return { title, body: body || (!title ? fallback : '') };
-      }
-      return { title: '', body: asText(x).trim() };
-    })
-    .filter(Boolean)
-    .filter((s) => (s.title || s.body).trim().length > 0);
-
-  const seen = new Set();
-  const out = [];
-  for (const s of steps) {
-    const key = normalizeForCompare(s.body || s.title);
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
-    out.push(s);
-  }
-  return out;
-};
-
-const toIngredients = (value) => {
-  const parsed = parseMaybeJSON(value);
-  if (!parsed) return [];
-
-  if (Array.isArray(parsed)) {
-    const seen = new Set();
-    const out = [];
-    for (const item of parsed) {
-      if (!item) continue;
-      if (typeof item === 'string') {
-        const name = item.trim();
-        const key = normalizeForCompare(name);
-        if (!key || seen.has(key)) continue;
-        seen.add(key);
-        out.push({ name, description: '' });
-        continue;
-      }
-      if (typeof item === 'object') {
-        const name = asText(item.name || item.title || '').trim();
-        const description = asText(item.description || item.details || '').trim();
-        const fallback = asText(item).trim();
-        const finalName = name || fallback;
-        if (!finalName) continue;
-        const key = normalizeForCompare(finalName);
-        if (!key || seen.has(key)) continue;
-        seen.add(key);
-        out.push({ name: finalName, description });
-      }
-    }
-    return out;
-  }
-
-  return asStringList(parsed).map((name) => ({ name, description: '' }));
-};
-
-const getArrayField = (product, keys) => {
-  if (!product) return [];
-  for (const key of keys) {
-    const raw = product[key];
-    const parsed = parseMaybeJSON(raw);
-    if (Array.isArray(parsed)) {
-      const cleaned = parsed.map(asText).filter((t) => t.trim().length > 0);
-      if (cleaned.length) return dedupeList(cleaned);
-    } else if (typeof parsed === 'string') {
-      const t = parsed.trim();
-      if (t.startsWith('[') && t.endsWith(']')) {
-        try {
-          const arr = JSON.parse(t);
-          if (Array.isArray(arr)) {
-            const cleaned = arr.map(asText).filter((v) => v.trim().length > 0);
-            if (cleaned.length) return dedupeList(cleaned);
-          }
-        } catch {}
-      }
-      if (t.length) return [t];
-    }
-  }
-  return [];
-};
-
-const getObjectField = (product, keys) => {
-  if (!product) return null;
-  for (const key of keys) {
-    const parsed = parseMaybeJSON(product[key]);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      return parsed;
-    }
-  }
-  return null;
-};
-
-const deriveDiscountFromBadges = (product) => {
-  const badges = product?.badges || [];
-  for (const badge of badges) {
-    const text = (badge.text || '').toLowerCase();
-    const match = text.match(/(\d+)\s*%/);
-    if (match) {
-      const pct = Number(match[1]);
-      if (pct > 0 && pct < 100) {
-        const base = Number(product?.displayPrice ?? product?.price ?? 0);
-        if (Number.isFinite(base) && base > 0) {
-          const original = base / (1 - pct / 100);
-          return { percent: pct, original };
-        }
-        return { percent: pct, original: null };
-      }
-    }
-  }
-  return null;
-};
-
-const isBeautyBoxProduct = (product) => {
-  const cat = String(product?.category || '').toLowerCase();
-  const name = String(product?.name || '').toLowerCase();
-  return cat === 'beauty boxes' || name.includes('beauty box');
-};
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -279,7 +84,8 @@ const getObjValueCaseInsensitive = (obj, keys) => {
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const log = useMemo(() => createLogger('ProductDetail'), []);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -292,20 +98,20 @@ export default function ProductDetailScreen() {
     loadProduct();
   }, [id]);
 
+
   const loadProduct = async () => {
     try {
-      console.log('🔍 Loading enhanced product with ID:', id);
+      log.debug('Loading product', { id: String(id) });
       
       // Use enhanced fetchProductById with user context
       const enhancedProduct = await fetchProductById(id, user, { locale });
       
       if (enhancedProduct) {
         setProduct(enhancedProduct);
-        console.log('✅ Product loaded from database:', enhancedProduct.name);
-        console.log('📋 Product data from server:', {
+        log.debug('Product loaded', {
+          name: enhancedProduct.name,
           hasVariants: enhancedProduct.variants?.length || 0,
           hasBadges: enhancedProduct.badges?.length || 0,
-          calculatedPrice: enhancedProduct.displayPrice || enhancedProduct.price
         });
 
         // Set default selections from enhanced API data
@@ -325,14 +131,14 @@ export default function ProductDetailScreen() {
         }
 
         if (user && enhancedProduct.originalPrice && enhancedProduct.originalPrice !== (enhancedProduct.displayPrice || enhancedProduct.price)) {
-          console.log('💰 User has discount applied server-side');
+          log.debug('User discount applied server-side');
         }
           } else {
             Alert.alert(t('product.error'), t('product.productNotFound'));
             router.back();
       }
     } catch (error) {
-      console.error('Error loading product:', error);
+      log.error('Error loading product', error?.message || error);
       Alert.alert(t('product.error'), t('product.failedToLoad'));
       router.back();
     } finally {
@@ -382,13 +188,13 @@ export default function ProductDetailScreen() {
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
-    console.log(`📐 Size changed to ${size}`);
+    log.debug('Size changed', { size });
     
     // Find the selected variant for pricing display (enhanced API provides this)
     if (product.variants) {
       const selectedVariant = product.variants.find(v => v.size === size);
       if (selectedVariant) {
-        console.log(`💰 Variant price: ${selectedVariant.price} AED`);
+        log.debug('Variant price', { price: selectedVariant.price });
       }
     }
   };
@@ -406,7 +212,7 @@ export default function ProductDetailScreen() {
 
   const handleColorChange = (color) => {
     setSelectedColor(color);
-    console.log(`🎨 Color changed to ${color}`);
+    log.debug('Color changed', { color });
   };
 
   const handleWishlistToggle = () => {
@@ -415,7 +221,7 @@ export default function ProductDetailScreen() {
 
   const handleShare = async () => {
     if (!product) return;
-    const url = `https://genosys.ae/products/${product.id}`;
+    const url = `${AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}/products/${product.id}`;
     const message = `${asText(getLocalizedProductName(product, locale) || product.name)}\n${formatPrice(product.displayPrice || product.price)} AED\n${url}`;
     try {
       await Share.share(
@@ -427,7 +233,7 @@ export default function ProductDetailScreen() {
         { dialogTitle: t('product.share') }
       );
     } catch (error) {
-      console.error('Failed to share product', error);
+      log.error('Failed to share product', error?.message || error);
       Alert.alert(t('product.error'), t('product.shareError'));
     }
   };
@@ -448,106 +254,6 @@ export default function ProductDetailScreen() {
       .trim();
   };
 
-  const parseBeautyBoxDescription = (rawText) => {
-    const text = asText(rawText || '').trim();
-    if (!text) {
-      return { description: '', pricingLine: '', title: '', items: [] };
-    }
-
-    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 0);
-    const idxPricing = lines.findIndex((l) => /^regular price:/i.test(l));
-    const idxTitle = lines.findIndex((l) => /beauty box\s*:/i.test(l));
-    const idxKit = lines.findIndex((l) => /^kit includes:?/i.test(l));
-
-    const descriptionLines = (idxPricing > 0 ? lines.slice(0, idxPricing) : lines.slice(0, Math.min(lines.length, 3)));
-    const description = descriptionLines.join('\n\n').trim();
-    const pricingLine = idxPricing >= 0 ? lines[idxPricing] : '';
-    const titleLine = idxTitle >= 0 ? lines[idxTitle] : '';
-    const title = titleLine
-      .replace(/^❤️\s*/i, '')
-      .replace(/^beauty box\s*:\s*/i, '')
-      .trim();
-
-    const startItems = idxKit >= 0 ? idxKit + 1 : (idxTitle >= 0 ? idxTitle + 1 : (idxPricing >= 0 ? idxPricing + 1 : 0));
-    const itemLines = startItems > 0 ? lines.slice(startItems) : [];
-
-    const items = [];
-    let current = null;
-
-    const flush = () => {
-      if (!current) return;
-      const body = current.body.join('\n').trim();
-      items.push({
-        index: current.index,
-        header: current.header.trim(),
-        body,
-      });
-      current = null;
-    };
-
-    for (const l of itemLines) {
-      const m = l.match(/^(\d+)\.\s*(.+)$/);
-      if (m) {
-        flush();
-        current = { index: Number(m[1]), header: m[2], body: [] };
-        continue;
-      }
-      if (!current) {
-        // Ignore stray lines before first item
-        continue;
-      }
-      current.body.push(l);
-    }
-    flush();
-
-    return { description, pricingLine, title, items };
-  };
-
-  const renderBeautyBoxDetails = () => {
-    if (!product) return null;
-    const localizedDescription = getLocalizedProductDescription(product, locale) || product.description;
-    const shouldParse = String(locale || 'en').toLowerCase().startsWith('en');
-    const parsed = shouldParse ? parseBeautyBoxDescription(product.description) : null;
-    const safeParsed = parsed || { description: '', pricingLine: '', title: '', items: [] };
-
-    return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('product.productDescription')}</Text>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{safeParsed.description || asText(localizedDescription)}</Text>
-        </View>
-
-        {safeParsed.pricingLine ? (
-          <View style={styles.beautyBoxPriceLineWrap}>
-            <Text style={styles.beautyBoxPriceLine}>{safeParsed.pricingLine}</Text>
-          </View>
-        ) : null}
-
-        {Array.isArray(safeParsed.items) && safeParsed.items.length > 0 ? (
-          <>
-            {/* Show this block only when we actually have parsed kit items (EN parsing). */}
-            <View style={styles.beautyBoxTitleRow}>
-              <Text style={styles.beautyBoxTitleHeart}>❤️</Text>
-              <Text style={styles.beautyBoxTitleText}>
-                {`Beauty Box: ${(safeParsed.title || asText(getLocalizedProductName(product, locale) || product.name).replace(/beauty box/i, '').trim())}`}
-              </Text>
-            </View>
-
-            <Text style={styles.beautyBoxKitTitle}>{t('product.kitIncludes')}</Text>
-
-            <View style={styles.beautyBoxKitList}>
-              {safeParsed.items.map((it) => (
-                <View key={`${it.index}-${it.header}`} style={styles.beautyBoxKitItem}>
-                  <Text style={styles.beautyBoxKitHeader}>{`${it.index}. ${it.header}`}</Text>
-                  {it.body ? <Text style={styles.beautyBoxKitBody}>{it.body}</Text> : null}
-                </View>
-              ))}
-            </View>
-          </>
-        ) : null}
-      </View>
-    );
-  };
 
   const getDisplayDescription = () => {
     if (!product?.description) return '';
@@ -562,14 +268,16 @@ export default function ProductDetailScreen() {
     return formatted;
   };
 
-  const renderInfoSection = (title, content) => {
+  const renderInfoSection = (title, content, options = {}) => {
     const text = asText(content);
     if (!text || text.trim().length === 0) return null;
+    const variant = options?.variant;
+    const isNote = variant === 'note';
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{title}</Text>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{text}</Text>
+        <View style={[styles.descriptionContainer, isNote && styles.noteContainer]}>
+          <Text style={[styles.description, isNote && styles.noteText]}>{text}</Text>
         </View>
       </View>
     );
@@ -580,6 +288,34 @@ export default function ProductDetailScreen() {
 
     const productDetailsObj =
       asKeyValueObject(product?.productDetails) || getObjectField(product, ['productDetails']);
+
+    const prettifySpecLabel = (raw) => {
+      const key = asText(raw).trim();
+      if (!key) return '';
+
+      const normalized = key.replace(/\s+/g, '').toLowerCase();
+      const special = {
+        sizeoptions: 'Size options',
+        keybenefits: 'Key Benefits',
+        skintype: 'Skin Type',
+        howtouse: 'How to use',
+        how_to_use: 'How to use',
+        countryoforigin: 'Origin',
+        madein: 'Origin',
+        productsize: 'Size',
+        volume: 'Size',
+        type: 'Type',
+      };
+      if (special[normalized]) return special[normalized];
+
+      // Convert camelCase / snake_case / kebab-case to Title Case.
+      const spaced = key
+        .replace(/[_-]+/g, ' ')
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .trim();
+      if (!spaced) return key;
+      return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+    };
 
     // 1) Build website-style rows from productDetails (exact strings/labels from website)
     const websiteRows = (productDetailsObj
@@ -652,6 +388,23 @@ export default function ProductDetailScreen() {
         }
       }
 
+      // Make "Size options" easier to scan (e.g. "50g (...) / 250g (...)" -> bullets)
+      if (nlabel === normalizeForCompare('Size options')) {
+        const parts = dedupeList(
+          txt
+            .split('/')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        );
+        if (parts.length > 1) {
+          return (
+            <Text style={styles.specValueText}>
+              {parts.map((p) => `• ${p}`).join('\n')}
+            </Text>
+          );
+        }
+      }
+
       return <Text style={styles.specValueText}>{txt}</Text>;
     };
 
@@ -667,7 +420,9 @@ export default function ProductDetailScreen() {
                 idx === rows.length - 1 ? styles.specItemLast : null,
               ]}
             >
-              <Text style={styles.specLabel}>{row.label}</Text>
+              <Text style={styles.specLabel} numberOfLines={2}>
+                {prettifySpecLabel(row.label)}
+              </Text>
               <View style={styles.specValueContainer}>{renderSpecValue(row.label, row.value)}</View>
             </View>
           ))}
@@ -813,7 +568,7 @@ export default function ProductDetailScreen() {
         <View style={styles.imageContainer}>
           {product.image ? (
             <Image
-              source={{ uri: `https://www.genosys.ae${product.image}` }}
+              source={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` }}
               style={styles.heroImage}
               resizeMode="cover"
             />
@@ -937,13 +692,15 @@ export default function ProductDetailScreen() {
 
           {/* Product content sections from API */}
           {isBeautyBoxProduct(product) ? (
-            renderBeautyBoxDetails()
+            <BeautyBoxDetails product={product} styles={styles} />
           ) : (
             <>
               {renderInfoSection(t('product.about'), getDisplayDescription())}
 
               {/* Required website-like sections (deduped + formatted) */}
               {renderSpecs()}
+
+              <PerfectCombinationCard product={product} user={user} styles={styles} />
 
               {(() => {
                 const benefits = dedupeList([
@@ -972,17 +729,28 @@ export default function ProductDetailScreen() {
 
               {(() => {
                 const steps = toHowToSteps(product?.howToUse);
-                const directionsText = pickField(product, ['directions', 'application', 'how_to_use']);
+                const howToText = pickField(product, ['howToUse', 'how_to_use', 'application', 'usage']);
+                const fallbackDirections = pickField(product, ['directions']);
+
+                // If we have explicit how-to content, we keep it under "Directions"
+                // and treat `product.directions` as an extra "Note" (matches website behavior for many products).
                 if (steps.length) return renderStepsSection(t('product.directions'), steps);
-                return renderInfoSection(t('product.directions'), directionsText || pickField(product, ['usage']));
+                if (howToText) return renderInfoSection(t('product.directions'), howToText);
+
+                // If no how-to content exists, fall back to `directions` as actual directions.
+                return renderInfoSection(t('product.directions'), fallbackDirections);
               })()}
 
               {renderIngredientsSection(t('product.keyIngredients'), toIngredients(product?.ingredients || product?.keyIngredients))}
 
-              {renderInfoSection(t('product.note'), pickField(product, ['note', 'notes', 'warning', 'caution']))}
-
-              {/* Optional helpful section */}
-              {renderListSection(t('product.targetConcerns'), getArrayField(product, ['targetConcerns', 'concerns']))}
+              {(() => {
+                // Prefer backend-driven `product.note` (added to mobile API),
+                // then fall back to legacy fields if needed. Avoid using `directions` as Note.
+                const noteBody =
+                  pickField(product, ['note']) ||
+                  pickField(product, ['notes', 'warning', 'caution']);
+                return noteBody ? renderInfoSection(t('product.note'), noteBody, { variant: 'note' }) : null;
+              })()}
             </>
           )}
 
@@ -1236,10 +1004,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
   },
+  noteContainer: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
   description: {
     fontSize: 16,
     lineHeight: 24,
     color: '#1D1D1F',
+  },
+  noteText: {
+    color: '#14532D',
   },
   readMoreButton: {
     marginTop: 12,
@@ -1307,7 +1083,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   specLabel: {
-    width: 110,
+    width: 124,
     fontSize: 14,
     color: '#6E6E73',
     fontWeight: '600',
@@ -1321,6 +1097,169 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1D1D1F',
     lineHeight: 22,
+  },
+  // Perfect Combination
+  pcOuter: {
+    marginBottom: 32,
+    borderTopWidth: 2,
+    borderTopColor: '#E5E5EA',
+    paddingTop: 18,
+  },
+  pcHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+  },
+  pcHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1D1D1F',
+  },
+  pcLoading: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  pcIntroText: {
+    fontSize: 13,
+    color: '#374151',
+    lineHeight: 19,
+    marginBottom: 12,
+  },
+  pcIntroBold: {
+    fontWeight: '800',
+    color: '#111827',
+  },
+  pcCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#FECACA', // red-200
+    padding: 12,
+  },
+  pcProductCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FCA5A5', // red-300
+    padding: 12,
+    marginBottom: 12,
+  },
+  pcImageWrap: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
+    marginBottom: 10,
+  },
+  pcImage: {
+    width: '100%',
+    height: '100%',
+  },
+  pcImageFallback: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#F3F4F6',
+  },
+  pcProductName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  pcProductSize: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  pcPriceRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    gap: 8,
+    marginBottom: 6,
+  },
+  pcPriceMain: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#E74C3C',
+  },
+  pcPriceOld: {
+    fontSize: 12,
+    color: '#6B7280',
+    textDecorationLine: 'line-through',
+    fontWeight: '600',
+  },
+  pcLoginText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  pcViewDetails: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  pcAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#E74C3C',
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  pcAddBtnText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  pcBenefitsCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FCA5A5',
+    padding: 12,
+  },
+  pcBenefitsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+  },
+  pcBenefitsTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#111827',
+    flex: 1,
+  },
+  pcBenefitsList: {
+    gap: 10,
+  },
+  pcBenefitRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  pcBenefitCheck: {
+    color: '#E74C3C',
+    fontWeight: '900',
+    marginTop: 1,
+  },
+  pcBenefitText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#374151',
+  },
+  pcBenefitTextBold: {
+    fontWeight: '800',
+    color: '#111827',
   },
   detailItem: {
     flexDirection: 'row',

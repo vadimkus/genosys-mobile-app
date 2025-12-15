@@ -4,6 +4,9 @@
  */
 
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('orderService');
 
 const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 
@@ -113,7 +116,7 @@ export async function getPaymentUrlForExistingOrder({ token, orderId, orderNumbe
  * @returns {Promise<Object>} Order submission result
  */
 export async function submitCODOrder(orderData) {
-  console.log('📦 Submitting COD order:', orderData.orderNumber);
+  log.debug('Submitting COD order', { orderNumber: orderData?.orderNumber });
   
   try {
     // Mobile endpoint (no CSRF): requires Authorization token
@@ -177,7 +180,7 @@ export async function submitCODOrder(orderData) {
       body: JSON.stringify(orderPayload),
     });
 
-    console.log('📡 COD order API response status:', response.status);
+    log.debug('COD order response status', { status: response.status });
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
@@ -187,7 +190,7 @@ export async function submitCODOrder(orderData) {
     }
 
     const result = await response.json();
-    console.log('✅ COD order submitted successfully:', {
+    log.debug('COD order submitted successfully', {
       success: result.success,
       orderNumber: result.orderNumber || orderData.orderNumber,
       orderId: result.orderId || result.id
@@ -201,7 +204,7 @@ export async function submitCODOrder(orderData) {
     };
 
   } catch (error) {
-    console.error('❌ COD order submission failed:', error);
+    log.error('COD order submission failed', error?.message || error);
     return {
       success: false,
       error: error.message || 'Failed to submit order',
@@ -216,7 +219,7 @@ export async function submitCODOrder(orderData) {
  * @returns {Promise<Object>} Order submission result
  */
 export async function submitCardOrder(orderData) {
-  console.log('💳 Submitting Card order:', orderData.orderNumber);
+  log.debug('Submitting Card order', { orderNumber: orderData?.orderNumber });
   
   try {
     // Mobile Stripe checkout endpoint (no CSRF): requires Authorization token
@@ -253,7 +256,7 @@ export async function submitCardOrder(orderData) {
       body: JSON.stringify(orderPayload),
     });
 
-    console.log('📡 Card order API response status:', response.status);
+    log.debug('Card order response status', { status: response.status });
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
@@ -263,7 +266,7 @@ export async function submitCardOrder(orderData) {
     }
 
     const result = await response.json();
-    console.log('✅ Card order submitted successfully:', {
+    log.debug('Card order submitted successfully', {
       success: result.success,
       orderNumber: result.orderNumber || orderData.orderNumber,
       orderId: result.orderId || result.id,
@@ -279,7 +282,7 @@ export async function submitCardOrder(orderData) {
     };
 
   } catch (error) {
-    console.error('❌ Card order submission failed:', error);
+    log.error('Card order submission failed', error?.message || error);
     return {
       success: false,
       error: error.message || 'Failed to submit card order',

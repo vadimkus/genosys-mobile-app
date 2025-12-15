@@ -1,10 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
 import { calculateCartTotals, UAE_EMIRATES } from '../utils/cartUtils';
 import { fetchShippingRates } from '../services/api';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('Cart');
 
 const CartContext = createContext();
 
@@ -46,6 +49,7 @@ export const CartProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [shippingRates, setShippingRates] = useState(null);
   const [emirates, setEmirates] = useState(UAE_EMIRATES);
+  const shippingRatesFetchRef = useRef({ inFlight: null, lastAt: 0 });
 
   // Load cart and emirate from storage on mount
   useEffect(() => {
@@ -187,7 +191,7 @@ export const CartProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Error loading cart from storage:', error);
+      log.error('Error loading cart from storage', error?.message || error);
     } finally {
       setIsLoading(false);
     }
@@ -195,15 +199,34 @@ export const CartProvider = ({ children }) => {
 
   const loadShippingRates = async () => {
     try {
-      const rates = await fetchShippingRates();
-      setShippingRates(rates);
-      if (Array.isArray(rates.emirates) && rates.emirates.length) {
-        setEmirates(rates.emirates);
+      const now = Date.now();
+      // Collapse rapid repeated calls (dev StrictMode / multiple screens mounting).
+      // If we fetched very recently, skip.
+      if (shippingRatesFetchRef.current.lastAt && now - shippingRatesFetchRef.current.lastAt < 10_000) {
+        return;
       }
-      await AsyncStorage.setItem(SHIPPING_RATES_STORAGE_KEY, JSON.stringify(rates));
-      console.log('✅ Shipping rates loaded from API');
+      // If a request is in-flight, reuse it.
+      if (shippingRatesFetchRef.current.inFlight) {
+        await shippingRatesFetchRef.current.inFlight;
+        return;
+      }
+
+      shippingRatesFetchRef.current.inFlight = (async () => {
+        const rates = await fetchShippingRates();
+        setShippingRates(rates);
+        if (Array.isArray(rates.emirates) && rates.emirates.length) {
+          setEmirates(rates.emirates);
+        }
+        await AsyncStorage.setItem(SHIPPING_RATES_STORAGE_KEY, JSON.stringify(rates));
+        log.debug('Shipping rates loaded', { source: rates?._source || 'unknown' });
+        shippingRatesFetchRef.current.lastAt = Date.now();
+      })();
+
+      await shippingRatesFetchRef.current.inFlight;
+      shippingRatesFetchRef.current.inFlight = null;
     } catch (error) {
-      console.warn('⚠️ Could not load shipping rates from API, using fallback:', error.message);
+      shippingRatesFetchRef.current.inFlight = null;
+      log.warn('Could not load shipping rates from API, using fallback', error?.message || error);
       // keep whatever we have from storage or hardcoded
     }
   };
@@ -212,7 +235,7 @@ export const CartProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
     } catch (error) {
-      console.error('Error saving cart to storage:', error);
+      log.error('Error saving cart to storage', error?.message || error);
     }
   };
 
@@ -220,7 +243,7 @@ export const CartProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem(EMIRATE_STORAGE_KEY, selectedEmirate);
     } catch (error) {
-      console.error('Error saving emirate to storage:', error);
+      log.error('Error saving emirate to storage', error?.message || error);
     }
   };
 
@@ -271,7 +294,7 @@ export const CartProvider = ({ children }) => {
       setItems(prev => [...prev, newItem]);
     }
 
-    console.log(`➕ Added ${quantity}x ${normalizedProduct.name} to cart`);
+    log.debug('Added to cart', { productId: normalizedProduct?.id, quantity });
   };
 
   /**
@@ -291,7 +314,7 @@ export const CartProvider = ({ children }) => {
       );
     }));
 
-    console.log(`➖ Removed product ${productId} from cart`);
+    log.debug('Removed from cart', { productId });
   };
 
   /**
@@ -314,7 +337,7 @@ export const CartProvider = ({ children }) => {
         : item
     ));
 
-    console.log(`🔄 Updated product ${productId} quantity to ${quantity}`);
+    log.debug('Updated quantity', { productId, quantity });
   };
 
   /**
@@ -365,7 +388,7 @@ export const CartProvider = ({ children }) => {
       }
     }
 
-    console.log(`🎨 Updated product ${productId} color from ${oldColor} to ${newColor}`);
+    log.debug('Updated color', { productId, oldColor, newColor });
   };
 
   /**
@@ -373,13 +396,13 @@ export const CartProvider = ({ children }) => {
    */
   const clearCart = () => {
     setItems([]);
-    console.log('🗑️ Cart cleared');
+    log.debug('Cart cleared');
   };
 
   // Save order to database
   const saveOrderToDatabase = async (orderData, userToken) => {
     try {
-      console.log('💾 Saving order to database:', orderData);
+      log.debug('Saving order to database');
       
       // Generate order number if not provided
       const orderNumber = orderData.orderNumber || `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -416,16 +439,16 @@ export const CartProvider = ({ children }) => {
       const result = await saveOrder(userToken, orderToSave);
       
       if (result.success) {
-        console.log('✅ Order saved successfully:', result.data);
+        log.debug('Order saved successfully');
         // Clear cart after successful order
         clearCart();
         return { success: true, order: result.data, orderNumber };
       } else {
-        console.error('❌ Failed to save order:', result.error);
+        log.error('Failed to save order', result?.error);
         return { success: false, error: result.error };
       }
     } catch (error) {
-      console.error('❌ Save order error:', error);
+      log.error('Save order error', error?.message || error);
       return { success: false, error: 'Failed to save order' };
     }
   };
@@ -480,9 +503,9 @@ export const CartProvider = ({ children }) => {
     if (validEmirate) {
       // store the canonical emirate name from the rates list
       setSelectedEmirateState(validEmirate.name);
-      console.log(`📍 Selected emirate: ${validEmirate.name}`);
+      log.debug('Selected emirate', { emirate: validEmirate.name });
     } else {
-      console.error(`Invalid emirate: ${emirate}`);
+      log.error('Invalid emirate', String(emirate));
     }
   };
 

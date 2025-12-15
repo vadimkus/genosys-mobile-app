@@ -10,9 +10,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
+import { useLocalization } from '../../contexts/LocalizationContext';
+import AUTH_CONFIG from '../../config/auth';
 
 export default function AboutScreen() {
   const router = useRouter();
+  const { t } = useLocalization();
+  const appVersion = String(Constants?.expoConfig?.version || Constants?.manifest?.version || '1.0.0');
 
   const handleLinkPress = (url) => {
     Linking.openURL(url);
@@ -50,7 +55,7 @@ export default function AboutScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>About Genosys</Text>
+        <Text style={styles.headerTitle}>{t('about.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -61,8 +66,8 @@ export default function AboutScreen() {
             <Text style={styles.logoText}>G</Text>
           </View>
           <Text style={styles.heroTitle}>Genosys</Text>
-          <Text style={styles.heroSubtitle}>Premium Skincare Solutions</Text>
-          <Text style={styles.versionText}>Version 1.0.0</Text>
+          <Text style={styles.heroSubtitle}>{t('about.premiumSubtitle')}</Text>
+          <Text style={styles.versionText}>{t('about.versionLabel', { version: appVersion })}</Text>
         </View>
 
         {/* Mission Section */}
@@ -217,7 +222,7 @@ export default function AboutScreen() {
           <SocialLink
             icon="globe"
             name="www.genosys.ae"
-            url="https://www.genosys.ae"
+            url={AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}
           />
         </View>
 

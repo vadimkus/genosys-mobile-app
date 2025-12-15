@@ -14,6 +14,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('AddAddress');
 
 export default function AddEditAddressScreen() {
   const router = useRouter();
@@ -87,7 +90,7 @@ export default function AddEditAddressScreen() {
         Alert.alert(t('common.error'), result.error || t('addAddress.saveFailed'));
       }
     } catch (error) {
-      console.error('Address save error:', error);
+      log.error('Address save error', error?.message || error);
       Alert.alert(t('common.error'), t('addAddress.genericError'));
     } finally {
       setIsSaving(false);

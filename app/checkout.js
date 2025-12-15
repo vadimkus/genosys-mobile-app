@@ -21,161 +21,22 @@ import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../service
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
-
-function isValidEmail(value) {
-  const email = String(value || '').trim();
-  if (!email) return false;
-  // Stricter (still simple) email validation:
-  // - must have local@domain.tld
-  // - TLD at least 2 chars
-  // - no trailing dot
-  // - no spaces
-  if (email.includes(' ')) return false;
-  if (email.endsWith('.')) return false;
-  const parts = email.split('@');
-  if (parts.length !== 2) return false;
-  const [local, domain] = parts;
-  if (!local || !domain) return false;
-  if (local.length < 1) return false;
-  if (domain.length < 3) return false;
-  const domainParts = domain.split('.');
-  if (domainParts.length < 2) return false;
-  const tld = domainParts[domainParts.length - 1];
-  if (!tld || tld.length < 2) return false;
-  // Basic allowed characters check (keeps it practical for UI validation).
-  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  return emailRegex.test(email);
-}
-
-// Phone UX (UAE fixed)
-function normalizeUaeToNationalDigits(raw) {
-  const digits = String(raw || '').replace(/\D/g, '');
-  if (!digits) return '';
-
-  // +9715XXXXXXXX / 9715XXXXXXXX
-  if (digits.startsWith('971')) {
-    return digits.slice(3, 12); // max 9 digits
-  }
-
-  // 05XXXXXXXX -> 5XXXXXXXX
-  if (digits.startsWith('05')) {
-    return digits.slice(1, 10);
-  }
-
-  // 5XXXXXXXX
-  if (digits.startsWith('5')) {
-    return digits.slice(0, 9);
-  }
-
-  // Fallback: keep last 9 digits (useful for paste)
-  return digits.slice(-9);
-}
-
-function formatUaeNationalForInput(nationalDigitsRaw) {
-  const d = String(nationalDigitsRaw || '').replace(/\D/g, '').slice(0, 9);
-  if (!d) return '';
-  // Format: 5X XXX XXXX
-  const p1 = d.slice(0, 2);
-  const p2 = d.slice(2, 5);
-  const p3 = d.slice(5, 9);
-  return [p1, p2, p3].filter(Boolean).join(' ').trim();
-}
-
-function isValidUaeMobileNational(nationalDigitsRaw) {
-  const d = String(nationalDigitsRaw || '').replace(/\D/g, '');
-  return d.length === 9 && d.startsWith('5');
-}
-
-function toE164UaePhone(nationalDigitsRaw) {
-  const d = String(nationalDigitsRaw || '').replace(/\D/g, '');
-  if (!d) return '';
-  return `+971${d.slice(0, 9)}`;
-}
-
-function getDeliveryEtaInfo(selectedEmirate) {
-  const emirate = String(selectedEmirate || '').trim();
-  const isDubai = emirate.toLowerCase() === 'dubai';
-  return {
-    isDubai,
-    // Dubai: today 1–2 hours; others: tomorrow 24–36 hours
-    etaLabel: isDubai ? 'today' : 'tomorrow',
-    etaWindow: isDubai ? '1–2 hours' : '24–36 hours',
-  };
-}
-
-function computeSavingsAED(items, totalsSubtotal) {
-  const paid = (items || []).filter((it) => !(it?.isPromotionItem === true || it?.selectedSize === '__PROMO__'));
-
-  const originalSubtotal = paid.reduce((sum, it) => {
-    const qty = Number(it?.quantity) || 0;
-    const original = Number(it?.product?.originalPrice);
-    const current = Number(it?.product?.displayPrice ?? it?.product?.price ?? 0);
-    const unit = Number.isFinite(original) && original > 0 ? original : (Number.isFinite(current) ? current : 0);
-    return sum + unit * qty;
-  }, 0);
-
-  const savings = (Number(originalSubtotal) || 0) - (Number(totalsSubtotal) || 0);
-  return Math.max(0, savings);
-}
-
-function EmirateFlagIcon({ name }) {
-  const emirate = String(name || '').trim();
-
-  // UAE national flag (used for Fujairah per requirement)
-  const UAE = () => (
-    <View style={flagStyles.flagBox}>
-      <View style={flagStyles.uaeRed} />
-      <View style={flagStyles.uaeRight}>
-        <View style={[flagStyles.uaeStripe, { backgroundColor: '#00732F' }]} />
-        <View style={[flagStyles.uaeStripe, { backgroundColor: '#FFFFFF' }]} />
-        <View style={[flagStyles.uaeStripe, { backgroundColor: '#000000' }]} />
-      </View>
-    </View>
-  );
-
-  // Abu Dhabi: red field with a small white canton in the upper hoist corner
-  const AbuDhabi = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
-      <View style={flagStyles.abuDhabiCanton} />
-    </View>
-  );
-
-  // Dubai / Ajman: red field with a vertical white stripe at the hoist
-  const DubaiAjman = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
-      <View style={flagStyles.hoistWhiteStripe} />
-    </View>
-  );
-
-  // Sharjah / Ras Al Khaimah: red rectangle on a white field
-  const SharjahRas = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#FFFFFF' }]}>
-      <View style={flagStyles.centerRedRect} />
-    </View>
-  );
-
-  // Umm Al Quwain: red field with a vertical white stripe at hoist and a white crescent + star
-  const UmmAlQuwain = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
-      <View style={flagStyles.hoistWhiteStripe} />
-      {/* Crescent (approx) */}
-      <View style={flagStyles.uaqCrescentOuter} />
-      <View style={flagStyles.uaqCrescentInner} />
-      {/* Star */}
-      <Text style={flagStyles.uaqStar}>★</Text>
-    </View>
-  );
-
-  if (emirate === 'Fujairah') return <UAE />;
-  if (emirate === 'Abu Dhabi') return <AbuDhabi />;
-  if (emirate === 'Dubai' || emirate === 'Ajman') return <DubaiAjman />;
-  if (emirate === 'Sharjah' || emirate === 'Ras Al Khaimah') return <SharjahRas />;
-  if (emirate === 'Umm Al Quwain') return <UmmAlQuwain />;
-
-  return <UAE />;
-}
+import CollapsibleFooter from '../components/CollapsibleFooter';
+import EmirateFlagIcon from '../components/checkout/EmirateFlagIcon';
+import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
+import { createLogger } from '../utils/logger';
+import {
+  isValidEmail,
+  normalizeUaeToNationalDigits,
+  formatUaeNationalForInput,
+  isValidUaeMobileNational,
+  toE164UaePhone,
+  getDeliveryEtaInfo,
+  computeSavingsAED,
+} from '../utils/checkoutFormUtils';
 
 export default function CheckoutScreen() {
+  const log = useMemo(() => createLogger('Checkout'), []);
   const { user } = useAuth();
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
   const { t } = useLocalization();
@@ -213,6 +74,7 @@ export default function CheckoutScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber] = useState(() => generateOrderNumber());
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
+  const [footerCollapsed, setFooterCollapsed] = useState(true);
 
   // Calculate totals
   const cartSummary = getCartSummary();
@@ -447,9 +309,8 @@ export default function CheckoutScreen() {
         userToken: user?.token || user?.accessToken || null,
       };
 
-      console.log('📦 Submitting order to database and sending emails:', {
+      log.info('Submitting order:', {
         orderNumber: orderData.orderNumber,
-        customerEmail: orderData.customerEmail,
         paymentMethod: orderData.paymentMethod,
         total: orderData.total,
         itemCount: orderData.items.length
@@ -464,7 +325,7 @@ export default function CheckoutScreen() {
       }
 
       if (result.success) {
-        console.log('✅ Checkout step success:', result);
+        log.debug('Checkout step success', { success: true, hasPaymentUrl: !!result.paymentUrl });
 
         // COD: submit immediately (no payment step)
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
@@ -495,7 +356,7 @@ export default function CheckoutScreen() {
           },
         });
       } else {
-        console.error('❌ Order submission failed:', result);
+        log.error('Order submission failed', result);
         Alert.alert(
           t('checkout.orderSubmissionFailedTitle'),
           result.error || t('checkout.orderProcessingErrorMessage'),
@@ -519,7 +380,7 @@ export default function CheckoutScreen() {
       }
 
     } catch (error) {
-      console.error('❌ Order processing error:', error);
+      log.error('Order processing error', error?.message || error);
       Alert.alert(
         t('checkout.orderProcessingErrorTitle'),
         t('checkout.orderProcessingErrorMessage'),
@@ -617,83 +478,20 @@ export default function CheckoutScreen() {
         <View style={styles.content}>
           
           {/* Order Summary Header */}
-          <View style={styles.orderHeaderCard}>
-            <TouchableOpacity
-              style={styles.orderHeader}
-              onPress={() => setOrderSummaryExpanded((v) => !v)}
-              activeOpacity={0.85}
-            >
-              <View style={styles.orderHeaderLeft}>
-                <Text style={styles.orderNumber}>Order {orderNumber}</Text>
-                <Text style={styles.itemCount}>{t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })}</Text>
-              </View>
-              <Ionicons
-                name={orderSummaryExpanded ? 'chevron-up' : 'chevron-down'}
-                size={20}
-                color="#ffffff"
-              />
-            </TouchableOpacity>
-
-            {orderSummaryExpanded ? (
-              <View style={styles.orderSummaryBody}>
-                <Text style={styles.orderSummaryTitle}>{t('checkout.orderSummary')}</Text>
-
-                {paidItems.map((it, idx) => {
-                  const name = it.product?.name || 'Item';
-                  const qty = Number(it.quantity) || 0;
-                  const size = it.selectedSize ? String(it.selectedSize) : '';
-                  const color = it.selectedColor ? String(it.selectedColor) : '';
-                  const extras = [
-                    size && `${t('common.size')}: ${size}`,
-                    color && `${t('common.color')}: ${color}`,
-                  ]
-                    .filter(Boolean)
-                    .join(' • ');
-                  const price = Number(it.product?.displayPrice ?? it.product?.price ?? 0) || 0;
-                  return (
-                    <Text key={`${it.product?.id || name}-${idx}`} style={styles.orderSummaryLine}>
-                      {qty}× {name}{extras ? ` — ${extras}` : ''} — AED {price.toFixed(2)}
-                    </Text>
-                  );
-                })}
-
-                {promoItems.length ? (
-                  <>
-                    <Text style={styles.orderSummarySection}>{t('checkout.promotion')}</Text>
-                    {promoItems.map((it, idx) => {
-                      const name = it.product?.name || 'Promo item';
-                      const qty = Number(it.quantity) || 1;
-                      const size = it.product?.size ? String(it.product.size) : '';
-                      return (
-                        <Text key={`${it.product?.id || name}-promo-${idx}`} style={styles.orderSummaryLine}>
-                          {qty}× {name}{size ? ` — ${size}` : ''} — {t('common.free')}
-                        </Text>
-                      );
-                    })}
-                  </>
-                ) : null}
-
-                <View style={styles.orderSummaryDivider} />
-                <Text style={styles.orderSummarySection}>{t('checkout.totals')}</Text>
-                <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabel}>{t('checkout.subtotal')}</Text>
-                  <Text style={styles.orderTotalsValue}>AED {safeSubtotal.toFixed(2)}</Text>
-                </View>
-                <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
-                  <Text style={styles.orderTotalsValue}>{safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}</Text>
-                </View>
-                <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabel}>{t('checkout.vatIncluded')}</Text>
-                  <Text style={styles.orderTotalsValue}>AED {safeVat.toFixed(2)}</Text>
-                </View>
-                <View style={styles.orderTotalsRow}>
-                  <Text style={styles.orderTotalsLabelStrong}>{t('checkout.total')}</Text>
-                  <Text style={styles.orderTotalsValueStrong}>AED {safeTotal.toFixed(2)}</Text>
-                </View>
-              </View>
-            ) : null}
-          </View>
+          <CheckoutOrderHeaderCard
+            styles={styles}
+            orderNumber={orderNumber}
+            itemCount={getTotalItems()}
+            orderSummaryExpanded={orderSummaryExpanded}
+            onToggle={() => setOrderSummaryExpanded((v) => !v)}
+            paidItems={paidItems}
+            promoItems={promoItems}
+            safeSubtotal={safeSubtotal}
+            safeShipping={safeShipping}
+            safeVat={safeVat}
+            safeTotal={safeTotal}
+            selectedEmirate={selectedEmirate}
+          />
 
           {/* Shipping Information */}
           <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
@@ -1012,54 +810,71 @@ export default function CheckoutScreen() {
       </ScrollView>
 
       {/* Bottom Action */}
-      <View style={styles.bottomContainer}>
-        <View style={styles.reviewRow}>
-          <Text style={styles.reviewText} numberOfLines={1} ellipsizeMode="tail">
-            {t('checkout.reviewLine', {
-              emirate: selectedEmirate,
-              payment:
-                selectedPaymentMethod === PAYMENT_METHODS.CARD
-                  ? t('checkout.cardPayment')
-                  : t('checkout.cashOnDelivery'),
-              total: safeTotal.toFixed(2),
-            })}
-          </Text>
-        </View>
-
-        <View style={styles.stickySummaryRow}>
-          <View style={styles.stickySummaryLeft}>
-            <View style={styles.etaPill}>
-              <Ionicons name="time-outline" size={14} color="#6B7280" />
-              <Text style={styles.etaPillText} numberOfLines={1} ellipsizeMode="tail">
-                {deliveryEtaText}
+      <CollapsibleFooter
+        collapsed={footerCollapsed}
+        onToggle={() => setFooterCollapsed((v) => !v)}
+        chevronCollapsedName="chevron-down"
+        chevronExpandedName="chevron-up"
+        chevronHitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        containerStyle={[styles.bottomContainer, footerCollapsed && styles.bottomContainerCollapsed]}
+        chevronButtonStyle={styles.footerChevronBtn}
+        contentStyle={styles.footerContent}
+        details={
+          <View style={styles.footerDetails}>
+            <View style={styles.reviewRow}>
+              <Text style={styles.reviewText} numberOfLines={1} ellipsizeMode="tail">
+                {t('checkout.reviewLine', {
+                  emirate: selectedEmirate,
+                  payment:
+                    selectedPaymentMethod === PAYMENT_METHODS.CARD
+                      ? t('checkout.cardPayment')
+                      : t('checkout.cashOnDelivery'),
+                  total: safeTotal.toFixed(2),
+                })}
               </Text>
             </View>
-            {savingsAED > 0.5 ? (
-              <View style={styles.savingsPill}>
-                <Ionicons name="pricetag-outline" size={14} color="#16A34A" />
-                <Text style={styles.savingsPillText}>
-                  {t('checkout.youSave')} AED {savingsAED.toFixed(2)}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-        </View>
 
-        <TouchableOpacity
-          style={[styles.placeOrderButton, isProcessing && styles.placeOrderButtonDisabled]}
-          onPress={handleSubmit}
-          disabled={isProcessing}
-        >
-          {isProcessing ? (
-            <ActivityIndicator color="#ffffff" size="small" />
-          ) : (
-            <Ionicons name="bag-check" size={20} color="#ffffff" />
-          )}
-          <Text style={styles.placeOrderButtonText}>
-            {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <View style={styles.stickySummaryRow}>
+              <View style={styles.stickySummaryLeft}>
+                <View style={styles.etaPill}>
+                  <Ionicons name="time-outline" size={14} color="#6B7280" />
+                  <Text style={styles.etaPillText} numberOfLines={1} ellipsizeMode="tail">
+                    {deliveryEtaText}
+                  </Text>
+                </View>
+                {savingsAED > 0.5 ? (
+                  <View style={styles.savingsPill}>
+                    <Ionicons name="pricetag-outline" size={14} color="#16A34A" />
+                    <Text style={styles.savingsPillText}>
+                      {t('checkout.youSave')} AED {savingsAED.toFixed(2)}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+          </View>
+        }
+        action={
+          <TouchableOpacity
+            style={[
+              styles.placeOrderButton,
+              footerCollapsed && styles.placeOrderButtonCollapsed,
+              isProcessing && styles.placeOrderButtonDisabled,
+            ]}
+            onPress={handleSubmit}
+            disabled={isProcessing}
+          >
+            {isProcessing ? (
+              <ActivityIndicator color="#ffffff" size="small" />
+            ) : (
+              <Ionicons name="bag-check" size={20} color="#ffffff" />
+            )}
+            <Text style={styles.placeOrderButtonText}>
+              {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
+            </Text>
+          </TouchableOpacity>
+        }
+      />
     </SafeAreaView>
   );
 }
@@ -1579,6 +1394,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 10,
     elevation: 12,
+    position: 'relative',
+  },
+  bottomContainerCollapsed: {
+    paddingTop: 8,
+  },
+  footerContent: {
+    // CollapsibleFooter already reserves paddingRight for chevron;
+    // we keep this for any future adjustments without touching shared component.
+  },
+  footerDetails: {
+    position: 'relative',
+    paddingRight: 40, // Keep space for chevron (Bag-style, avoids overlap)
+  },
+  footerChevronBtn: {
+    position: 'absolute',
+    right: 0,
+    top: 8,
+    padding: 8,
+    zIndex: 10,
+  },
+  placeOrderButtonCollapsed: {
+    // When details are hidden, the chevron is still absolute-positioned.
+    // Push the CTA down so it never overlaps with the chevron touch area.
+    marginTop: 34,
   },
   reviewRow: {
     paddingBottom: 10,
@@ -1660,98 +1499,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
-  },
-});
-
-const flagStyles = StyleSheet.create({
-  flagBox: {
-    width: 26,
-    height: 18,
-    borderRadius: 3,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
-    position: 'relative',
-  },
-
-  // UAE
-  uaeRed: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: '24%',
-    backgroundColor: '#CE1126',
-  },
-  uaeRight: {
-    position: 'absolute',
-    left: '24%',
-    top: 0,
-    bottom: 0,
-    right: 0,
-  },
-  uaeStripe: {
-    flex: 1,
-  },
-
-  // Abu Dhabi
-  abuDhabiCanton: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: '40%',
-    height: '45%',
-    backgroundColor: '#FFFFFF',
-  },
-
-  // Dubai / Ajman / UAQ hoist stripe
-  hoistWhiteStripe: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: '18%',
-    backgroundColor: '#FFFFFF',
-  },
-
-  // Sharjah / Ras Al Khaimah
-  centerRedRect: {
-    position: 'absolute',
-    left: '16%',
-    top: '18%',
-    width: '68%',
-    height: '64%',
-    backgroundColor: '#D81E05',
-  },
-
-  // Umm Al Quwain (approx crescent + star)
-  uaqCrescentOuter: {
-    position: 'absolute',
-    left: '46%',
-    top: '30%',
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: '#FFFFFF',
-  },
-  uaqCrescentInner: {
-    position: 'absolute',
-    left: '50%',
-    top: '30%',
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: '#D81E05',
-  },
-  uaqStar: {
-    position: 'absolute',
-    left: '58%',
-    top: '28%',
-    fontSize: 8,
-    color: '#FFFFFF',
-    fontWeight: '700',
-    backgroundColor: 'transparent',
   },
 });
 

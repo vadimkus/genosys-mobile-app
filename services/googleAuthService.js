@@ -5,6 +5,9 @@
 
 import { Alert, Linking } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('googleAuth');
 
 // Your production Google OAuth configuration (same as website)
 const GOOGLE_CLIENT_ID = '590508205468-7ek30vjj6o5k2jfpqpg3t6cr4bnu7rt5.apps.googleusercontent.com';
@@ -16,11 +19,11 @@ const REDIRECT_URI = 'genosys://oauth/google';
  */
 export const loginWithGoogleDirect = async () => {
   try {
-    console.log('🔐 Starting direct Google OAuth (production setup)...');
+    log.debug('Starting direct Google OAuth...');
     
     // Create Google OAuth URL directly
     const authUrl = createGoogleAuthUrl();
-    console.log('🔗 Auth URL:', authUrl);
+    log.debug('Auth URL created');
     
     // Open Google OAuth in browser
     const result = await WebBrowser.openAuthSessionAsync(
@@ -32,7 +35,7 @@ export const loginWithGoogleDirect = async () => {
       }
     );
     
-    console.log('📡 OAuth result:', result.type);
+    log.debug('OAuth result', { type: result.type });
     
     if (result.type === 'success' && result.url) {
       // Extract authorization code from redirect URL
@@ -71,7 +74,7 @@ export const loginWithGoogleDirect = async () => {
       };
     }
   } catch (error) {
-    console.error('❌ Direct Google OAuth error:', error);
+    log.error('Direct Google OAuth error', error?.message || error);
     return {
       success: false,
       error: 'Google authentication failed. Please try again.'
@@ -105,7 +108,7 @@ const extractAuthCodeFromUrl = (url) => {
     const urlObj = new URL(url);
     return urlObj.searchParams.get('code');
   } catch (error) {
-    console.error('Error extracting auth code:', error);
+    log.error('Error extracting auth code', error?.message || error);
     return null;
   }
 };
@@ -136,11 +139,11 @@ const exchangeCodeForToken = async (authCode) => {
       const tokenData = await response.json();
       return tokenData.id_token;
     } else {
-      console.error('Token exchange failed:', await response.text());
+      log.error('Token exchange failed', await response.text());
       return null;
     }
   } catch (error) {
-    console.error('Error exchanging code for token:', error);
+    log.error('Error exchanging code for token', error?.message || error);
     return null;
   }
 };

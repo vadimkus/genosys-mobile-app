@@ -21,6 +21,9 @@ import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getAddressLine, parseGenosysAddress } from '../../utils/addressUtils';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('EditProfile');
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -29,13 +32,6 @@ export default function EditProfileScreen() {
   
   // Check authentication immediately
   useEffect(() => {
-    console.log('🔍 Edit Profile Screen - Auth Check:', {
-      isAuthenticated,
-      userExists: !!user,
-      userToken: !!user?.token,
-      userEmail: user?.email
-    });
-    
     if (!isAuthenticated || !user) {
       Alert.alert(
         t('editProfile.authRequiredTitle'),
@@ -71,7 +67,6 @@ export default function EditProfileScreen() {
   // Populate form with user data when component loads
   useEffect(() => {
     if (user) {
-      console.log('📝 Populating profile form with user data:', user);
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
       const parsedAddr = parseGenosysAddress(user.address || '');
       setFormData({
@@ -213,9 +208,7 @@ export default function EditProfileScreen() {
   };
 
   const handleSave = async () => {
-    console.log('💾 Profile save started');
-    console.log('👤 Current user:', user);
-    console.log('🔑 User token exists:', !!user?.token);
+    log.debug('Profile save started');
     
     // Validate form
     if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.address.trim()) {
@@ -246,16 +239,8 @@ export default function EditProfileScreen() {
         smsNotifications,
       };
 
-      console.log('💾 Saving profile data:', profileData);
-      console.log('🔑 User token before update:', !!user?.token);
-      
       const result = await updateProfile(profileData);
-      
-      console.log('📊 Profile update result:', {
-        success: result.success,
-        error: result.error,
-        hasUserData: !!result.user
-      });
+      log.debug('Profile update result', { success: !!result?.success });
       
       if (result.success) {
         Alert.alert(
@@ -272,7 +257,7 @@ export default function EditProfileScreen() {
         Alert.alert(t('common.error'), result.error || t('editProfile.updateFailed'));
       }
     } catch (error) {
-      console.error('Profile save error:', error);
+      log.error('Profile save error', error?.message || error);
       Alert.alert(t('common.error'), t('editProfile.genericError'));
     } finally {
       setIsSaving(false);

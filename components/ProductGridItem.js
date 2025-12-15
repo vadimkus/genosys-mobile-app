@@ -14,6 +14,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey } from '../utils/productLocalization';
+import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -25,7 +26,9 @@ export default function ProductGridItem({ product }) {
     router.push(`/product/${product.id}`);
   };
 
-  const imageUrl = product.image_url || (product.image ? `https://genosys.ae${product.image}` : null);
+  const imageUrl =
+    product.image_url ||
+    (product.image ? `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` : null);
   const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
   const nameLower = (product?.name || '').trim().toLowerCase();
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');

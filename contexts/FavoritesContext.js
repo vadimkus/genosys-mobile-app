@@ -11,6 +11,9 @@ import {
   removeFromWishlist 
 } from '../services/databaseService';
 import { useAuth } from './AuthContext';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('Favorites');
 
 const FavoritesContext = createContext({});
 
@@ -61,10 +64,10 @@ export const FavoritesProvider = ({ children }) => {
       if (storedFavorites) {
         const parsed = JSON.parse(storedFavorites);
         setFavorites(parsed);
-        console.log('💖 Loaded favorites from storage:', parsed.length);
+        log.debug('Loaded favorites from storage', { count: parsed.length });
       }
     } catch (error) {
-      console.error('Error loading favorites:', error);
+      log.error('Error loading favorites', error?.message || error);
     }
   };
 
@@ -74,9 +77,9 @@ export const FavoritesProvider = ({ children }) => {
   const saveFavorites = async (favoritesToSave) => {
     try {
       await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoritesToSave));
-      console.log('💾 Saved favorites to storage:', favoritesToSave.length);
+      log.debug('Saved favorites to storage', { count: favoritesToSave.length });
     } catch (error) {
-      console.error('Error saving favorites:', error);
+      log.error('Error saving favorites', error?.message || error);
     }
   };
 
@@ -88,7 +91,7 @@ export const FavoritesProvider = ({ children }) => {
     
     try {
       setIsLoading(true);
-      console.log('🔄 Syncing favorites with database...');
+      log.debug('Syncing favorites with database...');
       
       const result = await getUserWishlist(user.token);
       
@@ -143,19 +146,19 @@ export const FavoritesProvider = ({ children }) => {
         setFavorites(convertedFavorites);
         await saveFavorites(convertedFavorites);
         
-        console.log('✅ Favorites synced with database:', convertedFavorites.length);
+        log.debug('Favorites synced with database', { count: convertedFavorites.length });
       } else {
         // Handle specific error cases
         if (result.error?.includes('404') || result.error?.includes('not found')) {
-          console.log('📱 Wishlist API not available yet - using offline mode');
+          log.debug('Wishlist API not available yet - using offline mode');
         } else {
-          console.warn('⚠️ Failed to sync favorites with server:', result.error);
+          log.warn('Failed to sync favorites with server', result?.error);
         }
-        console.log('📱 Using local favorites only');
+        log.debug('Using local favorites only');
       }
     } catch (error) {
-      console.warn('⚠️ Network error syncing favorites:', error.message);
-      console.log('📱 App will work offline with local favorites');
+      log.warn('Network error syncing favorites', error?.message || error);
+      log.debug('App will work offline with local favorites');
       // Don't throw error - let app continue with local favorites
     } finally {
       setIsLoading(false);
@@ -167,11 +170,11 @@ export const FavoritesProvider = ({ children }) => {
    */
   const addToFavorites = async (product) => {
     try {
-      console.log('💖 Adding to favorites:', product.name);
+      log.debug('Adding to favorites', { productId: product?.id });
       
       // Check if already in favorites
       if (favorites.some(fav => fav.id === product.id)) {
-        console.log('Product already in favorites');
+        log.debug('Product already in favorites');
         return { success: false, error: 'Product already in favorites' };
       }
       
@@ -200,23 +203,23 @@ export const FavoritesProvider = ({ children }) => {
           
           if (!dbResult.success) {
             if (dbResult.error?.includes('404') || dbResult.error?.includes('not found')) {
-              console.log('📱 Wishlist API not available - favorite saved locally only');
+              log.debug('Wishlist API not available - favorite saved locally only');
             } else {
-              console.warn('⚠️ Failed to sync favorite to server:', dbResult.error);
+              log.warn('Failed to sync favorite to server', dbResult?.error);
             }
           } else {
-            console.log('✅ Favorite synced to server successfully');
+            log.debug('Favorite synced to server successfully');
           }
         } catch (error) {
-          console.warn('⚠️ Network error adding to favorites (saved locally):', error.message);
+          log.warn('Network error adding to favorites (saved locally)', error?.message || error);
         }
       }
       
-      console.log('✅ Added to favorites successfully');
+      log.debug('Added to favorites successfully');
       return { success: true, favorites: updatedFavorites };
       
     } catch (error) {
-      console.error('Add to favorites error:', error);
+      log.error('Add to favorites error', error?.message || error);
       return { success: false, error: 'Failed to add to favorites' };
     }
   };
@@ -226,7 +229,7 @@ export const FavoritesProvider = ({ children }) => {
    */
   const removeFromFavorites = async (productId) => {
     try {
-      console.log('💔 Removing from favorites:', productId);
+      log.debug('Removing from favorites', { productId });
       
       // Update local state
       const updatedFavorites = favorites.filter(fav => fav.id !== productId);
@@ -240,23 +243,23 @@ export const FavoritesProvider = ({ children }) => {
           
           if (!dbResult.success) {
             if (dbResult.error?.includes('404') || dbResult.error?.includes('not found')) {
-              console.log('📱 Wishlist API not available - favorite removed locally only');
+              log.debug('Wishlist API not available - favorite removed locally only');
             } else {
-              console.warn('⚠️ Failed to sync favorite removal to server:', dbResult.error);
+              log.warn('Failed to sync favorite removal to server', dbResult?.error);
             }
           } else {
-            console.log('✅ Favorite removal synced to server successfully');
+            log.debug('Favorite removal synced to server successfully');
           }
         } catch (error) {
-          console.warn('⚠️ Network error removing favorite (removed locally):', error.message);
+          log.warn('Network error removing favorite (removed locally)', error?.message || error);
         }
       }
       
-      console.log('✅ Removed from favorites successfully');
+      log.debug('Removed from favorites successfully');
       return { success: true, favorites: updatedFavorites };
       
     } catch (error) {
-      console.error('Remove from favorites error:', error);
+      log.error('Remove from favorites error', error?.message || error);
       return { success: false, error: 'Failed to remove from favorites' };
     }
   };
@@ -288,13 +291,13 @@ export const FavoritesProvider = ({ children }) => {
     try {
       setFavorites([]);
       await AsyncStorage.removeItem(FAVORITES_STORAGE_KEY);
-      console.log('🗑️ Favorites cleared');
+      log.debug('Favorites cleared');
       
       // Note: We don't clear from database to preserve user data across devices
       
       return { success: true };
     } catch (error) {
-      console.error('Clear favorites error:', error);
+      log.error('Clear favorites error', error?.message || error);
       return { success: false, error: 'Failed to clear favorites' };
     }
   };

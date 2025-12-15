@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,17 +7,18 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Modal,
-  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleFooter from '../../components/CollapsibleFooter';
+import ProgressCard from '../../components/ProgressCard';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
 import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey } from '../../utils/productLocalization';
+import AUTH_CONFIG from '../../config/auth';
 
 export default function BagScreen() {
   const { user } = useAuth();
@@ -30,16 +31,14 @@ export default function BagScreen() {
     clearCart, 
     getCartSummary,
     selectedEmirate,
-    setSelectedEmirate,
     getAvailableEmirates,
     reloadShippingRates,
     isLoading
   } = useCart();
   
-  const [showEmirateModal, setShowEmirateModal] = useState(false);
   const [footerHeight, setFooterHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [footerCollapsed, setFooterCollapsed] = useState(false);
+  const [footerCollapsed, setFooterCollapsed] = useState(true);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -79,6 +78,18 @@ export default function BagScreen() {
       ? t('checkout.deliveryEtaDubai')
       : t('checkout.deliveryEtaOther');
   const deliveryCostText = cartSummary.hasFreeShipping ? t('common.free') : `${safeShipping.toFixed(2)} AED`;
+
+  // Progress bars (UI only)
+  const promo500Remaining = Math.max(0, 500 - promoSubtotal);
+  const promo700Remaining = Math.max(0, 700 - promoSubtotal);
+  const promo500Progress = Math.max(0, Math.min(1, promoSubtotal / 500));
+  const promo700Progress = Math.max(0, Math.min(1, promoSubtotal / 700));
+  const freeShippingThreshold = Number(cartSummary?.freeShippingThreshold) || 1000;
+  const freeDeliveryRemaining = Math.max(0, freeShippingThreshold - promoSubtotal);
+  const freeDeliveryProgress = Math.max(0, Math.min(1, promoSubtotal / freeShippingThreshold));
+
+  const promoCollagenImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/in.png`;
+  const promoSeaAlgaeImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/SEA.jpg`;
 
   const originalSubtotal = (() => {
     if (!Number.isFinite(discountPct) || discountPct <= 0 || discountPct >= 100) return null;
@@ -125,11 +136,11 @@ export default function BagScreen() {
   const handleCheckout = () => {
     if (!user) {
       Alert.alert(
-        'Login Required',
-        'Please login to proceed with checkout.',
+        t('checkout.loginRequiredTitle'),
+        t('checkout.loginRequiredMessage'),
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Login', onPress: () => router.push('/auth/login') }
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.login'), onPress: () => router.push('/auth/login') }
         ]
       );
       return;
@@ -155,10 +166,164 @@ export default function BagScreen() {
     );
   };
 
-  const handleEmirateSelect = (emirate) => {
-    setSelectedEmirate(emirate.name);
-    setShowEmirateModal(false);
-  };
+  const keyExtractor = useCallback(
+    (item) => `${item.product.id}-${item.selectedColor}-${item.selectedSize}`,
+    []
+  );
+
+  const renderCartItem = useCallback(
+    ({ item }) => {
+      const itemKey = `${item.product.id}-${item.selectedColor}-${item.selectedSize}`;
+      const imageUrl = item.product.image ? `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${item.product.image}` : null;
+      const rawSizeLabel = item.selectedSize || item.product?.size || '';
+      const sizeLabel = rawSizeLabel === '__PROMO__' ? (item.product?.size || '') : rawSizeLabel;
+      const promo = isPromoItem(item);
+
+      return (
+        <View key={itemKey} style={styles.cartItem}>
+          <TouchableOpacity
+            style={styles.itemImageContainer}
+            onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))}
+            disabled={promo}
+          >
+            {imageUrl ? (
+              <Image source={{ uri: imageUrl }} style={styles.itemImage} resizeMode="cover" />
+            ) : (
+              <View style={styles.itemImagePlaceholder}>
+                <Text style={styles.placeholderText}>{item.product.name?.charAt(0) || 'G'}</Text>
+              </View>
+            )}
+            {!!sizeLabel && (
+              <Text style={styles.itemImageSize} numberOfLines={1}>
+                {sizeLabel}
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.itemDetails}>
+            <TouchableOpacity onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))} disabled={promo}>
+              <Text style={styles.itemName} numberOfLines={2}>
+                {getLocalizedProductName(item.product, locale) || item.product.name}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.itemCategory}>
+              {getCategoryTranslationKey(item.product.category)
+                ? t(getCategoryTranslationKey(item.product.category))
+                : item.product.category}
+            </Text>
+
+            {/* Variants Display */}
+            {!promo && (item.selectedSize || item.selectedColor) && (
+              <View style={styles.variantsContainer}>
+                {item.selectedSize && (
+                  <Text style={styles.variantText}>
+                    {t('common.size')}: {item.selectedSize}
+                  </Text>
+                )}
+                {item.selectedColor && (
+                  <Text style={styles.variantText}>
+                    {t('common.color')}: {item.selectedColor}
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {/* Price with Discount Display */}
+            {promo ? (
+              <View style={styles.itemPriceContainer}>
+                <Text style={styles.itemOriginalPrice}>{(Number(item.product?.originalPrice) || 0).toFixed(2)} AED</Text>
+                <Text style={styles.itemDiscountLabel}>{t('bag.discount100')}</Text>
+                <Text style={styles.promoTag}>{t('bag.promotionTag')}</Text>
+              </View>
+            ) : (
+              (() => {
+                const pct = Number(user?.discountPercentage);
+                const hasUserDiscount = Number.isFinite(pct) && pct > 0 && pct < 100;
+                const isHydro = isHydroCoolMask(item.product);
+                const isFixed = hasFixedPriceOverride(item.product);
+                const isDevice = isDeviceProduct(item.product);
+                const base = (isHydro || isDevice || isFixed)
+                  ? getCanonicalUnitPrice(item.product)
+                  : Number(item.product?.displayPrice || item.product?.price || 0);
+                const original = Number(item.product?.originalPrice);
+                const isBeautyBox = isBeautyBoxProduct(item.product);
+
+                // Beauty Boxes: show bundle discount (15%) explicitly, ignore user discount
+                if (isBeautyBox && Number.isFinite(base) && base > 0) {
+                  const fullPrice = (Number.isFinite(original) && original > base)
+                    ? original
+                    : (base / 0.85); // bundle is 15% off
+
+                  return (
+                    <View style={styles.itemPriceContainer}>
+                      <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
+                      <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
+                      <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
+                    </View>
+                  );
+                }
+
+                // Hydro Cool Mask / Devices / Fixed: ignore any user discount; keep base price as-is
+                if (isHydro || isDevice || isFixed) {
+                  return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
+                }
+
+                const discounted = !isBeautyBox && hasUserDiscount && Number.isFinite(original) && original > 0
+                  ? original * (1 - pct / 100)
+                  : base;
+
+                if (Number.isFinite(original) && original > 0 && Number.isFinite(discounted) && discounted > 0 && original !== discounted) {
+                  const pctFromPrices = original ? Math.round((1 - discounted / original) * 100) : null;
+                  const pctLabel =
+                    (Number.isFinite(pctFromPrices) && pctFromPrices > 0 && pctFromPrices < 100 && pctFromPrices) ||
+                    (hasUserDiscount ? Math.round(pct) : null);
+                  return (
+                    <View style={styles.itemPriceContainer}>
+                      <Text style={styles.itemOriginalPrice}>{original.toFixed(2)} AED</Text>
+                      {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% OFF</Text> : null}
+                      <Text style={styles.itemDiscountedPrice}>{discounted.toFixed(2)} AED</Text>
+                    </View>
+                  );
+                }
+
+                return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
+              })()
+            )}
+          </View>
+
+          {promo ? (
+            <View style={styles.itemRightActions}>
+              <Text style={styles.promoQtyRight}>Qty {item.quantity || 1}</Text>
+              <Text style={styles.promoItemPriceRight}>{t('common.free')}</Text>
+            </View>
+          ) : (
+            <View style={styles.itemRightActions}>
+              <View style={styles.quantityContainer}>
+                <TouchableOpacity
+                  style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
+                  onPress={() => handleQuantityChange(item, -1)}
+                  disabled={item.quantity <= 1}
+                >
+                  <Ionicons name="remove" size={16} color="#000000" />
+                </TouchableOpacity>
+
+                <Text style={styles.quantityText}>{item.quantity}</Text>
+
+                <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 1)}>
+                  <Ionicons name="add" size={16} color="#000000" />
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveItem(item)}>
+                <Ionicons name="trash-outline" size={20} color="#E74C3C" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      );
+    },
+    [getCategoryTranslationKey, handleQuantityChange, handleRemoveItem, isPromoItem, locale, t, user]
+  );
 
   if (isLoading) {
     return (
@@ -267,247 +432,97 @@ export default function BagScreen() {
                 <Text style={styles.clearText}>{t('bag.clear')}</Text>
               </TouchableOpacity>
             </View>
-
-            <View style={styles.promoHeaderBlock}>
-              <Text style={styles.promoTitle}>{t('bag.freeMaskPromotion')}</Text>
-              <View style={styles.promoRow}>
-                <Text style={styles.promoLine}>{t('bag.promo500')}</Text>
-                <Ionicons
-                  name={promo500Met ? 'checkmark-circle' : 'ellipse-outline'}
-                  size={18}
-                  color={promo500Met ? '#27AE60' : '#C7C7CC'}
-                />
-              </View>
-              <View style={styles.promoRow}>
-                <Text style={styles.promoLine}>{t('bag.promo700')}</Text>
-                <Ionicons
-                  name={promo700Met ? 'checkmark-circle' : 'ellipse-outline'}
-                  size={18}
-                  color={promo700Met ? '#27AE60' : '#C7C7CC'}
-                />
-              </View>
-              {promoTier !== 'none' ? (
-                <Text style={styles.promoApplied}>
-                  {promoTier === 'twoMasks'
-                    ? t('bag.promoApplied2')
-                    : t('bag.promoApplied1')}
-                </Text>
-              ) : null}
-            </View>
           </View>
         </SafeAreaView>
       </Animated.View>
       
-      {/* Items List - Scrollable content with proper bottom padding */}
-      <Animated.ScrollView 
-        style={styles.itemsList} 
+      {/* Items List - Animated FlatList (better perf than map in ScrollView) */}
+      <Animated.FlatList
+        style={styles.itemsList}
+        data={items}
+        keyExtractor={keyExtractor}
+        renderItem={renderCartItem}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         contentContainerStyle={[
           styles.scrollContent,
-          // Ensure scroll content starts below the collapsing header.
           { paddingTop: scrollPaddingTop + 12 },
-          // Ensure last item can scroll above the fixed checkout footer on all devices.
           { paddingBottom: Math.max(footerHeight + 24, 240) },
         ]}
-      >
-        {/* Emirates Selection */}
-        <TouchableOpacity 
-          style={styles.emirateSelector}
-          onPress={() => setShowEmirateModal(true)}
-        >
-          <View style={styles.emirateSelectorContent}>
-            <View style={styles.emirateIcon}>
-              <Ionicons name="location-outline" size={20} color="#E74C3C" />
-            </View>
-            <View style={styles.emirateInfo}>
-              <Text style={styles.emirateLabel}>{t('bag.deliveryTo')}</Text>
-              <Text style={styles.emirateValue}>{selectedEmirate}</Text>
-              <Text style={styles.deliveryInfoLine}>{deliveryEtaText}</Text>
-              <Text style={styles.deliveryInfoLine}>
-                {t('bag.deliveryCostLabel')}: <Text style={styles.deliveryCostValue}>{deliveryCostText}</Text>
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#86868B" />
-          </View>
-        </TouchableOpacity>
-
-        {/* Free Shipping Banner */}
-        {cartSummary.amountForFreeShipping > 0 && (
-          <View style={styles.freeShippingBanner}>
-            <Text style={styles.freeShippingText}>
-              Add {cartSummary.amountForFreeShipping.toFixed(2)} AED more for FREE shipping!
-            </Text>
-          </View>
-        )}
-
-        {/* Cart Items */}
-        {items.map((item, index) => {
-          const itemKey = `${item.product.id}-${item.selectedColor}-${item.selectedSize}`;
-          const imageUrl = item.product.image ? `https://genosys.ae${item.product.image}` : null;
-          const rawSizeLabel = item.selectedSize || item.product?.size || '';
-          const sizeLabel = rawSizeLabel === '__PROMO__' ? (item.product?.size || '') : rawSizeLabel;
-          const promo = isPromoItem(item);
-          
-          return (
-            <View key={itemKey} style={styles.cartItem}>
-              <TouchableOpacity 
-                style={styles.itemImageContainer}
-                onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))}
-                disabled={promo}
-              >
-                {imageUrl ? (
-                  <Image 
-                    source={{ uri: imageUrl }} 
-                    style={styles.itemImage}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View style={styles.itemImagePlaceholder}>
-                    <Text style={styles.placeholderText}>
-                      {item.product.name?.charAt(0) || 'G'}
-                    </Text>
-                  </View>
-                )}
-                {!!sizeLabel && (
-                  <Text style={styles.itemImageSize} numberOfLines={1}>
-                    {sizeLabel}
-                  </Text>
-                )}
-              </TouchableOpacity>
-
-              <View style={styles.itemDetails}>
-                <TouchableOpacity onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))} disabled={promo}>
-                  <Text style={styles.itemName} numberOfLines={2}>{getLocalizedProductName(item.product, locale) || item.product.name}</Text>
-                </TouchableOpacity>
-                <Text style={styles.itemCategory}>
-                  {getCategoryTranslationKey(item.product.category) ? t(getCategoryTranslationKey(item.product.category)) : item.product.category}
-                </Text>
-                
-                {/* Variants Display */}
-                {!promo && (item.selectedSize || item.selectedColor) && (
-                  <View style={styles.variantsContainer}>
-                    {item.selectedSize && (
-                      <Text style={styles.variantText}>Size: {item.selectedSize}</Text>
-                    )}
-                    {item.selectedColor && (
-                      <Text style={styles.variantText}>Color: {item.selectedColor}</Text>
-                    )}
-                  </View>
-                )}
-
-                {/* Price with Discount Display */}
-                {promo ? (
-                  <View style={styles.itemPriceContainer}>
-                    <Text style={styles.itemOriginalPrice}>
-                      {(Number(item.product?.originalPrice) || 0).toFixed(2)} AED
-                    </Text>
-                    <Text style={styles.itemDiscountLabel}>{t('bag.discount100')}</Text>
-                    <Text style={styles.promoTag}>{t('bag.promotionTag')}</Text>
-                  </View>
-                ) : (() => {
-                  const pct = Number(user?.discountPercentage);
-                  const hasUserDiscount = Number.isFinite(pct) && pct > 0 && pct < 100;
-                  const isHydro = isHydroCoolMask(item.product);
-                  const isFixed = hasFixedPriceOverride(item.product);
-                  const isDevice = isDeviceProduct(item.product);
-                  const base = (isHydro || isDevice || isFixed)
-                    ? getCanonicalUnitPrice(item.product)
-                    : Number(item.product?.displayPrice || item.product?.price || 0);
-                  const original = Number(item.product?.originalPrice);
-                  const isBeautyBox = isBeautyBoxProduct(item.product);
-
-                  // Beauty Boxes: show bundle discount (15%) explicitly, ignore user discount
-                  if (isBeautyBox && Number.isFinite(base) && base > 0) {
-                    const fullPrice = (Number.isFinite(original) && original > base)
-                      ? original
-                      : (base / 0.85); // bundle is 15% off
-
-                    return (
-                      <View style={styles.itemPriceContainer}>
-                        <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
-                        <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
-                        <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
-                      </View>
-                    );
-                  }
-
-                  // Hydro Cool Mask: ignore any user discount; keep base price as-is
-                  if (isHydro || isDevice || isFixed) {
-                    return (
-                      <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>
-                    );
-                  }
-
-                  const discounted = !isBeautyBox && hasUserDiscount && Number.isFinite(original) && original > 0
-                    ? original * (1 - pct / 100)
-                    : base;
-
-                  if (Number.isFinite(original) && original > 0 && Number.isFinite(discounted) && discounted > 0 && original !== discounted) {
-                    const pctFromPrices = original ? Math.round((1 - discounted / original) * 100) : null;
-                    const pctLabel =
-                      (Number.isFinite(pctFromPrices) && pctFromPrices > 0 && pctFromPrices < 100 && pctFromPrices) ||
-                      (hasUserDiscount ? Math.round(pct) : null);
-                    return (
-                  <View style={styles.itemPriceContainer}>
-                    <Text style={styles.itemOriginalPrice}>{original.toFixed(2)} AED</Text>
-                    {pctLabel ? (
-                      <Text style={styles.itemDiscountLabel}>{pctLabel}% OFF</Text>
-                    ) : null}
-                    <Text style={styles.itemDiscountedPrice}>{discounted.toFixed(2)} AED</Text>
-                  </View>
-                    );
-                  }
-
-                  return (
-                    <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>
-                  );
-                })()}
+        ListFooterComponent={
+          <>
+            {/* Free Mask Promotion (Progress UI) */}
+            <View style={styles.sectionCard}>
+              <View style={styles.sectionTitleRow}>
+                <View style={styles.sectionTitleLeft}>
+                  <Ionicons name="gift-outline" size={18} color="#E74C3C" />
+                  <Text style={styles.sectionTitle}>{t('bag.freeMaskPromotion')}</Text>
+                </View>
+                <Text style={styles.sectionSubtle}>{t('bag.promoValidUntil', { date: '01/01/2026' })}</Text>
               </View>
 
-              {promo ? (
-                <View style={styles.itemRightActions}>
-                  <Text style={styles.promoQtyRight}>Qty {item.quantity || 1}</Text>
-                  <Text style={styles.promoItemPriceRight}>{t('common.free')}</Text>
+              <ProgressCard
+                leftText={t('bag.promoSpendAed', { amount: 500 })}
+                rightText={promo500Met ? '✓' : t('bag.promoRemainingAed', { amount: promo500Remaining.toFixed(2) })}
+                rightTextMet={promo500Met}
+                progress={promo500Progress}
+                met={promo500Met}
+                style={styles.progressCard}
+              >
+                <View style={styles.rewardRow}>
+                  <Image source={{ uri: promoCollagenImage }} style={styles.rewardImage} resizeMode="cover" />
+                  <Text style={styles.rewardText}>{t('bag.promoReward1')}</Text>
                 </View>
-              ) : (
-                <View style={styles.itemRightActions}>
-                  <View style={styles.quantityContainer}>
-                    <TouchableOpacity
-                      style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
-                      onPress={() => handleQuantityChange(item, -1)}
-                      disabled={item.quantity <= 1}
-                    >
-                      <Ionicons name="remove" size={16} color="#000000" />
-                    </TouchableOpacity>
-                    
-                    <Text style={styles.quantityText}>{item.quantity}</Text>
-                    
-                    <TouchableOpacity
-                      style={styles.quantityButton}
-                      onPress={() => handleQuantityChange(item, 1)}
-                    >
-                      <Ionicons name="add" size={16} color="#000000" />
-                    </TouchableOpacity>
+              </ProgressCard>
+
+              <ProgressCard
+                leftText={t('bag.promoSpendAed', { amount: 700 })}
+                rightText={promo700Met ? '✓' : t('bag.promoRemainingAed', { amount: promo700Remaining.toFixed(2) })}
+                rightTextMet={promo700Met}
+                progress={promo700Progress}
+                met={promo700Met}
+                style={styles.progressCard}
+              >
+                <View style={styles.rewardRow}>
+                  <View style={styles.rewardImagesRow}>
+                    <Image source={{ uri: promoSeaAlgaeImage }} style={styles.rewardImageSmall} resizeMode="cover" />
+                    <Image source={{ uri: promoCollagenImage }} style={styles.rewardImageSmall} resizeMode="cover" />
                   </View>
-
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => handleRemoveItem(item)}
-                  >
-                    <Ionicons name="trash-outline" size={20} color="#E74C3C" />
-                  </TouchableOpacity>
+                  <Text style={styles.rewardText}>{t('bag.promoReward2')}</Text>
                 </View>
-              )}
+              </ProgressCard>
             </View>
-          );
-        })}
 
-      </Animated.ScrollView>
+            {/* Free Delivery (Progress UI) */}
+            <View style={styles.sectionCard}>
+              <ProgressCard
+                headerLeft={
+                  <View style={styles.sectionTitleLeft}>
+                    <Ionicons name="car-outline" size={18} color="#E74C3C" />
+                    <Text style={styles.sectionTitle}>{t('bag.freeDeliveryTitle')}</Text>
+                  </View>
+                }
+                headerRight={
+                  cartSummary.hasFreeShipping ? (
+                    <View style={styles.progressRightRow}>
+                      <Ionicons name="checkmark-circle" size={18} color="#34C759" />
+                      <Text style={[styles.progressRightText, styles.progressRightTextMet]}>{t('common.free')}</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.progressRightText}>{t('bag.promoRemainingAed', { amount: freeDeliveryRemaining.toFixed(2) })}</Text>
+                  )
+                }
+                progress={freeDeliveryProgress}
+                met={!!cartSummary.hasFreeShipping}
+                style={styles.progressCard}
+              >
+                <Text style={styles.deliveryHintText}>{t('bag.freeDeliveryHint', { amount: freeShippingThreshold })}</Text>
+              </ProgressCard>
+            </View>
+          </>
+        }
+      />
 
       {/* Checkout Footer - Fixed at bottom */}
       <View
@@ -520,20 +535,15 @@ export default function BagScreen() {
         }}
       >
         <SafeAreaView edges={['bottom']}>
-        <View style={styles.summaryContainer}>
-          <TouchableOpacity
-            style={styles.footerChevronBtn}
-            onPress={() => setFooterCollapsed((v) => !v)}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name={footerCollapsed ? 'chevron-up' : 'chevron-down'}
-              size={18}
-              color="#86868B"
-            />
-          </TouchableOpacity>
-
-          {!footerCollapsed ? (
+        <CollapsibleFooter
+          collapsed={footerCollapsed}
+          onToggle={() => setFooterCollapsed((v) => !v)}
+          // Keep current Bag chevron behavior (collapsed shows chevron-up)
+          chevronCollapsedName="chevron-up"
+          chevronExpandedName="chevron-down"
+          contentStyle={styles.summaryContainer}
+          chevronButtonStyle={styles.footerChevronBtn}
+          details={
             <>
               {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 ? (
                 <>
@@ -548,9 +558,7 @@ export default function BagScreen() {
                       {t('bag.discountLabel')}{' '}
                       <Text style={styles.discountPctGreen}>{`(${discountPct}% OFF)`}</Text>
                     </Text>
-                    <Text style={styles.summaryDiscountValue}>
-                      -{discountAmount.toFixed(2)} AED
-                    </Text>
+                    <Text style={styles.summaryDiscountValue}>-{discountAmount.toFixed(2)} AED</Text>
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
@@ -578,13 +586,19 @@ export default function BagScreen() {
 
               <View style={styles.divider} />
             </>
-          ) : null}
-
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total ({cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'})</Text>
-            <Text style={styles.totalAmount}>{safeTotal.toFixed(2)} AED</Text>
-          </View>
-        </View>
+          }
+          always={
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>
+                {t('bag.totalLine', {
+                  count: cartSummary.itemCount,
+                  label: cartSummary.itemCount === 1 ? t('bag.item') : t('bag.items'),
+                })}
+              </Text>
+              <Text style={styles.totalAmount}>{safeTotal.toFixed(2)} AED</Text>
+            </View>
+          }
+        />
         
         <TouchableOpacity
           style={styles.checkoutButton}
@@ -595,53 +609,6 @@ export default function BagScreen() {
         </SafeAreaView>
       </View>
 
-      {/* Emirates Selection Modal */}
-      <Modal
-        visible={showEmirateModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t('bag.selectEmirate')}</Text>
-            <TouchableOpacity 
-              onPress={() => setShowEmirateModal(false)}
-              style={styles.modalCloseButton}
-            >
-              <Ionicons name="close" size={24} color="#1D1D1F" />
-            </TouchableOpacity>
-          </View>
-          
-          <FlatList
-            data={emirates}
-            keyExtractor={(item) => item.name}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  styles.emirateOption,
-                  selectedEmirate === item.name && styles.selectedEmirateOption
-                ]}
-                onPress={() => handleEmirateSelect(item)}
-              >
-                <View style={styles.emirateOptionContent}>
-                  <Text style={[
-                    styles.emirateOptionName,
-                    selectedEmirate === item.name && styles.selectedEmirateText
-                  ]}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.emirateShippingCost}>
-                    {item.shippingCost === 0 ? 'FREE shipping' : `${item.shippingCost} AED shipping`}
-                  </Text>
-                </View>
-                {selectedEmirate === item.name && (
-                  <Ionicons name="checkmark" size={20} color="#E74C3C" />
-                )}
-              </TouchableOpacity>
-            )}
-          />
-        </SafeAreaView>
-      </Modal>
     </View>
   );
 }
@@ -769,6 +736,91 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     // paddingBottom is computed dynamically from the footer height (see ScrollView contentContainerStyle)
+  },
+
+  // New sections (Promotion + Free Delivery)
+  sectionCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  sectionTitleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  sectionSubtle: {
+    fontSize: 12,
+    color: '#E74C3C',
+    fontWeight: '700',
+  },
+  progressCard: {
+    marginBottom: 12,
+  },
+  progressRightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  progressRightText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '700',
+  },
+  progressRightTextMet: {
+    color: '#34C759',
+  },
+  rewardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  rewardImagesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  rewardImage: {
+    width: 64,
+    height: 46,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+  },
+  rewardImageSmall: {
+    width: 46,
+    height: 46,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+  },
+  rewardText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1D1D1F',
+    fontWeight: '600',
+  },
+  deliveryHintText: {
+    marginTop: 2,
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '600',
   },
   
   // Emirates Selection

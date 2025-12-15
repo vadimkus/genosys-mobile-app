@@ -14,6 +14,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('Addresses');
 
 export default function AddressesScreen() {
   const router = useRouter();
@@ -35,11 +38,11 @@ export default function AddressesScreen() {
         // Defensive: ensure the UI always gets an array
         setAddresses(Array.isArray(result.data) ? result.data : []);
       } else {
-        console.error('Failed to load addresses:', result.error);
+        log.warn('Failed to load addresses', result?.error);
         // Keep existing list if API fails
       }
     } catch (error) {
-      console.error('Load addresses error:', error);
+      log.error('Load addresses error', error?.message || error);
     } finally {
       setLoading(false);
     }

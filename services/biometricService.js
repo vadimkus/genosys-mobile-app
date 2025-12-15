@@ -6,6 +6,9 @@
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import { Alert } from 'react-native';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('biometric');
 
 const BIOMETRIC_CREDENTIALS_KEY = 'biometric_credentials';
 const BIOMETRIC_ENABLED_KEY = 'biometric_enabled';
@@ -45,7 +48,7 @@ export const checkBiometricSupport = async () => {
       primaryType: biometricTypes[0] || 'Biometric',
     };
   } catch (error) {
-    console.error('Error checking biometric support:', error);
+    log.error('Error checking biometric support', error?.message || error);
     return {
       isAvailable: false,
       isEnrolled: false,
@@ -73,7 +76,7 @@ export const isBiometricEnabled = async () => {
     const enabled = await SecureStore.getItemAsync(BIOMETRIC_ENABLED_KEY);
     return enabled === 'true';
   } catch (error) {
-    console.error('Error checking if biometric is enabled:', error);
+    log.error('Error checking if biometric is enabled', error?.message || error);
     return false;
   }
 };
@@ -143,7 +146,7 @@ export const enableBiometricAuth = async (emailOrPayload, password) => {
       };
     }
   } catch (error) {
-    console.error('Error enabling biometric auth:', error);
+    log.error('Error enabling biometric auth', error?.message || error);
     return {
       success: false,
       error: 'Failed to enable biometric authentication'
@@ -165,7 +168,7 @@ export const disableBiometricAuth = async () => {
       message: 'Biometric authentication disabled'
     };
   } catch (error) {
-    console.error('Error disabling biometric auth:', error);
+    log.error('Error disabling biometric auth', error?.message || error);
     return {
       success: false,
       error: 'Failed to disable biometric authentication'
@@ -229,7 +232,7 @@ export const authenticateWithBiometrics = async () => {
       };
     }
   } catch (error) {
-    console.error('Error authenticating with biometrics:', error);
+    log.error('Error authenticating with biometrics', error?.message || error);
     return {
       success: false,
       error: 'Biometric authentication failed'
@@ -266,7 +269,7 @@ export const promptBiometricAuth = async (message = 'Authenticate', subtitle = '
       error: authResult.error || (authResult.success ? null : 'Authentication failed')
     };
   } catch (error) {
-    console.error('Error in biometric prompt:', error);
+    log.error('Error in biometric prompt', error?.message || error);
     return {
       success: false,
       error: 'Biometric authentication failed'
@@ -339,7 +342,7 @@ export const testBiometricAuth = async () => {
       biometricType: support.primaryType
     };
   } catch (error) {
-    console.error('Biometric test error:', error);
+    log.error('Biometric test error', error?.message || error);
     return {
       success: false,
       error: `Test failed: ${error.message}`
@@ -413,7 +416,7 @@ export const setupBiometricAuth = async (email, password) => {
       );
     });
   } catch (error) {
-    console.error('Error in biometric setup:', error);
+    log.error('Error in biometric setup', error?.message || error);
     return {
       success: false,
       error: 'Failed to setup biometric authentication'

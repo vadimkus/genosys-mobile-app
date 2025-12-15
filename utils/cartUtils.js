@@ -30,8 +30,6 @@ const DEFAULT_FREE_SHIPPING_THRESHOLD = 1000;
  * @returns {Object} Cart totals for UI display
  */
 export function calculateCartTotals(items, user, selectedEmirate, emiratesOverrideOrConfig = null) {
-  console.log('🧮 Calculating cart totals (client-side for display only)');
-  
   if (!items || items.length === 0) {
     return {
       subtotal: 0,
@@ -130,9 +128,6 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
     amountForFreeShipping,
     hasFreeShipping: shipping === 0,
   };
-
-  console.log('💰 Cart totals calculated:', totals);
-  
   return totals;
 }
 
