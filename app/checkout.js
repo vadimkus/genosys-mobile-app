@@ -807,13 +807,15 @@ export default function CheckoutScreen() {
         chevronCollapsedName="chevron-down"
         chevronExpandedName="chevron-up"
         chevronHitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        chevronSize={20}
+        chevronColor="#6B7280"
         containerStyle={[styles.bottomContainer, footerCollapsed && styles.bottomContainerCollapsed]}
         chevronButtonStyle={styles.footerChevronBtn}
         contentStyle={styles.footerContent}
         details={
           <View style={styles.footerDetails}>
             <View style={styles.reviewRow}>
-              <Text style={styles.reviewText} numberOfLines={1} ellipsizeMode="tail">
+              <Text style={styles.reviewText} numberOfLines={2} ellipsizeMode="tail">
                 {t('checkout.reviewLine', {
                   emirate: selectedEmirate,
                   payment:
@@ -1391,28 +1393,25 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   footerContent: {
-    // CollapsibleFooter already reserves paddingRight for chevron;
-    // we keep this for any future adjustments without touching shared component.
+    // Chevron on left side, content flows naturally on right
+    paddingLeft: 36, // Space for left-aligned chevron
+    paddingRight: 0, // No right padding needed
   },
   footerDetails: {
     position: 'relative',
-    paddingRight: 0, // Remove right padding to prevent total from being cut off
   },
   footerChevronBtn: {
     position: 'absolute',
-    right: 0,
-    top: 16, // Move chevron down so it aligns better with content
+    left: 0, // Move chevron to LEFT side (elegant!)
+    top: 0, // Align with top of content
     padding: 8,
     zIndex: 10,
   },
   placeOrderButtonCollapsed: {
-    // When details are hidden, the chevron is still absolute-positioned.
-    // Push the CTA down so it never overlaps with the chevron touch area.
-    marginTop: 34,
+    // When collapsed, no extra margin needed
   },
   reviewRow: {
     paddingBottom: 10,
-    paddingRight: 44, // Add padding to prevent text from being cut off by chevron
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F7',
     marginBottom: 12,
@@ -1421,7 +1420,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     fontWeight: '700',
-    flexShrink: 1, // Allow text to shrink if needed
+    lineHeight: 16, // Better line spacing for 2 lines
   },
   stickySummaryRow: {
     marginBottom: 12,
