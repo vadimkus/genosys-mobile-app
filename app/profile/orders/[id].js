@@ -214,26 +214,29 @@ export default function OrderDetailScreen() {
             ) : null}
           </View>
 
-          {/* Status Card */}
+          {/* Order Status Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="information-circle" size={20} color="#007AFF" />
-              <Text style={styles.sectionTitle}>{t('ordersDetail.status')}</Text>
+              <Text style={styles.sectionTitle}>{t('ordersDetail.orderStatus')}</Text>
             </View>
             <View style={styles.statusRow}>
               <View style={styles.statusBadge}>
-                <Text style={styles.statusBadgeText}>{String(status)}</Text>
+                <Text style={styles.statusBadgeText}>{String(status).toUpperCase()}</Text>
               </View>
-              {paymentStatus ? (
-                <View style={[styles.statusBadge, styles.paymentStatusBadge]}>
-                  <Text style={styles.statusBadgeText}>{String(paymentStatus)}</Text>
-                </View>
-              ) : null}
-              {paymentMethod ? (
-                <View style={[styles.statusBadge, styles.methodBadge]}>
-                  <Text style={styles.statusBadgeText}>{String(paymentMethod).toUpperCase()}</Text>
-                </View>
-              ) : null}
+            </View>
+          </View>
+
+          {/* Payment Method Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="card" size={20} color="#27AE60" />
+              <Text style={styles.sectionTitle}>{t('ordersDetail.paymentMethod')}</Text>
+            </View>
+            <View style={styles.paymentMethodCard}>
+              <Text style={styles.paymentMethodText}>
+                {isCodLike(order) ? 'Cash on Delivery (COD)' : isCardLike(order) ? 'Stripe (Card Payment)' : String(paymentMethod || 'N/A').toUpperCase()}
+              </Text>
             </View>
           </View>
 
@@ -565,6 +568,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#ffffff',
     textTransform: 'uppercase',
+  },
+  
+  // Payment Method
+  paymentMethodCard: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  paymentMethodText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1D1D1F',
   },
   
   // Items
