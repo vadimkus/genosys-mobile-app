@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
+import { SFSymbol } from 'react-native-sfsymbols';
 import { useCart } from '../../contexts/CartContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 
@@ -18,6 +20,27 @@ export default function TabLayout() {
   const { getTotalItems } = useCart();
   const cartCount = getTotalItems();
   const { t } = useLocalization();
+  const isExpoGo = Constants.appOwnership === 'expo';
+
+  const TabIcon = ({ iosName, androidActiveName, androidInactiveName, color, size, focused }) => {
+    // True SF Symbols only work in a custom dev build / production build.
+    // Expo Go doesn’t include this native module, so we fall back to Ionicons there.
+    const canUseSFSymbols = Platform.OS === 'ios' && !isExpoGo;
+    if (canUseSFSymbols) {
+      const name = focused ? `${iosName}.fill` : iosName;
+      return (
+        <SFSymbol
+          name={name}
+          color={color}
+          size={size}
+          weight="semibold"
+          scale="medium"
+          style={{ width: size, height: size }}
+        />
+      );
+    }
+    return <Ionicons name={focused ? androidActiveName : androidInactiveName} size={size} color={color} />;
+  };
 
   return (
     <Tabs
@@ -54,8 +77,15 @@ export default function TabLayout() {
         name="shop"
         options={{
           title: t('tabs.home'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <TabIcon
+              iosName="house"
+              androidActiveName="home"
+              androidInactiveName="home-outline"
+              color={color}
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -63,8 +93,15 @@ export default function TabLayout() {
         name="orders"
         options={{
           title: t('tabs.orders'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="receipt-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <TabIcon
+              iosName="receipt"
+              androidActiveName="receipt"
+              androidInactiveName="receipt-outline"
+              color={color}
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -73,9 +110,16 @@ export default function TabLayout() {
         options={{
           title: t('tabs.bag'),
           tabBarStyle: { display: 'none' }, // Hide tab bar on bag page
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size, focused }) => (
             <View>
-              <Ionicons name="bag" size={size} color={color} />
+              <TabIcon
+                iosName="bag"
+                androidActiveName="bag-handle"
+                androidInactiveName="bag-handle-outline"
+                color={color}
+                size={size}
+                focused={focused}
+              />
               <TabBarBadge count={cartCount} color="#E74C3C" />
             </View>
           ),
