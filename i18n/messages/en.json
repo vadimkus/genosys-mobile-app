@@ -932,6 +932,8 @@
   },
   "common": {
     "ok": "OK",
+    "back": "Back",
+    "edit": "Edit",
     "cancel": "Cancel",
     "delete": "Delete",
     "login": "Login",
