@@ -609,16 +609,6 @@ export default function CheckoutScreen() {
               />
               {showError('address') ? <Text style={styles.helperError}>{errors.address}</Text> : null}
 
-              <TouchableOpacity
-                style={[styles.pinRowButton, !String(address || '').trim() && styles.pinButtonDisabled]}
-                onPress={openAddressInMaps}
-                disabled={!String(address || '').trim()}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="location-outline" size={16} color="#007AFF" />
-                <Text style={styles.pinRowButtonText}>{t('checkout.pinOnMap')}</Text>
-              </TouchableOpacity>
-
               <View style={styles.landmarkWrap}>
                 <Text style={styles.label}>{t('checkout.landmarkOptional')}</Text>
                 <TextInput
@@ -1406,12 +1396,12 @@ const styles = StyleSheet.create({
   },
   footerDetails: {
     position: 'relative',
-    paddingRight: 40, // Keep space for chevron (Bag-style, avoids overlap)
+    paddingRight: 0, // Remove right padding to prevent total from being cut off
   },
   footerChevronBtn: {
     position: 'absolute',
     right: 0,
-    top: 8,
+    top: 16, // Move chevron down so it aligns better with content
     padding: 8,
     zIndex: 10,
   },
@@ -1422,6 +1412,7 @@ const styles = StyleSheet.create({
   },
   reviewRow: {
     paddingBottom: 10,
+    paddingRight: 44, // Add padding to prevent text from being cut off by chevron
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F7',
     marginBottom: 12,
@@ -1430,6 +1421,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     fontWeight: '700',
+    flexShrink: 1, // Allow text to shrink if needed
   },
   stickySummaryRow: {
     marginBottom: 12,
