@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../../services/paymentPreferences';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -24,6 +25,14 @@ export default function PaymentScreen() {
   const [billingAddress, setBillingAddress] = useState('');
   const [vatNumber, setVatNumber] = useState('');
 
+  const loadBilling = useCallback(async () => {
+    if (!token) return;
+    const res = await getUserBilling(token).catch(() => null);
+    const data = res?.data?.data || res?.data || {};
+    setBillingAddress(String(data?.billingAddress || '').trim());
+    setVatNumber(String(data?.vatNumber || '').trim());
+  }, [token]);
+
   useEffect(() => {
     (async () => {
       const method = await getDefaultPaymentMethod();
@@ -31,20 +40,16 @@ export default function PaymentScreen() {
     })();
   }, []);
 
+  // Initial load + refresh whenever user returns from the Billing edit screen.
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (!token) return;
-      const res = await getUserBilling(token).catch(() => null);
-      const data = res?.data?.data || res?.data || {};
-      if (cancelled) return;
-      setBillingAddress(String(data?.billingAddress || '').trim());
-      setVatNumber(String(data?.vatNumber || '').trim());
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [token]);
+    loadBilling();
+  }, [loadBilling]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadBilling();
+    }, [loadBilling])
+  );
 
   const selectDefault = async (method) => {
     try {
@@ -133,9 +138,8 @@ export default function PaymentScreen() {
             
             <View style={[styles.billingRow, { marginTop: 16 }]}>
               <Text style={styles.billingLabel}>{t('paymentSettings.taxInfo')}</Text>
-              <TouchableOpacity onPress={() => router.push('/profile/billing')} activeOpacity={0.7}>
-                <Text style={styles.billingLink}>{t('paymentSettings.manage')}</Text>
-              </TouchableOpacity>
+              {/* single action only: keep "Update" above; tax info is view-only here */}
+              <View />
             </View>
             <Text style={styles.billingAddress}>
               {vatNumber ? `VAT/TRN: ${vatNumber}` : t('paymentSettings.vatNumberMissing')}

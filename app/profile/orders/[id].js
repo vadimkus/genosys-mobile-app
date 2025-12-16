@@ -114,6 +114,7 @@ export default function OrderDetailScreen() {
   const customerPhone = order?.customerPhone || order?.customer_phone || user?.phone || '';
   const customerAddress = order?.customerAddress || order?.customer_address || order?.address || '';
   const emirate = order?.emirate || '';
+  const orderNotes = String(order?.orderNotes || order?.order_notes || '').trim();
   
   const createdAt = order?.createdAt || order?.created_at || order?.orderDate || order?.order_date;
   const formattedDateTime = formatDateTime(createdAt);
@@ -239,6 +240,19 @@ export default function OrderDetailScreen() {
               </Text>
             </View>
           </View>
+
+          {/* Order Notes */}
+          {orderNotes ? (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Ionicons name="chatbox-ellipses-outline" size={20} color="#6B7280" />
+                <Text style={styles.sectionTitle}>{t('ordersDetail.orderNotes')}</Text>
+              </View>
+              <View style={styles.notesCard}>
+                <Text style={styles.notesText}>{orderNotes}</Text>
+              </View>
+            </View>
+          ) : null}
 
           {/* Items Section */}
           <View style={styles.section}>
@@ -577,6 +591,16 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#E5E5EA',
+  },
+  notesCard: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 16,
+  },
+  notesText: {
+    fontSize: 15,
+    color: '#1D1D1F',
+    lineHeight: 22,
   },
   paymentMethodText: {
     fontSize: 14,

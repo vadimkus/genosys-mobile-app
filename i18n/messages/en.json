@@ -630,7 +630,8 @@
     "total": "Total",
     "payNow": "Pay Now",
     "startingPayment": "Starting Payment…",
-    "supportWhatsapp": "Support via WhatsApp"
+    "supportWhatsapp": "Support via WhatsApp",
+    "orderNotes": "Order Notes"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Could not start payment",

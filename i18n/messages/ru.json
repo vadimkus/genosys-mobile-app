@@ -630,7 +630,8 @@
     "total": "Итого",
     "payNow": "Оплатить",
     "startingPayment": "Запуск оплаты…",
-    "supportWhatsapp": "Поддержка WhatsApp"
+    "supportWhatsapp": "Поддержка WhatsApp",
+    "orderNotes": "Комментарий к заказу"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",

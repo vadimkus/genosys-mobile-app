@@ -631,7 +631,8 @@
     "total": "الإجمالي",
     "payNow": "ادفع الآن",
     "startingPayment": "جاري بدء الدفع…",
-    "supportWhatsapp": "الدعم عبر واتساب"
+    "supportWhatsapp": "الدعم عبر واتساب",
+    "orderNotes": "ملاحظات الطلب"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",
