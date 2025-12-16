@@ -811,7 +811,7 @@ export default function CheckoutScreen() {
         chevronColor="#6B7280"
         containerStyle={[styles.bottomContainer, footerCollapsed && styles.bottomContainerCollapsed]}
         chevronButtonStyle={styles.footerChevronBtn}
-        contentStyle={styles.footerContent}
+        contentStyle={[styles.footerContent, !footerCollapsed && styles.footerContentExpanded]}
         details={
           <View style={styles.footerDetails}>
             <View style={styles.reviewRow}>
@@ -1393,22 +1393,25 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   footerContent: {
-    // Chevron on left side, content flows naturally on right
-    paddingLeft: 36, // Space for left-aligned chevron
-    paddingRight: 0, // No right padding needed
+    // Default: no right padding when collapsed
+    paddingRight: 0,
+  },
+  footerContentExpanded: {
+    // When expanded: add whitespace for chevron on right
+    paddingRight: 48, // Generous space for chevron (20px icon + 28px buffer)
   },
   footerDetails: {
     position: 'relative',
   },
   footerChevronBtn: {
     position: 'absolute',
-    left: 0, // Move chevron to LEFT side (elegant!)
-    top: 0, // Align with top of content
+    right: 0, // Chevron on RIGHT side
+    top: 0, // Align with top
     padding: 8,
     zIndex: 10,
   },
   placeOrderButtonCollapsed: {
-    // When collapsed, no extra margin needed
+    // No extra margin when collapsed
   },
   reviewRow: {
     paddingBottom: 10,
@@ -1420,7 +1423,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     fontWeight: '700',
-    lineHeight: 16, // Better line spacing for 2 lines
+    lineHeight: 16,
   },
   stickySummaryRow: {
     marginBottom: 12,
