@@ -33,6 +33,7 @@ export function createLogger(scope) {
   };
 
   const warn = (...args) => {
+    if (!__DEV__) return;
     console.warn(prefix, ...args);
   };
 

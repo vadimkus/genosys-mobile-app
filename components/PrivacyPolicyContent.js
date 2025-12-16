@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
+import AUTH_CONFIG from '../config/auth';
 
 export default function PrivacyPolicyContent({ showLastUpdated = true }) {
   const { t } = useLocalization();
@@ -14,6 +15,11 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
 
   const handleGooglePrivacyPress = () => {
     Linking.openURL('https://policies.google.com/privacy');
+  };
+
+  const handlePrivacyPolicyPress = () => {
+    const url = AUTH_CONFIG?.PRIVACY_POLICY_URL || 'https://genosys.ae/privacy-policy';
+    Linking.openURL(url);
   };
 
   return (
@@ -87,6 +93,17 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
             </Text>
           </Text>
         </View>
+      </View>
+
+      {/* Genosys Privacy Policy */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Genosys Privacy Policy</Text>
+        <Text style={styles.paragraph}>
+          You can review the Genosys Privacy Policy here:{' '}
+          <Text style={styles.link} onPress={handlePrivacyPolicyPress}>
+            {AUTH_CONFIG?.PRIVACY_POLICY_URL || 'https://genosys.ae/privacy-policy'}
+          </Text>
+        </Text>
       </View>
 
       {/* Contact Us */}

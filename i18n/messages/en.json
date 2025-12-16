@@ -1,6 +1,7 @@
 {
   "tabs": {
     "home": "Home",
+    "orders": "Orders",
     "bag": "Bag"
   },
   "orders": {
