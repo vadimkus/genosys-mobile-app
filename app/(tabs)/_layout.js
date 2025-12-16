@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { SFSymbol } from 'react-native-sfsymbols';
 import { useCart } from '../../contexts/CartContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 
@@ -22,25 +22,50 @@ export default function TabLayout() {
   const { t } = useLocalization();
   const isExpoGo = Constants.appOwnership === 'expo';
 
-  const TabIcon = ({ iosName, androidActiveName, androidInactiveName, color, size, focused }) => {
-    // True SF Symbols only work in a custom dev build / production build.
-    // Expo Go doesn’t include this native module, so we fall back to Ionicons there.
-    const canUseSFSymbols = Platform.OS === 'ios' && !isExpoGo;
-    if (canUseSFSymbols) {
-      const name = focused ? `${iosName}.fill` : iosName;
-      return (
-        <SFSymbol
-          name={name}
-          color={color}
-          size={size}
-          weight="semibold"
-          scale="medium"
-          style={{ width: size, height: size }}
-        />
-      );
-    }
-    return <Ionicons name={focused ? androidActiveName : androidInactiveName} size={size} color={color} />;
-  };
+  // Lazy-load SF Symbols module so Expo Go doesn't try to import a native module it doesn't have.
+  const canUseSFSymbols = Platform.OS === 'ios' && !isExpoGo;
+  const [SFSymbolComponent, setSFSymbolComponent] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!canUseSFSymbols) return;
+
+    (async () => {
+      try {
+        const mod = await import('react-native-sfsymbols');
+        if (!cancelled) setSFSymbolComponent(() => mod?.SFSymbol || null);
+      } catch {
+        // If module isn't available, silently fall back to Ionicons.
+        if (!cancelled) setSFSymbolComponent(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [canUseSFSymbols]);
+
+  const TabIcon = useMemo(
+    () =>
+      ({ iosName, androidActiveName, androidInactiveName, color, size, focused }) => {
+        if (canUseSFSymbols && SFSymbolComponent) {
+          const name = focused ? `${iosName}.fill` : iosName;
+          const SFSymbol = SFSymbolComponent;
+          return (
+            <SFSymbol
+              name={name}
+              color={color}
+              size={size}
+              weight="semibold"
+              scale="medium"
+              style={{ width: size, height: size }}
+            />
+          );
+        }
+        return <Ionicons name={focused ? androidActiveName : androidInactiveName} size={size} color={color} />;
+      },
+    [SFSymbolComponent, canUseSFSymbols]
+  );
 
   return (
     <Tabs

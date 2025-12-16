@@ -1406,6 +1406,10 @@ const styles = StyleSheet.create({
   footerContent: {
     // Default: no right padding when collapsed
     paddingRight: 0,
+    // Reserve vertical space for the absolutely-positioned chevron so it doesn't overlap the CTA.
+    // When collapsed, `details` is not rendered and the chevron is position:absolute, so without this
+    // the content area has ~0 height and the chevron sits on top of the Place Order button.
+    minHeight: 44,
   },
   footerContentExpanded: {
     // When expanded: add whitespace for chevron on right

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,63 @@ import { getAddressLine, parseGenosysAddress } from '../../utils/addressUtils';
 import { createLogger } from '../../utils/logger';
 
 const log = createLogger('EditProfile');
+
+const GENDER_VALUES = {
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other',
+  NA: 'na',
+};
+
+const normalizeGenderValue = (raw) => {
+  const v = String(raw || '').trim();
+  if (!v) return GENDER_VALUES.NA;
+  const key = v.toLowerCase();
+  if ([GENDER_VALUES.MALE, GENDER_VALUES.FEMALE, GENDER_VALUES.OTHER, GENDER_VALUES.NA].includes(key)) {
+    return key;
+  }
+
+  // Back-compat: previously we stored localized labels; map common variants.
+  // English
+  if (key === 'male') return GENDER_VALUES.MALE;
+  if (key === 'female') return GENDER_VALUES.FEMALE;
+  if (key === 'other') return GENDER_VALUES.OTHER;
+  if (key.includes('prefer') || key.includes('not to say')) return GENDER_VALUES.NA;
+
+  // Russian
+  if (key.includes('муж')) return GENDER_VALUES.MALE;
+  if (key.includes('жен')) return GENDER_VALUES.FEMALE;
+  if (key.includes('дру')) return GENDER_VALUES.OTHER;
+  if (key.includes('предпоч')) return GENDER_VALUES.NA;
+
+  // Arabic (basic)
+  if (key.includes('ذكر')) return GENDER_VALUES.MALE;
+  if (key.includes('أنث') || key.includes('انث')) return GENDER_VALUES.FEMALE;
+  if (key.includes('آخر') || key.includes('اخر')) return GENDER_VALUES.OTHER;
+  if (key.includes('عدم') || key.includes('أفضل') || key.includes('افضل')) return GENDER_VALUES.NA;
+
+  return GENDER_VALUES.NA;
+};
+
+const getGenderLabel = (t, genderValue) => {
+  switch (genderValue) {
+    case GENDER_VALUES.MALE: return t('editProfile.genderMale');
+    case GENDER_VALUES.FEMALE: return t('editProfile.genderFemale');
+    case GENDER_VALUES.OTHER: return t('editProfile.genderOther');
+    case GENDER_VALUES.NA:
+    default:
+      return t('editProfile.preferNotToSay');
+  }
+};
+
+function FormSection({ title, children }) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {children}
+    </View>
+  );
+}
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -54,13 +111,15 @@ export default function EditProfileScreen() {
     email: '',
     phone: '',
     dateOfBirth: '',
-    gender: t('editProfile.preferNotToSay'),
+    // Store stable gender value (male/female/other/na). Display uses translation.
+    gender: GENDER_VALUES.NA,
     address: '',
     profilePicture: null,
   });
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -80,7 +139,7 @@ export default function EditProfileScreen() {
         phone: user.phone || '',
         // Backend uses `birthday` (YYYY-MM-DD). Keep local field name for UI.
         dateOfBirth: birthday,
-        gender: user.gender || t('editProfile.preferNotToSay'),
+        gender: normalizeGenderValue(user.gender),
         // Don't show GENOSYS_ADDR_V1 payload in the input
         address: getAddressLine(parsedAddr || (user.address || '')),
         profilePicture: user.profilePicture || null,
@@ -99,6 +158,9 @@ export default function EditProfileScreen() {
         emailNotifications: nextEmailNotif,
         smsNotifications: nextSmsNotif,
       });
+
+      // Start in edit mode on first open. After a save we flip to view-mode.
+      setIsEditing(true);
       
       // Set initial date if available
       if (birthday) {
@@ -123,8 +185,9 @@ export default function EditProfileScreen() {
   })();
 
   const updateField = useCallback((field, text) => {
+    if (!isEditing) setIsEditing(true);
     setFormData(prevData => ({...prevData, [field]: text}));
-  }, []);
+  }, [isEditing]);
 
   const handleEmailNotificationToggle = useCallback((value) => {
     setEmailNotifications(value);
@@ -136,6 +199,7 @@ export default function EditProfileScreen() {
 
   // Profile Picture Functions
   const handleProfilePicturePress = () => {
+    if (!isEditing) return;
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
@@ -237,20 +301,40 @@ export default function EditProfileScreen() {
 
   // Gender Selection Functions
   const genderOptions = [
-    t('editProfile.genderMale'),
-    t('editProfile.genderFemale'),
-    t('editProfile.genderOther'),
-    t('editProfile.preferNotToSay'),
+    { value: GENDER_VALUES.MALE, label: t('editProfile.genderMale') },
+    { value: GENDER_VALUES.FEMALE, label: t('editProfile.genderFemale') },
+    { value: GENDER_VALUES.OTHER, label: t('editProfile.genderOther') },
+    { value: GENDER_VALUES.NA, label: t('editProfile.preferNotToSay') },
   ];
 
-  const handleGenderSelect = (selectedGender) => {
-    updateField('gender', selectedGender);
+  const handleGenderSelect = (selectedGenderValue) => {
+    updateField('gender', selectedGenderValue);
     setShowGenderModal(false);
   };
 
   const showGenderSelector = () => {
+    if (!isEditing) return;
     setShowGenderModal(true);
   };
+
+  const resetToSnapshot = useCallback(() => {
+    if (!initialSnapshot) return;
+    setFormData({
+      firstName: initialSnapshot.firstName || '',
+      lastName: initialSnapshot.lastName || '',
+      email: initialSnapshot.email || '',
+      phone: initialSnapshot.phone || '',
+      dateOfBirth: initialSnapshot.dateOfBirth || '',
+      gender: initialSnapshot.gender || GENDER_VALUES.NA,
+      address: initialSnapshot.address || '',
+      profilePicture: initialSnapshot.profilePicture || null,
+    });
+    setEmailNotifications(!!initialSnapshot.emailNotifications);
+    setSmsNotifications(!!initialSnapshot.smsNotifications);
+    if (initialSnapshot.dateOfBirth) {
+      setSelectedDate(new Date(initialSnapshot.dateOfBirth));
+    }
+  }, [initialSnapshot]);
 
   const handleSave = async () => {
     log.debug('Profile save started');
@@ -278,6 +362,7 @@ export default function EditProfileScreen() {
         phone: formData.phone.trim(),
         // Backend contract expects `birthday` (YYYY-MM-DD).
         birthday: formData.dateOfBirth,
+        // Stable value (male/female/other/na)
         gender: formData.gender,
         address: formData.address.trim(),
         profilePicture: formData.profilePicture,
@@ -292,6 +377,7 @@ export default function EditProfileScreen() {
         // Mark form as "clean" so it no longer feels like you're mid-edit.
         setInitialSnapshot(getCurrentSnapshot());
         Keyboard.dismiss();
+        setIsEditing(false); // Exit edit mode after a successful save
         Alert.alert(
           t('editProfile.successTitle'),
           t('editProfile.successMessage'),
@@ -315,9 +401,16 @@ export default function EditProfileScreen() {
   };
 
   const handleCancel = () => {
-    // If nothing changed, just go back (no discard prompt).
-    if (!isDirty) {
+    // In view-mode: cancel acts as Back.
+    if (!isEditing) {
       router.back();
+      return;
+    }
+
+    // In edit-mode: Cancel discards changes and returns to view-mode.
+    if (!isDirty) {
+      setIsEditing(false);
+      Keyboard.dismiss();
       return;
     }
     Alert.alert(
@@ -325,9 +418,13 @@ export default function EditProfileScreen() {
       t('editProfile.discardMessage'),
       [
         { text: t('editProfile.keepEditing'), style: 'cancel' },
-        { text: t('editProfile.discard'), style: 'destructive', onPress: () => router.back() }
+        { text: t('editProfile.discard'), style: 'destructive', onPress: () => { resetToSnapshot(); setIsEditing(false); Keyboard.dismiss(); } }
       ]
     );
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   const handleDeleteAccount = () => {
@@ -363,30 +460,36 @@ export default function EditProfileScreen() {
     );
   };
 
-  const FormSection = memo(({ title, children }) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {children}
-    </View>
-  ));
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-          <Text style={styles.cancelText}>{t('editProfile.cancel')}</Text>
-        </TouchableOpacity>
+        {isEditing ? (
+          <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
+            <Text style={styles.cancelText}>{t('editProfile.cancel')}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleBack} style={[styles.headerButton, styles.headerBackButton]}>
+            <Ionicons name="chevron-back" size={18} color="#E74C3C" />
+            <Text style={styles.backText}>{t('common.back')}</Text>
+          </TouchableOpacity>
+        )}
         <Text style={styles.headerTitle}>{t('editProfile.headerTitle')}</Text>
-        <TouchableOpacity 
-          onPress={handleSave} 
-          style={[styles.headerButton, (isSaving || !isDirty) && styles.headerButtonDisabled]}
-          disabled={isSaving || !isDirty}
-        >
-          <Text style={[styles.saveText, (isSaving || !isDirty) && styles.saveTextDisabled]}>
-            {isSaving ? t('editProfile.saving') : t('editProfile.save')}
-          </Text>
-        </TouchableOpacity>
+        {isEditing ? (
+          <TouchableOpacity 
+            onPress={handleSave} 
+            style={[styles.headerButton, (isSaving || !isDirty) && styles.headerButtonDisabled]}
+            disabled={isSaving || !isDirty}
+          >
+            <Text style={[styles.saveText, (isSaving || !isDirty) && styles.saveTextDisabled]}>
+              {isSaving ? t('editProfile.saving') : t('editProfile.save')}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.headerButton}>
+            <Text style={styles.saveText}>{t('common.edit')}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView 
@@ -398,7 +501,11 @@ export default function EditProfileScreen() {
         {/* Profile Picture Section */}
         <FormSection title={t('editProfile.profilePicture')}>
           <View style={styles.formContent}>
-            <TouchableOpacity style={styles.profilePictureContainer} onPress={handleProfilePicturePress}>
+            <TouchableOpacity
+              style={[styles.profilePictureContainer, !isEditing && styles.readOnlyBlock]}
+              onPress={handleProfilePicturePress}
+              disabled={!isEditing}
+            >
               <View style={styles.profilePictureWrapper}>
                 {formData.profilePicture ? (
                   <Image source={{ uri: formData.profilePicture }} style={styles.profilePicture} />
@@ -407,11 +514,13 @@ export default function EditProfileScreen() {
                     <Ionicons name="person" size={40} color="#C7C7CC" />
                   </View>
                 )}
-                <View style={styles.editIconContainer}>
+                <View style={[styles.editIconContainer, !isEditing && styles.editIconDisabled]}>
                   <Ionicons name="camera" size={16} color="#ffffff" />
                 </View>
               </View>
-              <Text style={styles.profilePictureText}>{t('editProfile.tapToChangePhoto')}</Text>
+              <Text style={styles.profilePictureText}>
+                {isEditing ? t('editProfile.tapToChangePhoto') : t('common.edit')}
+              </Text>
             </TouchableOpacity>
           </View>
         </FormSection>
@@ -435,6 +544,7 @@ export default function EditProfileScreen() {
                 returnKeyType="next"
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
+                editable={isEditing}
               />
             </View>
             
@@ -454,6 +564,7 @@ export default function EditProfileScreen() {
                 returnKeyType="next"
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
+                editable={isEditing}
               />
             </View>
             
@@ -474,6 +585,7 @@ export default function EditProfileScreen() {
                 returnKeyType="next"
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
+                editable={isEditing}
               />
             </View>
             
@@ -490,6 +602,7 @@ export default function EditProfileScreen() {
                 returnKeyType="done"
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
+                editable={isEditing}
               />
             </View>
           </View>
@@ -500,7 +613,11 @@ export default function EditProfileScreen() {
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>{t('editProfile.dateOfBirth')}</Text>
-              <TouchableOpacity style={styles.selectField} onPress={showDatePickerModal}>
+              <TouchableOpacity
+                style={[styles.selectField, !isEditing && styles.readOnlyBlock]}
+                onPress={showDatePickerModal}
+                disabled={!isEditing}
+              >
                 <Text style={[styles.selectFieldText, !formData.dateOfBirth && styles.placeholderText]}>
                   {formatDisplayDate(formData.dateOfBirth) || 'Select date of birth'}
                 </Text>
@@ -509,8 +626,12 @@ export default function EditProfileScreen() {
             </View>
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>{t('editProfile.gender')}</Text>
-              <TouchableOpacity style={styles.selectField} onPress={showGenderSelector}>
-                <Text style={styles.selectFieldText}>{formData.gender}</Text>
+              <TouchableOpacity
+                style={[styles.selectField, !isEditing && styles.readOnlyBlock]}
+                onPress={showGenderSelector}
+                disabled={!isEditing}
+              >
+                <Text style={styles.selectFieldText}>{getGenderLabel(t, formData.gender)}</Text>
                 <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
               </TouchableOpacity>
             </View>
@@ -532,6 +653,7 @@ export default function EditProfileScreen() {
                 returnKeyType="default"
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
+                editable={isEditing}
               />
             </View>
           </View>
@@ -654,20 +776,20 @@ export default function EditProfileScreen() {
             <View style={styles.modalContent}>
               {genderOptions.map((option) => (
                 <TouchableOpacity
-                  key={option}
+                  key={option.value}
                   style={[
                     styles.genderOption,
-                    formData.gender === option && styles.selectedGenderOption
+                    formData.gender === option.value && styles.selectedGenderOption
                   ]}
-                  onPress={() => handleGenderSelect(option)}
+                  onPress={() => handleGenderSelect(option.value)}
                 >
                   <Text style={[
                     styles.genderOptionText,
-                    formData.gender === option && styles.selectedGenderOptionText
+                    formData.gender === option.value && styles.selectedGenderOptionText
                   ]}>
-                    {option}
+                    {option.label}
                   </Text>
-                  {formData.gender === option && (
+                  {formData.gender === option.value && (
                     <Ionicons name="checkmark" size={20} color="#E74C3C" />
                   )}
                 </TouchableOpacity>
@@ -697,19 +819,24 @@ const styles = StyleSheet.create({
   headerButton: {
     minWidth: 60,
   },
+  headerBackButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#000000',
   },
+  backText: {
+    fontSize: 17,
+    color: '#E74C3C',
+    fontWeight: '400',
+  },
   cancelText: {
     fontSize: 17,
     color: '#E74C3C',
-  },
-  saveText: {
-    color: '#E74C3C',
-    fontSize: 17,
-    fontWeight: '600',
   },
   headerButtonDisabled: {
     opacity: 0.5,
@@ -723,11 +850,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'right',
   },
-  headerButtonDisabled: {
-    opacity: 0.5,
+  readOnlyBlock: {
+    opacity: 0.75,
   },
-  saveTextDisabled: {
-    color: '#999999',
+  editIconDisabled: {
+    opacity: 0.55,
   },
   scrollView: {
     flex: 1,

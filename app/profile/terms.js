@@ -116,18 +116,11 @@ export default function TermsScreen() {
           </View>
         </Section>
 
-        {/* Returns and Refunds */}
-        <Section title="Returns and Refunds">
+        {/* Returns and Exchanges */}
+        <Section title="Returns and Exchanges">
           <Paragraph>
-            We accept returns of unopened products in original condition within 30 days of purchase.
+            We accept returns and exchanges within 7 days of delivery for unopened products in their original packaging. Please contact us to initiate a return or exchange.
           </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• Opened skincare products can be returned within 14 days</Text>
-            <Text style={styles.bulletPoint}>• Products must be in original packaging with all labels</Text>
-            <Text style={styles.bulletPoint}>• Return shipping costs are customer's responsibility</Text>
-            <Text style={styles.bulletPoint}>• Refunds will be processed to original payment method</Text>
-            <Text style={styles.bulletPoint}>• Custom or personalized products cannot be returned</Text>
-          </View>
         </Section>
 
         {/* Privacy Policy */}
@@ -195,9 +188,9 @@ export default function TermsScreen() {
             If you have any questions about these Terms & Conditions, please contact us:
           </Paragraph>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactItem}>Email: legal@genosys.ae</Text>
-            <Text style={styles.contactItem}>Phone: +971 4 123 4567</Text>
-            <Text style={styles.contactItem}>Address: Dubai Marina, UAE</Text>
+            <Text style={styles.contactItem}>Email: sales@genosys.ae</Text>
+            <Text style={styles.contactItem}>WhatsApp: +971 58 548 76 65</Text>
+            <Text style={styles.contactItem}>Address: Cordoba Residence, E02, Dubai, UAE</Text>
           </View>
         </Section>
 

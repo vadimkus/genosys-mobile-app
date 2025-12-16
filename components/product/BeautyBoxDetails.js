@@ -42,7 +42,7 @@ export default function BeautyBoxDetails({ product, styles }) {
           <View style={styles.beautyBoxKitList}>
             {safeParsed.items.map((it) => (
               <View key={`${it.index}-${it.header}`} style={styles.beautyBoxKitItem}>
-                <Text style={styles.beautyBoxKitHeader}>{`${it.index}. ${it.header}`}</Text>
+                <Text style={styles.beautyBoxKitHeader}>{`${it.index}. ${asText(it.header)}`}</Text>
                 {it.body ? <Text style={styles.beautyBoxKitBody}>{it.body}</Text> : null}
               </View>
             ))}
@@ -52,5 +52,6 @@ export default function BeautyBoxDetails({ product, styles }) {
     </View>
   );
 }
+
 
 

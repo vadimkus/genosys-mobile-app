@@ -16,7 +16,8 @@ Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials/c
 - **App domain**: `https://genosys.ae`
 - **Authorized domains**: 
   - `genosys.ae`
-  - `expo.dev` (for development)
+  - `auth.expo.io` (required for Expo Go redirect `https://auth.expo.io/@...`)
+  - `expo.dev` (optional; Expo docs domain)
 
 **Developer contact information:**
 - **Email addresses**: `support@genosys.ae`

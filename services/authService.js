@@ -158,12 +158,15 @@ export const processGoogleAuth = async (idToken) => {
         isNewUser: result.isNewUser
       };
     } else {
-      const error = await response.json();
-      log.warn('Google auth failed', error);
-      return { 
-        success: false, 
-        error: error.error || 'Google authentication failed' 
-      };
+      const errorText = await response.text().catch(() => '');
+      let errorJson = null;
+      try { errorJson = errorText ? JSON.parse(errorText) : null; } catch {}
+      const message =
+        (errorJson && (errorJson.error || errorJson.message)) ||
+        (errorText && errorText.slice(0, 200)) ||
+        'Google authentication failed';
+      log.warn('Google auth failed', { status: response.status, message });
+      return { success: false, error: message };
     }
   } catch (error) {
     log.error('Google auth error', error?.message || error);

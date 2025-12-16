@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,33 +20,27 @@ export default function AboutScreen() {
   const { t } = useLocalization();
   const appVersion = String(Constants?.expoConfig?.version || Constants?.manifest?.version || '1.0.0');
 
-  const handleLinkPress = (url) => {
-    Linking.openURL(url);
+  const openUrl = async (url) => {
+    const u = String(url || '').trim();
+    if (!u) return;
+    try {
+      await Linking.openURL(u);
+    } catch {
+      // ignore
+    }
   };
 
-  const FeatureCard = ({ icon, title, description, color }) => (
-    <View style={styles.featureCard}>
-      <View style={[styles.featureIcon, { backgroundColor: color }]}>
-        <Ionicons name={icon} size={24} color="#ffffff" />
-      </View>
-      <Text style={styles.featureTitle}>{title}</Text>
-      <Text style={styles.featureDescription}>{description}</Text>
+  const InfoRow = ({ label, value, onPress }) => (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      {onPress ? (
+        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+          <Text style={[styles.infoValue, styles.infoValueLink]}>{value}</Text>
+        </TouchableOpacity>
+      ) : (
+        <Text style={styles.infoValue}>{value}</Text>
+      )}
     </View>
-  );
-
-  const TeamMember = ({ role, description }) => (
-    <View style={styles.teamMember}>
-      <Text style={styles.teamRole}>{role}</Text>
-      <Text style={styles.teamDescription}>{description}</Text>
-    </View>
-  );
-
-  const SocialLink = ({ icon, name, url }) => (
-    <TouchableOpacity style={styles.socialLink} onPress={() => handleLinkPress(url)}>
-      <Ionicons name={icon} size={24} color="#E74C3C" />
-      <Text style={styles.socialText}>{name}</Text>
-      <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
-    </TouchableOpacity>
   );
 
   return (
@@ -63,196 +58,56 @@ export default function AboutScreen() {
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>G</Text>
-          </View>
-          <Text style={styles.heroTitle}>Genosys</Text>
-          <Text style={styles.heroSubtitle}>{t('about.premiumSubtitle')}</Text>
-          <Text style={styles.versionText}>{t('about.versionLabel', { version: appVersion })}</Text>
-        </View>
-
-        {/* Mission Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Our Mission</Text>
-          <Text style={styles.missionText}>
-            At Genosys, we believe that healthy, radiant skin is achievable for everyone. 
-            Our mission is to provide premium, clinically-proven skincare solutions that deliver 
-            visible results while respecting the unique needs of each individual's skin.
-          </Text>
-        </View>
-
-        {/* Features */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What Makes Us Different</Text>
-          <View style={styles.featuresGrid}>
-            <FeatureCard
-              icon="flask"
-              title="Science-Based"
-              description="All products backed by clinical research and dermatological testing"
-              color="#E74C3C"
-            />
-            <FeatureCard
-              icon="leaf"
-              title="Natural Ingredients"
-              description="Premium natural ingredients sourced from sustainable suppliers"
-              color="#27AE60"
-            />
-            <FeatureCard
-              icon="star"
-              title="Proven Results"
-              description="Visible improvements in skin texture, tone, and overall health"
-              color="#007AFF"
-            />
-            <FeatureCard
-              icon="shield-checkmark"
-              title="Dermatologist Approved"
-              description="Recommended by skin care professionals worldwide"
-              color="#AF52DE"
+            <Image
+              source={{ uri: AUTH_CONFIG.LOGO_URL || `${AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}/images/prd_logo.png` }}
+              style={styles.logoImage}
+              resizeMode="contain"
             />
           </View>
+          <Text style={styles.heroTitle}>{t('about.companyName')}</Text>
+          <Text style={styles.heroSubtitle}>{t('about.country')}</Text>
         </View>
 
-        {/* Story Section */}
-        <View style={styles.storySection}>
-          <Text style={styles.sectionTitle}>Our Story</Text>
-          <Text style={styles.storyText}>
-            Founded in 2020 in Dubai, Genosys emerged from a passion for combining cutting-edge 
-            skincare science with the luxury beauty traditions of the Middle East. Our founders, 
-            experienced dermatologists and beauty experts, recognized the need for premium skincare 
-            solutions tailored to the unique climate and lifestyle of the region.
-          </Text>
-          <Text style={styles.storyText}>
-            Today, we serve thousands of satisfied customers across the UAE, helping them achieve 
-            their skincare goals with our carefully curated collection of products and personalized 
-            beauty consultations.
-          </Text>
-        </View>
-
-        {/* Values Section */}
+        {/* About Us */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Our Values</Text>
-          <View style={styles.valuesList}>
-            <View style={styles.valueItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#27AE60" />
-              <View style={styles.valueContent}>
-                <Text style={styles.valueTitle}>Quality First</Text>
-                <Text style={styles.valueDescription}>Never compromising on product quality or safety standards</Text>
-              </View>
-            </View>
-            <View style={styles.valueItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#27AE60" />
-              <View style={styles.valueContent}>
-                <Text style={styles.valueTitle}>Customer-Centric</Text>
-                <Text style={styles.valueDescription}>Every decision we make puts our customers' needs first</Text>
-              </View>
-            </View>
-            <View style={styles.valueItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#27AE60" />
-              <View style={styles.valueContent}>
-                <Text style={styles.valueTitle}>Innovation</Text>
-                <Text style={styles.valueDescription}>Continuously researching and developing new solutions</Text>
-              </View>
-            </View>
-            <View style={styles.valueItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#27AE60" />
-              <View style={styles.valueContent}>
-                <Text style={styles.valueTitle}>Sustainability</Text>
-                <Text style={styles.valueDescription}>Committed to eco-friendly practices and packaging</Text>
-              </View>
-            </View>
+          <Text style={styles.sectionTitle}>{t('about.aboutUsTitle')}</Text>
+          <Text style={styles.paragraph}>{t('about.aboutUsLine1')}</Text>
+          <Text style={styles.paragraph}>{t('about.aboutUsLine2')}</Text>
+        </View>
+
+        {/* Mission */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('about.missionTitle')}</Text>
+          <Text style={styles.paragraph}>{t('about.missionText')}</Text>
+        </View>
+
+        {/* Legal Information & Contact */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('about.legalTitle')}</Text>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{t('about.companyDetailsTitle')}</Text>
+            <InfoRow label={t('about.companyLabel')} value={t('about.companyName')} />
+            <InfoRow label={t('about.yearLabel')} value={t('about.yearValue')} />
+            <InfoRow label={t('about.licenseLabel')} value={t('about.licenseValue')} />
+            <InfoRow label={t('about.trnLabel')} value={t('about.trnValue')} />
+            <InfoRow label={t('about.mainOfficeLabel')} value={t('about.mainOfficeValue')} />
+            <InfoRow label={t('about.dubaiOfficeLabel')} value={t('about.dubaiOfficeValue')} />
           </View>
-        </View>
 
-        {/* Team Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Meet Our Team</Text>
-          <TeamMember
-            role="Dermatology Experts"
-            description="Board-certified dermatologists who oversee product development and safety"
-          />
-          <TeamMember
-            role="Beauty Consultants"
-            description="Licensed aestheticians providing personalized skincare recommendations"
-          />
-          <TeamMember
-            role="Customer Success"
-            description="Dedicated support team ensuring exceptional customer experiences"
-          />
-          <TeamMember
-            role="Research & Development"
-            description="Scientists and chemists developing innovative skincare formulations"
-          />
-        </View>
-
-        {/* Recognition */}
-        <View style={styles.recognitionSection}>
-          <Text style={styles.sectionTitle}>Recognition & Certifications</Text>
-          <View style={styles.certificationsList}>
-            <View style={styles.certificationItem}>
-              <Ionicons name="ribbon" size={20} color="#FFD700" />
-              <Text style={styles.certificationText}>UAE Beauty Awards 2023 - Best Skincare Brand</Text>
-            </View>
-            <View style={styles.certificationItem}>
-              <Ionicons name="shield-checkmark" size={20} color="#27AE60" />
-              <Text style={styles.certificationText}>ISO 9001:2015 Quality Management Certified</Text>
-            </View>
-            <View style={styles.certificationItem}>
-              <Ionicons name="leaf" size={20} color="#27AE60" />
-              <Text style={styles.certificationText}>Cruelty-Free International Certified</Text>
-            </View>
-            <View style={styles.certificationItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#007AFF" />
-              <Text style={styles.certificationText}>FDA Registered Manufacturing Partner</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Social Media */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Follow Us</Text>
-          <SocialLink
-            icon="logo-instagram"
-            name="@genosys_uae"
-            url="https://instagram.com/genosys_uae"
-          />
-          <SocialLink
-            icon="logo-facebook"
-            name="Genosys UAE"
-            url="https://facebook.com/genosysuae"
-          />
-          <SocialLink
-            icon="globe"
-            name="www.genosys.ae"
-            url={AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}
-          />
-        </View>
-
-        {/* App Information */}
-        <View style={styles.appInfoSection}>
-          <Text style={styles.sectionTitle}>App Information</Text>
-          <View style={styles.appInfoCard}>
-            <View style={styles.appInfoRow}>
-              <Text style={styles.appInfoLabel}>Version</Text>
-              <Text style={styles.appInfoValue}>1.0.0</Text>
-            </View>
-            <View style={styles.appInfoRow}>
-              <Text style={styles.appInfoLabel}>Last Updated</Text>
-              <Text style={styles.appInfoValue}>December 2025</Text>
-            </View>
-            <View style={styles.appInfoRow}>
-              <Text style={styles.appInfoLabel}>Size</Text>
-              <Text style={styles.appInfoValue}>25.6 MB</Text>
-            </View>
-            <View style={styles.appInfoRow}>
-              <Text style={styles.appInfoLabel}>Compatibility</Text>
-              <Text style={styles.appInfoValue}>iOS 14.0+ / Android 8.0+</Text>
-            </View>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{t('about.businessInfoTitle')}</Text>
+            <InfoRow label={t('about.distributorLabel')} value={t('about.distributorValue')} />
+            <InfoRow label={t('about.certificationLabel')} value={t('about.certificationValue')} />
+            <InfoRow label={t('about.productsLabel')} value={t('about.productsValue')} />
+            <InfoRow label={t('about.areaLabel')} value={t('about.areaValue')} />
           </View>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2025 Genosys LLC. All rights reserved.</Text>
-          <Text style={styles.footerSubtext}>Made with ❤️ in Dubai, UAE</Text>
+          <Text style={styles.footerText}>{t('about.footerCopyright')}</Text>
+          <Text style={styles.footerSubtext}>{t('about.versionLabel', { version: appVersion })}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -293,21 +148,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 32,
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#ffffff',
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#E74C3C',
+    width: 86,
+    height: 86,
+    borderRadius: 18,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    padding: 10,
   },
-  logoText: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#ffffff',
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   heroTitle: {
     fontSize: 28,
@@ -318,7 +175,7 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 16,
-    color: '#8E8E93',
+    color: '#1D1D1F',
     marginBottom: 8,
   },
   versionText: {
@@ -339,168 +196,49 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
 
-  // Mission
-  missionText: {
+  paragraph: {
     fontSize: 16,
     color: '#1D1D1F',
     lineHeight: 24,
-  },
-
-  // Features
-  featuresGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  featureCard: {
-    width: '48%',
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  featureIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 12,
   },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  featureDescription: {
-    fontSize: 14,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 18,
-  },
 
-  // Story
-  storySection: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#F8F9FA',
+  card: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 14,
   },
-  storyText: {
+  cardTitle: {
     fontSize: 16,
-    color: '#1D1D1F',
-    lineHeight: 24,
-    marginBottom: 16,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 12,
   },
-
-  // Values
-  valuesList: {
-    gap: 16,
-  },
-  valueItem: {
+  infoRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'flex-start',
-  },
-  valueContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  valueTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: 4,
-  },
-  valueDescription: {
-    fontSize: 15,
-    color: '#8E8E93',
-    lineHeight: 20,
-  },
-
-  // Team
-  teamMember: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  teamRole: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: 6,
-  },
-  teamDescription: {
-    fontSize: 15,
-    color: '#8E8E93',
-    lineHeight: 20,
-  },
-
-  // Recognition
-  recognitionSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#F8F9FA',
-  },
-  certificationsList: {
-    gap: 12,
-  },
-  certificationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 8,
-  },
-  certificationText: {
-    fontSize: 15,
-    color: '#1D1D1F',
-    marginLeft: 12,
-    flex: 1,
-  },
-
-  // Social Links
-  socialLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  socialText: {
-    fontSize: 17,
-    color: '#000000',
-    flex: 1,
-    marginLeft: 16,
-  },
-
-  // App Info
-  appInfoSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-  },
-  appInfoCard: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-  },
-  appInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
   },
-  appInfoLabel: {
-    fontSize: 16,
-    color: '#8E8E93',
+  infoLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#6B7280',
+    width: '38%',
+    paddingRight: 8,
   },
-  appInfoValue: {
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+    width: '62%',
+    textAlign: 'right',
+  },
+  infoValueLink: {
+    color: '#2563eb',
   },
 
   // Footer
@@ -519,6 +257,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#C7C7CC',
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 8,
   },
 });

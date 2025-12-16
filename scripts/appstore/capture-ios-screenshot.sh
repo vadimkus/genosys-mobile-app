@@ -36,3 +36,4 @@ xcrun simctl io booted screenshot "$OUT_FILE"
 echo "Done."
 
 
+

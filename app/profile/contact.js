@@ -1,82 +1,140 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
-  Alert,
   Linking,
+  Image,
+  Animated,
+  Easing,
+  I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import AUTH_CONFIG from '../../config/auth';
 
 export default function ContactScreen() {
   const router = useRouter();
   const { t } = useLocalization();
-  const [formData, setFormData] = useState({
-    subject: '',
-    message: '',
-    email: 'sales@genosys.ae',
-  });
+  const WHATSAPP_NUMBER = String(AUTH_CONFIG.WHATSAPP_NUMBER || '971585487665').replace(/[^\d]/g, '');
+  const PHONE_DISPLAY = t('contact.phoneDisplay');
+  const EMAIL = 'sales@genosys.ae';
+  const WEBSITE = 'https://genosys.ae';
+  const INSTAGRAM = 'https://instagram.com/genosys.uae';
+  const FACEBOOK = 'https://facebook.com/genosys.ae';
+  const MAP_URL = 'https://maps.google.com/?q=' + encodeURIComponent('Cordoba Residence, E02, Dubai, UAE');
 
-  const handleSendMessage = () => {
-    if (!formData.subject.trim() || !formData.message.trim()) {
-      Alert.alert(t('contact.missingInfoTitle'), t('contact.missingInfoMessage'));
-      return;
-    }
+  // Small pulsing heart (one pulse every ~4 seconds)
+  const heartScale = useRef(new Animated.Value(1)).current;
+  const heartOpacity = useRef(new Animated.Value(0.9)).current;
 
-    Alert.alert(
-      t('contact.messageSentTitle'),
-      t('contact.messageSentText'),
-      [
-        { text: t('contact.ok'), onPress: () => router.back() }
-      ]
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.delay(3400),
+        Animated.parallel([
+          Animated.timing(heartScale, {
+            toValue: 1.18,
+            duration: 220,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(heartOpacity, {
+            toValue: 1,
+            duration: 220,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(heartScale, {
+            toValue: 1,
+            duration: 220,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(heartOpacity, {
+            toValue: 0.9,
+            duration: 220,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+      ])
     );
-  };
+    anim.start();
+    return () => {
+      anim.stop();
+    };
+  }, [heartOpacity, heartScale]);
 
   const contactMethods = [
     {
+      id: 'whatsapp',
+      title: t('contact.methodWhatsappTitle'),
+      value: PHONE_DISPLAY,
+      icon: 'logo-whatsapp',
+      description: t('contact.methodWhatsappDesc'),
+      action: () => Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`),
+    },
+    {
       id: 'phone',
       title: t('contact.methodPhoneTitle'),
-      value: '+971 58 548 76 65',
+      value: PHONE_DISPLAY,
       icon: 'call',
       description: t('contact.methodPhoneDesc'),
-      action: () => Linking.openURL('tel:+971585487665'),
+      action: () => Linking.openURL(`tel:+${WHATSAPP_NUMBER}`),
     },
     {
       id: 'email',
       title: t('contact.methodEmailTitle'),
-      value: 'sales@genosys.ae',
+      value: EMAIL,
       icon: 'mail',
       description: t('contact.methodEmailDesc'),
-      action: () => Linking.openURL('mailto:sales@genosys.ae'),
+      action: () => Linking.openURL(`mailto:${EMAIL}`),
     },
     {
-      id: 'whatsapp',
-      title: t('contact.methodWhatsappTitle'),
-      value: '+971 58 548 76 65',
-      icon: 'logo-whatsapp',
-      description: t('contact.methodWhatsappDesc'),
-      action: () => Linking.openURL('https://wa.me/971585487665'),
+      id: 'website',
+      title: t('contact.methodWebsiteTitle'),
+      value: 'genosys.ae',
+      icon: 'globe',
+      description: t('contact.methodWebsiteDesc'),
+      action: () => Linking.openURL(WEBSITE),
     },
     {
-      id: 'address',
+      id: 'instagram',
+      title: t('contact.methodInstagramTitle'),
+      value: '@genosys.uae',
+      icon: 'logo-instagram',
+      description: t('contact.methodInstagramDesc'),
+      action: () => Linking.openURL(INSTAGRAM),
+    },
+    {
+      id: 'facebook',
+      title: t('contact.methodFacebookTitle'),
+      value: 'genosys.ae',
+      icon: 'logo-facebook',
+      description: t('contact.methodFacebookDesc'),
+      action: () => Linking.openURL(FACEBOOK),
+    },
+    {
+      id: 'location',
       title: t('contact.methodVisitTitle'),
-      value: t('contact.methodVisitValue'),
+      value: t('contact.locationValue'),
       icon: 'location',
       description: t('contact.methodVisitDesc'),
-      action: () => Linking.openURL('https://maps.google.com/?q=Dubai+Marina,UAE'),
+      action: () => Linking.openURL(MAP_URL),
     },
   ];
 
   const ContactMethodCard = ({ method }) => (
     <TouchableOpacity style={styles.contactCard} onPress={method.action}>
       <View style={styles.contactIcon}>
-        <Ionicons name={method.icon} size={24} color="#E74C3C" />
+        <Ionicons name={method.icon} size={24} color={method.icon === 'logo-whatsapp' ? '#25D366' : '#E74C3C'} />
       </View>
       <View style={styles.contactDetails}>
         <Text style={styles.contactTitle}>{method.title}</Text>
@@ -101,13 +159,19 @@ export default function ContactScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
-          <View style={styles.heroIcon}>
-            <Ionicons name="chatbubbles" size={48} color="#E74C3C" />
+          <Image
+            source={require('../../assets/splash-logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.heroTitle}>{t('contact.companyName')}</Text>
+          <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
+            <Text style={styles.flagText}>🇦🇪</Text>
+            <Text style={styles.countryText}>{t('contact.country')}</Text>
+            <Animated.View style={{ transform: [{ scale: heartScale }], opacity: heartOpacity }}>
+              <Ionicons name="heart" size={14} color="#E74C3C" />
+            </Animated.View>
           </View>
-          <Text style={styles.heroTitle}>{t('contact.hero')}</Text>
-          <Text style={styles.heroSubtitle}>
-            {t('contact.heroSubtitle')}
-          </Text>
         </View>
 
         {/* Contact Methods */}
@@ -118,108 +182,40 @@ export default function ContactScreen() {
           ))}
         </View>
 
-        {/* Contact Form */}
+        {/* Official Distributor in the UAE */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('contact.sendMessage')}</Text>
-          <View style={styles.formContainer}>
-            <View style={styles.formField}>
-              <Text style={styles.fieldLabel}>{t('contact.yourEmail')}</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.email}
-                onChangeText={(text) => setFormData({...formData, email: text})}
-                placeholder={t('contact.emailPlaceholder')}
-                keyboardType="email-address"
-                editable={false}
-                placeholderTextColor="#C7C7CC"
-              />
+          <Text style={styles.sectionTitle}>{t('contact.officialDistributorTitle')}</Text>
+          <View style={styles.distributorCard}>
+            <View style={styles.distributorRow}>
+              <Ionicons name="checkmark-circle" size={18} color="#27AE60" />
+              <Text style={styles.distributorText}>{t('contact.officialDistributorLine1')}</Text>
             </View>
-
-            <View style={styles.formField}>
-              <Text style={styles.fieldLabel}>{t('contact.subjectRequired')}</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.subject}
-                onChangeText={(text) => setFormData({...formData, subject: text})}
-                placeholder={t('contact.subjectPlaceholder')}
-                placeholderTextColor="#C7C7CC"
-              />
+            <View style={styles.distributorRow}>
+              <Ionicons name="checkmark-circle" size={18} color="#27AE60" />
+              <Text style={styles.distributorText}>{t('contact.officialDistributorLine2')}</Text>
             </View>
-
-            <View style={styles.formField}>
-              <Text style={styles.fieldLabel}>{t('contact.messageRequired')}</Text>
-              <TextInput
-                style={[styles.textInput, styles.messageInput]}
-                value={formData.message}
-                onChangeText={(text) => setFormData({...formData, message: text})}
-                placeholder={t('contact.messagePlaceholder')}
-                multiline
-                numberOfLines={6}
-                textAlignVertical="top"
-                placeholderTextColor="#C7C7CC"
-              />
+            <View style={[styles.distributorRow, { marginTop: 6 }]}>
+              <Ionicons name="document-text" size={18} color="#8E8E93" />
+              <Text style={styles.distributorText}>
+                {t('contact.licenseLabel')} {t('contact.licenseValue')}
+              </Text>
             </View>
-
-            <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-              <Text style={styles.sendButtonText}>{t('contact.send')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Office Information */}
-        <View style={styles.officeSection}>
-          <Text style={styles.sectionTitle}>{t('contact.office')}</Text>
-          <View style={styles.officeCard}>
-            <View style={styles.officeHeader}>
-              <Text style={styles.officeTitle}>{t('contact.hq')}</Text>
-              <TouchableOpacity 
-                style={styles.mapButton}
-                onPress={() => Linking.openURL('https://maps.google.com/?q=Dubai+Marina,UAE')}
-              >
-                <Text style={styles.mapButtonText}>{t('contact.viewMap')}</Text>
-              </TouchableOpacity>
+            <View style={styles.distributorRow}>
+              <Ionicons name="document-text" size={18} color="#8E8E93" />
+              <Text style={styles.distributorText}>
+                {t('contact.companyLicenseLabel')} {t('contact.companyLicenseValue')}
+              </Text>
             </View>
-            
-            <View style={styles.officeDetails}>
-              <View style={styles.officeItem}>
-                <Ionicons name="location" size={16} color="#8E8E93" />
-                <Text style={styles.officeText}>{t('contact.officeLocation')}</Text>
-              </View>
-              <View style={styles.officeItem}>
-                <Ionicons name="time" size={16} color="#8E8E93" />
-                <Text style={styles.officeText}>{t('contact.officeHours')}</Text>
-              </View>
-              <View style={styles.officeItem}>
-                <Ionicons name="car" size={16} color="#8E8E93" />
-                <Text style={styles.officeText}>{t('contact.parking')}</Text>
-              </View>
+            <View style={styles.distributorRow}>
+              <Ionicons name="document-text" size={18} color="#8E8E93" />
+              <Text style={styles.distributorText}>
+                {t('contact.trnLabel')} {t('contact.trnValue')}
+              </Text>
             </View>
           </View>
         </View>
 
-        {/* FAQ Link */}
-        <View style={styles.faqSection}>
-          <TouchableOpacity 
-            style={styles.faqCard}
-            onPress={() => router.push('/profile/help')}
-          >
-            <View style={styles.faqIcon}>
-              <Ionicons name="help-circle" size={24} color="#27AE60" />
-            </View>
-            <View style={styles.faqDetails}>
-              <Text style={styles.faqTitle}>{t('contact.checkFaq')}</Text>
-              <Text style={styles.faqSubtitle}>{t('contact.faqSubtitle')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Response Time Notice */}
-        <View style={styles.responseNotice}>
-          <Text style={styles.responseText}>
-            {t('contact.responseTimeNote')}
-          </Text>
-        </View>
+        <View style={{ height: 24 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -259,7 +255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 32,
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#ffffff',
   },
   heroIcon: {
     width: 80,
@@ -283,6 +279,28 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     textAlign: 'center',
     lineHeight: 22,
+  },
+  logo: {
+    width: 240,
+    height: 72,
+    marginBottom: 14,
+  },
+  countryRow: {
+    marginTop: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  countryRowRtl: {
+    flexDirection: 'row-reverse',
+  },
+  flagText: {
+    fontSize: 14,
+  },
+  countryText: {
+    fontSize: 16,
+    color: '#8E8E93',
   },
 
   // Sections
@@ -334,6 +352,24 @@ const styles = StyleSheet.create({
   contactDescription: {
     fontSize: 14,
     color: '#8E8E93',
+  },
+
+  distributorCard: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 16,
+  },
+  distributorRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  distributorText: {
+    fontSize: 15,
+    color: '#000000',
+    marginLeft: 10,
+    flex: 1,
+    lineHeight: 20,
   },
 
   // Form

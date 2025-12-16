@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
@@ -184,6 +184,39 @@ export default function PerfectCombinationCard({ product, user, styles }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id, product?.productNumber, locale, user?.id, recId]);
 
+  // Hooks must be called unconditionally (before any returns).
+  const recommendedProductId = useMemo(() => {
+    const pid = recommendedProduct?.id ?? recommendedProduct?.productNumber ?? null;
+    return pid != null ? String(pid) : null;
+  }, [recommendedProduct?.id, recommendedProduct?.productNumber]);
+
+  const recommendedName = useMemo(() => {
+    if (!recommendedProduct) return '';
+    return asText(getLocalizedProductName(recommendedProduct, locale) || recommendedProduct.name).trim();
+  }, [recommendedProduct, locale]);
+
+  const handleOpenRecommended = useCallback(() => {
+    if (!recommendedProductId) return;
+    router.push({ pathname: '/product/[id]', params: { id: recommendedProductId } });
+  }, [recommendedProductId]);
+
+  const handleAddRecommendedToBag = useCallback(() => {
+    if (!recommendedProduct) return;
+    try {
+      addItem(recommendedProduct, 1, '', '');
+      Alert.alert(
+        t('product.addedToBagTitle') || 'Added to bag',
+        `${recommendedName || 'Item'} has been added to your bag`,
+        [
+          { text: t('product.continueShopping') || t('common.ok') || 'OK', style: 'default' },
+          { text: t('product.viewBag') || 'View bag', style: 'default', onPress: () => router.push('/(tabs)/bag') },
+        ]
+      );
+    } catch (e) {
+      Alert.alert(t('common.error') || 'Error', 'Failed to add to bag');
+    }
+  }, [addItem, recommendedProduct, recommendedName, t]);
+
   if (!product || isBeautyBoxProduct(product)) return null;
   if (!recId) return null;
 
@@ -198,7 +231,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
   if (!recommendedProduct) return null;
 
   const currentName = asText(getLocalizedProductName(product, locale) || product.name).trim();
-  const recName = asText(getLocalizedProductName(recommendedProduct, locale) || recommendedProduct.name).trim();
+  const recName = recommendedName;
   const { intro, benefits } = getPerfectCombinationCopy(t, currentId, recId, currentName, recName);
 
   const canSeePrices = user?.canSeePrices !== false;
@@ -229,11 +262,8 @@ export default function PerfectCombinationCard({ product, user, styles }) {
       ) : null}
 
       <View style={styles.pcCard}>
-        <TouchableOpacity
-          style={styles.pcProductCard}
-          onPress={() => router.push(`/product/${recommendedProduct.id}`)}
-          activeOpacity={0.9}
-        >
+        <View style={styles.pcProductCard}>
+          <TouchableOpacity onPress={handleOpenRecommended} activeOpacity={0.9}>
           <View style={styles.pcImageWrap}>
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.pcImage} resizeMode="cover" />
@@ -262,16 +292,17 @@ export default function PerfectCombinationCard({ product, user, styles }) {
           )}
 
           <Text style={styles.pcViewDetails}>{t('product.clickToViewDetails')}</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.pcAddBtn}
-            onPress={() => addItem(recommendedProduct, 1)}
+            onPress={handleAddRecommendedToBag}
             activeOpacity={0.9}
           >
             <Ionicons name="bag-add" size={16} color="#ffffff" />
             <Text style={styles.pcAddBtnText}>{t('product.addToBag')}</Text>
           </TouchableOpacity>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.pcBenefitsCard}>
           <View style={styles.pcBenefitsHeader}>

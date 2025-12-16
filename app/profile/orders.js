@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
@@ -71,6 +71,7 @@ export default function OrdersScreen() {
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
   const { t } = useLocalization();
+  const insets = useSafeAreaInsets();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -229,12 +230,12 @@ export default function OrdersScreen() {
     }
 
     Alert.alert(
-      'Delete order?',
-      `Are you sure you want to delete order ${String(orderNumber)}?`,
+      t('ordersScreen.deleteOrderTitle'),
+      t('ordersScreen.deleteOrderMessage', { orderNumber: String(orderNumber) }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -263,7 +264,6 @@ export default function OrdersScreen() {
             <Ionicons name="chevron-back" size={24} color="#E74C3C" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('orders.title')}</Text>
-          <Text style={styles.headerTitle}>{t('orders.title')}</Text>
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.center}>
@@ -289,6 +289,7 @@ export default function OrdersScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: (insets?.bottom || 0) + 24 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E74C3C" />}
       >
         {loading ? (
@@ -356,7 +357,10 @@ export default function OrdersScreen() {
                         <Ionicons name="chevron-forward" size={14} color="#8E8E93" />
                       </TouchableOpacity>
                       <TouchableOpacity
-                        onPress={() => handleDelete(o)}
+                        // Safer UX: delete is long-press only to prevent accidental taps.
+                        onPress={() => Alert.alert(t('ordersScreen.holdToDeleteTitle'), t('ordersScreen.holdToDeleteMessage'))}
+                        onLongPress={() => handleDelete(o)}
+                        delayLongPress={650}
                         activeOpacity={0.85}
                         style={styles.deletePill}
                       >
@@ -379,7 +383,9 @@ export default function OrdersScreen() {
                   </Text>
                   <View style={styles.cardBottom}>
                     <Text style={styles.totalText}>AED {formatAED(total)}</Text>
-                    <Text style={styles.itemsText}>{itemCount} items</Text>
+                    <Text style={styles.itemsText}>
+                      {t('ordersScreen.itemsCount', { count: itemCount })}
+                    </Text>
                   </View>
                   <View style={styles.breakdownRow}>
                     <Text style={styles.breakdownText}>Shipping: {freeShipping ? 'FREE' : `AED ${formatAED(shipping)}`}</Text>
@@ -485,7 +491,8 @@ const styles = StyleSheet.create({
   },
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   orderToggle: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  detailsActions: { alignItems: 'flex-end', gap: 8 },
+  // More spacing between Details and Delete to reduce accidental taps.
+  detailsActions: { alignItems: 'flex-end', gap: 16 },
   detailsPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -507,6 +514,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F2F7',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 4,
   },
   statusRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
   orderNumber: { fontSize: 15, fontWeight: '700', color: '#1D1D1F' },

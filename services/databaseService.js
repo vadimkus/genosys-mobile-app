@@ -108,6 +108,27 @@ export const updateUserProfile = async (token, profileData) => {
   });
 };
 
+// ============= BILLING / TAX =============
+
+export const getUserBilling = async (token) => {
+  return await apiRequest('/user/billing', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+};
+
+export const updateUserBilling = async (token, { billingAddress, vatNumber }) => {
+  return await apiRequest('/user/billing', {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ billingAddress, vatNumber }),
+  });
+};
+
 /**
  * Upload profile picture
  * @param {string} token - User auth token

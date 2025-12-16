@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { fetchUserOrders } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -37,6 +38,49 @@ export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
+  const [ordersCount, setOrdersCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const token = user?.token;
+      if (!token) {
+        setOrdersCount(0);
+        return;
+      }
+      try {
+        // Count only Pending + Completed, excluding deleted/cancelled orders.
+        // Backend currently returns list (no totalCount field), so we fetch a reasonable page size.
+        const list = await fetchUserOrders(token, { page: 1, limit: 100 }).catch(() => []);
+        const arr = Array.isArray(list) ? list : [];
+
+        const allowed = new Set(['pending', 'completed', 'delivered']);
+        const deleted = new Set(['deleted', 'cancelled', 'canceled']);
+        const seen = new Set();
+
+        const count = arr.filter((o) => {
+          const key = String(o?.id || o?.orderId || o?.orderNumber || o?.order_number || o?.number || '');
+          if (key) {
+            if (seen.has(key)) return false;
+            seen.add(key);
+          }
+          const s = String(o?.status || '').toLowerCase();
+          const ps = String(o?.paymentStatus || o?.payment_status || '').toLowerCase();
+          if (deleted.has(s) || deleted.has(ps)) return false;
+          // Treat "paid/confirmed" as completed even if status field is different.
+          if (ps === 'paid' || ps === 'confirmed') return true;
+          return allowed.has(s);
+        }).length;
+
+        if (!cancelled) setOrdersCount(count);
+      } catch {
+        if (!cancelled) setOrdersCount(0);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.token]);
 
   const profileImageUri =
     (typeof user?.profilePicture === 'string' && user.profilePicture.trim()) ? user.profilePicture.trim()
@@ -150,6 +194,10 @@ export default function ProfileScreen() {
     </TouchableOpacity>
   );
 
+  const ordersSubtitle = useMemo(() => {
+    return t('profile.purchasesCount', { count: ordersCount });
+  }, [ordersCount, t]);
+
   // Section List Item Component
   const ProfileSection = ({ title, children, style }) => (
     <View style={[styles.section, style]}>
@@ -246,7 +294,7 @@ export default function ProfileScreen() {
             <QuickActionCard
               icon="receipt-outline"
               title={t('profile.orders')}
-              subtitle={t('profile.trackPurchases')}
+              subtitle={ordersSubtitle}
               color="#E74C3C"
               onPress={() => router.push('/profile/orders')}
             />
@@ -280,7 +328,7 @@ export default function ProfileScreen() {
             />
             <ProfileItem
               icon="notifications-outline"
-              title={t('profile.notifications')}
+              title={t('profile.pushNotifications')}
               rightComponent={
                 <Switch
                   value={notificationsEnabled}
@@ -325,12 +373,6 @@ export default function ProfileScreen() {
                 hasArrow={false}
               />
             )}
-            <ProfileItem
-              icon="location-outline"
-              title={t('profile.myAddresses')}
-              subtitle={t('profile.manageDeliveryAddresses')}
-              onPress={() => router.push('/profile/addresses')}
-            />
             <ProfileItem
               icon="shield-outline"
               title={t('profile.privacyPolicy')}

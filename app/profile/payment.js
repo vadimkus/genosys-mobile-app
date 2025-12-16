@@ -12,11 +12,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../../services/paymentPreferences';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { getUserBilling } from '../../services/databaseService';
 
 export default function PaymentScreen() {
   const router = useRouter();
   const { t } = useLocalization();
+  const { user } = useAuth();
+  const token = user?.token || '';
   const [defaultMethod, setDefaultMethodState] = useState(PAYMENT_METHODS.COD);
+  const [billingAddress, setBillingAddress] = useState('');
+  const [vatNumber, setVatNumber] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -24,6 +30,21 @@ export default function PaymentScreen() {
       setDefaultMethodState(method);
     })();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!token) return;
+      const res = await getUserBilling(token).catch(() => null);
+      const data = res?.data?.data || res?.data || {};
+      if (cancelled) return;
+      setBillingAddress(String(data?.billingAddress || '').trim());
+      setVatNumber(String(data?.vatNumber || '').trim());
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   const selectDefault = async (method) => {
     try {
@@ -46,11 +67,6 @@ export default function PaymentScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Info Section */}
-        <View style={styles.infoSection}>
-          <Text style={styles.infoText}>{t('paymentSettings.info')}</Text>
-        </View>
-
         {/* Payment Methods */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('paymentSettings.defaultMethod')}</Text>
@@ -107,19 +123,23 @@ export default function PaymentScreen() {
           <View style={styles.billingCard}>
             <View style={styles.billingRow}>
               <Text style={styles.billingLabel}>{t('paymentSettings.billingAddress')}</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/profile/billing')} activeOpacity={0.7}>
                 <Text style={styles.billingLink}>{t('paymentSettings.update')}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.billingAddress}>{t('paymentSettings.sameAsShipping')}</Text>
+            <Text style={styles.billingAddress}>
+              {billingAddress ? billingAddress : t('paymentSettings.sameAsShipping')}
+            </Text>
             
             <View style={[styles.billingRow, { marginTop: 16 }]}>
               <Text style={styles.billingLabel}>{t('paymentSettings.taxInfo')}</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/profile/billing')} activeOpacity={0.7}>
                 <Text style={styles.billingLink}>{t('paymentSettings.manage')}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.billingAddress}>{t('paymentSettings.vatNumberMissing')}</Text>
+            <Text style={styles.billingAddress}>
+              {vatNumber ? `VAT/TRN: ${vatNumber}` : t('paymentSettings.vatNumberMissing')}
+            </Text>
           </View>
         </View>
 

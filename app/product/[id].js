@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  Animated,
   TouchableOpacity,
   Image,
   StyleSheet,
@@ -16,6 +16,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useFavorites } from '../../contexts/FavoritesContext';
 import { fetchProductById } from '../../services/api';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../../utils/productRules';
@@ -43,7 +44,8 @@ import {
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const HEADER_HEIGHT = 400;
+// Product detail hero/header is intentionally more compact than before.
+const HEADER_HEIGHT = 240;
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -87,14 +89,15 @@ const log = createLogger('ProductDetail');
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const { t, locale, dir } = useLocalization();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const { addItem, isInCart, getItemQuantity } = useCart();
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadProduct();
@@ -217,8 +220,20 @@ export default function ProductDetailScreen() {
     log.debug('Color changed', { color });
   };
 
-  const handleWishlistToggle = () => {
-    setIsWishlisted(!isWishlisted);
+  const handleWishlistToggle = async () => {
+    if (!product?.id) return;
+    try {
+      const displayName = asText(getLocalizedProductName(product, locale) || product.name);
+      const unitPrice = getSelectedUnitPrice();
+      await toggleFavorite({
+        id: product.id,
+        name: displayName,
+        image: product.image,
+        price: unitPrice || product.displayPrice || product.price || 0,
+      });
+    } catch (e) {
+      Alert.alert(t('common.error'), 'Failed to update favorites');
+    }
   };
 
   const handleShare = async () => {
@@ -532,40 +547,63 @@ export default function ProductDetailScreen() {
     );
   }
 
+  const isWishlisted = !!(product?.id && isFavorite(product.id));
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 60],
+    outputRange: [0, -80],
+    extrapolate: 'clamp',
+  });
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 40, 80],
+    outputRange: [1, 0.9, 0],
+    extrapolate: 'clamp',
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
-      <SafeAreaView style={styles.headerContainer}>
-        <View style={styles.headerButtons}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => router.back()}
-        >
-            <Ionicons name="chevron-back" size={22} color="#1D1D1F" />
-        </TouchableOpacity>
-        
-          <TouchableOpacity
-            style={[styles.headerButton, styles.headerButtonMiddle]}
-            onPress={handleShare}
-          >
-            <Ionicons name="share-outline" size={22} color="#1D1D1F" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.headerButton, styles.headerButtonLast]}
-            onPress={handleWishlistToggle}
-          >
-            <Ionicons 
-              name={isWishlisted ? "heart" : "heart-outline"} 
-              size={22} 
-              color={isWishlisted ? "#E74C3C" : "#1D1D1F"}
-            />
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      {/* Collapsing header (overlay) */}
+      <Animated.View
+        pointerEvents="box-none"
+        style={[
+          styles.headerOverlay,
+          { transform: [{ translateY: headerTranslateY }], opacity: headerOpacity },
+        ]}
+      >
+        <SafeAreaView style={styles.headerContainer}>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
+              <Ionicons name="chevron-back" size={20} color="#1D1D1F" />
+            </TouchableOpacity>
+
+            <View style={styles.headerRightButtons}>
+              <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
+                <Ionicons name="share-outline" size={20} color="#1D1D1F" />
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.headerButton} onPress={handleWishlistToggle}>
+                <Ionicons
+                  name={isWishlisted ? 'heart' : 'heart-outline'}
+                  size={20}
+                  color={isWishlisted ? '#E74C3C' : '#1D1D1F'}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </SafeAreaView>
+      </Animated.View>
 
       {/* Product Content */}
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+      >
         {/* Hero Image */}
         <View style={styles.imageContainer}>
           {product.image ? (
@@ -764,7 +802,7 @@ export default function ProductDetailScreen() {
 
           {/* Rating Section removed (not needed for now) */}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
@@ -827,10 +865,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  headerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 50,
+  },
   headerContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'rgba(255, 255, 255, 0.96)',
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingBottom: 8,
   },
   headerButtons: {
     flexDirection: 'row',
@@ -838,10 +883,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  headerRightButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 12,
+  },
   headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -850,12 +901,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
-  headerButtonMiddle: {
-    marginHorizontal: 16,
-  },
-  headerButtonLast: {
-    marginLeft: 0,
   },
   scrollView: {
     flex: 1,
@@ -883,7 +928,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 16,
     paddingBottom: 100, // Space for bottom button
   },
   productInfo: {
