@@ -334,7 +334,18 @@ export default function CheckoutScreen() {
           Alert.alert(
             t('checkout.orderSubmittedTitle'),
             t('checkout.orderSubmittedMessageCOD', { orderNumber: finalOrderNumber }),
-            [{ text: t('checkout.continueShopping'), onPress: () => router.replace('/(tabs)/shop') }]
+            [
+              { 
+                text: t('checkout.viewOrder'), 
+                onPress: () => router.replace('/(tabs)/orders'),
+                style: 'default'
+              },
+              { 
+                text: t('checkout.continueShopping'), 
+                onPress: () => router.replace('/(tabs)/shop'),
+                style: 'cancel'
+              }
+            ]
           );
           return;
         }

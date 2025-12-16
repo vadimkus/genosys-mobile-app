@@ -151,24 +151,21 @@ export default function StripePaymentScreen() {
       orderNumber ? t('payment.paymentSuccessMessageWithOrder', { orderNumber }) : t('payment.paymentSuccessMessage'),
       [
         {
-          text: fromOrders ? t('payment.backToOrders') : t('common.continueShopping'),
+          text: t('payment.viewOrder'),
           onPress: () => {
-            if (!fromOrders) {
-              clearCart();
-              router.replace('/(tabs)/shop');
-            } else {
-              router.replace('/profile/orders');
-            }
+            clearCart();
+            router.replace('/(tabs)/orders');
           },
+          style: 'default',
         },
-        ...(fromOrders
-          ? [
-              {
-                text: t('common.continueShopping'),
-                onPress: () => router.replace('/(tabs)/shop'),
-              },
-            ]
-          : []),
+        {
+          text: t('common.continueShopping'),
+          onPress: () => {
+            clearCart();
+            router.replace('/(tabs)/shop');
+          },
+          style: 'cancel',
+        },
       ]
     );
   }, [paid, orderNumber, clearCart, fromOrders]);
