@@ -465,10 +465,19 @@ export const AuthProvider = ({ children }) => {
       const result = await dbUpdateUserProfile(user.token, updatedProfileData);
       
       if (result.success) {
+        // dbUpdateUserProfile -> apiRequest() returns:
+        // { success: true, data: <raw backend json> }
+        // Backend returns: { success: true, data: { ...userProfile } }
+        const serverUser =
+          result?.user ||
+          result?.data?.user ||
+          result?.data?.data ||
+          null;
+
         // Update user in context and storage, preserving the token
         const updatedUser = { 
           ...user, 
-          ...result.user, // Use result.user instead of result.data.user
+          ...(serverUser || {}),
           token: user.token  // Always preserve the token
         };
         setUser(updatedUser);
@@ -476,6 +485,15 @@ export const AuthProvider = ({ children }) => {
         log.debug('User profile updated (token preserved)');
       }
       
+      // Normalize return shape for callers that expect `result.user`
+      if (result?.success) {
+        const normalizedUser =
+          result?.user ||
+          result?.data?.user ||
+          result?.data?.data ||
+          undefined;
+        return { ...result, user: normalizedUser };
+      }
       return result;
     } catch (error) {
       log.error('Profile update error', error?.message || error);

@@ -98,12 +98,11 @@ export const updateUserProfile = async (token, profileData) => {
     body: JSON.stringify({
       name: profileData.name,
       phone: profileData.phone,
-      dateOfBirth: profileData.dateOfBirth,
-      gender: profileData.gender,
       address: profileData.address,
       profilePicture: profileData.profilePicture,
-      emailNotifications: profileData.emailNotifications,
-      smsNotifications: profileData.smsNotifications,
+      // Backend contract: expects `birthday` in YYYY-MM-DD format.
+      // Keep compatibility with callers still using `dateOfBirth`.
+      birthday: profileData.birthday ?? profileData.dateOfBirth ?? null,
     }),
   });
 };

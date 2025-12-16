@@ -69,12 +69,14 @@ export default function EditProfileScreen() {
     if (user) {
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
       const parsedAddr = parseGenosysAddress(user.address || '');
+      const birthday = user.birthday || user.dateOfBirth || '';
       setFormData({
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
         email: user.email || '',
         phone: user.phone || '',
-        dateOfBirth: user.dateOfBirth || '',
+        // Backend uses `birthday` (YYYY-MM-DD). Keep local field name for UI.
+        dateOfBirth: birthday,
         gender: user.gender || t('editProfile.preferNotToSay'),
         // Don't show GENOSYS_ADDR_V1 payload in the input
         address: getAddressLine(parsedAddr || (user.address || '')),
@@ -82,8 +84,8 @@ export default function EditProfileScreen() {
       });
       
       // Set initial date if available
-      if (user.dateOfBirth) {
-        setSelectedDate(new Date(user.dateOfBirth));
+      if (birthday) {
+        setSelectedDate(new Date(birthday));
       }
     }
   }, [user]);
@@ -231,7 +233,8 @@ export default function EditProfileScreen() {
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-        dateOfBirth: formData.dateOfBirth,
+        // Backend contract expects `birthday` (YYYY-MM-DD).
+        birthday: formData.dateOfBirth,
         gender: formData.gender,
         address: formData.address.trim(),
         profilePicture: formData.profilePicture,
@@ -249,7 +252,8 @@ export default function EditProfileScreen() {
           [
             {
               text: t('contact.ok'),
-              onPress: () => router.back()
+              // Stay on the same page after saving.
+              onPress: () => {}
             }
           ]
         );
