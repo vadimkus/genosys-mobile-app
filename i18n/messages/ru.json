@@ -483,6 +483,8 @@
     "setDefaultFailed": "Не удалось установить адрес по умолчанию"
   },
   "ordersScreen": {
+    "holdToDeleteTitle": "Удаление",
+    "holdToDeleteMessage": "Нажмите и удерживайте значок корзины, чтобы удалить заказ.",
     "loginRequired": "Требуется вход",
     "loginRequiredText": "Войдите, чтобы увидеть ваши заказы.",
     "loading": "Загрузка заказов...",
@@ -499,7 +501,10 @@
     "cannotDeleteTitle": "Нельзя удалить",
     "cannotDeleteMessage1": "Этот заказ нельзя удалить в приложении. Пожалуйста, свяжитесь с поддержкой.",
     "cannotDeleteMessage2": "Этот заказ больше нельзя удалить. Если нужна помощь — свяжитесь с поддержкой.",
-    "deleteFailedTitle": "Не удалось удалить"
+    "deleteFailedTitle": "Не удалось удалить",
+    "deleteOrderTitle": "Удалить заказ?",
+    "deleteOrderMessage": "Вы уверены, что хотите удалить заказ {orderNumber}?",
+    "itemsCount": "{count} товаров"
   },
   "editProfile": {
     "authRequiredTitle": "Требуется вход",
@@ -911,6 +916,7 @@
   "common": {
     "ok": "OK",
     "cancel": "Отмена",
+    "delete": "Удалить",
     "login": "Войти",
     "close": "Закрыть",
     "save": "Сохранить",

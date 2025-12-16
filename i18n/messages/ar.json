@@ -483,6 +483,8 @@
     "setDefaultFailed": "تعذر تعيين العنوان الافتراضي"
   },
   "ordersScreen": {
+    "holdToDeleteTitle": "الحذف",
+    "holdToDeleteMessage": "اضغط مطولاً على أيقونة سلة المهملات لحذف هذا الطلب.",
     "loginRequired": "تسجيل الدخول مطلوب",
     "loginRequiredText": "يرجى تسجيل الدخول لعرض طلباتك.",
     "loading": "جارٍ تحميل طلباتك...",
@@ -499,7 +501,10 @@
     "cannotDeleteTitle": "تعذر الحذف",
     "cannotDeleteMessage1": "لا يمكن حذف هذا الطلب من التطبيق. يرجى التواصل مع الدعم.",
     "cannotDeleteMessage2": "لم يعد بالإمكان حذف هذا الطلب. يرجى التواصل مع الدعم إذا كنت بحاجة للمساعدة.",
-    "deleteFailedTitle": "فشل الحذف"
+    "deleteFailedTitle": "فشل الحذف",
+    "deleteOrderTitle": "حذف الطلب؟",
+    "deleteOrderMessage": "هل أنت متأكد أنك تريد حذف الطلب {orderNumber}؟",
+    "itemsCount": "{count} عناصر"
   },
   "editProfile": {
     "authRequiredTitle": "تسجيل الدخول مطلوب",
@@ -911,6 +916,7 @@
   "common": {
     "ok": "موافق",
     "cancel": "إلغاء",
+    "delete": "حذف",
     "login": "تسجيل الدخول",
     "close": "إغلاق",
     "save": "حفظ",

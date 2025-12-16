@@ -483,6 +483,8 @@
     "setDefaultFailed": "Failed to set default address"
   },
   "ordersScreen": {
+    "holdToDeleteTitle": "Hold to delete",
+    "holdToDeleteMessage": "Long-press the trash icon to delete this order.",
     "loginRequired": "Login required",
     "loginRequiredText": "Please login to view your orders.",
     "loading": "Loading your orders...",
@@ -499,7 +501,10 @@
     "cannotDeleteTitle": "Cannot delete",
     "cannotDeleteMessage1": "This order cannot be deleted from the app. Please contact support.",
     "cannotDeleteMessage2": "This order can no longer be deleted. Please contact support if you need help.",
-    "deleteFailedTitle": "Delete failed"
+    "deleteFailedTitle": "Delete failed",
+    "deleteOrderTitle": "Delete order?",
+    "deleteOrderMessage": "Are you sure you want to delete order {orderNumber}?",
+    "itemsCount": "{count} items"
   },
   "editProfile": {
     "authRequiredTitle": "Authentication Required",
@@ -928,6 +933,7 @@
   "common": {
     "ok": "OK",
     "cancel": "Cancel",
+    "delete": "Delete",
     "login": "Login",
     "close": "Close",
     "save": "Save",
