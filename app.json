@@ -7,7 +7,7 @@
     "userInterfaceStyle": "light",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,6 +19,11 @@
       "bundleIdentifier": "com.genosys.mobile",
       "buildNumber": "1",
       "icon": "./assets/icon.png",
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
       "infoPlist": {
         "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account.",
         "NSCameraUsageDescription": "Genosys uses the camera to take a profile photo.",
@@ -31,6 +36,11 @@
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
         "backgroundColor": "#ffffff"
       }
     },
