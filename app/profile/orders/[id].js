@@ -13,6 +13,26 @@ const formatAED = (value) => {
   return Number.isFinite(num) ? num.toFixed(2) : '0.00';
 };
 
+const formatDateTime = (dateString) => {
+  if (!dateString) return null;
+  try {
+    const date = new Date(dateString);
+    const dateStr = date.toLocaleDateString('en-GB', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    });
+    const timeStr = date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
+    return `${dateStr} at ${timeStr}`;
+  } catch {
+    return null;
+  }
+};
+
 const isPaidLike = (order) => {
   const s = String(order?.status || '').toLowerCase();
   const ps = String(order?.paymentStatus || order?.payment_status || '').toLowerCase();
@@ -28,6 +48,10 @@ const isCardLike = (order) => {
   const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
   if (!pm) return false;
   return pm.includes('card') || pm.includes('stripe') || pm.includes('apple') || pm.includes('online');
+};
+
+const isPromoItem = (item) => {
+  return item?.isPromotionItem === true || item?.selectedSize === '__PROMO__' || Number(item?.price || 0) === 0;
 };
 
 export default function OrderDetailScreen() {
@@ -46,7 +70,6 @@ export default function OrderDetailScreen() {
     if (!token) return;
     setLoading(true);
     try {
-      // Canonical: GET /api/mobile/orders/:id
       let match = null;
       try {
         match = await fetchUserOrderById(token, idParam);
@@ -54,7 +77,6 @@ export default function OrderDetailScreen() {
         match = null;
       }
 
-      // Fallback: some builds may navigate using orderNumber. In that case, search in list payloads.
       if (!match) {
         const list = await fetchUserOrders(token, { page: 1, limit: 50 }).catch(() => []);
         const orders = Array.isArray(list) ? list : [];
@@ -86,6 +108,19 @@ export default function OrderDetailScreen() {
   const shipping = freeShipping ? 0 : shippingRaw;
   const vat = Number(order?.vat ?? order?.vatAmount ?? 0) || 0;
   const total = Number(order?.total ?? order?.totalAmount ?? order?.total_amount ?? order?.amount ?? 0) || 0;
+  
+  const customerName = order?.customerName || order?.customer_name || user?.name || '';
+  const customerEmail = order?.customerEmail || order?.customer_email || user?.email || '';
+  const customerPhone = order?.customerPhone || order?.customer_phone || user?.phone || '';
+  const customerAddress = order?.customerAddress || order?.customer_address || order?.address || '';
+  const emirate = order?.emirate || '';
+  
+  const createdAt = order?.createdAt || order?.created_at || order?.orderDate || order?.order_date;
+  const formattedDateTime = formatDateTime(createdAt);
+
+  const items = Array.isArray(order?.items) ? order.items : [];
+  const paidItems = items.filter((it) => !isPromoItem(it));
+  const promoItems = items.filter((it) => isPromoItem(it));
 
   const showPay = useMemo(() => {
     if (!order) return false;
@@ -138,67 +173,219 @@ export default function OrderDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Order {String(orderNumber)}</Text>
+        <Text style={styles.headerTitle}>{t('ordersDetail.orderDetails')}</Text>
         <TouchableOpacity onPress={load} style={styles.refreshButton}>
           <Ionicons name="refresh" size={20} color="#8E8E93" />
         </TouchableOpacity>
       </View>
 
       {loading ? (
-        <View style={styles.center}>
+        <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#E74C3C" />
           <Text style={styles.loadingText}>{t('ordersDetail.loading')}</Text>
         </View>
       ) : !order ? (
-        <View style={styles.center}>
+        <View style={styles.centerContainer}>
+          <Ionicons name="receipt-outline" size={64} color="#E5E5EA" />
           <Text style={styles.emptyTitle}>{t('ordersDetail.notFound')}</Text>
           <Text style={styles.emptyText}>{t('ordersDetail.notFoundHint')}</Text>
         </View>
       ) : (
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          <View style={styles.card}>
-            <Text style={styles.meta}>
-              Status: {String(status)}{paymentStatus ? ` • Payment: ${String(paymentStatus)}` : ''}{paymentMethod ? ` • ${String(paymentMethod).toUpperCase()}` : ''}
-            </Text>
+          {/* Order Number Card */}
+          <View style={styles.orderNumberCard}>
+            <View style={styles.orderNumberHeader}>
+              <Ionicons name="receipt" size={24} color="#E74C3C" />
+              <View style={styles.orderNumberTextContainer}>
+                <Text style={styles.orderNumberLabel}>{t('ordersDetail.orderNumber')}</Text>
+                <Text style={styles.orderNumber}>{String(orderNumber)}</Text>
+              </View>
+            </View>
+            {formattedDateTime ? (
+              <View style={styles.dateTimeRow}>
+                <Ionicons name="time-outline" size={14} color="#8E8E93" />
+                <Text style={styles.dateTimeText}>{formattedDateTime}</Text>
+              </View>
+            ) : null}
+          </View>
 
-            <View style={styles.row}>
-              <Text style={styles.label}>{t('ordersDetail.subtotal')}</Text>
-              <Text style={styles.value}>AED {formatAED(subtotal)}</Text>
+          {/* Status Card */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="information-circle" size={20} color="#007AFF" />
+              <Text style={styles.sectionTitle}>{t('ordersDetail.status')}</Text>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>{t('ordersDetail.shipping')}</Text>
-              <Text style={styles.value}>{freeShipping ? 'FREE' : `AED ${formatAED(shipping)}`}</Text>
+            <View style={styles.statusRow}>
+              <View style={styles.statusBadge}>
+                <Text style={styles.statusBadgeText}>{String(status)}</Text>
+              </View>
+              {paymentStatus ? (
+                <View style={[styles.statusBadge, styles.paymentStatusBadge]}>
+                  <Text style={styles.statusBadgeText}>{String(paymentStatus)}</Text>
+                </View>
+              ) : null}
+              {paymentMethod ? (
+                <View style={[styles.statusBadge, styles.methodBadge]}>
+                  <Text style={styles.statusBadgeText}>{String(paymentMethod).toUpperCase()}</Text>
+                </View>
+              ) : null}
             </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>{t('ordersDetail.vatIncluded')}</Text>
-              <Text style={styles.value}>AED {formatAED(vat)}</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.row}>
-              <Text style={styles.totalLabel}>{t('ordersDetail.total')}</Text>
-              <Text style={styles.totalValue}>AED {formatAED(total)}</Text>
-            </View>
+          </View>
 
-            <View style={styles.divider} />
-
-            <Text style={styles.sectionTitle}>{t('ordersDetail.items')}</Text>
-            {(Array.isArray(order.items) ? order.items : []).map((it, idx) => {
-              const qty = Number(it?.quantity) || 0;
+          {/* Items Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="bag-handle" size={20} color="#E74C3C" />
+              <Text style={styles.sectionTitle}>{t('ordersDetail.items')}</Text>
+            </View>
+            
+            {/* Paid Items */}
+            {paidItems.map((it, idx) => {
+              const qty = Number(it?.quantity) || 1;
+              const price = Number(it?.price) || 0;
               const name = it?.name || it?.productName || `Item ${idx + 1}`;
               const size = it?.size || it?.selectedSize || '';
               const color = it?.color || it?.selectedColor || '';
-              const extras = [size && `Size: ${size}`, color && `Color: ${color}`].filter(Boolean).join(' • ');
+              const itemTotal = qty * price;
+              
               return (
-                <Text key={`${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemLine}>
-                  {qty}× {String(name)}{extras ? ` — ${extras}` : ''}
-                </Text>
+                <View key={`paid-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemCard}>
+                  <View style={styles.itemHeader}>
+                    <Text style={styles.itemName}>{String(name)}</Text>
+                    <Text style={styles.itemPrice}>AED {formatAED(itemTotal)}</Text>
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemDetailText}>Qty: {qty}</Text>
+                    {size && size !== '__PROMO__' ? (
+                      <Text style={styles.itemDetailText}>• Size: {String(size)}</Text>
+                    ) : null}
+                    {color ? (
+                      <Text style={styles.itemDetailText}>• Color: {String(color)}</Text>
+                    ) : null}
+                    <Text style={styles.itemDetailText}>• AED {formatAED(price)} each</Text>
+                  </View>
+                </View>
               );
             })}
 
+            {/* Promo/Free Items */}
+            {promoItems.length > 0 ? (
+              <View style={styles.promoSection}>
+                <View style={styles.promoHeader}>
+                  <Ionicons name="gift" size={16} color="#16A34A" />
+                  <Text style={styles.promoHeaderText}>{t('ordersDetail.freeItems')}</Text>
+                </View>
+                {promoItems.map((it, idx) => {
+                  const qty = Number(it?.quantity) || 1;
+                  const name = it?.name || it?.productName || `Free Item ${idx + 1}`;
+                  
+                  return (
+                    <View key={`promo-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.promoItemCard}>
+                      <View style={styles.itemHeader}>
+                        <Text style={styles.promoItemName}>{String(name)}</Text>
+                        <View style={styles.freeBadge}>
+                          <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
+                        </View>
+                      </View>
+                      <Text style={styles.promoItemQty}>Qty: {qty}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            ) : null}
+          </View>
+
+          {/* Shipping Details */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="location" size={20} color="#27AE60" />
+              <Text style={styles.sectionTitle}>{t('ordersDetail.shippingDetails')}</Text>
+            </View>
+            
+            {customerName ? (
+              <View style={styles.detailRow}>
+                <Ionicons name="person-outline" size={16} color="#8E8E93" />
+                <Text style={styles.detailLabel}>{t('ordersDetail.customer')}</Text>
+                <Text style={styles.detailValue}>{String(customerName)}</Text>
+              </View>
+            ) : null}
+            
+            {customerPhone ? (
+              <View style={styles.detailRow}>
+                <Ionicons name="call-outline" size={16} color="#8E8E93" />
+                <Text style={styles.detailLabel}>{t('ordersDetail.phone')}</Text>
+                <Text style={styles.detailValue}>{String(customerPhone)}</Text>
+              </View>
+            ) : null}
+            
+            {customerEmail ? (
+              <View style={styles.detailRow}>
+                <Ionicons name="mail-outline" size={16} color="#8E8E93" />
+                <Text style={styles.detailLabel}>{t('ordersDetail.email')}</Text>
+                <Text style={styles.detailValue}>{String(customerEmail)}</Text>
+              </View>
+            ) : null}
+            
+            {emirate ? (
+              <View style={styles.detailRow}>
+                <Ionicons name="flag-outline" size={16} color="#8E8E93" />
+                <Text style={styles.detailLabel}>{t('ordersDetail.emirate')}</Text>
+                <Text style={styles.detailValue}>{String(emirate)}</Text>
+              </View>
+            ) : null}
+            
+            {customerAddress ? (
+              <View style={styles.detailRow}>
+                <Ionicons name="home-outline" size={16} color="#8E8E93" />
+                <Text style={styles.detailLabel}>{t('ordersDetail.address')}</Text>
+                <Text style={[styles.detailValue, styles.addressValue]}>{String(customerAddress)}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Order Summary */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="calculator" size={20} color="#007AFF" />
+              <Text style={styles.sectionTitle}>{t('ordersDetail.orderSummary')}</Text>
+            </View>
+            
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>{t('ordersDetail.subtotal')}</Text>
+              <Text style={styles.summaryValue}>AED {formatAED(subtotal)}</Text>
+            </View>
+            
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>{t('ordersDetail.shipping')}</Text>
+              {freeShipping ? (
+                <View style={styles.freeBadge}>
+                  <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
+                </View>
+              ) : (
+                <Text style={styles.summaryValue}>AED {formatAED(shipping)}</Text>
+              )}
+            </View>
+            
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>{t('ordersDetail.vatIncluded')}</Text>
+              <Text style={styles.summaryValue}>AED {formatAED(vat)}</Text>
+            </View>
+            
+            <View style={styles.summaryDivider} />
+            
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>{t('ordersDetail.total')}</Text>
+              <Text style={styles.totalValue}>AED {formatAED(total)}</Text>
+            </View>
+          </View>
+
+          {/* Actions */}
+          <View style={styles.actionsSection}>
             {showPay ? (
               <TouchableOpacity
                 style={[styles.payButton, paying && styles.buttonDisabled]}
@@ -206,13 +393,19 @@ export default function OrderDetailScreen() {
                 disabled={paying}
                 activeOpacity={0.85}
               >
-                <Ionicons name="card-outline" size={16} color="#ffffff" />
-                <Text style={styles.payButtonText}>{paying ? 'Starting payment…' : 'Pay now'}</Text>
+                {paying ? (
+                  <ActivityIndicator color="#ffffff" size="small" />
+                ) : (
+                  <Ionicons name="card" size={20} color="#ffffff" />
+                )}
+                <Text style={styles.payButtonText}>
+                  {paying ? t('ordersDetail.startingPayment') : t('ordersDetail.payNow')}
+                </Text>
               </TouchableOpacity>
             ) : null}
-
+            
             <TouchableOpacity style={styles.supportButton} onPress={onSupport} activeOpacity={0.85}>
-              <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
+              <Ionicons name="logo-whatsapp" size={20} color="#ffffff" />
               <Text style={styles.supportButtonText}>{t('ordersDetail.supportWhatsapp')}</Text>
             </TouchableOpacity>
           </View>
@@ -223,66 +416,359 @@ export default function OrderDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: '#ffffff',
     borderBottomWidth: 0.5,
     borderBottomColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
   },
-  backButton: { padding: 4 },
-  headerTitle: { fontSize: 16, fontWeight: '700', color: '#1D1D1F' },
-  refreshButton: { padding: 4 },
-  scrollView: { flex: 1 },
-  center: { padding: 24, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { marginTop: 12, color: '#8E8E93' },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1D1D1F', marginBottom: 6, textAlign: 'center' },
-  emptyText: { fontSize: 14, color: '#8E8E93', textAlign: 'center', lineHeight: 20 },
-  card: {
+  backButton: {
+    padding: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  refreshButton: {
+    padding: 4,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#8E8E93',
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#8E8E93',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  
+  // Order Number Card
+  orderNumberCard: {
     margin: 20,
+    marginBottom: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
     borderWidth: 1,
     borderColor: '#E5E5EA',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  orderNumberHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  orderNumberTextContainer: {
+    flex: 1,
+  },
+  orderNumberLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#8E8E93',
+    marginBottom: 2,
+  },
+  orderNumber: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1D1D1F',
+    fontFamily: 'monospace',
+  },
+  dateTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F2F2F7',
+  },
+  dateTimeText: {
+    fontSize: 13,
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  
+  // Section
+  section: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  
+  // Status
+  statusRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#007AFF',
+  },
+  paymentStatusBadge: {
+    backgroundColor: '#27AE60',
+  },
+  methodBadge: {
+    backgroundColor: '#8E8E93',
+  },
+  statusBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+  },
+  
+  // Items
+  itemCard: {
+    backgroundColor: '#F8F9FA',
     borderRadius: 12,
     padding: 14,
-    backgroundColor: '#ffffff',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
-  meta: { fontSize: 12, color: '#8E8E93', marginBottom: 12 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
-  label: { fontSize: 13, color: '#8E8E93', fontWeight: '600' },
-  value: { fontSize: 13, color: '#1D1D1F', fontWeight: '700' },
-  divider: { height: 1, backgroundColor: '#F2F2F7', marginVertical: 10 },
-  totalLabel: { fontSize: 14, color: '#1D1D1F', fontWeight: '800' },
-  totalValue: { fontSize: 14, color: '#E74C3C', fontWeight: '900' },
-  sectionTitle: { fontSize: 14, fontWeight: '800', color: '#1D1D1F', marginBottom: 8 },
-  itemLine: { fontSize: 12, color: '#3C3C43', lineHeight: 18, marginBottom: 4 },
+  itemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 12,
+  },
+  itemName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    lineHeight: 18,
+  },
+  itemPrice: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#E74C3C',
+  },
+  itemDetails: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  itemDetailText: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  
+  // Promo Items
+  promoSection: {
+    marginTop: 8,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
+  },
+  promoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  promoHeaderText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#16A34A',
+  },
+  promoItemCard: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+  },
+  promoItemName: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#16A34A',
+    lineHeight: 18,
+  },
+  promoItemQty: {
+    fontSize: 12,
+    color: '#16A34A',
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  freeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+  },
+  freeBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#16A34A',
+    textTransform: 'uppercase',
+  },
+  
+  // Shipping Details
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 12,
+  },
+  detailLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#8E8E93',
+    width: 80,
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#1D1D1F',
+    lineHeight: 18,
+  },
+  addressValue: {
+    lineHeight: 20,
+  },
+  
+  // Summary
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#3C3C43',
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  summaryDivider: {
+    height: 1,
+    backgroundColor: '#E5E5EA',
+    marginVertical: 12,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  totalValue: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#E74C3C',
+  },
+  
+  // Actions
+  actionsSection: {
+    marginHorizontal: 20,
+    marginBottom: 32,
+    gap: 12,
+  },
   payButton: {
-    marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     backgroundColor: '#E74C3C',
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 16,
+    borderRadius: 14,
+    shadowColor: '#E74C3C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  payButtonText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
+  payButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
   supportButton: {
-    marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     backgroundColor: '#25D366',
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 16,
+    borderRadius: 14,
+    shadowColor: '#25D366',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  supportButtonText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
-  buttonDisabled: { opacity: 0.6 },
+  supportButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
 });
-
-
 
