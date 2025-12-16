@@ -12,6 +12,7 @@ import {
   Modal,
   ActionSheetIOS,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -63,6 +64,8 @@ export default function EditProfileScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [tempDate, setTempDate] = useState(new Date());
+  const [initialSnapshot, setInitialSnapshot] = useState(null);
 
   // Populate form with user data when component loads
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function EditProfileScreen() {
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
       const parsedAddr = parseGenosysAddress(user.address || '');
       const birthday = user.birthday || user.dateOfBirth || '';
-      setFormData({
+      const nextForm = {
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
         email: user.email || '',
@@ -81,6 +84,20 @@ export default function EditProfileScreen() {
         // Don't show GENOSYS_ADDR_V1 payload in the input
         address: getAddressLine(parsedAddr || (user.address || '')),
         profilePicture: user.profilePicture || null,
+      };
+      setFormData(nextForm);
+
+      // If backend ever adds these, we’ll pick them up; otherwise keep defaults.
+      const nextEmailNotif = typeof user.emailNotifications === 'boolean' ? user.emailNotifications : true;
+      const nextSmsNotif = typeof user.smsNotifications === 'boolean' ? user.smsNotifications : false;
+      setEmailNotifications(nextEmailNotif);
+      setSmsNotifications(nextSmsNotif);
+
+      // Establish "clean" baseline for dirty tracking.
+      setInitialSnapshot({
+        ...nextForm,
+        emailNotifications: nextEmailNotif,
+        smsNotifications: nextSmsNotif,
       });
       
       // Set initial date if available
@@ -89,6 +106,21 @@ export default function EditProfileScreen() {
       }
     }
   }, [user]);
+
+  const getCurrentSnapshot = useCallback(() => ({
+    ...formData,
+    emailNotifications,
+    smsNotifications,
+  }), [formData, emailNotifications, smsNotifications]);
+
+  const isDirty = (() => {
+    if (!initialSnapshot) return false;
+    try {
+      return JSON.stringify(getCurrentSnapshot()) !== JSON.stringify(initialSnapshot);
+    } catch {
+      return true;
+    }
+  })();
 
   const updateField = useCallback((field, text) => {
     setFormData(prevData => ({...prevData, [field]: text}));
@@ -179,7 +211,18 @@ export default function EditProfileScreen() {
   };
 
   const showDatePickerModal = () => {
+    // On iOS we use a modal with explicit Done/Cancel, so keep a temp value.
+    setTempDate(selectedDate || new Date());
     setShowDatePicker(true);
+  };
+
+  const closeDatePicker = () => setShowDatePicker(false);
+
+  const confirmDatePicker = () => {
+    setSelectedDate(tempDate);
+    const formattedDate = tempDate.toISOString().split('T')[0];
+    updateField('dateOfBirth', formattedDate);
+    setShowDatePicker(false);
   };
 
   const formatDisplayDate = (dateString) => {
@@ -246,6 +289,9 @@ export default function EditProfileScreen() {
       log.debug('Profile update result', { success: !!result?.success });
       
       if (result.success) {
+        // Mark form as "clean" so it no longer feels like you're mid-edit.
+        setInitialSnapshot(getCurrentSnapshot());
+        Keyboard.dismiss();
         Alert.alert(
           t('editProfile.successTitle'),
           t('editProfile.successMessage'),
@@ -269,6 +315,11 @@ export default function EditProfileScreen() {
   };
 
   const handleCancel = () => {
+    // If nothing changed, just go back (no discard prompt).
+    if (!isDirty) {
+      router.back();
+      return;
+    }
     Alert.alert(
       t('editProfile.discardTitle'),
       t('editProfile.discardMessage'),
@@ -329,10 +380,10 @@ export default function EditProfileScreen() {
         <Text style={styles.headerTitle}>{t('editProfile.headerTitle')}</Text>
         <TouchableOpacity 
           onPress={handleSave} 
-          style={[styles.headerButton, isSaving && styles.headerButtonDisabled]}
-          disabled={isSaving}
+          style={[styles.headerButton, (isSaving || !isDirty) && styles.headerButtonDisabled]}
+          disabled={isSaving || !isDirty}
         >
-          <Text style={[styles.saveText, isSaving && styles.saveTextDisabled]}>
+          <Text style={[styles.saveText, (isSaving || !isDirty) && styles.saveTextDisabled]}>
             {isSaving ? t('editProfile.saving') : t('editProfile.save')}
           </Text>
         </TouchableOpacity>
@@ -542,15 +593,47 @@ export default function EditProfileScreen() {
       </ScrollView>
 
       {/* Date Picker Modal */}
-      {showDatePicker && (
+      {showDatePicker && Platform.OS === 'android' && (
         <DateTimePicker
           value={selectedDate}
           mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          display="default"
           onChange={handleDateChange}
           maximumDate={new Date()}
           minimumDate={new Date(1950, 0, 1)}
         />
+      )}
+
+      {showDatePicker && Platform.OS === 'ios' && (
+        <Modal
+          visible={showDatePicker}
+          transparent
+          animationType="slide"
+          onRequestClose={closeDatePicker}
+        >
+          <View style={styles.iosDateOverlay}>
+            <View style={styles.iosDateModal}>
+              <View style={styles.iosDateHeader}>
+                <TouchableOpacity onPress={closeDatePicker} style={styles.iosDateHeaderBtn}>
+                  <Text style={styles.iosDateHeaderText}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={confirmDatePicker} style={styles.iosDateHeaderBtn}>
+                  <Text style={[styles.iosDateHeaderText, styles.iosDateHeaderDone]}>{t('common.done')}</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={tempDate}
+                mode="date"
+                display="spinner"
+                themeVariant="light"
+                textColor="#000000"
+                onChange={(event, d) => setTempDate(d || tempDate)}
+                maximumDate={new Date()}
+                minimumDate={new Date(1950, 0, 1)}
+              />
+            </View>
+          </View>
+        </Modal>
       )}
 
       {/* Gender Selection Modal */}
@@ -861,6 +944,39 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  iosDateOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  iosDateModal: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden',
+    paddingBottom: 10,
+  },
+  iosDateHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  iosDateHeaderBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+  },
+  iosDateHeaderText: {
+    fontSize: 16,
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  iosDateHeaderDone: {
+    fontWeight: '700',
   },
   modalContainer: {
     backgroundColor: '#ffffff',
