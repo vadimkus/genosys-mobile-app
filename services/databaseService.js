@@ -103,6 +103,7 @@ export const updateUserProfile = async (token, profileData) => {
       // Backend contract: expects `birthday` in YYYY-MM-DD format.
       // Keep compatibility with callers still using `dateOfBirth`.
       birthday: profileData.birthday ?? profileData.dateOfBirth ?? null,
+      gender: profileData.gender ?? null,
     }),
   });
 };
@@ -125,23 +126,43 @@ export const uploadProfilePicture = async (token, imageUri) => {
     const response = await fetch(`${API_BASE_URL}/user/profile-picture`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'multipart/form-data',
+        // NOTE: Do NOT set Content-Type for FormData in React Native fetch.
+        // fetch will set the correct boundary automatically; manually setting it can break uploads.
         'x-api-key': API_KEY,
         'Authorization': `Bearer ${token}`,
       },
       body: formData,
     });
 
-    const result = await response.json();
+    const contentType = response.headers.get('content-type') || '';
+    const rawText = await response.text().catch(() => '');
+    let result = null;
+    if (rawText && contentType.includes('application/json')) {
+      try {
+        result = JSON.parse(rawText);
+      } catch (_e) {
+        // fall through; we'll report a better error below
+      }
+    }
+    // If server returned JSON but content-type was wrong, try parsing anyway.
+    if (!result && rawText) {
+      try {
+        result = JSON.parse(rawText);
+      } catch (_e) {}
+    }
     
     if (response.ok) {
       return { 
         success: true, 
-        imageUrl: result.imageUrl,
+        imageUrl: result?.imageUrl,
         message: 'Profile picture uploaded successfully'
       };
     } else {
-      return { success: false, error: result.error || 'Upload failed' };
+      const err =
+        result?.error ||
+        (rawText ? rawText.slice(0, 200) : null) ||
+        `HTTP ${response.status}: ${response.statusText}`;
+      return { success: false, error: err || 'Upload failed' };
     }
   } catch (error) {
     log.error('Profile picture upload error', error?.message || error);
