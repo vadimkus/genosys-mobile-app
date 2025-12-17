@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
@@ -10,6 +11,7 @@ import { getUserBilling, updateUserBilling } from '../../services/databaseServic
 export default function BillingScreen() {
   const router = useRouter();
   const { t } = useLocalization();
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const token = user?.token || '';
 
@@ -53,12 +55,12 @@ export default function BillingScreen() {
         vatNumber: vatNumber.trim() || null,
       });
       if (!res?.success) {
-        Alert.alert(t('common.error'), res?.error || 'Failed to save');
+        Alert.alert(t('common.error'), res?.error || t('billing.saveFailed'));
         return;
       }
-      Alert.alert(t('common.done'), 'Saved', [{ text: t('common.ok'), onPress: () => router.back() }]);
+      Alert.alert(t('common.done'), t('billing.saved'), [{ text: t('common.ok'), onPress: () => router.back() }]);
     } catch {
-      Alert.alert(t('common.error'), 'Failed to save');
+      Alert.alert(t('common.error'), t('billing.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -70,7 +72,7 @@ export default function BillingScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Billing</Text>
+        <Text style={styles.headerTitle}>{t('billing.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -79,27 +81,31 @@ export default function BillingScreen() {
           <ActivityIndicator color="#E74C3C" />
         </View>
       ) : (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-          <Text style={styles.label}>Billing Address</Text>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[styles.content, { paddingBottom: (insets?.bottom || 0) + 24 }]}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.label}>{t('billing.addressLabel')}</Text>
           <TextInput
             style={[styles.input, styles.textarea]}
             value={billingAddress}
             onChangeText={setBillingAddress}
-            placeholder="Billing address (optional)"
+            placeholder={t('billing.addressPlaceholder')}
             multiline
           />
 
-          <Text style={[styles.label, { marginTop: 16 }]}>VAT / TRN Number</Text>
+          <Text style={[styles.label, { marginTop: 16 }]}>{t('billing.vatLabel')}</Text>
           <TextInput
             style={styles.input}
             value={vatNumber}
             onChangeText={setVatNumber}
-            placeholder="VAT/TRN (optional)"
+            placeholder={t('billing.vatPlaceholder')}
             autoCapitalize="characters"
           />
 
           <TouchableOpacity style={[styles.saveBtn, saving && styles.saveBtnDisabled]} onPress={handleSave} disabled={saving}>
-            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>Save</Text>}
+            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>{t('common.save')}</Text>}
           </TouchableOpacity>
         </ScrollView>
       )}

@@ -441,6 +441,9 @@
     "paymentAndBilling": "الدفع والفوترة",
     "notifications": "الإشعارات",
     "pushNotifications": "إشعارات الدفع",
+    "pushEnabled": "تم تفعيل إشعارات الدفع",
+    "pushDisabled": "تم تعطيل إشعارات الدفع",
+    "pushEnableFailed": "تعذر تحديث إشعارات الدفع",
     "privacyAndSecurity": "الخصوصية والأمان",
     "biometricAuthentication": "المصادقة البيومترية",
     "myAddresses": "عناويني",
@@ -470,6 +473,15 @@
     "biometricDisabled": "تم تعطيل {biometricType} لحسابك.",
     "disableBiometricFailed": "تعذر تعطيل المصادقة البيومترية",
     "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+  },
+  "billing": {
+    "title": "الفوترة",
+    "addressLabel": "عنوان الفوترة",
+    "addressPlaceholder": "عنوان الفوترة (اختياري)",
+    "vatLabel": "رقم VAT / TRN",
+    "vatPlaceholder": "VAT/TRN (اختياري)",
+    "saved": "تم الحفظ",
+    "saveFailed": "تعذر الحفظ"
   },
   "addresses": {
     "title": "العناوين",

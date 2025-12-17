@@ -18,6 +18,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchUserOrders } from '../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
 
 const { width } = Dimensions.get('window');
 
@@ -35,10 +37,25 @@ export default function ProfileScreen() {
     disableBiometric
   } = useAuth();
   const { locale, t } = useLocalization();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
+  const PUSH_PREF_KEY = '@genosys_push_enabled';
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const v = await AsyncStorage.getItem(PUSH_PREF_KEY);
+        const enabled = v === '1';
+        if (!cancelled) setNotificationsEnabled(enabled);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,6 +197,39 @@ export default function ProfileScreen() {
       Alert.alert(t('common.error'), t('profile.genericError'));
     } finally {
       setBiometricLoading(false);
+    }
+  };
+
+  const handlePushToggle = async (value) => {
+    // Only meaningful when logged in (we need user token to store token server-side)
+    if (!user?.token) {
+      Alert.alert(t('common.error'), t('auth.loginRequired') || t('checkout.loginRequiredMessage'));
+      return;
+    }
+
+    try {
+      if (value) {
+        const reg = await registerForPushNotificationsAsync();
+        if (!reg?.success || !reg?.token) {
+          Alert.alert(t('common.error'), reg?.error || t('profile.pushEnableFailed'));
+          return;
+        }
+        const saved = await savePushTokenToBackend(user.token, reg.token);
+        if (!saved?.success) {
+          Alert.alert(t('common.error'), saved?.error || t('profile.pushEnableFailed'));
+          return;
+        }
+        setNotificationsEnabled(true);
+        await AsyncStorage.setItem(PUSH_PREF_KEY, '1');
+        Alert.alert(t('common.done'), t('profile.pushEnabled'));
+      } else {
+        await clearPushTokenOnBackend(user.token);
+        setNotificationsEnabled(false);
+        await AsyncStorage.setItem(PUSH_PREF_KEY, '0');
+        Alert.alert(t('common.done'), t('profile.pushDisabled'));
+      }
+    } catch {
+      Alert.alert(t('common.error'), t('profile.pushEnableFailed'));
     }
   };
 
@@ -332,7 +382,7 @@ export default function ProfileScreen() {
               rightComponent={
                 <Switch
                   value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
+                  onValueChange={handlePushToggle}
                   trackColor={{ false: '#E5E5EA', true: '#E74C3C' }}
                   thumbColor="#ffffff"
                   ios_backgroundColor="#E5E5EA"

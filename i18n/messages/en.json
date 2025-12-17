@@ -440,6 +440,9 @@
     "paymentAndBilling": "Payment & Billing",
     "notifications": "Notifications",
     "pushNotifications": "Push Notifications",
+    "pushEnabled": "Push notifications enabled",
+    "pushDisabled": "Push notifications disabled",
+    "pushEnableFailed": "Could not update push notifications",
     "privacyAndSecurity": "Privacy & Security",
     "biometricAuthentication": "Biometric Authentication",
     "myAddresses": "My Addresses",
@@ -469,6 +472,15 @@
     "biometricDisabled": "{biometricType} has been disabled for your account.",
     "disableBiometricFailed": "Failed to disable biometric authentication",
     "genericError": "Something went wrong. Please try again."
+  },
+  "billing": {
+    "title": "Billing",
+    "addressLabel": "Billing Address",
+    "addressPlaceholder": "Billing address (optional)",
+    "vatLabel": "VAT / TRN Number",
+    "vatPlaceholder": "VAT/TRN (optional)",
+    "saved": "Saved",
+    "saveFailed": "Failed to save"
   },
   "addresses": {
     "title": "Addresses",

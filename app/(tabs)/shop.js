@@ -194,7 +194,7 @@ export default function ShopScreen() {
       const norm = (s) => String(s || '').toLowerCase().normalize('NFKD');
       const q = norm(searchQuery).trim();
       filtered = filtered.filter((product) => {
-        const canonical = normalizeCategory(product?.category) || '';
+        const canonical = normalizeCategoryCanonical(product?.category) || '';
         const canonicalKey = canonical ? getCategoryTranslationKey(canonical) : null;
         const canonicalLabel = canonicalKey ? t(canonicalKey) : canonical;
 

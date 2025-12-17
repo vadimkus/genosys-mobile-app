@@ -440,6 +440,9 @@
     "paymentAndBilling": "Оплата и биллинг",
     "notifications": "Уведомления",
     "pushNotifications": "Push-уведомления",
+    "pushEnabled": "Push-уведомления включены",
+    "pushDisabled": "Push-уведомления отключены",
+    "pushEnableFailed": "Не удалось обновить push-уведомления",
     "privacyAndSecurity": "Конфиденциальность и безопасность",
     "biometricAuthentication": "Биометрическая аутентификация",
     "myAddresses": "Мои адреса",
@@ -469,6 +472,15 @@
     "biometricDisabled": "{biometricType} отключено для вашего аккаунта.",
     "disableBiometricFailed": "Не удалось отключить биометрическую аутентификацию",
     "genericError": "Что-то пошло не так. Попробуйте ещё раз."
+  },
+  "billing": {
+    "title": "Биллинг",
+    "addressLabel": "Адрес для счетов",
+    "addressPlaceholder": "Адрес для счетов (необязательно)",
+    "vatLabel": "Номер VAT / TRN",
+    "vatPlaceholder": "VAT/TRN (необязательно)",
+    "saved": "Сохранено",
+    "saveFailed": "Не удалось сохранить"
   },
   "addresses": {
     "title": "Адреса",
