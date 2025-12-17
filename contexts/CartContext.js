@@ -42,6 +42,17 @@ const PROMO_THRESHOLDS = {
 
 const isPromotionItem = (item) => item?.isPromotionItem === true || item?.selectedSize === PROMO_VARIANT_SIZE;
 
+const inferOriginalFromUserDiscount = ({ discountedPrice, discountPct }) => {
+  const pct = Number(discountPct);
+  const base = Number(discountedPrice);
+  if (!Number.isFinite(base) || base <= 0) return null;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 100) return null;
+  const multiplier = 1 - pct / 100;
+  if (!Number.isFinite(multiplier) || multiplier <= 0) return null;
+  const inferred = base / multiplier;
+  return Number.isFinite(inferred) && inferred > base ? inferred : null;
+};
+
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
@@ -184,14 +195,24 @@ export const CartProvider = ({ children }) => {
           const v = product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize);
           const vp = Number(v?.price);
           if (!Number.isFinite(vp) || vp <= 0) return it;
+          const discountPct = Number(user?.discountPercentage);
+          const inferredOriginal = inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct });
+          const variantOriginal = Number(v?.originalPrice);
+          const productOriginal = Number(product?.originalPrice);
+          const keptOriginal =
+            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
+            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
+            inferredOriginal ||
+            null;
           return {
             ...it,
             product: {
               ...product,
               price: vp,
               displayPrice: vp,
-              // Avoid carrying an originalPrice from another size; Bag will infer discount from base if needed.
-              originalPrice: Number(v?.originalPrice) || null,
+              // Prefer variant originalPrice; otherwise keep product originalPrice if it still makes sense for this size.
+              // If neither exists but user has a discount, infer original so Bag doesn't "double-discount" the already-discounted price.
+              originalPrice: keptOriginal,
             },
           };
         });
@@ -282,12 +303,22 @@ export const CartProvider = ({ children }) => {
         const v = product.variants.find((vv) => String(vv?.size || '').trim() === String(normalizedSize).trim());
         const vp = Number(v?.price);
         if (Number.isFinite(vp) && vp > 0) {
+          const discountPct = Number(user?.discountPercentage);
+          const inferredOriginal = inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct });
+          const variantOriginal = Number(v?.originalPrice);
+          const productOriginal = Number(product?.originalPrice);
+          const keptOriginal =
+            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
+            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
+            inferredOriginal ||
+            null;
           return {
             ...product,
             price: vp,
             displayPrice: vp,
-            // Prevent mismatch: originalPrice from base product can be for a different size.
-            originalPrice: Number(v?.originalPrice) || null,
+            // Prefer variant originalPrice; otherwise keep product originalPrice if it still makes sense for this size.
+            // If neither exists but user has a discount, infer original so Bag doesn't "double-discount" the already-discounted price.
+            originalPrice: keptOriginal,
           };
         }
       }

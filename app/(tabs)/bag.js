@@ -115,7 +115,7 @@ export default function BagScreen() {
       }
       const orig = Number.isFinite(explicitOriginal) && explicitOriginal > 0
         ? explicitOriginal
-        : (hasVariantPrice ? base : (base / multiplier));
+        : (base / multiplier);
       return acc + (Number.isFinite(orig) ? orig : base) * qty;
     }, 0);
     return Number.isFinite(sum) ? sum : null;
@@ -286,24 +286,44 @@ export default function BagScreen() {
                   return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
                 }
 
-                const originalForDiscount =
-                  (Number.isFinite(original) && original > 0 ? original : NaN) ||
-                  (Number.isFinite(base) && base > 0 ? base : NaN) ||
-                  0;
-                const discounted = !isBeautyBox && hasUserDiscount && Number.isFinite(originalForDiscount) && originalForDiscount > 0
-                  ? originalForDiscount * (1 - pct / 100)
-                  : base;
+                // Prefer the variant's originalPrice if present; otherwise use the cart item's originalPrice (which we may infer on add).
+                // If neither exists but the user has a % discount, infer original from the displayed (already-discounted) base price,
+                // so the UI can show "145 → 72.5" instead of only "72.5".
+                const storedOriginal = Number(item.product?.originalPrice);
+                const originalForDisplay = (() => {
+                  const fromVariant = Number(original);
+                  if (Number.isFinite(fromVariant) && fromVariant > base) return fromVariant;
+                  if (Number.isFinite(storedOriginal) && storedOriginal > base) return storedOriginal;
+                  if (hasUserDiscount && Number.isFinite(base) && base > 0) {
+                    const inferred = base / (1 - pct / 100);
+                    if (Number.isFinite(inferred) && inferred > base) return inferred;
+                  }
+                  return null;
+                })();
 
-                if (Number.isFinite(originalForDiscount) && originalForDiscount > 0 && Number.isFinite(discounted) && discounted > 0 && originalForDiscount !== discounted) {
-                  const pctFromPrices = originalForDiscount ? Math.round((1 - discounted / originalForDiscount) * 100) : null;
-                  const pctLabel =
-                    (Number.isFinite(pctFromPrices) && pctFromPrices > 0 && pctFromPrices < 100 && pctFromPrices) ||
-                    (hasUserDiscount ? Math.round(pct) : null);
+                const discountedForDisplay = (() => {
+                  if (!hasUserDiscount || !originalForDisplay) return base;
+                  // If base already looks discounted (< original), keep it.
+                  if (base < originalForDisplay - 0.01) return base;
+                  // Otherwise compute discounted from original.
+                  return originalForDisplay * (1 - pct / 100);
+                })();
+
+                if (
+                  !isBeautyBox &&
+                  hasUserDiscount &&
+                  Number.isFinite(originalForDisplay) &&
+                  originalForDisplay > 0 &&
+                  Number.isFinite(discountedForDisplay) &&
+                  discountedForDisplay > 0 &&
+                  originalForDisplay > discountedForDisplay + 0.01
+                ) {
+                  const pctLabel = Math.round(pct);
                   return (
                     <View style={styles.itemPriceContainer}>
-                      <Text style={styles.itemOriginalPrice}>{originalForDiscount.toFixed(2)} AED</Text>
+                      <Text style={styles.itemOriginalPrice}>{originalForDisplay.toFixed(2)} AED</Text>
                       {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% OFF</Text> : null}
-                      <Text style={styles.itemDiscountedPrice}>{discounted.toFixed(2)} AED</Text>
+                      <Text style={styles.itemDiscountedPrice}>{discountedForDisplay.toFixed(2)} AED</Text>
                     </View>
                   );
                 }

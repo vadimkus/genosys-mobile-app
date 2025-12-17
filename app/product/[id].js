@@ -808,20 +808,26 @@ export default function ProductDetailScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
-          <TouchableOpacity
-          style={[styles.addToBagButton, isInCart(product.id) && styles.inCartButton]}
-            onPress={handleAddToBag}
-        >
+        {(() => {
+          const inBagForSelection = isInCart(product.id, selectedColor, selectedSize);
+          const qtyForSelection = getItemQuantity(product.id, selectedColor, selectedSize);
+          return (
+            <TouchableOpacity
+              style={[styles.addToBagButton, inBagForSelection && styles.inCartButton]}
+              onPress={handleAddToBag}
+            >
           <Ionicons 
-            name={isInCart(product.id) ? "checkmark" : "bag"} 
+                name={inBagForSelection ? "checkmark" : "bag"} 
             size={20} 
             color="#ffffff" 
             style={styles.buttonIcon}
           />
             <Text style={styles.addToBagText}>
-            {isInCart(product.id) ? t('product.inBag', { count: getItemQuantity(product.id) }) : t('product.addToBag')}
+                {inBagForSelection ? t('product.inBag', { count: qtyForSelection }) : t('product.addToBag')}
             </Text>
           </TouchableOpacity>
+          );
+        })()}
         </View>
       </SafeAreaView>
   );

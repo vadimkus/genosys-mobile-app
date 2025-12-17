@@ -152,7 +152,7 @@ function getPerfectCombinationCopy(t, currentId, recId, currentName, recName) {
 
 export default function PerfectCombinationCard({ product, user, styles }) {
   const { t, locale } = useLocalization();
-  const { addItem } = useCart();
+  const { addItem, isInCart, getItemQuantity } = useCart();
 
   const [recommendedProduct, setRecommendedProduct] = useState(null);
   const [recommendedLoading, setRecommendedLoading] = useState(false);
@@ -200,10 +200,35 @@ export default function PerfectCombinationCard({ product, user, styles }) {
     router.push({ pathname: '/product/[id]', params: { id: recommendedProductId } });
   }, [recommendedProductId]);
 
+  const defaultRecSize = useMemo(() => {
+    const variants = recommendedProduct?.variants;
+    if (!Array.isArray(variants) || variants.length === 0) return '';
+    const v =
+      variants.find((x) => x?.isDefault) ||
+      variants.find((x) => x?.available) ||
+      variants[0];
+    const s = String(v?.size || '').trim();
+    return s;
+  }, [recommendedProduct?.variants]);
+
+  const inBagForRec = useMemo(() => {
+    if (!recommendedProduct?.id) return false;
+    // Use default variant size if the product has variants; otherwise treat as simple product.
+    const sizeKey = defaultRecSize || '';
+    return isInCart(recommendedProduct.id, '', sizeKey);
+  }, [isInCart, recommendedProduct?.id, defaultRecSize]);
+
+  const recQty = useMemo(() => {
+    if (!recommendedProduct?.id) return 0;
+    const sizeKey = defaultRecSize || '';
+    return getItemQuantity(recommendedProduct.id, '', sizeKey);
+  }, [getItemQuantity, recommendedProduct?.id, defaultRecSize]);
+
   const handleAddRecommendedToBag = useCallback(() => {
     if (!recommendedProduct) return;
     try {
-      addItem(recommendedProduct, 1, '', '');
+      // If recommended product has variants, add the default variant to keep cart keys consistent.
+      addItem(recommendedProduct, 1, '', defaultRecSize || '');
       Alert.alert(
         t('product.addedToBagTitle') || 'Added to bag',
         `${recommendedName || 'Item'} has been added to your bag`,
@@ -215,7 +240,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
     } catch (e) {
       Alert.alert(t('common.error') || 'Error', 'Failed to add to bag');
     }
-  }, [addItem, recommendedProduct, recommendedName, t]);
+  }, [addItem, recommendedProduct, recommendedName, t, defaultRecSize]);
 
   if (!product || isBeautyBoxProduct(product)) return null;
   if (!recId) return null;
@@ -295,12 +320,14 @@ export default function PerfectCombinationCard({ product, user, styles }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.pcAddBtn}
+            style={[styles.pcAddBtn, inBagForRec ? { backgroundColor: '#27AE60' } : null]}
             onPress={handleAddRecommendedToBag}
             activeOpacity={0.9}
           >
-            <Ionicons name="bag-add" size={16} color="#ffffff" />
-            <Text style={styles.pcAddBtnText}>{t('product.addToBag')}</Text>
+            <Ionicons name={inBagForRec ? 'checkmark' : 'bag-add'} size={16} color="#ffffff" />
+            <Text style={styles.pcAddBtnText}>
+              {inBagForRec ? t('product.inBag', { count: recQty || 1 }) : t('product.addToBag')}
+            </Text>
           </TouchableOpacity>
         </View>
 
