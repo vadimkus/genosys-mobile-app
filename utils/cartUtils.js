@@ -84,14 +84,31 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
       item.price ??
       0;
 
-    const original = Number(item.product?.originalPrice);
+    const productOriginal = Number(item.product?.originalPrice);
+    const variantOriginal = Number(selectedVariant?.originalPrice);
+
     const itemPrice = forceCanonicalPrice
       ? getCanonicalUnitPrice(item.product)
-      : (hasVariantPrice
-        ? variantPrice
-        : (!excludedFromUserDiscount && hasUserDiscount && Number.isFinite(original) && original > 0
-          ? original * (1 - discountPct / 100)
-          : Number(rawDisplay)));
+      : (() => {
+          // Apply user discount to variant-priced items too (otherwise size-selected items show no discount).
+          if (hasVariantPrice) {
+            if (!excludedFromUserDiscount && hasUserDiscount) {
+              const originalForDiscount =
+                (Number.isFinite(variantOriginal) && variantOriginal > 0 ? variantOriginal : NaN) ||
+                (Number.isFinite(productOriginal) && productOriginal > 0 ? productOriginal : NaN) ||
+                variantPrice;
+              const safeOriginal = Math.max(variantPrice, Number(originalForDiscount) || variantPrice);
+              return safeOriginal * (1 - discountPct / 100);
+            }
+            return variantPrice;
+          }
+
+          if (!excludedFromUserDiscount && hasUserDiscount && Number.isFinite(productOriginal) && productOriginal > 0) {
+            return productOriginal * (1 - discountPct / 100);
+          }
+
+          return Number(rawDisplay);
+        })();
     const qty = Number(item.quantity) || 0;
     return sum + (Number.isFinite(itemPrice) ? itemPrice * qty : 0);
   }, 0);

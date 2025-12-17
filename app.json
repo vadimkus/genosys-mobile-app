@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/app-icon-1024-tight.png",
+    "icon": "./assets/app-icon-1024-no-alpha.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -19,7 +19,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
       "usesAppleSignIn": true,
-      "icon": "./assets/app-icon-1024-tight.png",
+      "icon": "./assets/app-icon-1024-no-alpha.png",
       "splash": {
         "image": "./assets/splash.png",
         "resizeMode": "contain",
@@ -45,7 +45,7 @@
       "package": "com.genosys.mobile",
       "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icon-1024-tight.png",
+        "foregroundImage": "./assets/app-icon-1024-no-alpha.png",
         "backgroundColor": "#ffffff"
       },
       "splash": {

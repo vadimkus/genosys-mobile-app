@@ -90,6 +90,15 @@ export default function LoginScreen() {
     }
     try {
       setLoading(true);
+      // Surface a clearer message when Apple Sign-In isn't available on the device.
+      const isAvailable = await AppleAuthentication.isAvailableAsync().catch(() => false);
+      if (!isAvailable) {
+        Alert.alert(
+          t('authScreen.authFailedTitle'),
+          'Apple Sign‑In is not available on this device. Please ensure you are signed into iCloud and try again.'
+        );
+        return;
+      }
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -114,7 +123,17 @@ export default function LoginScreen() {
     } catch (error) {
       // User cancelled is common; don't show scary error.
       if (error && String(error?.code || '').toLowerCase().includes('canceled')) return;
-      Alert.alert(t('common.error'), t('authScreen.appleAuthFailed'));
+      // Provide actionable diagnostics (especially for TestFlight builds).
+      const code = String(error?.code || '').trim();
+      const msg = String(error?.message || '').trim();
+      log.error('Apple sign-in failed', { code, message: msg });
+      const detail = [code, msg].filter(Boolean).join(': ');
+      Alert.alert(
+        t('common.error'),
+        detail
+          ? `${t('authScreen.appleAuthFailed')}\n\n${detail}`
+          : t('authScreen.appleAuthFailed')
+      );
     } finally {
       setLoading(false);
     }

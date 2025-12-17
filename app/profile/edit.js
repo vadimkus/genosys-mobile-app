@@ -116,8 +116,6 @@ export default function EditProfileScreen() {
     address: '',
     profilePicture: null,
   });
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [smsNotifications, setSmsNotifications] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -146,17 +144,9 @@ export default function EditProfileScreen() {
       };
       setFormData(nextForm);
 
-      // If backend ever adds these, we’ll pick them up; otherwise keep defaults.
-      const nextEmailNotif = typeof user.emailNotifications === 'boolean' ? user.emailNotifications : true;
-      const nextSmsNotif = typeof user.smsNotifications === 'boolean' ? user.smsNotifications : false;
-      setEmailNotifications(nextEmailNotif);
-      setSmsNotifications(nextSmsNotif);
-
       // Establish "clean" baseline for dirty tracking.
       setInitialSnapshot({
         ...nextForm,
-        emailNotifications: nextEmailNotif,
-        smsNotifications: nextSmsNotif,
       });
 
       // Start in edit mode on first open. After a save we flip to view-mode.
@@ -169,11 +159,7 @@ export default function EditProfileScreen() {
     }
   }, [user]);
 
-  const getCurrentSnapshot = useCallback(() => ({
-    ...formData,
-    emailNotifications,
-    smsNotifications,
-  }), [formData, emailNotifications, smsNotifications]);
+  const getCurrentSnapshot = useCallback(() => ({ ...formData }), [formData]);
 
   const isDirty = (() => {
     if (!initialSnapshot) return false;
@@ -189,13 +175,7 @@ export default function EditProfileScreen() {
     setFormData(prevData => ({...prevData, [field]: text}));
   }, [isEditing]);
 
-  const handleEmailNotificationToggle = useCallback((value) => {
-    setEmailNotifications(value);
-  }, []);
-
-  const handleSmsNotificationToggle = useCallback((value) => {
-    setSmsNotifications(value);
-  }, []);
+  // Notification preferences were moved to Profile → Privacy & Security.
 
   // Profile Picture Functions
   const handleProfilePicturePress = () => {
@@ -330,8 +310,6 @@ export default function EditProfileScreen() {
       address: initialSnapshot.address || '',
       profilePicture: initialSnapshot.profilePicture || null,
     });
-    setEmailNotifications(!!initialSnapshot.emailNotifications);
-    setSmsNotifications(!!initialSnapshot.smsNotifications);
     if (initialSnapshot.dateOfBirth) {
       setSelectedDate(new Date(initialSnapshot.dateOfBirth));
     }
@@ -367,8 +345,6 @@ export default function EditProfileScreen() {
         gender: formData.gender,
         address: formData.address.trim(),
         profilePicture: formData.profilePicture,
-        emailNotifications,
-        smsNotifications,
       };
 
       const result = await updateProfile(profileData);
@@ -655,38 +631,6 @@ export default function EditProfileScreen() {
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
                 editable={isEditing}
-              />
-            </View>
-          </View>
-        </FormSection>
-
-        {/* Notification Preferences */}
-        <FormSection title={t('editProfile.notificationPreferences')}>
-          <View style={styles.formContent}>
-            <View style={styles.switchContainer}>
-              <View style={styles.switchLabel}>
-                <Text style={styles.fieldLabel}>{t('editProfile.emailNotifications')}</Text>
-                <Text style={styles.switchSubtext}>{t('editProfile.emailNotificationsHint')}</Text>
-              </View>
-              <Switch
-                value={emailNotifications}
-                onValueChange={handleEmailNotificationToggle}
-                trackColor={{ false: '#E5E5EA', true: '#E74C3C' }}
-                thumbColor="#ffffff"
-                ios_backgroundColor="#E5E5EA"
-              />
-            </View>
-            <View style={styles.switchContainer}>
-              <View style={styles.switchLabel}>
-                <Text style={styles.fieldLabel}>{t('editProfile.smsNotifications')}</Text>
-                <Text style={styles.switchSubtext}>{t('editProfile.smsNotificationsHint')}</Text>
-              </View>
-              <Switch
-                value={smsNotifications}
-                onValueChange={handleSmsNotificationToggle}
-                trackColor={{ false: '#E5E5EA', true: '#27AE60' }}
-                thumbColor="#ffffff"
-                ios_backgroundColor="#E5E5EA"
               />
             </View>
           </View>

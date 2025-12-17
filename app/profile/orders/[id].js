@@ -119,6 +119,35 @@ export default function OrderDetailScreen() {
   const createdAt = order?.createdAt || order?.created_at || order?.orderDate || order?.order_date;
   const formattedDateTime = formatDateTime(createdAt);
 
+  const getStatusLabel = () => {
+    const raw = String(status || '').trim();
+    const s = raw.toLowerCase();
+    const map = {
+      pending: 'ordersDetail.statusPending',
+      processing: 'ordersDetail.statusProcessing',
+      confirmed: 'ordersDetail.statusConfirmed',
+      paid: 'ordersDetail.statusPaid',
+      completed: 'ordersDetail.statusCompleted',
+      shipped: 'ordersDetail.statusShipped',
+      delivered: 'ordersDetail.statusDelivered',
+      cancelled: 'ordersDetail.statusCancelled',
+      canceled: 'ordersDetail.statusCancelled',
+      refunded: 'ordersDetail.statusRefunded',
+      failed: 'ordersDetail.statusFailed',
+      deleted: 'ordersDetail.statusDeleted',
+    };
+    const key = map[s];
+    return key ? t(key) : raw.toUpperCase();
+  };
+
+  const getPaymentMethodLabel = () => {
+    if (isCodLike(order)) return t('ordersDetail.paymentMethodCod');
+    if (isCardLike(order)) return t('ordersDetail.paymentMethodCard');
+    const pm = String(paymentMethod || '').trim();
+    if (!pm) return t('ordersDetail.paymentMethodUnknown');
+    return t('ordersDetail.paymentMethodOther', { method: pm.toUpperCase() });
+  };
+
   const items = Array.isArray(order?.items) ? order.items : [];
   const paidItems = items.filter((it) => !isPromoItem(it));
   const promoItems = items.filter((it) => isPromoItem(it));
@@ -223,7 +252,7 @@ export default function OrderDetailScreen() {
             </View>
             <View style={styles.statusRow}>
               <View style={styles.statusBadge}>
-                <Text style={styles.statusBadgeText}>{String(status).toUpperCase()}</Text>
+                <Text style={styles.statusBadgeText}>{getStatusLabel()}</Text>
               </View>
             </View>
           </View>
@@ -236,7 +265,7 @@ export default function OrderDetailScreen() {
             </View>
             <View style={styles.paymentMethodCard}>
               <Text style={styles.paymentMethodText}>
-                {isCodLike(order) ? 'Cash on Delivery (COD)' : isCardLike(order) ? 'Stripe (Card Payment)' : String(paymentMethod || 'N/A').toUpperCase()}
+                {getPaymentMethodLabel()}
               </Text>
             </View>
           </View>

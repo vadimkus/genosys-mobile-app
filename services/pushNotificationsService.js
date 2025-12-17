@@ -23,7 +23,12 @@ export async function registerForPushNotificationsAsync() {
     finalStatus = status;
   }
   if (finalStatus !== 'granted') {
-    return { success: false, error: 'Push permission not granted' };
+    // Keep service UI-agnostic: return a translation key (and a fallback message)
+    return {
+      success: false,
+      errorKey: 'profile.pushPermissionDenied',
+      error: 'Push permission not granted',
+    };
   }
 
   // Get Expo push token

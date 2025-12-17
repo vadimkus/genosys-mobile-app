@@ -20,16 +20,50 @@ const formatDate = (value) => {
   return d.toLocaleDateString();
 };
 
-const statusLabel = (status) => {
-  const s = String(status || '').toLowerCase();
-  if (!s) return 'Pending';
-  if (s === 'paid') return 'Paid';
-  if (s === 'confirmed') return 'Confirmed';
-  if (s === 'processing') return 'Processing';
-  if (s === 'shipped') return 'Shipped';
-  if (s === 'delivered') return 'Delivered';
-  if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
-  return status;
+const statusLabelKey = (status) => {
+  const s = String(status || '').trim().toLowerCase();
+  const map = {
+    pending: 'ordersDetail.statusPending',
+    processing: 'ordersDetail.statusProcessing',
+    confirmed: 'ordersDetail.statusConfirmed',
+    paid: 'ordersDetail.statusPaid',
+    completed: 'ordersDetail.statusCompleted',
+    shipped: 'ordersDetail.statusShipped',
+    shipping: 'ordersDetail.statusShipped',
+    delivered: 'ordersDetail.statusDelivered',
+    cancelled: 'ordersDetail.statusCancelled',
+    canceled: 'ordersDetail.statusCancelled',
+    refunded: 'ordersDetail.statusRefunded',
+    failed: 'ordersDetail.statusFailed',
+    deleted: 'ordersDetail.statusDeleted',
+  };
+  return map[s] || null;
+};
+
+const formatStatusLabel = (t, rawStatus) => {
+  const raw = String(rawStatus || '').trim();
+  const key = statusLabelKey(raw);
+  return key ? t(key) : (raw ? raw.toUpperCase() : t('ordersDetail.statusPending'));
+};
+
+const canonicalEmirateKey = (value) => {
+  const s = String(value || '').trim().toLowerCase();
+  if (!s) return '';
+  const cleaned = s.replace(/[\.\,]/g, '').replace(/\s+/g, ' ');
+  if (cleaned === 'abu dhabi' || cleaned === 'abudhabi') return 'abuDhabi';
+  if (cleaned === 'dubai') return 'dubai';
+  if (cleaned === 'sharjah') return 'sharjah';
+  if (cleaned === 'ajman') return 'ajman';
+  if (cleaned === 'umm al quwain' || cleaned === 'umm al-quwain' || cleaned === 'ummalquwain') return 'ummAlQuwain';
+  if (cleaned === 'ras al khaimah' || cleaned === 'ras al-khaimah' || cleaned === 'rasalkhaimah') return 'rasAlKhaimah';
+  if (cleaned === 'fujairah') return 'fujairah';
+  return '';
+};
+
+const formatEmirateLabel = (t, emirate) => {
+  const raw = String(emirate || '').trim();
+  const key = canonicalEmirateKey(raw);
+  return key ? t(`addAddress.emirates.${key}`) : raw;
 };
 
 const statusColor = (status) => {
@@ -339,7 +373,9 @@ export default function OrdersScreen() {
                       onPress={() => toggleExpanded(keyId)}
                       activeOpacity={0.85}
                     >
-                      <Text style={styles.orderNumber}>Order {String(orderNumber)}</Text>
+                      <Text style={styles.orderNumber}>
+                        {t('ordersDetail.orderNumber')}: {String(orderNumber)}
+                      </Text>
                       <Ionicons
                         name={isExpanded ? 'chevron-up' : 'chevron-down'}
                         size={18}
@@ -371,15 +407,17 @@ export default function OrdersScreen() {
 
                   <View style={styles.statusRow}>
                     <View style={[styles.statusPill, { backgroundColor: statusColor(status) + '20' }]}>
-                      <Text style={[styles.statusText, { color: statusColor(status) }]}>{statusLabel(status)}</Text>
+                      <Text style={[styles.statusText, { color: statusColor(status) }]}>
+                        {formatStatusLabel(t, status)}
+                      </Text>
                     </View>
                   </View>
 
                   <Text style={styles.metaText}>
                     {formatDate(createdAt)}
-                    {emirate ? ` • ${emirate}` : ''}
+                    {emirate ? ` • ${formatEmirateLabel(t, emirate)}` : ''}
                     {paymentMethod ? ` • ${String(paymentMethod).toUpperCase()}` : ''}
-                    {paymentStatus ? ` • ${statusLabel(paymentStatus)}` : ''}
+                    {paymentStatus ? ` • ${formatStatusLabel(t, paymentStatus)}` : ''}
                   </Text>
                   <View style={styles.cardBottom}>
                     <Text style={styles.totalText}>AED {formatAED(total)}</Text>
@@ -388,7 +426,9 @@ export default function OrdersScreen() {
                     </Text>
                   </View>
                   <View style={styles.breakdownRow}>
-                    <Text style={styles.breakdownText}>Shipping: {freeShipping ? 'FREE' : `AED ${formatAED(shipping)}`}</Text>
+                    <Text style={styles.breakdownText}>
+                      {t('ordersScreen.shipping')}: {freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}
+                    </Text>
                   </View>
 
                   {isExpanded ? (
@@ -397,15 +437,20 @@ export default function OrdersScreen() {
 
                       {(Array.isArray(o.items) ? o.items : []).map((it, idx) => {
                         const qty = Number(it?.quantity) || 0;
-                        const name = it?.name || it?.productName || `Item ${idx + 1}`;
+                        const name = it?.name || it?.productName || `${t('ordersScreen.item')} ${idx + 1}`;
                         const size = it?.size || it?.selectedSize || '';
                         const color = it?.color || it?.selectedColor || '';
-                        const extras = [size && `Size: ${size}`, color && `Color: ${color}`].filter(Boolean).join(' • ');
+                        const extras = [
+                          size && `${t('common.size')}: ${size}`,
+                          color && `${t('common.color')}: ${color}`,
+                        ]
+                          .filter(Boolean)
+                          .join(' • ');
                         const price = Number(it?.price ?? 0) || 0;
                         const isPromo = it?.isPromotionItem === true;
                         return (
                           <Text key={`${String(it?.productId || it?.id || name)}-${idx}`} style={styles.orderSummaryLine}>
-                            {qty}× {String(name)}{extras ? ` — ${extras}` : ''} — {isPromo ? 'FREE' : `AED ${formatAED(price)}`}
+                            {qty}× {String(name)}{extras ? ` — ${extras}` : ''} — {isPromo ? t('common.free') : `AED ${formatAED(price)}`}
                           </Text>
                         );
                       })}
@@ -417,7 +462,7 @@ export default function OrdersScreen() {
                       </View>
                       <View style={styles.orderTotalsRow}>
                         <Text style={styles.orderTotalsLabel}>{t('ordersScreen.shipping')}</Text>
-                        <Text style={styles.orderTotalsValue}>{freeShipping ? 'FREE' : `AED ${formatAED(shipping)}`}</Text>
+                        <Text style={styles.orderTotalsValue}>{freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}</Text>
                       </View>
                       <View style={styles.orderTotalsRow}>
                         <Text style={styles.orderTotalsLabel}>{t('ordersScreen.vatIncluded')}</Text>

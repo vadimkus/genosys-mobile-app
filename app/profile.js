@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,14 @@ import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTok
 
 const { width } = Dimensions.get('window');
 
+// Keep Switch color props stable across renders (prevents iOS visual flicker on nearby switches).
+const SWITCH_TRACK_PUSH = { false: '#E5E5EA', true: '#E74C3C' };
+const SWITCH_TRACK_BIOMETRIC = { false: '#E5E5EA', true: '#27AE60' };
+const SWITCH_TRACK_EMAIL = { false: '#E5E5EA', true: '#E74C3C' };
+const SWITCH_TRACK_SMS = { false: '#E5E5EA', true: '#27AE60' };
+const SWITCH_THUMB = '#ffffff';
+const SWITCH_IOS_BG = '#E5E5EA';
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { clearCart, getTotalItems } = useCart();
@@ -38,10 +46,15 @@ export default function ProfileScreen() {
   } = useAuth();
   const { locale, t } = useLocalization();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [pushToggleLoading, setPushToggleLoading] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
   const PUSH_PREF_KEY = '@genosys_push_enabled';
+  const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
+  const SMS_NOTIF_PREF_KEY = '@genosys_sms_notif_enabled';
 
   useEffect(() => {
     let cancelled = false;
@@ -50,6 +63,24 @@ export default function ProfileScreen() {
         const v = await AsyncStorage.getItem(PUSH_PREF_KEY);
         const enabled = v === '1';
         if (!cancelled) setNotificationsEnabled(enabled);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Local-only notification preferences (email/sms). Backend does not currently persist these.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const e = await AsyncStorage.getItem(EMAIL_NOTIF_PREF_KEY);
+        const s = await AsyncStorage.getItem(SMS_NOTIF_PREF_KEY);
+        if (!cancelled) {
+          if (e === '0' || e === '1') setEmailNotifications(e === '1');
+          if (s === '0' || s === '1') setSmsNotifications(s === '1');
+        }
       } catch {
         // ignore
       }
@@ -148,7 +179,7 @@ export default function ProfileScreen() {
     router.push('/profile/about');
   };
 
-  const handleBiometricToggle = async (value) => {
+  const handleBiometricToggle = useCallback(async (value) => {
     if (biometricLoading) return;
     
     setBiometricLoading(true);
@@ -198,40 +229,103 @@ export default function ProfileScreen() {
     } finally {
       setBiometricLoading(false);
     }
-  };
+  }, [biometricLoading, biometricType, disableBiometric, enableBiometric, t, user?.email]);
 
   const handlePushToggle = async (value) => {
+    if (pushToggleLoading) return;
     // Only meaningful when logged in (we need user token to store token server-side)
     if (!user?.token) {
       Alert.alert(t('common.error'), t('auth.loginRequired') || t('checkout.loginRequiredMessage'));
       return;
     }
 
+    // Optimistic UI: switch updates immediately, then we do async work.
+    const prev = notificationsEnabled;
+    setNotificationsEnabled(!!value);
+    setPushToggleLoading(true);
+    await AsyncStorage.setItem(PUSH_PREF_KEY, value ? '1' : '0').catch(() => {});
+
     try {
       if (value) {
         const reg = await registerForPushNotificationsAsync();
         if (!reg?.success || !reg?.token) {
-          Alert.alert(t('common.error'), reg?.error || t('profile.pushEnableFailed'));
-          return;
+          const msg =
+            (reg?.errorKey && t(reg.errorKey)) ||
+            reg?.error ||
+            t('profile.pushEnableFailed');
+          throw new Error(msg);
         }
         const saved = await savePushTokenToBackend(user.token, reg.token);
         if (!saved?.success) {
-          Alert.alert(t('common.error'), saved?.error || t('profile.pushEnableFailed'));
-          return;
+          throw new Error(saved?.error || t('profile.pushEnableFailed'));
         }
-        setNotificationsEnabled(true);
-        await AsyncStorage.setItem(PUSH_PREF_KEY, '1');
-        Alert.alert(t('common.done'), t('profile.pushEnabled'));
+        // Success: keep optimistic state; no extra alert (feels instant).
       } else {
-        await clearPushTokenOnBackend(user.token);
-        setNotificationsEnabled(false);
-        await AsyncStorage.setItem(PUSH_PREF_KEY, '0');
-        Alert.alert(t('common.done'), t('profile.pushDisabled'));
+        const cleared = await clearPushTokenOnBackend(user.token);
+        if (cleared && cleared.success === false) {
+          throw new Error(cleared?.error || t('profile.pushEnableFailed'));
+        }
+        // Success: keep optimistic state; no extra alert (feels instant).
       }
     } catch {
+      // Revert UI + local pref on failure
+      setNotificationsEnabled(prev);
+      await AsyncStorage.setItem(PUSH_PREF_KEY, prev ? '1' : '0').catch(() => {});
       Alert.alert(t('common.error'), t('profile.pushEnableFailed'));
+    } finally {
+      setPushToggleLoading(false);
     }
   };
+
+  const handleEmailNotifToggle = useCallback(async (value) => {
+    setEmailNotifications(!!value);
+    await AsyncStorage.setItem(EMAIL_NOTIF_PREF_KEY, value ? '1' : '0').catch(() => {});
+  }, []);
+
+  const handleSmsNotifToggle = useCallback(async (value) => {
+    setSmsNotifications(!!value);
+    await AsyncStorage.setItem(SMS_NOTIF_PREF_KEY, value ? '1' : '0').catch(() => {});
+  }, []);
+
+  // Memoized switch row to prevent unrelated switches from re-rendering and flickering on iOS.
+  const ProfileSwitchItem = useMemo(() => {
+    return React.memo(function ProfileSwitchItemInner({
+      icon,
+      title,
+      subtitle,
+      value,
+      onValueChange,
+      trackColor,
+      disabled,
+      isLast,
+    }) {
+      return (
+        <View style={[styles.profileItem, isLast && styles.profileItemLast]}>
+          <View style={styles.profileItemLeft}>
+            {icon && (
+              <View style={styles.iconContainer}>
+                <Ionicons name={icon} size={22} color="#E74C3C" />
+              </View>
+            )}
+            <View style={styles.profileItemText}>
+              <Text style={styles.profileItemTitle}>{title}</Text>
+              {subtitle ? <Text style={styles.profileItemSubtitle}>{subtitle}</Text> : null}
+            </View>
+          </View>
+          <View style={styles.profileItemRight}>
+            <Switch
+              value={value}
+              onValueChange={onValueChange}
+              trackColor={trackColor}
+              thumbColor={SWITCH_THUMB}
+              ios_backgroundColor={SWITCH_IOS_BG}
+              disabled={!!disabled}
+            />
+          </View>
+        </View>
+      );
+    });
+  }, []);
 
   // Quick Action Card Component (Genosys brand style)
   const QuickActionCard = ({ icon, title, subtitle, onPress, color = "#E74C3C" }) => (
@@ -256,33 +350,45 @@ export default function ProfileScreen() {
     </View>
   );
 
-  const ProfileItem = ({ icon, title, subtitle, onPress, rightComponent, hasArrow = true, style, isLast = false }) => (
-    <TouchableOpacity 
-      style={[
-        styles.profileItem, 
-        isLast && styles.profileItemLast,
-        style
-      ]} 
-      onPress={onPress} 
-      disabled={!onPress}
-      activeOpacity={0.6}
-    >
-      <View style={styles.profileItemLeft}>
-        {icon && (
-          <View style={styles.iconContainer}>
-            <Ionicons name={icon} size={22} color="#E74C3C" />
+  const ProfileItem = ({ icon, title, subtitle, onPress, rightComponent, hasArrow = true, style, isLast = false }) => {
+    const content = (
+      <>
+        <View style={styles.profileItemLeft}>
+          {icon && (
+            <View style={styles.iconContainer}>
+              <Ionicons name={icon} size={22} color="#E74C3C" />
+            </View>
+          )}
+          <View style={styles.profileItemText}>
+            <Text style={styles.profileItemTitle}>{title}</Text>
+            {subtitle && <Text style={styles.profileItemSubtitle}>{subtitle}</Text>}
           </View>
-        )}
-        <View style={styles.profileItemText}>
-          <Text style={styles.profileItemTitle}>{title}</Text>
-          {subtitle && <Text style={styles.profileItemSubtitle}>{subtitle}</Text>}
         </View>
-      </View>
-      <View style={styles.profileItemRight}>
-        {rightComponent || (hasArrow && <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />)}
-      </View>
-    </TouchableOpacity>
-  );
+        <View style={styles.profileItemRight}>
+          {rightComponent || (hasArrow && <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />)}
+        </View>
+      </>
+    );
+
+    const itemStyle = [
+      styles.profileItem,
+      isLast && styles.profileItemLast,
+      style,
+    ];
+
+    // IMPORTANT: When there's no row onPress (e.g., rows with Switch controls),
+    // don't wrap in a touchable. Touch responders can interfere with Switch gestures
+    // and make other switches "react" on tap.
+    if (!onPress) {
+      return <View style={itemStyle}>{content}</View>;
+    }
+
+    return (
+      <TouchableOpacity style={itemStyle} onPress={onPress} activeOpacity={0.6}>
+        {content}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -376,20 +482,14 @@ export default function ProfileScreen() {
               title={t('profile.paymentAndBilling')}
               onPress={() => router.push('/profile/payment')}
             />
-            <ProfileItem
+            <ProfileSwitchItem
               icon="notifications-outline"
               title={t('profile.pushNotifications')}
-              rightComponent={
-                <Switch
-                  value={notificationsEnabled}
-                  onValueChange={handlePushToggle}
-                  trackColor={{ false: '#E5E5EA', true: '#E74C3C' }}
-                  thumbColor="#ffffff"
-                  ios_backgroundColor="#E5E5EA"
-                />
-              }
-              hasArrow={false}
-              isLast={true}
+              value={notificationsEnabled}
+              onValueChange={handlePushToggle}
+              trackColor={SWITCH_TRACK_PUSH}
+              disabled={pushToggleLoading}
+              isLast
             />
           </View>
         </ProfileSection>
@@ -398,20 +498,13 @@ export default function ProfileScreen() {
         <ProfileSection title={t('profile.privacyAndSecurity')}>
           <View style={styles.sectionContent}>
             {biometricAvailable ? (
-              <ProfileItem
+              <ProfileSwitchItem
                 icon={biometricType.includes('Face') ? 'scan-outline' : 'finger-print-outline'}
                 title={biometricType}
-                rightComponent={
-                  <Switch
-                    value={biometricEnabled}
-                    onValueChange={handleBiometricToggle}
-                    trackColor={{ false: '#E5E5EA', true: '#27AE60' }}
-                    thumbColor="#ffffff"
-                    ios_backgroundColor="#E5E5EA"
-                    disabled={biometricLoading}
-                  />
-                }
-                hasArrow={false}
+                value={biometricEnabled}
+                onValueChange={handleBiometricToggle}
+                trackColor={SWITCH_TRACK_BIOMETRIC}
+                disabled={biometricLoading}
               />
             ) : (
               <ProfileItem
@@ -423,6 +516,26 @@ export default function ProfileScreen() {
                 hasArrow={false}
               />
             )}
+
+            {/* Moved here from Edit Profile */}
+            <ProfileSwitchItem
+              icon="mail-outline"
+              title={t('editProfile.emailNotifications')}
+              subtitle={t('editProfile.emailNotificationsHint')}
+              value={emailNotifications}
+              onValueChange={handleEmailNotifToggle}
+              trackColor={SWITCH_TRACK_EMAIL}
+              disabled={!user?.token}
+            />
+            <ProfileSwitchItem
+              icon="chatbubble-ellipses-outline"
+              title={t('editProfile.smsNotifications')}
+              subtitle={t('editProfile.smsNotificationsHint')}
+              value={smsNotifications}
+              onValueChange={handleSmsNotifToggle}
+              trackColor={SWITCH_TRACK_SMS}
+              disabled={!user?.token}
+            />
             <ProfileItem
               icon="shield-outline"
               title={t('profile.privacyPolicy')}

@@ -99,6 +99,12 @@ export default function BagScreen() {
       const qty = Number(item.quantity) || 0;
       const explicitOriginal = Number(item.product?.originalPrice);
       const base = Number(item.product?.displayPrice ?? item.product?.price ?? 0) || 0;
+      const selectedSize = String(item?.selectedSize || '').trim();
+      const selectedVariant = selectedSize && Array.isArray(item?.product?.variants)
+        ? item.product.variants.find((v) => String(v?.size || '').trim() === selectedSize)
+        : null;
+      const variantPrice = Number(selectedVariant?.price);
+      const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
       // Discount-excluded products (Beauty Boxes, Hydro Cool Mask): ignore user discount
       if (isUserDiscountExcludedProduct(item.product)) {
         // Canonical-price products should always use canonical/base price (e.g. Hydro Cool, Devices)
@@ -109,7 +115,7 @@ export default function BagScreen() {
       }
       const orig = Number.isFinite(explicitOriginal) && explicitOriginal > 0
         ? explicitOriginal
-        : (base / multiplier);
+        : (hasVariantPrice ? base : (base / multiplier));
       return acc + (Number.isFinite(orig) ? orig : base) * qty;
     }, 0);
     return Number.isFinite(sum) ? sum : null;
@@ -280,18 +286,22 @@ export default function BagScreen() {
                   return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
                 }
 
-                const discounted = !hasVariantPrice && !isBeautyBox && hasUserDiscount && Number.isFinite(original) && original > 0
-                  ? original * (1 - pct / 100)
+                const originalForDiscount =
+                  (Number.isFinite(original) && original > 0 ? original : NaN) ||
+                  (Number.isFinite(base) && base > 0 ? base : NaN) ||
+                  0;
+                const discounted = !isBeautyBox && hasUserDiscount && Number.isFinite(originalForDiscount) && originalForDiscount > 0
+                  ? originalForDiscount * (1 - pct / 100)
                   : base;
 
-                if (Number.isFinite(original) && original > 0 && Number.isFinite(discounted) && discounted > 0 && original !== discounted) {
-                  const pctFromPrices = original ? Math.round((1 - discounted / original) * 100) : null;
+                if (Number.isFinite(originalForDiscount) && originalForDiscount > 0 && Number.isFinite(discounted) && discounted > 0 && originalForDiscount !== discounted) {
+                  const pctFromPrices = originalForDiscount ? Math.round((1 - discounted / originalForDiscount) * 100) : null;
                   const pctLabel =
                     (Number.isFinite(pctFromPrices) && pctFromPrices > 0 && pctFromPrices < 100 && pctFromPrices) ||
                     (hasUserDiscount ? Math.round(pct) : null);
                   return (
                     <View style={styles.itemPriceContainer}>
-                      <Text style={styles.itemOriginalPrice}>{original.toFixed(2)} AED</Text>
+                      <Text style={styles.itemOriginalPrice}>{originalForDiscount.toFixed(2)} AED</Text>
                       {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% OFF</Text> : null}
                       <Text style={styles.itemDiscountedPrice}>{discounted.toFixed(2)} AED</Text>
                     </View>
