@@ -22,10 +22,24 @@ import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import Constants from 'expo-constants';
 
 const log = createLogger('Login');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+const getNativeBundleId = () => {
+  try {
+    return (
+      Constants?.expoConfig?.ios?.bundleIdentifier ||
+      Constants?.manifest2?.extra?.expoClient?.ios?.bundleIdentifier ||
+      Constants?.manifest?.ios?.bundleIdentifier ||
+      ''
+    );
+  } catch {
+    return '';
+  }
+};
 
 export default function LoginScreen() {
   const { t } = useLocalization();
@@ -127,6 +141,18 @@ export default function LoginScreen() {
       const code = String(error?.code || '').trim();
       const msg = String(error?.message || '').trim();
       log.error('Apple sign-in failed', { code, message: msg });
+      const bundleId = getNativeBundleId();
+      const msgLower = msg.toLowerCase();
+      const looksLikeSetupNotComplete =
+        msgLower.includes('setup') && msgLower.includes('not complete');
+
+      if (looksLikeSetupNotComplete || code === 'ERR_REQUEST_NOT_HANDLED') {
+        Alert.alert(
+          t('authScreen.authFailedTitle'),
+          t('authScreen.appleSetupNotComplete', { bundleId: bundleId || 'unknown' })
+        );
+        return;
+      }
       const detail = [code, msg].filter(Boolean).join(': ');
       Alert.alert(
         t('common.error'),

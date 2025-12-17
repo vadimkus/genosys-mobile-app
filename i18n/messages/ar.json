@@ -891,6 +891,7 @@
     "privacyRequiredMessage": "يرجى قراءة سياسة الخصوصية والموافقة عليها للمتابعة.",
     "googleAuthFailed": "فشل تسجيل الدخول عبر Google. يرجى استخدام تسجيل الدخول عبر البريد وكلمة المرور.",
     "appleAuthFailed": "فشل تسجيل الدخول عبر Apple. يرجى المحاولة مرة أخرى.",
+    "appleSetupNotComplete": "لم يتم إعداد تسجيل الدخول عبر Apple لهذه النسخة بعد.\n\nتحقق من التالي:\n- أوقف وضع الطيران / يلزم وجود إنترنت\n- تأكد من تسجيل الدخول إلى iCloud على الجهاز\n- Apple Developer: تم تفعيل “Sign In with Apple” لهذا الـ Bundle ID\n\nBundle ID: {bundleId}",
     "appleNoToken": "تعذر بدء Apple Sign‑In. يرجى المحاولة مرة أخرى.",
     "authFailedTitle": "فشل التحقق",
     "biometricLoginFailed": "فشل تسجيل الدخول بالبصمة",

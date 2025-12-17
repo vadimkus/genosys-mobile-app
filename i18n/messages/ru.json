@@ -912,6 +912,7 @@
     "privacyRequiredMessage": "Пожалуйста, прочитайте и примите Политику конфиденциальности, чтобы продолжить.",
     "googleAuthFailed": "Не удалось войти через Google. Используйте вход по email и паролю.",
     "appleAuthFailed": "Не удалось войти через Apple. Попробуйте ещё раз.",
+    "appleSetupNotComplete": "Apple Sign‑In не настроен для этой сборки.\n\nПроверьте:\n- Выключите авиарежим / нужен интернет\n- На устройстве выполнен вход в iCloud\n- Apple Developer: для этого Bundle ID включена опция “Sign In with Apple”\n\nBundle ID: {bundleId}",
     "appleNoToken": "Не удалось запустить Apple Sign‑In. Попробуйте ещё раз.",
     "authFailedTitle": "Ошибка аутентификации",
     "biometricLoginFailed": "Не удалось войти по биометрии",

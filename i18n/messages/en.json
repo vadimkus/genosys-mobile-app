@@ -907,6 +907,7 @@
     "privacyRequiredMessage": "Please read and accept our Privacy Policy to continue.",
     "googleAuthFailed": "Google authentication failed. Please use email & password login.",
     "appleAuthFailed": "Apple authentication failed. Please try again.",
+    "appleSetupNotComplete": "Apple Sign‑In isn’t set up for this build yet.\n\nChecklist:\n- Disable Airplane Mode / ensure internet\n- Sign in to iCloud on the device\n- Apple Developer: App ID has “Sign In with Apple” enabled for this bundle\n\nBundle ID: {bundleId}",
     "appleNoToken": "Could not start Apple Sign-In. Please try again.",
     "authFailedTitle": "Authentication Failed",
     "biometricLoginFailed": "Biometric login failed",
