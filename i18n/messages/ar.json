@@ -494,6 +494,11 @@
     "tipDefault": "عيّن عنواناً افتراضياً لتسريع الدفع",
     "tipApt": "أضف رقم الشقة/المكتب لضمان توصيل دقيق",
     "tipPhone": "أضف رقم هاتف للتنسيق مع التوصيل",
+    "manageHint": "قم بإدارة عناوين الشحن لتسريع عملية الدفع",
+    "deleteTitle": "حذف العنوان",
+    "deleteMessage": "هل أنت متأكد أنك تريد حذف هذا العنوان؟",
+    "optionsTitle": "خيارات العنوان",
+    "setAsDefault": "تعيين كافتراضي",
     "deleteFailed": "تعذر حذف العنوان",
     "setDefaultFailed": "تعذر تعيين العنوان الافتراضي"
   },
@@ -577,7 +582,11 @@
     "deleteAccountConfirm": "حذف",
     "deleteAccountSuccessTitle": "تم حذف الحساب",
     "deleteAccountSuccessMessage": "تم حذف حسابك بنجاح.",
-    "deleteAccountFailed": "تعذر حذف الحساب. يرجى المحاولة مرة أخرى."
+    "deleteAccountFailed": "تعذر حذف الحساب. يرجى المحاولة مرة أخرى.",
+    "additionalInformation": "معلومات إضافية",
+    "notificationPreferences": "تفضيلات الإشعارات",
+    "selectDateOfBirthPlaceholder": "اختر تاريخ الميلاد",
+    "privacyNote": "معلوماتك الشخصية محمية ولن تتم مشاركتها مع أطراف ثالثة. بتحديث ملفك الشخصي، فإنك توافق على سياسة الخصوصية الخاصة بنا."
   },
   "addAddress": {
     "addTitle": "إضافة عنوان",
@@ -588,9 +597,18 @@
     "typeHome": "المنزل",
     "typeWork": "العمل",
     "typeOther": "أخرى",
-    "defaultCity": "Dubai",
+    "emirates": {
+      "abuDhabi": "أبوظبي",
+      "dubai": "دبي",
+      "sharjah": "الشارقة",
+      "ajman": "عجمان",
+      "ummAlQuwain": "أم القيوين",
+      "rasAlKhaimah": "رأس الخيمة",
+      "fujairah": "الفجيرة"
+    },
+    "defaultCity": "دبي",
     "defaultEmirate": "Dubai",
-    "defaultCountry": "United Arab Emirates",
+    "defaultCountry": "الإمارات العربية المتحدة",
     "validationMissingFields": "يرجى تعبئة جميع الحقول المطلوبة.",
     "validationInvalidUaePhone": "يرجى إدخال رقم هاتف إماراتي صالح.",
     "successTitle": "تم بنجاح",

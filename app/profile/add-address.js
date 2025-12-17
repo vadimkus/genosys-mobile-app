@@ -41,8 +41,13 @@ export default function AddEditAddressScreen() {
   const [isSaving, setIsSaving] = useState(false);
 
   const emirates = [
-    'Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman',
-    'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'
+    { value: 'Abu Dhabi', key: 'abuDhabi' },
+    { value: 'Dubai', key: 'dubai' },
+    { value: 'Sharjah', key: 'sharjah' },
+    { value: 'Ajman', key: 'ajman' },
+    { value: 'Umm Al Quwain', key: 'ummAlQuwain' },
+    { value: 'Ras Al Khaimah', key: 'rasAlKhaimah' },
+    { value: 'Fujairah', key: 'fujairah' },
   ];
 
   const addressTypes = [t('addAddress.typeHome'), t('addAddress.typeWork'), t('addAddress.typeOther')];
@@ -257,18 +262,18 @@ export default function AddEditAddressScreen() {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {emirates.map((emirate) => (
                     <TouchableOpacity
-                      key={emirate}
+                      key={emirate.value}
                       style={[
                         styles.emirateButton,
-                        formData.emirate === emirate && styles.activeEmirateButton
+                        formData.emirate === emirate.value && styles.activeEmirateButton
                       ]}
-                      onPress={() => updateField('emirate', emirate)}
+                      onPress={() => updateField('emirate', emirate.value)}
                     >
                       <Text style={[
                         styles.emirateButtonText,
-                        formData.emirate === emirate && styles.activeEmirateButtonText
+                        formData.emirate === emirate.value && styles.activeEmirateButtonText
                       ]}>
-                        {emirate}
+                        {t(`addAddress.emirates.${emirate.key}`)}
                       </Text>
                     </TouchableOpacity>
                   ))}

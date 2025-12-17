@@ -66,7 +66,17 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
     const forceCanonicalPrice =
       isHydroCoolMask(item.product) || isDeviceProduct(item.product) || hasFixedPriceOverride(item.product);
 
+    // Size variants: if the product carries variants, prefer the selected variant price.
+    // This prevents the cart UI from incorrectly reusing base/originalPrice from a different size.
+    const selectedSize = String(item?.selectedSize || '').trim();
+    const selectedVariant = selectedSize && Array.isArray(item?.product?.variants)
+      ? item.product.variants.find((v) => String(v?.size || '').trim() === selectedSize)
+      : null;
+    const variantPrice = Number(selectedVariant?.price);
+    const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
+
     const rawDisplay =
+      (hasVariantPrice ? variantPrice : undefined) ??
       item.product?.displayPrice ??
       item.product?.price ??
       item.product?.priceIncludingVat ??
@@ -77,9 +87,11 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
     const original = Number(item.product?.originalPrice);
     const itemPrice = forceCanonicalPrice
       ? getCanonicalUnitPrice(item.product)
-      : (!excludedFromUserDiscount && hasUserDiscount && Number.isFinite(original) && original > 0
-      ? original * (1 - discountPct / 100)
-      : Number(rawDisplay));
+      : (hasVariantPrice
+        ? variantPrice
+        : (!excludedFromUserDiscount && hasUserDiscount && Number.isFinite(original) && original > 0
+          ? original * (1 - discountPct / 100)
+          : Number(rawDisplay)));
     const qty = Number(item.quantity) || 0;
     return sum + (Number.isFinite(itemPrice) ? itemPrice * qty : 0);
   }, 0);

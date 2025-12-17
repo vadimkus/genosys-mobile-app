@@ -176,7 +176,26 @@ export const CartProvider = ({ children }) => {
 
       if (cartData) {
         const parsedCart = JSON.parse(cartData);
-        setItems(parsedCart || []);
+        // Normalize any previously-saved variant items so their stored unit price matches the selected size.
+        const normalized = (Array.isArray(parsedCart) ? parsedCart : []).map((it) => {
+          const selectedSize = String(it?.selectedSize || '').trim();
+          const product = it?.product;
+          if (!selectedSize || !product || !Array.isArray(product?.variants)) return it;
+          const v = product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize);
+          const vp = Number(v?.price);
+          if (!Number.isFinite(vp) || vp <= 0) return it;
+          return {
+            ...it,
+            product: {
+              ...product,
+              price: vp,
+              displayPrice: vp,
+              // Avoid carrying an originalPrice from another size; Bag will infer discount from base if needed.
+              originalPrice: Number(v?.originalPrice) || null,
+            },
+          };
+        });
+        setItems(normalized);
       }
 
       if (emirateData) {
@@ -257,6 +276,22 @@ export const CartProvider = ({ children }) => {
     // Ensure special products are stored in cart with canonical pricing fields
     // (so UI + order payloads stay consistent).
     const normalizedProduct = (() => {
+      // If a size variant is selected and the product includes variant pricing, store the selected variant price
+      // as the product unit price in the cart item.
+      if (normalizedSize && Array.isArray(product?.variants) && product.variants.length > 0) {
+        const v = product.variants.find((vv) => String(vv?.size || '').trim() === String(normalizedSize).trim());
+        const vp = Number(v?.price);
+        if (Number.isFinite(vp) && vp > 0) {
+          return {
+            ...product,
+            price: vp,
+            displayPrice: vp,
+            // Prevent mismatch: originalPrice from base product can be for a different size.
+            originalPrice: Number(v?.originalPrice) || null,
+          };
+        }
+      }
+
       const needsCanonical = isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
       if (!needsCanonical) return product;
       const base = getCanonicalUnitPrice(product);
@@ -425,7 +460,15 @@ export const CartProvider = ({ children }) => {
         items: items.map(item => ({
           id: item.product.id,
           name: item.product.name,
-          price: item.product.price,
+          price: (() => {
+            const selectedSize = String(item?.selectedSize || '').trim();
+            const v = selectedSize && Array.isArray(item?.product?.variants)
+              ? item.product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize)
+              : null;
+            const vp = Number(v?.price);
+            if (Number.isFinite(vp) && vp > 0) return vp;
+            return item.product.price;
+          })(),
           quantity: item.quantity,
           image: item.product.image,
           selectedColor: item.selectedColor || null,

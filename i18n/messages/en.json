@@ -493,6 +493,11 @@
     "tipDefault": "Set a default address for faster checkout",
     "tipApt": "Include apartment/office numbers for accurate delivery",
     "tipPhone": "Provide a phone number for delivery coordination",
+    "manageHint": "Manage your shipping addresses for faster checkout",
+    "deleteTitle": "Delete Address",
+    "deleteMessage": "Are you sure you want to delete this address?",
+    "optionsTitle": "Address Options",
+    "setAsDefault": "Set as Default",
     "deleteFailed": "Failed to delete address",
     "setDefaultFailed": "Failed to set default address"
   },
@@ -576,7 +581,11 @@
     "deleteAccountConfirm": "Delete",
     "deleteAccountSuccessTitle": "Account deleted",
     "deleteAccountSuccessMessage": "Your account has been deleted successfully.",
-    "deleteAccountFailed": "Could not delete your account. Please try again."
+    "deleteAccountFailed": "Could not delete your account. Please try again.",
+    "additionalInformation": "Additional Information",
+    "notificationPreferences": "Notification Preferences",
+    "selectDateOfBirthPlaceholder": "Select date of birth",
+    "privacyNote": "Your personal information is protected and will not be shared with third parties. By updating your profile, you agree to our Privacy Policy."
   },
   "addAddress": {
     "addTitle": "Add Address",
@@ -587,6 +596,15 @@
     "typeHome": "Home",
     "typeWork": "Work",
     "typeOther": "Other",
+    "emirates": {
+      "abuDhabi": "Abu Dhabi",
+      "dubai": "Dubai",
+      "sharjah": "Sharjah",
+      "ajman": "Ajman",
+      "ummAlQuwain": "Umm Al Quwain",
+      "rasAlKhaimah": "Ras Al Khaimah",
+      "fujairah": "Fujairah"
+    },
     "defaultCity": "Dubai",
     "defaultEmirate": "Dubai",
     "defaultCountry": "United Arab Emirates",

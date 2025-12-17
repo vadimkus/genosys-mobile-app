@@ -81,6 +81,49 @@ export function asStringList(value) {
   return [txt];
 }
 
+function countCharsByScript(text) {
+  const s = String(text || '');
+  // Basic ranges are enough for our “RU vs EN” filtering.
+  const cyrillic = (s.match(/[\u0400-\u04FF]/g) || []).length;
+  const latin = (s.match(/[A-Za-z]/g) || []).length;
+  const arabic = (s.match(/[\u0600-\u06FF]/g) || []).length;
+  return { cyrillic, latin, arabic };
+}
+
+/**
+ * Remove obvious mixed-locale artifacts.
+ * Example: RU locale but we still receive English-only bullet lines like "Blemish coverage, sun protection..."
+ */
+export function filterListForLocale(items = [], locale = 'en') {
+  const loc = String(locale || '').toLowerCase();
+  const list = Array.isArray(items) ? items : [];
+
+  // Only apply for strict locales where this issue shows up.
+  if (!loc.startsWith('ru') && !loc.startsWith('ar')) return list;
+
+  const filtered = list.filter((raw) => {
+    const t = asText(raw).trim();
+    if (!t) return false;
+    const { cyrillic, latin, arabic } = countCharsByScript(t);
+
+    if (loc.startsWith('ru')) {
+      // Drop clearly English-only lines (keep mixed lines, acronyms, numbers).
+      if (cyrillic === 0 && latin >= 8) return false;
+    }
+
+    if (loc.startsWith('ar')) {
+      // Drop clearly English-only lines in Arabic UI.
+      if (arabic === 0 && latin >= 8) return false;
+    }
+
+    return true;
+  });
+
+  // If we accidentally filtered everything (some products only have EN bullets),
+  // fall back to original list to avoid empty sections.
+  return filtered.length ? filtered : list;
+}
+
 export function asKeyValueObject(value) {
   const parsed = parseMaybeJSON(value);
   if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
@@ -182,6 +225,7 @@ export function deriveDiscountFromBadges(product) {
   }
   return null;
 }
+
 
 
 

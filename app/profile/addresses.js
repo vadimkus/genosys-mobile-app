@@ -26,6 +26,49 @@ export default function AddressesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const normalizeKey = (s) => String(s || '').trim().toLowerCase();
+  const getTypeMeta = (rawType) => {
+    const val = String(rawType || '').trim();
+    const home = t('addAddress.typeHome');
+    const work = t('addAddress.typeWork');
+    const other = t('addAddress.typeOther');
+    const k = normalizeKey(val);
+    const isHome = k === 'home' || val === home;
+    const isWork = k === 'work' || k === 'office' || val === work;
+    const isOther = !isHome && !isWork;
+    return {
+      icon: isHome ? 'home' : isWork ? 'business' : 'location',
+      label: isHome ? home : isWork ? work : other,
+    };
+  };
+
+  const formatEmirate = (raw) => {
+    const v = String(raw || '').trim();
+    if (!v) return '';
+    const k = normalizeKey(v);
+    const map = {
+      'abu dhabi': 'abuDhabi',
+      'dubai': 'dubai',
+      'sharjah': 'sharjah',
+      'ajman': 'ajman',
+      'umm al quwain': 'ummAlQuwain',
+      'umm al-quwain': 'ummAlQuwain',
+      'ras al khaimah': 'rasAlKhaimah',
+      'ras al-khaimah': 'rasAlKhaimah',
+      'fujairah': 'fujairah',
+    };
+    const key = map[k];
+    return key ? t(`addAddress.emirates.${key}`) : v;
+  };
+
+  const formatCountry = (raw) => {
+    const v = String(raw || '').trim();
+    if (!v) return '';
+    const k = normalizeKey(v);
+    if (k === 'united arab emirates' || k === 'uae') return t('addAddress.defaultCountry');
+    return v;
+  };
+
   useEffect(() => {
     loadAddresses();
   }, []);
@@ -70,12 +113,12 @@ export default function AddressesScreen() {
 
   const handleDeleteAddress = (addressId) => {
     Alert.alert(
-      'Delete Address',
-      'Are you sure you want to delete this address?',
+      t('addresses.deleteTitle'),
+      t('addresses.deleteMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             const result = await removeAddress(addressId);
@@ -103,50 +146,53 @@ export default function AddressesScreen() {
     }
   };
 
-  const AddressCard = ({ address }) => (
-    <View style={styles.addressCard}>
-      <View style={styles.addressHeader}>
-        <View style={styles.addressTypeContainer}>
-          <Ionicons 
-            name={address.type === 'Home' ? 'home' : 'business'} 
-            size={20} 
-            color="#E74C3C" 
-          />
-          <Text style={styles.addressType}>{address.type}</Text>
-          {address.isDefault && (
-            <View style={styles.defaultBadge}>
-              <Text style={styles.defaultText}>{t('addresses.default')}</Text>
-            </View>
-          )}
+  const AddressCard = ({ address }) => {
+    const typeMeta = getTypeMeta(address?.type);
+    return (
+      <View style={styles.addressCard}>
+        <View style={styles.addressHeader}>
+          <View style={styles.addressTypeContainer}>
+            <Ionicons
+              name={typeMeta.icon}
+              size={20}
+              color="#E74C3C"
+            />
+            <Text style={styles.addressType}>{typeMeta.label}</Text>
+            {address.isDefault && (
+              <View style={styles.defaultBadge}>
+                <Text style={styles.defaultText}>{t('addresses.default')}</Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.moreButton}
+            onPress={() => {
+              Alert.alert(
+                t('addresses.optionsTitle'),
+                '',
+                [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  { text: t('common.edit'), onPress: () => handleEditAddress(address) },
+                  !address.isDefault && { text: t('addresses.setAsDefault'), onPress: () => handleSetDefault(address.id) },
+                  { text: t('common.delete'), style: 'destructive', onPress: () => handleDeleteAddress(address.id) },
+                ].filter(Boolean)
+              );
+            }}
+          >
+            <Ionicons name="ellipsis-horizontal" size={20} color="#8E8E93" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity 
-          style={styles.moreButton}
-          onPress={() => {
-            Alert.alert(
-              'Address Options',
-              '',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Edit', onPress: () => handleEditAddress(address) },
-                !address.isDefault && { text: 'Set as Default', onPress: () => handleSetDefault(address.id) },
-                { text: 'Delete', style: 'destructive', onPress: () => handleDeleteAddress(address.id) }
-              ].filter(Boolean)
-            );
-          }}
-        >
-          <Ionicons name="ellipsis-horizontal" size={20} color="#8E8E93" />
-        </TouchableOpacity>
+
+        <View style={styles.addressDetails}>
+          <Text style={styles.addressName}>{address.name}</Text>
+          <Text style={styles.addressText}>{address.address}</Text>
+          <Text style={styles.addressText}>{address.city}, {formatEmirate(address.emirate)}</Text>
+          <Text style={styles.addressText}>{formatCountry(address.country)}</Text>
+          <Text style={styles.addressPhone}>{address.phone}</Text>
+        </View>
       </View>
-      
-      <View style={styles.addressDetails}>
-        <Text style={styles.addressName}>{address.name}</Text>
-        <Text style={styles.addressText}>{address.address}</Text>
-        <Text style={styles.addressText}>{address.city}, {address.emirate}</Text>
-        <Text style={styles.addressText}>{address.country}</Text>
-        <Text style={styles.addressPhone}>{address.phone}</Text>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -175,7 +221,7 @@ export default function AddressesScreen() {
         {/* Info Section */}
         <View style={styles.infoSection}>
           <Text style={styles.infoText}>
-            Manage your shipping addresses for faster checkout
+            {t('addresses.manageHint')}
           </Text>
         </View>
 

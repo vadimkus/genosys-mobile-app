@@ -85,7 +85,7 @@ function FormSection({ title, children }) {
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, locale } = useLocalization();
   const { user, updateProfile, deleteAccount, isAuthenticated } = useAuth();
   
   // Check authentication immediately
@@ -96,7 +96,7 @@ export default function EditProfileScreen() {
         t('editProfile.pleaseLoginToEdit'),
         [
           {
-            text: t('contact.ok'),
+            text: t('common.ok'),
             onPress: () => router.back()
           }
         ]
@@ -203,7 +203,7 @@ export default function EditProfileScreen() {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ['Cancel', 'Take Photo', 'Choose from Library'],
+          options: [t('common.cancel'), t('editProfile.takePhoto'), t('editProfile.chooseFromLibrary')],
           cancelButtonIndex: 0,
         },
         (buttonIndex) => {
@@ -292,7 +292,8 @@ export default function EditProfileScreen() {
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
+    const displayLocale = locale === 'ru' ? 'ru-RU' : locale === 'ar' ? 'ar-AE' : 'en-GB';
+    return date.toLocaleDateString(displayLocale, {
       day: '2-digit',
       month: '2-digit', 
       year: 'numeric'
@@ -383,7 +384,7 @@ export default function EditProfileScreen() {
           t('editProfile.successMessage'),
           [
             {
-              text: t('contact.ok'),
+              text: t('common.ok'),
               // Stay on the same page after saving.
               onPress: () => {}
             }
@@ -609,7 +610,7 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Additional Information */}
-        <FormSection title="Additional Information">
+        <FormSection title={t('editProfile.additionalInformation')}>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>{t('editProfile.dateOfBirth')}</Text>
@@ -619,7 +620,7 @@ export default function EditProfileScreen() {
                 disabled={!isEditing}
               >
                 <Text style={[styles.selectFieldText, !formData.dateOfBirth && styles.placeholderText]}>
-                  {formatDisplayDate(formData.dateOfBirth) || 'Select date of birth'}
+                  {formatDisplayDate(formData.dateOfBirth) || t('editProfile.selectDateOfBirthPlaceholder')}
                 </Text>
                 <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
               </TouchableOpacity>
@@ -638,7 +639,7 @@ export default function EditProfileScreen() {
 
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>
-                Address
+                {t('editProfile.deliveryAddress')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
@@ -660,7 +661,7 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Notification Preferences */}
-        <FormSection title="Notification Preferences">
+        <FormSection title={t('editProfile.notificationPreferences')}>
           <View style={styles.formContent}>
             <View style={styles.switchContainer}>
               <View style={styles.switchLabel}>
@@ -708,8 +709,7 @@ export default function EditProfileScreen() {
         {/* Privacy Note */}
         <View style={styles.privacyNote}>
           <Text style={styles.privacyText}>
-            Your personal information is protected and will not be shared with third parties. 
-            By updating your profile, you agree to our Privacy Policy.
+            {t('editProfile.privacyNote')}
           </Text>
         </View>
       </ScrollView>

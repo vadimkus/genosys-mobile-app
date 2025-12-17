@@ -7,6 +7,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Crypto from 'expo-crypto';
 import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
 
@@ -15,10 +16,22 @@ const log = createLogger('googleAuth');
 // Ensure any pending auth sessions are completed (recommended by Expo)
 WebBrowser.maybeCompleteAuthSession();
 
-// Use the web client ID for OAuth code+PKCE with a custom scheme redirect.
-// This must have `genosys://oauth/google` in Authorized redirect URIs in Google Cloud Console.
-const GOOGLE_CLIENT_ID = AUTH_CONFIG?.GOOGLE_OAUTH?.webClientId || AUTH_CONFIG?.GOOGLE_OAUTH?.clientId;
-const NATIVE_REDIRECT_URI = AUTH_CONFIG?.GOOGLE_OAUTH?.redirectUri || 'genosys://oauth/google';
+// Client ID selection:
+// - Expo Go: we keep using the web client id + AuthSession proxy.
+// - Standalone/TestFlight: on iOS we should use the iOS client id + reversed-scheme redirect
+//   to avoid "404" redirects in the browser and ensure iOS can reopen the app.
+const IOS_CLIENT_ID = AUTH_CONFIG?.GOOGLE_OAUTH?.iosClientId || AUTH_CONFIG?.GOOGLE_OAUTH?.clientId;
+const WEB_CLIENT_ID = AUTH_CONFIG?.GOOGLE_OAUTH?.webClientId || AUTH_CONFIG?.GOOGLE_OAUTH?.clientId;
+const IOS_URL_SCHEME = AUTH_CONFIG?.GOOGLE_OAUTH?.iosUrlScheme; // com.googleusercontent.apps....
+const GENOSYS_SCHEME_REDIRECT = AUTH_CONFIG?.GOOGLE_OAUTH?.redirectUri || 'genosys://oauth/google';
+
+const getStandaloneRedirectUri = () => {
+  if (Platform.OS === 'ios' && IOS_URL_SCHEME) {
+    // Standard iOS OAuth redirect format.
+    return `${IOS_URL_SCHEME}:/oauthredirect`;
+  }
+  return GENOSYS_SCHEME_REDIRECT;
+};
 
 // Expo Go cannot handle custom schemes reliably; use the AuthSession proxy in Expo Go.
 const isExpoGo = Constants?.appOwnership === 'expo';
@@ -35,8 +48,10 @@ const getRedirectConfig = () => {
     return { googleRedirectUri, returnUrl, mode: 'expoGo' };
   }
 
-  // Standalone / TestFlight / APK builds: custom scheme works end-to-end.
-  return { googleRedirectUri: NATIVE_REDIRECT_URI, returnUrl: NATIVE_REDIRECT_URI, mode: 'standalone' };
+  // Standalone / TestFlight / APK builds.
+  const googleRedirectUri = getStandaloneRedirectUri();
+  const returnUrl = googleRedirectUri;
+  return { googleRedirectUri, returnUrl, mode: 'standalone' };
 };
 
 const base64ToBase64Url = (b64) =>
@@ -65,6 +80,57 @@ const sha256Base64Url = async (input) => {
   return base64ToBase64Url(digestB64);
 };
 
+const parseQueryParamsFromUrl = (url) => {
+  const u = String(url || '');
+  const q = u.includes('?') ? u.split('?')[1] : '';
+  const query = (q || '').split('#')[0] || '';
+  return new URLSearchParams(query);
+};
+
+const extractAuthCodeFromUrl = (url) => {
+  try {
+    const sp = parseQueryParamsFromUrl(url);
+    return sp.get('code');
+  } catch {
+    return null;
+  }
+};
+
+const exchangeCodeForIdToken = async ({ code, codeVerifier, redirectUri, clientId }) => {
+  const tokenUrl = 'https://oauth2.googleapis.com/token';
+  const body = new URLSearchParams({
+    code: String(code || ''),
+    client_id: String(clientId || ''),
+    code_verifier: String(codeVerifier || ''),
+    redirect_uri: String(redirectUri || ''),
+    grant_type: 'authorization_code',
+  }).toString();
+
+  const res = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+
+  const text = await res.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = null;
+  }
+
+  if (!res.ok) {
+    const err = json?.error || res.statusText || 'token_exchange_failed';
+    const desc = json?.error_description || text || '';
+    throw new Error([err, desc].filter(Boolean).join(': '));
+  }
+
+  const idToken = json?.id_token;
+  if (!idToken) throw new Error('Token exchange succeeded but id_token is missing');
+  return idToken;
+};
+
 /**
  * Direct Google OAuth login (bypasses Expo development proxy)
  * This will show your production "Genosys Middle East FZ-LLC" OAuth consent
@@ -73,21 +139,41 @@ export const loginWithGoogleDirect = async () => {
   try {
     log.debug('Starting direct Google OAuth...');
     
-    if (!GOOGLE_CLIENT_ID) {
-      return { success: false, error: 'Google OAuth client ID missing (webClientId)' };
+    const isStandaloneIos = !isExpoGo && Platform.OS === 'ios';
+    const googleClientId = (isExpoGo ? WEB_CLIENT_ID : (isStandaloneIos ? IOS_CLIENT_ID : WEB_CLIENT_ID));
+    if (!googleClientId) {
+      return { success: false, error: 'Google OAuth client ID missing' };
     }
 
     const { googleRedirectUri, returnUrl, mode } = getRedirectConfig();
     log.debug(`Google OAuth redirect mode=${mode} googleRedirectUri=${googleRedirectUri} returnUrl=${returnUrl}`);
 
-    // We intentionally use the implicit ID token flow here (response_type=id_token).
-    // Reason: exchanging an auth code via /token for a Web Client typically requires client_secret,
-    // which we cannot (and should not) ship in a mobile app. The backend verifies id_token anyway.
     const nonce = await randomPkceVerifier(32);
     const state = await randomPkceVerifier(16);
 
+    // For iOS standalone/TestFlight, Google's iOS OAuth client does NOT accept response_type=id_token.
+    // Use Authorization Code + PKCE (no client_secret required for native iOS clients), then exchange for id_token.
+    let pkceVerifier = null;
+    let pkceChallenge = null;
+    let responseType = 'id_token';
+    let responseMode = 'fragment';
+    if (isStandaloneIos) {
+      pkceVerifier = await randomPkceVerifier(64);
+      pkceChallenge = await sha256Base64Url(pkceVerifier);
+      responseType = 'code';
+      responseMode = 'query';
+    }
+
     // Create Google OAuth URL directly
-    const authUrl = createGoogleAuthUrl({ redirectUri: googleRedirectUri, nonce, state });
+    const authUrl = createGoogleAuthUrl({
+      clientId: googleClientId,
+      redirectUri: googleRedirectUri,
+      nonce,
+      state,
+      responseType,
+      responseMode,
+      codeChallenge: pkceChallenge,
+    });
     log.debug('Auth URL created');
     
     // Open Google OAuth in browser
@@ -103,7 +189,28 @@ export const loginWithGoogleDirect = async () => {
     log.debug('OAuth result', { type: result.type });
     
     if (result.type === 'success' && result.url) {
-      // Extract id_token from redirect URL (fragment)
+      if (isStandaloneIos) {
+        const code = extractAuthCodeFromUrl(result.url);
+        if (!code || !pkceVerifier) {
+          const oauthErr = extractOAuthErrorFromUrl(result.url);
+          if (oauthErr?.error || oauthErr?.errorDescription) {
+            log.error('Google OAuth error from redirect', oauthErr);
+            const msg = [oauthErr.error, oauthErr.errorDescription].filter(Boolean).join(': ');
+            return { success: false, error: msg || 'Google OAuth failed' };
+          }
+          log.error('No code found in redirect URL', String(result.url).slice(0, 200));
+          return { success: false, error: 'Google did not return an authorization code' };
+        }
+        const idToken = await exchangeCodeForIdToken({
+          code,
+          codeVerifier: pkceVerifier,
+          redirectUri: googleRedirectUri,
+          clientId: googleClientId,
+        });
+        return { success: true, idToken };
+      }
+
+      // Expo Go / other platforms: implicit id_token in fragment
       const idToken = extractIdTokenFromUrl(result.url);
       if (!idToken) {
         const oauthErr = extractOAuthErrorFromUrl(result.url);
@@ -139,20 +246,35 @@ export const loginWithGoogleDirect = async () => {
 /**
  * Create Google OAuth URL with production configuration
  */
-const createGoogleAuthUrl = ({ redirectUri, nonce, state }) => {
-  const params = new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: redirectUri,
-    // Implicit flow: return id_token directly (backend verifies it)
-    response_type: 'id_token',
-    response_mode: 'fragment',
+const createGoogleAuthUrl = ({ clientId, redirectUri, nonce, state, responseType, responseMode, codeChallenge }) => {
+  // Avoid URLSearchParams here: some native runtimes/polyfills can produce malformed query strings
+  // which results in a Google 404 ("requested URL was not found on this server").
+  const params = {
+    client_id: String(clientId || ''),
+    redirect_uri: String(redirectUri || ''),
+    response_type: String(responseType || 'id_token'),
+    response_mode: String(responseMode || 'fragment'),
     scope: 'openid profile email',
     prompt: 'select_account',
-    nonce,
-    state,
-  });
-  
-  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+    nonce: String(nonce || ''),
+    state: String(state || ''),
+  };
+
+  if (params.response_type === 'code') {
+    if (!codeChallenge) throw new Error('Missing PKCE code_challenge');
+    params.code_challenge = String(codeChallenge);
+    params.code_challenge_method = 'S256';
+  }
+
+  if (!params.client_id || !params.redirect_uri) {
+    throw new Error('Missing Google client_id or redirect_uri');
+  }
+
+  const qs = Object.entries(params)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .join('&');
+
+  return `https://accounts.google.com/o/oauth2/v2/auth?${qs}`;
 };
 
 /**

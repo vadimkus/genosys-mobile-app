@@ -35,6 +35,7 @@ import {
   pickField,
   parseMaybeJSON,
   asStringList,
+  filterListForLocale,
   asKeyValueObject,
   toHowToSteps,
   toIngredients,
@@ -766,11 +767,12 @@ export default function ProductDetailScreen() {
                       .filter(Boolean);
                   })(),
                 ]);
+                const filteredBenefits = filterListForLocale(benefits, locale);
 
-                if (benefits.length === 1 && benefits[0].length > 200 && !benefits[0].includes(' — ')) {
-                  return renderInfoSection(t('product.benefits'), benefits[0]);
+                if (filteredBenefits.length === 1 && filteredBenefits[0].length > 200 && !filteredBenefits[0].includes(' — ')) {
+                  return renderInfoSection(t('product.benefits'), filteredBenefits[0]);
                 }
-                return renderListSection(t('product.benefits'), benefits);
+                return renderListSection(t('product.benefits'), filteredBenefits);
               })()}
 
               {(() => {

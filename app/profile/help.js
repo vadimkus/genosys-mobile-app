@@ -22,6 +22,17 @@ export default function HelpSupportScreen() {
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [returnExpanded, setReturnExpanded] = useState(false);
 
+  // Local palette (Help screen previously referenced an undefined `colors` object, causing a crash).
+  const colors = {
+    primary: '#E74C3C',
+    text: '#000000',
+    textSecondary: '#8E8E93',
+    textMuted: '#C7C7CC',
+    card: '#F2F2F7',
+    card2: '#ffffff',
+    borderSubtle: '#E5E5EA',
+  };
+
   const handleReturnItem = async () => {
     const name = String(user?.name || '').trim();
     const phone = String(user?.phone || '').trim();

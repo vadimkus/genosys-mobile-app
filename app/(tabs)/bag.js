@@ -244,10 +244,20 @@ export default function BagScreen() {
                 const isHydro = isHydroCoolMask(item.product);
                 const isFixed = hasFixedPriceOverride(item.product);
                 const isDevice = isDeviceProduct(item.product);
+                const selectedSize = String(item?.selectedSize || '').trim();
+                const selectedVariant = selectedSize && Array.isArray(item?.product?.variants)
+                  ? item.product.variants.find((v) => String(v?.size || '').trim() === selectedSize)
+                  : null;
+                const variantPrice = Number(selectedVariant?.price);
+                const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
+
                 const base = (isHydro || isDevice || isFixed)
                   ? getCanonicalUnitPrice(item.product)
-                  : Number(item.product?.displayPrice || item.product?.price || 0);
-                const original = Number(item.product?.originalPrice);
+                  : (hasVariantPrice ? variantPrice : Number(item.product?.displayPrice || item.product?.price || 0));
+
+                // IMPORTANT: if we're using a selected variant price, product.originalPrice may correspond to another size.
+                // Do not apply user-discount math from a mismatched originalPrice; rely on variant price directly.
+                const original = hasVariantPrice ? Number(selectedVariant?.originalPrice) : Number(item.product?.originalPrice);
                 const isBeautyBox = isBeautyBoxProduct(item.product);
 
                 // Beauty Boxes: show bundle discount (15%) explicitly, ignore user discount
@@ -270,7 +280,7 @@ export default function BagScreen() {
                   return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
                 }
 
-                const discounted = !isBeautyBox && hasUserDiscount && Number.isFinite(original) && original > 0
+                const discounted = !hasVariantPrice && !isBeautyBox && hasUserDiscount && Number.isFinite(original) && original > 0
                   ? original * (1 - pct / 100)
                   : base;
 
