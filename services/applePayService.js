@@ -3,6 +3,17 @@ import Constants from 'expo-constants';
 import { debugLog, errorLog } from '../utils/logger';
 
 const STRIPE_PUBLISHABLE_KEY = Constants.expoConfig?.extra?.stripePublishableKey || process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+const MERCHANT_IDENTIFIER = 'merchant.ae.genosys.app';
+
+export const getStripeConfigStatus = () => {
+  const key = String(STRIPE_PUBLISHABLE_KEY || '');
+  return {
+    hasPublishableKey: !!key,
+    publishableKeyPrefix: key ? key.slice(0, 7) : '',
+    publishableKeyLength: key.length,
+    merchantIdentifier: MERCHANT_IDENTIFIER,
+  };
+};
 
 async function getStripe() {
   // IMPORTANT: Do not import Stripe RN at module load.
@@ -43,7 +54,7 @@ export const initializeStripe = async () => {
 
     await stripe.initStripe({
       publishableKey: STRIPE_PUBLISHABLE_KEY,
-      merchantIdentifier: 'merchant.ae.genosys.app',
+      merchantIdentifier: MERCHANT_IDENTIFIER,
       urlScheme: 'genosys',
     });
 

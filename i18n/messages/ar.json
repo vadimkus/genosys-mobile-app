@@ -145,6 +145,10 @@
   "applePay": {
     "applePay": "Apple Pay",
     "subtitle": "ادفع فوراً عبر Apple Pay",
+    "tryShort": "اضغط لتجربة Apple Pay",
+    "notConfiguredShort": "Apple Pay غير مُعد",
+    "notConfiguredTitle": "Apple Pay غير مُعد",
+    "notConfiguredMessage": "Apple Pay غير مُعد في هذا الإصدار من التطبيق. يرجى تحديث التطبيق أو التواصل مع الدعم.",
     "notSupportedShort": "Apple Pay غير متوفر على هذا الجهاز",
     "notSupportedTitle": "Apple Pay غير متوفر",
     "notSupportedMessage": "Apple Pay غير متوفر على هذا الجهاز. يرجى اختيار الدفع بالبطاقة أو الدفع عند الاستلام.",

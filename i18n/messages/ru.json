@@ -145,6 +145,10 @@
   "applePay": {
     "applePay": "Apple Pay",
     "subtitle": "Оплатите сразу с Apple Pay",
+    "tryShort": "Нажмите, чтобы попробовать Apple Pay",
+    "notConfiguredShort": "Apple Pay не настроен",
+    "notConfiguredTitle": "Apple Pay не настроен",
+    "notConfiguredMessage": "Apple Pay не настроен в этой версии приложения. Обновите приложение или обратитесь в поддержку.",
     "notSupportedShort": "Apple Pay недоступен на этом устройстве",
     "notSupportedTitle": "Apple Pay недоступен",
     "notSupportedMessage": "Apple Pay недоступен на этом устройстве. Выберите оплату картой или оплату при доставке.",

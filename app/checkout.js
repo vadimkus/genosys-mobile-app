@@ -26,7 +26,7 @@ import EmirateFlagIcon from '../components/checkout/EmirateFlagIcon';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
 import { createLogger } from '../utils/logger';
 import ApplePayButton from '../components/ApplePayButton';
-import { initializeStripe, checkApplePayAvailability, presentApplePaySheet } from '../services/applePayService';
+import { initializeStripe, checkApplePayAvailability, presentApplePaySheet, getStripeConfigStatus } from '../services/applePayService';
 import {
   isValidEmail,
   normalizeUaeToNationalDigits,
@@ -75,6 +75,8 @@ export default function CheckoutScreen() {
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
   const [applePaySupported, setApplePaySupported] = useState(false);
+  const [applePayConfigured, setApplePayConfigured] = useState(true);
+  const [applePayDebug, setApplePayDebug] = useState(null);
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
@@ -145,6 +147,15 @@ export default function CheckoutScreen() {
     (async () => {
       try {
         if (Platform.OS !== 'ios') {
+          if (!cancelled) setApplePaySupported(false);
+          return;
+        }
+        const cfg = getStripeConfigStatus?.() || {};
+        if (!cancelled) {
+          setApplePayConfigured(!!cfg?.hasPublishableKey);
+          setApplePayDebug(cfg);
+        }
+        if (!cfg?.hasPublishableKey) {
           if (!cancelled) setApplePaySupported(false);
           return;
         }
@@ -346,10 +357,17 @@ export default function CheckoutScreen() {
       if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
         result = await submitCODOrder(orderData);
       } else if (selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY) {
-        if (Platform.OS !== 'ios' || !applePaySupported) {
+        if (Platform.OS !== 'ios') {
           Alert.alert(t('applePay.notSupportedTitle'), t('applePay.notSupportedMessage'));
           return;
         }
+        if (!applePayConfigured) {
+          Alert.alert(t('applePay.notConfiguredTitle'), t('applePay.notConfiguredMessage'));
+          return;
+        }
+        // NOTE: Stripe's isApplePaySupported() can return false on some real devices
+        // (e.g. Wallet/cards/networks quirks). We don't hard-block here; we try and surface
+        // the real error from Stripe if it fails.
         result = await submitApplePayOrder(orderData);
       } else {
         result = await submitCardOrder(orderData);
@@ -411,7 +429,14 @@ export default function CheckoutScreen() {
           });
 
           if (!payRes?.success) {
-            Alert.alert(t('applePay.failedTitle'), t('applePay.failedMessage'));
+            const details =
+              payRes?.error?.message ||
+              payRes?.error?.localizedMessage ||
+              (typeof payRes?.error === 'string' ? payRes.error : '');
+            Alert.alert(
+              t('applePay.failedTitle'),
+              details ? `${t('applePay.failedMessage')}\n\n${details}` : t('applePay.failedMessage')
+            );
             return;
           }
 
@@ -819,10 +844,18 @@ export default function CheckoutScreen() {
                   style={[
                     styles.paymentOption,
                     selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY && styles.paymentOptionSelected,
-                    !applePaySupported && styles.paymentOptionDisabled,
+                    (!applePayConfigured) && styles.paymentOptionDisabled,
                   ]}
                   onPress={() => selectPaymentMethod(PAYMENT_METHODS.APPLE_PAY)}
-                  disabled={!applePaySupported}
+                onLongPress={() => {
+                  // Quick diagnostics for TestFlight debugging (no sensitive data; prefix only)
+                  try {
+                    const info = applePayDebug ? JSON.stringify(applePayDebug, null, 2) : 'No debug info';
+                    Alert.alert('Apple Pay Debug', info);
+                  } catch {
+                    Alert.alert('Apple Pay Debug', 'Unable to render debug info');
+                  }
+                }}
                 >
                   <View style={styles.paymentOptionHeader}>
                     <Ionicons
@@ -834,7 +867,9 @@ export default function CheckoutScreen() {
                     <Text style={styles.paymentTitle}>{t('applePay.applePay')}</Text>
                   </View>
                   <Text style={styles.paymentDescription}>
-                    {applePaySupported ? t('applePay.subtitle') : t('applePay.notSupportedShort')}
+                    {!applePayConfigured
+                      ? t('applePay.notConfiguredShort')
+                      : (applePaySupported ? t('applePay.subtitle') : t('applePay.tryShort'))}
                   </Text>
                 </TouchableOpacity>
               ) : null}
@@ -970,7 +1005,7 @@ export default function CheckoutScreen() {
           selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? (
             <ApplePayButton
               onPress={handleSubmit}
-              disabled={!applePaySupported}
+              disabled={!applePayConfigured}
               loading={isProcessing}
               style={[
                 styles.placeOrderButton,

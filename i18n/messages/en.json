@@ -145,6 +145,10 @@
   "applePay": {
     "applePay": "Apple Pay",
     "subtitle": "Pay instantly with Apple Pay",
+    "tryShort": "Tap to try Apple Pay",
+    "notConfiguredShort": "Apple Pay is not configured",
+    "notConfiguredTitle": "Apple Pay not configured",
+    "notConfiguredMessage": "Apple Pay is not configured in this app build. Please update the app or contact support.",
     "notSupportedShort": "Apple Pay is not available on this device",
     "notSupportedTitle": "Apple Pay not available",
     "notSupportedMessage": "Apple Pay is not available on this device. Please choose Card Payment or Cash on Delivery.",
