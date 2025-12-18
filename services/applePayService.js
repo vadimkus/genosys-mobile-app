@@ -4,6 +4,8 @@ import { debugLog, errorLog } from '../utils/logger';
 
 const STRIPE_PUBLISHABLE_KEY = Constants.expoConfig?.extra?.stripePublishableKey || process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
 const MERCHANT_IDENTIFIER = 'merchant.ae.genosys.app';
+const APPLE_PAY_MERCHANT_COUNTRY_CODE = 'AE';
+const APPLE_PAY_CURRENCY_CODE = 'AED';
 
 export const getStripeConfigStatus = () => {
   const key = String(STRIPE_PUBLISHABLE_KEY || '');
@@ -12,6 +14,8 @@ export const getStripeConfigStatus = () => {
     publishableKeyPrefix: key ? key.slice(0, 7) : '',
     publishableKeyLength: key.length,
     merchantIdentifier: MERCHANT_IDENTIFIER,
+    merchantCountryCode: APPLE_PAY_MERCHANT_COUNTRY_CODE,
+    currencyCode: APPLE_PAY_CURRENCY_CODE,
   };
 };
 
@@ -92,11 +96,12 @@ export const checkApplePayAvailability = async () => {
     }
 
     const stripe = getStripe();
-    if (!stripe?.isApplePaySupported) return false;
+    if (!stripe?.isPlatformPaySupported) return false;
 
-    const isSupported = await stripe.isApplePaySupported();
-    debugLog('[ApplePay] Apple Pay supported:', isSupported);
-    return isSupported;
+    // On iOS, `isPlatformPaySupported()` checks Apple Pay.
+    const isSupported = await stripe.isPlatformPaySupported();
+    debugLog('[ApplePay] Apple Pay (Platform Pay) supported:', isSupported);
+    return !!isSupported;
   } catch (error) {
     errorLog('[ApplePay] Error checking Apple Pay availability:', error);
     return false;
@@ -121,9 +126,9 @@ export const presentApplePaySheet = async ({
   labels,
 }) => {
   try {
-    debugLog('[ApplePay] Presenting Apple Pay sheet...');
+    debugLog('[ApplePay] Confirming Platform Pay payment (Apple Pay)...');
     const stripe = getStripe();
-    if (!stripe?.presentApplePay || !stripe?.confirmApplePayPayment) {
+    if (!stripe?.confirmPlatformPayPayment) {
       const runtime = getStripeRuntimeStatus();
       const details = runtime?.errorMessage ? ` (${runtime.errorMessage})` : '';
       return { success: false, error: { message: `Stripe native module not available${details}` } };
@@ -132,47 +137,43 @@ export const presentApplePaySheet = async ({
     const safeLabels = labels || {};
     const totalLabel = safeLabels.total || 'Total';
 
-    // Format items for Apple Pay (either provided explicitly or derived from cart items)
-    const applePayLineItems = Array.isArray(lineItems) && lineItems.length
+    // Stripe RN v0.50.x uses Platform Pay (Apple Pay on iOS).
+    // Apple Pay expects cartItems with `paymentType` and `amount` as string.
+    const baseItems = Array.isArray(lineItems) && lineItems.length
       ? lineItems
       : (Array.isArray(cartItems) ? cartItems : []).map(item => ({
           label: item.product?.name || item.name || 'Item',
           amount: ((Number(item.product?.displayPrice ?? item.product?.price ?? item.price ?? 0) * (Number(item.quantity) || 0))).toFixed(2),
-          type: 'final',
         }));
 
-    // Ensure there's a final total line
-    applePayLineItems.push({
-      label: totalLabel,
-      amount: Number(totalAmount || 0).toFixed(2),
-      type: 'final',
-    });
+    const platformPayCartItems = [
+      ...baseItems.map((it) => ({
+        label: String(it.label || 'Item'),
+        amount: Number(it.amount || 0).toFixed(2),
+        paymentType: 'Immediate',
+      })),
+      {
+        label: totalLabel,
+        amount: Number(totalAmount || 0).toFixed(2),
+        paymentType: 'Immediate',
+      },
+    ];
 
-    const { error } = await stripe.presentApplePay({
-      cartItems: applePayLineItems,
-      country: 'AE',
-      currency: 'AED',
-      requiredBillingContactFields: ['emailAddress', 'name'],
-      requiredShippingContactFields: ['phoneNumber', 'name', 'postalAddress'],
+    const { error, paymentIntent, paymentMethod } = await stripe.confirmPlatformPayPayment(clientSecret, {
+      applePay: {
+        merchantCountryCode: APPLE_PAY_MERCHANT_COUNTRY_CODE,
+        currencyCode: APPLE_PAY_CURRENCY_CODE,
+        cartItems: platformPayCartItems,
+      },
     });
 
     if (error) {
-      errorLog('[ApplePay] Error presenting Apple Pay:', error);
+      errorLog('[ApplePay] Apple Pay payment failed:', error);
       return { success: false, error };
     }
 
-    debugLog('[ApplePay] Apple Pay sheet presented successfully');
-    
-    // Confirm payment
-    const { error: confirmError } = await stripe.confirmApplePayPayment(clientSecret);
-
-    if (confirmError) {
-      errorLog('[ApplePay] Payment confirmation failed:', confirmError);
-      return { success: false, error: confirmError };
-    }
-
-    debugLog('[ApplePay] Payment confirmed successfully');
-    return { success: true };
+    debugLog('[ApplePay] Apple Pay payment confirmed successfully');
+    return { success: true, paymentIntent, paymentMethod };
 
   } catch (error) {
     errorLog('[ApplePay] Exception in presentApplePaySheet:', error);
