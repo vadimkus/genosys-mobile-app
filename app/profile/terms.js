@@ -9,9 +9,121 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 export default function TermsScreen() {
   const router = useRouter();
+  const { t } = useLocalization();
+
+  const lastUpdated = t('terms.lastUpdatedDate');
+
+  const sections = [
+    {
+      key: 'agreement',
+      title: t('terms.sections.agreement.title'),
+      paragraphs: [t('terms.sections.agreement.p1')],
+    },
+    {
+      key: 'useLicense',
+      title: t('terms.sections.useLicense.title'),
+      paragraphs: [t('terms.sections.useLicense.p1')],
+      bullets: [
+        t('terms.sections.useLicense.b1'),
+        t('terms.sections.useLicense.b2'),
+        t('terms.sections.useLicense.b3'),
+        t('terms.sections.useLicense.b4'),
+      ],
+    },
+    {
+      key: 'accountTerms',
+      title: t('terms.sections.accountTerms.title'),
+      paragraphs: [t('terms.sections.accountTerms.p1')],
+      bullets: [
+        t('terms.sections.accountTerms.b1'),
+        t('terms.sections.accountTerms.b2'),
+        t('terms.sections.accountTerms.b3'),
+        t('terms.sections.accountTerms.b4'),
+      ],
+    },
+    {
+      key: 'products',
+      title: t('terms.sections.products.title'),
+      paragraphs: [t('terms.sections.products.p1')],
+      bullets: [
+        t('terms.sections.products.b1'),
+        t('terms.sections.products.b2'),
+        t('terms.sections.products.b3'),
+        t('terms.sections.products.b4'),
+      ],
+    },
+    {
+      key: 'orders',
+      title: t('terms.sections.orders.title'),
+      paragraphs: [t('terms.sections.orders.p1')],
+      bullets: [
+        t('terms.sections.orders.b1'),
+        t('terms.sections.orders.b2'),
+        t('terms.sections.orders.b3'),
+        t('terms.sections.orders.b4'),
+        t('terms.sections.orders.b5'),
+      ],
+    },
+    {
+      key: 'shipping',
+      title: t('terms.sections.shipping.title'),
+      paragraphs: [t('terms.sections.shipping.p1')],
+      bullets: [
+        t('terms.sections.shipping.b1'),
+        t('terms.sections.shipping.b2'),
+        t('terms.sections.shipping.b3'),
+        t('terms.sections.shipping.b4'),
+      ],
+    },
+    {
+      key: 'returns',
+      title: t('terms.sections.returns.title'),
+      paragraphs: [t('terms.sections.returns.p1')],
+    },
+    {
+      key: 'privacy',
+      title: t('terms.sections.privacy.title'),
+      paragraphs: [t('terms.sections.privacy.p1')],
+    },
+    {
+      key: 'prohibited',
+      title: t('terms.sections.prohibited.title'),
+      paragraphs: [t('terms.sections.prohibited.p1')],
+      bullets: [
+        t('terms.sections.prohibited.b1'),
+        t('terms.sections.prohibited.b2'),
+        t('terms.sections.prohibited.b3'),
+        t('terms.sections.prohibited.b4'),
+      ],
+    },
+    {
+      key: 'disclaimers',
+      title: t('terms.sections.disclaimers.title'),
+      paragraphs: [
+        t('terms.sections.disclaimers.p1'),
+        t('terms.sections.disclaimers.p2'),
+      ],
+    },
+    {
+      key: 'limitations',
+      title: t('terms.sections.limitations.title'),
+      paragraphs: [t('terms.sections.limitations.p1')],
+    },
+    {
+      key: 'governingLaw',
+      title: t('terms.sections.governingLaw.title'),
+      paragraphs: [t('terms.sections.governingLaw.p1')],
+    },
+    {
+      key: 'changes',
+      title: t('terms.sections.changes.title'),
+      paragraphs: [t('terms.sections.changes.p1')],
+    },
+  ];
 
   const Section = ({ title, children }) => (
     <View style={styles.section}>
@@ -31,166 +143,45 @@ export default function TermsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Terms & Conditions</Text>
+        <Text style={styles.headerTitle}>{t('terms.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Last Updated */}
         <View style={styles.updateInfo}>
-          <Text style={styles.updateText}>Last updated: December 11, 2025</Text>
+          <Text style={styles.updateText}>{t('terms.lastUpdated', { date: lastUpdated })}</Text>
         </View>
 
-        {/* Introduction */}
-        <Section title="Agreement to Terms">
-          <Paragraph>
-            By accessing and using the Genosys mobile application, you accept and agree to be bound by the terms 
-            and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
-          </Paragraph>
-        </Section>
-
-        {/* Use License */}
-        <Section title="Use License">
-          <Paragraph>
-            Permission is granted to temporarily use the Genosys mobile application for personal, 
-            non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
-          </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• Modify or copy the materials</Text>
-            <Text style={styles.bulletPoint}>• Use the materials for commercial purposes or public display</Text>
-            <Text style={styles.bulletPoint}>• Attempt to decompile or reverse engineer any software</Text>
-            <Text style={styles.bulletPoint}>• Remove any copyright or proprietary notations</Text>
-          </View>
-        </Section>
-
-        {/* Account Terms */}
-        <Section title="Account Terms">
-          <Paragraph>
-            When you create an account with us, you must provide information that is accurate, complete, and current at all times.
-          </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• You are responsible for safeguarding your password</Text>
-            <Text style={styles.bulletPoint}>• You must not share your account with others</Text>
-            <Text style={styles.bulletPoint}>• You must notify us immediately of any unauthorized use</Text>
-            <Text style={styles.bulletPoint}>• We reserve the right to terminate accounts that violate these terms</Text>
-          </View>
-        </Section>
-
-        {/* Products and Services */}
-        <Section title="Products and Services">
-          <Paragraph>
-            All products are subject to availability. We reserve the right to discontinue any product at any time.
-          </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• Product descriptions and prices are subject to change without notice</Text>
-            <Text style={styles.bulletPoint}>• We make every effort to display accurate colors and images</Text>
-            <Text style={styles.bulletPoint}>• Results from skincare products may vary by individual</Text>
-            <Text style={styles.bulletPoint}>• Professional consultation is recommended for sensitive skin conditions</Text>
-          </View>
-        </Section>
-
-        {/* Orders and Payment */}
-        <Section title="Orders and Payment">
-          <Paragraph>
-            By placing an order, you agree to provide current, complete, and accurate purchase information.
-          </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• All prices are in UAE Dirhams (AED)</Text>
-            <Text style={styles.bulletPoint}>• Payment is required at the time of order</Text>
-            <Text style={styles.bulletPoint}>• We accept major credit cards and approved payment methods</Text>
-            <Text style={styles.bulletPoint}>• Orders are subject to product availability</Text>
-            <Text style={styles.bulletPoint}>• We reserve the right to refuse or cancel any order</Text>
-          </View>
-        </Section>
-
-        {/* Shipping and Delivery */}
-        <Section title="Shipping and Delivery">
-          <Paragraph>
-            We currently ship within the United Arab Emirates only.
-          </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• Delivery times are estimates and not guaranteed</Text>
-            <Text style={styles.bulletPoint}>• Risk of loss transfers to you upon delivery</Text>
-            <Text style={styles.bulletPoint}>• Additional charges may apply for remote areas</Text>
-            <Text style={styles.bulletPoint}>• Someone must be available to receive the package</Text>
-          </View>
-        </Section>
-
-        {/* Returns and Exchanges */}
-        <Section title="Returns and Exchanges">
-          <Paragraph>
-            We accept returns and exchanges within 7 days of delivery for unopened products in their original packaging. Please contact us to initiate a return or exchange.
-          </Paragraph>
-        </Section>
-
-        {/* Privacy Policy */}
-        <Section title="Privacy Policy">
-          <Paragraph>
-            Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your information 
-            when you use our service. By using our service, you agree to the collection and use of information in accordance 
-            with our Privacy Policy.
-          </Paragraph>
-        </Section>
-
-        {/* Prohibited Uses */}
-        <Section title="Prohibited Uses">
-          <Paragraph>
-            You may not use our service for any unlawful purpose or to solicit others to perform unlawful acts:
-          </Paragraph>
-          <View style={styles.bulletList}>
-            <Text style={styles.bulletPoint}>• Violate any international, federal, provincial, or state regulations or laws</Text>
-            <Text style={styles.bulletPoint}>• Transmit or procure the sending of any advertising or promotional material</Text>
-            <Text style={styles.bulletPoint}>• Impersonate or attempt to impersonate the company or another user</Text>
-            <Text style={styles.bulletPoint}>• Use the service in any way that could damage or overburden the service</Text>
-          </View>
-        </Section>
-
-        {/* Disclaimers */}
-        <Section title="Disclaimers">
-          <Paragraph>
-            The information on this mobile application is provided on an "as is" basis. To the fullest extent permitted by law, 
-            this company excludes all representations, warranties, and conditions relating to our app and the use of this app.
-          </Paragraph>
-          <Paragraph>
-            Individual results from skincare products may vary. Consult with a healthcare professional before use if you have 
-            any medical conditions or skin sensitivities.
-          </Paragraph>
-        </Section>
-
-        {/* Limitations */}
-        <Section title="Limitations">
-          <Paragraph>
-            In no event shall Genosys or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, 
-            or due to business interruption) arising out of the use or inability to use the materials on the app, 
-            even if Genosys or an authorized representative has been notified orally or in writing of the possibility of such damage.
-          </Paragraph>
-        </Section>
-
-        {/* Governing Law */}
-        <Section title="Governing Law">
-          <Paragraph>
-            These terms and conditions are governed by and construed in accordance with the laws of the United Arab Emirates, 
-            and you irrevocably submit to the exclusive jurisdiction of the courts in Dubai, UAE.
-          </Paragraph>
-        </Section>
-
-        {/* Changes to Terms */}
-        <Section title="Changes to Terms">
-          <Paragraph>
-            We reserve the right, at our sole discretion, to modify or replace these Terms at any time. 
-            If a revision is material, we will try to provide at least 30 days notice prior to any new terms taking effect.
-          </Paragraph>
-        </Section>
+        {sections.map((s) => (
+          <Section key={s.key} title={s.title}>
+            {Array.isArray(s.paragraphs) &&
+              s.paragraphs.map((p, idx) => <Paragraph key={`${s.key}-p-${idx}`}>{p}</Paragraph>)}
+            {Array.isArray(s.bullets) && s.bullets.length > 0 && (
+              <View style={styles.bulletList}>
+                {s.bullets.map((b, idx) => (
+                  <Text key={`${s.key}-b-${idx}`} style={styles.bulletPoint}>
+                    • {b}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </Section>
+        ))}
 
         {/* Contact Information */}
-        <Section title="Contact Us">
-          <Paragraph>
-            If you have any questions about these Terms & Conditions, please contact us:
-          </Paragraph>
+        <Section title={t('terms.sections.contact.title')}>
+          <Paragraph>{t('terms.sections.contact.p1')}</Paragraph>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactItem}>Email: sales@genosys.ae</Text>
-            <Text style={styles.contactItem}>WhatsApp: +971 58 548 76 65</Text>
-            <Text style={styles.contactItem}>Address: Cordoba Residence, E02, Dubai, UAE</Text>
+            <Text style={styles.contactItem}>
+              {t('terms.contact.emailLabel')}: {t('contact.emailValue')}
+            </Text>
+            <Text style={styles.contactItem}>
+              {t('terms.contact.whatsappLabel')}: {t('contact.phoneDisplay')}
+            </Text>
+            <Text style={styles.contactItem}>
+              {t('terms.contact.addressLabel')}: {t('contact.locationValue')}
+            </Text>
           </View>
         </Section>
 

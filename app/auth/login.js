@@ -146,7 +146,17 @@ export default function LoginScreen() {
       const looksLikeSetupNotComplete =
         msgLower.includes('setup') && msgLower.includes('not complete');
 
-      if (looksLikeSetupNotComplete || code === 'ERR_REQUEST_NOT_HANDLED') {
+      // Apple "Setup not complete" commonly surfaces as:
+      // - message contains "setup not complete"
+      // - error codes from expo-apple-authentication: ERR_NOT_HANDLED / ERR_INVALID_RESPONSE / ERR_UNKNOWN
+      // - native AuthorizationError 1000 (often returned as part of the message)
+      const codeUpper = code.toUpperCase();
+      const looksLikeNotHandled =
+        codeUpper === 'ERR_NOT_HANDLED' ||
+        codeUpper === 'ERR_INVALID_RESPONSE' ||
+        (codeUpper === 'ERR_UNKNOWN' && (msgLower.includes('authorization') || msgLower.includes('1000')));
+
+      if (looksLikeSetupNotComplete || looksLikeNotHandled) {
         Alert.alert(
           t('authScreen.authFailedTitle'),
           t('authScreen.appleSetupNotComplete', { bundleId: bundleId || 'unknown' })

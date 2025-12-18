@@ -113,9 +113,13 @@ export default function BagScreen() {
         }
         return acc + base * qty;
       }
-      const orig = Number.isFinite(explicitOriginal) && explicitOriginal > 0
-        ? explicitOriginal
-        : (base / multiplier);
+      // Prefer the larger of explicit original vs inferred original from discount,
+      // because explicit original may be for a different size (e.g. cleanser 500ml).
+      const inferred = base > 0 ? (base / multiplier) : 0;
+      const orig = Math.max(
+        (Number.isFinite(explicitOriginal) && explicitOriginal > 0 ? explicitOriginal : 0),
+        (Number.isFinite(inferred) && inferred > 0 ? inferred : 0)
+      );
       return acc + (Number.isFinite(orig) ? orig : base) * qty;
     }, 0);
     return Number.isFinite(sum) ? sum : null;
@@ -293,11 +297,11 @@ export default function BagScreen() {
                 const originalForDisplay = (() => {
                   const fromVariant = Number(original);
                   if (Number.isFinite(fromVariant) && fromVariant > base) return fromVariant;
-                  if (Number.isFinite(storedOriginal) && storedOriginal > base) return storedOriginal;
                   if (hasUserDiscount && Number.isFinite(base) && base > 0) {
                     const inferred = base / (1 - pct / 100);
                     if (Number.isFinite(inferred) && inferred > base) return inferred;
                   }
+                  if (Number.isFinite(storedOriginal) && storedOriginal > base) return storedOriginal;
                   return null;
                 })();
 

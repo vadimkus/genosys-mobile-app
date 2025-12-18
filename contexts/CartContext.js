@@ -201,8 +201,10 @@ export const CartProvider = ({ children }) => {
           const productOriginal = Number(product?.originalPrice);
           const keptOriginal =
             (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
+            // If backend doesn't give variant originalPrice, prefer the inferred original from user discount
+            // (otherwise we'd show the base product's originalPrice for all sizes, which is wrong for bigger sizes).
             inferredOriginal ||
+            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
             null;
           return {
             ...it,
@@ -309,8 +311,9 @@ export const CartProvider = ({ children }) => {
           const productOriginal = Number(product?.originalPrice);
           const keptOriginal =
             (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
+            // Prefer inferred original from user discount over base product originalPrice for size variants.
             inferredOriginal ||
+            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
             null;
           return {
             ...product,

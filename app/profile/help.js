@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Linking,
-  I18nManager,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +20,7 @@ export default function HelpSupportScreen() {
   const { t } = useLocalization();
   const { user } = useAuth();
   const [expandedFaq, setExpandedFaq] = useState(null);
-  const [returnExpanded, setReturnExpanded] = useState(false);
+  const [returnModalVisible, setReturnModalVisible] = useState(false);
 
   // Local palette (Help screen previously referenced an undefined `colors` object, causing a crash).
   const colors = {
@@ -95,6 +95,65 @@ export default function HelpSupportScreen() {
     },
   ];
 
+  const renderFormattedAnswer = (answer) => {
+    const raw = String(answer || '');
+    const lines = raw.replace(/\r\n/g, '\n').split('\n');
+    const rows = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineRaw = lines[i] ?? '';
+      const line = String(lineRaw).trim();
+      if (!line) {
+        // Paragraph break
+        if (rows.length && rows[rows.length - 1]?.type !== 'spacer') rows.push({ type: 'spacer', key: `sp-${i}` });
+        continue;
+      }
+
+      const bullet = line.match(/^[-•]\s+(.*)$/);
+      if (bullet) {
+        rows.push({ type: 'bullet', key: `b-${i}`, text: bullet[1] });
+        continue;
+      }
+
+      const numbered = line.match(/^(\d+)\.\s+(.*)$/);
+      if (numbered) {
+        rows.push({ type: 'number', key: `n-${i}`, num: numbered[1], text: numbered[2] });
+        continue;
+      }
+
+      rows.push({ type: 'p', key: `p-${i}`, text: line });
+    }
+
+    return (
+      <View style={styles.faqAnswerBody}>
+        {rows.map((r) => {
+          if (r.type === 'spacer') return <View key={r.key} style={{ height: 8 }} />;
+          if (r.type === 'bullet') {
+            return (
+              <View key={r.key} style={styles.answerRow}>
+                <Text style={styles.answerBullet}>•</Text>
+                <Text style={styles.answerText}>{r.text}</Text>
+              </View>
+            );
+          }
+          if (r.type === 'number') {
+            return (
+              <View key={r.key} style={styles.answerRow}>
+                <Text style={styles.answerNumber}>{r.num}.</Text>
+                <Text style={styles.answerText}>{r.text}</Text>
+              </View>
+            );
+          }
+          return (
+            <Text key={r.key} style={styles.answerParagraph}>
+              {r.text}
+            </Text>
+          );
+        })}
+      </View>
+    );
+  };
+
   const handleFaqPress = (faqId) => {
     setExpandedFaq(expandedFaq === faqId ? null : faqId);
   };
@@ -129,7 +188,7 @@ export default function HelpSupportScreen() {
       
       {expandedFaq === faq.id && (
         <View style={[styles.faqAnswer, { backgroundColor: colors.card }]}>
-          <Text style={[styles.faqAnswerText, { color: colors.textSecondary }]}>{faq.answer}</Text>
+          {renderFormattedAnswer(faq.answer)}
         </View>
       )}
     </View>
@@ -188,58 +247,14 @@ export default function HelpSupportScreen() {
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={[
-                styles.quickActionCard,
-                returnExpanded && styles.quickActionCardExpanded,
-              ]}
-              onPress={() => setReturnExpanded((v) => !v)}
+              style={styles.quickActionCard}
+              onPress={() => setReturnModalVisible(true)}
               activeOpacity={0.8}
             >
-              <View
-                style={[
-                  styles.returnChevronWrap,
-                  I18nManager.isRTL ? { left: 10, right: undefined } : { right: 10, left: undefined },
-                ]}
-              >
-                <Ionicons
-                  name={returnExpanded ? 'chevron-up' : 'chevron-down'}
-                  size={18}
-                  color="#8E8E93"
-                />
-              </View>
               <View style={styles.quickActionIcon}>
                 <Ionicons name="refresh-outline" size={24} color="#007AFF" />
               </View>
               <Text style={styles.quickActionTitle}>{t('help.returnItem')}</Text>
-
-              {returnExpanded ? (
-                <View style={styles.returnChecklistWrap}>
-                  <Text style={styles.returnChecklistTitle}>{t('help.returnChecklistTitle')}</Text>
-                  <View style={styles.returnChecklistList}>
-                    <View style={styles.returnChecklistItem}>
-                      <Text style={styles.returnBullet}>•</Text>
-                      <Text style={styles.returnChecklistText}>{t('help.returnChecklist1')}</Text>
-                    </View>
-                    <View style={styles.returnChecklistItem}>
-                      <Text style={styles.returnBullet}>•</Text>
-                      <Text style={styles.returnChecklistText}>{t('help.returnChecklist2')}</Text>
-                    </View>
-                    <View style={styles.returnChecklistItem}>
-                      <Text style={styles.returnBullet}>•</Text>
-                      <Text style={styles.returnChecklistText}>{t('help.returnChecklist3')}</Text>
-                    </View>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.returnEmailButton}
-                    onPress={handleReturnItem}
-                    activeOpacity={0.8}
-                  >
-                    <Ionicons name="mail-outline" size={16} color="#ffffff" />
-                    <Text style={styles.returnEmailButtonText}>{t('help.emailSales')}</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : null}
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -251,18 +266,68 @@ export default function HelpSupportScreen() {
               </View>
               <Text style={styles.quickActionTitle}>{t('help.whatsappSupport')}</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => Alert.alert(t('help.alerts.productGuideTitle'), t('help.alerts.productGuideSoon'))}
-            >
-              <View style={styles.quickActionIcon}>
-                <Ionicons name="book-outline" size={24} color="#AF52DE" />
-              </View>
-              <Text style={styles.quickActionTitle}>{t('help.productGuide')}</Text>
-            </TouchableOpacity>
           </View>
         </View>
+
+        {/* Return item modal (keeps Quick Actions compact) */}
+        <Modal
+          visible={returnModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setReturnModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.returnModalCard}>
+              <View style={styles.returnModalHeader}>
+                <View style={styles.returnModalHeaderLeft}>
+                  <View style={[styles.quickActionIcon, { marginBottom: 0 }]}>
+                    <Ionicons name="refresh-outline" size={22} color="#007AFF" />
+                  </View>
+                  <Text style={styles.returnModalTitle}>{t('help.returnItem')}</Text>
+                </View>
+                <TouchableOpacity onPress={() => setReturnModalVisible(false)} style={styles.modalCloseBtn}>
+                  <Ionicons name="close" size={22} color="#8E8E93" />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.returnChecklistTitle}>{t('help.returnChecklistTitle')}</Text>
+              <View style={styles.returnChecklistList}>
+                <View style={styles.returnChecklistItem}>
+                  <Text style={styles.returnBullet}>•</Text>
+                  <Text style={styles.returnChecklistText}>{t('help.returnChecklist1')}</Text>
+                </View>
+                <View style={styles.returnChecklistItem}>
+                  <Text style={styles.returnBullet}>•</Text>
+                  <Text style={styles.returnChecklistText}>{t('help.returnChecklist2')}</Text>
+                </View>
+                <View style={styles.returnChecklistItem}>
+                  <Text style={styles.returnBullet}>•</Text>
+                  <Text style={styles.returnChecklistText}>{t('help.returnChecklist3')}</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.returnEmailButton}
+                onPress={async () => {
+                  setReturnModalVisible(false);
+                  await handleReturnItem();
+                }}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="mail-outline" size={16} color="#ffffff" />
+                <Text style={styles.returnEmailButtonText}>{t('help.emailSales')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalSecondaryBtn}
+                onPress={() => setReturnModalVisible(false)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalSecondaryBtnText}>{t('common.close')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* Business Hours */}
         <View style={styles.businessHoursSection}>
@@ -345,13 +410,19 @@ const styles = StyleSheet.create({
 
   // Support Cards
   supportCard: {
-    borderRadius: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
     borderWidth: 1,
     backgroundColor: '#F2F2F7',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   supportIcon: {
     width: 48,
@@ -384,8 +455,11 @@ const styles = StyleSheet.create({
 
   // FAQ
   faqContainer: {
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
   faqItem: {
     borderBottomWidth: 0.5,
@@ -394,7 +468,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: '#ffffff',
   },
   faqQuestionText: {
     fontSize: 16,
@@ -403,66 +479,90 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   faqAnswer: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    padding: 14,
   },
-  faqAnswerText: {
+
+  // FAQ answer formatting
+  faqAnswerBody: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  answerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 8,
+  },
+  answerBullet: {
+    fontSize: 16,
+    lineHeight: 22,
+    color: '#E74C3C',
+    fontWeight: '800',
+  },
+  answerNumber: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#E74C3C',
+    fontWeight: '800',
+    minWidth: 22,
+    textAlign: 'right',
+  },
+  answerText: {
+    flex: 1,
     fontSize: 15,
-    color: '#8E8E93',
-    lineHeight: 20,
+    lineHeight: 22,
+    color: '#3C3C43',
+    fontWeight: '500',
+  },
+  answerParagraph: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#3C3C43',
+    fontWeight: '500',
+    marginBottom: 8,
   },
 
   // Quick Actions
   quickActionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    gap: 12,
   },
   quickActionCard: {
     width: '48%',
     backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    padding: 12,
     alignItems: 'center',
-    marginBottom: 12,
     position: 'relative',
-  },
-  quickActionCardExpanded: {
-    width: '100%',
-    alignItems: 'stretch',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
   },
   quickActionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
     alignSelf: 'center',
   },
   quickActionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: '#000000',
     textAlign: 'center',
-  },
-  returnChevronWrap: {
-    position: 'absolute',
-    top: 10,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  returnChecklistWrap: {
-    marginTop: 12,
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-    padding: 12,
   },
   returnChecklistTitle: {
     fontSize: 14,
@@ -485,9 +585,10 @@ const styles = StyleSheet.create({
   },
   returnChecklistText: {
     flex: 1,
-    fontSize: 13,
-    lineHeight: 18,
-    color: '#1D1D1F',
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#3C3C43',
+    fontWeight: '500',
   },
   returnEmailButton: {
     marginTop: 12,
@@ -504,6 +605,60 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '700',
+  },
+
+  // Modal (Return item)
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    padding: 20,
+    justifyContent: 'center',
+  },
+  returnModalCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  returnModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  returnModalHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  returnModalTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1D1D1F',
+  },
+  modalCloseBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F2F2F7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSecondaryBtn: {
+    marginTop: 10,
+    backgroundColor: '#F2F2F7',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  modalSecondaryBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
   },
 
   // Business Hours

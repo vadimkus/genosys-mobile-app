@@ -27,7 +27,6 @@ const { width } = Dimensions.get('window');
 const SWITCH_TRACK_PUSH = { false: '#E5E5EA', true: '#E74C3C' };
 const SWITCH_TRACK_BIOMETRIC = { false: '#E5E5EA', true: '#27AE60' };
 const SWITCH_TRACK_EMAIL = { false: '#E5E5EA', true: '#E74C3C' };
-const SWITCH_TRACK_SMS = { false: '#E5E5EA', true: '#27AE60' };
 const SWITCH_THUMB = '#ffffff';
 const SWITCH_IOS_BG = '#E5E5EA';
 
@@ -48,13 +47,11 @@ export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [pushToggleLoading, setPushToggleLoading] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [smsNotifications, setSmsNotifications] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
   const PUSH_PREF_KEY = '@genosys_push_enabled';
   const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
-  const SMS_NOTIF_PREF_KEY = '@genosys_sms_notif_enabled';
 
   useEffect(() => {
     let cancelled = false;
@@ -76,10 +73,8 @@ export default function ProfileScreen() {
     (async () => {
       try {
         const e = await AsyncStorage.getItem(EMAIL_NOTIF_PREF_KEY);
-        const s = await AsyncStorage.getItem(SMS_NOTIF_PREF_KEY);
         if (!cancelled) {
           if (e === '0' || e === '1') setEmailNotifications(e === '1');
-          if (s === '0' || s === '1') setSmsNotifications(s === '1');
         }
       } catch {
         // ignore
@@ -282,11 +277,6 @@ export default function ProfileScreen() {
     await AsyncStorage.setItem(EMAIL_NOTIF_PREF_KEY, value ? '1' : '0').catch(() => {});
   }, []);
 
-  const handleSmsNotifToggle = useCallback(async (value) => {
-    setSmsNotifications(!!value);
-    await AsyncStorage.setItem(SMS_NOTIF_PREF_KEY, value ? '1' : '0').catch(() => {});
-  }, []);
-
   // Memoized switch row to prevent unrelated switches from re-rendering and flickering on iOS.
   const ProfileSwitchItem = useMemo(() => {
     return React.memo(function ProfileSwitchItemInner({
@@ -482,15 +472,6 @@ export default function ProfileScreen() {
               title={t('profile.paymentAndBilling')}
               onPress={() => router.push('/profile/payment')}
             />
-            <ProfileSwitchItem
-              icon="notifications-outline"
-              title={t('profile.pushNotifications')}
-              value={notificationsEnabled}
-              onValueChange={handlePushToggle}
-              trackColor={SWITCH_TRACK_PUSH}
-              disabled={pushToggleLoading}
-              isLast
-            />
           </View>
         </ProfileSection>
 
@@ -528,13 +509,12 @@ export default function ProfileScreen() {
               disabled={!user?.token}
             />
             <ProfileSwitchItem
-              icon="chatbubble-ellipses-outline"
-              title={t('editProfile.smsNotifications')}
-              subtitle={t('editProfile.smsNotificationsHint')}
-              value={smsNotifications}
-              onValueChange={handleSmsNotifToggle}
-              trackColor={SWITCH_TRACK_SMS}
-              disabled={!user?.token}
+              icon="notifications-outline"
+              title={t('profile.pushNotifications')}
+              value={notificationsEnabled}
+              onValueChange={handlePushToggle}
+              trackColor={SWITCH_TRACK_PUSH}
+              disabled={pushToggleLoading}
             />
             <ProfileItem
               icon="shield-outline"
