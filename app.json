@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/app-icon-1024-no-alpha.png",
+    "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -19,7 +19,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
       "usesAppleSignIn": true,
-      "icon": "./assets/app-icon-1024-no-alpha.png",
+      "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "entitlements": {
         "com.apple.developer.in-app-payments": [
           "merchant.ae.genosys.app"
@@ -50,7 +50,7 @@
       "package": "com.genosys.mobile",
       "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icon-1024-no-alpha.png",
+        "foregroundImage": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
         "backgroundColor": "#ffffff"
       },
       "splash": {
@@ -63,7 +63,13 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.ae.genosys.app"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

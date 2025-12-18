@@ -19,6 +19,26 @@ function safeToString(value) {
   }
 }
 
+// Simple top-level helpers used across services.
+// Many call sites already include their own prefix (e.g. "[ApplePay]"), so we don't add one here.
+export function debugLog(...args) {
+  if (!__DEV__) return;
+  console.log(...args);
+}
+
+export function infoLog(...args) {
+  if (!__DEV__) return;
+  console.log(...args);
+}
+
+export function warnLog(...args) {
+  console.warn(...args);
+}
+
+export function errorLog(...args) {
+  console.error(...args.map((a) => (typeof a === 'string' ? a : safeToString(a))));
+}
+
 export function createLogger(scope) {
   const prefix = scope ? `[${scope}]` : '[app]';
 
@@ -33,7 +53,6 @@ export function createLogger(scope) {
   };
 
   const warn = (...args) => {
-    if (!__DEV__) return;
     console.warn(prefix, ...args);
   };
 

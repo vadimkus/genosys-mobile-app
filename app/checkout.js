@@ -494,17 +494,26 @@ export default function CheckoutScreen() {
       }
 
     } catch (error) {
-      log.error('Order processing error', error?.message || error);
+      const errMsg =
+        typeof error?.message === 'string'
+          ? error.message
+          : typeof error === 'string'
+            ? error
+            : '';
+
+      log.error('Order processing error', errMsg || error);
       Alert.alert(
         t('checkout.orderProcessingErrorTitle'),
-        t('checkout.orderProcessingErrorMessage'),
+        errMsg
+          ? `${t('checkout.orderProcessingErrorMessage')}\n\n${errMsg}`
+          : t('checkout.orderProcessingErrorMessage'),
         [
           { text: t('checkout.tryAgain'), style: 'default' },
           { 
             text: t('checkout.contactSupport'), 
             onPress: async () => {
               const phoneNumber = '971585487665';
-              const message = `Hi! I encountered an error while placing order ${orderNumber}. Can you help me?`;
+              const message = `Hi! I encountered an error while placing order ${orderNumber}. Payment method: ${selectedPaymentMethod}.${errMsg ? ` Error: ${errMsg}` : ''} Can you help me?`;
               const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
               try {
                 await Linking.openURL(whatsappUrl);

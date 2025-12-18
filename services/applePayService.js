@@ -15,17 +15,35 @@ export const getStripeConfigStatus = () => {
   };
 };
 
-async function getStripe() {
-  // IMPORTANT: Do not import Stripe RN at module load.
-  // In Expo Go, native modules aren’t available and this will crash.
+// IMPORTANT:
+// - In Expo Go, Stripe native modules are not available.
+// - In production/TestFlight builds, we need a deterministic module load (dynamic import can be flaky).
+let stripeModule = null;
+let stripeModuleTried = false;
+let stripeModuleError = null;
+
+function getStripe() {
+  if (stripeModuleTried) return stripeModule;
+  stripeModuleTried = true;
+
   try {
-    const mod = await import('@stripe/stripe-react-native');
-    return mod;
+    // Use require() so Metro always includes the module in the bundle.
+    // If native side isn't present (Expo Go / missing plugin), this will throw and we can handle it.
+    // eslint-disable-next-line global-require
+    stripeModule = require('@stripe/stripe-react-native');
+    return stripeModule;
   } catch (e) {
-    errorLog('[ApplePay] Stripe native module not available (use a dev build / production build):', e);
+    stripeModuleError = e;
+    errorLog('[ApplePay] Stripe native module not available (use a dev build / production build):', e?.message || e);
     return null;
   }
 }
+
+export const getStripeRuntimeStatus = () => ({
+  moduleLoaded: !!stripeModule,
+  tried: stripeModuleTried,
+  errorMessage: stripeModuleError ? String(stripeModuleError?.message || stripeModuleError) : '',
+});
 
 /**
  * Apple Pay Service
@@ -49,7 +67,7 @@ export const initializeStripe = async () => {
       return;
     }
 
-    const stripe = await getStripe();
+    const stripe = getStripe();
     if (!stripe?.initStripe) return;
 
     await stripe.initStripe({
@@ -73,7 +91,7 @@ export const checkApplePayAvailability = async () => {
       return false;
     }
 
-    const stripe = await getStripe();
+    const stripe = getStripe();
     if (!stripe?.isApplePaySupported) return false;
 
     const isSupported = await stripe.isApplePaySupported();
@@ -104,9 +122,11 @@ export const presentApplePaySheet = async ({
 }) => {
   try {
     debugLog('[ApplePay] Presenting Apple Pay sheet...');
-    const stripe = await getStripe();
+    const stripe = getStripe();
     if (!stripe?.presentApplePay || !stripe?.confirmApplePayPayment) {
-      return { success: false, error: { message: 'Stripe native module not available' } };
+      const runtime = getStripeRuntimeStatus();
+      const details = runtime?.errorMessage ? ` (${runtime.errorMessage})` : '';
+      return { success: false, error: { message: `Stripe native module not available${details}` } };
     }
 
     const safeLabels = labels || {};
