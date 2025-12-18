@@ -109,6 +109,7 @@ export default function EditProfileScreen() {
     firstName: '',
     lastName: '',
     email: '',
+    contactEmail: '',
     phone: '',
     dateOfBirth: '',
     // Store stable gender value (male/female/other/na). Display uses translation.
@@ -134,6 +135,7 @@ export default function EditProfileScreen() {
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
         email: user.email || '',
+        contactEmail: user.contactEmail || '',
         phone: user.phone || '',
         // Backend uses `birthday` (YYYY-MM-DD). Keep local field name for UI.
         dateOfBirth: birthday,
@@ -304,6 +306,7 @@ export default function EditProfileScreen() {
       firstName: initialSnapshot.firstName || '',
       lastName: initialSnapshot.lastName || '',
       email: initialSnapshot.email || '',
+      contactEmail: initialSnapshot.contactEmail || '',
       phone: initialSnapshot.phone || '',
       dateOfBirth: initialSnapshot.dateOfBirth || '',
       gender: initialSnapshot.gender || GENDER_VALUES.NA,
@@ -331,13 +334,19 @@ export default function EditProfileScreen() {
       return;
     }
 
+    // Contact Email validation (optional)
+    const contactEmail = String(formData.contactEmail || '').trim();
+    if (contactEmail && !emailRegex.test(contactEmail)) {
+      Alert.alert(t('common.error'), t('editProfile.validationInvalidContactEmail'));
+      return;
+    }
+
     try {
       setIsSaving(true);
       
       // Prepare profile data for API
       const profileData = {
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
-        email: formData.email.trim(),
         phone: formData.phone.trim(),
         // Backend contract expects `birthday` (YYYY-MM-DD).
         birthday: formData.dateOfBirth,
@@ -345,6 +354,7 @@ export default function EditProfileScreen() {
         gender: formData.gender,
         address: formData.address.trim(),
         profilePicture: formData.profilePicture,
+        contactEmail: contactEmail || null,
       };
 
       const result = await updateProfile(profileData);
@@ -553,7 +563,6 @@ export default function EditProfileScreen() {
               <TextInput
                 style={styles.textInput}
                 value={formData.email}
-                onChangeText={(text) => updateField('email', text)}
                 placeholder={t('editProfile.enterEmail')}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -562,9 +571,44 @@ export default function EditProfileScreen() {
                 returnKeyType="next"
                 blurOnSubmit={false}
                 placeholderTextColor="#C7C7CC"
-                editable={isEditing}
+                editable={false}
               />
+              {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
+                <View style={styles.infoBox}>
+                  <Ionicons name="shield-checkmark" size={16} color="#2563EB" />
+                  <Text style={styles.infoBoxText}>{t('editProfile.appleRelayInfo')}</Text>
+                </View>
+              ) : null}
             </View>
+
+            {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
+              <View style={styles.fieldContainer}>
+                <Text style={styles.fieldLabel}>
+                  {t('editProfile.contactEmail')}
+                  <Text style={styles.optionalMark}> {t('editProfile.optional')}</Text>
+                </Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={formData.contactEmail}
+                  onChangeText={(text) => updateField('contactEmail', text)}
+                  placeholder={t('editProfile.contactEmailPlaceholder')}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="email"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  placeholderTextColor="#C7C7CC"
+                  editable={isEditing}
+                />
+                {!String(formData.contactEmail || '').trim() ? (
+                  <View style={styles.warningBox}>
+                    <Ionicons name="alert-circle" size={16} color="#B45309" />
+                    <Text style={styles.warningBoxText}>{t('editProfile.contactEmailHint')}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
             
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>{t('editProfile.phoneNumber')}</Text>
@@ -874,6 +918,11 @@ const styles = StyleSheet.create({
     color: '#E74C3C',
     fontSize: 17,
   },
+  optionalMark: {
+    color: '#8E8E93',
+    fontSize: 13,
+    fontWeight: '500',
+  },
   textInput: {
     fontSize: 17,
     color: '#000000',
@@ -882,6 +931,42 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     minHeight: 40,
     textAlignVertical: 'top',
+  },
+  infoBox: {
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  infoBoxText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#1D4ED8',
+    lineHeight: 16,
+    fontWeight: '600',
+  },
+  warningBox: {
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  warningBoxText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#92400E',
+    lineHeight: 16,
+    fontWeight: '600',
   },
   selectField: {
     flexDirection: 'row',

@@ -104,6 +104,7 @@ export const updateUserProfile = async (token, profileData) => {
       // Keep compatibility with callers still using `dateOfBirth`.
       birthday: profileData.birthday ?? profileData.dateOfBirth ?? null,
       gender: profileData.gender ?? null,
+      contactEmail: profileData.contactEmail ?? null,
     }),
   });
 };

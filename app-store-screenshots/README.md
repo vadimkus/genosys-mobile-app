@@ -1,142 +1,81 @@
 # App Store Screenshots
 
-This folder contains screenshots and video previews for the Genosys iOS app submission.
+This directory contains screenshots for App Store submission.
 
----
+## Requirements
 
-## 📂 Folder Structure
+- **Dimensions:** 1242×2688px, 2688×1242px, 1284×2778px, or 2778×1284px
+- **Format:** PNG or JPG
+- **Max Count:** Up to 10 screenshots per localization
+- **First 3:** Will be used on app installation sheets
+- **iOS Only:** Screenshots are required only for iOS apps
 
+## Screenshot Plan
+
+1. **Shop Home** - Product catalog with categories and discounts
+2. **Product Detail** - Product information with variants and Add to Bag
+3. **Shopping Bag** - Cart with items, totals, and checkout button
+4. **Checkout** - Payment options (Apple Pay, COD) and delivery details
+5. **Profile** - User account with orders and settings
+6. **Order Detail** - Order history with discount breakdown and tracking
+
+## Capturing Screenshots
+
+### Automated Capture (Recommended)
+
+Run the automated screenshot script:
+
+```bash
+npm run screenshots
+# or
+node scripts/capture-appstore-screenshots.js
 ```
-app-store-screenshots/
-├── 6.7-inch/                    # iPhone 15 Pro Max screenshots (REQUIRED)
-│   └── [10 screenshots go here]
-│
-├── 6.5-inch/                    # iPhone 11 Pro Max screenshots (FALLBACK)
-│   └── [10 screenshots go here]
-│
-├── previews/                    # Optional video previews
-│   └── [Up to 3 videos go here]
-│
-├── README.md                    # This file
-├── SCREENSHOT_GUIDE.md          # Detailed guide
-└── QUICK_CHECKLIST.md           # Quick reference
-```
 
----
+**Instructions:**
+1. Start Expo and open the app on iOS simulator
+2. Run the screenshot script
+3. Navigate through the app as prompted (2s delay between captures)
+4. Screenshots will be saved in `app-store-screenshots/`
 
-## 📱 What You Need
+### Manual Capture
 
-### Required (Minimum):
-- **10 screenshots** for iPhone 6.7" display (1290 × 2796 pixels)
+1. Start iOS simulator with Expo
+2. Navigate to each screen
+3. Press `⌘ + S` (Cmd + S) in simulator to save screenshot
+4. Rename files to match the naming convention
 
-### Recommended:
-- **3 video previews** (15-30 seconds each, optional)
+## File Naming Convention
 
-### Optional:
-- **10 screenshots** for iPhone 6.5" display (1242 × 2688 pixels) as fallback
+- `01-shop-home.png` - Shop home with product grid
+- `02-product-detail.png` - Product detail page
+- `03-bag-cart.png` - Shopping bag/cart
+- `04-checkout.png` - Checkout screen
+- `05-profile.png` - Profile/account screen
+- `06-order-detail.png` - Order detail screen
 
----
+## Upload to App Store Connect
 
-## 🚀 Quick Start
+1. Log in to [App Store Connect](https://appstoreconnect.apple.com)
+2. Go to your app → App Store tab
+3. Scroll to **App Previews and Screenshots**
+4. Upload screenshots for each device size category
+5. First 3 screenshots will appear on the installation sheet
 
-1. **Read:** `QUICK_CHECKLIST.md` for the screenshot list
-2. **Take:** 10 screenshots on iPhone 15 Pro Max (or simulator)
-3. **Save:** Screenshots to `6.7-inch/` folder
-4. **Review:** Make sure all images are 1290 × 2796 pixels
-5. **Upload:** To App Store Connect when ready
+## Tips
 
----
+- ✅ Show the app's best features
+- ✅ Use clean, uncluttered screens
+- ✅ Include real content (not placeholders)
+- ✅ Show user benefits clearly
+- ✅ Maintain consistent branding
+- ❌ Avoid showing bugs or errors
+- ❌ Don't include status bar time/battery if sensitive
 
-## 📸 Screenshot List (10 Required)
+## Localization
 
-1. Splash or Home page
-2. Shop (product grid)
-3. Product detail
-4. Shopping bag
-5. Checkout form
-6. Payment methods (show Apple Pay!) ⭐
-7. Orders list
-8. Order detail
-9. Profile page
-10. About or Help page
+If supporting multiple languages, capture screenshots for:
+- English (en)
+- Arabic (ar) - if available
+- Russian (ru) - if available
 
----
-
-## 🎬 Video Previews (Optional, 3 Max)
-
-1. Shopping flow (browse → add → checkout)
-2. Apple Pay payment demo ⭐
-3. Order tracking
-
----
-
-## 📏 Dimensions
-
-### iPhone 6.7" (Primary - REQUIRED)
-- **Resolution:** 1290 × 2796 pixels
-- **Devices:** iPhone 15 Pro Max, 14 Pro Max, 13 Pro Max, 12 Pro Max
-- **Folder:** `6.7-inch/`
-
-### iPhone 6.5" (Fallback - Optional)
-- **Resolution:** 1242 × 2688 pixels
-- **Devices:** iPhone 11 Pro Max, XS Max
-- **Folder:** `6.5-inch/`
-
----
-
-## ✅ Quality Standards
-
-- ✅ Real product content
-- ✅ Status bar: 9:41 AM, full battery, full signal
-- ✅ No personal data
-- ✅ Professional appearance
-- ✅ Show Apple Pay feature
-- ✅ PNG or JPG format
-- ✅ < 10 MB per file
-
----
-
-## 📖 Documentation
-
-- **Full Guide:** `SCREENSHOT_GUIDE.md` - Complete instructions and best practices
-- **Quick Checklist:** `QUICK_CHECKLIST.md` - Fast reference for taking screenshots
-- **This File:** Overview and quick start
-
----
-
-## 🎯 Priority
-
-**Most Important:**
-- First 3 screenshots (used on app installation sheets)
-- Show Apple Pay payment option
-- High-quality product images
-- Clean, professional UI
-
----
-
-## 📞 Need Help?
-
-See `SCREENSHOT_GUIDE.md` for:
-- Detailed instructions
-- How to take screenshots
-- Recording video previews
-- Troubleshooting tips
-- Professional tools and resources
-
----
-
-## 🔄 Status
-
-Current status: **Ready for screenshots**
-
-- [x] Folders created
-- [x] Documentation written
-- [ ] Screenshots taken (10 required)
-- [ ] Video previews recorded (optional)
-- [ ] Ready for App Store Connect upload
-
----
-
-**Start taking screenshots now! 📸**
-
-See `QUICK_CHECKLIST.md` for the exact list of screens to capture.
+Create subdirectories: `en/`, `ar/`, `ru/` for localized screenshots.

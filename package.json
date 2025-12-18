@@ -20,7 +20,9 @@
     "start": "EXPO_USE_POLLING=1 expo start",
     "android": "EXPO_USE_POLLING=1 expo start --android",
     "ios": "EXPO_USE_POLLING=1 expo start --ios",
-    "web": "EXPO_USE_POLLING=1 expo start --web"
+    "web": "EXPO_USE_POLLING=1 expo start --web",
+    "screenshots": "bash scripts/capture-appstore-screenshots.sh",
+    "screenshots:interactive": "bash scripts/capture-screenshots-interactive.sh"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
