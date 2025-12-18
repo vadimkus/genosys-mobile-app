@@ -7,6 +7,20 @@ const MERCHANT_IDENTIFIER = 'merchant.ae.genosys.app';
 const APPLE_PAY_MERCHANT_COUNTRY_CODE = 'AE';
 const APPLE_PAY_CURRENCY_CODE = 'AED';
 
+function isUserCancelledPlatformPay(err) {
+  const code = String(err?.code || '').toLowerCase();
+  const message = String(err?.message || err?.localizedMessage || '').toLowerCase();
+  // Stripe can surface cancellation with different shapes/strings depending on iOS version / SDK.
+  return (
+    code.includes('canceled') ||
+    code.includes('cancelled') ||
+    message.includes('canceled') ||
+    message.includes('cancelled') ||
+    message === 'canceled' ||
+    message === 'cancelled'
+  );
+}
+
 export const getStripeConfigStatus = () => {
   const key = String(STRIPE_PUBLISHABLE_KEY || '');
   return {
@@ -126,6 +140,15 @@ export const presentApplePaySheet = async ({
   labels,
 }) => {
   try {
+    // Defensive: ensure Stripe is initialized right before invoking Apple Pay.
+    // This avoids rare race conditions where the availability check ran but initStripe
+    // didn't complete before the user tapped Pay.
+    try {
+      await initializeStripe();
+    } catch {
+      // initializeStripe already logs; we continue and let Stripe return a concrete error if any.
+    }
+
     debugLog('[ApplePay] Confirming Platform Pay payment (Apple Pay)...');
     const stripe = getStripe();
     if (!stripe?.confirmPlatformPayPayment) {
@@ -164,12 +187,17 @@ export const presentApplePaySheet = async ({
         merchantCountryCode: APPLE_PAY_MERCHANT_COUNTRY_CODE,
         currencyCode: APPLE_PAY_CURRENCY_CODE,
         cartItems: platformPayCartItems,
+        // Ensure Apple Pay is configured for 3DS-capable networks (common requirement)
+        merchantCapabilities: ['supports3DS'],
+        // Match our previous Apple Pay setup; improves consistency and reduces edge-case failures.
+        requiredBillingContactFields: ['emailAddress', 'name'],
+        requiredShippingAddressFields: ['phoneNumber', 'name', 'postalAddress'],
       },
     });
 
     if (error) {
       errorLog('[ApplePay] Apple Pay payment failed:', error);
-      return { success: false, error };
+      return { success: false, cancelled: isUserCancelledPlatformPay(error), error };
     }
 
     debugLog('[ApplePay] Apple Pay payment confirmed successfully');
@@ -177,7 +205,7 @@ export const presentApplePaySheet = async ({
 
   } catch (error) {
     errorLog('[ApplePay] Exception in presentApplePaySheet:', error);
-    return { success: false, error };
+    return { success: false, cancelled: isUserCancelledPlatformPay(error), error };
   }
 };
 

@@ -20,6 +20,18 @@ const formatDate = (value) => {
   return d.toLocaleDateString();
 };
 
+const inferOriginalUnitPriceFromPct = ({ unitPrice, discountPct }) => {
+  const p = Number(unitPrice);
+  const pct = Number(discountPct);
+  if (!Number.isFinite(p) || p <= 0) return null;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 100) return null;
+  const mult = 1 - pct / 100;
+  if (!Number.isFinite(mult) || mult <= 0) return null;
+  const inferred = p / mult;
+  if (!Number.isFinite(inferred) || inferred <= p * 1.001) return null;
+  return inferred;
+};
+
 const statusLabelKey = (status) => {
   const s = String(status || '').trim().toLowerCase();
   const map = {
@@ -68,10 +80,33 @@ const formatEmirateLabel = (t, emirate) => {
 
 const statusColor = (status) => {
   const s = String(status || '').toLowerCase();
+  if (s === 'pending') return '#E74C3C';
   if (s === 'paid' || s === 'confirmed' || s === 'delivered') return '#27AE60';
   if (s === 'cancelled' || s === 'canceled') return '#E74C3C';
   if (s === 'shipped') return '#007AFF';
   return '#8E8E93';
+};
+
+const parsePaymentMetadata = (order) => {
+  const raw = order?.paymentMetadata ?? order?.payment_metadata ?? null;
+  if (!raw) return null;
+  if (typeof raw === 'object') return raw;
+  if (typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+const isApplePayLike = (order) => {
+  const flow = String(order?.paymentFlow || order?.payment_flow || '').toLowerCase();
+  if (flow === 'apple_pay') return true;
+  const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
+  if (pm.includes('apple')) return true;
+  const meta = parsePaymentMetadata(order);
+  const metaFlow = String(meta?.paymentFlow || meta?.payment_flow || '').toLowerCase();
+  return metaFlow === 'apple_pay';
 };
 
 const isPaidLike = (order) => {
@@ -365,6 +400,7 @@ export default function OrdersScreen() {
               const keyId = String(o.id || orderNumber);
               const isPaying = payingOrderId === keyId;
               const isExpanded = expandedOrderKey === keyId;
+              const discountPct = Number(user?.discountPercentage);
               return (
                 <View key={String(o.id || orderNumber)} style={styles.card}>
                   <View style={styles.cardTop}>
@@ -374,7 +410,7 @@ export default function OrdersScreen() {
                       activeOpacity={0.85}
                     >
                       <Text style={styles.orderNumber}>
-                        {t('ordersDetail.orderNumber')}: {String(orderNumber)}
+                        {t('ordersScreen.orderLabel')}: {String(orderNumber)}
                       </Text>
                       <Ionicons
                         name={isExpanded ? 'chevron-up' : 'chevron-down'}
@@ -413,12 +449,23 @@ export default function OrdersScreen() {
                     </View>
                   </View>
 
-                  <Text style={styles.metaText}>
-                    {formatDate(createdAt)}
-                    {emirate ? ` • ${formatEmirateLabel(t, emirate)}` : ''}
-                    {paymentMethod ? ` • ${String(paymentMethod).toUpperCase()}` : ''}
-                    {paymentStatus ? ` • ${formatStatusLabel(t, paymentStatus)}` : ''}
-                  </Text>
+                  <View style={styles.metaRow}>
+                    <Text style={styles.metaText}>
+                      {formatDate(createdAt)}
+                      {emirate ? ` • ${formatEmirateLabel(t, emirate)}` : ''}
+                    </Text>
+                    <View style={styles.metaRight}>
+                      {isApplePayLike(o) ? (
+                        <>
+                          <Ionicons name="logo-apple" size={14} color="#111827" style={{ marginRight: 4 }} />
+                          <Text style={styles.metaText}>{t('ordersDetail.paymentMethodApplePay')}</Text>
+                        </>
+                      ) : paymentMethod ? (
+                        <Text style={styles.metaText}>{String(paymentMethod).toUpperCase()}</Text>
+                      ) : null}
+                      {paymentStatus ? <Text style={styles.metaText}> • {formatStatusLabel(t, paymentStatus)}</Text> : null}
+                    </View>
+                  </View>
                   <View style={styles.cardBottom}>
                     <Text style={styles.totalText}>AED {formatAED(total)}</Text>
                     <Text style={styles.itemsText}>
@@ -448,10 +495,30 @@ export default function OrdersScreen() {
                           .join(' • ');
                         const price = Number(it?.price ?? 0) || 0;
                         const isPromo = it?.isPromotionItem === true;
+                        const originalUnit = !isPromo
+                          ? inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct })
+                          : null;
+                        const showDiscount = originalUnit != null;
                         return (
-                          <Text key={`${String(it?.productId || it?.id || name)}-${idx}`} style={styles.orderSummaryLine}>
-                            {qty}× {String(name)}{extras ? ` — ${extras}` : ''} — {isPromo ? t('common.free') : `AED ${formatAED(price)}`}
-                          </Text>
+                          <View
+                            key={`${String(it?.productId || it?.id || name)}-${idx}`}
+                            style={styles.orderSummaryItemRow}
+                          >
+                            <Text style={styles.orderSummaryLine}>
+                              {qty}× {String(name)}{extras ? ` — ${extras}` : ''}
+                            </Text>
+                            {isPromo ? (
+                              <Text style={styles.orderSummaryLineMuted}>{t('common.free')}</Text>
+                            ) : showDiscount ? (
+                              <Text style={styles.orderSummaryLineMuted}>
+                                {t('ordersDetail.fullPrice')}: <Text style={styles.orderSummaryPriceStrike}>AED {formatAED(originalUnit)}</Text>{' '}
+                                • {t('ordersDetail.discount')}: {Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : ''}{' '}
+                                • {t('ordersDetail.priceAfterDiscount')}: <Text style={styles.orderSummaryPriceFinal}>AED {formatAED(price)}</Text>
+                              </Text>
+                            ) : (
+                              <Text style={styles.orderSummaryLineMuted}>AED {formatAED(price)}</Text>
+                            )}
+                          </View>
                         );
                       })}
 
@@ -565,6 +632,18 @@ const styles = StyleSheet.create({
   orderNumber: { fontSize: 15, fontWeight: '700', color: '#1D1D1F' },
   statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   statusText: { fontSize: 12, fontWeight: '700' },
+  metaRow: {
+    marginTop: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  metaRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
   metaText: { marginTop: 6, fontSize: 12, color: '#8E8E93' },
   cardBottom: { marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   totalText: { fontSize: 15, fontWeight: '700', color: '#E74C3C' },
@@ -581,6 +660,10 @@ const styles = StyleSheet.create({
   },
   orderSummaryTitle: { fontSize: 13, fontWeight: '800', color: '#1D1D1F', marginBottom: 8 },
   orderSummaryLine: { fontSize: 12, color: '#3C3C43', lineHeight: 18, marginBottom: 4 },
+  orderSummaryItemRow: { marginBottom: 6 },
+  orderSummaryLineMuted: { fontSize: 12, color: '#6B7280', lineHeight: 18 },
+  orderSummaryPriceStrike: { textDecorationLine: 'line-through', color: '#9CA3AF', fontWeight: '700' },
+  orderSummaryPriceFinal: { color: '#E74C3C', fontWeight: '800' },
   orderSummaryDivider: { height: 1, backgroundColor: '#E5E5EA', marginTop: 10, marginBottom: 6 },
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   orderTotalsLabel: { fontSize: 12, color: '#3C3C43', fontWeight: '700' },

@@ -76,7 +76,6 @@ export default function CheckoutScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [applePaySupported, setApplePaySupported] = useState(false);
   const [applePayConfigured, setApplePayConfigured] = useState(true);
-  const [applePayDebug, setApplePayDebug] = useState(null);
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
@@ -153,7 +152,6 @@ export default function CheckoutScreen() {
         const cfg = getStripeConfigStatus?.() || {};
         if (!cancelled) {
           setApplePayConfigured(!!cfg?.hasPublishableKey);
-          setApplePayDebug(cfg);
         }
         if (!cfg?.hasPublishableKey) {
           if (!cancelled) setApplePaySupported(false);
@@ -429,6 +427,10 @@ export default function CheckoutScreen() {
           });
 
           if (!payRes?.success) {
+            if (payRes?.cancelled) {
+              Alert.alert(t('applePay.cancelledTitle'), t('applePay.cancelledMessage'));
+              return;
+            }
             const details =
               payRes?.error?.message ||
               payRes?.error?.localizedMessage ||
@@ -856,15 +858,6 @@ export default function CheckoutScreen() {
                     (!applePayConfigured) && styles.paymentOptionDisabled,
                   ]}
                   onPress={() => selectPaymentMethod(PAYMENT_METHODS.APPLE_PAY)}
-                onLongPress={() => {
-                  // Quick diagnostics for TestFlight debugging (no sensitive data; prefix only)
-                  try {
-                    const info = applePayDebug ? JSON.stringify(applePayDebug, null, 2) : 'No debug info';
-                    Alert.alert('Apple Pay Debug', info);
-                  } catch {
-                    Alert.alert('Apple Pay Debug', 'Unable to render debug info');
-                  }
-                }}
                 >
                   <View style={styles.paymentOptionHeader}>
                     <Ionicons

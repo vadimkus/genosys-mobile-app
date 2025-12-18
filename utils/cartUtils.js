@@ -133,14 +133,14 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
     ? 0
     : Math.max(0, freeShippingThreshold - (Number.isFinite(subtotal) ? subtotal : 0));
 
-  // VAT is INCLUDED in product prices. Compute the included portion for display only.
+  // VAT is INCLUDED in prices (and shipping). Compute the included portion for display only.
   const vatRateRaw = config?.vatRate;
   const vatRate =
     (Number.isFinite(Number(vatRateRaw)) && Number(vatRateRaw) >= 0)
       ? Number(vatRateRaw)
       : 0.05;
-  const vatAmount = Number.isFinite(subtotal) ? (subtotal * vatRate) / (1 + vatRate) : 0;
   const totalWithVat = (Number.isFinite(subtotal) ? subtotal : 0) + shipping;
+  const vatAmount = Number.isFinite(totalWithVat) ? (totalWithVat * vatRate) / (1 + vatRate) : 0;
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 

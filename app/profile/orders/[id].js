@@ -39,6 +39,32 @@ const isPaidLike = (order) => {
   return s === 'paid' || s === 'confirmed' || ps === 'paid' || ps === 'confirmed';
 };
 
+const parsePaymentMetadata = (order) => {
+  const raw =
+    order?.paymentMetadata ??
+    order?.payment_metadata ??
+    order?.paymentMeta ??
+    order?.payment_meta ??
+    null;
+  if (!raw) return null;
+  if (typeof raw === 'object') return raw;
+  if (typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+const isApplePayLike = (order) => {
+  const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
+  if (pm.includes('apple')) return true;
+  const meta = parsePaymentMetadata(order);
+  const flow = String(meta?.paymentFlow || meta?.payment_flow || '').toLowerCase();
+  const provider = String(meta?.provider || meta?.paymentProvider || '').toLowerCase();
+  return flow === 'apple_pay' || provider.includes('apple');
+};
+
 const isCodLike = (order) => {
   const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
   return pm === 'cod' || pm === 'cash' || pm === 'cash_on_delivery' || pm === 'cash on delivery';
@@ -52,6 +78,19 @@ const isCardLike = (order) => {
 
 const isPromoItem = (item) => {
   return item?.isPromotionItem === true || item?.selectedSize === '__PROMO__' || Number(item?.price || 0) === 0;
+};
+
+const inferOriginalUnitPriceFromPct = ({ unitPrice, discountPct }) => {
+  const p = Number(unitPrice);
+  const pct = Number(discountPct);
+  if (!Number.isFinite(p) || p <= 0) return null;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 100) return null;
+  const mult = 1 - pct / 100;
+  if (!Number.isFinite(mult) || mult <= 0) return null;
+  const inferred = p / mult;
+  // Only accept if it produces a meaningful "full price" above the discounted unit price.
+  if (!Number.isFinite(inferred) || inferred <= p * 1.001) return null;
+  return inferred;
 };
 
 export default function OrderDetailScreen() {
@@ -141,6 +180,7 @@ export default function OrderDetailScreen() {
   };
 
   const getPaymentMethodLabel = () => {
+    if (isApplePayLike(order)) return t('ordersDetail.paymentMethodApplePay');
     if (isCodLike(order)) return t('ordersDetail.paymentMethodCod');
     if (isCardLike(order)) return t('ordersDetail.paymentMethodCard');
     const pm = String(paymentMethod || '').trim();
@@ -251,7 +291,12 @@ export default function OrderDetailScreen() {
               <Text style={styles.sectionTitle}>{t('ordersDetail.orderStatus')}</Text>
             </View>
             <View style={styles.statusRow}>
-              <View style={styles.statusBadge}>
+              <View
+                style={[
+                  styles.statusBadge,
+                  String(status || '').trim().toLowerCase() === 'pending' && styles.statusBadgePending,
+                ]}
+              >
                 <Text style={styles.statusBadgeText}>{getStatusLabel()}</Text>
               </View>
             </View>
@@ -264,9 +309,15 @@ export default function OrderDetailScreen() {
               <Text style={styles.sectionTitle}>{t('ordersDetail.paymentMethod')}</Text>
             </View>
             <View style={styles.paymentMethodCard}>
-              <Text style={styles.paymentMethodText}>
-                {getPaymentMethodLabel()}
-              </Text>
+              <View style={styles.paymentMethodRow}>
+                {isApplePayLike(order) ? (
+                  <Ionicons name="logo-apple" size={16} color="#111827" style={{ marginRight: 8 }} />
+                ) : null}
+                <Text style={styles.paymentMethodText}>{getPaymentMethodLabel()}</Text>
+                {isPaidLike(order) && isApplePayLike(order) ? (
+                  <Text style={styles.paymentMethodPaidHint}> • {t('ordersDetail.paid')}</Text>
+                ) : null}
+              </View>
             </View>
           </View>
 
@@ -298,6 +349,11 @@ export default function OrderDetailScreen() {
               const size = it?.size || it?.selectedSize || '';
               const color = it?.color || it?.selectedColor || '';
               const itemTotal = qty * price;
+
+              const discountPct = Number(user?.discountPercentage);
+              const inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
+              const canShowDiscountBreakdown = !isPromoItem(it) && inferredOriginalUnit != null;
+              const discountUnit = canShowDiscountBreakdown ? (inferredOriginalUnit - price) : 0;
               
               return (
                 <View key={`paid-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemCard}>
@@ -306,14 +362,28 @@ export default function OrderDetailScreen() {
                     <Text style={styles.itemPrice}>AED {formatAED(itemTotal)}</Text>
                   </View>
                   <View style={styles.itemDetails}>
-                    <Text style={styles.itemDetailText}>Qty: {qty}</Text>
+                    <Text style={styles.itemDetailText}>{t('ordersDetail.qty')}: {qty}</Text>
                     {size && size !== '__PROMO__' ? (
-                      <Text style={styles.itemDetailText}>• Size: {String(size)}</Text>
+                      <Text style={styles.itemDetailText}>• {t('ordersDetail.size')}: {String(size)}</Text>
                     ) : null}
                     {color ? (
-                      <Text style={styles.itemDetailText}>• Color: {String(color)}</Text>
+                      <Text style={styles.itemDetailText}>• {t('ordersDetail.color')}: {String(color)}</Text>
                     ) : null}
-                    <Text style={styles.itemDetailText}>• AED {formatAED(price)} each</Text>
+                    <Text style={styles.itemDetailText}>• AED {formatAED(price)} {t('ordersDetail.each')}</Text>
+
+                    {canShowDiscountBreakdown ? (
+                      <>
+                        <Text style={styles.itemDetailText}>
+                          • {t('ordersDetail.fullPrice')}: AED {formatAED(inferredOriginalUnit)}
+                        </Text>
+                        <Text style={styles.itemDetailText}>
+                          • {t('ordersDetail.discount')}: {Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : ''} (-AED {formatAED(discountUnit)})
+                        </Text>
+                        <Text style={styles.itemDetailText}>
+                          • {t('ordersDetail.priceAfterDiscount')}: AED {formatAED(price)}
+                        </Text>
+                      </>
+                    ) : null}
                   </View>
                 </View>
               );
@@ -338,7 +408,7 @@ export default function OrderDetailScreen() {
                           <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
                         </View>
                       </View>
-                      <Text style={styles.promoItemQty}>Qty: {qty}</Text>
+                      <Text style={styles.promoItemQty}>{t('ordersDetail.qty')}: {qty}</Text>
                     </View>
                   );
                 })}
@@ -600,6 +670,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#007AFF',
   },
+  statusBadgePending: {
+    backgroundColor: '#E74C3C',
+  },
   paymentStatusBadge: {
     backgroundColor: '#27AE60',
   },
@@ -635,6 +708,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1D1D1F',
+  },
+  paymentMethodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  paymentMethodPaidHint: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#16A34A',
   },
   
   // Items
