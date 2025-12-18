@@ -34,6 +34,9 @@ import AUTH_CONFIG from '../../config/auth';
 const log = createLogger('Shop');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const GRID_SIDE_PADDING = 20;
+const GRID_GUTTER = 12;
+const GRID_CARD_WIDTH = Math.floor((SCREEN_WIDTH - GRID_SIDE_PADDING * 2 - GRID_GUTTER) / 2);
 
 // Allowed categories (order as desired in UI)
 const ALLOWED_CATEGORY_ORDER = [
@@ -364,6 +367,7 @@ export default function ShopScreen() {
       
       <ScrollView 
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -500,7 +504,7 @@ export default function ShopScreen() {
               {filteredProducts.map((product, index) => (
                 <TouchableOpacity 
                   key={product.id} 
-                  style={[styles.gridCard, index % 2 === 0 ? styles.gridCardLeft : styles.gridCardRight]}
+                  style={styles.gridCard}
                   onPress={() => handleProductPress(product)}
                   activeOpacity={0.95}
                 >
@@ -714,8 +718,13 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 32,
+  },
   contentContainer: {
-    flex: 1,
+    // IMPORTANT: do not set flex: 1 inside a ScrollView, it can prevent the content height
+    // from growing beyond the viewport on small screens (e.g. iPhone SE), making it look
+    // like only 1 product exists because you can’t scroll to the rest.
   },
   header: {
     flexDirection: 'row',
@@ -864,11 +873,11 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 20,
+    paddingHorizontal: GRID_SIDE_PADDING,
     justifyContent: 'space-between',
   },
   gridCard: {
-    width: '48%',
+    width: GRID_CARD_WIDTH,
     backgroundColor: '#ffffff',
     borderRadius: 12,
     marginBottom: 16,
@@ -880,12 +889,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
     // Remove overflow: 'hidden' to allow badges to show
-  },
-  gridCardLeft: {
-    marginRight: 8,
-  },
-  gridCardRight: {
-    marginLeft: 8,
   },
   gridImageContainer: {
     width: '100%',

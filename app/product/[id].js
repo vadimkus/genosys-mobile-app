@@ -1433,8 +1433,10 @@ const styles = StyleSheet.create({
   },
   beautyBoxDetailDiscountRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    rowGap: 8,
+    columnGap: 10,
   },
   beautyBoxDetailDiscount: {
     fontSize: 14,
@@ -1444,10 +1446,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
+    flexShrink: 1,
   },
   beautyBoxDetailFinalPrice: {
     fontSize: 18,
     color: '#27AE60',
     fontWeight: 'bold',
+    marginLeft: 'auto',
+    flexShrink: 1,
+    minWidth: 0,
+    textAlign: 'right',
   },
 });

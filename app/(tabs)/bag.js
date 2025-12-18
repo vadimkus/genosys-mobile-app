@@ -505,7 +505,7 @@ export default function BagScreen() {
                   <Ionicons name="gift-outline" size={18} color="#E74C3C" />
                   <Text style={styles.sectionTitle}>{t('bag.freeMaskPromotion')}</Text>
                 </View>
-                <Text style={styles.sectionSubtle}>{t('bag.promoValidUntil', { date: '01/01/2026' })}</Text>
+                <Text style={styles.sectionSubtle}>{t('bag.promoValidUntil', { date: '01/02/2026' })}</Text>
               </View>
 
               <ProgressCard
@@ -795,14 +795,17 @@ const styles = StyleSheet.create({
   },
   sectionTitleRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
     marginBottom: 12,
   },
   sectionTitleLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+    flex: 1,
+    minWidth: 0,
   },
   sectionTitle: {
     fontSize: 18,
@@ -813,6 +816,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#E74C3C',
     fontWeight: '700',
+    flexShrink: 1,
+    maxWidth: '48%',
+    textAlign: 'right',
   },
   progressCard: {
     marginBottom: 12,
