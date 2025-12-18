@@ -17,7 +17,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { calculateCartTotals } from '../utils/cartUtils';
-import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
+import { submitCODOrder, submitCardOrder, submitApplePayOrder, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
@@ -25,6 +25,8 @@ import CollapsibleFooter from '../components/CollapsibleFooter';
 import EmirateFlagIcon from '../components/checkout/EmirateFlagIcon';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
 import { createLogger } from '../utils/logger';
+import ApplePayButton from '../components/ApplePayButton';
+import { initializeStripe, checkApplePayAvailability, presentApplePaySheet } from '../services/applePayService';
 import {
   isValidEmail,
   normalizeUaeToNationalDigits,
@@ -39,7 +41,7 @@ export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
   const { user } = useAuth();
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
-  const { t } = useLocalization();
+  const { t, locale } = useLocalization();
   const scrollRef = useRef(null);
   const fieldLayoutsRef = useRef({});
   const sectionLayoutsRef = useRef({ delivery: 0, payment: 0, review: 0 });
@@ -72,6 +74,7 @@ export default function CheckoutScreen() {
   
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
+  const [applePaySupported, setApplePaySupported] = useState(false);
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
@@ -136,11 +139,32 @@ export default function CheckoutScreen() {
     })();
   }, []);
 
+  // Initialize Stripe + detect Apple Pay availability (iOS only)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (Platform.OS !== 'ios') {
+          if (!cancelled) setApplePaySupported(false);
+          return;
+        }
+        await initializeStripe();
+        const supported = await checkApplePayAvailability();
+        if (!cancelled) setApplePaySupported(!!supported);
+      } catch {
+        if (!cancelled) setApplePaySupported(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   const selectPaymentMethod = async (method) => {
     const safe =
-      method === PAYMENT_METHODS.CARD
-        ? PAYMENT_METHODS.CARD
-        : PAYMENT_METHODS.COD;
+      method === PAYMENT_METHODS.APPLE_PAY
+        ? PAYMENT_METHODS.APPLE_PAY
+        : method === PAYMENT_METHODS.CARD
+          ? PAYMENT_METHODS.CARD
+          : PAYMENT_METHODS.COD;
     setSelectedPaymentMethod(safe);
     // Persist for next checkout
     try {
@@ -306,6 +330,7 @@ export default function CheckoutScreen() {
         total: safeTotal,
         paymentMethod: selectedPaymentMethod,
         orderNotes: orderNotes.trim(),
+        locale: locale || 'en',
         userToken: user?.token || user?.accessToken || null,
       };
 
@@ -320,6 +345,12 @@ export default function CheckoutScreen() {
       let result;
       if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
         result = await submitCODOrder(orderData);
+      } else if (selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY) {
+        if (Platform.OS !== 'ios' || !applePaySupported) {
+          Alert.alert(t('applePay.notSupportedTitle'), t('applePay.notSupportedMessage'));
+          return;
+        }
+        result = await submitApplePayOrder(orderData);
       } else {
         result = await submitCardOrder(orderData);
       }
@@ -345,6 +376,52 @@ export default function CheckoutScreen() {
                 onPress: () => router.replace('/(tabs)/shop'),
                 style: 'cancel'
               }
+            ]
+          );
+          return;
+        }
+
+        // Apple Pay: confirm on-device via Stripe RN + client secret
+        if (selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY) {
+          const clientSecret = String(result.clientSecret || '');
+          if (!clientSecret) {
+            Alert.alert(t('applePay.failedTitle'), t('applePay.missingClientSecret'));
+            return;
+          }
+
+          const lineItems = [
+            { label: t('checkout.subtotal'), amount: safeSubtotal.toFixed(2), type: 'final' },
+            { label: t('checkout.shipping'), amount: safeShipping.toFixed(2), type: 'final' },
+          ];
+
+          const payRes = await presentApplePaySheet({
+            clientSecret,
+            cartItems: items,
+            lineItems,
+            totalAmount: safeTotal,
+            customerInfo: {
+              name: orderData.customerName,
+              email: orderData.customerEmail,
+              phone: orderData.customerPhone,
+              address: orderData.customerAddress,
+            },
+            labels: {
+              total: t('checkout.total'),
+            },
+          });
+
+          if (!payRes?.success) {
+            Alert.alert(t('applePay.failedTitle'), t('applePay.failedMessage'));
+            return;
+          }
+
+          clearCart();
+          Alert.alert(
+            t('applePay.successTitle'),
+            t('applePay.successMessage', { orderNumber: finalOrderNumber }),
+            [
+              { text: t('checkout.viewOrder'), onPress: () => router.replace('/(tabs)/orders') },
+              { text: t('checkout.continueShopping'), onPress: () => router.replace('/(tabs)/shop'), style: 'cancel' },
             ]
           );
           return;
@@ -691,7 +768,11 @@ export default function CheckoutScreen() {
             <Text style={styles.paymentHint}>
               {t('checkout.defaultPaymentMethod')}:{' '}
               <Text style={styles.paymentHintStrong}>
-                {selectedPaymentMethod === PAYMENT_METHODS.CARD ? t('checkout.cardPayment') : t('checkout.cashOnDelivery')}
+                {selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY
+                  ? t('applePay.applePay')
+                  : selectedPaymentMethod === PAYMENT_METHODS.CARD
+                    ? t('checkout.cardPayment')
+                    : t('checkout.cashOnDelivery')}
               </Text>
               {' '}• {t('checkout.tapToChange')}
             </Text>
@@ -732,6 +813,31 @@ export default function CheckoutScreen() {
                 </View>
                 <Text style={styles.paymentDescription}>{t('checkout.paySecurelyStripe')}</Text>
               </TouchableOpacity>
+
+              {Platform.OS === 'ios' ? (
+                <TouchableOpacity
+                  style={[
+                    styles.paymentOption,
+                    selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY && styles.paymentOptionSelected,
+                    !applePaySupported && styles.paymentOptionDisabled,
+                  ]}
+                  onPress={() => selectPaymentMethod(PAYMENT_METHODS.APPLE_PAY)}
+                  disabled={!applePaySupported}
+                >
+                  <View style={styles.paymentOptionHeader}>
+                    <Ionicons
+                      name={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "radio-button-on" : "radio-button-off"}
+                      size={20}
+                      color={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "#E74C3C" : "#C7C7CC"}
+                    />
+                    <Ionicons name="logo-apple" size={18} color="#000000" style={{ marginLeft: 8, marginRight: 6 }} />
+                    <Text style={styles.paymentTitle}>{t('applePay.applePay')}</Text>
+                  </View>
+                  <Text style={styles.paymentDescription}>
+                    {applePaySupported ? t('applePay.subtitle') : t('applePay.notSupportedShort')}
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
 
             <View style={styles.trustRow}>
@@ -830,9 +936,11 @@ export default function CheckoutScreen() {
                 {t('checkout.reviewLine', {
                   emirate: selectedEmirate,
                   payment:
-                    selectedPaymentMethod === PAYMENT_METHODS.CARD
-                      ? t('checkout.cardPayment')
-                      : t('checkout.cashOnDelivery'),
+                    selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY
+                      ? t('applePay.applePay')
+                      : selectedPaymentMethod === PAYMENT_METHODS.CARD
+                        ? t('checkout.cardPayment')
+                        : t('checkout.cashOnDelivery'),
                   total: safeTotal.toFixed(2),
                 })}
               </Text>
@@ -859,24 +967,36 @@ export default function CheckoutScreen() {
           </View>
         }
         action={
-          <TouchableOpacity
-            style={[
-              styles.placeOrderButton,
-              footerCollapsed && styles.placeOrderButtonCollapsed,
-              isProcessing && styles.placeOrderButtonDisabled,
-            ]}
-            onPress={handleSubmit}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <ActivityIndicator color="#ffffff" size="small" />
-            ) : (
-              <Ionicons name="bag-check" size={20} color="#ffffff" />
-            )}
-            <Text style={styles.placeOrderButtonText}>
-              {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
-            </Text>
-          </TouchableOpacity>
+          selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? (
+            <ApplePayButton
+              onPress={handleSubmit}
+              disabled={!applePaySupported}
+              loading={isProcessing}
+              style={[
+                styles.placeOrderButton,
+                footerCollapsed && styles.placeOrderButtonCollapsed,
+              ]}
+            />
+          ) : (
+            <TouchableOpacity
+              style={[
+                styles.placeOrderButton,
+                footerCollapsed && styles.placeOrderButtonCollapsed,
+                isProcessing && styles.placeOrderButtonDisabled,
+              ]}
+              onPress={handleSubmit}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Ionicons name="bag-check" size={20} color="#ffffff" />
+              )}
+              <Text style={styles.placeOrderButtonText}>
+                {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
+              </Text>
+            </TouchableOpacity>
+          )
         }
       />
     </SafeAreaView>
@@ -1281,6 +1401,9 @@ const styles = StyleSheet.create({
   paymentOptionSelected: {
     borderColor: '#E74C3C',
     backgroundColor: '#FFF5F5',
+  },
+  paymentOptionDisabled: {
+    opacity: 0.6,
   },
   paymentOptionHeader: {
     flexDirection: 'row',

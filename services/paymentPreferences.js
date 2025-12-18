@@ -6,15 +6,20 @@ const DEFAULT_PAYMENT_METHOD_KEY = 'genosys_default_payment_method';
 export const PAYMENT_METHODS = {
   COD: 'cod',
   CARD: 'card',
+  APPLE_PAY: 'apple_pay',
 };
 
 export async function getDefaultPaymentMethod() {
   try {
     const value = await AsyncStorage.getItem(DEFAULT_PAYMENT_METHOD_KEY);
-    // Legacy support: previously we stored 'apple_pay' as a separate choice.
-    // Card payments already support Apple Pay / Google Pay in Stripe, so we map it to CARD.
-    if (value === 'apple_pay') return PAYMENT_METHODS.CARD;
-    if (value === PAYMENT_METHODS.CARD || value === PAYMENT_METHODS.COD) return value;
+    // Backward/forward compatibility: accept known values only.
+    if (
+      value === PAYMENT_METHODS.CARD ||
+      value === PAYMENT_METHODS.COD ||
+      value === PAYMENT_METHODS.APPLE_PAY
+    ) {
+      return value;
+    }
     return PAYMENT_METHODS.COD;
   } catch {
     return PAYMENT_METHODS.COD;
@@ -23,9 +28,9 @@ export async function getDefaultPaymentMethod() {
 
 export async function setDefaultPaymentMethod(method) {
   const safe =
-    method === PAYMENT_METHODS.CARD
-      ? PAYMENT_METHODS.CARD
-      : method === 'apple_pay'
+    method === PAYMENT_METHODS.APPLE_PAY
+      ? PAYMENT_METHODS.APPLE_PAY
+      : method === PAYMENT_METHODS.CARD
         ? PAYMENT_METHODS.CARD
         : PAYMENT_METHODS.COD;
   await AsyncStorage.setItem(DEFAULT_PAYMENT_METHOD_KEY, safe);

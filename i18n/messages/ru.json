@@ -142,6 +142,20 @@
     "couldNotOpenMaps": "Не удалось открыть карты. Попробуйте ещё раз.",
     "youSave": "Вы экономите"
   },
+  "applePay": {
+    "applePay": "Apple Pay",
+    "subtitle": "Оплатите сразу с Apple Pay",
+    "notSupportedShort": "Apple Pay недоступен на этом устройстве",
+    "notSupportedTitle": "Apple Pay недоступен",
+    "notSupportedMessage": "Apple Pay недоступен на этом устройстве. Выберите оплату картой или оплату при доставке.",
+    "failedTitle": "Ошибка Apple Pay",
+    "failedMessage": "Не удалось завершить оплату Apple Pay. Пожалуйста, попробуйте ещё раз.",
+    "missingClientSecret": "Не удалось запустить оплату Apple Pay. Пожалуйста, попробуйте ещё раз.",
+    "successTitle": "Оплата прошла успешно",
+    "successMessage": "Оплата Apple Pay успешно выполнена для заказа {orderNumber}.",
+    "payWithPrefix": "Оплатить через",
+    "processing": "Обработка…"
+  },
   "product": {
     "about": "О продукте",
     "productDetails": "Детали продукта",
