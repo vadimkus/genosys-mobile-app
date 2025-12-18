@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
@@ -7,19 +7,23 @@ import AUTH_CONFIG from '../config/auth';
 export default function PrivacyPolicyContent({ showLastUpdated = true }) {
   const { t } = useLocalization();
 
-  const lastUpdated = useMemo(() => 'December 13, 2025', []);
+  const lastUpdated = t('privacy.lastUpdatedDate');
+  const email = t('contact.emailValue') || 'sales@genosys.ae';
+  const phoneDisplay = t('contact.phoneDisplay') || '+971 58 548 76 65';
+  const location = t('contact.locationValue') || 'Dubai, UAE';
+  const genosysPrivacyUrl = AUTH_CONFIG?.PRIVACY_POLICY_URL || 'https://genosys.ae/privacy-policy';
+  const googlePrivacyUrl = 'https://policies.google.com/privacy';
 
   const handleEmailPress = () => {
-    Linking.openURL('mailto:sales@genosys.ae');
+    Linking.openURL(`mailto:${email}`);
   };
 
   const handleGooglePrivacyPress = () => {
-    Linking.openURL('https://policies.google.com/privacy');
+    Linking.openURL(googlePrivacyUrl);
   };
 
   const handlePrivacyPolicyPress = () => {
-    const url = AUTH_CONFIG?.PRIVACY_POLICY_URL || 'https://genosys.ae/privacy-policy';
-    Linking.openURL(url);
+    Linking.openURL(genosysPrivacyUrl);
   };
 
   return (
@@ -36,60 +40,51 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
 
       {/* Privacy Rights Section */}
       <View style={styles.highlightSection}>
-        <Text style={styles.highlightTitle}>Your Privacy Rights</Text>
-        <Text style={styles.highlightText}>
-          As a registered user, you have the right to access, update, or delete your personal information.
-          This section outlines how we handle your data and your rights under our privacy policy.
-        </Text>
+        <Text style={styles.highlightTitle}>{t('privacy.rightsTitle')}</Text>
+        <Text style={styles.highlightText}>{t('privacy.rightsText')}</Text>
       </View>
 
       {/* Personal Information We Collect */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>1. Personal Information We Collect</Text>
+        <Text style={styles.sectionTitle}>{t('privacy.sections.personalInfo.title')}</Text>
         <View style={styles.listContainer}>
           <View style={styles.listItem}>
-            <Text style={styles.listItemLabel}>Account Information:</Text>
-            <Text style={styles.listItemText}>Name, email, phone number, address</Text>
+            <Text style={styles.listItemLabel}>{t('privacy.sections.personalInfo.accountLabel')}</Text>
+            <Text style={styles.listItemText}>{t('privacy.sections.personalInfo.accountText')}</Text>
           </View>
           <View style={styles.listItem}>
-            <Text style={styles.listItemLabel}>Profile Data:</Text>
-            <Text style={styles.listItemText}>Birthday, profile picture, customer preferences</Text>
+            <Text style={styles.listItemLabel}>{t('privacy.sections.personalInfo.profileLabel')}</Text>
+            <Text style={styles.listItemText}>{t('privacy.sections.personalInfo.profileText')}</Text>
           </View>
           <View style={styles.listItem}>
-            <Text style={styles.listItemLabel}>Order Information:</Text>
-            <Text style={styles.listItemText}>Purchase history, shipping addresses, payment details</Text>
+            <Text style={styles.listItemLabel}>{t('privacy.sections.personalInfo.orderLabel')}</Text>
+            <Text style={styles.listItemText}>{t('privacy.sections.personalInfo.orderText')}</Text>
           </View>
           <View style={styles.listItem}>
-            <Text style={styles.listItemLabel}>Usage Data:</Text>
-            <Text style={styles.listItemText}>Website interactions, page views, session data</Text>
+            <Text style={styles.listItemLabel}>{t('privacy.sections.personalInfo.usageLabel')}</Text>
+            <Text style={styles.listItemText}>{t('privacy.sections.personalInfo.usageText')}</Text>
           </View>
         </View>
       </View>
 
       {/* Google Authentication */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>2. Google Authentication (OAuth)</Text>
+        <Text style={styles.sectionTitle}>{t('privacy.sections.google.title')}</Text>
 
         <View style={styles.subSection}>
-          <Text style={styles.subSectionLabel}>Google Sign-In:</Text>
-          <Text style={styles.subSectionText}>
-            When you sign in with Google, we receive your basic profile information (name, email, profile picture)
-            from Google according to your Google account privacy settings.
-          </Text>
+          <Text style={styles.subSectionLabel}>{t('privacy.sections.google.signInLabel')}</Text>
+          <Text style={styles.subSectionText}>{t('privacy.sections.google.signInText')}</Text>
         </View>
         <View style={styles.subSection}>
-          <Text style={styles.subSectionLabel}>Data Shared:</Text>
-          <Text style={styles.subSectionText}>
-            We only receive information that you have made publicly available in your Google profile or that you
-            explicitly consent to share during the authentication process.
-          </Text>
+          <Text style={styles.subSectionLabel}>{t('privacy.sections.google.sharedLabel')}</Text>
+          <Text style={styles.subSectionText}>{t('privacy.sections.google.sharedText')}</Text>
         </View>
         <View style={styles.subSection}>
-          <Text style={styles.subSectionLabel}>Google Privacy:</Text>
+          <Text style={styles.subSectionLabel}>{t('privacy.sections.google.privacyLabel')}</Text>
           <Text style={styles.subSectionText}>
-            Google's use of your information is governed by their privacy policy. You can review it at:{' '}
+            {t('privacy.sections.google.privacyPrefix')}{' '}
             <Text style={styles.link} onPress={handleGooglePrivacyPress}>
-              https://policies.google.com/privacy
+              {googlePrivacyUrl}
             </Text>
           </Text>
         </View>
@@ -97,40 +92,34 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
 
       {/* Genosys Privacy Policy */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Genosys Privacy Policy</Text>
+        <Text style={styles.sectionTitle}>{t('privacy.sections.genosys.title')}</Text>
         <Text style={styles.paragraph}>
-          You can review the Genosys Privacy Policy here:{' '}
+          {t('privacy.sections.genosys.prefix')}{' '}
           <Text style={styles.link} onPress={handlePrivacyPolicyPress}>
-            {AUTH_CONFIG?.PRIVACY_POLICY_URL || 'https://genosys.ae/privacy-policy'}
+            {genosysPrivacyUrl}
           </Text>
         </Text>
       </View>
 
       {/* Contact Us */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>3. Contact Us</Text>
-        <Text style={styles.paragraph}>
-          If you have any questions about this Privacy Policy or our data practices, please contact us:
-        </Text>
+        <Text style={styles.sectionTitle}>{t('privacy.sections.contact.title')}</Text>
+        <Text style={styles.paragraph}>{t('privacy.sections.contact.text')}</Text>
 
         <View style={styles.contactInfo}>
           <View style={styles.contactItem}>
             <Ionicons name="mail-outline" size={16} color="#E74C3C" />
             <TouchableOpacity onPress={handleEmailPress}>
-              <Text style={styles.contactLink}>sales@genosys.ae</Text>
+              <Text style={styles.contactLink}>{email}</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.contactItem}>
             <Ionicons name="call-outline" size={16} color="#E74C3C" />
-            <Text style={styles.contactText}>+971 58 548 76 65</Text>
+            <Text style={styles.contactText}>{phoneDisplay}</Text>
           </View>
           <View style={styles.contactItem}>
             <Ionicons name="location-outline" size={16} color="#E74C3C" />
-            <Text style={styles.contactText}>
-              Boulevard Plaza Tower 2, Floor 22{'\n'}
-              Mohammed Bin Rashid Boulevard{'\n'}
-              Downtown, Dubai, UAE
-            </Text>
+            <Text style={styles.contactText}>{location}</Text>
           </View>
         </View>
       </View>

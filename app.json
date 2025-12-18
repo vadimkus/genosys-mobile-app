@@ -32,6 +32,9 @@
         "NSPhotoLibraryUsageDescription": "Genosys uses your photo library to let you choose a profile photo.",
         "NSPhotoLibraryAddUsageDescription": "Genosys can save your profile photo to your photo library.",
         "ITSAppUsesNonExemptEncryption": false,
+        "com.apple.developer.in-app-payments": [
+          "merchant.ae.genosys.app"
+        ],
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [

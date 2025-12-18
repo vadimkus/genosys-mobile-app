@@ -391,7 +391,7 @@ export default function ShopScreen() {
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity 
-                  style={styles.clearButton}
+                  style={styles.searchClearIconButton}
                   onPress={() => setSearchQuery('')}
                 >
                   <Ionicons name="close" size={14} color="#ffffff" />
@@ -474,18 +474,22 @@ export default function ShopScreen() {
               <View style={styles.clearButtonsContainer}>
                 {searchQuery && (
                   <TouchableOpacity 
-                    style={[styles.clearSearchButton, styles.clearButton]}
+                    style={[styles.clearSearchButton, styles.noResultsActionButton]}
                     onPress={() => setSearchQuery('')}
                   >
-                    <Text style={styles.clearSearchText}>{t('shop.clearSearch')}</Text>
+                    <Text style={styles.clearSearchText} numberOfLines={1} ellipsizeMode="tail">
+                      {t('shop.clearSearch')}
+                    </Text>
                   </TouchableOpacity>
                 )}
                 {selectedCategory !== 'All' && (
                   <TouchableOpacity 
-                    style={[styles.clearSearchButton, styles.clearButton]}
+                    style={[styles.clearSearchButton, styles.noResultsActionButton]}
                     onPress={() => setSelectedCategory('All')}
                   >
-                    <Text style={styles.clearSearchText}>{t('shop.showAll')}</Text>
+                    <Text style={styles.clearSearchText} numberOfLines={1} ellipsizeMode="tail">
+                      {t('shop.showAll')}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -967,6 +971,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  searchClearIconButton: {
+    marginLeft: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#86868B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // No Results Styles
   noResultsContainer: {
@@ -989,6 +1002,7 @@ const styles = StyleSheet.create({
   },
   clearButtonsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
     justifyContent: 'center',
   },
@@ -998,9 +1012,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
   },
-  clearButton: {
-    flex: 1,
-    maxWidth: 120,
+  noResultsActionButton: {
+    // Allow long translations (e.g. RU) without overlapping: buttons can wrap to the next row.
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 150,
+    maxWidth: 220,
   },
   clearSearchText: {
     color: '#ffffff',

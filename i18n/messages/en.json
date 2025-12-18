@@ -934,7 +934,40 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: {date}"
+    "lastUpdated": "Last updated: {date}",
+    "lastUpdatedDate": "December 13, 2025",
+    "rightsTitle": "Your Privacy Rights",
+    "rightsText": "As a registered user, you have the right to access, update, or delete your personal information. This section outlines how we handle your data and your rights under our privacy policy.",
+    "sections": {
+      "personalInfo": {
+        "title": "1. Personal Information We Collect",
+        "accountLabel": "Account Information:",
+        "accountText": "Name, email, phone number, address",
+        "profileLabel": "Profile Data:",
+        "profileText": "Birthday, profile picture, customer preferences",
+        "orderLabel": "Order Information:",
+        "orderText": "Purchase history, shipping addresses, payment details",
+        "usageLabel": "Usage Data:",
+        "usageText": "Website interactions, page views, session data"
+      },
+      "google": {
+        "title": "2. Google Authentication (OAuth)",
+        "signInLabel": "Google Sign-In:",
+        "signInText": "When you sign in with Google, we receive your basic profile information (name, email, profile picture) from Google according to your Google account privacy settings.",
+        "sharedLabel": "Data Shared:",
+        "sharedText": "We only receive information that you have made publicly available in your Google profile or that you explicitly consent to share during the authentication process.",
+        "privacyLabel": "Google Privacy:",
+        "privacyPrefix": "Google's use of your information is governed by their privacy policy. You can review it at:"
+      },
+      "genosys": {
+        "title": "Genosys Privacy Policy",
+        "prefix": "You can review the Genosys Privacy Policy here:"
+      },
+      "contact": {
+        "title": "3. Contact Us",
+        "text": "If you have any questions about this Privacy Policy or our data practices, please contact us:"
+      }
+    }
   },
   "terms": {
     "title": "Terms & Conditions",
