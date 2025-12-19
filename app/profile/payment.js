@@ -18,7 +18,8 @@ import { getUserBilling } from '../../services/databaseService';
 
 export default function PaymentScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const token = user?.token || '';
   const [defaultMethod, setDefaultMethodState] = useState(PAYMENT_METHODS.COD);
@@ -65,7 +66,7 @@ export default function PaymentScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('paymentSettings.title')}</Text>
         <View style={styles.addButton} />
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     flex: 1,
-    paddingRight: 12,
+    paddingEnd: 12,
   },
   methodText: {
     flex: 1,

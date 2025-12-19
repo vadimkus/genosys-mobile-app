@@ -193,3 +193,4 @@ echo -e "   ${GREEN}✓${NC} First 3 will appear on installation sheets"
 echo ""
 echo -e "${GREEN}✨ Professional screenshots ready for App Store submission!${NC}"
 echo ""
+

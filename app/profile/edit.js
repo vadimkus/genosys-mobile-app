@@ -85,7 +85,8 @@ function FormSection({ title, children }) {
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { user, updateProfile, deleteAccount, isAuthenticated } = useAuth();
   
   // Check authentication immediately
@@ -457,7 +458,7 @@ export default function EditProfileScreen() {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={handleBack} style={[styles.headerButton, styles.headerBackButton]}>
-            <Ionicons name="chevron-back" size={18} color="#dc2626" />
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={18} color="#dc2626" />
             <Text style={styles.backText}>{t('common.back')}</Text>
           </TouchableOpacity>
         )}
@@ -1068,7 +1069,7 @@ const styles = StyleSheet.create({
   editIconContainer: {
     position: 'absolute',
     bottom: 4,
-    right: 4,
+    end: 4,
     width: 28,
     height: 28,
     borderRadius: 14,

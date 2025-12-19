@@ -12,6 +12,8 @@ import {
   Platform,
   ScrollView,
   Dimensions,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -42,7 +44,8 @@ const getNativeBundleId = () => {
 };
 
 export default function LoginScreen() {
-  const { t } = useLocalization();
+  const { t, locale, setLocale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,6 +54,8 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [langSwitching, setLangSwitching] = useState(false);
   
   const { 
     loginWithGoogle, 
@@ -265,6 +270,23 @@ export default function LoginScreen() {
     setShowPrivacyModal(true);
   };
 
+  const currentLangCode = langSwitching
+    ? '...'
+    : (locale === 'ar' ? 'AR' : locale === 'ru' ? 'RU' : 'EN');
+
+  const handleSelectLocale = async (nextLocale) => {
+    const next = String(nextLocale || '').toLowerCase();
+    if (!['en', 'ru', 'ar'].includes(next)) return;
+    setLangOpen(false);
+    setLangSwitching(true);
+    try {
+      await setLocale?.(next);
+    } finally {
+      // If a reload happens (AR <-> non-AR), the app will restart anyway.
+      setTimeout(() => setLangSwitching(false), 150);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -272,6 +294,21 @@ export default function LoginScreen() {
         style={styles.keyboardContainer}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          {/* Top controls (language) */}
+          <View style={[styles.topControls, isRTL && styles.topControlsRtl]}>
+            <TouchableOpacity
+              onPress={() => setLangOpen(true)}
+              disabled={langSwitching}
+              activeOpacity={0.85}
+              style={styles.langButton}
+              accessibilityRole="button"
+              accessibilityLabel="Switch language"
+            >
+              <Text style={styles.langButtonText}>{currentLangCode}</Text>
+              <Ionicons name="chevron-down" size={14} color="#16A34A" />
+            </TouchableOpacity>
+          </View>
+
           {/* Header with Logo */}
           <View style={styles.header}>
             <Image 
@@ -306,51 +343,58 @@ export default function LoginScreen() {
               disabled={loading || !privacyConsent}
               activeOpacity={0.8}
             >
-              <View style={styles.biometricButtonContent}>
+              <View style={[styles.biometricButtonContent, isRTL && styles.biometricButtonContentRTL]}>
                 <Ionicons 
                   name={biometricType.includes('Face') ? 'scan' : 'finger-print'} 
-                  size={24} 
+                  size={20} 
                   color="#ffffff" 
                 />
-                <Text style={styles.biometricButtonText}>
+                <Text style={[styles.biometricButtonText, isRTL && styles.biometricButtonTextRTL]}>
                   {t('authScreen.loginWithBiometrics', { biometricType })}
                 </Text>
               </View>
             </TouchableOpacity>
           )}
 
-          {/* Google Login Button */}
-          <TouchableOpacity
-            style={[
-              styles.googleButton,
-              !privacyConsent && styles.googleButtonDisabled
-            ]}
-            onPress={handleGoogleLogin}
-            disabled={loading || !privacyConsent}
-            activeOpacity={0.8}
-          >
-            <View style={styles.googleButtonContent}>
-              <View style={styles.googleIcon}>
-                <Text style={styles.googleIconText}>G</Text>
-              </View>
-              <Text style={styles.googleButtonText}>{t('authScreen.continueWithGoogle')}</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Apple Login Button (iOS only) */}
-          {Platform.OS === 'ios' && (
+          {/* Social Login Buttons (compact) */}
+          <View style={[styles.socialRow, isRTL && styles.socialRowRTL]}>
             <TouchableOpacity
-              style={[styles.appleButton, !privacyConsent && styles.appleButtonDisabled]}
-              onPress={handleAppleLogin}
+              style={[
+                styles.googleButton,
+                !privacyConsent && styles.googleButtonDisabled
+              ]}
+              onPress={handleGoogleLogin}
               disabled={loading || !privacyConsent}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
+              accessibilityLabel={t('authScreen.continueWithGoogle')}
             >
-              <View style={styles.appleButtonContent}>
-                <Ionicons name="logo-apple" size={18} color="#ffffff" style={{ marginRight: 10 }} />
-                <Text style={styles.appleButtonText}>{t('authScreen.continueWithApple')}</Text>
+              <View style={[styles.googleButtonContent, isRTL && styles.googleButtonContentRTL]}>
+                <View style={[styles.googleIcon, isRTL ? styles.googleIconRTL : styles.googleIconLTR]}>
+                  <Text style={styles.googleIconText}>G</Text>
+                </View>
+                <Text style={[styles.googleButtonText, isRTL && styles.googleButtonTextRTL]}>
+                  {t('authScreen.googleShort')}
+                </Text>
               </View>
             </TouchableOpacity>
-          )}
+
+            {Platform.OS === 'ios' && (
+              <TouchableOpacity
+                style={[styles.appleButton, !privacyConsent && styles.appleButtonDisabled]}
+                onPress={handleAppleLogin}
+                disabled={loading || !privacyConsent}
+                activeOpacity={0.85}
+                accessibilityLabel={t('authScreen.continueWithApple')}
+              >
+                <View style={[styles.appleButtonContent, isRTL && styles.appleButtonContentRTL]}>
+                  <Ionicons name="logo-apple" size={18} color="#ffffff" style={styles.appleIcon} />
+                  <Text style={[styles.appleButtonText, isRTL && styles.appleButtonTextRTL]}>
+                    {t('authScreen.appleShort')}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Divider */}
           <View style={styles.divider}>
@@ -362,24 +406,25 @@ export default function LoginScreen() {
           {/* Email/Password Form */}
           <View style={styles.form}>
             {!isLogin && (
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>{t('authScreen.fullNameLabel')}</Text>
+              <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+                <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>{t('authScreen.fullNameLabel')}</Text>
                 <TextInput
-                  style={styles.textInput}
+                  style={[styles.textInput, isRTL && styles.textInputRTL]}
                   placeholder={t('authScreen.fullNamePlaceholder')}
                   value={name}
                   onChangeText={setName}
                   autoCapitalize="words"
                   autoComplete="name"
                   placeholderTextColor="#86868B"
+                  textAlign={isRTL ? 'right' : 'left'}
                 />
               </View>
             )}
             
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>{t('authScreen.emailLabel')}</Text>
+            <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+              <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>{t('authScreen.emailLabel')}</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.textInputRTL]}
                 placeholder={t('authScreen.emailPlaceholder')}
                 value={email}
                 onChangeText={setEmail}
@@ -387,23 +432,25 @@ export default function LoginScreen() {
                 autoCapitalize="none"
                 autoComplete="email"
                 placeholderTextColor="#86868B"
+                textAlign={isRTL ? 'right' : 'left'}
               />
             </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>{t('authScreen.passwordLabel')}</Text>
-              <View style={styles.passwordContainer}>
+            <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+              <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>{t('authScreen.passwordLabel')}</Text>
+              <View style={[styles.passwordContainer, isRTL && styles.passwordContainerRTL]}>
                 <TextInput
-                  style={styles.passwordInput}
+                  style={[styles.passwordInput, isRTL && styles.passwordInputRTL]}
                   placeholder={t('authScreen.passwordPlaceholder')}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
                   placeholderTextColor="#86868B"
+                  textAlign={isRTL ? 'right' : 'left'}
                 />
                 <TouchableOpacity
-                  style={styles.passwordToggle}
+                  style={[styles.passwordToggle, isRTL && styles.passwordToggleRTL]}
                   onPress={() => setShowPassword(!showPassword)}
                 >
                   <Ionicons
@@ -417,18 +464,18 @@ export default function LoginScreen() {
           </View>
 
           {/* Privacy Policy Consent */}
-          <View style={styles.privacySection}>
+          <View style={[styles.privacySection, isRTL && styles.privacySectionRTL]}>
             <TouchableOpacity
-              style={styles.checkboxContainer}
+              style={[styles.checkboxContainer, isRTL && styles.checkboxContainerRTL]}
               onPress={() => setPrivacyConsent(!privacyConsent)}
               activeOpacity={0.7}
             >
-              <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked]}>
+              <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked, isRTL && styles.checkboxRTL]}>
                 {privacyConsent && (
                   <Ionicons name="checkmark" size={16} color="#ffffff" />
                 )}
               </View>
-              <Text style={styles.privacyText}>
+              <Text style={[styles.privacyText, isRTL && styles.privacyTextRTL]}>
                 {t('authScreen.privacyConsentPrefix')}{' '}
                 <Text style={styles.privacyLink} onPress={handlePrivacyPolicyPress}>
                   {t('authScreen.privacyPolicyLink')}
@@ -453,7 +500,7 @@ export default function LoginScreen() {
               <ActivityIndicator color="#ffffff" size="small" />
             ) : (
               <Text style={styles.authButtonText}>
-                {isLogin ? 'Sign In' : 'Create Account'}
+                {isLogin ? t('authScreen.signIn') : t('authScreen.createAccount')}
               </Text>
             )}
           </TouchableOpacity>
@@ -470,13 +517,13 @@ export default function LoginScreen() {
           )}
 
           {/* Switch Mode */}
-          <View style={styles.switchMode}>
-            <Text style={styles.switchModeText}>
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <View style={[styles.switchMode, isRTL && styles.switchModeRTL]}>
+            <Text style={[styles.switchModeText, isRTL && styles.switchModeTextRTL]}>
+              {isLogin ? t('authScreen.dontHaveAccount') : t('authScreen.alreadyHaveAccount')}
             </Text>
             <TouchableOpacity onPress={toggleMode} activeOpacity={0.7}>
               <Text style={styles.switchModeButton}>
-                {isLogin ? 'Sign Up' : 'Sign In'}
+                {isLogin ? t('authScreen.signUp') : t('authScreen.signIn')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -488,6 +535,46 @@ export default function LoginScreen() {
         visible={showPrivacyModal}
         onClose={() => setShowPrivacyModal(false)}
       />
+
+      {/* Language dropdown */}
+      <Modal
+        visible={langOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLangOpen(false)}
+      >
+        <Pressable style={styles.langOverlay} onPress={() => setLangOpen(false)}>
+          <View style={[styles.langMenu, isRTL && styles.langMenuRtl]}>
+            <TouchableOpacity
+              onPress={() => handleSelectLocale('en')}
+              activeOpacity={0.85}
+              style={[styles.langMenuItem, locale === 'en' && styles.langMenuItemActive]}
+            >
+              <Text style={[styles.langMenuItemText, isRTL && styles.langMenuItemTextRtl, locale === 'en' && styles.langMenuItemTextActive]}>
+                English
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleSelectLocale('ru')}
+              activeOpacity={0.85}
+              style={[styles.langMenuItem, locale === 'ru' && styles.langMenuItemActive]}
+            >
+              <Text style={[styles.langMenuItemText, isRTL && styles.langMenuItemTextRtl, locale === 'ru' && styles.langMenuItemTextActive]}>
+                Русский
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleSelectLocale('ar')}
+              activeOpacity={0.85}
+              style={[styles.langMenuItem, locale === 'ar' && styles.langMenuItemActive]}
+            >
+              <Text style={[styles.langMenuItemText, isRTL && styles.langMenuItemTextRtl, locale === 'ar' && styles.langMenuItemTextActive]}>
+                العربية
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -505,6 +592,69 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 20,
     justifyContent: 'center',
+  },
+  topControls: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginBottom: 8,
+  },
+  topControlsRtl: {
+    justifyContent: 'flex-end',
+  },
+  langButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  langButtonText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#16A34A',
+  },
+  langOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    justifyContent: 'flex-start',
+    paddingTop: 60,
+    paddingHorizontal: 16,
+  },
+  langMenu: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    borderRadius: 12,
+    overflow: 'hidden',
+    minWidth: 160,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  langMenuRtl: {
+    alignSelf: 'flex-end',
+  },
+  langMenuItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  langMenuItemActive: {
+    backgroundColor: '#fef2f2',
+  },
+  langMenuItemText: {
+    fontSize: 14,
+    color: '#111827',
+    fontWeight: '600',
+  },
+  langMenuItemTextRtl: {
+    textAlign: 'right',
+  },
+  langMenuItemTextActive: {
+    color: '#dc2626',
+    fontWeight: '800',
   },
   header: {
     alignItems: 'center',
@@ -549,9 +699,9 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#E5E5EA',
     borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    flex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -564,13 +714,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   googleIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#EA4335',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+  },
+  googleIconRTL: {
+    marginLeft: 10,
+    marginRight: 0,
+  },
+  googleIconLTR: {
+    marginRight: 10,
+    marginLeft: 0,
   },
   googleIconText: {
     color: '#ffffff',
@@ -578,8 +735,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   googleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#1D1D1F',
   },
   googleButtonDisabled: {
@@ -588,14 +745,17 @@ const styles = StyleSheet.create({
   appleButton: {
     backgroundColor: '#000000',
     borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    flex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
+  },
+  appleIcon: {
+    marginEnd: 10,
   },
   appleButtonContent: {
     flexDirection: 'row',
@@ -603,8 +763,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   appleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#ffffff',
   },
   appleButtonDisabled: {
@@ -613,9 +773,9 @@ const styles = StyleSheet.create({
   biometricButton: {
     backgroundColor: '#dc2626',
     borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 12,
     shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -628,10 +788,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   biometricButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#ffffff',
     marginLeft: 12,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 18,
+  },
+  socialRowRTL: {
+    flexDirection: 'row-reverse',
   },
   biometricButtonDisabled: {
     opacity: 0.5,
@@ -790,5 +958,69 @@ const styles = StyleSheet.create({
     color: '#856404',
     textAlign: 'center',
     fontWeight: '500',
+  },
+
+  // RTL-specific styles for Arabic
+  inputContainerRTL: {
+    alignItems: 'flex-end',
+  },
+  inputLabelRTL: {
+    textAlign: 'right',
+  },
+  textInputRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  passwordContainerRTL: {
+    flexDirection: 'row-reverse',
+  },
+  passwordInputRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  passwordToggleRTL: {
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  privacySectionRTL: {
+    alignItems: 'flex-end',
+  },
+  checkboxContainerRTL: {
+    flexDirection: 'row-reverse',
+  },
+  checkboxRTL: {
+    marginRight: 0,
+    marginLeft: 12,
+  },
+  privacyTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  switchModeRTL: {
+    flexDirection: 'row-reverse',
+  },
+  switchModeTextRTL: {
+    textAlign: 'right',
+  },
+  
+  // Button RTL styles
+  biometricButtonContentRTL: {
+    flexDirection: 'row-reverse',
+  },
+  biometricButtonTextRTL: {
+    marginLeft: 0,
+    marginRight: 12,
+  },
+  googleButtonContentRTL: {
+    flexDirection: 'row-reverse',
+  },
+  googleButtonTextRTL: {
+    textAlign: 'right',
+  },
+  appleButtonContentRTL: {
+    flexDirection: 'row-reverse',
+  },
+  appleButtonTextRTL: {
+    textAlign: 'right',
   },
 });

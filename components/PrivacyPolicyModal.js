@@ -12,7 +12,8 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import PrivacyPolicyContent from './PrivacyPolicyContent';
 
 export default function PrivacyPolicyModal({ visible, onClose, showCloseButton = true }) {
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
   return (
     <Modal
@@ -22,10 +23,10 @@ export default function PrivacyPolicyModal({ visible, onClose, showCloseButton =
     >
       <SafeAreaView style={styles.container}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('privacy.title')}</Text>
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('privacy.title')}</Text>
           {showCloseButton && (
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <TouchableOpacity onPress={onClose} style={[styles.closeButton, isRTL && styles.closeButtonRTL]}>
               <Ionicons name="close" size={24} color="#86868B" />
             </TouchableOpacity>
           )}
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
   },
+  headerRTL: { flexDirection: 'row-reverse' },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -60,9 +62,13 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
     position: 'absolute',
-    right: 16,
+    end: 16,
     zIndex: 1,
   },
+  closeButtonRTL: {
+    // `end` already mirrors; keep for clarity/override if needed later
+  },
+  textRTL: { writingDirection: 'rtl', textAlign: 'center' },
   // Body styles moved to `components/PrivacyPolicyContent`
 });
 

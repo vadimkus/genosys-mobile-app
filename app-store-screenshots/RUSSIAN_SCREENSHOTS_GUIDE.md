@@ -447,3 +447,4 @@ Products already have Russian names in database!
 *Created: December 19, 2025*  
 *For: Genosys Mobile App*  
 *Purpose: Russian App Store localization*
+

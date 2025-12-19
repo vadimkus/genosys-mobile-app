@@ -10,7 +10,8 @@ import { getUserBilling, updateUserBilling } from '../../services/databaseServic
 
 export default function BillingScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const token = user?.token || '';
@@ -68,17 +69,17 @@ export default function BillingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('billing.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('billing.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       {loading ? (
         <View style={styles.loading}>
-          <ActivityIndicator color="#E74C3C" />
+          <ActivityIndicator color="#dc2626" />
         </View>
       ) : (
         <ScrollView
@@ -86,18 +87,18 @@ export default function BillingScreen() {
           contentContainerStyle={[styles.content, { paddingBottom: (insets?.bottom || 0) + 24 }]}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.label}>{t('billing.addressLabel')}</Text>
+          <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.addressLabel')}</Text>
           <TextInput
-            style={[styles.input, styles.textarea]}
+            style={[styles.input, styles.textarea, isRTL && styles.inputRTL]}
             value={billingAddress}
             onChangeText={setBillingAddress}
             placeholder={t('billing.addressPlaceholder')}
             multiline
           />
 
-          <Text style={[styles.label, { marginTop: 16 }]}>{t('billing.vatLabel')}</Text>
+          <Text style={[styles.label, { marginTop: 16 }, isRTL && styles.textRTL]}>{t('billing.vatLabel')}</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, isRTL && styles.inputRTL, isRTL && styles.inputValueLTR]}
             value={vatNumber}
             onChangeText={setVatNumber}
             placeholder={t('billing.vatPlaceholder')}
@@ -123,6 +124,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
   },
+  headerRTL: { flexDirection: 'row-reverse' },
   backButton: { padding: 4 },
   headerTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: '600', color: '#000' },
   headerSpacer: { width: 32 },
@@ -138,9 +140,12 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   textarea: { minHeight: 96, textAlignVertical: 'top' },
+  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  inputRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  inputValueLTR: { writingDirection: 'ltr' },
   saveBtn: {
     marginTop: 24,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',

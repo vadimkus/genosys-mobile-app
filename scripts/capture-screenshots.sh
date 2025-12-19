@@ -169,3 +169,4 @@ for file in "$SCREENSHOT_DIR"/*.png; do
 done
 echo ""
 echo -e "${GREEN}✓ Done!${NC}"
+

@@ -55,11 +55,14 @@ const styles = StyleSheet.create({
   },
   content: {
     position: 'relative',
-    paddingRight: 40, // reserve space for chevron so it never overlaps content
+    // Reserve space for chevron so it never overlaps content.
+    // Use direction-aware padding so it auto-mirrors in RTL (e.g. Arabic).
+    paddingEnd: 40,
   },
   chevronBtn: {
     position: 'absolute',
-    right: 0,
+    // Use direction-aware positioning so it auto-mirrors in RTL.
+    end: 0,
     top: 0,
     padding: 8,
     zIndex: 10,

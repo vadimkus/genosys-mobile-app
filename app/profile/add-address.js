@@ -20,7 +20,8 @@ const log = createLogger('AddAddress');
 
 export default function AddEditAddressScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { user, addAddress, editAddress } = useAuth();
   const params = useLocalSearchParams();
   

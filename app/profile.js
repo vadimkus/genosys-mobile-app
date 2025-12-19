@@ -43,7 +43,8 @@ export default function ProfileScreen() {
     enableBiometric,
     disableBiometric
   } = useAuth();
-  const { locale, t } = useLocalization();
+  const { locale, t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [pushToggleLoading, setPushToggleLoading] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -319,12 +320,12 @@ export default function ProfileScreen() {
 
   // Quick Action Card Component (Genosys brand style)
   const QuickActionCard = ({ icon, title, subtitle, onPress, color = "#dc2626" }) => (
-    <TouchableOpacity style={styles.quickActionCard} onPress={onPress}>
+    <TouchableOpacity style={[styles.quickActionCard, isRTL && styles.quickActionCardRTL]} onPress={onPress}>
       <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
         <Ionicons name={icon} size={24} color="#ffffff" />
       </View>
-      <Text style={styles.quickActionTitle}>{title}</Text>
-      <Text style={styles.quickActionSubtitle}>{subtitle}</Text>
+      <Text style={[styles.quickActionTitle, isRTL && styles.quickActionTitleRTL]}>{title}</Text>
+      <Text style={[styles.quickActionSubtitle, isRTL && styles.quickActionSubtitleRTL]}>{subtitle}</Text>
     </TouchableOpacity>
   );
 
@@ -343,19 +344,19 @@ export default function ProfileScreen() {
   const ProfileItem = ({ icon, title, subtitle, onPress, rightComponent, hasArrow = true, style, isLast = false }) => {
     const content = (
       <>
-        <View style={styles.profileItemLeft}>
+        <View style={[styles.profileItemLeft, isRTL && styles.profileItemLeftRTL]}>
           {icon && (
             <View style={styles.iconContainer}>
               <Ionicons name={icon} size={22} color="#dc2626" />
             </View>
           )}
-          <View style={styles.profileItemText}>
-            <Text style={styles.profileItemTitle}>{title}</Text>
-            {subtitle && <Text style={styles.profileItemSubtitle}>{subtitle}</Text>}
+          <View style={[styles.profileItemText, isRTL && styles.profileItemTextRTL]}>
+            <Text style={[styles.profileItemTitle, isRTL && styles.profileItemTitleRTL]}>{title}</Text>
+            {subtitle && <Text style={[styles.profileItemSubtitle, isRTL && styles.profileItemSubtitleRTL]}>{subtitle}</Text>}
           </View>
         </View>
-        <View style={styles.profileItemRight}>
-          {rightComponent || (hasArrow && <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />)}
+        <View style={[styles.profileItemRight, isRTL && styles.profileItemRightRTL]}>
+          {rightComponent || (hasArrow && <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />)}
         </View>
       </>
     );
@@ -383,16 +384,16 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Navigation Header */}
-      <View style={styles.navHeader}>
+      <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
         <TouchableOpacity 
-          style={styles.backButton}
+          style={[styles.backButton, isRTL && styles.backButtonRTL]}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#007AFF" />
         </TouchableOpacity>
         
-        <Text style={styles.navTitle}>{t('profile.accountTitle')}</Text>
+        <Text style={[styles.navTitle, isRTL && styles.navTitleRTL]}>{t('profile.accountTitle')}</Text>
         
         <View style={styles.headerSpacer} />
       </View>
@@ -401,8 +402,8 @@ export default function ProfileScreen() {
         {/* Apple Store Style Header */}
         <View style={styles.profileHeader}>
           
-          <View style={styles.profileCard}>
-            <View style={styles.avatarContainer}>
+          <View style={[styles.profileCard, isRTL && styles.profileCardRTL]}>
+            <View style={[styles.avatarContainer, isRTL && styles.avatarContainerRTL]}>
               {profileImageUri ? (
                 <Image 
                   source={{ uri: profileImageUri }} 
@@ -415,20 +416,20 @@ export default function ProfileScreen() {
               )}
               <View style={styles.onlineDot} />
             </View>
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>
+            <View style={[styles.userInfo, isRTL && styles.userInfoRTL]}>
+              <Text style={[styles.userName, isRTL && styles.userNameRTL]}>
                 {user?.name || t('common.loading')}
               </Text>
-              <Text style={styles.userEmail}>
+              <Text style={[styles.userEmail, isRTL && styles.userEmailRTL]}>
                 {user?.email || t('profile.loadingUserData')}
               </Text>
               {user?.phone && (
-                <Text style={styles.userPhone}>
+                <Text style={[styles.userPhone, isRTL && styles.userPhoneRTL]}>
                   {user.phone}
                 </Text>
               )}
-              <TouchableOpacity onPress={handleEditProfile} style={styles.editButton}>
-                <Text style={styles.editButtonText}>{t('profile.viewAndEdit')}</Text>
+              <TouchableOpacity onPress={handleEditProfile} style={[styles.editButton, isRTL && styles.editButtonRTL]}>
+                <Text style={[styles.editButtonText, isRTL && styles.editButtonTextRTL]}>{t('profile.viewAndEdit')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -646,7 +647,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginEnd: 16,
     position: 'relative',
   },
   avatarText: {
@@ -662,7 +663,7 @@ const styles = StyleSheet.create({
   onlineDot: {
     position: 'absolute',
     bottom: 2,
-    right: 2,
+    end: 2,
     width: 20,
     height: 20,
     borderRadius: 10,
@@ -672,6 +673,7 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flex: 1,
+    minWidth: 0,
   },
   userName: {
     fontSize: 22,
@@ -684,11 +686,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#8E8E93',
     marginBottom: 4,
+    flexShrink: 1,
   },
   userPhone: {
     fontSize: 14,
     color: '#999999',
     marginBottom: 12,
+    flexShrink: 1,
   },
   editButton: {
     alignSelf: 'flex-start',
@@ -844,5 +848,75 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#C7C7CC',
     marginTop: 4,
+  },
+
+  // RTL Support Styles
+  navHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
+  backButtonRTL: {
+    marginLeft: 0,
+    marginRight: 16,
+  },
+  navTitleRTL: {
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
+  profileCardRTL: {
+    flexDirection: 'row-reverse',
+  },
+  avatarContainerRTL: {
+    // In RTL the avatar sits on the right; ensure spacing is on the correct side so it never overlaps text.
+    marginEnd: 0,
+    marginStart: 16,
+  },
+  userInfoRTL: {
+    alignItems: 'flex-end',
+    marginEnd: 0,
+    marginStart: 16,
+  },
+  userNameRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  userEmailRTL: {
+    textAlign: 'right',
+  },
+  userPhoneRTL: {
+    textAlign: 'right',
+  },
+  editButtonTextRTL: {
+    textAlign: 'center',
+  },
+  editButtonRTL: {
+    alignSelf: 'flex-end',
+  },
+  quickActionCardRTL: {
+    alignItems: 'flex-end',
+  },
+  quickActionTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  quickActionSubtitleRTL: {
+    textAlign: 'right',
+  },
+  profileItemLeftRTL: {
+    flexDirection: 'row-reverse',
+  },
+  profileItemTextRTL: {
+    alignItems: 'flex-end',
+    marginLeft: 0,
+    marginRight: 12,
+  },
+  profileItemTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  profileItemSubtitleRTL: {
+    textAlign: 'right',
+  },
+  profileItemRightRTL: {
+    flexDirection: 'row-reverse',
   },
 });

@@ -355,6 +355,8 @@ export const fetchUserOrders = async (token, params = {}) => {
     if (params.status) qs.set('status', String(params.status));
     const url = `${API_BASE_URL}/orders${qs.toString() ? `?${qs.toString()}` : ''}`;
 
+    log.debug('Fetching user orders:', url);
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -371,8 +373,13 @@ export const fetchUserOrders = async (token, params = {}) => {
     }
 
     const body = await response.json();
+    log.debug('Orders response body:', body);
+    
     const data = Array.isArray(body) ? body : (body.data || body.orders || []);
-    return Array.isArray(data) ? data : [];
+    const result = Array.isArray(data) ? data : [];
+    
+    log.debug('Parsed orders array length:', result.length);
+    return result;
   } catch (error) {
     log.error('Failed to fetch user orders', error?.message || error);
     throw error;

@@ -5,6 +5,8 @@ import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { LocalizationProvider } from '../contexts/LocalizationContext';
+import { OrdersProvider } from '../contexts/OrdersContext';
+import { AnimationProvider } from '../contexts/AnimationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
 
@@ -23,12 +25,16 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <LocalizationProvider>
-        <FavoritesProvider>
-          <CartProvider>
-            <StatusBar style="dark" backgroundColor="#ffffff" />
-            <AuthWrapper />
-          </CartProvider>
-        </FavoritesProvider>
+        <AnimationProvider>
+          <FavoritesProvider>
+            <CartProvider>
+              <OrdersProvider>
+                <StatusBar style="dark" backgroundColor="#ffffff" />
+                <AuthWrapper />
+              </OrdersProvider>
+            </CartProvider>
+          </FavoritesProvider>
+        </AnimationProvider>
       </LocalizationProvider>
     </AuthProvider>
   );

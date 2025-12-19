@@ -19,18 +19,19 @@ export default function CheckoutOrderHeaderCard({
   safeTotal,
   selectedEmirate,
 }) {
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
   return (
     <View style={styles.orderHeaderCard}>
       <TouchableOpacity
-        style={styles.orderHeader}
+        style={[styles.orderHeader, isRTL && styles.orderHeaderRTL]}
         onPress={onToggle}
         activeOpacity={0.85}
       >
-        <View style={styles.orderHeaderLeft}>
-          <Text style={styles.orderNumber}>{t('checkout.orderNumberLine', { orderNumber })}</Text>
-          <Text style={styles.itemCount}>
+        <View style={[styles.orderHeaderLeft, isRTL && styles.orderHeaderLeftRTL]}>
+          <Text style={[styles.orderNumber, isRTL && styles.textRTL]}>{t('checkout.orderNumberLine', { orderNumber })}</Text>
+          <Text style={[styles.itemCount, isRTL && styles.textRTL]}>
             {t('bag.header', {
               count: itemCount,
               label: itemCount === 1 ? t('bag.item') : t('bag.items'),
@@ -46,7 +47,7 @@ export default function CheckoutOrderHeaderCard({
 
       {orderSummaryExpanded ? (
         <View style={styles.orderSummaryBody}>
-          <Text style={styles.orderSummaryTitle}>{t('checkout.orderSummary')}</Text>
+          <Text style={[styles.orderSummaryTitle, isRTL && styles.textRTL]}>{t('checkout.orderSummary')}</Text>
 
           {(paidItems || []).map((it, idx) => {
             const name = getLocalizedProductName(it.product, locale) || it.product?.name || t('common.item');
@@ -61,7 +62,7 @@ export default function CheckoutOrderHeaderCard({
               .join(' • ');
             const price = Number(it.product?.displayPrice ?? it.product?.price ?? 0) || 0;
             return (
-              <Text key={`${it.product?.id || name}-${idx}`} style={styles.orderSummaryLine}>
+              <Text key={`${it.product?.id || name}-${idx}`} style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                 {qty}× {name}
                 {extras ? ` — ${extras}` : ''} — AED {price.toFixed(2)}
               </Text>
@@ -70,13 +71,13 @@ export default function CheckoutOrderHeaderCard({
 
           {promoItems?.length ? (
             <>
-              <Text style={styles.orderSummarySection}>{t('checkout.promotion')}</Text>
+              <Text style={[styles.orderSummarySection, isRTL && styles.textRTL]}>{t('checkout.promotion')}</Text>
               {promoItems.map((it, idx) => {
                 const name = getLocalizedProductName(it.product, locale) || it.product?.name || t('common.promoItem');
                 const qty = Number(it.quantity) || 1;
                 const size = it.product?.size ? String(it.product.size) : '';
                 return (
-                  <Text key={`${it.product?.id || name}-promo-${idx}`} style={styles.orderSummaryLine}>
+                  <Text key={`${it.product?.id || name}-promo-${idx}`} style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                     {qty}× {name}
                     {size ? ` — ${size}` : ''} — {t('common.free')}
                   </Text>
@@ -86,26 +87,26 @@ export default function CheckoutOrderHeaderCard({
           ) : null}
 
           <View style={styles.orderSummaryDivider} />
-          <Text style={styles.orderSummarySection}>{t('checkout.totals')}</Text>
-          <View style={styles.orderTotalsRow}>
-            <Text style={styles.orderTotalsLabel}>{t('checkout.subtotal')}</Text>
-            <Text style={styles.orderTotalsValue}>AED {Number(safeSubtotal || 0).toFixed(2)}</Text>
+          <Text style={[styles.orderSummarySection, isRTL && styles.textRTL]}>{t('checkout.totals')}</Text>
+          <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+            <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTL]}>{t('checkout.subtotal')}</Text>
+            <Text style={[styles.orderTotalsValue, isRTL && styles.summaryValueRTL]}>AED {Number(safeSubtotal || 0).toFixed(2)}</Text>
           </View>
-          <View style={styles.orderTotalsRow}>
-            <Text style={styles.orderTotalsLabel}>
+          <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+            <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTL]}>
               {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
             </Text>
-            <Text style={styles.orderTotalsValue}>
+            <Text style={[styles.orderTotalsValue, isRTL && styles.summaryValueRTL]}>
               {Number(safeShipping || 0) === 0 ? t('common.free') : `AED ${Number(safeShipping || 0).toFixed(2)}`}
             </Text>
           </View>
-          <View style={styles.orderTotalsRow}>
-            <Text style={styles.orderTotalsLabel}>{t('checkout.vatIncluded')}</Text>
-            <Text style={styles.orderTotalsValue}>AED {Number(safeVat || 0).toFixed(2)}</Text>
+          <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+            <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTL]}>{t('checkout.vatIncluded')}</Text>
+            <Text style={[styles.orderTotalsValue, isRTL && styles.summaryValueRTL]}>AED {Number(safeVat || 0).toFixed(2)}</Text>
           </View>
-          <View style={styles.orderTotalsRow}>
-            <Text style={styles.orderTotalsLabelStrong}>{t('checkout.total')}</Text>
-            <Text style={styles.orderTotalsValueStrong}>AED {Number(safeTotal || 0).toFixed(2)}</Text>
+          <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+            <Text style={[styles.orderTotalsLabelStrong, isRTL && styles.textRTL]}>{t('checkout.total')}</Text>
+            <Text style={[styles.orderTotalsValueStrong, isRTL && styles.summaryValueRTL]}>AED {Number(safeTotal || 0).toFixed(2)}</Text>
           </View>
         </View>
       ) : null}

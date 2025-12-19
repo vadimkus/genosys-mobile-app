@@ -79,3 +79,4 @@ If supporting multiple languages, capture screenshots for:
 - Russian (ru) - if available
 
 Create subdirectories: `en/`, `ar/`, `ru/` for localized screenshots.
+

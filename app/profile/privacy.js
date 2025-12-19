@@ -13,16 +13,17 @@ import PrivacyPolicyContent from '../../components/PrivacyPolicyContent';
 
 export default function PrivacyPolicyScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('privacy.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('privacy.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -46,6 +47,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
+  headerRTL: { flexDirection: 'row-reverse' },
   backButton: {
     padding: 4,
   },
@@ -57,5 +59,6 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 32,
   },
+  textRTL: { writingDirection: 'rtl', textAlign: 'center' },
   // Body styles moved to `components/PrivacyPolicyContent`
 });

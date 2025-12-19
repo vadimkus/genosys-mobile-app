@@ -23,7 +23,8 @@ import AUTH_CONFIG from '../../config/auth';
 
 export default function BagScreen() {
   const { user } = useAuth();
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { 
     items, 
     getTotalItems, 
@@ -194,7 +195,7 @@ export default function BagScreen() {
       const promo = isPromoItem(item);
 
       return (
-        <View key={itemKey} style={styles.cartItem}>
+        <View key={itemKey} style={[styles.cartItem, isRTL && styles.cartItemRTL]}>
           <TouchableOpacity
             style={styles.itemImageContainer}
             onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))}
@@ -214,13 +215,13 @@ export default function BagScreen() {
             )}
           </TouchableOpacity>
 
-          <View style={styles.itemDetails}>
+          <View style={[styles.itemDetails, isRTL && styles.itemDetailsRTL]}>
             <TouchableOpacity onPress={() => (promo ? null : router.push(`/product/${item.product.id}`))} disabled={promo}>
-              <Text style={styles.itemName} numberOfLines={2}>
+              <Text style={[styles.itemName, isRTL && styles.itemNameRTL]} numberOfLines={2}>
                 {getLocalizedProductName(item.product, locale) || item.product.name}
               </Text>
             </TouchableOpacity>
-            <Text style={styles.itemCategory}>
+            <Text style={[styles.itemCategory, isRTL && styles.itemCategoryRTL]}>
               {(() => {
                 const canon = normalizeCategoryCanonical(item.product.category) || item.product.category;
                 const key = getCategoryTranslationKey(canon);
@@ -230,14 +231,14 @@ export default function BagScreen() {
 
             {/* Variants Display */}
             {!promo && (item.selectedSize || item.selectedColor) && (
-              <View style={styles.variantsContainer}>
+              <View style={[styles.variantsContainer, isRTL && styles.variantsContainerRTL]}>
                 {item.selectedSize && (
-                  <Text style={styles.variantText}>
+                  <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
                     {t('common.size')}: {item.selectedSize}
                   </Text>
                 )}
                 {item.selectedColor && (
-                  <Text style={styles.variantText}>
+                  <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
                     {t('common.color')}: {item.selectedColor}
                   </Text>
                 )}
@@ -246,10 +247,10 @@ export default function BagScreen() {
 
             {/* Price with Discount Display */}
             {promo ? (
-              <View style={styles.itemPriceContainer}>
-                <Text style={styles.itemOriginalPrice}>{(Number(item.product?.originalPrice) || 0).toFixed(2)} AED</Text>
-                <Text style={styles.itemDiscountLabel}>{t('bag.discount100')}</Text>
-                <Text style={styles.promoTag}>{t('bag.promotionTag')}</Text>
+              <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
+                <Text style={[styles.itemOriginalPrice, isRTL && styles.itemOriginalPriceRTL]}>{(Number(item.product?.originalPrice) || 0).toFixed(2)} AED</Text>
+                <Text style={[styles.itemDiscountLabel, isRTL && styles.itemDiscountLabelRTL]}>{t('bag.discount100')}</Text>
+                <Text style={[styles.promoTag, isRTL && styles.promoTagRTL]}>{t('bag.promotionTag')}</Text>
               </View>
             ) : (
               (() => {
@@ -291,7 +292,7 @@ export default function BagScreen() {
 
                 // Hydro Cool Mask / Devices / Fixed: ignore any user discount; keep base price as-is
                 if (isHydro || isDevice || isFixed) {
-                  return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
+                  return <Text style={[styles.itemPrice, isRTL && styles.itemPriceRTL]}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
                 }
 
                 // Prefer the variant's originalPrice if present; otherwise use the cart item's originalPrice (which we may infer on add).
@@ -342,13 +343,13 @@ export default function BagScreen() {
           </View>
 
           {promo ? (
-            <View style={styles.itemRightActions}>
-              <Text style={styles.promoQtyRight}>Qty {item.quantity || 1}</Text>
-              <Text style={styles.promoItemPriceRight}>{t('common.free')}</Text>
+            <View style={[styles.itemRightActions, isRTL && styles.itemRightActionsRTL]}>
+              <Text style={[styles.promoQtyRight, isRTL && styles.promoQtyRightRTL]}>Qty {item.quantity || 1}</Text>
+              <Text style={[styles.promoItemPriceRight, isRTL && styles.promoItemPriceRightRTL]}>{t('common.free')}</Text>
             </View>
           ) : (
-            <View style={styles.itemRightActions}>
-              <View style={styles.quantityContainer}>
+            <View style={[styles.itemRightActions, isRTL && styles.itemRightActionsRTL]}>
+              <View style={[styles.quantityContainer, isRTL && styles.quantityContainerRTL]}>
                 <TouchableOpacity
                   style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
                   onPress={() => handleQuantityChange(item, -1)}
@@ -357,7 +358,7 @@ export default function BagScreen() {
                   <Ionicons name="remove" size={16} color="#000000" />
                 </TouchableOpacity>
 
-                <Text style={styles.quantityText}>{item.quantity}</Text>
+                <Text style={[styles.quantityText, isRTL && styles.quantityTextRTL]}>{item.quantity}</Text>
 
                 <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 1)}>
                   <Ionicons name="add" size={16} color="#000000" />
@@ -380,13 +381,13 @@ export default function BagScreen() {
       <View style={styles.container}>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.header}>
-            <View style={styles.headerTop}>
+            <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
               <TouchableOpacity 
-                style={styles.backButton}
-                onPress={() => router.back()}
+                style={[styles.backButton, isRTL && styles.backButtonRTL]}
+                onPress={() => router.replace('/(tabs)/shop')}
               >
-                <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-                <Text style={styles.backText}>{t('tabs.home')}</Text>
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
@@ -410,13 +411,13 @@ export default function BagScreen() {
       <View style={styles.container}>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.header}>
-            <View style={styles.headerTop}>
+            <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
               <TouchableOpacity 
-                style={styles.backButton}
-                onPress={() => router.back()}
+                style={[styles.backButton, isRTL && styles.backButtonRTL]}
+                onPress={() => router.replace('/(tabs)/shop')}
               >
-                <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-                <Text style={styles.backText}>{t('tabs.home')}</Text>
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
@@ -433,15 +434,15 @@ export default function BagScreen() {
           <View style={styles.iconContainer}>
             <Ionicons name="bag-outline" size={64} color="#D1D1D6" />
           </View>
-          <Text style={styles.emptyTitle}>{t('bag.emptyTitle')}</Text>
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyTitle, isRTL && styles.emptyTitleRTL]}>{t('bag.emptyTitle')}</Text>
+          <Text style={[styles.emptyText, isRTL && styles.emptyTextRTL]}>
             {t('bag.emptyText')}
           </Text>
           <TouchableOpacity 
             style={styles.shopButton}
             onPress={() => router.push('/(tabs)/shop')}
           >
-            <Text style={styles.shopButtonText}>{t('bag.startShopping')}</Text>
+            <Text style={[styles.shopButtonText, isRTL && styles.shopButtonTextRTL]}>{t('bag.startShopping')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -460,17 +461,17 @@ export default function BagScreen() {
       >
         <SafeAreaView edges={['top']} style={styles.safeArea}>
           <View style={styles.header}>
-            <View style={styles.headerTop}>
+            <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
               <TouchableOpacity 
-                style={styles.backButton}
-                onPress={() => router.back()}
+                style={[styles.backButton, isRTL && styles.backButtonRTL]}
+                onPress={() => router.replace('/(tabs)/shop')}
               >
-                <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-                <Text style={styles.backText}>{t('tabs.home')}</Text>
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
               </TouchableOpacity>
 
               <View pointerEvents="none" style={styles.headerCenterAbsolute}>
-                <Text style={styles.titleInline}>
+                <Text style={[styles.titleInline, isRTL && styles.titleInlineRTL]}>
                   {t('bag.header', {
                     count: paidItemCount,
                     label: paidItemCount === 1 ? t('bag.item') : t('bag.items'),
@@ -478,8 +479,8 @@ export default function BagScreen() {
                 </Text>
               </View>
 
-              <TouchableOpacity onPress={handleClearBag} style={styles.clearButton}>
-                <Text style={styles.clearText}>{t('bag.clear')}</Text>
+              <TouchableOpacity onPress={handleClearBag} style={[styles.clearButton, isRTL && styles.clearButtonRTL]}>
+                <Text style={[styles.clearText, isRTL && styles.clearTextRTL]}>{t('bag.clear')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -503,13 +504,13 @@ export default function BagScreen() {
         ListFooterComponent={
           <>
             {/* Free Mask Promotion (Progress UI) */}
-            <View style={styles.sectionCard}>
-              <View style={styles.sectionTitleRow}>
-                <View style={styles.sectionTitleLeft}>
+            <View style={[styles.sectionCard, isRTL && styles.sectionCardRTL]}>
+              <View style={[styles.sectionTitleRow, isRTL && styles.sectionTitleRowRTL]}>
+                <View style={[styles.sectionTitleLeft, isRTL && styles.sectionTitleLeftRTL]}>
                   <Ionicons name="gift-outline" size={18} color="#dc2626" />
-                  <Text style={styles.sectionTitle}>{t('bag.freeMaskPromotion')}</Text>
+                  <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('bag.freeMaskPromotion')}</Text>
                 </View>
-                <Text style={styles.sectionSubtle}>{t('bag.promoValidUntil', { date: '01/02/2026' })}</Text>
+                <Text style={[styles.sectionSubtle, isRTL && styles.sectionSubtleRTL]}>{t('bag.promoValidUntil', { date: '01/02/2026' })}</Text>
               </View>
 
               <ProgressCard
@@ -520,9 +521,9 @@ export default function BagScreen() {
                 met={promo500Met}
                 style={styles.progressCard}
               >
-                <View style={styles.rewardRow}>
+                <View style={[styles.rewardRow, isRTL && styles.rewardRowRTL]}>
                   <Image source={{ uri: promoCollagenImage }} style={styles.rewardImage} resizeMode="cover" />
-                  <Text style={styles.rewardText}>{t('bag.promoReward1')}</Text>
+                  <Text style={[styles.rewardText, isRTL && styles.rewardTextRTL]}>{t('bag.promoReward1')}</Text>
                 </View>
               </ProgressCard>
 
@@ -534,12 +535,12 @@ export default function BagScreen() {
                 met={promo700Met}
                 style={styles.progressCard}
               >
-                <View style={styles.rewardRow}>
-                  <View style={styles.rewardImagesRow}>
+                <View style={[styles.rewardRow, isRTL && styles.rewardRowRTL]}>
+                  <View style={[styles.rewardImagesRow, isRTL && styles.rewardImagesRowRTL]}>
                     <Image source={{ uri: promoSeaAlgaeImage }} style={styles.rewardImageSmall} resizeMode="cover" />
                     <Image source={{ uri: promoCollagenImage }} style={styles.rewardImageSmall} resizeMode="cover" />
                   </View>
-                  <Text style={styles.rewardText}>{t('bag.promoReward2')}</Text>
+                  <Text style={[styles.rewardText, isRTL && styles.rewardTextRTL]}>{t('bag.promoReward2')}</Text>
                 </View>
               </ProgressCard>
             </View>
@@ -597,57 +598,57 @@ export default function BagScreen() {
             <>
               {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 ? (
                 <>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>{t('bag.subtotalBeforeDiscount')}</Text>
-                    <Text style={[styles.summaryValue, styles.summaryOriginalValue]}>
+                  <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                    <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('bag.subtotalBeforeDiscount')}</Text>
+                    <Text style={[styles.summaryValue, styles.summaryOriginalValue, isRTL && styles.summaryValueRTL]}>
                       {Number(originalSubtotal).toFixed(2)} AED
                     </Text>
                   </View>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>
+                  <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                    <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>
                       {t('bag.discountLabel')}{' '}
                       <Text style={styles.discountPctGreen}>{`(${discountPct}% OFF)`}</Text>
                     </Text>
-                    <Text style={styles.summaryDiscountValue}>-{discountAmount.toFixed(2)} AED</Text>
+                    <Text style={[styles.summaryDiscountValue, isRTL && styles.summaryValueRTL]}>-{discountAmount.toFixed(2)} AED</Text>
                   </View>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
-                    <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
+                  <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                    <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('checkout.subtotal')}</Text>
+                    <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>{safeSubtotal.toFixed(2)} AED</Text>
                   </View>
                 </>
               ) : (
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>{t('checkout.subtotal')}</Text>
-                  <Text style={styles.summaryValue}>{safeSubtotal.toFixed(2)} AED</Text>
+                <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                  <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('checkout.subtotal')}</Text>
+                  <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>{safeSubtotal.toFixed(2)} AED</Text>
                 </View>
               )}
 
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>
                   {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
                 </Text>
-                <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
+                <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL, cartSummary.hasFreeShipping && styles.freeText]}>
                   {cartSummary.hasFreeShipping ? t('common.free') : `${safeShipping.toFixed(2)} AED`}
                 </Text>
               </View>
 
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>{t('checkout.vatIncluded')}</Text>
-                <Text style={styles.summaryValue}>{safeVat.toFixed(2)} AED</Text>
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('checkout.vatIncluded')}</Text>
+                <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>{safeVat.toFixed(2)} AED</Text>
               </View>
 
               <View style={styles.divider} />
             </>
           }
           always={
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>
+            <View style={[styles.totalRow, isRTL && styles.totalRowRTL]}>
+              <Text style={[styles.totalLabel, isRTL && styles.totalLabelRTL]}>
                 {t('bag.totalLine', {
                   count: cartSummary.itemCount,
                   label: cartSummary.itemCount === 1 ? t('bag.item') : t('bag.items'),
                 })}
               </Text>
-              <Text style={styles.totalAmount}>{safeTotal.toFixed(2)} AED</Text>
+              <Text style={[styles.totalAmount, isRTL && styles.totalAmountRTL]}>{safeTotal.toFixed(2)} AED</Text>
             </View>
           }
         />
@@ -846,6 +847,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    alignSelf: 'stretch',
   },
   rewardImagesRow: {
     flexDirection: 'row',
@@ -870,6 +872,8 @@ const styles = StyleSheet.create({
   },
   rewardText: {
     flex: 1,
+    minWidth: 0,
+    flexShrink: 1,
     fontSize: 16,
     color: '#1D1D1F',
     fontWeight: '600',
@@ -946,10 +950,13 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
+  cartItemRTL: {
+    flexDirection: 'row-reverse',
+  },
   itemImageContainer: {
     width: 80,
     height: 96,
-    marginRight: 16,
+    marginEnd: 16,
     alignItems: 'center',
   },
   itemImage: {
@@ -979,7 +986,7 @@ const styles = StyleSheet.create({
   },
   itemDetails: {
     flex: 1,
-    marginRight: 12,
+    marginEnd: 12,
   },
   itemRightActions: {
     alignItems: 'flex-end',
@@ -1154,11 +1161,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
     position: 'relative',
-    paddingRight: 40,
+    paddingEnd: 40,
   },
   footerChevronBtn: {
     position: 'absolute',
-    right: 0,
+    end: 0,
     top: 0,
     padding: 8,
     zIndex: 10,
@@ -1277,5 +1284,145 @@ const styles = StyleSheet.create({
   emirateShippingCost: {
     fontSize: 14,
     color: '#86868B',
+  },
+
+  // RTL Support Styles
+  itemDetailsRTL: {
+    alignItems: 'flex-end',
+  },
+  itemNameRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  itemCategoryRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  variantsContainerRTL: {
+    alignItems: 'flex-end',
+  },
+  variantTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  itemPriceContainerRTL: {
+    alignItems: 'flex-end',
+  },
+  itemOriginalPriceRTL: {
+    textAlign: 'right',
+  },
+  itemDiscountLabelRTL: {
+    textAlign: 'right',
+  },
+  itemBundleLabelRTL: {
+    textAlign: 'right',
+  },
+  itemDiscountedPriceRTL: {
+    textAlign: 'right',
+  },
+  promoTagRTL: {
+    textAlign: 'right',
+  },
+  itemPriceRTL: {
+    textAlign: 'right',
+  },
+  itemRightActionsRTL: {
+    alignItems: 'flex-start',
+  },
+  quantityContainerRTL: {
+    flexDirection: 'row-reverse',
+  },
+  quantityTextRTL: {
+    textAlign: 'center',
+  },
+  promoQtyRightRTL: {
+    textAlign: 'left',
+  },
+  promoItemPriceRightRTL: {
+    textAlign: 'left',
+  },
+  headerTopRTL: {
+    flexDirection: 'row-reverse',
+  },
+  backButtonRTL: {
+    flexDirection: 'row-reverse',
+  },
+  backTextRTL: {
+    textAlign: 'right',
+    marginLeft: 0,
+    marginRight: 8,
+  },
+  titleInlineRTL: {
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
+  clearButtonRTL: {
+    alignItems: 'flex-start',
+  },
+  clearTextRTL: {
+    textAlign: 'left',
+  },
+  sectionCardRTL: {
+    // Important: keep children stretched full-width; use per-row RTL styles instead.
+    alignItems: 'stretch',
+  },
+  sectionTitleRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  sectionTitleLeftRTL: {
+    flexDirection: 'row-reverse',
+  },
+  sectionTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    marginLeft: 0,
+    marginRight: 8,
+  },
+  sectionSubtleRTL: {
+    textAlign: 'left',
+  },
+  // Empty state RTL
+  emptyTitleRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
+  emptyTextRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
+  shopButtonTextRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
+  rewardRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  rewardImagesRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  rewardTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  // Footer RTL support
+  summaryRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  summaryLabelRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  summaryValueRTL: {
+    textAlign: 'left',
+  },
+  totalRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  totalLabelRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  totalAmountRTL: {
+    textAlign: 'left',
   },
 });

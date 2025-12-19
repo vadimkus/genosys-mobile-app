@@ -10,12 +10,18 @@ import {
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
+import {
+  getLocalizedProductName,
+  getLocalizedProductDescription,
+  getCategoryTranslationKey,
+} from '../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.8;
 
 export default function HeroCard({ product }) {
-  const { t } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
@@ -45,14 +51,24 @@ export default function HeroCard({ product }) {
       </View>
       
       <View style={styles.content}>
-        <Text style={styles.category} numberOfLines={1}>
-          {product.category}
+        <Text
+          style={[
+            styles.category,
+            isRTL && styles.textRTL,
+            locale === 'ar' && styles.categoryAr,
+          ]}
+          numberOfLines={1}
+        >
+          {(() => {
+            const key = getCategoryTranslationKey(product?.category);
+            return key ? t(key) : product?.category;
+          })()}
         </Text>
-        <Text style={styles.name} numberOfLines={2}>
-          {product.name}
+        <Text style={[styles.name, isRTL && styles.textRTL]} numberOfLines={2}>
+          {getLocalizedProductName(product, locale) || product?.name}
         </Text>
-        <Text style={styles.description} numberOfLines={3}>
-          {product.description}
+        <Text style={[styles.description, isRTL && styles.textRTL]} numberOfLines={3}>
+          {getLocalizedProductDescription(product, locale) || product?.localizedDescription || product?.description}
         </Text>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>
@@ -80,7 +96,7 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     backgroundColor: '#ffffff',
     borderRadius: 12,
-    marginRight: 16,
+    marginEnd: 16,
     borderWidth: 1,
     borderColor: '#E5E5EA',
     shadowColor: '#000',
@@ -129,6 +145,15 @@ const styles = StyleSheet.create({
     color: '#6E6E73',
     lineHeight: 22,
     marginBottom: 16,
+  },
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  categoryAr: {
+    // Avoid forced uppercase/letter spacing in Arabic.
+    textTransform: 'none',
+    letterSpacing: 0,
   },
   priceContainer: {
     flexDirection: 'row',

@@ -942,10 +942,17 @@
   },
   "authScreen": {
     "uaeLine": "United Arab Emirates",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "dontHaveAccount": "Don't have an account? ",
+    "alreadyHaveAccount": "Already have an account? ",
     "privacyNotice": "To continue, please accept our Privacy Policy below.",
     "loginWithBiometrics": "Login with {biometricType}",
     "continueWithGoogle": "Continue with Google",
     "continueWithApple": "Continue with Apple",
+    "googleShort": "Google",
+    "appleShort": "Apple",
     "or": "or",
     "fullNameLabel": "Full Name",
     "forgotPassword": "Forgot Password?",
@@ -1024,12 +1031,21 @@
         "privacyLabel": "Google Privacy:",
         "privacyPrefix": "Google's use of your information is governed by their privacy policy. You can review it at:"
       },
+      "apple": {
+        "title": "3. Apple Sign‑In",
+        "signInLabel": "Sign in with Apple:",
+        "signInText": "When you sign in with Apple, we may receive your name and email address (depending on what you choose to share). Apple may provide a private relay email address instead of your real email address.",
+        "sharedLabel": "Data Shared:",
+        "sharedText": "We use the information received from Apple to create or sign you into your account and to identify your account in our system. We do not receive your Apple ID password.",
+        "privacyLabel": "Apple Privacy:",
+        "privacyPrefix": "Apple's use of your information is governed by their privacy policy. You can review it at:"
+      },
       "genosys": {
         "title": "Genosys Privacy Policy",
         "prefix": "You can review the Genosys Privacy Policy here:"
       },
       "contact": {
-        "title": "3. Contact Us",
+        "title": "4. Contact Us",
         "text": "If you have any questions about this Privacy Policy or our data practices, please contact us:"
       }
     }

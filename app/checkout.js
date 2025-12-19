@@ -42,7 +42,8 @@ export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
   const { user } = useAuth();
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const scrollRef = useRef(null);
   const fieldLayoutsRef = useRef({});
   const sectionLayoutsRef = useRef({ delivery: 0, payment: 0, review: 0 });
@@ -543,21 +544,21 @@ export default function CheckoutScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity 
-          style={styles.backButton}
+          style={[styles.backButton, isRTL && styles.backButtonRTL]}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#007AFF" />
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>{t('checkout.title')}</Text>
-          <View style={styles.stepsRow}>
+          <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('checkout.title')}</Text>
+          <View style={[styles.stepsRow, isRTL && styles.stepsRowRTL]}>
             {(['delivery', 'payment', 'review']).map((k) => (
               <View key={k} style={styles.stepItem}>
-                <Text style={[styles.stepText, activeStep === k && styles.stepTextActive]}>
+                <Text style={[styles.stepText, isRTL && styles.textRTL, activeStep === k && styles.stepTextActive]}>
                   {k === 'delivery'
                     ? t('checkout.stepDelivery')
                     : k === 'payment'
@@ -621,16 +622,16 @@ export default function CheckoutScreen() {
 
           {/* Shipping Information */}
           <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
               <Ionicons name="location" size={20} color="#dc2626" />
-              <Text style={styles.sectionTitle}>{t('checkout.shippingInformation')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>
             </View>
 
-            <View style={styles.formRow}>
+            <View style={[styles.formRow, isRTL && styles.formRowRTL]}>
               <View style={styles.formHalf} onLayout={registerFieldLayout('firstName')}>
-                <Text style={styles.label}>{t('checkout.firstName')} *</Text>
+                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.firstName')} *</Text>
                 <TextInput
-                  style={[styles.input, showError('firstName') && styles.inputError]}
+                  style={[styles.input, isRTL && styles.inputRTL, showError('firstName') && styles.inputError]}
                   value={firstName}
                   onChangeText={setFirstName}
                   placeholder={t('checkout.enterFirstName')}
@@ -640,12 +641,12 @@ export default function CheckoutScreen() {
                   returnKeyType="next"
                   onSubmitEditing={() => lastNameRef.current?.focus?.()}
                 />
-                {showError('firstName') ? <Text style={styles.helperError}>{errors.firstName}</Text> : null}
+                {showError('firstName') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.firstName}</Text> : null}
               </View>
               <View style={styles.formHalf} onLayout={registerFieldLayout('lastName')}>
-                <Text style={styles.label}>{t('checkout.lastName')} *</Text>
+                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.lastName')} *</Text>
                 <TextInput
-                  style={[styles.input, showError('lastName') && styles.inputError]}
+                  style={[styles.input, isRTL && styles.inputRTL, showError('lastName') && styles.inputError]}
                   value={lastName}
                   onChangeText={setLastName}
                   placeholder={t('checkout.enterLastName')}
@@ -655,17 +656,19 @@ export default function CheckoutScreen() {
                   returnKeyType="next"
                   onSubmitEditing={() => emailRef.current?.focus?.()}
                 />
-                {showError('lastName') ? <Text style={styles.helperError}>{errors.lastName}</Text> : null}
+                {showError('lastName') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.lastName}</Text> : null}
               </View>
             </View>
 
             <View style={styles.formGroup} onLayout={registerFieldLayout('email')}>
-              <Text style={styles.label}>{t('checkout.emailAddress')} *</Text>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.emailAddress')} *</Text>
               <View style={styles.inputWrap}>
                 <TextInput
                   style={[
                     styles.input,
                     styles.inputWithRightIcon,
+                    isRTL && styles.inputRTL,
+                    isRTL && styles.inputValueLTR,
                     showError('email') && styles.inputError,
                   ]}
                   value={email}
@@ -684,12 +687,12 @@ export default function CheckoutScreen() {
                   </View>
                 ) : null}
               </View>
-              {showError('email') ? <Text style={styles.helperError}>{errors.email}</Text> : null}
+              {showError('email') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.email}</Text> : null}
             </View>
 
             <View style={styles.formGroup} onLayout={registerFieldLayout('phone')}>
-              <Text style={styles.label}>{t('checkout.phoneNumber')} *</Text>
-              <View style={styles.phoneRow}>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.phoneNumber')} *</Text>
+              <View style={[styles.phoneRow, isRTL && styles.phoneRowRTL]}>
                 <View style={styles.phonePrefix}>
                   <Text style={styles.phonePrefixText}>+971</Text>
                 </View>
@@ -698,6 +701,8 @@ export default function CheckoutScreen() {
                     style={[
                       styles.input,
                       styles.inputWithRightIcon,
+                      isRTL && styles.inputRTL,
+                      isRTL && styles.inputValueLTR,
                       showError('phone') && styles.inputError,
                     ]}
                     value={formatUaeNationalForInput(phoneNational)}
@@ -716,13 +721,13 @@ export default function CheckoutScreen() {
                   ) : null}
                 </View>
               </View>
-              {showError('phone') ? <Text style={styles.helperError}>{errors.phone}</Text> : null}
+              {showError('phone') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.phone}</Text> : null}
             </View>
 
             <View style={styles.formGroup} onLayout={registerFieldLayout('address')}>
-              <Text style={styles.label}>{t('checkout.deliveryAddress')} *</Text>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.deliveryAddress')} *</Text>
               <TextInput
-                style={[styles.input, styles.textArea, showError('address') && styles.inputError]}
+                style={[styles.input, styles.textArea, isRTL && styles.inputRTL, showError('address') && styles.inputError]}
                 value={address}
                 onChangeText={setAddress}
                 placeholder={t('checkout.enterAddress')}
@@ -732,12 +737,12 @@ export default function CheckoutScreen() {
                 onBlur={() => setTouched((p) => ({ ...p, address: true }))}
                 ref={addressRef}
               />
-              {showError('address') ? <Text style={styles.helperError}>{errors.address}</Text> : null}
+              {showError('address') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.address}</Text> : null}
 
               <View style={styles.landmarkWrap}>
-                <Text style={styles.label}>{t('checkout.landmarkOptional')}</Text>
+                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.landmarkOptional')}</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, isRTL && styles.inputRTL]}
                   value={landmark}
                   onChangeText={setLandmark}
                   placeholder={t('checkout.landmarkPlaceholder')}
@@ -747,9 +752,9 @@ export default function CheckoutScreen() {
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>{t('checkout.emirate')} *</Text>
-              <Text style={styles.deliveryEtaHint}>{deliveryEtaText}</Text>
-              <View style={styles.emirateGrid}>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.emirate')} *</Text>
+              <Text style={[styles.deliveryEtaHint, isRTL && styles.textRTL]}>{deliveryEtaText}</Text>
+              <View style={[styles.emirateGrid, isRTL && styles.emirateGridRTL]}>
                 {getAvailableEmirates().map((emirate) => (
                   <TouchableOpacity
                     key={emirate.name}
@@ -762,14 +767,15 @@ export default function CheckoutScreen() {
                       setSelectedEmirate(emirate.name);
                     }}
                   >
-                    <View style={styles.emirateTopRow}>
-                      <View style={styles.emirateTopLeft}>
+                    <View style={[styles.emirateTopRow, isRTL && styles.rowRTL]}>
+                      <View style={[styles.emirateTopLeft, isRTL && styles.emirateTopLeftRTL]}>
                         <EmirateFlagIcon name={emirate.name} />
                         <Text
                           numberOfLines={1}
                           ellipsizeMode="tail"
                           style={[
                             styles.emirateText,
+                            isRTL && styles.textRTL,
                             selectedEmirate === emirate.name && styles.emirateTextSelected,
                           ]}
                         >
@@ -780,13 +786,13 @@ export default function CheckoutScreen() {
                         <Ionicons name="checkmark" size={16} color="#dc2626" />
                       ) : null}
                     </View>
-                    <View style={styles.emirateBottomRow}>
+                    <View style={[styles.emirateBottomRow, isRTL && styles.emirateBottomRowRTL]}>
                       {(!!totals?.hasFreeShipping || Number(emirate.shippingCost) === 0) ? (
                         <View style={styles.freeBadge}>
-                          <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
+                          <Text style={[styles.freeBadgeText, isRTL && styles.textRTL]}>{t('common.free')}</Text>
                         </View>
                       ) : (
-                        <Text style={styles.emirateShipping}>AED {emirate.shippingCost}</Text>
+                        <Text style={[styles.emirateShipping, isRTL && styles.textRTL]}>AED {emirate.shippingCost}</Text>
                       )}
                     </View>
                   </TouchableOpacity>
@@ -797,12 +803,12 @@ export default function CheckoutScreen() {
 
           {/* Payment Method */}
           <View style={styles.section} onLayout={registerSectionLayout('payment')}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
               <Ionicons name="card" size={20} color="#27AE60" />
-              <Text style={styles.sectionTitle}>{t('checkout.paymentMethod')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.paymentMethod')}</Text>
             </View>
 
-            <Text style={styles.paymentHint}>
+            <Text style={[styles.paymentHint, isRTL && styles.textRTL]}>
               {t('checkout.defaultPaymentMethod')}:{' '}
               <Text style={styles.paymentHintStrong}>
                 {selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY
@@ -822,15 +828,15 @@ export default function CheckoutScreen() {
                 ]}
                 onPress={() => selectPaymentMethod(PAYMENT_METHODS.COD)}
               >
-                <View style={styles.paymentOptionHeader}>
+                <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
                   <Ionicons 
                     name={selectedPaymentMethod === PAYMENT_METHODS.COD ? "radio-button-on" : "radio-button-off"} 
                     size={20} 
                     color={selectedPaymentMethod === PAYMENT_METHODS.COD ? "#dc2626" : "#C7C7CC"} 
                   />
-                  <Text style={styles.paymentTitle}>{t('checkout.cashOnDelivery')}</Text>
+                  <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('checkout.cashOnDelivery')}</Text>
                 </View>
-                <Text style={styles.paymentDescription}>{t('checkout.payWhenDelivered')}</Text>
+                <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>{t('checkout.payWhenDelivered')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -840,15 +846,15 @@ export default function CheckoutScreen() {
                 ]}
                 onPress={() => selectPaymentMethod(PAYMENT_METHODS.CARD)}
               >
-                <View style={styles.paymentOptionHeader}>
+                <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
                   <Ionicons 
                     name={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "radio-button-on" : "radio-button-off"} 
                     size={20} 
                     color={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "#dc2626" : "#C7C7CC"} 
                   />
-                  <Text style={styles.paymentTitle}>{t('checkout.cardPayment')}</Text>
+                  <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('checkout.cardPayment')}</Text>
                 </View>
-                <Text style={styles.paymentDescription}>{t('checkout.paySecurelyStripe')}</Text>
+                <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>{t('checkout.paySecurelyStripe')}</Text>
               </TouchableOpacity>
 
               {Platform.OS === 'ios' ? (
@@ -860,16 +866,16 @@ export default function CheckoutScreen() {
                   ]}
                   onPress={() => selectPaymentMethod(PAYMENT_METHODS.APPLE_PAY)}
                 >
-                  <View style={styles.paymentOptionHeader}>
+                  <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
                     <Ionicons
                       name={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "radio-button-on" : "radio-button-off"}
                       size={20}
                       color={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "#dc2626" : "#C7C7CC"}
                     />
-                    <Ionicons name="logo-apple" size={18} color="#000000" style={{ marginLeft: 8, marginRight: 6 }} />
-                    <Text style={styles.paymentTitle}>{t('applePay.applePay')}</Text>
+                    <Ionicons name="logo-apple" size={18} color="#000000" style={{ marginStart: 8, marginEnd: 6 }} />
+                    <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('applePay.applePay')}</Text>
                   </View>
-                  <Text style={styles.paymentDescription}>
+                  <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>
                     {!applePayConfigured
                       ? t('applePay.notConfiguredShort')
                       : (applePaySupported ? t('applePay.subtitle') : t('applePay.tryShort'))}
@@ -878,18 +884,18 @@ export default function CheckoutScreen() {
               ) : null}
             </View>
 
-            <View style={styles.trustRow}>
+            <View style={[styles.trustRow, isRTL && styles.rowRTL]}>
               <Ionicons name="lock-closed" size={14} color="#6B7280" />
-              <Text style={styles.trustText}>{t('checkout.trustStripe')}</Text>
+              <Text style={[styles.trustText, isRTL && styles.textRTL]}>{t('checkout.trustStripe')}</Text>
             </View>
-            <Text style={styles.trustTextSecondary}>{t('checkout.trustStripeSecondary')}</Text>
+            <Text style={[styles.trustTextSecondary, isRTL && styles.trustTextSecondaryRTL]}>{t('checkout.trustStripeSecondary')}</Text>
           </View>
 
           {/* Order Notes */}
           <View style={styles.section}>
-            <Text style={styles.label}>{t('checkout.orderNotesOptional')}</Text>
+            <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.orderNotesOptional')}</Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.input, styles.textArea, isRTL && styles.inputRTL]}
               value={orderNotes}
               onChangeText={setOrderNotes}
               placeholder={t('checkout.orderNotesPlaceholder')}
@@ -901,36 +907,36 @@ export default function CheckoutScreen() {
 
           {/* Order Summary */}
           <View style={styles.section} onLayout={registerSectionLayout('review')}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
               <Ionicons name="receipt" size={20} color="#007AFF" />
-              <Text style={styles.sectionTitle}>{t('checkout.orderSummary')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.orderSummary')}</Text>
             </View>
 
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>
+            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
                 {t('checkout.subtotal')} ({t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })})
               </Text>
-              <Text style={styles.summaryValue}>AED {safeSubtotal.toFixed(2)}</Text>
+              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeSubtotal.toFixed(2)}</Text>
             </View>
 
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>
+            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
                 {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
               </Text>
-              <Text style={styles.summaryValue}>
+              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>
                 {safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}
               </Text>
             </View>
 
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>{t('checkout.vatIncluded')}</Text>
-              <Text style={styles.summaryValue}>AED {safeVat.toFixed(2)}</Text>
+            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('checkout.vatIncluded')}</Text>
+              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeVat.toFixed(2)}</Text>
             </View>
 
             {totals.subtotal >= 1000 && (
-              <View style={styles.freeShippingBanner}>
+              <View style={[styles.freeShippingBanner, isRTL && styles.rowRTL]}>
                 <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-                <Text style={styles.freeShippingText}>{t('checkout.freeShippingApplied')}</Text>
+                <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>{t('checkout.freeShippingApplied')}</Text>
               </View>
             )}
 
@@ -939,19 +945,19 @@ export default function CheckoutScreen() {
               if (!freeMaskCount) return null;
               const msg = freeMaskCount >= 2 ? t('bag.promoApplied2') : t('bag.promoApplied1');
               return (
-                <View style={styles.freeShippingBanner}>
+                <View style={[styles.freeShippingBanner, isRTL && styles.rowRTL]}>
                   <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-                  <Text style={styles.freeShippingText}>{msg}</Text>
+                  <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>{msg}</Text>
                 </View>
               );
             })()}
 
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>{t('checkout.total')}</Text>
-              <Text style={styles.totalValue}>AED {safeTotal.toFixed(2)}</Text>
+            <View style={[styles.totalRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.totalLabel, isRTL && styles.textRTL]}>{t('checkout.total')}</Text>
+              <Text style={[styles.totalValue, isRTL && styles.summaryValueRTL]}>AED {safeTotal.toFixed(2)}</Text>
             </View>
 
-            <Text style={styles.vatNote}>*{t('checkout.allPricesVatInclusive')}</Text>
+            <Text style={[styles.vatNote, isRTL && styles.textRTL]}>*{t('checkout.allPricesVatInclusive')}</Text>
           </View>
 
         </View>
@@ -970,9 +976,9 @@ export default function CheckoutScreen() {
         chevronButtonStyle={styles.footerChevronBtn}
         contentStyle={[styles.footerContent, !footerCollapsed && styles.footerContentExpanded]}
         details={
-          <View style={styles.footerDetails}>
+          <View style={[styles.footerDetails, isRTL && styles.footerDetailsRTL]}>
             <View style={styles.reviewRow}>
-              <Text style={styles.reviewText} numberOfLines={2} ellipsizeMode="tail">
+              <Text style={[styles.reviewText, isRTL && styles.textRTL]} numberOfLines={2} ellipsizeMode="tail">
                 {t('checkout.reviewLine', {
                   emirate: selectedEmirate,
                   payment:
@@ -988,16 +994,16 @@ export default function CheckoutScreen() {
 
             <View style={styles.stickySummaryRow}>
               <View style={styles.stickySummaryLeft}>
-                <View style={styles.etaPill}>
+                <View style={[styles.etaPill, isRTL && styles.rowRTL]}>
                   <Ionicons name="time-outline" size={14} color="#6B7280" />
-                  <Text style={styles.etaPillText} numberOfLines={1} ellipsizeMode="tail">
+                  <Text style={[styles.etaPillText, isRTL && styles.textRTL]} numberOfLines={1} ellipsizeMode="tail">
                     {deliveryEtaText}
                   </Text>
                 </View>
                 {savingsAED > 0.5 ? (
-                  <View style={styles.savingsPill}>
+                  <View style={[styles.savingsPill, isRTL && styles.rowRTL]}>
                     <Ionicons name="pricetag-outline" size={14} color="#16A34A" />
-                    <Text style={styles.savingsPillText}>
+                    <Text style={[styles.savingsPillText, isRTL && styles.textRTL]}>
                       {t('checkout.youSave')} AED {savingsAED.toFixed(2)}
                     </Text>
                   </View>
@@ -1015,6 +1021,7 @@ export default function CheckoutScreen() {
               style={[
                 styles.placeOrderButton,
                 footerCollapsed && styles.placeOrderButtonCollapsed,
+                isRTL && styles.placeOrderButtonRTL,
               ]}
             />
           ) : (
@@ -1023,6 +1030,7 @@ export default function CheckoutScreen() {
                 styles.placeOrderButton,
                 footerCollapsed && styles.placeOrderButtonCollapsed,
                 isProcessing && styles.placeOrderButtonDisabled,
+                isRTL && styles.placeOrderButtonRTL,
               ]}
               onPress={handleSubmit}
               disabled={isProcessing}
@@ -1032,7 +1040,7 @@ export default function CheckoutScreen() {
               ) : (
                 <Ionicons name="bag-check" size={20} color="#ffffff" />
               )}
-              <Text style={styles.placeOrderButtonText}>
+              <Text style={[styles.placeOrderButtonText, isRTL && styles.placeOrderButtonTextRTL]}>
                 {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
               </Text>
             </TouchableOpacity>
@@ -1057,12 +1065,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#E5E5EA',
   },
+  headerRTL: {
+    flexDirection: 'row-reverse',
+  },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'flex-start',
+  },
+  backButtonRTL: {
+    alignItems: 'flex-end',
   },
   headerTitle: {
     fontSize: 18,
@@ -1088,6 +1102,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
     gap: 14,
+  },
+  stepsRowRTL: {
+    flexDirection: 'row-reverse',
   },
   stepItem: {
     alignItems: 'center',
@@ -1140,9 +1157,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  orderHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
   orderHeaderLeft: {
     flex: 1,
-    paddingRight: 12,
+    paddingEnd: 12,
+  },
+  orderHeaderLeftRTL: {
+    alignItems: 'flex-end',
   },
   orderNumber: {
     fontSize: 18,
@@ -1192,6 +1215,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
   },
+  orderTotalsRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   orderTotalsLabel: {
     fontSize: 12,
     color: '#3C3C43',
@@ -1228,6 +1254,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     gap: 8,
   },
+  sectionHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
@@ -1239,6 +1268,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginBottom: 16,
+  },
+  formRowRTL: {
+    flexDirection: 'row-reverse',
   },
   formHalf: {
     flex: 1,
@@ -1273,6 +1305,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
+  phoneRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   phonePrefix: {
     height: 48,
     paddingHorizontal: 12,
@@ -1292,11 +1327,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   inputWithRightIcon: {
-    paddingRight: 44,
+    paddingEnd: 44,
   },
   inputRightIcon: {
     position: 'absolute',
-    right: 12,
+    end: 12,
     top: 0,
     bottom: 0,
     justifyContent: 'center',
@@ -1311,6 +1346,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#dc2626',
     fontWeight: '600',
+  },
+  helperErrorRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  inputRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  // For values that should remain LTR even in Arabic UI (emails, phone numbers)
+  inputValueLTR: {
+    writingDirection: 'ltr',
   },
   textArea: {
     minHeight: 80,
@@ -1363,6 +1410,9 @@ const styles = StyleSheet.create({
     gap: 8,
     justifyContent: 'space-between',
   },
+  emirateGridRTL: {
+    flexDirection: 'row-reverse',
+  },
   emirateTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1373,7 +1423,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     flex: 1,
-    paddingRight: 8,
+    paddingEnd: 8,
+  },
+  emirateTopLeftRTL: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-end',
   },
   emirateOption: {
     width: '48%',
@@ -1400,6 +1454,9 @@ const styles = StyleSheet.create({
   emirateBottomRow: {
     marginTop: 6,
     alignItems: 'flex-end',
+  },
+  emirateBottomRowRTL: {
+    alignItems: 'flex-start',
   },
   emirateShipping: {
     fontSize: 12,
@@ -1461,6 +1518,12 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     marginLeft: 32,
   },
+  paymentDescriptionRTL: {
+    marginLeft: 0,
+    marginRight: 32,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
   paymentHint: {
     fontSize: 12,
     color: '#6B7280',
@@ -1490,6 +1553,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 22,
   },
+  trustTextSecondaryRTL: {
+    marginLeft: 0,
+    marginRight: 22,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
 
   // Summary
   summaryRow: {
@@ -1497,6 +1566,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  summaryRowRTL: {
+    flexDirection: 'row-reverse',
   },
   summaryLabel: {
     fontSize: 14,
@@ -1506,6 +1578,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#1D1D1F',
+  },
+  summaryValueRTL: {
+    textAlign: 'left',
   },
   freeShippingBanner: {
     flexDirection: 'row',
@@ -1568,7 +1643,7 @@ const styles = StyleSheet.create({
   },
   footerContent: {
     // Default: no right padding when collapsed
-    paddingRight: 0,
+    paddingEnd: 0,
     // Reserve vertical space for the absolutely-positioned chevron so it doesn't overlap the CTA.
     // When collapsed, `details` is not rendered and the chevron is position:absolute, so without this
     // the content area has ~0 height and the chevron sits on top of the Place Order button.
@@ -1576,14 +1651,14 @@ const styles = StyleSheet.create({
   },
   footerContentExpanded: {
     // When expanded: add whitespace for chevron on right
-    paddingRight: 48, // Generous space for chevron (20px icon + 28px buffer)
+    paddingEnd: 48, // Generous space for chevron (20px icon + 28px buffer)
   },
   footerDetails: {
     position: 'relative',
   },
   footerChevronBtn: {
     position: 'absolute',
-    right: 0, // Chevron on RIGHT side
+    end: 0, // Chevron on END side (auto-mirrors in RTL)
     top: 0, // Align with top
     padding: 8,
     zIndex: 10,
@@ -1672,6 +1747,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
+  },
+  // RTL support (footer)
+  footerDetailsRTL: {
+    alignItems: 'flex-end',
+  },
+  rowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  placeOrderButtonRTL: {
+    flexDirection: 'row-reverse',
+  },
+  placeOrderButtonTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
 });
 

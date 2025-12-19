@@ -2,8 +2,8 @@ import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
 import { useCart } from '../../contexts/CartContext';
+import { useOrders } from '../../contexts/OrdersContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 
 function TabBarBadge({ count, color }) {
@@ -18,53 +18,19 @@ function TabBarBadge({ count, color }) {
 
 export default function TabLayout() {
   const { getTotalItems } = useCart();
+  const { ordersCount } = useOrders();
   const cartCount = getTotalItems();
-  const { t } = useLocalization();
-  const isExpoGo = Constants.appOwnership === 'expo';
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
-  // Lazy-load SF Symbols module so Expo Go doesn't try to import a native module it doesn't have.
-  const canUseSFSymbols = Platform.OS === 'ios' && !isExpoGo;
-  const [SFSymbolComponent, setSFSymbolComponent] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!canUseSFSymbols) return;
-
-    (async () => {
-      try {
-        const mod = await import('react-native-sfsymbols');
-        if (!cancelled) setSFSymbolComponent(() => mod?.SFSymbol || null);
-      } catch {
-        // If module isn't available, silently fall back to Ionicons.
-        if (!cancelled) setSFSymbolComponent(null);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [canUseSFSymbols]);
-
+  // Always use Ionicons for tab icons.
+  // This avoids device/build-specific SF Symbols rendering issues that can appear as "triangles".
   const TabIcon = useMemo(
     () =>
-      ({ iosName, androidActiveName, androidInactiveName, color, size, focused }) => {
-        if (canUseSFSymbols && SFSymbolComponent) {
-          const name = focused ? `${iosName}.fill` : iosName;
-          const SFSymbol = SFSymbolComponent;
-          return (
-            <SFSymbol
-              name={name}
-              color={color}
-              size={size}
-              weight="semibold"
-              scale="medium"
-              style={{ width: size, height: size }}
-            />
-          );
-        }
+      ({ androidActiveName, androidInactiveName, color, size, focused }) => {
         return <Ionicons name={focused ? androidActiveName : androidInactiveName} size={size} color={color} />;
       },
-    [SFSymbolComponent, canUseSFSymbols]
+    []
   );
 
   return (
@@ -72,23 +38,28 @@ export default function TabLayout() {
       initialRouteName="shop"
       screenOptions={{
         headerShown: false,
-        tabBarStyle: Platform.OS === 'ios' ? {
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          elevation: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderTopWidth: 0.5,
-          borderTopColor: 'rgba(0, 0, 0, 0.1)',
-          height: 88,
-          paddingTop: 8,
-          paddingBottom: 34, // Safe area for home indicator
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-        } : styles.androidTabBar,
+        tabBarStyle: [
+          Platform.OS === 'ios'
+            ? {
+                position: 'absolute',
+                bottom: 0,
+                start: 0,
+                end: 0,
+                elevation: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderTopWidth: 0.5,
+                borderTopColor: 'rgba(0, 0, 0, 0.1)',
+                height: 88,
+                paddingTop: 8,
+                paddingBottom: 34, // Safe area for home indicator
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: -2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+              }
+            : styles.androidTabBar,
+          isRTL && { flexDirection: 'row-reverse' },
+        ],
         tabBarActiveTintColor: '#dc2626',
         tabBarInactiveTintColor: '#8E8E93',
         tabBarLabelStyle: {
@@ -102,9 +73,9 @@ export default function TabLayout() {
         name="shop"
         options={{
           title: t('tabs.home'),
+          tabBarLabel: t('tabs.home'),
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon
-              iosName="house"
               androidActiveName="home"
               androidInactiveName="home-outline"
               color={color}
@@ -118,36 +89,47 @@ export default function TabLayout() {
         name="orders"
         options={{
           title: t('tabs.orders'),
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon
-              iosName="receipt"
-              androidActiveName="receipt"
-              androidInactiveName="receipt-outline"
-              color={color}
-              size={size}
-              focused={focused}
-            />
-          ),
+          tabBarLabel: t('tabs.orders'),
+          tabBarIcon: ({ color, size, focused }) => {
+            // Change orders icon color to green when there are orders
+            const ordersColor = ordersCount > 0 ? '#10b981' : color; // green-500 when orders exist
+            return (
+              <View>
+                <TabIcon
+                  androidActiveName="list"
+                  androidInactiveName="list-outline"
+                  color={ordersColor}
+                  size={size}
+                  focused={focused}
+                />
+                <TabBarBadge count={ordersCount} color="#dc2626" />
+              </View>
+            );
+          },
         }}
       />
       <Tabs.Screen
         name="bag"
         options={{
           title: t('tabs.bag'),
+          tabBarLabel: t('tabs.bag'),
           tabBarStyle: { display: 'none' }, // Hide tab bar on bag page
-          tabBarIcon: ({ color, size, focused }) => (
-            <View>
-              <TabIcon
-                iosName="bag"
-                androidActiveName="bag-handle"
-                androidInactiveName="bag-handle-outline"
-                color={color}
-                size={size}
-                focused={focused}
-              />
-              <TabBarBadge count={cartCount} color="#dc2626" />
-            </View>
-          ),
+          tabBarIcon: ({ color, size, focused }) => {
+            // Change bag icon color to green when cart has items
+            const bagColor = cartCount > 0 ? '#10b981' : color; // green-500 when cart has items
+            return (
+              <View>
+                <TabIcon
+                  androidActiveName="bag"
+                  androidInactiveName="bag-outline"
+                  color={bagColor}
+                  size={size}
+                  focused={focused}
+                />
+                <TabBarBadge count={cartCount} color="#dc2626" />
+              </View>
+            );
+          },
         }}
       />
     </Tabs>
@@ -170,7 +152,7 @@ const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
     top: -6,
-    right: -6,
+    end: -6,
     minWidth: 18,
     height: 18,
     borderRadius: 9,

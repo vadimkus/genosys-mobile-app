@@ -942,10 +942,17 @@
   },
   "authScreen": {
     "uaeLine": "الإمارات العربية المتحدة",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "createAccount": "إنشاء حساب",
+    "dontHaveAccount": "ليس لديك حساب؟ ",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟ ",
     "privacyNotice": "للمتابعة، يرجى الموافقة على سياسة الخصوصية أدناه.",
     "loginWithBiometrics": "تسجيل الدخول باستخدام {biometricType}",
     "continueWithGoogle": "المتابعة مع Google",
     "continueWithApple": "المتابعة مع Apple",
+    "googleShort": "جوجل",
+    "appleShort": "أبل",
     "or": "أو",
     "fullNameLabel": "الاسم الكامل",
     "forgotPassword": "هل نسيت كلمة المرور؟",
@@ -1024,12 +1031,21 @@
         "privacyLabel": "خصوصية Google:",
         "privacyPrefix": "يخضع استخدام Google لمعلوماتك لسياسة الخصوصية الخاصة بهم. يمكنك مراجعتها هنا:"
       },
+      "apple": {
+        "title": "3. تسجيل الدخول عبر Apple",
+        "signInLabel": "Sign in with Apple:",
+        "signInText": "عند تسجيل الدخول عبر Apple، قد نستلم اسمك وعنوان بريدك الإلكتروني (حسب ما تختار مشاركته). وقد توفّر Apple بريدًا إلكترونيًا خاصًا (Private Relay) بدلًا من بريدك الحقيقي.",
+        "sharedLabel": "البيانات التي تتم مشاركتها:",
+        "sharedText": "نستخدم المعلومات المستلمة من Apple لإنشاء حسابك أو تسجيل الدخول إليه وللتعرّف على حسابك في نظامنا. لا نستلم كلمة مرور Apple ID الخاصة بك.",
+        "privacyLabel": "خصوصية Apple:",
+        "privacyPrefix": "يخضع استخدام Apple لمعلوماتك لسياسة الخصوصية الخاصة بهم. يمكنك مراجعتها هنا:"
+      },
       "genosys": {
         "title": "سياسة الخصوصية الخاصة بـ Genosys",
         "prefix": "يمكنك مراجعة سياسة الخصوصية الخاصة بـ Genosys هنا:"
       },
       "contact": {
-        "title": "3. تواصل معنا",
+        "title": "4. تواصل معنا",
         "text": "إذا كانت لديك أي أسئلة حول سياسة الخصوصية أو ممارسات البيانات لدينا، يرجى التواصل معنا:"
       }
     }

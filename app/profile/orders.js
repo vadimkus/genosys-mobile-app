@@ -4,6 +4,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOrders } from '../../contexts/OrdersContext';
 import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../services/orderService';
 import { useLocalization } from '../../contexts/LocalizationContext';
@@ -12,6 +13,18 @@ import { formatEmirateLabel } from '../../utils/emirateUtils';
 const formatAED = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num.toFixed(2) : '0.00';
+};
+
+const isUserDiscountExcludedOrderItemName = (nameRaw) => {
+  const name = String(nameRaw || '').trim().toLowerCase();
+  if (!name) return false;
+  // Beauty Boxes (bundles already discounted)
+  if (name.includes('beauty box') || name.includes('beautybox')) return true;
+  // Hydro Cool Modelling Mask
+  if (name.includes('hydro') && name.includes('cool') && name.includes('mask')) return true;
+  // Devices (fallback by name)
+  if (name.includes('genoled') || name.includes('gentron') || name.includes('hairgen')) return true;
+  return false;
 };
 
 const formatDate = (value) => {
@@ -119,8 +132,10 @@ const isDeletableByUser = (order) => {
 export default function OrdersScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { refreshOrdersCount } = useOrders();
   const token = user?.token || user?.accessToken || '';
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
 
   const [loading, setLoading] = useState(true);
@@ -152,6 +167,8 @@ export default function OrdersScreen() {
       });
       const data = deduped;
       setOrders(Array.isArray(data) ? data : []);
+      // Refresh the orders count in the tab bar
+      refreshOrdersCount();
     } catch (e) {
       setError(e?.message || 'Failed to load orders');
     }
@@ -291,6 +308,8 @@ export default function OrdersScreen() {
               await deleteUserOrder(token, orderId);
               setOrders((prev) => prev.filter((o) => String(o?.id || o?.orderId || '') !== orderId));
               setExpandedOrderKey((prev) => (prev === orderId ? '' : prev));
+              // Refresh the orders count in the tab bar
+              refreshOrdersCount();
             } catch (e) {
               Alert.alert(t('ordersScreen.deleteFailedTitle'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
             }
@@ -308,16 +327,16 @@ export default function OrdersScreen() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#dc2626" />
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <TouchableOpacity onPress={() => router.replace('/(tabs)/shop')} style={styles.backButton}>
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('orders.title')}</Text>
+          <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
           <View style={styles.headerSpacer} />
         </View>
-        <View style={styles.center}>
-          <Text style={styles.emptyTitle}>{t('ordersScreen.loginRequired')}</Text>
-          <Text style={styles.emptyText}>{t('ordersScreen.loginRequiredText')}</Text>
+        <View style={[styles.center, isRTL && styles.centerRTL]}>
+          <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.loginRequired')}</Text>
+          <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.loginRequiredText')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -325,11 +344,11 @@ export default function OrdersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/shop')} style={styles.backButton}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('orders.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
         <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
           <Ionicons name="refresh" size={20} color="#8E8E93" />
         </TouchableOpacity>
@@ -342,19 +361,19 @@ export default function OrdersScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#dc2626" />}
       >
         {loading ? (
-          <View style={styles.center}>
+          <View style={[styles.center, isRTL && styles.centerRTL]}>
             <ActivityIndicator size="large" color="#dc2626" />
-            <Text style={styles.loadingText}>{t('ordersScreen.loading')}</Text>
+            <Text style={[styles.loadingText, isRTL && styles.textRTLRight]}>{t('ordersScreen.loading')}</Text>
           </View>
         ) : error ? (
-          <View style={styles.center}>
-            <Text style={styles.emptyTitle}>{t('ordersScreen.couldNotLoad')}</Text>
-            <Text style={styles.emptyText}>{error}</Text>
+          <View style={[styles.center, isRTL && styles.centerRTL]}>
+            <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.couldNotLoad')}</Text>
+            <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{error}</Text>
           </View>
         ) : sortedOrders.length === 0 ? (
-          <View style={styles.center}>
-            <Text style={styles.emptyTitle}>{t('ordersScreen.noOrdersYet')}</Text>
-            <Text style={styles.emptyText}>{t('ordersScreen.noOrdersHint')}</Text>
+          <View style={[styles.center, isRTL && styles.centerRTL]}>
+            <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersYet')}</Text>
+            <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersHint')}</Text>
           </View>
         ) : (
           <View style={styles.list}>
@@ -383,13 +402,13 @@ export default function OrdersScreen() {
               const discountPct = Number(user?.discountPercentage);
               return (
                 <View key={String(o.id || orderNumber)} style={styles.card}>
-                  <View style={styles.cardTop}>
+                  <View style={[styles.cardTop, isRTL && styles.cardTopRTL]}>
                     <TouchableOpacity
-                      style={styles.orderToggle}
+                      style={[styles.orderToggle, isRTL && styles.orderToggleRTL]}
                       onPress={() => toggleExpanded(keyId)}
                       activeOpacity={0.85}
                     >
-                      <Text style={styles.orderNumber}>
+                      <Text style={[styles.orderNumber, isRTL && styles.textRTLRight]}>
                         {t('ordersScreen.orderLabel')}: {String(orderNumber)}
                       </Text>
                       <Ionicons
@@ -399,14 +418,14 @@ export default function OrdersScreen() {
                       />
                     </TouchableOpacity>
 
-                    <View style={styles.detailsActions}>
+                    <View style={[styles.detailsActions, isRTL && styles.detailsActionsRTL]}>
                       <TouchableOpacity
                         onPress={() => router.push({ pathname: '/profile/orders/[id]', params: { id: String(o.id || orderNumber) } })}
                         activeOpacity={0.85}
-                        style={styles.detailsPill}
+                        style={[styles.detailsPill, isRTL && styles.detailsPillRTL]}
                       >
-                        <Text style={styles.detailsPillText}>{t('ordersScreen.details')}</Text>
-                        <Ionicons name="chevron-forward" size={14} color="#8E8E93" />
+                        <Text style={[styles.detailsPillText, isRTL && styles.textRTLRight]}>{t('ordersScreen.details')}</Text>
+                        <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={14} color="#8E8E93" />
                       </TouchableOpacity>
                       <TouchableOpacity
                         // Safer UX: delete is long-press only to prevent accidental taps.
@@ -421,7 +440,7 @@ export default function OrdersScreen() {
                     </View>
                   </View>
 
-                  <View style={styles.statusRow}>
+                  <View style={[styles.statusRow, isRTL && styles.statusRowRTL]}>
                     <View style={[styles.statusPill, { backgroundColor: statusColor(status) + '20' }]}>
                       <Text style={[styles.statusText, { color: statusColor(status) }]}>
                         {formatStatusLabel(t, status)}
@@ -429,38 +448,38 @@ export default function OrdersScreen() {
                     </View>
                   </View>
 
-                  <View style={styles.metaRow}>
-                    <Text style={styles.metaText}>
+                  <View style={[styles.metaRow, isRTL && styles.metaRowRTL]}>
+                    <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>
                       {formatDate(createdAt)}
                       {emirate ? ` • ${formatEmirateLabel(t, emirate)}` : ''}
                     </Text>
-                    <View style={styles.metaRight}>
+                    <View style={[styles.metaRight, isRTL && styles.metaRightRTL]}>
                       {isApplePayLike(o) ? (
                         <>
-                          <Ionicons name="logo-apple" size={14} color="#111827" style={{ marginRight: 4 }} />
-                          <Text style={styles.metaText}>{t('ordersDetail.paymentMethodApplePay')}</Text>
+                          <Ionicons name="logo-apple" size={14} color="#111827" style={styles.appleLogo} />
+                          <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>{t('ordersDetail.paymentMethodApplePay')}</Text>
                         </>
                       ) : paymentMethod ? (
-                        <Text style={styles.metaText}>{String(paymentMethod).toUpperCase()}</Text>
+                        <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>{String(paymentMethod).toUpperCase()}</Text>
                       ) : null}
-                      {paymentStatus ? <Text style={styles.metaText}> • {formatStatusLabel(t, paymentStatus)}</Text> : null}
+                      {paymentStatus ? <Text style={[styles.metaText, isRTL && styles.textRTLRight]}> • {formatStatusLabel(t, paymentStatus)}</Text> : null}
                     </View>
                   </View>
-                  <View style={styles.cardBottom}>
-                    <Text style={styles.totalText}>AED {formatAED(total)}</Text>
-                    <Text style={styles.itemsText}>
+                  <View style={[styles.cardBottom, isRTL && styles.cardBottomRTL]}>
+                    <Text style={[styles.totalText, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
+                    <Text style={[styles.itemsText, isRTL && styles.textRTLRight]}>
                       {t('ordersScreen.itemsCount', { count: itemCount })}
                     </Text>
                   </View>
-                  <View style={styles.breakdownRow}>
-                    <Text style={styles.breakdownText}>
+                  <View style={[styles.breakdownRow, isRTL && styles.breakdownRowRTL]}>
+                    <Text style={[styles.breakdownText, isRTL && styles.textRTLRight]}>
                       {t('ordersScreen.shipping')}: {freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}
                     </Text>
                   </View>
 
                   {isExpanded ? (
                     <View style={styles.orderSummaryBody}>
-                      <Text style={styles.orderSummaryTitle}>{t('ordersScreen.orderSummary')}</Text>
+                      <Text style={[styles.orderSummaryTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.orderSummary')}</Text>
 
                       {(Array.isArray(o.items) ? o.items : []).map((it, idx) => {
                         const qty = Number(it?.quantity) || 0;
@@ -474,8 +493,12 @@ export default function OrdersScreen() {
                           .filter(Boolean)
                           .join(' • ');
                         const price = Number(it?.price ?? 0) || 0;
-                        const isPromo = it?.isPromotionItem === true;
-                        const originalUnit = !isPromo
+                        const isPromo =
+                          it?.isPromotionItem === true ||
+                          String(size || '').trim() === '__PROMO__' ||
+                          Number(price) === 0;
+                        const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
+                        const originalUnit = (!isPromo && !excludedFromUserDiscount)
                           ? inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct })
                           : null;
                         const showDiscount = originalUnit != null;
@@ -484,63 +507,63 @@ export default function OrdersScreen() {
                             key={`${String(it?.productId || it?.id || name)}-${idx}`}
                             style={styles.orderSummaryItemRow}
                           >
-                            <Text style={styles.orderSummaryLine}>
+                            <Text style={[styles.orderSummaryLine, isRTL && styles.textRTLRight]}>
                               {qty}× {String(name)}{extras ? ` — ${extras}` : ''}
                             </Text>
                             {isPromo ? (
-                              <Text style={styles.orderSummaryLineMuted}>{t('common.free')}</Text>
+                              <Text style={[styles.orderSummaryLineMuted, isRTL && styles.textRTLRight]}>{t('common.free')}</Text>
                             ) : showDiscount ? (
-                              <Text style={styles.orderSummaryLineMuted}>
+                              <Text style={[styles.orderSummaryLineMuted, isRTL && styles.textRTLRight]}>
                                 {t('ordersDetail.fullPrice')}: <Text style={styles.orderSummaryPriceStrike}>AED {formatAED(originalUnit)}</Text>{' '}
                                 • {t('ordersDetail.discount')}: {Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : ''}{' '}
                                 • {t('ordersDetail.priceAfterDiscount')}: <Text style={styles.orderSummaryPriceFinal}>AED {formatAED(price)}</Text>
                               </Text>
                             ) : (
-                              <Text style={styles.orderSummaryLineMuted}>AED {formatAED(price)}</Text>
+                              <Text style={[styles.orderSummaryLineMuted, isRTL && styles.valueLTR]}>AED {formatAED(price)}</Text>
                             )}
                           </View>
                         );
                       })}
 
                       <View style={styles.orderSummaryDivider} />
-                      <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabel}>{t('ordersScreen.subtotal')}</Text>
-                        <Text style={styles.orderTotalsValue}>AED {formatAED(subtotal)}</Text>
+                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                        <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.subtotal')}</Text>
+                        <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
                       </View>
-                      <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabel}>{t('ordersScreen.shipping')}</Text>
-                        <Text style={styles.orderTotalsValue}>{freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}</Text>
+                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                        <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.shipping')}</Text>
+                        <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>{freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}</Text>
                       </View>
-                      <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabel}>{t('ordersScreen.vatIncluded')}</Text>
-                        <Text style={styles.orderTotalsValue}>AED {formatAED(vat)}</Text>
+                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                        <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.vatIncluded')}</Text>
+                        <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(vat)}</Text>
                       </View>
-                      <View style={styles.orderTotalsRow}>
-                        <Text style={styles.orderTotalsLabelStrong}>{t('ordersScreen.total')}</Text>
-                        <Text style={styles.orderTotalsValueStrong}>AED {formatAED(total)}</Text>
+                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                        <Text style={[styles.orderTotalsLabelStrong, isRTL && styles.textRTLRight]}>{t('ordersScreen.total')}</Text>
+                        <Text style={[styles.orderTotalsValueStrong, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
                       </View>
                     </View>
                   ) : null}
 
                   {showPay ? (
                     <TouchableOpacity
-                      style={[styles.payButton, isPaying && styles.payButtonDisabled]}
+                      style={[styles.payButton, isRTL && styles.buttonRTL, isPaying && styles.payButtonDisabled]}
                       onPress={() => handlePay(o)}
                       disabled={isPaying}
                       activeOpacity={0.85}
                     >
                       <Ionicons name="card-outline" size={16} color="#ffffff" />
-                      <Text style={styles.payButtonText}>{isPaying ? t('orders.startingPayment') : t('orders.payNow')}</Text>
+                      <Text style={[styles.payButtonText, isRTL && styles.textRTLRight]}>{isPaying ? t('orders.startingPayment') : t('orders.payNow')}</Text>
                     </TouchableOpacity>
                   ) : null}
 
                   <TouchableOpacity
-                    style={styles.supportButton}
+                    style={[styles.supportButton, isRTL && styles.buttonRTL]}
                     onPress={() => contactSupportWhatsApp(o)}
                     activeOpacity={0.85}
                   >
                     <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
-                    <Text style={styles.supportButtonText}>{t('ordersScreen.supportWhatsapp')}</Text>
+                    <Text style={[styles.supportButtonText, isRTL && styles.textRTLRight]}>{t('ordersScreen.supportWhatsapp')}</Text>
                   </TouchableOpacity>
                 </View>
               );
@@ -564,15 +587,27 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5EA',
     backgroundColor: '#ffffff',
   },
+  headerRTL: {
+    flexDirection: 'row-reverse',
+  },
   backButton: { padding: 4 },
   headerTitle: { fontSize: 18, fontWeight: '600', color: '#000000' },
   headerSpacer: { width: 28 },
   refreshButton: { padding: 4 },
   scrollView: { flex: 1 },
   center: { padding: 24, alignItems: 'center', justifyContent: 'center' },
+  centerRTL: { alignItems: 'flex-end' },
   loadingText: { marginTop: 12, color: '#8E8E93' },
   emptyTitle: { fontSize: 18, fontWeight: '600', color: '#1D1D1F', marginBottom: 6, textAlign: 'center' },
   emptyText: { fontSize: 14, color: '#8E8E93', textAlign: 'center', lineHeight: 20 },
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
+  textRTLRight: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   list: { padding: 20, gap: 12 },
   card: {
     borderWidth: 1,
@@ -582,9 +617,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  cardTopRTL: { flexDirection: 'row-reverse' },
   orderToggle: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  orderToggleRTL: { flexDirection: 'row-reverse' },
   // More spacing between Details and Delete to reduce accidental taps.
   detailsActions: { alignItems: 'flex-end', gap: 16 },
+  detailsActionsRTL: { alignItems: 'flex-start' },
   detailsPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -596,6 +634,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
     backgroundColor: '#F2F2F7',
   },
+  detailsPillRTL: { flexDirection: 'row-reverse' },
   detailsPillText: { fontSize: 12, fontWeight: '700', color: '#1D1D1F' },
   deletePill: {
     width: 36,
@@ -609,6 +648,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   statusRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
+  statusRowRTL: { justifyContent: 'flex-end' },
   orderNumber: { fontSize: 15, fontWeight: '700', color: '#1D1D1F' },
   statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   statusText: { fontSize: 12, fontWeight: '700' },
@@ -619,16 +659,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
   },
+  metaRowRTL: { flexDirection: 'row-reverse' },
   metaRight: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
   },
+  metaRightRTL: { flexDirection: 'row-reverse' },
+  appleLogo: { marginEnd: 4 },
   metaText: { marginTop: 6, fontSize: 12, color: '#8E8E93' },
   cardBottom: { marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  cardBottomRTL: { flexDirection: 'row-reverse' },
   totalText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
   itemsText: { fontSize: 12, color: '#8E8E93' },
   breakdownRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
+  breakdownRowRTL: { justifyContent: 'flex-end' },
   breakdownText: { fontSize: 12, color: '#8E8E93' },
   orderSummaryBody: {
     marginTop: 12,
@@ -646,6 +691,7 @@ const styles = StyleSheet.create({
   orderSummaryPriceFinal: { color: '#dc2626', fontWeight: '800' },
   orderSummaryDivider: { height: 1, backgroundColor: '#E5E5EA', marginTop: 10, marginBottom: 6 },
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
+  orderTotalsRowRTL: { flexDirection: 'row-reverse' },
   orderTotalsLabel: { fontSize: 12, color: '#3C3C43', fontWeight: '700' },
   orderTotalsValue: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
   orderTotalsLabelStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
@@ -673,6 +719,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   supportButtonText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
+  buttonRTL: { flexDirection: 'row-reverse' },
+  // Keep prices readable in RTL contexts.
+  valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
 });
 
 

@@ -19,7 +19,8 @@ import AUTH_CONFIG from '../../config/auth';
 
 export default function ContactScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const WHATSAPP_NUMBER = String(AUTH_CONFIG.WHATSAPP_NUMBER || '971585487665').replace(/[^\d]/g, '');
   const PHONE_DISPLAY = t('contact.phoneDisplay');
   const EMAIL = 'sales@genosys.ae';
@@ -132,27 +133,27 @@ export default function ContactScreen() {
   ];
 
   const ContactMethodCard = ({ method }) => (
-    <TouchableOpacity style={styles.contactCard} onPress={method.action}>
+    <TouchableOpacity style={[styles.contactCard, isRTL && styles.contactCardRTL]} onPress={method.action}>
       <View style={styles.contactIcon}>
         <Ionicons name={method.icon} size={24} color={method.icon === 'logo-whatsapp' ? '#25D366' : '#dc2626'} />
       </View>
-      <View style={styles.contactDetails}>
-        <Text style={styles.contactTitle}>{method.title}</Text>
-        <Text style={styles.contactValue}>{method.value}</Text>
-        <Text style={styles.contactDescription}>{method.description}</Text>
+      <View style={[styles.contactDetails, isRTL && styles.contactDetailsRTL]}>
+        <Text style={[styles.contactTitle, isRTL && styles.textRTL]}>{method.title}</Text>
+        <Text style={[styles.contactValue, isRTL && styles.valueLTR]}>{method.value}</Text>
+        <Text style={[styles.contactDescription, isRTL && styles.textRTL]}>{method.description}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
+      <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('contact.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('contact.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -164,10 +165,10 @@ export default function ContactScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.heroTitle}>{t('contact.companyName')}</Text>
+          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>{t('contact.companyName')}</Text>
           <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
             <Text style={styles.flagText}>🇦🇪</Text>
-            <Text style={styles.countryText}>{t('contact.country')}</Text>
+            <Text style={[styles.countryText, isRTL && styles.textRTL]}>{t('contact.country')}</Text>
             <Animated.View style={{ transform: [{ scale: heartScale }], opacity: heartOpacity }}>
               <Ionicons name="heart" size={14} color="#dc2626" />
             </Animated.View>
@@ -176,7 +177,7 @@ export default function ContactScreen() {
 
         {/* Contact Methods */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('contact.contactMethods')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('contact.contactMethods')}</Text>
           {contactMethods.map((method) => (
             <ContactMethodCard key={method.id} method={method} />
           ))}
@@ -184,31 +185,31 @@ export default function ContactScreen() {
 
         {/* Official Distributor in the UAE */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('contact.officialDistributorTitle')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('contact.officialDistributorTitle')}</Text>
           <View style={styles.distributorCard}>
-            <View style={styles.distributorRow}>
+            <View style={[styles.distributorRow, isRTL && styles.rowRTL]}>
               <Ionicons name="checkmark-circle" size={18} color="#27AE60" />
-              <Text style={styles.distributorText}>{t('contact.officialDistributorLine1')}</Text>
+              <Text style={[styles.distributorText, isRTL && styles.textRTL]}>{t('contact.officialDistributorLine1')}</Text>
             </View>
-            <View style={styles.distributorRow}>
+            <View style={[styles.distributorRow, isRTL && styles.rowRTL]}>
               <Ionicons name="checkmark-circle" size={18} color="#27AE60" />
-              <Text style={styles.distributorText}>{t('contact.officialDistributorLine2')}</Text>
+              <Text style={[styles.distributorText, isRTL && styles.textRTL]}>{t('contact.officialDistributorLine2')}</Text>
             </View>
-            <View style={[styles.distributorRow, { marginTop: 6 }]}>
+            <View style={[styles.distributorRow, isRTL && styles.rowRTL, { marginTop: 6 }]}>
               <Ionicons name="document-text" size={18} color="#8E8E93" />
-              <Text style={styles.distributorText}>
+              <Text style={[styles.distributorText, isRTL && styles.textRTL]}>
                 {t('contact.licenseLabel')} {t('contact.licenseValue')}
               </Text>
             </View>
-            <View style={styles.distributorRow}>
+            <View style={[styles.distributorRow, isRTL && styles.rowRTL]}>
               <Ionicons name="document-text" size={18} color="#8E8E93" />
-              <Text style={styles.distributorText}>
+              <Text style={[styles.distributorText, isRTL && styles.textRTL]}>
                 {t('contact.companyLicenseLabel')} {t('contact.companyLicenseValue')}
               </Text>
             </View>
-            <View style={styles.distributorRow}>
+            <View style={[styles.distributorRow, isRTL && styles.rowRTL]}>
               <Ionicons name="document-text" size={18} color="#8E8E93" />
-              <Text style={styles.distributorText}>
+              <Text style={[styles.distributorText, isRTL && styles.textRTL]}>
                 {t('contact.trnLabel')} {t('contact.trnValue')}
               </Text>
             </View>
@@ -235,6 +236,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
   },
+  headerRTL: { flexDirection: 'row-reverse' },
   backButton: {
     padding: 4,
   },
@@ -325,6 +327,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  contactCardRTL: {
+    flexDirection: 'row-reverse',
+  },
   contactIcon: {
     width: 48,
     height: 48,
@@ -332,10 +337,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginEnd: 16,
   },
   contactDetails: {
     flex: 1,
+  },
+  contactDetailsRTL: {
+    alignItems: 'flex-end',
   },
   contactTitle: {
     fontSize: 17,
@@ -367,9 +375,20 @@ const styles = StyleSheet.create({
   distributorText: {
     fontSize: 15,
     color: '#000000',
-    marginLeft: 10,
+    marginStart: 10,
     flex: 1,
     lineHeight: 20,
+  },
+  rowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  valueLTR: {
+    writingDirection: 'ltr',
+    textAlign: 'left',
   },
 
   // Form
@@ -456,7 +475,7 @@ const styles = StyleSheet.create({
   officeText: {
     fontSize: 15,
     color: '#8E8E93',
-    marginLeft: 8,
+    marginStart: 8,
     flex: 1,
     lineHeight: 20,
   },

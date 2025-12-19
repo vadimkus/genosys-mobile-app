@@ -11,7 +11,8 @@ const LOCALES = ['en', 'ru', 'ar'];
 
 export default function LanguageScreen() {
   const router = useRouter();
-  const { locale, t, setLocale } = useLocalization();
+  const { locale, t, setLocale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
 
@@ -48,16 +49,16 @@ export default function LanguageScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('profile.language')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('profile.language')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.subtitle}>{t('profile.selectLanguage')}</Text>
+        <Text style={[styles.subtitle, isRTL && styles.textRTL]}>{t('profile.selectLanguage')}</Text>
 
         {options.map((o) => {
           const active = o.code === locale;
@@ -69,13 +70,15 @@ export default function LanguageScreen() {
               disabled={saving}
               activeOpacity={0.85}
             >
-              <Text style={[styles.rowText, active && styles.rowTextActive]}>{o.label}</Text>
-              {active ? <Ionicons name="checkmark" size={18} color="#27AE60" /> : <View style={{ width: 18 }} />}
+              <View style={[styles.rowInner, isRTL && styles.rowInnerRTL]}>
+                <Text style={[styles.rowText, isRTL && styles.textRTL, active && styles.rowTextActive]}>{o.label}</Text>
+                {active ? <Ionicons name="checkmark" size={18} color="#27AE60" /> : <View style={{ width: 18 }} />}
+              </View>
             </TouchableOpacity>
           );
         })}
 
-        <Text style={styles.note}>
+        <Text style={[styles.note, isRTL && styles.textRTL]}>
           {Platform.OS === 'ios' ? 'Tip: iOS may require a restart for full RTL layout.' : 'Tip: Android may require a restart for full RTL layout.'}
         </Text>
       </View>
@@ -95,6 +98,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5EA',
     backgroundColor: '#ffffff',
   },
+  headerRTL: { flexDirection: 'row-reverse' },
   backButton: { padding: 4 },
   headerTitle: { fontSize: 16, fontWeight: '700', color: '#1D1D1F' },
   headerSpacer: { width: 28 },
@@ -113,11 +117,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E5E5EA',
+    marginBottom: 10,
+    backgroundColor: '#ffffff',
+  },
+  rowInner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
-    backgroundColor: '#ffffff',
+  },
+  rowInnerRTL: {
+    flexDirection: 'row-reverse',
   },
   rowActive: {
     borderColor: '#27AE60',
@@ -126,6 +135,7 @@ const styles = StyleSheet.create({
   rowText: { fontSize: 15, fontWeight: '600', color: '#1D1D1F' },
   rowTextActive: { color: '#14532D' },
   note: { marginTop: 8, fontSize: 12, color: '#8E8E93', lineHeight: 18 },
+  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });
 
 

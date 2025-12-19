@@ -13,7 +13,8 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 
 export default function TermsScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
   const lastUpdated = t('terms.lastUpdatedDate');
 
@@ -127,30 +128,30 @@ export default function TermsScreen() {
 
   const Section = ({ title, children }) => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
       {children}
     </View>
   );
 
   const Paragraph = ({ children }) => (
-    <Text style={styles.paragraph}>{children}</Text>
+    <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{children}</Text>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('terms.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('terms.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Last Updated */}
         <View style={styles.updateInfo}>
-          <Text style={styles.updateText}>{t('terms.lastUpdated', { date: lastUpdated })}</Text>
+          <Text style={[styles.updateText, isRTL && styles.updateTextRTL]}>{t('terms.lastUpdated', { date: lastUpdated })}</Text>
         </View>
 
         {sections.map((s) => (
@@ -160,8 +161,8 @@ export default function TermsScreen() {
             {Array.isArray(s.bullets) && s.bullets.length > 0 && (
               <View style={styles.bulletList}>
                 {s.bullets.map((b, idx) => (
-                  <Text key={`${s.key}-b-${idx}`} style={styles.bulletPoint}>
-                    • {b}
+                  <Text key={`${s.key}-b-${idx}`} style={[styles.bulletPoint, isRTL && styles.textRTL]}>
+                    {isRTL ? `${b} •` : `• ${b}`}
                   </Text>
                 ))}
               </View>
@@ -173,13 +174,13 @@ export default function TermsScreen() {
         <Section title={t('terms.sections.contact.title')}>
           <Paragraph>{t('terms.sections.contact.p1')}</Paragraph>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactItem}>
+            <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
               {t('terms.contact.emailLabel')}: {t('contact.emailValue')}
             </Text>
-            <Text style={styles.contactItem}>
+            <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
               {t('terms.contact.whatsappLabel')}: {t('contact.phoneDisplay')}
             </Text>
-            <Text style={styles.contactItem}>
+            <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
               {t('terms.contact.addressLabel')}: {t('contact.locationValue')}
             </Text>
           </View>
@@ -206,6 +207,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
   },
+  headerRTL: { flexDirection: 'row-reverse' },
   backButton: {
     padding: 4,
   },
@@ -235,6 +237,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
   },
+  updateTextRTL: {
+    writingDirection: 'rtl',
+  },
 
   // Sections
   section: {
@@ -260,7 +265,7 @@ const styles = StyleSheet.create({
   // Lists
   bulletList: {
     marginVertical: 8,
-    marginLeft: 12,
+    marginStart: 12,
   },
   bulletPoint: {
     fontSize: 16,
@@ -278,9 +283,10 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     fontSize: 16,
-    color: '#E74C3C',
+    color: '#dc2626',
     marginBottom: 4,
   },
+  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 
   // Footer
   footerSpace: {

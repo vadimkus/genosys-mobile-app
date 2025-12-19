@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  I18nManager,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +23,7 @@ const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
 export default function ProductGridItem({ product }) {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t, locale } = useLocalization();
+  const isRTL = !!I18nManager.isRTL;
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
@@ -117,7 +119,7 @@ export default function ProductGridItem({ product }) {
         
         {/* Enhanced Badges from Server */}
         {badges.length > 0 && (
-          <View style={styles.badgesContainer}>
+          <View style={[styles.badgesContainer, isRTL && styles.badgesContainerRTL]}>
             {badges
               .sort((a, b) => (a.priority || 10) - (b.priority || 10))  // Sort by priority
               .slice(0, 2)  // Show max 2 badges
@@ -137,13 +139,13 @@ export default function ProductGridItem({ product }) {
       </View>
       
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={2}>
+        <Text style={[styles.name, isRTL && styles.textRTL]} numberOfLines={2}>
           {getLocalizedProductName(product, locale) || product.name}
         </Text>
         
         {/* Badges removed from content area to avoid duplication - they show on image */}
         
-        <Text style={styles.category} numberOfLines={1}>
+        <Text style={[styles.category, isRTL && styles.textRTL]} numberOfLines={1}>
           {(() => {
             const canon = normalizeCategoryCanonical(product.category) || product.category;
             const key = getCategoryTranslationKey(canon);
@@ -153,9 +155,9 @@ export default function ProductGridItem({ product }) {
         
         {/* Enhanced Size Information from Server */}
         {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
-          <View style={styles.sizeBadgeContainer}>
+          <View style={[styles.sizeBadgeContainer, isRTL && styles.rowRTL]}>
             <View style={styles.sizeBadge}>
-              <Text style={styles.sizeBadgeText}>
+              <Text style={[styles.sizeBadgeText, isRTL && styles.textRTL]}>
                 {product.variants && product.variants.length > 0
                   ? t('product.sizesCountShort', { count: product.variants.length })
                   : product.hasVariants 
@@ -165,14 +167,14 @@ export default function ProductGridItem({ product }) {
             </View>
             {(product.stock || product.inStock) && (
               <View style={styles.stockBadge}>
-                <Text style={styles.stockBadgeText}>{t('stock.inStock')}</Text>
+                <Text style={[styles.stockBadgeText, isRTL && styles.textRTL]}>{t('stock.inStock')}</Text>
               </View>
             )}
           </View>
         )}
         
         {/* Enhanced Pricing from Server with Beauty Boxes Special Display */}
-        <View style={styles.priceContainer}>
+        <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
           {(() => {
             const category = product?.category;
             const name = product?.name || '';
@@ -181,27 +183,27 @@ export default function ProductGridItem({ product }) {
             return isCategoryBeautyBoxes || hasBeautyBoxInName;
           })() ? (
             // Special pricing display for Beauty Boxes - show full price + 15% discount clearly
-            <View style={styles.beautyBoxPricing}>
-              <Text style={styles.beautyBoxFullPrice}>
+            <View style={[styles.beautyBoxPricing, isRTL && styles.alignEndRTL]}>
+              <Text style={[styles.beautyBoxFullPrice, isRTL && styles.textRTL]}>
                 {t('product.fullPrice', { price: (product.originalPrice || product.displayPrice || product.price || 0).toFixed(2) })}
               </Text>
-              <View style={styles.beautyBoxDiscountContainer}>
+              <View style={[styles.beautyBoxDiscountContainer, isRTL && styles.rowRTL]}>
                 <Text style={styles.beautyBoxDiscount}>{t('bag.bundleDiscount15')}</Text>
-                <Text style={styles.beautyBoxFinalPrice}>
+                <Text style={[styles.beautyBoxFinalPrice, isRTL && styles.valueRTL]}>
                   {t('product.finalPrice', { price: (product.displayPrice || product.price || 0).toFixed(2) })}
                 </Text>
               </View>
             </View>
           ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
-            <Text style={styles.price}>
+            <Text style={[styles.price, isRTL && styles.valueRTL]}>
               {getCanonicalUnitPrice(product).toFixed(2)} AED
             </Text>
           ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
-            <View style={styles.discountPricing}>
-              <Text style={styles.originalPrice}>
+            <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
+              <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
                 {product.originalPrice.toFixed(2)} AED
               </Text>
-              <Text style={styles.discountedPrice}>
+              <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
                 {(product.displayPrice || product.price).toFixed(2)} AED
               </Text>
               {product.discountLabel && (
@@ -213,7 +215,7 @@ export default function ProductGridItem({ product }) {
               )}
             </View>
           ) : (
-            <Text style={styles.price}>
+            <Text style={[styles.price, isRTL && styles.valueRTL]}>
               {(product.displayPrice || product.price).toFixed(2)} AED
             </Text>
           )}
@@ -287,10 +289,13 @@ const styles = StyleSheet.create({
   badgesContainer: {
     position: 'absolute',
     top: 8,
-    left: 8,
+    start: 8,
     flexDirection: 'column',
     alignItems: 'flex-start',
     zIndex: 10,
+  },
+  badgesContainerRTL: {
+    alignItems: 'flex-end',
   },
   badge: {
     paddingHorizontal: 8,
@@ -330,6 +335,9 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     alignItems: 'flex-start',
+  },
+  priceContainerRTL: {
+    alignItems: 'flex-end',
   },
   price: {
     fontSize: 16,
@@ -395,6 +403,11 @@ const styles = StyleSheet.create({
     color: '#27AE60',
     fontWeight: 'bold',
   },
+  rowRTL: { flexDirection: 'row-reverse' },
+  alignEndRTL: { alignItems: 'flex-end' },
+  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  // In RTL, values like prices should stay readable and align to the outside edge
+  valueRTL: { textAlign: 'left' },
   
   // Size Badge Styles
   sizeBadgeContainer: {

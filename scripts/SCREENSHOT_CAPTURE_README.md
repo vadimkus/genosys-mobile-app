@@ -90,3 +90,4 @@ open app-store-screenshots/6.7-inch/
 ---
 
 **Ready? Run the script and follow the prompts!** 📸
+

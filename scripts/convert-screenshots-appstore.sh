@@ -117,3 +117,4 @@ if [ "$CONVERTED" -gt 0 ]; then
     echo -e "${BLUE}💡 Note:${NC} Use 1284×2778px for best compatibility"
     echo ""
 fi
+

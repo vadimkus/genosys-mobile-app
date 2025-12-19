@@ -414,3 +414,4 @@ open app-store-screenshots/appstore-ready/ru-RU/  # View results
 *App: Genosys Mobile App*  
 *Language: Russian (Русский)*  
 *Ready for: App Store Connect*
+

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Linking, I18nManager } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -13,6 +13,8 @@ const formatAED = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num.toFixed(2) : '0.00';
 };
+
+const FLEX_ROW = I18nManager.isRTL ? 'row-reverse' : 'row';
 
 const formatDateTime = (dateString, locale, t) => {
   if (!dateString) return null;
@@ -81,6 +83,18 @@ const isPromoItem = (item) => {
   return item?.isPromotionItem === true || item?.selectedSize === '__PROMO__' || Number(item?.price || 0) === 0;
 };
 
+const isUserDiscountExcludedOrderItemName = (nameRaw) => {
+  const name = String(nameRaw || '').trim().toLowerCase();
+  if (!name) return false;
+  // Beauty Boxes (bundles already discounted)
+  if (name.includes('beauty box') || name.includes('beautybox')) return true;
+  // Hydro Cool Modelling Mask
+  if (name.includes('hydro') && name.includes('cool') && name.includes('mask')) return true;
+  // Devices (fallback by name)
+  if (name.includes('genoled') || name.includes('gentron') || name.includes('hairgen')) return true;
+  return false;
+};
+
 const inferOriginalUnitPriceFromPct = ({ unitPrice, discountPct }) => {
   const p = Number(unitPrice);
   const pct = Number(discountPct);
@@ -100,7 +114,8 @@ export default function OrderDetailScreen() {
 
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
@@ -245,11 +260,11 @@ export default function OrderDetailScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('ordersDetail.orderDetails')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderDetails')}</Text>
         <TouchableOpacity onPress={load} style={styles.refreshButton}>
           <Ionicons name="refresh" size={20} color="#8E8E93" />
         </TouchableOpacity>
@@ -258,47 +273,47 @@ export default function OrderDetailScreen() {
       {loading ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#dc2626" />
-          <Text style={styles.loadingText}>{t('ordersDetail.loading')}</Text>
+          <Text style={[styles.loadingText, isRTL && styles.textRTL]}>{t('ordersDetail.loading')}</Text>
         </View>
       ) : !order ? (
         <View style={styles.centerContainer}>
           <Ionicons name="receipt-outline" size={64} color="#E5E5EA" />
-          <Text style={styles.emptyTitle}>{t('ordersDetail.notFound')}</Text>
-          <Text style={styles.emptyText}>{t('ordersDetail.notFoundHint')}</Text>
+          <Text style={[styles.emptyTitle, isRTL && styles.textRTL]}>{t('ordersDetail.notFound')}</Text>
+          <Text style={[styles.emptyText, isRTL && styles.textRTL]}>{t('ordersDetail.notFoundHint')}</Text>
         </View>
       ) : (
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Order Number Card */}
           <View style={styles.orderNumberCard}>
-            <View style={styles.orderNumberHeader}>
+            <View style={[styles.orderNumberHeader, isRTL && styles.rowRTL]}>
               <Ionicons name="receipt" size={24} color="#dc2626" />
-              <View style={styles.orderNumberTextContainer}>
-                <Text style={styles.orderNumberLabel}>{t('ordersDetail.orderNumber')}</Text>
+              <View style={[styles.orderNumberTextContainer, isRTL && styles.alignEndRTL]}>
+                <Text style={[styles.orderNumberLabel, isRTL && styles.textRTL]}>{t('ordersDetail.orderNumber')}</Text>
                 <Text style={styles.orderNumber}>{String(orderNumber)}</Text>
               </View>
             </View>
             {formattedDateTime ? (
-              <View style={styles.dateTimeRow}>
+              <View style={[styles.dateTimeRow, isRTL && styles.rowRTL]}>
                 <Ionicons name="time-outline" size={14} color="#8E8E93" />
-                <Text style={styles.dateTimeText}>{formattedDateTime}</Text>
+                <Text style={[styles.dateTimeText, isRTL && styles.textRTL]}>{formattedDateTime}</Text>
               </View>
             ) : null}
           </View>
 
           {/* Order Status Section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
               <Ionicons name="information-circle" size={20} color="#007AFF" />
-              <Text style={styles.sectionTitle}>{t('ordersDetail.orderStatus')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderStatus')}</Text>
             </View>
-            <View style={styles.statusRow}>
+            <View style={[styles.statusRow, isRTL && styles.statusRowRTL]}>
               <View
                 style={[
                   styles.statusBadge,
                   String(status || '').trim().toLowerCase() === 'pending' && styles.statusBadgePending,
                 ]}
               >
-                <Text style={styles.statusBadgeText}>{getStatusLabel()}</Text>
+                <Text style={[styles.statusBadgeText, isRTL && styles.textRTL]}>{getStatusLabel()}</Text>
               </View>
             </View>
           </View>
@@ -352,8 +367,9 @@ export default function OrderDetailScreen() {
               const itemTotal = qty * price;
 
               const discountPct = Number(user?.discountPercentage);
+              const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
               const inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
-              const canShowDiscountBreakdown = !isPromoItem(it) && inferredOriginalUnit != null;
+              const canShowDiscountBreakdown = !isPromoItem(it) && !excludedFromUserDiscount && inferredOriginalUnit != null;
               const discountUnit = canShowDiscountBreakdown ? (inferredOriginalUnit - price) : 0;
               const originalLineTotal = canShowDiscountBreakdown ? (inferredOriginalUnit * qty) : null;
               const discountLineTotal = canShowDiscountBreakdown ? (discountUnit * qty) : null;
@@ -596,6 +612,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#E5E5EA',
   },
+  headerRTL: {
+    flexDirection: 'row-reverse',
+  },
   backButton: {
     padding: 4,
   },
@@ -714,6 +733,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
+  statusRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   statusBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -734,6 +756,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#ffffff',
     textTransform: 'uppercase',
+  },
+  // RTL helpers
+  rowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  alignEndRTL: {
+    alignItems: 'flex-end',
   },
   
   // Payment Method
@@ -760,7 +793,7 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
   },
   paymentMethodRow: {
-    flexDirection: 'row',
+    flexDirection: FLEX_ROW,
     alignItems: 'center',
     flexWrap: 'wrap',
   },
@@ -780,7 +813,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   itemHeader: {
-    flexDirection: 'row',
+    flexDirection: FLEX_ROW,
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
@@ -789,7 +822,7 @@ const styles = StyleSheet.create({
   itemTitleWrap: {
     flex: 1,
     minWidth: 0,
-    flexDirection: 'row',
+    flexDirection: FLEX_ROW,
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 8,
@@ -820,7 +853,7 @@ const styles = StyleSheet.create({
     color: '#dc2626',
   },
   itemDetails: {
-    flexDirection: 'row',
+    flexDirection: FLEX_ROW,
     flexWrap: 'wrap',
     gap: 8,
   },
@@ -836,7 +869,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E5EA',
   },
   itemPriceRow: {
-    flexDirection: 'row',
+    flexDirection: FLEX_ROW,
     justifyContent: 'space-between',
     alignItems: 'baseline',
     gap: 12,

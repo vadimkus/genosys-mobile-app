@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, I18nManager } from 'react-native';
 import ProgressBar from './ProgressBar';
 
 /**
@@ -17,19 +17,20 @@ export default function ProgressCard({
   children,
   style,
 }) {
+  const isRTL = !!I18nManager.isRTL;
   return (
     <View style={[styles.card, style]}>
-      <View style={styles.topRow}>
+      <View style={[styles.topRow, isRTL && styles.topRowRTL]}>
         {headerLeft ? (
-          <View style={styles.headerLeftWrap}>{headerLeft}</View>
+          <View style={[styles.headerLeftWrap, isRTL && styles.headerLeftWrapRTL]}>{headerLeft}</View>
         ) : (
-          <Text style={styles.leftText}>{leftText}</Text>
+          <Text style={[styles.leftText, isRTL && styles.textRTL]}>{leftText}</Text>
         )}
 
         {headerRight ? (
-          <View style={styles.headerRightWrap}>{headerRight}</View>
+          <View style={[styles.headerRightWrap, isRTL && styles.headerRightWrapRTL]}>{headerRight}</View>
         ) : (
-          <Text style={[styles.rightText, (met || rightTextMet) && styles.rightTextMet]}>
+          <Text style={[styles.rightText, isRTL && styles.textRTL, (met || rightTextMet) && styles.rightTextMet]}>
             {rightText}
           </Text>
         )}
@@ -59,14 +60,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 10,
   },
+  topRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   headerLeftWrap: {
     flex: 1,
+    minWidth: 0,
+  },
+  headerLeftWrapRTL: {
+    alignItems: 'flex-end',
   },
   headerRightWrap: {
     alignItems: 'flex-end',
   },
+  headerRightWrapRTL: {
+    alignItems: 'flex-start',
+  },
   leftText: {
     flex: 1,
+    minWidth: 0,
+    flexShrink: 1,
     fontSize: 16,
     color: '#1D1D1F',
     fontWeight: '700',
@@ -78,6 +91,10 @@ const styles = StyleSheet.create({
   },
   rightTextMet: {
     color: '#34C759',
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   barWrap: {
     marginBottom: 12,

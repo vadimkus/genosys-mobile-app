@@ -12,7 +12,8 @@ import { useLocalization } from '../contexts/LocalizationContext';
  * Only renders on iOS platform.
  */
 export default function ApplePayButton({ onPress, disabled = false, loading = false, style }) {
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   // Apple Pay is iOS-only
   if (Platform.OS !== 'ios') {
     return null;
@@ -20,7 +21,7 @@ export default function ApplePayButton({ onPress, disabled = false, loading = fa
 
   return (
     <TouchableOpacity
-      style={[styles.applePayButton, disabled && styles.disabled, style]}
+      style={[styles.applePayButton, isRTL && styles.applePayButtonRTL, disabled && styles.disabled, style]}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.8}
@@ -36,7 +37,7 @@ export default function ApplePayButton({ onPress, disabled = false, loading = fa
       </View>
       
       {/* Pay with Apple Pay text */}
-      <Text style={styles.buttonText}>
+      <Text style={[styles.buttonText, isRTL && styles.buttonTextRTL]}>
         {loading ? t('applePay.processing') : t('applePay.payWithPrefix')}{!loading ? ' ' : ''}
         <Text style={styles.buttonTextBold}>
           {loading ? '' : t('applePay.applePay')}
@@ -62,18 +63,25 @@ const styles = StyleSheet.create({
     elevation: 3,
     minHeight: 56,
   },
+  applePayButtonRTL: {
+    flexDirection: 'row-reverse',
+  },
   disabled: {
     backgroundColor: '#666666',
     opacity: 0.6,
   },
   logoContainer: {
-    marginRight: 10,
+    marginEnd: 10,
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 17,
     fontWeight: '400',
     letterSpacing: 0.3,
+  },
+  buttonTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   buttonTextBold: {
     color: '#FFFFFF',

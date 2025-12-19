@@ -92,6 +92,7 @@ export default function ProductDetailScreen() {
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -294,9 +295,9 @@ export default function ProductDetailScreen() {
     const isNote = variant === 'note';
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
         <View style={[styles.descriptionContainer, isNote && styles.noteContainer]}>
-          <Text style={[styles.description, isNote && styles.noteText]}>{text}</Text>
+          <Text style={[styles.description, isNote && styles.noteText, isRTL && styles.textRTL]}>{text}</Text>
         </View>
       </View>
     );
@@ -410,7 +411,7 @@ export default function ProductDetailScreen() {
             return upper + t.slice(1);
           };
           return (
-            <Text style={styles.specValueText}>
+            <Text style={[styles.specValueText, isRTL && styles.specValueTextRTL]}>
               {parts.map((p) => `• ${capFirst(p)}`).join('\n')}
             </Text>
           );
@@ -427,32 +428,35 @@ export default function ProductDetailScreen() {
         );
         if (parts.length > 1) {
           return (
-            <Text style={styles.specValueText}>
+            <Text style={[styles.specValueText, isRTL && styles.specValueTextRTL]}>
               {parts.map((p) => `• ${p}`).join('\n')}
             </Text>
           );
         }
       }
 
-      return <Text style={styles.specValueText}>{txt}</Text>;
+      return <Text style={[styles.specValueText, isRTL && styles.specValueTextRTL]}>{txt}</Text>;
     };
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('product.productDetails')}</Text>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('product.productDetails')}</Text>
         <View style={styles.specList}>
           {rows.map((row, idx) => (
             <View
               key={row.label + idx}
               style={[
                 styles.specItem,
+                isRTL && styles.specItemRTL,
                 idx === rows.length - 1 ? styles.specItemLast : null,
               ]}
             >
-              <Text style={styles.specLabel} numberOfLines={2}>
+              <Text style={[styles.specLabel, isRTL && styles.specLabelRTL]} numberOfLines={2}>
                 {prettifySpecLabel(row.label)}
               </Text>
-              <View style={styles.specValueContainer}>{renderSpecValue(row.label, row.value)}</View>
+              <View style={[styles.specValueContainer, isRTL && styles.specValueContainerRTL]}>
+                {renderSpecValue(row.label, row.value)}
+              </View>
             </View>
           ))}
         </View>
@@ -464,12 +468,12 @@ export default function ProductDetailScreen() {
     if (!items || items.length === 0) return null;
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
         <View style={styles.listContainer}>
           {items.map((item, idx) => (
-            <View key={idx} style={styles.listItem}>
-              <Text style={styles.listBullet}>•</Text>
-              <Text style={styles.listText}>{asText(item)}</Text>
+            <View key={idx} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+              <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
+              <Text style={[styles.listText, isRTL && styles.textRTL]}>{asText(item)}</Text>
             </View>
           ))}
         </View>
@@ -483,12 +487,12 @@ export default function ProductDetailScreen() {
     if (!entries.length) return null;
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
         <View style={styles.specList}>
           {entries.map(([k, v], idx) => (
-            <View key={k + idx} style={styles.specItem}>
-              <Text style={styles.specLabel}>{asText(k)}</Text>
-              <Text style={styles.specValue}>{asText(v)}</Text>
+            <View key={k + idx} style={[styles.specItem, isRTL && styles.specItemRTL]}>
+              <Text style={[styles.specLabel, isRTL && styles.specLabelRTL]}>{asText(k)}</Text>
+              <Text style={[styles.specValue, isRTL && styles.specValueRTL]}>{asText(v)}</Text>
             </View>
           ))}
         </View>
@@ -500,12 +504,12 @@ export default function ProductDetailScreen() {
     if (!steps || steps.length === 0) return null;
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
         <View style={styles.listContainer}>
           {steps.map((s, idx) => (
-            <View key={`${idx}-${s.title}`} style={styles.listItem}>
-              <Text style={styles.listBullet}>{idx + 1}.</Text>
-              <Text style={styles.listText}>
+            <View key={`${idx}-${s.title}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+              <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>{idx + 1}.</Text>
+              <Text style={[styles.listText, isRTL && styles.textRTL]}>
                 {s.title ? `${s.title}: ` : ''}
                 {s.body}
               </Text>
@@ -520,12 +524,12 @@ export default function ProductDetailScreen() {
     if (!items || items.length === 0) return null;
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
         <View style={styles.listContainer}>
           {items.map((it, idx) => (
-            <View key={`${idx}-${it.name}`} style={styles.listItem}>
-              <Text style={styles.listBullet}>•</Text>
-              <Text style={styles.listText}>
+            <View key={`${idx}-${it.name}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+              <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
+              <Text style={[styles.listText, isRTL && styles.textRTL]}>
                 <Text style={{ fontWeight: '700', color: '#1D1D1F' }}>{it.name}</Text>
                 {it.description ? ` — ${it.description}` : ''}
               </Text>
@@ -543,7 +547,7 @@ export default function ProductDetailScreen() {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#dc2626" />
-        <Text style={styles.loadingText}>{t('productScreen.loadingDetails')}</Text>
+        <Text style={[styles.loadingText, isRTL && styles.textRTL]}>{t('productScreen.loadingDetails')}</Text>
       </SafeAreaView>
     );
   }
@@ -551,9 +555,9 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <SafeAreaView style={styles.errorContainer}>
-        <Text style={styles.errorText}>{t('productScreen.notFound')}</Text>
+        <Text style={[styles.errorText, isRTL && styles.textRTL]}>{t('productScreen.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>{t('productScreen.goBack')}</Text>
+          <Text style={[styles.backButtonText, isRTL && styles.textRTL]}>{t('productScreen.goBack')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -584,12 +588,12 @@ export default function ProductDetailScreen() {
         ]}
       >
         <SafeAreaView style={styles.headerContainer}>
-          <View style={styles.headerButtons}>
+          <View style={[styles.headerButtons, isRTL && styles.headerButtonsRTL]}>
             <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
-              <Ionicons name="chevron-back" size={20} color="#1D1D1F" />
+              <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color="#1D1D1F" />
             </TouchableOpacity>
 
-            <View style={styles.headerRightButtons}>
+            <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
               <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
                 <Ionicons name="share-outline" size={20} color="#1D1D1F" />
               </TouchableOpacity>
@@ -636,18 +640,18 @@ export default function ProductDetailScreen() {
         {/* Product Info */}
         <View style={styles.contentContainer}>
           <View style={styles.productInfo}>
-            <Text style={styles.category}>
+            <Text style={[styles.category, isRTL && styles.textRTL]}>
               {(() => {
                 const canon = normalizeCategoryCanonical(product.category) || asText(product.category);
                 const key = getCategoryTranslationKey(canon);
                 return key ? t(key) : canon;
               })()}
             </Text>
-            <Text style={styles.productName}>{asText(getLocalizedProductName(product, locale) || product.name)}</Text>
+            <Text style={[styles.productName, isRTL && styles.textRTL]}>{asText(getLocalizedProductName(product, locale) || product.name)}</Text>
             
             {/* Enhanced Size and Stock Info from Server */}
             {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
-              <View style={styles.sizeInfoContainer}>
+              <View style={[styles.sizeInfoContainer, isRTL && styles.sizeInfoContainerRTL]}>
                 <Text style={styles.sizeInfo}>
                   {product.variants && product.variants.length > 0
                     ? t('product.sizesAvailable', { count: product.variants.length })
@@ -668,9 +672,9 @@ export default function ProductDetailScreen() {
                   <Text style={styles.beautyBoxDetailFullPrice}>
                     {t('product.fullPrice', { price: formatPrice(product.originalPrice || product.displayPrice || product.price || 0) })}
                   </Text>
-                  <View style={styles.beautyBoxDetailDiscountRow}>
+                  <View style={[styles.beautyBoxDetailDiscountRow, isRTL && { flexDirection: 'row-reverse' }]}>
                     <Text style={styles.beautyBoxDetailDiscount}>{t('product.bundleDiscount')}</Text>
-                    <Text style={styles.beautyBoxDetailFinalPrice}>
+                    <Text style={[styles.beautyBoxDetailFinalPrice, isRTL && { textAlign: 'left' }]}>
                       {t('product.finalPrice', { price: formatPrice(product.displayPrice || product.price || 0) })}
                     </Text>
                   </View>
@@ -721,11 +725,11 @@ export default function ProductDetailScreen() {
 
                     return (
                       <View>
-                        <Text style={styles.originalPrice}>{formatPrice(original)} AED</Text>
-                        <View style={styles.discountRow}>
-                          <Text style={styles.discountedPrice}>{formatPrice(discounted)} AED</Text>
+                        <Text style={[styles.originalPrice, isRTL && styles.textRTL]}>{formatPrice(original)} AED</Text>
+                        <View style={[styles.discountRow, isRTL && styles.discountRowRTL]}>
+                          <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatPrice(discounted)} AED</Text>
                           <View style={styles.discountBadge}>
-                            <Text style={styles.discountBadgeText}>{`${Math.round(effectivePct)}% OFF`}</Text>
+                            <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{`${Math.round(effectivePct)}% OFF`}</Text>
                           </View>
                         </View>
                       </View>
@@ -824,16 +828,16 @@ export default function ProductDetailScreen() {
           const qtyForSelection = getItemQuantity(product.id, selectedColor, selectedSize);
           return (
             <TouchableOpacity
-              style={[styles.addToBagButton, inBagForSelection && styles.inCartButton]}
+              style={[styles.addToBagButton, isRTL && styles.addToBagButtonRTL, inBagForSelection && styles.inCartButton]}
               onPress={handleAddToBag}
             >
           <Ionicons 
                 name={inBagForSelection ? "checkmark" : "bag"} 
             size={20} 
             color="#ffffff" 
-            style={styles.buttonIcon}
+            style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
           />
-            <Text style={styles.addToBagText}>
+            <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
                 {inBagForSelection ? t('product.inBag', { count: qtyForSelection }) : t('product.addToBag')}
             </Text>
           </TouchableOpacity>
@@ -902,11 +906,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  headerButtonsRTL: {
+    flexDirection: 'row-reverse',
+  },
   headerRightButtons: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
     gap: 12,
+  },
+  headerRightButtonsRTL: {
+    flexDirection: 'row-reverse',
   },
   headerButton: {
     width: 36,
@@ -983,6 +993,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     flexWrap: 'wrap',
+  },
+  discountRowRTL: {
+    flexDirection: 'row-reverse',
   },
   discountBadge: {
     backgroundColor: '#27AE6020',
@@ -1126,10 +1139,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
   },
+  listItemRTL: {
+    flexDirection: 'row-reverse',
+  },
   listBullet: {
     fontSize: 18,
     color: '#dc2626',
     lineHeight: 22,
+  },
+  listBulletRTL: {
+    textAlign: 'right',
   },
   listText: {
     flex: 1,
@@ -1151,6 +1170,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ECEEF0',
   },
+  specItemRTL: {
+    flexDirection: 'row-reverse',
+  },
   specItemLast: {
     borderBottomWidth: 0,
   },
@@ -1161,14 +1183,33 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 20,
   },
+  specLabelRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
   specValueContainer: {
     flex: 1,
     alignItems: 'flex-start',
+  },
+  specValueContainerRTL: {
+    alignItems: 'flex-end',
   },
   specValueText: {
     fontSize: 15,
     color: '#1D1D1F',
     lineHeight: 22,
+  },
+  specValueTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  specValueRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   // Perfect Combination
   pcOuter: {
@@ -1381,12 +1422,19 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
+  addToBagButtonRTL: {
+    flexDirection: 'row-reverse',
+  },
   inCartButton: {
     backgroundColor: '#27AE60',
     shadowColor: '#27AE60',
   },
   buttonIcon: {
-    marginRight: 8,
+    marginEnd: 8,
+  },
+  buttonIconRTL: {
+    marginEnd: 0,
+    marginStart: 8,
   },
   addToBagText: {
     fontSize: 18,
@@ -1399,6 +1447,9 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 12,
     flexWrap: 'wrap',
+  },
+  sizeInfoContainerRTL: {
+    flexDirection: 'row-reverse',
   },
   sizeInfo: {
     fontSize: 14,
@@ -1463,7 +1514,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#27AE60',
     fontWeight: 'bold',
-    marginLeft: 'auto',
+    marginStart: 'auto',
     flexShrink: 1,
     minWidth: 0,
     textAlign: 'right',

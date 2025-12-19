@@ -17,7 +17,8 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function HelpSupportScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [returnModalVisible, setReturnModalVisible] = useState(false);
@@ -199,7 +200,7 @@ export default function HelpSupportScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('help.title')}</Text>
         <View style={styles.placeholder} />
@@ -476,7 +477,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     flex: 1,
-    paddingRight: 16,
+    paddingEnd: 16,
   },
   faqAnswer: {
     padding: 14,
@@ -506,7 +507,7 @@ const styles = StyleSheet.create({
   answerNumber: {
     fontSize: 14,
     lineHeight: 22,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '800',
     minWidth: 22,
     textAlign: 'right',

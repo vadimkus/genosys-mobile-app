@@ -22,7 +22,8 @@ const log = createLogger('Addresses');
 export default function AddressesScreen() {
   const router = useRouter();
   const { user, getAddresses, removeAddress, setAddressAsDefault } = useAuth();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -183,7 +184,7 @@ export default function AddressesScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('addresses.title')}</Text>
         <TouchableOpacity onPress={handleAddAddress} style={styles.addButton}>
@@ -350,14 +351,14 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: '#000000',
-    marginLeft: 8,
+    marginStart: 8,
   },
   defaultBadge: {
     backgroundColor: '#27AE60',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
-    marginLeft: 8,
+    marginStart: 8,
   },
   defaultText: {
     fontSize: 12,
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   addressDetails: {
-    paddingLeft: 28,
+    paddingStart: 28,
   },
   addressName: {
     fontSize: 16,
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginEnd: 12,
   },
   addNewText: {
     fontSize: 17,
@@ -441,7 +442,7 @@ const styles = StyleSheet.create({
   tipText: {
     fontSize: 15,
     color: '#8E8E93',
-    marginLeft: 8,
+    marginStart: 8,
     flex: 1,
     lineHeight: 20,
   },

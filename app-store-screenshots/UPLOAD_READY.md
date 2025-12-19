@@ -306,3 +306,4 @@ open app-store-screenshots/appstore-ready/
 **Last Updated:** December 14, 2025  
 **Device:** iPhone 16 Pro Max → iPhone 14 Pro Max (converted)  
 **Status:** ✅ Ready for App Store Connect Upload
+

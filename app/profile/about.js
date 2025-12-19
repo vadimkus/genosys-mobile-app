@@ -17,7 +17,8 @@ import AUTH_CONFIG from '../../config/auth';
 
 export default function AboutScreen() {
   const router = useRouter();
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const appVersion = String(Constants?.expoConfig?.version || Constants?.manifest?.version || '1.0.0');
 
   const openUrl = async (url) => {
@@ -31,14 +32,14 @@ export default function AboutScreen() {
   };
 
   const InfoRow = ({ label, value, onPress }) => (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
+    <View style={[styles.infoRow, isRTL && styles.infoRowRTL]}>
+      <Text style={[styles.infoLabel, isRTL && styles.infoLabelRTL]}>{label}</Text>
       {onPress ? (
         <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-          <Text style={[styles.infoValue, styles.infoValueLink]}>{value}</Text>
+          <Text style={[styles.infoValue, styles.infoValueLink, isRTL && styles.infoValueRTL]}>{value}</Text>
         </TouchableOpacity>
       ) : (
-        <Text style={styles.infoValue}>{value}</Text>
+        <Text style={[styles.infoValue, isRTL && styles.infoValueRTL]}>{value}</Text>
       )}
     </View>
   );
@@ -46,11 +47,11 @@ export default function AboutScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
+        <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('about.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.headerTitleRTL]}>{t('about.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -64,29 +65,29 @@ export default function AboutScreen() {
               resizeMode="contain"
             />
           </View>
-          <Text style={styles.heroTitle}>{t('about.companyName')}</Text>
-          <Text style={styles.heroSubtitle}>{t('about.country')}</Text>
+          <Text style={[styles.heroTitle, isRTL && styles.heroTitleRTL]}>{t('about.companyName')}</Text>
+          <Text style={[styles.heroSubtitle, isRTL && styles.heroSubtitleRTL]}>{t('about.country')}</Text>
         </View>
 
         {/* About Us */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('about.aboutUsTitle')}</Text>
-          <Text style={styles.paragraph}>{t('about.aboutUsLine1')}</Text>
-          <Text style={styles.paragraph}>{t('about.aboutUsLine2')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('about.aboutUsTitle')}</Text>
+          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>{t('about.aboutUsLine1')}</Text>
+          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>{t('about.aboutUsLine2')}</Text>
         </View>
 
         {/* Mission */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('about.missionTitle')}</Text>
-          <Text style={styles.paragraph}>{t('about.missionText')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('about.missionTitle')}</Text>
+          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>{t('about.missionText')}</Text>
         </View>
 
         {/* Legal Information & Contact */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('about.legalTitle')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('about.legalTitle')}</Text>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{t('about.companyDetailsTitle')}</Text>
+            <Text style={[styles.cardTitle, isRTL && styles.cardTitleRTL]}>{t('about.companyDetailsTitle')}</Text>
             <InfoRow label={t('about.companyLabel')} value={t('about.companyName')} />
             <InfoRow label={t('about.yearLabel')} value={t('about.yearValue')} />
             <InfoRow label={t('about.licenseLabel')} value={t('about.licenseValue')} />
@@ -96,7 +97,7 @@ export default function AboutScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{t('about.businessInfoTitle')}</Text>
+            <Text style={[styles.cardTitle, isRTL && styles.cardTitleRTL]}>{t('about.businessInfoTitle')}</Text>
             <InfoRow label={t('about.distributorLabel')} value={t('about.distributorValue')} />
             <InfoRow label={t('about.certificationLabel')} value={t('about.certificationValue')} />
             <InfoRow label={t('about.productsLabel')} value={t('about.productsValue')} />
@@ -106,8 +107,8 @@ export default function AboutScreen() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>{t('about.footerCopyright')}</Text>
-          <Text style={styles.footerSubtext}>{t('about.versionLabel', { version: appVersion })}</Text>
+          <Text style={[styles.footerText, isRTL && styles.footerTextRTL]}>{t('about.footerCopyright')}</Text>
+          <Text style={[styles.footerSubtext, isRTL && styles.footerSubtextRTL]}>{t('about.versionLabel', { version: appVersion })}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#6B7280',
     width: '38%',
-    paddingRight: 8,
+    paddingEnd: 8,
   },
   infoValue: {
     fontSize: 14,
@@ -258,5 +259,54 @@ const styles = StyleSheet.create({
     color: '#C7C7CC',
     textAlign: 'center',
     marginTop: 8,
+  },
+
+  // RTL Support Styles
+  headerRTL: {
+    flexDirection: 'row-reverse',
+  },
+  backButtonRTL: {
+    marginRight: 0,
+    marginStart: 'auto',
+  },
+  headerTitleRTL: {
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
+  heroTitleRTL: {
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
+  heroSubtitleRTL: {
+    textAlign: 'center',
+  },
+  sectionTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  paragraphRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  cardTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  infoRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  infoLabelRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  infoValueRTL: {
+    textAlign: 'left',
+  },
+  footerTextRTL: {
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
+  footerSubtextRTL: {
+    textAlign: 'center',
   },
 });
