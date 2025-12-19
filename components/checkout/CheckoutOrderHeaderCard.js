@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../../utils/productLocalization';
+import { formatEmirateLabel } from '../../utils/emirateUtils';
 
 export default function CheckoutOrderHeaderCard({
   styles,
@@ -28,7 +29,7 @@ export default function CheckoutOrderHeaderCard({
         activeOpacity={0.85}
       >
         <View style={styles.orderHeaderLeft}>
-          <Text style={styles.orderNumber}>Order {orderNumber}</Text>
+          <Text style={styles.orderNumber}>{t('checkout.orderNumberLine', { orderNumber })}</Text>
           <Text style={styles.itemCount}>
             {t('bag.header', {
               count: itemCount,
@@ -48,7 +49,7 @@ export default function CheckoutOrderHeaderCard({
           <Text style={styles.orderSummaryTitle}>{t('checkout.orderSummary')}</Text>
 
           {(paidItems || []).map((it, idx) => {
-            const name = getLocalizedProductName(it.product, locale) || it.product?.name || 'Item';
+            const name = getLocalizedProductName(it.product, locale) || it.product?.name || t('common.item');
             const qty = Number(it.quantity) || 0;
             const size = it.selectedSize ? String(it.selectedSize) : '';
             const color = it.selectedColor ? String(it.selectedColor) : '';
@@ -71,7 +72,7 @@ export default function CheckoutOrderHeaderCard({
             <>
               <Text style={styles.orderSummarySection}>{t('checkout.promotion')}</Text>
               {promoItems.map((it, idx) => {
-                const name = getLocalizedProductName(it.product, locale) || it.product?.name || 'Promo item';
+                const name = getLocalizedProductName(it.product, locale) || it.product?.name || t('common.promoItem');
                 const qty = Number(it.quantity) || 1;
                 const size = it.product?.size ? String(it.product.size) : '';
                 return (
@@ -91,7 +92,9 @@ export default function CheckoutOrderHeaderCard({
             <Text style={styles.orderTotalsValue}>AED {Number(safeSubtotal || 0).toFixed(2)}</Text>
           </View>
           <View style={styles.orderTotalsRow}>
-            <Text style={styles.orderTotalsLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
+            <Text style={styles.orderTotalsLabel}>
+              {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
+            </Text>
             <Text style={styles.orderTotalsValue}>
               {Number(safeShipping || 0) === 0 ? t('common.free') : `AED ${Number(safeShipping || 0).toFixed(2)}`}
             </Text>

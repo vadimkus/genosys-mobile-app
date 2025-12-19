@@ -38,7 +38,7 @@ export default function ForgotPasswordScreen() {
         t('authScreen.resetEmailSentMessage'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => router.push({ pathname: '/auth/reset-password', params: { email: email.trim() } }),
           },
         ]
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   button: {
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,

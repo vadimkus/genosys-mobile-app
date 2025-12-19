@@ -179,7 +179,7 @@ export default function StripePaymentScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.headerSpacer} />
@@ -210,7 +210,7 @@ export default function StripePaymentScreen() {
             disabled={!canCheck || checking}
             activeOpacity={0.85}
           >
-            {checking ? <ActivityIndicator color="#E74C3C" /> : <Ionicons name="refresh" size={18} color="#E74C3C" />}
+            {checking ? <ActivityIndicator color="#dc2626" /> : <Ionicons name="refresh" size={18} color="#dc2626" />}
             <Text style={styles.secondaryButtonText}>{checking ? t('payment.checking') : t('payment.checkPaymentStatus')}</Text>
           </TouchableOpacity>
 
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 14,
     borderRadius: 12,
   },
@@ -275,12 +275,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: '#FFF5F5',
   },
-  secondaryButtonText: { color: '#E74C3C', fontSize: 15, fontWeight: '700' },
+  secondaryButtonText: { color: '#dc2626', fontSize: 15, fontWeight: '700' },
   linkButton: { alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 12 },
   linkText: { color: '#007AFF', fontSize: 14, fontWeight: '600' },
   buttonDisabled: { opacity: 0.6 },

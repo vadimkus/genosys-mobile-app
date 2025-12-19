@@ -108,17 +108,17 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
 
         <View style={styles.contactInfo}>
           <View style={styles.contactItem}>
-            <Ionicons name="mail-outline" size={16} color="#E74C3C" />
+            <Ionicons name="mail-outline" size={16} color="#dc2626" />
             <TouchableOpacity onPress={handleEmailPress}>
               <Text style={styles.contactLink}>{email}</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.contactItem}>
-            <Ionicons name="call-outline" size={16} color="#E74C3C" />
+            <Ionicons name="call-outline" size={16} color="#dc2626" />
             <Text style={styles.contactText}>{phoneDisplay}</Text>
           </View>
           <View style={styles.contactItem}>
-            <Ionicons name="location-outline" size={16} color="#E74C3C" />
+            <Ionicons name="location-outline" size={16} color="#dc2626" />
             <Text style={styles.contactText}>{location}</Text>
           </View>
         </View>
@@ -148,9 +148,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#E74C3C',
+    borderLeftColor: '#dc2626',
   },
-  highlightTitle: { fontSize: 18, fontWeight: '700', color: '#E74C3C', marginBottom: 8 },
+  highlightTitle: { fontSize: 18, fontWeight: '700', color: '#dc2626', marginBottom: 8 },
   highlightText: { fontSize: 16, lineHeight: 24, color: '#333' },
   section: { paddingHorizontal: 20, paddingVertical: 20 },
   sectionTitle: { fontSize: 18, fontWeight: '600', color: '#1D1D1F', marginBottom: 12 },
@@ -171,12 +171,12 @@ const styles = StyleSheet.create({
   contactItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, paddingLeft: 4 },
   contactLink: {
     fontSize: 16,
-    color: '#E74C3C',
+    color: '#dc2626',
     textDecorationLine: 'underline',
     marginLeft: 8,
   },
   contactText: { fontSize: 16, color: '#333', marginLeft: 8, flex: 1, lineHeight: 22 },
-  link: { color: '#E74C3C', textDecorationLine: 'underline' },
+  link: { color: '#dc2626', textDecorationLine: 'underline' },
   footerSpace: { height: 40 },
 });
 

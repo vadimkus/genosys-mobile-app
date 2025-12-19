@@ -17,6 +17,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
 import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import AUTH_CONFIG from '../../config/auth';
 
@@ -96,6 +97,9 @@ export default function BagScreen() {
     const multiplier = 1 - discountPct / 100;
     if (multiplier <= 0) return null;
     const sum = items.reduce((acc, item) => {
+      // Never include promo items in "before discount" math.
+      if (isPromoItem(item)) return acc;
+
       const qty = Number(item.quantity) || 0;
       const explicitOriginal = Number(item.product?.originalPrice);
       const base = Number(item.product?.displayPrice ?? item.product?.price ?? 0) || 0;
@@ -361,7 +365,7 @@ export default function BagScreen() {
               </View>
 
               <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveItem(item)}>
-                <Ionicons name="trash-outline" size={20} color="#E74C3C" />
+                <Ionicons name="trash-outline" size={20} color="#dc2626" />
               </TouchableOpacity>
             </View>
           )}
@@ -502,7 +506,7 @@ export default function BagScreen() {
             <View style={styles.sectionCard}>
               <View style={styles.sectionTitleRow}>
                 <View style={styles.sectionTitleLeft}>
-                  <Ionicons name="gift-outline" size={18} color="#E74C3C" />
+                  <Ionicons name="gift-outline" size={18} color="#dc2626" />
                   <Text style={styles.sectionTitle}>{t('bag.freeMaskPromotion')}</Text>
                 </View>
                 <Text style={styles.sectionSubtle}>{t('bag.promoValidUntil', { date: '01/02/2026' })}</Text>
@@ -545,7 +549,7 @@ export default function BagScreen() {
               <ProgressCard
                 headerLeft={
                   <View style={styles.sectionTitleLeft}>
-                    <Ionicons name="car-outline" size={18} color="#E74C3C" />
+                    <Ionicons name="car-outline" size={18} color="#dc2626" />
                     <Text style={styles.sectionTitle}>{t('bag.freeDeliveryTitle')}</Text>
                   </View>
                 }
@@ -619,7 +623,9 @@ export default function BagScreen() {
               )}
 
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
+                <Text style={styles.summaryLabel}>
+                  {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
+                </Text>
                 <Text style={[styles.summaryValue, cartSummary.hasFreeShipping && styles.freeText]}>
                   {cartSummary.hasFreeShipping ? t('common.free') : `${safeShipping.toFixed(2)} AED`}
                 </Text>
@@ -772,7 +778,7 @@ const styles = StyleSheet.create({
   },
   clearText: {
     fontSize: 16,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
   },
   // Layout Sections
@@ -814,7 +820,7 @@ const styles = StyleSheet.create({
   },
   sectionSubtle: {
     fontSize: 12,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '700',
     flexShrink: 1,
     maxWidth: '48%',
@@ -969,7 +975,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   itemDetails: {
     flex: 1,
@@ -1050,7 +1056,7 @@ const styles = StyleSheet.create({
   itemDiscountedPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   itemBundleLabel: {
     fontSize: 11,
@@ -1116,7 +1122,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   shopButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
@@ -1181,7 +1187,7 @@ const styles = StyleSheet.create({
   summaryDiscountValue: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   discountPctGreen: {
     color: '#27AE60',
@@ -1212,7 +1218,7 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
   },
   checkoutButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -1254,7 +1260,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F2F2F7',
   },
   selectedEmirateOption: {
-    backgroundColor: '#E74C3C10',
+    backgroundColor: '#dc262610',
   },
   emirateOptionContent: {
     flex: 1,
@@ -1266,7 +1272,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   selectedEmirateText: {
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   emirateShippingCost: {
     fontSize: 14,

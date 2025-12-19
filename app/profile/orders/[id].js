@@ -7,27 +7,28 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { fetchUserOrderById, fetchUserOrders } from '../../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
 import { useLocalization } from '../../../contexts/LocalizationContext';
+import { formatEmirateLabel } from '../../../utils/emirateUtils';
 
 const formatAED = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num.toFixed(2) : '0.00';
 };
 
-const formatDateTime = (dateString) => {
+const formatDateTime = (dateString, locale, t) => {
   if (!dateString) return null;
   try {
     const date = new Date(dateString);
-    const dateStr = date.toLocaleDateString('en-GB', { 
+    const dateStr = date.toLocaleDateString(locale || undefined, {
       day: '2-digit', 
       month: 'short', 
       year: 'numeric' 
     });
-    const timeStr = date.toLocaleTimeString('en-US', { 
+    const timeStr = date.toLocaleTimeString(locale || undefined, {
       hour: '2-digit', 
       minute: '2-digit',
       hour12: true 
     });
-    return `${dateStr} at ${timeStr}`;
+    return `${dateStr} ${t('common.at')} ${timeStr}`;
   } catch {
     return null;
   }
@@ -99,7 +100,7 @@ export default function OrderDetailScreen() {
 
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
-  const { t } = useLocalization();
+  const { t, locale } = useLocalization();
 
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
@@ -127,7 +128,7 @@ export default function OrderDetailScreen() {
 
       setOrder(match);
     } catch (e) {
-      Alert.alert(t('common.error'), e?.message || 'Please try again.');
+      Alert.alert(t('common.error'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
       setLoading(false);
     }
@@ -156,7 +157,7 @@ export default function OrderDetailScreen() {
   const orderNotes = String(order?.orderNotes || order?.order_notes || '').trim();
   
   const createdAt = order?.createdAt || order?.created_at || order?.orderDate || order?.order_date;
-  const formattedDateTime = formatDateTime(createdAt);
+  const formattedDateTime = formatDateTime(createdAt, locale, t);
 
   const getStatusLabel = () => {
     const raw = String(status || '').trim();
@@ -234,7 +235,7 @@ export default function OrderDetailScreen() {
 
   const onSupport = () => {
     const phoneNumber = '971585487665';
-    const message = `Hi! I need help with order ${String(orderNumber)}. Can you assist me?`;
+    const message = t('support.whatsappOrderHelpMessage', { orderNumber: String(orderNumber) });
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(whatsappUrl).catch(() => {
       Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
@@ -246,7 +247,7 @@ export default function OrderDetailScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('ordersDetail.orderDetails')}</Text>
         <TouchableOpacity onPress={load} style={styles.refreshButton}>
@@ -256,7 +257,7 @@ export default function OrderDetailScreen() {
 
       {loading ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#E74C3C" />
+          <ActivityIndicator size="large" color="#dc2626" />
           <Text style={styles.loadingText}>{t('ordersDetail.loading')}</Text>
         </View>
       ) : !order ? (
@@ -270,7 +271,7 @@ export default function OrderDetailScreen() {
           {/* Order Number Card */}
           <View style={styles.orderNumberCard}>
             <View style={styles.orderNumberHeader}>
-              <Ionicons name="receipt" size={24} color="#E74C3C" />
+              <Ionicons name="receipt" size={24} color="#dc2626" />
               <View style={styles.orderNumberTextContainer}>
                 <Text style={styles.orderNumberLabel}>{t('ordersDetail.orderNumber')}</Text>
                 <Text style={styles.orderNumber}>{String(orderNumber)}</Text>
@@ -337,7 +338,7 @@ export default function OrderDetailScreen() {
           {/* Items Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="bag-handle" size={20} color="#E74C3C" />
+              <Ionicons name="bag-handle" size={20} color="#dc2626" />
               <Text style={styles.sectionTitle}>{t('ordersDetail.items')}</Text>
             </View>
             
@@ -345,7 +346,7 @@ export default function OrderDetailScreen() {
             {paidItems.map((it, idx) => {
               const qty = Number(it?.quantity) || 1;
               const price = Number(it?.price) || 0;
-              const name = it?.name || it?.productName || `Item ${idx + 1}`;
+              const name = it?.name || it?.productName || t('common.itemWithNumber', { number: idx + 1 });
               const size = it?.size || it?.selectedSize || '';
               const color = it?.color || it?.selectedColor || '';
               const itemTotal = qty * price;
@@ -354,13 +355,23 @@ export default function OrderDetailScreen() {
               const inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
               const canShowDiscountBreakdown = !isPromoItem(it) && inferredOriginalUnit != null;
               const discountUnit = canShowDiscountBreakdown ? (inferredOriginalUnit - price) : 0;
+              const originalLineTotal = canShowDiscountBreakdown ? (inferredOriginalUnit * qty) : null;
+              const discountLineTotal = canShowDiscountBreakdown ? (discountUnit * qty) : null;
               
               return (
                 <View key={`paid-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemCard}>
                   <View style={styles.itemHeader}>
-                    <Text style={styles.itemName}>{String(name)}</Text>
+                    <View style={styles.itemTitleWrap}>
+                      <Text style={styles.itemName} numberOfLines={2}>{String(name)}</Text>
+                      {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
+                        <View style={styles.discountPill}>
+                          <Text style={styles.discountPillText}>{`${Math.round(discountPct)}%`}</Text>
+                        </View>
+                      ) : null}
+                    </View>
                     <Text style={styles.itemPrice}>AED {formatAED(itemTotal)}</Text>
                   </View>
+
                   <View style={styles.itemDetails}>
                     <Text style={styles.itemDetailText}>{t('ordersDetail.qty')}: {qty}</Text>
                     {size && size !== '__PROMO__' ? (
@@ -369,20 +380,59 @@ export default function OrderDetailScreen() {
                     {color ? (
                       <Text style={styles.itemDetailText}>• {t('ordersDetail.color')}: {String(color)}</Text>
                     ) : null}
-                    <Text style={styles.itemDetailText}>• AED {formatAED(price)} {t('ordersDetail.each')}</Text>
+                  </View>
+
+                  <View style={styles.itemPriceBlock}>
+                    <View style={styles.itemPriceRow}>
+                      <Text style={styles.itemPriceLabel}>{t('ordersDetail.each')}</Text>
+                      <Text style={styles.itemPriceValue}>AED {formatAED(price)}</Text>
+                    </View>
 
                     {canShowDiscountBreakdown ? (
                       <>
-                        <Text style={styles.itemDetailText}>
-                          • {t('ordersDetail.fullPrice')}: AED {formatAED(inferredOriginalUnit)}
-                        </Text>
-                        <Text style={styles.itemDetailText}>
-                          • {t('ordersDetail.discount')}: {Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : ''} (-AED {formatAED(discountUnit)})
-                        </Text>
-                        <Text style={styles.itemDetailText}>
-                          • {t('ordersDetail.priceAfterDiscount')}: AED {formatAED(price)}
-                        </Text>
+                        <View style={styles.itemPriceRow}>
+                          <Text style={styles.itemPriceLabel}>{t('ordersDetail.fullPrice')}</Text>
+                          <Text style={[styles.itemPriceValue, styles.itemPriceValueMuted, styles.itemPriceValueStrikethrough]}>
+                            AED {formatAED(inferredOriginalUnit)}
+                          </Text>
+                        </View>
+                        <View style={styles.itemPriceRow}>
+                          <Text style={styles.itemPriceLabel}>
+                            {t('ordersDetail.discount')}
+                            {Number.isFinite(discountPct) ? (
+                              <Text style={styles.discountPctText}> {`(${Math.round(discountPct)}%)`}</Text>
+                            ) : null}
+                          </Text>
+                          <Text style={[styles.itemPriceValue, styles.discountValue]}>-AED {formatAED(discountUnit)}</Text>
+                        </View>
+                        <View style={styles.itemPriceRow}>
+                          <Text style={styles.itemPriceLabelStrong}>{t('ordersDetail.priceAfterDiscount')}</Text>
+                          <Text style={[styles.itemPriceValue, styles.itemPriceValueStrong]}>AED {formatAED(price)}</Text>
+                        </View>
                       </>
+                    ) : null}
+
+                    {qty > 1 ? (
+                      <View style={styles.itemLineTotals}>
+                        {canShowDiscountBreakdown ? (
+                          <>
+                            <View style={styles.itemPriceRow}>
+                              <Text style={styles.itemPriceLabel}>{t('ordersDetail.fullPrice')}</Text>
+                              <Text style={[styles.itemPriceValue, styles.itemPriceValueMuted, styles.itemPriceValueStrikethrough]}>
+                                AED {formatAED(originalLineTotal)}
+                              </Text>
+                            </View>
+                            <View style={styles.itemPriceRow}>
+                              <Text style={styles.itemPriceLabel}>{t('ordersDetail.discount')}</Text>
+                              <Text style={[styles.itemPriceValue, styles.discountValue]}>-AED {formatAED(discountLineTotal)}</Text>
+                            </View>
+                          </>
+                        ) : null}
+                        <View style={styles.itemPriceRow}>
+                          <Text style={styles.itemPriceLabelStrong}>{t('ordersDetail.total')}</Text>
+                          <Text style={styles.itemPrice}>{`AED ${formatAED(itemTotal)}`}</Text>
+                        </View>
+                      </View>
                     ) : null}
                   </View>
                 </View>
@@ -398,7 +448,7 @@ export default function OrderDetailScreen() {
                 </View>
                 {promoItems.map((it, idx) => {
                   const qty = Number(it?.quantity) || 1;
-                  const name = it?.name || it?.productName || `Free Item ${idx + 1}`;
+                  const name = it?.name || it?.productName || t('common.freeItemWithNumber', { number: idx + 1 });
                   
                   return (
                     <View key={`promo-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.promoItemCard}>
@@ -451,7 +501,7 @@ export default function OrderDetailScreen() {
               <View style={styles.detailRow}>
                 <Ionicons name="flag-outline" size={16} color="#8E8E93" />
                 <Text style={styles.detailLabel}>{t('ordersDetail.emirate')}</Text>
-                <Text style={styles.detailValue}>{String(emirate)}</Text>
+                <Text style={styles.detailValue}>{formatEmirateLabel(t, emirate)}</Text>
               </View>
             ) : null}
             
@@ -671,7 +721,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
   },
   statusBadgePending: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
   },
   paymentStatusBadge: {
     backgroundColor: '#27AE60',
@@ -736,6 +786,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     gap: 12,
   },
+  itemTitleWrap: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   itemName: {
     flex: 1,
     fontSize: 14,
@@ -743,10 +801,23 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
     lineHeight: 18,
   },
+  discountPill: {
+    backgroundColor: '#DCFCE7',
+    borderColor: '#16A34A',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  discountPillText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#16A34A',
+  },
   itemPrice: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   itemDetails: {
     flexDirection: 'row',
@@ -757,6 +828,61 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8E8E93',
     fontWeight: '500',
+  },
+  itemPriceBlock: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
+  },
+  itemPriceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: 12,
+    marginTop: 6,
+  },
+  itemPriceLabel: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '600',
+  },
+  itemPriceLabelStrong: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 12,
+    color: '#1D1D1F',
+    fontWeight: '800',
+  },
+  itemPriceValue: {
+    fontSize: 12,
+    color: '#1D1D1F',
+    fontWeight: '700',
+  },
+  itemPriceValueMuted: {
+    color: '#9CA3AF',
+  },
+  itemPriceValueStrikethrough: {
+    textDecorationLine: 'line-through',
+  },
+  itemPriceValueStrong: {
+    fontWeight: '900',
+  },
+  discountValue: {
+    color: '#16A34A',
+    fontWeight: '900',
+  },
+  discountPctText: {
+    color: '#16A34A',
+    fontWeight: '900',
+  },
+  itemLineTotals: {
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
   },
   
   // Promo Items
@@ -873,7 +999,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   
   // Actions
@@ -887,10 +1013,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 16,
     borderRadius: 14,
-    shadowColor: '#E74C3C',
+    shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

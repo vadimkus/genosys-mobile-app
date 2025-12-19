@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../services/orderService';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { formatEmirateLabel } from '../../utils/emirateUtils';
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -58,31 +59,11 @@ const formatStatusLabel = (t, rawStatus) => {
   return key ? t(key) : (raw ? raw.toUpperCase() : t('ordersDetail.statusPending'));
 };
 
-const canonicalEmirateKey = (value) => {
-  const s = String(value || '').trim().toLowerCase();
-  if (!s) return '';
-  const cleaned = s.replace(/[\.\,]/g, '').replace(/\s+/g, ' ');
-  if (cleaned === 'abu dhabi' || cleaned === 'abudhabi') return 'abuDhabi';
-  if (cleaned === 'dubai') return 'dubai';
-  if (cleaned === 'sharjah') return 'sharjah';
-  if (cleaned === 'ajman') return 'ajman';
-  if (cleaned === 'umm al quwain' || cleaned === 'umm al-quwain' || cleaned === 'ummalquwain') return 'ummAlQuwain';
-  if (cleaned === 'ras al khaimah' || cleaned === 'ras al-khaimah' || cleaned === 'rasalkhaimah') return 'rasAlKhaimah';
-  if (cleaned === 'fujairah') return 'fujairah';
-  return '';
-};
-
-const formatEmirateLabel = (t, emirate) => {
-  const raw = String(emirate || '').trim();
-  const key = canonicalEmirateKey(raw);
-  return key ? t(`addAddress.emirates.${key}`) : raw;
-};
-
 const statusColor = (status) => {
   const s = String(status || '').toLowerCase();
-  if (s === 'pending') return '#E74C3C';
+  if (s === 'pending') return '#dc2626';
   if (s === 'paid' || s === 'confirmed' || s === 'delivered') return '#27AE60';
-  if (s === 'cancelled' || s === 'canceled') return '#E74C3C';
+  if (s === 'cancelled' || s === 'canceled') return '#dc2626';
   if (s === 'shipped') return '#007AFF';
   return '#8E8E93';
 };
@@ -255,8 +236,7 @@ export default function OrdersScreen() {
       const res = await getPaymentUrlForExistingOrder({ token, orderId, orderNumber, order });
       if (!res?.success || !res?.paymentUrl) {
         throw new Error(
-          res?.error ||
-            'Could not start payment. This usually means the backend does not yet support resuming Stripe payments for pending orders.'
+          res?.error || t('ordersDetailAlerts.couldNotStartPaymentMessage')
         );
       }
 
@@ -270,7 +250,7 @@ export default function OrdersScreen() {
         },
       });
     } catch (e) {
-      Alert.alert(t('orders.couldNotStartPayment'), e?.message || 'Please try again.');
+      Alert.alert(t('orders.couldNotStartPayment'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
       setPayingOrderId('');
     }
@@ -279,7 +259,7 @@ export default function OrdersScreen() {
   const contactSupportWhatsApp = (order) => {
     const orderNumber = order?.orderNumber || order?.order_number || order?.number || order?.id || '';
     const phoneNumber = '971585487665';
-    const message = `Hi! I need help with order ${String(orderNumber)}. Can you assist me?`;
+    const message = t('support.whatsappOrderHelpMessage', { orderNumber: String(orderNumber) });
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(whatsappUrl).catch(() => {
       Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
@@ -330,7 +310,7 @@ export default function OrdersScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+            <Ionicons name="chevron-back" size={24} color="#dc2626" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('orders.title')}</Text>
           <View style={styles.headerSpacer} />
@@ -347,7 +327,7 @@ export default function OrdersScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('orders.title')}</Text>
         <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
@@ -359,11 +339,11 @@ export default function OrdersScreen() {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: (insets?.bottom || 0) + 24 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E74C3C" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#dc2626" />}
       >
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color="#E74C3C" />
+            <ActivityIndicator size="large" color="#dc2626" />
             <Text style={styles.loadingText}>{t('ordersScreen.loading')}</Text>
           </View>
         ) : error ? (
@@ -436,7 +416,7 @@ export default function OrdersScreen() {
                         activeOpacity={0.85}
                         style={styles.deletePill}
                       >
-                        <Ionicons name="trash-outline" size={16} color="#E74C3C" />
+                        <Ionicons name="trash-outline" size={16} color="#dc2626" />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -646,7 +626,7 @@ const styles = StyleSheet.create({
   },
   metaText: { marginTop: 6, fontSize: 12, color: '#8E8E93' },
   cardBottom: { marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  totalText: { fontSize: 15, fontWeight: '700', color: '#E74C3C' },
+  totalText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
   itemsText: { fontSize: 12, color: '#8E8E93' },
   breakdownRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
   breakdownText: { fontSize: 12, color: '#8E8E93' },
@@ -663,7 +643,7 @@ const styles = StyleSheet.create({
   orderSummaryItemRow: { marginBottom: 6 },
   orderSummaryLineMuted: { fontSize: 12, color: '#6B7280', lineHeight: 18 },
   orderSummaryPriceStrike: { textDecorationLine: 'line-through', color: '#9CA3AF', fontWeight: '700' },
-  orderSummaryPriceFinal: { color: '#E74C3C', fontWeight: '800' },
+  orderSummaryPriceFinal: { color: '#dc2626', fontWeight: '800' },
   orderSummaryDivider: { height: 1, backgroundColor: '#E5E5EA', marginTop: 10, marginBottom: 6 },
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   orderTotalsLabel: { fontSize: 12, color: '#3C3C43', fontWeight: '700' },
@@ -676,7 +656,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 12,
     borderRadius: 10,
   },

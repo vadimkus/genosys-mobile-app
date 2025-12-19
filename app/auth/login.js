@@ -282,7 +282,7 @@ export default function LoginScreen() {
             <View style={styles.uaeRow}>
               <Text style={styles.uaeFlag}>🇦🇪</Text>
               <Text style={styles.title}>{t('authScreen.uaeLine')}</Text>
-              <Ionicons name="heart" size={12} color="#E74C3C" style={styles.uaeHeart} />
+              <Ionicons name="heart" size={12} color="#dc2626" style={styles.uaeHeart} />
             </View>
           </View>
 
@@ -611,12 +611,12 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   biometricButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 20,
     marginBottom: 16,
-    shadowColor: '#E74C3C',
+    shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -694,12 +694,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   authButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 18,
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: '#E74C3C',
+    shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
   switchMode: {
@@ -734,7 +734,7 @@ const styles = StyleSheet.create({
   },
   switchModeButton: {
     fontSize: 14,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
   },
 
@@ -760,8 +760,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkboxChecked: {
-    backgroundColor: '#E74C3C',
-    borderColor: '#E74C3C',
+    backgroundColor: '#dc2626',
+    borderColor: '#dc2626',
   },
   privacyText: {
     flex: 1,

@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
+import { formatEmirateLabel } from '../../utils/emirateUtils';
 
 const log = createLogger('Addresses');
 
@@ -42,24 +43,7 @@ export default function AddressesScreen() {
     };
   };
 
-  const formatEmirate = (raw) => {
-    const v = String(raw || '').trim();
-    if (!v) return '';
-    const k = normalizeKey(v);
-    const map = {
-      'abu dhabi': 'abuDhabi',
-      'dubai': 'dubai',
-      'sharjah': 'sharjah',
-      'ajman': 'ajman',
-      'umm al quwain': 'ummAlQuwain',
-      'umm al-quwain': 'ummAlQuwain',
-      'ras al khaimah': 'rasAlKhaimah',
-      'ras al-khaimah': 'rasAlKhaimah',
-      'fujairah': 'fujairah',
-    };
-    const key = map[k];
-    return key ? t(`addAddress.emirates.${key}`) : v;
-  };
+  const formatEmirate = (raw) => formatEmirateLabel(t, raw);
 
   const formatCountry = (raw) => {
     const v = String(raw || '').trim();
@@ -155,7 +139,7 @@ export default function AddressesScreen() {
             <Ionicons
               name={typeMeta.icon}
               size={20}
-              color="#E74C3C"
+              color="#dc2626"
             />
             <Text style={styles.addressType}>{typeMeta.label}</Text>
             {address.isDefault && (
@@ -199,11 +183,11 @@ export default function AddressesScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('addresses.title')}</Text>
         <TouchableOpacity onPress={handleAddAddress} style={styles.addButton}>
-          <Ionicons name="add" size={24} color="#E74C3C" />
+          <Ionicons name="add" size={24} color="#dc2626" />
         </TouchableOpacity>
       </View>
 
@@ -214,7 +198,7 @@ export default function AddressesScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#E74C3C"
+            tintColor="#dc2626"
           />
         }
       >
@@ -228,7 +212,7 @@ export default function AddressesScreen() {
         {/* Addresses List */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#E74C3C" />
+            <ActivityIndicator size="large" color="#dc2626" />
             <Text style={styles.loadingText}>{t('addresses.loading')}</Text>
           </View>
         ) : (
@@ -250,7 +234,7 @@ export default function AddressesScreen() {
         <TouchableOpacity style={styles.addNewButton} onPress={handleAddAddress}>
           <View style={styles.addNewContent}>
             <View style={styles.addIconContainer}>
-              <Ionicons name="add" size={24} color="#E74C3C" />
+              <Ionicons name="add" size={24} color="#dc2626" />
             </View>
             <Text style={styles.addNewText}>{t('addresses.addNew')}</Text>
           </View>
@@ -430,7 +414,7 @@ const styles = StyleSheet.create({
   },
   addNewText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
 

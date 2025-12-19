@@ -296,7 +296,7 @@ export default function ShopScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#E74C3C" />
+        <ActivityIndicator size="large" color="#dc2626" />
         <Text style={styles.loadingText}>{t('shop.loading')}</Text>
       </SafeAreaView>
     );
@@ -326,7 +326,7 @@ export default function ShopScreen() {
               <Ionicons 
                 name={getFavoritesCount() > 0 ? "heart" : "heart-outline"} 
                 size={24} 
-                color={getFavoritesCount() > 0 ? "#E74C3C" : "#C7C7CC"} 
+                color={getFavoritesCount() > 0 ? "#dc2626" : "#C7C7CC"} 
               />
               {getFavoritesCount() > 0 && (
                 <View style={styles.favoritesBadge}>
@@ -373,7 +373,7 @@ export default function ShopScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#E74C3C"
+            tintColor="#dc2626"
           />
         }
       >
@@ -549,16 +549,16 @@ export default function ShopScreen() {
                       const computedBadges = [];
                       if (!isOutOfStock) {
                         if (isMesopeciaKit) {
-                          computedBadges.push({ text: 'Order', color: '#FF9500', priority: 0 });
+                          computedBadges.push({ text: t('common.order'), color: '#FF9500', priority: 0 });
                         } else if (!isHolidayKit) {
-                          computedBadges.push({ text: 'In stock', color: '#34C759', priority: 0 });
+                          computedBadges.push({ text: t('stock.inStock'), color: '#34C759', priority: 0 });
                         }
                       }
 
                       // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
                       const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
                       if (isBioFermentMask && !hasNewBadge) {
-                        computedBadges.push({ text: 'New', color: '#007AFF', priority: 1 });
+                        computedBadges.push({ text: t('common.new'), color: '#007AFF', priority: 1 });
                       }
 
                       const badges = [...computedBadges, ...baseBadges]
@@ -593,7 +593,7 @@ export default function ShopScreen() {
                       <Ionicons 
                         name={isFavorite(product.id) ? "heart" : "heart-outline"} 
                         size={20} 
-                        color={isFavorite(product.id) ? "#E74C3C" : "#ffffff"} 
+                        color={isFavorite(product.id) ? "#dc2626" : "#ffffff"} 
                       />
                     </TouchableOpacity>
                     
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 8,
     minWidth: 16,
     height: 16,
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
   },
   productCount: {
     fontSize: 13,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
     marginTop: 8,
     textAlign: 'left',
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
   gridPlaceholderText: {
     fontSize: 32,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   gridContent: {
     padding: 12,
@@ -1010,7 +1010,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   clearSearchButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1062,8 +1062,8 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   activeCategoryButton: {
-    backgroundColor: '#E74C3C',
-    borderColor: '#E74C3C',
+    backgroundColor: '#dc2626',
+    borderColor: '#dc2626',
   },
   categoryButtonText: {
     fontSize: 14,
@@ -1155,13 +1155,13 @@ const styles = StyleSheet.create({
   discountedPrice: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   savings: {
     fontSize: 10,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
-    backgroundColor: '#E74C3C20',
+    backgroundColor: '#dc262620',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -1185,7 +1185,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,

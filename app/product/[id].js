@@ -173,7 +173,8 @@ export default function ProductDetailScreen() {
 
       addItem(productForCart, 1, selectedColor, selectedSize);
       
-      let message = `${getLocalizedProductName(product, locale) || product.name} has been added to your bag`;
+      const safeName = getLocalizedProductName(product, locale) || product.name;
+      let message = t('product.addedToBagMessage', { name: safeName });
       if (selectedSize) {
         message += `\n${t('common.size')}: ${selectedSize}`;
       }
@@ -313,16 +314,26 @@ export default function ProductDetailScreen() {
 
       const normalized = key.replace(/\s+/g, '').toLowerCase();
       const special = {
-        sizeoptions: 'Size options',
-        keybenefits: 'Key Benefits',
-        skintype: 'Skin Type',
-        howtouse: 'How to use',
-        how_to_use: 'How to use',
-        countryoforigin: 'Origin',
-        madein: 'Origin',
-        productsize: 'Size',
-        volume: 'Size',
-        type: 'Type',
+        sizeoptions: t('product.spec.sizeOptions'),
+        keybenefits: t('product.spec.keyBenefits'),
+        skintype: t('product.spec.skinType'),
+        formulation: t('product.spec.formulation'),
+        origin: t('product.spec.origin'),
+        howtouse: t('product.spec.howToUse'),
+        how_to_use: t('product.spec.howToUse'),
+        countryoforigin: t('product.spec.origin'),
+        madein: t('product.spec.origin'),
+        productsize: t('product.spec.size'),
+        volume: t('product.spec.size'),
+        size: t('product.spec.size'),
+        form: t('product.spec.form'),
+        target: t('product.spec.target'),
+        technology: t('product.spec.technology'),
+        usage: t('product.spec.usage'),
+        application: t('product.spec.application'),
+        note: t('product.spec.note'),
+        notes: t('product.spec.note'),
+        type: t('product.spec.type'),
       };
       if (special[normalized]) return special[normalized];
 
@@ -531,7 +542,7 @@ export default function ProductDetailScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#E74C3C" />
+        <ActivityIndicator size="large" color="#dc2626" />
         <Text style={styles.loadingText}>{t('productScreen.loadingDetails')}</Text>
       </SafeAreaView>
     );
@@ -587,7 +598,7 @@ export default function ProductDetailScreen() {
                 <Ionicons
                   name={isWishlisted ? 'heart' : 'heart-outline'}
                   size={20}
-                  color={isWishlisted ? '#E74C3C' : '#1D1D1F'}
+                  color={isWishlisted ? '#dc2626' : '#1D1D1F'}
                 />
               </TouchableOpacity>
             </View>
@@ -863,7 +874,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -932,7 +943,7 @@ const styles = StyleSheet.create({
   heroPlaceholderText: {
     fontSize: 64,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   contentContainer: {
     paddingHorizontal: 20,
@@ -945,7 +956,7 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 8,
@@ -1085,7 +1096,7 @@ const styles = StyleSheet.create({
   readMoreText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   // Rating styles removed (rating section not used)
   featureList: {
@@ -1117,7 +1128,7 @@ const styles = StyleSheet.create({
   },
   listBullet: {
     fontSize: 18,
-    color: '#E74C3C',
+    color: '#dc2626',
     lineHeight: 22,
   },
   listText: {
@@ -1246,7 +1257,7 @@ const styles = StyleSheet.create({
   pcPriceMain: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   pcPriceOld: {
     fontSize: 12,
@@ -1271,7 +1282,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 12,
     borderRadius: 12,
   },
@@ -1308,7 +1319,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pcBenefitCheck: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '900',
     marginTop: 1,
   },
@@ -1358,13 +1369,13 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   addToBagButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#E74C3C',
+    shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -1414,7 +1425,7 @@ const styles = StyleSheet.create({
   discountedPrice: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   // Beauty Boxes detail page pricing styles
   beautyBoxDetailPricing: {
@@ -1422,7 +1433,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     marginVertical: 8,
   },
   beautyBoxDetailFullPrice: {
@@ -1440,7 +1451,7 @@ const styles = StyleSheet.create({
   },
   beautyBoxDetailDiscount: {
     fontSize: 14,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: 'bold',
     backgroundColor: '#FFE5E5',
     paddingHorizontal: 10,

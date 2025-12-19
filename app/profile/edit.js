@@ -457,7 +457,7 @@ export default function EditProfileScreen() {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={handleBack} style={[styles.headerButton, styles.headerBackButton]}>
-            <Ionicons name="chevron-back" size={18} color="#E74C3C" />
+            <Ionicons name="chevron-back" size={18} color="#dc2626" />
             <Text style={styles.backText}>{t('common.back')}</Text>
           </TouchableOpacity>
         )}
@@ -778,7 +778,7 @@ export default function EditProfileScreen() {
                     {option.label}
                   </Text>
                   {formData.gender === option.value && (
-                    <Ionicons name="checkmark" size={20} color="#E74C3C" />
+                    <Ionicons name="checkmark" size={20} color="#dc2626" />
                   )}
                 </TouchableOpacity>
               ))}
@@ -819,12 +819,12 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '400',
   },
   cancelText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   headerButtonDisabled: {
     opacity: 0.5,
@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
     textAlign: 'right',
   },
@@ -859,7 +859,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '400',
   },
 
@@ -915,7 +915,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   requiredMark: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontSize: 17,
   },
   optionalMark: {
@@ -1025,7 +1025,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   deleteAccountButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -1072,7 +1072,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -1080,7 +1080,7 @@ const styles = StyleSheet.create({
   },
   profilePictureText: {
     fontSize: 16,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
 
@@ -1174,13 +1174,13 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   selectedGenderOptionText: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
 
   // Required field indicator
   requiredMark: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontSize: 16,
     fontWeight: '600',
   },

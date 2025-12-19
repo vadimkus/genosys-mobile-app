@@ -89,7 +89,7 @@ export default function TabLayout() {
           shadowOpacity: 0.1,
           shadowRadius: 8,
         } : styles.androidTabBar,
-        tabBarActiveTintColor: '#E74C3C',
+        tabBarActiveTintColor: '#dc2626',
         tabBarInactiveTintColor: '#8E8E93',
         tabBarLabelStyle: {
           fontSize: 10,
@@ -145,7 +145,7 @@ export default function TabLayout() {
                 size={size}
                 focused={focused}
               />
-              <TabBarBadge count={cartCount} color="#E74C3C" />
+              <TabBarBadge count={cartCount} color="#dc2626" />
             </View>
           ),
         }}

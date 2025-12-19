@@ -65,7 +65,7 @@ export default function PaymentScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('paymentSettings.title')}</Text>
         <View style={styles.addButton} />
@@ -91,7 +91,7 @@ export default function PaymentScreen() {
             <Ionicons
               name={defaultMethod === PAYMENT_METHODS.COD ? 'radio-button-on' : 'radio-button-off'}
               size={22}
-              color={defaultMethod === PAYMENT_METHODS.COD ? '#E74C3C' : '#C7C7CC'}
+              color={defaultMethod === PAYMENT_METHODS.COD ? '#dc2626' : '#C7C7CC'}
             />
           </TouchableOpacity>
 
@@ -110,7 +110,7 @@ export default function PaymentScreen() {
             <Ionicons
               name={defaultMethod === PAYMENT_METHODS.CARD ? 'radio-button-on' : 'radio-button-off'}
               size={22}
-              color={defaultMethod === PAYMENT_METHODS.CARD ? '#E74C3C' : '#C7C7CC'}
+              color={defaultMethod === PAYMENT_METHODS.CARD ? '#dc2626' : '#C7C7CC'}
             />
           </TouchableOpacity>
         </View>
@@ -142,7 +142,7 @@ export default function PaymentScreen() {
               <View />
             </View>
             <Text style={styles.billingAddress}>
-              {vatNumber ? `VAT/TRN: ${vatNumber}` : t('paymentSettings.vatNumberMissing')}
+              {vatNumber ? t('paymentSettings.vatTrn', { vatNumber }) : t('paymentSettings.vatNumberMissing')}
             </Text>
           </View>
         </View>
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     borderColor: '#F2F2F7',
   },
   methodRowSelected: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
   },
   methodLeft: {
     flexDirection: 'row',
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   billingLink: {
     fontSize: 15,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
   billingAddress: {

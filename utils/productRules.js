@@ -19,9 +19,19 @@ export const isCushionBB = (product) => {
 };
 
 export const isBeautyBoxProduct = (product) => {
-  const cat = String(product?.category || '').trim().toLowerCase();
+  const catRaw = String(product?.category || '').trim().toLowerCase();
   const name = normalizeProductName(product);
-  return cat === 'beauty boxes' || name.includes('beauty box');
+  // Normalize category by removing non-alphanumerics to catch "Beauty Boxes", "Beauty box", "beauty-boxes", etc.
+  const catCompact = catRaw.replace(/[^a-z0-9]/g, '');
+
+  // Category-based detection (most reliable when present)
+  if (catRaw === 'beauty boxes' || catRaw === 'beauty box') return true;
+  if (catCompact.includes('beautybox')) return true;
+
+  // Name-based fallback (some datasets may not have a stable category)
+  if (name.includes('beauty box') || name.includes('beautybox')) return true;
+
+  return false;
 };
 
 // Hydro Cool Mask: user discounts must NOT apply (price stays 300 AED).

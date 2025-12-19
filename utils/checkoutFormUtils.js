@@ -1,5 +1,7 @@
 // Pure helpers extracted from app/checkout.js to keep the screen declarative.
 
+import { isUserDiscountExcludedProduct } from './productRules';
+
 export function isValidEmail(value) {
   const email = String(value || '').trim();
   if (!email) return false;
@@ -85,6 +87,10 @@ export function computeSavingsAED(items, totalsSubtotal) {
   const paid = (items || []).filter((it) => !(it?.isPromotionItem === true || it?.selectedSize === '__PROMO__'));
 
   const originalSubtotal = paid.reduce((sum, it) => {
+    // Products excluded from user discounts (Beauty Boxes, Devices, Hydro Cool Mask, fixed overrides)
+    // should not contribute to "You save" calculations in checkout.
+    if (isUserDiscountExcludedProduct(it?.product)) return sum;
+
     const qty = Number(it?.quantity) || 0;
     const original = Number(it?.product?.originalPrice);
     const current = Number(it?.product?.displayPrice ?? it?.product?.price ?? 0);

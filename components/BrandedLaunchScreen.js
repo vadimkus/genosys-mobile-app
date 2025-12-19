@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
 
 export default function BrandedLaunchScreen({ onDone, minimumMs = 650 }) {
+  // IMPORTANT: This screen is rendered before `LocalizationProvider` (Expo Go only),
+  // so do not depend on i18n here. Keep the company line exact and stable.
+  const COMPANY_NAME = 'Genosys Middle East FZ-LLC';
   useEffect(() => {
     let cancelled = false;
     const startedAt = Date.now();
@@ -36,7 +39,7 @@ export default function BrandedLaunchScreen({ onDone, minimumMs = 650 }) {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.companyText}>Genosys Middle East FZ-LLC</Text>
+        <Text style={styles.companyText}>{COMPANY_NAME}</Text>
       </View>
     </View>
   );
@@ -61,7 +64,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 18,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
     textAlign: 'center',
   },
 });

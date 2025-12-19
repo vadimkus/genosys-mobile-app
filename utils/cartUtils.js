@@ -60,6 +60,11 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
   // - Other products: if user has a percentage discount and product.originalPrice is present, compute discounted price from originalPrice.
   // - Otherwise, use server-provided displayPrice/price.
   const subtotal = items.reduce((sum, item) => {
+    // Promotion items must NEVER affect totals (they're free add-ons).
+    // In some flows they can carry originalPrice (e.g., 36 AED) which must not be discounted/added.
+    const isPromoItem = item?.isPromotionItem === true || String(item?.selectedSize || '').trim() === '__PROMO__';
+    if (isPromoItem) return sum;
+
     const discountPct = Number(user?.discountPercentage);
     const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
     const excludedFromUserDiscount = isUserDiscountExcludedProduct(item.product);

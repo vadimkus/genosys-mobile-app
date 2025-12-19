@@ -8,10 +8,10 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
   Linking,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,6 +25,7 @@ import CollapsibleFooter from '../components/CollapsibleFooter';
 import EmirateFlagIcon from '../components/checkout/EmirateFlagIcon';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
 import { createLogger } from '../utils/logger';
+import { formatEmirateLabel } from '../utils/emirateUtils';
 import ApplePayButton from '../components/ApplePayButton';
 import { initializeStripe, checkApplePayAvailability, presentApplePaySheet, getStripeConfigStatus } from '../services/applePayService';
 import {
@@ -114,7 +115,7 @@ export default function CheckoutScreen() {
     if (!query) return;
     const url =
       Platform.OS === 'ios'
-        ? `http://maps.apple.com/?q=${encodeURIComponent(query)}`
+        ? `https://maps.apple.com/?q=${encodeURIComponent(query)}`
         : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     try {
       await Linking.openURL(url);
@@ -621,7 +622,7 @@ export default function CheckoutScreen() {
           {/* Shipping Information */}
           <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="location" size={20} color="#E74C3C" />
+              <Ionicons name="location" size={20} color="#dc2626" />
               <Text style={styles.sectionTitle}>{t('checkout.shippingInformation')}</Text>
             </View>
 
@@ -772,11 +773,11 @@ export default function CheckoutScreen() {
                             selectedEmirate === emirate.name && styles.emirateTextSelected,
                           ]}
                         >
-                          {emirate.name}
+                          {formatEmirateLabel(t, emirate.name)}
                         </Text>
                       </View>
                       {selectedEmirate === emirate.name ? (
-                        <Ionicons name="checkmark" size={16} color="#E74C3C" />
+                        <Ionicons name="checkmark" size={16} color="#dc2626" />
                       ) : null}
                     </View>
                     <View style={styles.emirateBottomRow}>
@@ -825,7 +826,7 @@ export default function CheckoutScreen() {
                   <Ionicons 
                     name={selectedPaymentMethod === PAYMENT_METHODS.COD ? "radio-button-on" : "radio-button-off"} 
                     size={20} 
-                    color={selectedPaymentMethod === PAYMENT_METHODS.COD ? "#E74C3C" : "#C7C7CC"} 
+                    color={selectedPaymentMethod === PAYMENT_METHODS.COD ? "#dc2626" : "#C7C7CC"} 
                   />
                   <Text style={styles.paymentTitle}>{t('checkout.cashOnDelivery')}</Text>
                 </View>
@@ -843,7 +844,7 @@ export default function CheckoutScreen() {
                   <Ionicons 
                     name={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "radio-button-on" : "radio-button-off"} 
                     size={20} 
-                    color={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "#E74C3C" : "#C7C7CC"} 
+                    color={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "#dc2626" : "#C7C7CC"} 
                   />
                   <Text style={styles.paymentTitle}>{t('checkout.cardPayment')}</Text>
                 </View>
@@ -863,7 +864,7 @@ export default function CheckoutScreen() {
                     <Ionicons
                       name={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "radio-button-on" : "radio-button-off"}
                       size={20}
-                      color={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "#E74C3C" : "#C7C7CC"}
+                      color={selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? "#dc2626" : "#C7C7CC"}
                     />
                     <Ionicons name="logo-apple" size={18} color="#000000" style={{ marginLeft: 8, marginRight: 6 }} />
                     <Text style={styles.paymentTitle}>{t('applePay.applePay')}</Text>
@@ -913,7 +914,9 @@ export default function CheckoutScreen() {
             </View>
 
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>{t('checkout.shippingTo', { emirate: selectedEmirate })}</Text>
+              <Text style={styles.summaryLabel}>
+                {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
+              </Text>
               <Text style={styles.summaryValue}>
                 {safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}
               </Text>
@@ -1131,7 +1134,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   orderHeader: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1300,13 +1303,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputError: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     backgroundColor: '#FFF5F5',
   },
   helperError: {
     marginTop: 6,
     fontSize: 12,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
   },
   textArea: {
@@ -1382,7 +1385,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   emirateOptionSelected: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     backgroundColor: '#FFF5F5',
   },
   emirateText: {
@@ -1392,7 +1395,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   emirateTextSelected: {
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   emirateBottomRow: {
     marginTop: 6,
@@ -1436,7 +1439,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   paymentOptionSelected: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     backgroundColor: '#FFF5F5',
   },
   paymentOptionDisabled: {
@@ -1535,7 +1538,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   vatNote: {
     fontSize: 12,
@@ -1650,11 +1653,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingVertical: 16,
     borderRadius: 14,
     gap: 8,
-    shadowColor: '#E74C3C',
+    shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

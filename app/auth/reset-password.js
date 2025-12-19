@@ -48,7 +48,7 @@ export default function ResetPasswordScreen() {
       }
 
       Alert.alert(t('authScreen.passwordResetSuccessTitle'), t('authScreen.passwordResetSuccessMessage'), [
-        { text: 'OK', onPress: () => router.replace('/auth/login') },
+        { text: t('common.ok'), onPress: () => router.replace('/auth/login') },
       ]);
     } catch (_e) {
       Alert.alert(t('common.error'), t('authScreen.genericError'));
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   button: {
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,

@@ -134,7 +134,7 @@ export default function ContactScreen() {
   const ContactMethodCard = ({ method }) => (
     <TouchableOpacity style={styles.contactCard} onPress={method.action}>
       <View style={styles.contactIcon}>
-        <Ionicons name={method.icon} size={24} color={method.icon === 'logo-whatsapp' ? '#25D366' : '#E74C3C'} />
+        <Ionicons name={method.icon} size={24} color={method.icon === 'logo-whatsapp' ? '#25D366' : '#dc2626'} />
       </View>
       <View style={styles.contactDetails}>
         <Text style={styles.contactTitle}>{method.title}</Text>
@@ -150,7 +150,7 @@ export default function ContactScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('contact.title')}</Text>
         <View style={styles.placeholder} />
@@ -169,7 +169,7 @@ export default function ContactScreen() {
             <Text style={styles.flagText}>🇦🇪</Text>
             <Text style={styles.countryText}>{t('contact.country')}</Text>
             <Animated.View style={{ transform: [{ scale: heartScale }], opacity: heartOpacity }}>
-              <Ionicons name="heart" size={14} color="#E74C3C" />
+              <Ionicons name="heart" size={14} color="#dc2626" />
             </Animated.View>
           </View>
         </View>
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   contactValue: {
     fontSize: 15,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
     marginBottom: 2,
   },
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   sendButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   mapButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,

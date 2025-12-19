@@ -56,7 +56,7 @@ export default function ProductGridItem({ product }) {
     if (isMesopeciaKit) {
       computedBadges.push({
         type: 'order',
-        text: 'Order',
+        text: t('common.order'),
         color: '#FF9500',
         textColor: '#FFFFFF',
         priority: 0,
@@ -64,7 +64,7 @@ export default function ProductGridItem({ product }) {
     } else if (!isHolidayKit) {
       computedBadges.push({
         type: 'in_stock',
-        text: 'In stock',
+        text: t('stock.inStock'),
         color: '#34C759',
         textColor: '#FFFFFF',
         priority: 0,
@@ -77,7 +77,7 @@ export default function ProductGridItem({ product }) {
   if (isBioFermentMask && !hasNewBadge) {
     computedBadges.push({
       type: 'new',
-      text: 'New',
+      text: t('common.new'),
       color: '#007AFF',
       textColor: '#FFFFFF',
       priority: 1,
@@ -157,10 +157,10 @@ export default function ProductGridItem({ product }) {
             <View style={styles.sizeBadge}>
               <Text style={styles.sizeBadgeText}>
                 {product.variants && product.variants.length > 0
-                  ? `${product.variants.length} sizes`
+                  ? t('product.sizesCountShort', { count: product.variants.length })
                   : product.hasVariants 
-                    ? 'Multiple sizes'
-                    : `Size: ${product.size}`}
+                    ? t('product.multipleSizesShort')
+                    : t('product.sizeLine', { size: String(product.size || '').trim() })}
               </Text>
             </View>
             {(product.stock || product.inStock) && (
@@ -183,12 +183,12 @@ export default function ProductGridItem({ product }) {
             // Special pricing display for Beauty Boxes - show full price + 15% discount clearly
             <View style={styles.beautyBoxPricing}>
               <Text style={styles.beautyBoxFullPrice}>
-                Full Price: {(product.originalPrice || product.displayPrice || product.price || 0).toFixed(2)} AED
+                {t('product.fullPrice', { price: (product.originalPrice || product.displayPrice || product.price || 0).toFixed(2) })}
               </Text>
               <View style={styles.beautyBoxDiscountContainer}>
                 <Text style={styles.beautyBoxDiscount}>{t('bag.bundleDiscount15')}</Text>
                 <Text style={styles.beautyBoxFinalPrice}>
-                  Final: {(product.displayPrice || product.price || 0).toFixed(2)} AED
+                  {t('product.finalPrice', { price: (product.displayPrice || product.price || 0).toFixed(2) })}
                 </Text>
               </View>
             </View>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   stockOverlay: {
     position: 'absolute',
@@ -348,11 +348,11 @@ const styles = StyleSheet.create({
   discountedPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
     marginBottom: 2,
   },
   savingsContainer: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -364,11 +364,11 @@ const styles = StyleSheet.create({
   },
   // Beauty Boxes specific pricing styles
   beautyBoxPricing: {
-    backgroundColor: '#FF0000', // BRIGHT RED for testing
+    backgroundColor: '#F8F9FA',
     padding: 8,
-    borderRadius: 6,
-    borderWidth: 5, // THICK border for testing
-    borderColor: '#00FF00', // BRIGHT GREEN border for testing
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   beautyBoxFullPrice: {
     fontSize: 12,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   },
   beautyBoxDiscount: {
     fontSize: 11,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: 'bold',
     backgroundColor: '#FFE5E5',
     paddingHorizontal: 6,

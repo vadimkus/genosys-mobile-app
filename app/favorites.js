@@ -135,7 +135,7 @@ export default function FavoritesScreen() {
         <View style={styles.headerCenter}>
           <Text style={styles.title}>{t('favorites.title')}</Text>
           <View style={styles.headerRight}>
-            <Ionicons name="heart" size={20} color="#E74C3C" />
+            <Ionicons name="heart" size={20} color="#dc2626" />
             <Text style={styles.countText}>({getFavoritesCount()})</Text>
           </View>
         </View>
@@ -178,7 +178,7 @@ export default function FavoritesScreen() {
                     <Ionicons 
                       name="heart" 
                       size={20} 
-                      color="#E74C3C" 
+                      color="#dc2626" 
                     />
                   </TouchableOpacity>
                   
@@ -208,16 +208,16 @@ export default function FavoritesScreen() {
                     const computedBadges = [];
                     if (!isOutOfStock) {
                       if (isMesopeciaKit) {
-                        computedBadges.push({ text: 'Order', color: '#FF9500', priority: 0 });
+                        computedBadges.push({ text: t('common.order'), color: '#FF9500', priority: 0 });
                       } else if (!isHolidayKit) {
-                        computedBadges.push({ text: 'In stock', color: '#34C759', priority: 0 });
+                        computedBadges.push({ text: t('stock.inStock'), color: '#34C759', priority: 0 });
                       }
                     }
 
                     // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
                     const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
                     if (isBioFermentMask && !hasNewBadge) {
-                      computedBadges.push({ text: 'New', color: '#007AFF', priority: 1 });
+                      computedBadges.push({ text: t('common.new'), color: '#007AFF', priority: 1 });
                     }
 
                     const badges = [...computedBadges, ...baseBadges]
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   countText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   scrollView: {
     flex: 1,
@@ -392,11 +392,11 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   browseButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
-    shadowColor: '#E74C3C',
+    shadowColor: '#dc2626',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   gridPlaceholderText: {
     fontSize: 32,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   favoriteHeart: {
     position: 'absolute',
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   discountedPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#E74C3C',
+    color: '#dc2626',
     marginBottom: 2,
   },
   savings: {
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     marginHorizontal: 12,
     marginBottom: 12,
     paddingVertical: 10,

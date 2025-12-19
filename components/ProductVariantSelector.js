@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   selectedColorOption: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     backgroundColor: '#FFF5F5',
   },
   colorSwatch: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   selectedColorSwatch: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
   },
   colorLabel: {
     fontSize: 12,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedColorLabel: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
   },
   
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   selectedSizeOption: {
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     backgroundColor: '#FFF5F5',
   },
   sizeLabel: {
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   selectedSizeLabel: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
   },
   sizePrice: {
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedSizePrice: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
   

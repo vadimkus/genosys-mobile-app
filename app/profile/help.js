@@ -24,7 +24,7 @@ export default function HelpSupportScreen() {
 
   // Local palette (Help screen previously referenced an undefined `colors` object, causing a crash).
   const colors = {
-    primary: '#E74C3C',
+    primary: '#dc2626',
     text: '#000000',
     textSecondary: '#8E8E93',
     textMuted: '#C7C7CC',
@@ -199,7 +199,7 @@ export default function HelpSupportScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#E74C3C" />
+          <Ionicons name="chevron-back" size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('help.title')}</Text>
         <View style={styles.placeholder} />
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   },
   supportDescription: {
     fontSize: 15,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '500',
   },
 
@@ -499,7 +499,8 @@ const styles = StyleSheet.create({
   answerBullet: {
     fontSize: 16,
     lineHeight: 22,
-    color: '#E74C3C',
+    color: '#dc2626',
+    color: '#dc2626',
     fontWeight: '800',
   },
   answerNumber: {
@@ -592,7 +593,7 @@ const styles = StyleSheet.create({
   },
   returnEmailButton: {
     marginTop: 12,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,

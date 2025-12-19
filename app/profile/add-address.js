@@ -161,7 +161,7 @@ export default function AddEditAddressScreen() {
                   <Ionicons 
                     name={type === t('addAddress.typeHome') ? 'home' : type === t('addAddress.typeWork') ? 'business' : 'location'} 
                     size={20} 
-                    color={formData.type === type ? '#ffffff' : '#E74C3C'} 
+                    color={formData.type === type ? '#ffffff' : '#dc2626'} 
                   />
                   <Text style={[
                     styles.typeButtonText,
@@ -310,7 +310,7 @@ export default function AddEditAddressScreen() {
               <Switch
                 value={formData.isDefault}
                 onValueChange={(value) => updateField('isDefault', value)}
-                trackColor={{ false: '#E5E5EA', true: '#E74C3C' }}
+                trackColor={{ false: '#E5E5EA', true: '#dc2626' }}
                 thumbColor="#ffffff"
                 ios_backgroundColor="#E5E5EA"
               />
@@ -355,11 +355,11 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   saveText: {
     fontSize: 17,
-    color: '#E74C3C',
+    color: '#dc2626',
     fontWeight: '600',
   },
   headerButtonDisabled: {
@@ -408,17 +408,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E74C3C',
+    borderColor: '#dc2626',
     backgroundColor: '#ffffff',
     gap: 8,
   },
   activeTypeButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
   },
   typeButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   activeTypeButtonText: {
     color: '#ffffff',
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   requiredMark: {
-    color: '#E74C3C',
+    color: '#dc2626',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -474,8 +474,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   activeEmirateButton: {
-    backgroundColor: '#E74C3C',
-    borderColor: '#E74C3C',
+    backgroundColor: '#dc2626',
+    borderColor: '#dc2626',
   },
   emirateButtonText: {
     fontSize: 14,

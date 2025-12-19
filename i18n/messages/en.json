@@ -84,6 +84,7 @@
     "validationInvalidEmail": "Please enter a valid email address.",
     "orderSubmittedTitle": "Order Submitted Successfully!",
     "orderSubmittedMessageCOD": "Your order {orderNumber} has been placed successfully! You will receive a confirmation email shortly. Pay when your order is delivered.",
+    "orderNumberLine": "Order {orderNumber}",
     "paymentLinkUnavailableTitle": "Payment link unavailable",
     "paymentLinkUnavailableMessage": "We could not start the payment flow. Please try again or contact support.",
     "orderSubmissionFailedTitle": "Order Submission Failed",
@@ -174,10 +175,12 @@
     "productDescription": "Product Description",
     "kitIncludes": "Kit includes:",
     "addedToBagTitle": "🛍️ Added to Bag",
+    "addedToBagMessage": "{name} has been added to your bag.",
     "continueShopping": "Continue Shopping",
     "viewBag": "View Bag",
     "addToBag": "Add to Bag",
     "inBag": "In Bag ({count})",
+    "addToBagFailed": "Failed to add to bag. Please try again.",
     "error": "Error",
     "productNotFound": "Product not found",
     "failedToLoad": "Failed to load product",
@@ -185,11 +188,29 @@
     "shareError": "Could not open share sheet. Please try again.",
     "sizesAvailable": "{count} sizes available",
     "multipleSizesAvailable": "Multiple sizes available",
+    "sizesCountShort": "{count} sizes",
+    "multipleSizesShort": "Multiple sizes",
     "sizeLine": "Size: {size}",
     "inStock": "✓ In Stock",
     "fullPrice": "Full Price: {price} AED",
     "bundleDiscount": "15% OFF (Bundle Discount)",
     "finalPrice": "Final: {price} AED",
+    "spec": {
+      "size": "Size",
+      "sizeOptions": "Size options",
+      "skinType": "Skin Type",
+      "formulation": "Formulation",
+      "origin": "Origin",
+      "form": "Form",
+      "target": "Target",
+      "technology": "Technology",
+      "keyBenefits": "Key Benefits",
+      "usage": "Usage",
+      "application": "Application",
+      "note": "Note",
+      "howToUse": "How to use",
+      "type": "Type"
+    },
     "perfectCombination": "Perfect Combination",
     "clickToViewDetails": "Click to view details →",
     "whyCombineTheseProducts": "Why Combine These Products?",
@@ -452,6 +473,7 @@
     "orders": "Orders",
     "trackPurchases": "Track purchases",
     "purchasesCount": "{count} purchases",
+    "ordersCount": "{count} orders",
     "bag": "Bag",
     "itemsCount": "{count} items",
     "empty": "Empty",
@@ -694,7 +716,7 @@
     "qty": "Qty",
     "size": "Size",
     "color": "Color",
-    "each": "each",
+    "each": "Each",
     "fullPrice": "Full price",
     "discount": "Discount",
     "priceAfterDiscount": "Price after discount",
@@ -717,6 +739,7 @@
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Could not start payment",
+    "couldNotStartPaymentMessage": "Could not start payment. Please try again.",
     "pleaseTryAgain": "Please try again."
   },
   "help": {
@@ -729,9 +752,14 @@
       "phoneTitle": "Phone Support",
       "phoneSubtitle": "Speak with our team",
       "whatsappTitle": "WhatsApp",
-      "whatsappSubtitle": "Chat on WhatsApp"
+      "whatsappSubtitle": "Chat on WhatsApp",
+      "liveChatTitle": "Live Chat",
+      "liveChatSubtitle": "Instant messaging",
+      "liveChatHours": "Available 9 AM – 6 PM"
     },
     "alerts": {
+      "liveChatTitle": "Live Chat",
+      "liveChatSoon": "Live chat coming soon!",
       "orderStatusTitle": "Order Status",
       "redirectingToOrders": "Redirecting to orders...",
       "returnsTitle": "Returns",
@@ -909,7 +937,8 @@
   },
   "support": {
     "whatsappOpenFailedTitle": "Could not open WhatsApp",
-    "whatsappOpenFailedMessage": "Please install WhatsApp or try again."
+    "whatsappOpenFailedMessage": "Please install WhatsApp or try again.",
+    "whatsappOrderHelpMessage": "Hi! I need help with order {orderNumber}. Can you assist me?"
   },
   "authScreen": {
     "uaeLine": "United Arab Emirates",
@@ -1160,6 +1189,7 @@
     "taxInfo": "Tax Information",
     "manage": "Manage",
     "vatNumberMissing": "VAT Number: Not provided",
+    "vatTrn": "VAT/TRN: {vatNumber}",
     "securityPrivacy": "Security & Privacy",
     "securePayments": "Secure Payments",
     "securePaymentsText": "All transactions are encrypted and secure",
@@ -1183,6 +1213,9 @@
     "outOfStockMessage": "This product is currently out of stock.",
     "inStock": "In Stock"
   },
+  "branding": {
+    "companyName": "Genosys Middle East FZ-LLC"
+  },
   "common": {
     "ok": "OK",
     "back": "Back",
@@ -1201,6 +1234,13 @@
     "continueShopping": "Continue Shopping",
     "opening": "Opening…",
     "error": "Error",
-    "loadingRecommendation": "Loading recommendation..."
+    "loadingRecommendation": "Loading recommendation...",
+    "at": "at",
+    "order": "Order",
+    "item": "Item",
+    "promoItem": "Promo item",
+    "new": "New",
+    "itemWithNumber": "Item {number}",
+    "freeItemWithNumber": "Free Item {number}"
   }
 }

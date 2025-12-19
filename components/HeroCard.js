@@ -9,11 +9,13 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask } from '../utils/productRules';
+import { useLocalization } from '../contexts/LocalizationContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.8;
 
 export default function HeroCard({ product }) {
+  const { t } = useLocalization();
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
@@ -59,11 +61,11 @@ export default function HeroCard({ product }) {
           {!isOutOfStock && !isHolidayKit && (
             isMesopeciaKit ? (
               <View style={styles.orderBadge}>
-                <Text style={styles.orderText}>Order</Text>
+                <Text style={styles.orderText}>{t('common.order')}</Text>
               </View>
             ) : (
               <View style={styles.inStockBadge}>
-                <Text style={styles.inStockText}>In stock</Text>
+                <Text style={styles.inStockText}>{t('stock.inStock')}</Text>
               </View>
             )
           )}
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#E74C3C',
+    color: '#dc2626',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,

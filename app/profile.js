@@ -24,9 +24,9 @@ import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTok
 const { width } = Dimensions.get('window');
 
 // Keep Switch color props stable across renders (prevents iOS visual flicker on nearby switches).
-const SWITCH_TRACK_PUSH = { false: '#E5E5EA', true: '#E74C3C' };
+const SWITCH_TRACK_PUSH = { false: '#E5E5EA', true: '#dc2626' };
 const SWITCH_TRACK_BIOMETRIC = { false: '#E5E5EA', true: '#27AE60' };
-const SWITCH_TRACK_EMAIL = { false: '#E5E5EA', true: '#E74C3C' };
+const SWITCH_TRACK_EMAIL = { false: '#E5E5EA', true: '#dc2626' };
 const SWITCH_THUMB = '#ffffff';
 const SWITCH_IOS_BG = '#E5E5EA';
 
@@ -294,7 +294,7 @@ export default function ProfileScreen() {
           <View style={styles.profileItemLeft}>
             {icon && (
               <View style={styles.iconContainer}>
-                <Ionicons name={icon} size={22} color="#E74C3C" />
+                <Ionicons name={icon} size={22} color="#dc2626" />
               </View>
             )}
             <View style={styles.profileItemText}>
@@ -318,7 +318,7 @@ export default function ProfileScreen() {
   }, []);
 
   // Quick Action Card Component (Genosys brand style)
-  const QuickActionCard = ({ icon, title, subtitle, onPress, color = "#E74C3C" }) => (
+  const QuickActionCard = ({ icon, title, subtitle, onPress, color = "#dc2626" }) => (
     <TouchableOpacity style={styles.quickActionCard} onPress={onPress}>
       <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
         <Ionicons name={icon} size={24} color="#ffffff" />
@@ -346,7 +346,7 @@ export default function ProfileScreen() {
         <View style={styles.profileItemLeft}>
           {icon && (
             <View style={styles.iconContainer}>
-              <Ionicons name={icon} size={22} color="#E74C3C" />
+              <Ionicons name={icon} size={22} color="#dc2626" />
             </View>
           )}
           <View style={styles.profileItemText}>
@@ -441,7 +441,7 @@ export default function ProfileScreen() {
               icon="receipt-outline"
               title={t('profile.orders')}
               subtitle={ordersSubtitle}
-              color="#E74C3C"
+              color="#dc2626"
               onPress={() => router.push('/profile/orders')}
             />
             <QuickActionCard
@@ -566,7 +566,7 @@ export default function ProfileScreen() {
             disabled={isLoggingOut}
           >
             {isLoggingOut ? (
-              <ActivityIndicator color="#E74C3C" size="small" />
+              <ActivityIndicator color="#dc2626" size="small" />
             ) : (
               <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
             )}
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: 17,
     fontWeight: '400',
-    color: '#E74C3C',
+    color: '#dc2626',
   },
   signOutButtonDisabled: {
     opacity: 0.6,

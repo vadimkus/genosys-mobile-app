@@ -230,15 +230,15 @@ export default function PerfectCombinationCard({ product, user, styles }) {
       // If recommended product has variants, add the default variant to keep cart keys consistent.
       addItem(recommendedProduct, 1, '', defaultRecSize || '');
       Alert.alert(
-        t('product.addedToBagTitle') || 'Added to bag',
-        `${recommendedName || 'Item'} has been added to your bag`,
+        t('product.addedToBagTitle'),
+        t('product.addedToBagMessage', { name: recommendedName || t('common.item') }),
         [
-          { text: t('product.continueShopping') || t('common.ok') || 'OK', style: 'default' },
-          { text: t('product.viewBag') || 'View bag', style: 'default', onPress: () => router.push('/(tabs)/bag') },
+          { text: t('product.continueShopping'), style: 'default' },
+          { text: t('product.viewBag'), style: 'default', onPress: () => router.push('/(tabs)/bag') },
         ]
       );
     } catch (e) {
-      Alert.alert(t('common.error') || 'Error', 'Failed to add to bag');
+      Alert.alert(t('common.error'), t('product.addToBagFailed'));
     }
   }, [addItem, recommendedProduct, recommendedName, t, defaultRecSize]);
 
@@ -272,7 +272,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
   return (
     <View style={styles.pcOuter}>
       <View style={styles.pcHeaderRow}>
-        <Ionicons name="sparkles" size={18} color="#E74C3C" />
+        <Ionicons name="sparkles" size={18} color="#dc2626" />
         <Text style={styles.pcHeaderTitle}>{t('product.perfectCombination')}</Text>
       </View>
 
@@ -333,7 +333,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
 
         <View style={styles.pcBenefitsCard}>
           <View style={styles.pcBenefitsHeader}>
-            <Ionicons name="sparkles" size={14} color="#E74C3C" />
+            <Ionicons name="sparkles" size={14} color="#dc2626" />
             <Text style={styles.pcBenefitsTitle}>{t('product.whyCombineTheseProducts')}</Text>
           </View>
           <View style={styles.pcBenefitsList}>
