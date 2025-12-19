@@ -261,7 +261,7 @@ export default function OrderDetailScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/orders')} style={styles.backButton}>
           <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderDetails')}</Text>
@@ -320,18 +320,18 @@ export default function OrderDetailScreen() {
 
           {/* Payment Method Section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
               <Ionicons name="card" size={20} color="#27AE60" />
-              <Text style={styles.sectionTitle}>{t('ordersDetail.paymentMethod')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.paymentMethod')}</Text>
             </View>
             <View style={styles.paymentMethodCard}>
               <View style={styles.paymentMethodRow}>
                 {isApplePayLike(order) ? (
-                  <Ionicons name="logo-apple" size={16} color="#111827" style={{ marginRight: 8 }} />
+                  <Ionicons name="logo-apple" size={16} color="#111827" style={styles.appleLogo} />
                 ) : null}
-                <Text style={styles.paymentMethodText}>{getPaymentMethodLabel()}</Text>
+                <Text style={[styles.paymentMethodText, isRTL && styles.textRTL]}>{getPaymentMethodLabel()}</Text>
                 {isPaidLike(order) && isApplePayLike(order) ? (
-                  <Text style={styles.paymentMethodPaidHint}> • {t('ordersDetail.paid')}</Text>
+                  <Text style={[styles.paymentMethodPaidHint, isRTL && styles.textRTL]}> • {t('ordersDetail.paid')}</Text>
                 ) : null}
               </View>
             </View>
@@ -340,21 +340,21 @@ export default function OrderDetailScreen() {
           {/* Order Notes */}
           {orderNotes ? (
             <View style={styles.section}>
-              <View style={styles.sectionHeader}>
+              <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
                 <Ionicons name="chatbox-ellipses-outline" size={20} color="#6B7280" />
-                <Text style={styles.sectionTitle}>{t('ordersDetail.orderNotes')}</Text>
+                <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderNotes')}</Text>
               </View>
               <View style={styles.notesCard}>
-                <Text style={styles.notesText}>{orderNotes}</Text>
+                <Text style={[styles.notesText, isRTL && styles.textRTL]}>{orderNotes}</Text>
               </View>
             </View>
           ) : null}
 
           {/* Items Section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
               <Ionicons name="bag-handle" size={20} color="#dc2626" />
-              <Text style={styles.sectionTitle}>{t('ordersDetail.items')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.items')}</Text>
             </View>
             
             {/* Paid Items */}
@@ -378,52 +378,53 @@ export default function OrderDetailScreen() {
                 <View key={`paid-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemCard}>
                   <View style={styles.itemHeader}>
                     <View style={styles.itemTitleWrap}>
-                      <Text style={styles.itemName} numberOfLines={2}>{String(name)}</Text>
+                      <Text style={[styles.itemName, isRTL && styles.textRTL]} numberOfLines={2}>{String(name)}</Text>
                       {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
                         <View style={styles.discountPill}>
                           <Text style={styles.discountPillText}>{`${Math.round(discountPct)}%`}</Text>
                         </View>
                       ) : null}
                     </View>
-                    <Text style={styles.itemPrice}>AED {formatAED(itemTotal)}</Text>
+                    <Text style={[styles.itemPrice, isRTL && styles.valueLTR]}>AED {formatAED(itemTotal)}</Text>
                   </View>
 
                   <View style={styles.itemDetails}>
-                    <Text style={styles.itemDetailText}>{t('ordersDetail.qty')}: {qty}</Text>
-                    {size && size !== '__PROMO__' ? (
-                      <Text style={styles.itemDetailText}>• {t('ordersDetail.size')}: {String(size)}</Text>
-                    ) : null}
-                    {color ? (
-                      <Text style={styles.itemDetailText}>• {t('ordersDetail.color')}: {String(color)}</Text>
-                    ) : null}
+                    <Text style={[styles.itemDetailText, isRTL && styles.textRTL]}>
+                      {(() => {
+                        const parts = [`${t('ordersDetail.qty')}: ${qty}`];
+                        if (size && size !== '__PROMO__') parts.push(`${t('ordersDetail.size')}: ${String(size)}`);
+                        if (color) parts.push(`${t('ordersDetail.color')}: ${String(color)}`);
+                        return parts.join(' • ');
+                      })()}
+                    </Text>
                   </View>
 
                   <View style={styles.itemPriceBlock}>
                     <View style={styles.itemPriceRow}>
-                      <Text style={styles.itemPriceLabel}>{t('ordersDetail.each')}</Text>
-                      <Text style={styles.itemPriceValue}>AED {formatAED(price)}</Text>
+                      <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>{t('ordersDetail.each')}</Text>
+                      <Text style={[styles.itemPriceValue, isRTL && styles.valueLTR]}>AED {formatAED(price)}</Text>
                     </View>
 
                     {canShowDiscountBreakdown ? (
                       <>
                         <View style={styles.itemPriceRow}>
-                          <Text style={styles.itemPriceLabel}>{t('ordersDetail.fullPrice')}</Text>
-                          <Text style={[styles.itemPriceValue, styles.itemPriceValueMuted, styles.itemPriceValueStrikethrough]}>
+                          <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>{t('ordersDetail.fullPrice')}</Text>
+                          <Text style={[styles.itemPriceValue, styles.itemPriceValueMuted, styles.itemPriceValueStrikethrough, isRTL && styles.valueLTR]}>
                             AED {formatAED(inferredOriginalUnit)}
                           </Text>
                         </View>
                         <View style={styles.itemPriceRow}>
-                          <Text style={styles.itemPriceLabel}>
+                          <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>
                             {t('ordersDetail.discount')}
                             {Number.isFinite(discountPct) ? (
-                              <Text style={styles.discountPctText}> {`(${Math.round(discountPct)}%)`}</Text>
+                              <Text style={[styles.discountPctText, isRTL && styles.valueLTR]}> {`(${Math.round(discountPct)}%)`}</Text>
                             ) : null}
                           </Text>
-                          <Text style={[styles.itemPriceValue, styles.discountValue]}>-AED {formatAED(discountUnit)}</Text>
+                          <Text style={[styles.itemPriceValue, styles.discountValue, isRTL && styles.valueLTR]}>-AED {formatAED(discountUnit)}</Text>
                         </View>
                         <View style={styles.itemPriceRow}>
-                          <Text style={styles.itemPriceLabelStrong}>{t('ordersDetail.priceAfterDiscount')}</Text>
-                          <Text style={[styles.itemPriceValue, styles.itemPriceValueStrong]}>AED {formatAED(price)}</Text>
+                          <Text style={[styles.itemPriceLabelStrong, isRTL && styles.textRTL]}>{t('ordersDetail.priceAfterDiscount')}</Text>
+                          <Text style={[styles.itemPriceValue, styles.itemPriceValueStrong, isRTL && styles.valueLTR]}>AED {formatAED(price)}</Text>
                         </View>
                       </>
                     ) : null}
@@ -433,20 +434,20 @@ export default function OrderDetailScreen() {
                         {canShowDiscountBreakdown ? (
                           <>
                             <View style={styles.itemPriceRow}>
-                              <Text style={styles.itemPriceLabel}>{t('ordersDetail.fullPrice')}</Text>
-                              <Text style={[styles.itemPriceValue, styles.itemPriceValueMuted, styles.itemPriceValueStrikethrough]}>
+                              <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>{t('ordersDetail.fullPrice')}</Text>
+                              <Text style={[styles.itemPriceValue, styles.itemPriceValueMuted, styles.itemPriceValueStrikethrough, isRTL && styles.valueLTR]}>
                                 AED {formatAED(originalLineTotal)}
                               </Text>
                             </View>
                             <View style={styles.itemPriceRow}>
-                              <Text style={styles.itemPriceLabel}>{t('ordersDetail.discount')}</Text>
-                              <Text style={[styles.itemPriceValue, styles.discountValue]}>-AED {formatAED(discountLineTotal)}</Text>
+                              <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>{t('ordersDetail.discount')}</Text>
+                              <Text style={[styles.itemPriceValue, styles.discountValue, isRTL && styles.valueLTR]}>-AED {formatAED(discountLineTotal)}</Text>
                             </View>
                           </>
                         ) : null}
                         <View style={styles.itemPriceRow}>
-                          <Text style={styles.itemPriceLabelStrong}>{t('ordersDetail.total')}</Text>
-                          <Text style={styles.itemPrice}>{`AED ${formatAED(itemTotal)}`}</Text>
+                          <Text style={[styles.itemPriceLabelStrong, isRTL && styles.textRTL]}>{t('ordersDetail.total')}</Text>
+                          <Text style={[styles.itemPrice, isRTL && styles.valueLTR]}>{`AED ${formatAED(itemTotal)}`}</Text>
                         </View>
                       </View>
                     ) : null}
@@ -458,9 +459,9 @@ export default function OrderDetailScreen() {
             {/* Promo/Free Items */}
             {promoItems.length > 0 ? (
               <View style={styles.promoSection}>
-                <View style={styles.promoHeader}>
+                <View style={[styles.promoHeader, isRTL && styles.rowRTL]}>
                   <Ionicons name="gift" size={16} color="#16A34A" />
-                  <Text style={styles.promoHeaderText}>{t('ordersDetail.freeItems')}</Text>
+                  <Text style={[styles.promoHeaderText, isRTL && styles.textRTL]}>{t('ordersDetail.freeItems')}</Text>
                 </View>
                 {promoItems.map((it, idx) => {
                   const qty = Number(it?.quantity) || 1;
@@ -469,12 +470,12 @@ export default function OrderDetailScreen() {
                   return (
                     <View key={`promo-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.promoItemCard}>
                       <View style={styles.itemHeader}>
-                        <Text style={styles.promoItemName}>{String(name)}</Text>
+                        <Text style={[styles.promoItemName, isRTL && styles.textRTL]}>{String(name)}</Text>
                         <View style={styles.freeBadge}>
                           <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
                         </View>
                       </View>
-                      <Text style={styles.promoItemQty}>{t('ordersDetail.qty')}: {qty}</Text>
+                      <Text style={[styles.promoItemQty, isRTL && styles.textRTL]}>{t('ordersDetail.qty')}: {qty}</Text>
                     </View>
                   );
                 })}
@@ -484,85 +485,85 @@ export default function OrderDetailScreen() {
 
           {/* Shipping Details */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
               <Ionicons name="location" size={20} color="#27AE60" />
-              <Text style={styles.sectionTitle}>{t('ordersDetail.shippingDetails')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.shippingDetails')}</Text>
             </View>
             
             {customerName ? (
-              <View style={styles.detailRow}>
+              <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="person-outline" size={16} color="#8E8E93" />
-                <Text style={styles.detailLabel}>{t('ordersDetail.customer')}</Text>
-                <Text style={styles.detailValue}>{String(customerName)}</Text>
+                <Text style={[styles.detailLabel, isRTL && styles.textRTL]}>{t('ordersDetail.customer')}</Text>
+                <Text style={[styles.detailValue, isRTL && styles.textRTL]}>{String(customerName)}</Text>
               </View>
             ) : null}
             
             {customerPhone ? (
-              <View style={styles.detailRow}>
+              <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="call-outline" size={16} color="#8E8E93" />
-                <Text style={styles.detailLabel}>{t('ordersDetail.phone')}</Text>
-                <Text style={styles.detailValue}>{String(customerPhone)}</Text>
+                <Text style={[styles.detailLabel, isRTL && styles.textRTL]}>{t('ordersDetail.phone')}</Text>
+                <Text style={[styles.detailValue, isRTL && styles.valueLTR]}>{String(customerPhone)}</Text>
               </View>
             ) : null}
             
             {customerEmail ? (
-              <View style={styles.detailRow}>
+              <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="mail-outline" size={16} color="#8E8E93" />
-                <Text style={styles.detailLabel}>{t('ordersDetail.email')}</Text>
-                <Text style={styles.detailValue}>{String(customerEmail)}</Text>
+                <Text style={[styles.detailLabel, isRTL && styles.textRTL]}>{t('ordersDetail.email')}</Text>
+                <Text style={[styles.detailValue, isRTL && styles.valueLTR]}>{String(customerEmail)}</Text>
               </View>
             ) : null}
             
             {emirate ? (
-              <View style={styles.detailRow}>
+              <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="flag-outline" size={16} color="#8E8E93" />
-                <Text style={styles.detailLabel}>{t('ordersDetail.emirate')}</Text>
-                <Text style={styles.detailValue}>{formatEmirateLabel(t, emirate)}</Text>
+                <Text style={[styles.detailLabel, isRTL && styles.textRTL]}>{t('ordersDetail.emirate')}</Text>
+                <Text style={[styles.detailValue, isRTL && styles.textRTL]}>{formatEmirateLabel(t, emirate)}</Text>
               </View>
             ) : null}
             
             {customerAddress ? (
-              <View style={styles.detailRow}>
+              <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="home-outline" size={16} color="#8E8E93" />
-                <Text style={styles.detailLabel}>{t('ordersDetail.address')}</Text>
-                <Text style={[styles.detailValue, styles.addressValue]}>{String(customerAddress)}</Text>
+                <Text style={[styles.detailLabel, isRTL && styles.textRTL]}>{t('ordersDetail.address')}</Text>
+                <Text style={[styles.detailValue, styles.addressValue, isRTL && styles.textRTL]}>{String(customerAddress)}</Text>
               </View>
             ) : null}
           </View>
 
           {/* Order Summary */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
+            <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
               <Ionicons name="calculator" size={20} color="#007AFF" />
-              <Text style={styles.sectionTitle}>{t('ordersDetail.orderSummary')}</Text>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderSummary')}</Text>
             </View>
             
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>{t('ordersDetail.subtotal')}</Text>
-              <Text style={styles.summaryValue}>AED {formatAED(subtotal)}</Text>
+            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.subtotal')}</Text>
+              <Text style={[styles.summaryValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
             </View>
             
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>{t('ordersDetail.shipping')}</Text>
+            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.shipping')}</Text>
               {freeShipping ? (
                 <View style={styles.freeBadge}>
                   <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
                 </View>
               ) : (
-                <Text style={styles.summaryValue}>AED {formatAED(shipping)}</Text>
+                <Text style={[styles.summaryValue, isRTL && styles.valueLTR]}>AED {formatAED(shipping)}</Text>
               )}
             </View>
             
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>{t('ordersDetail.vatIncluded')}</Text>
-              <Text style={styles.summaryValue}>AED {formatAED(vat)}</Text>
+            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.vatIncluded')}</Text>
+              <Text style={[styles.summaryValue, isRTL && styles.valueLTR]}>AED {formatAED(vat)}</Text>
             </View>
             
             <View style={styles.summaryDivider} />
             
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>{t('ordersDetail.total')}</Text>
-              <Text style={styles.totalValue}>AED {formatAED(total)}</Text>
+            <View style={[styles.totalRow, isRTL && styles.summaryRowRTL]}>
+              <Text style={[styles.totalLabel, isRTL && styles.textRTL]}>{t('ordersDetail.total')}</Text>
+              <Text style={[styles.totalValue, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
             </View>
           </View>
 
@@ -570,7 +571,7 @@ export default function OrderDetailScreen() {
           <View style={styles.actionsSection}>
             {showPay ? (
               <TouchableOpacity
-                style={[styles.payButton, paying && styles.buttonDisabled]}
+                style={[styles.payButton, isRTL && styles.buttonRTL, paying && styles.buttonDisabled]}
                 onPress={onPay}
                 disabled={paying}
                 activeOpacity={0.85}
@@ -580,15 +581,15 @@ export default function OrderDetailScreen() {
                 ) : (
                   <Ionicons name="card" size={20} color="#ffffff" />
                 )}
-                <Text style={styles.payButtonText}>
+                <Text style={[styles.payButtonText, isRTL && styles.textRTL]}>
                   {paying ? t('ordersDetail.startingPayment') : t('ordersDetail.payNow')}
                 </Text>
               </TouchableOpacity>
             ) : null}
             
-            <TouchableOpacity style={styles.supportButton} onPress={onSupport} activeOpacity={0.85}>
+            <TouchableOpacity style={[styles.supportButton, isRTL && styles.buttonRTL]} onPress={onSupport} activeOpacity={0.85}>
               <Ionicons name="logo-whatsapp" size={20} color="#ffffff" />
-              <Text style={styles.supportButtonText}>{t('ordersDetail.supportWhatsapp')}</Text>
+              <Text style={[styles.supportButtonText, isRTL && styles.textRTL]}>{t('ordersDetail.supportWhatsapp')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -776,6 +777,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#E5E5EA',
+  },
+  appleLogo: {
+    marginEnd: 8,
   },
   notesCard: {
     backgroundColor: '#F2F2F7',
@@ -979,6 +983,9 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 12,
   },
+  detailRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   detailLabel: {
     fontSize: 13,
     fontWeight: '600',
@@ -1002,6 +1009,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  summaryRowRTL: {
+    flexDirection: 'row-reverse',
   },
   summaryLabel: {
     fontSize: 14,
@@ -1081,6 +1091,13 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+  buttonRTL: {
+    flexDirection: 'row-reverse',
+  },
+  valueLTR: {
+    writingDirection: 'ltr',
+    textAlign: 'left',
   },
 });
 

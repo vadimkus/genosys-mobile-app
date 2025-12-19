@@ -514,9 +514,9 @@ export default function OrdersScreen() {
                               <Text style={[styles.orderSummaryLineMuted, isRTL && styles.textRTLRight]}>{t('common.free')}</Text>
                             ) : showDiscount ? (
                               <Text style={[styles.orderSummaryLineMuted, isRTL && styles.textRTLRight]}>
-                                {t('ordersDetail.fullPrice')}: <Text style={styles.orderSummaryPriceStrike}>AED {formatAED(originalUnit)}</Text>{' '}
+                                {t('ordersDetail.fullPrice')}: <Text style={[styles.orderSummaryPriceStrike, isRTL && styles.valueLTR]}>AED {formatAED(originalUnit)}</Text>{' '}
                                 • {t('ordersDetail.discount')}: {Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : ''}{' '}
-                                • {t('ordersDetail.priceAfterDiscount')}: <Text style={styles.orderSummaryPriceFinal}>AED {formatAED(price)}</Text>
+                                • {t('ordersDetail.priceAfterDiscount')}: <Text style={[styles.orderSummaryPriceFinal, isRTL && styles.valueLTR]}>AED {formatAED(price)}</Text>
                               </Text>
                             ) : (
                               <Text style={[styles.orderSummaryLineMuted, isRTL && styles.valueLTR]}>AED {formatAED(price)}</Text>
