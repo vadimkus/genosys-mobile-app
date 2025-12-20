@@ -131,22 +131,22 @@ export default function HelpSupportScreen() {
           if (r.type === 'spacer') return <View key={r.key} style={{ height: 8 }} />;
           if (r.type === 'bullet') {
             return (
-              <View key={r.key} style={styles.answerRow}>
+              <View key={r.key} style={[styles.answerRow, isRTL && styles.answerRowRTL]}>
                 <Text style={styles.answerBullet}>•</Text>
-                <Text style={styles.answerText}>{r.text}</Text>
+                <Text style={[styles.answerText, isRTL && styles.textRTL]}>{r.text}</Text>
               </View>
             );
           }
           if (r.type === 'number') {
             return (
-              <View key={r.key} style={styles.answerRow}>
-                <Text style={styles.answerNumber}>{r.num}.</Text>
-                <Text style={styles.answerText}>{r.text}</Text>
+              <View key={r.key} style={[styles.answerRow, isRTL && styles.answerRowRTL]}>
+                <Text style={[styles.answerNumber, isRTL && styles.answerNumberRTL]}>{r.num}.</Text>
+                <Text style={[styles.answerText, isRTL && styles.textRTL]}>{r.text}</Text>
               </View>
             );
           }
           return (
-            <Text key={r.key} style={styles.answerParagraph}>
+            <Text key={r.key} style={[styles.answerParagraph, isRTL && styles.textRTL]}>
               {r.text}
             </Text>
           );
@@ -160,26 +160,35 @@ export default function HelpSupportScreen() {
   };
 
   const SupportOptionCard = ({ option }) => (
-    <TouchableOpacity style={[styles.supportCard, { backgroundColor: colors.card, borderColor: colors.borderSubtle }]} onPress={option.action}>
-      <View style={[styles.supportIcon, { backgroundColor: colors.card2 }]}>
+    <TouchableOpacity style={[styles.supportCard, isRTL && styles.supportCardRTL, { backgroundColor: colors.card, borderColor: colors.borderSubtle }]} onPress={option.action}>
+      <View style={[styles.supportIcon, isRTL && styles.supportIconRTL, { backgroundColor: colors.card2 }]}>
         <Ionicons name={option.icon} size={24} color={colors.primary} />
       </View>
       <View style={styles.supportDetails}>
-        <Text style={[styles.supportTitle, { color: colors.text }]}>{option.title}</Text>
-        <Text style={[styles.supportSubtitle, { color: colors.textSecondary }]}>{option.subtitle}</Text>
-        <Text style={[styles.supportDescription, { color: colors.primary }]}>{option.description}</Text>
+        <Text style={[styles.supportTitle, isRTL && styles.textRTL, { color: colors.text }]}>{option.title}</Text>
+        <Text style={[styles.supportSubtitle, isRTL && styles.textRTL, { color: colors.textSecondary }]}>{option.subtitle}</Text>
+        <Text
+          style={[
+            styles.supportDescription,
+            // Keep emails/phone numbers LTR so digits don't get visually inverted in Arabic UI.
+            isRTL && (option.id === 'phone' || option.id === 'whatsapp' || option.id === 'email') ? styles.valueLTRRight : styles.textRTL,
+            { color: colors.primary },
+          ]}
+        >
+          {option.description}
+        </Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+      <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color={colors.textMuted} />
     </TouchableOpacity>
   );
 
   const FaqItem = ({ faq }) => (
     <View style={[styles.faqItem, { borderBottomColor: colors.borderSubtle }]}>
       <TouchableOpacity 
-        style={styles.faqQuestion}
+        style={[styles.faqQuestion, isRTL && styles.faqQuestionRTL]}
         onPress={() => handleFaqPress(faq.id)}
       >
-        <Text style={[styles.faqQuestionText, { color: colors.text }]}>{faq.question}</Text>
+        <Text style={[styles.faqQuestionText, isRTL && styles.textRTL, { color: colors.text }]}>{faq.question}</Text>
         <Ionicons 
           name={expandedFaq === faq.id ? 'chevron-up' : 'chevron-down'} 
           size={20} 
@@ -198,26 +207,31 @@ export default function HelpSupportScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
+        <TouchableOpacity onPress={() => router.replace('/profile')} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
+          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+            <Text style={[styles.backText, isRTL && styles.backTextRTL]} numberOfLines={1}>
+              {t('profile.accountTitle')}
+            </Text>
+          </View>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('help.title')}</Text>
-        <View style={styles.placeholder} />
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('help.title')}</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>{t('help.hero')}</Text>
-          <Text style={styles.heroSubtitle}>
+          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>{t('help.hero')}</Text>
+          <Text style={[styles.heroSubtitle, isRTL && styles.textRTL]}>
             {t('help.heroSubtitle')}
           </Text>
         </View>
 
         {/* Contact Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('help.contactUs')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.contactUs')}</Text>
           {supportOptions.map((option) => (
             <SupportOptionCard key={option.id} option={option} />
           ))}
@@ -225,7 +239,7 @@ export default function HelpSupportScreen() {
 
         {/* FAQ Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('help.faqTitle')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.faqTitle')}</Text>
           <View style={styles.faqContainer}>
             {faqData.map((faq) => (
               <FaqItem key={faq.id} faq={faq} />
@@ -235,7 +249,7 @@ export default function HelpSupportScreen() {
 
         {/* Quick Actions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('help.quickActions')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.quickActions')}</Text>
           <View style={styles.quickActionsGrid}>
             <TouchableOpacity 
               style={styles.quickActionCard}
@@ -244,7 +258,7 @@ export default function HelpSupportScreen() {
               <View style={styles.quickActionIcon}>
                 <Ionicons name="receipt-outline" size={24} color="#27AE60" />
               </View>
-              <Text style={styles.quickActionTitle}>{t('help.trackOrder')}</Text>
+              <Text style={[styles.quickActionTitle, isRTL && styles.textRTL]}>{t('help.trackOrder')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -255,7 +269,7 @@ export default function HelpSupportScreen() {
               <View style={styles.quickActionIcon}>
                 <Ionicons name="refresh-outline" size={24} color="#007AFF" />
               </View>
-              <Text style={styles.quickActionTitle}>{t('help.returnItem')}</Text>
+              <Text style={[styles.quickActionTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -265,7 +279,7 @@ export default function HelpSupportScreen() {
               <View style={styles.quickActionIcon}>
                 <Ionicons name="logo-whatsapp" size={24} color="#27AE60" />
               </View>
-              <Text style={styles.quickActionTitle}>{t('help.whatsappSupport')}</Text>
+              <Text style={[styles.quickActionTitle, isRTL && styles.textRTL]}>{t('help.whatsappSupport')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -279,36 +293,36 @@ export default function HelpSupportScreen() {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.returnModalCard}>
-              <View style={styles.returnModalHeader}>
-                <View style={styles.returnModalHeaderLeft}>
+              <View style={[styles.returnModalHeader, isRTL && styles.returnModalHeaderRTL]}>
+                <View style={[styles.returnModalHeaderLeft, isRTL && styles.returnModalHeaderLeftRTL]}>
                   <View style={[styles.quickActionIcon, { marginBottom: 0 }]}>
                     <Ionicons name="refresh-outline" size={22} color="#007AFF" />
                   </View>
-                  <Text style={styles.returnModalTitle}>{t('help.returnItem')}</Text>
+                  <Text style={[styles.returnModalTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
                 </View>
                 <TouchableOpacity onPress={() => setReturnModalVisible(false)} style={styles.modalCloseBtn}>
                   <Ionicons name="close" size={22} color="#8E8E93" />
                 </TouchableOpacity>
               </View>
 
-              <Text style={styles.returnChecklistTitle}>{t('help.returnChecklistTitle')}</Text>
+              <Text style={[styles.returnChecklistTitle, isRTL && styles.textRTL]}>{t('help.returnChecklistTitle')}</Text>
               <View style={styles.returnChecklistList}>
-                <View style={styles.returnChecklistItem}>
+                <View style={[styles.returnChecklistItem, isRTL && styles.returnChecklistItemRTL]}>
                   <Text style={styles.returnBullet}>•</Text>
-                  <Text style={styles.returnChecklistText}>{t('help.returnChecklist1')}</Text>
+                  <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist1')}</Text>
                 </View>
-                <View style={styles.returnChecklistItem}>
+                <View style={[styles.returnChecklistItem, isRTL && styles.returnChecklistItemRTL]}>
                   <Text style={styles.returnBullet}>•</Text>
-                  <Text style={styles.returnChecklistText}>{t('help.returnChecklist2')}</Text>
+                  <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist2')}</Text>
                 </View>
-                <View style={styles.returnChecklistItem}>
+                <View style={[styles.returnChecklistItem, isRTL && styles.returnChecklistItemRTL]}>
                   <Text style={styles.returnBullet}>•</Text>
-                  <Text style={styles.returnChecklistText}>{t('help.returnChecklist3')}</Text>
+                  <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist3')}</Text>
                 </View>
               </View>
 
               <TouchableOpacity
-                style={styles.returnEmailButton}
+                style={[styles.returnEmailButton, isRTL && styles.returnEmailButtonRTL]}
                 onPress={async () => {
                   setReturnModalVisible(false);
                   await handleReturnItem();
@@ -324,7 +338,7 @@ export default function HelpSupportScreen() {
                 onPress={() => setReturnModalVisible(false)}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalSecondaryBtnText}>{t('common.close')}</Text>
+                <Text style={[styles.modalSecondaryBtnText, isRTL && styles.textRTL]}>{t('common.close')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -332,14 +346,14 @@ export default function HelpSupportScreen() {
 
         {/* Business Hours */}
         <View style={styles.businessHoursSection}>
-          <Text style={styles.businessHoursTitle}>{t('help.serviceHours')}</Text>
+          <Text style={[styles.businessHoursTitle, isRTL && styles.textRTL]}>{t('help.serviceHours')}</Text>
           <View style={styles.businessHoursCard}>
-            <View style={styles.businessHoursItem}>
-              <Text style={styles.dayText}>{t('help.everyDay')}</Text>
-              <Text style={styles.hoursText}>{t('help.everyDayHours')}</Text>
+            <View style={[styles.businessHoursItem, isRTL && styles.businessHoursItemRTL]}>
+              <Text style={[styles.dayText, isRTL && styles.textRTL]}>{t('help.everyDay')}</Text>
+              <Text style={[styles.hoursText, isRTL && styles.textRTL]}>{t('help.everyDayHours')}</Text>
             </View>
           </View>
-          <Text style={styles.timezoneText}>{t('help.timezone')}</Text>
+          <Text style={[styles.timezoneText, isRTL && styles.textRTL]}>{t('help.timezone')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -360,16 +374,23 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
   },
+  headerRTL: {
+    flexDirection: 'row-reverse',
+  },
   backButton: {
     padding: 4,
+    width: 130,
   },
+  backButtonRTL: { alignItems: 'flex-end' },
+  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  backButtonContentRTL: { flexDirection: 'row-reverse' },
+  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
   },
-  placeholder: {
-    width: 32,
-  },
+  headerSpacer: { width: 130 },
   scrollView: {
     flex: 1,
   },
@@ -425,6 +446,9 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
+  supportCardRTL: {
+    flexDirection: 'row-reverse',
+  },
   supportIcon: {
     width: 48,
     height: 48,
@@ -433,6 +457,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
+  },
+  supportIconRTL: {
+    marginRight: 0,
+    marginLeft: 16,
   },
   supportDetails: {
     flex: 1,
@@ -447,6 +475,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#8E8E93',
     marginBottom: 4,
+  },
+  valueLTRRight: {
+    writingDirection: 'ltr',
+    textAlign: 'right',
   },
   supportDescription: {
     fontSize: 15,
@@ -473,6 +505,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     backgroundColor: '#ffffff',
   },
+  faqQuestionRTL: {
+    flexDirection: 'row-reverse',
+  },
   faqQuestionText: {
     fontSize: 16,
     fontWeight: '500',
@@ -497,10 +532,12 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 8,
   },
+  answerRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   answerBullet: {
     fontSize: 16,
     lineHeight: 22,
-    color: '#dc2626',
     color: '#dc2626',
     fontWeight: '800',
   },
@@ -511,6 +548,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     minWidth: 22,
     textAlign: 'right',
+  },
+  answerNumberRTL: {
+    textAlign: 'left',
   },
   answerText: {
     flex: 1,
@@ -580,6 +620,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
   },
+  returnChecklistItemRTL: {
+    flexDirection: 'row-reverse',
+  },
   returnBullet: {
     fontSize: 16,
     lineHeight: 20,
@@ -602,6 +645,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  returnEmailButtonRTL: {
+    flexDirection: 'row-reverse',
   },
   returnEmailButtonText: {
     color: '#ffffff',
@@ -629,10 +675,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
+  returnModalHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
   returnModalHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  returnModalHeaderLeftRTL: {
+    flexDirection: 'row-reverse',
   },
   returnModalTitle: {
     fontSize: 16,
@@ -687,6 +739,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
+  businessHoursItemRTL: {
+    flexDirection: 'row-reverse',
+  },
   dayText: {
     fontSize: 16,
     fontWeight: '500',
@@ -701,5 +756,11 @@ const styles = StyleSheet.create({
     color: '#C7C7CC',
     textAlign: 'center',
     marginTop: 12,
+  },
+
+  // RTL Support Styles
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
 });

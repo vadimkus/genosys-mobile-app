@@ -1098,20 +1098,10 @@ export default function ShopScreen() {
           ) : (
             <View style={styles.gridContainer}>
               {filteredProducts.map((product, index) => {
-                if (!animationsEnabled) {
-                  return (
-                    <TouchableOpacity
-                      key={product.id}
-                      style={styles.gridCard}
-                      onPress={() => handleProductPress(product)}
-                      activeOpacity={0.95}
-                    >
-                      {renderProductCardInner(product)}
-                    </TouchableOpacity>
-                  );
-                }
-
                 const anim = getCardAnim(product.id, index);
+                
+                // Always use Animated.View to prevent remounting when toggling animations
+                // When animations disabled, anim values are already set to static (opacity: 1, translateY: 0, etc.)
                 const floatY = anim.float.interpolate({ inputRange: [0, 1], outputRange: [0, -4] });
                 const translateY = Animated.add(anim.enterY, floatY);
                 const scale = anim.pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.008] });

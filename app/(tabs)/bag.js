@@ -539,7 +539,6 @@ export default function BagScreen() {
                   <Ionicons name="gift-outline" size={18} color="#dc2626" />
                   <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('bag.freeMaskPromotion')}</Text>
                 </View>
-                <Text style={[styles.sectionSubtle, isRTL && styles.sectionSubtleRTL]}>{t('bag.promoValidUntil', { date: '01/02/2026' })}</Text>
               </View>
 
               <ProgressCard
