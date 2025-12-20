@@ -329,7 +329,10 @@ export default function OrdersScreen() {
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <TouchableOpacity onPress={() => router.replace('/(tabs)/shop')} style={styles.backButton}>
-            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+            <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
+              <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+              <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+            </View>
           </TouchableOpacity>
           <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
           <View style={styles.headerSpacer} />
@@ -346,7 +349,10 @@ export default function OrdersScreen() {
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/shop')} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+            <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+          </View>
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
         <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
@@ -591,6 +597,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   backButton: { padding: 4 },
+  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  backButtonContentRTL: { flexDirection: 'row-reverse' },
+  backText: { fontSize: 14, color: '#dc2626', fontWeight: '600' },
+  backTextRTL: { writingDirection: 'rtl', textAlign: 'right' },
   headerTitle: { fontSize: 18, fontWeight: '600', color: '#000000' },
   headerSpacer: { width: 28 },
   refreshButton: { padding: 4 },

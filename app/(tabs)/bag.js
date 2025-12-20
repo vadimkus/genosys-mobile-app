@@ -386,7 +386,7 @@ export default function BagScreen() {
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
                 onPress={() => router.replace('/(tabs)/shop')}
               >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
                 <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
               </TouchableOpacity>
               
@@ -416,7 +416,7 @@ export default function BagScreen() {
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
                 onPress={() => router.replace('/(tabs)/shop')}
               >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
                 <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
               </TouchableOpacity>
               
@@ -466,7 +466,7 @@ export default function BagScreen() {
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
                 onPress={() => router.replace('/(tabs)/shop')}
               >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
                 <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
               </TouchableOpacity>
 
@@ -702,9 +702,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backText: {
-    fontSize: 16,
-    color: '#1D1D1F',
-    fontWeight: '400',
+    fontSize: 14,
+    color: '#dc2626',
+    fontWeight: '600',
     marginLeft: 4,
   },
   headerCenter: {

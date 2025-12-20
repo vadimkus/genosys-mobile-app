@@ -168,6 +168,53 @@ export const getLocalizedProductDescription = (product, locale) => {
 };
 
 /**
+ * Some products currently ship with a localized `size` string coming from the backend
+ * (e.g. RU: "1 набор"). When the app is in EN/AR this looks broken.
+ *
+ * Until backend provides `sizeRu/sizeAr` (or `localizedSize`), normalize the most common tokens.
+ */
+export const getLocalizedProductSize = (product, locale) => {
+  const l = normLocale(locale);
+  const raw = pickFirstNonEmpty(
+    product?.localizedSize,
+    product?.sizeAr,
+    product?.size_ar,
+    product?.arSize,
+    product?.ar_size,
+    product?.sizeRu,
+    product?.size_ru,
+    product?.ruSize,
+    product?.ru_size,
+    product?.size
+  );
+  const s = String(raw || '').trim();
+  if (!s) return '';
+
+  const hasCyrillic = /[\u0400-\u04FF]/.test(s);
+  let out = s;
+
+  // RU → EN/AR fallback for common "kit/set" size label.
+  if (hasCyrillic && l !== 'ru') {
+    const replacement = l === 'ar' ? 'مجموعة' : 'set';
+    // NOTE: JS \b word boundaries are ASCII-centric and won't match Cyrillic reliably.
+    out = out.replace(/набор/gi, replacement);
+    return out;
+  }
+
+  // EN "set" → AR
+  if (l === 'ar') {
+    out = out.replace(/\bset\b/gi, 'مجموعة');
+  }
+
+  // EN "set" → RU (if backend ever sends EN size while in RU)
+  if (l === 'ru' && !hasCyrillic) {
+    out = out.replace(/\bset\b/gi, 'набор');
+  }
+
+  return out;
+};
+
+/**
  * Category labels are stored in DB in English (canonical values).
  * This helper returns a translation key for a given canonical category.
  */

@@ -34,9 +34,10 @@ export default function AddEditAddressScreen() {
     name: addressData?.name || user?.name || '',
     phone: addressData?.phone || user?.phone || '',
     address: addressData?.address || '',
-    city: addressData?.city || t('addAddress.defaultCity'),
-    emirate: addressData?.emirate || t('addAddress.defaultEmirate'),
-    country: addressData?.country || t('addAddress.defaultCountry'),
+    // Store canonical values so they can be used reliably across locales.
+    city: addressData?.city || 'Dubai',
+    emirate: addressData?.emirate || 'Dubai',
+    country: addressData?.country || 'United Arab Emirates',
     isDefault: addressData?.isDefault || false,
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -73,12 +74,28 @@ export default function AddEditAddressScreen() {
 
     try {
       setIsSaving(true);
+
+      // Normalize type to a stable backend value (home/work/other), regardless of UI language.
+      const typeKeyRaw = String(formData.type || '').trim();
+      const typeHome = t('addAddress.typeHome');
+      const typeWork = t('addAddress.typeWork');
+      const typeOther = t('addAddress.typeOther');
+      const typeKey =
+        typeKeyRaw === typeWork ? 'work' :
+        typeKeyRaw === typeOther ? 'other' :
+        typeKeyRaw === typeHome ? 'home' :
+        // Best-effort fallback based on text
+        String(typeKeyRaw).toLowerCase().includes('work') ? 'work' :
+        String(typeKeyRaw).toLowerCase().includes('other') ? 'other' :
+        'home';
+      
+      const payload = { ...formData, type: typeKey };
       
       let result;
       if (isEditing) {
-        result = await editAddress(params.addressId, formData);
+        result = await editAddress(params.addressId, payload);
       } else {
-        result = await addAddress(formData);
+        result = await addAddress(payload);
       }
       
       if (result.success) {

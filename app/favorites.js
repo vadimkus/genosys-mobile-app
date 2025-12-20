@@ -27,7 +27,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function FavoritesScreen() {
   const { user } = useAuth();
-  const { t, locale } = useLocalization();
+  const { t, locale, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
   const { addItem } = useCart();
   const { favorites, toggleFavorite, getFavoritesCount } = useFavorites();
   const [addingProducts, setAddingProducts] = useState(new Set());
@@ -92,7 +93,7 @@ export default function FavoritesScreen() {
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Ionicons name="arrow-back" size={24} color="#007AFF" />
+            <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
           </TouchableOpacity>
           
           <View style={styles.headerCenter}>
@@ -129,7 +130,7 @@ export default function FavoritesScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>

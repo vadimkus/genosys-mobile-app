@@ -387,10 +387,13 @@ export default function ProfileScreen() {
       <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
         <TouchableOpacity 
           style={[styles.backButton, isRTL && styles.backButtonRTL]}
-          onPress={() => router.back()}
+          onPress={() => router.replace('/(tabs)/shop')}
           activeOpacity={0.7}
         >
-          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#007AFF" />
+          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
+            <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
+            <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+          </View>
         </TouchableOpacity>
         
         <Text style={[styles.navTitle, isRTL && styles.navTitleRTL]}>{t('profile.accountTitle')}</Text>
@@ -609,6 +612,23 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'flex-start',
+  },
+  backButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  backButtonContentRTL: {
+    flexDirection: 'row-reverse',
+  },
+  backText: {
+    fontSize: 14,
+    color: '#dc2626',
+    fontWeight: '600',
+  },
+  backTextRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   navTitle: {
     flex: 1,

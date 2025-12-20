@@ -220,9 +220,29 @@ export const getUserAddresses = async (token) => {
     (Array.isArray(raw?.data?.addresses) ? raw.data.addresses : null) ||
     [];
 
-  // Parse single-string address records into richer objects used by the mobile UI.
+  // Parse responses into richer objects used by the mobile UI.
   const V1_PREFIX = 'GENOSYS_ADDR_V1:';
   const parsed = maybeArray.map((a) => {
+    // New API shape (multiple addresses)
+    if (a && (a.addressLine1 || a.address_line1 || a.address_line)) {
+      const line1 = String(a.addressLine1 || a.address_line1 || a.address_line || '').trim();
+      const line2 = String(a.addressLine2 || a.address_line2 || '').trim();
+      const combined = line2 ? `${line1}, ${line2}` : line1;
+      return {
+        id: a?.id || '',
+        label: a?.label || a?.type || 'Address',
+        address: combined,
+        type: a?.type || 'home',
+        name: a?.name || '',
+        phone: a?.phone || '',
+        city: a?.city || '',
+        emirate: a?.emirate || '',
+        country: a?.country || 'United Arab Emirates',
+        isDefault: !!a?.isDefault,
+        _raw: a,
+      };
+    }
+
     const addrStr = String(a?.address || '');
     if (addrStr.startsWith(V1_PREFIX)) {
       try {
@@ -237,7 +257,7 @@ export const getUserAddresses = async (token) => {
           city: obj?.city || '',
           emirate: obj?.emirate || '',
           country: obj?.country || 'United Arab Emirates',
-          isDefault: true,
+          isDefault: !!(a?.isDefault ?? obj?.isDefault ?? true),
           _raw: a,
         };
       } catch {
@@ -273,29 +293,22 @@ export const getUserAddresses = async (token) => {
 export const createAddress = async (token, addressData) => {
   log.debug('Creating address');
 
-  // Website currently supports a single "primary" address stored as a string.
-  // We store a structured payload in a string so the mobile UI can round-trip all fields.
-  const V1_PREFIX = 'GENOSYS_ADDR_V1:';
-  const payload = {
-    type: addressData?.type || 'Home',
-    label: addressData?.type || addressData?.label || 'Primary Address',
-    name: addressData?.name || '',
-    phone: addressData?.phone || '',
-    address: addressData?.address || '',
-    city: addressData?.city || '',
-    emirate: addressData?.emirate || '',
-    country: addressData?.country || 'United Arab Emirates',
-    isDefault: true,
-  };
-
   return await apiRequest('/user/addresses', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({
-      label: payload.label,
-      address: `${V1_PREFIX}${JSON.stringify(payload)}`,
+      type: addressData?.type || 'home',
+      label: addressData?.label || null,
+      name: addressData?.name || '',
+      phone: addressData?.phone || '',
+      addressLine1: addressData?.address || addressData?.addressLine1 || '',
+      addressLine2: addressData?.addressLine2 || '',
+      city: addressData?.city || '',
+      emirate: addressData?.emirate || '',
+      country: addressData?.country || 'United Arab Emirates',
+      isDefault: !!addressData?.isDefault,
     }),
   });
 };
@@ -310,29 +323,23 @@ export const createAddress = async (token, addressData) => {
 export const updateAddress = async (token, addressId, addressData) => {
   log.debug('Updating address', { addressId });
 
-  // Website does NOT support PUT /user/addresses/:id.
-  // Use POST /user/addresses which performs add/update of the single primary address.
-  const V1_PREFIX = 'GENOSYS_ADDR_V1:';
-  const payload = {
-    type: addressData?.type || 'Home',
-    label: addressData?.type || addressData?.label || 'Primary Address',
-    name: addressData?.name || '',
-    phone: addressData?.phone || '',
-    address: addressData?.address || '',
-    city: addressData?.city || '',
-    emirate: addressData?.emirate || '',
-    country: addressData?.country || 'United Arab Emirates',
-    isDefault: true,
-  };
-
-  return await apiRequest('/user/addresses', {
-    method: 'POST',
+  const id = String(addressId || '').trim();
+  return await apiRequest(`/user/addresses/${encodeURIComponent(id)}`, {
+    method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({
-      label: payload.label,
-      address: `${V1_PREFIX}${JSON.stringify(payload)}`,
+      type: addressData?.type || 'home',
+      label: addressData?.label || null,
+      name: addressData?.name || '',
+      phone: addressData?.phone || '',
+      addressLine1: addressData?.address || addressData?.addressLine1 || '',
+      addressLine2: addressData?.addressLine2 || '',
+      city: addressData?.city || '',
+      emirate: addressData?.emirate || '',
+      country: addressData?.country || 'United Arab Emirates',
+      isDefault: !!addressData?.isDefault,
     }),
   });
 };
@@ -346,8 +353,9 @@ export const updateAddress = async (token, addressId, addressData) => {
 export const deleteAddress = async (token, addressId) => {
   log.debug('Deleting address');
 
-  // Website supports DELETE /user/addresses (clears primary address).
-  return await apiRequest('/user/addresses', {
+  const id = String(addressId || '').trim();
+  const endpoint = id ? `/user/addresses/${encodeURIComponent(id)}` : '/user/addresses';
+  return await apiRequest(endpoint, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -364,9 +372,13 @@ export const deleteAddress = async (token, addressId) => {
 export const setDefaultAddress = async (token, addressId) => {
   log.debug('Setting default address');
 
-  // Website currently supports only one address which is always default.
-  // Keep this as a no-op success to avoid breaking the UI.
-  return { success: true, data: { ok: true } };
+  return await apiRequest('/user/addresses', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ action: 'setDefault', id: String(addressId || '').trim() }),
+  });
 };
 
 // ============= WISHLIST =============

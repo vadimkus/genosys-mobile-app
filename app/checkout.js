@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Linking,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -40,7 +41,7 @@ import {
 
 export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
-  const { user } = useAuth();
+  const { user, getAddresses } = useAuth();
   const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -52,6 +53,7 @@ export default function CheckoutScreen() {
   const emailRef = useRef(null);
   const phoneRef = useRef(null);
   const addressRef = useRef(null);
+  const userPickedSavedAddressRef = useRef(false);
   
   // Form states
   const [firstName, setFirstName] = useState('');
@@ -61,6 +63,9 @@ export default function CheckoutScreen() {
   const [address, setAddress] = useState('');
   const [landmark, setLandmark] = useState('');
   const [addressDetails, setAddressDetails] = useState(null);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [savedAddressPickerOpen, setSavedAddressPickerOpen] = useState(false);
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(null);
   const [orderNotes, setOrderNotes] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
 
@@ -187,6 +192,7 @@ export default function CheckoutScreen() {
 
   // Pre-fill form with user data
   useEffect(() => {
+    if (userPickedSavedAddressRef.current) return;
     if (user) {
       const nameParts = user.name?.split(' ') || [];
       setFirstName(nameParts[0] || '');
@@ -211,6 +217,57 @@ export default function CheckoutScreen() {
       }
     }
   }, [user]);
+
+  const loadSavedAddresses = useCallback(async () => {
+    try {
+      const res = await getAddresses?.();
+      if (res?.success) {
+        setSavedAddresses(Array.isArray(res.data) ? res.data : []);
+      }
+    } catch {
+      // ignore
+    }
+  }, [getAddresses]);
+
+  useEffect(() => {
+    loadSavedAddresses();
+  }, [loadSavedAddresses]);
+
+  const getSavedTypeLabel = useCallback((typeRaw) => {
+    const k = String(typeRaw || '').trim().toLowerCase();
+    if (k === 'work') return t('addAddress.typeWork');
+    if (k === 'other') return t('addAddress.typeOther');
+    return t('addAddress.typeHome');
+  }, [t]);
+
+  const applySavedAddress = useCallback((addr) => {
+    if (!addr) return;
+    userPickedSavedAddressRef.current = true;
+    setSelectedSavedAddressId(String(addr.id || ''));
+
+    const name = String(addr.name || '').trim();
+    const parts = name ? name.split(' ') : [];
+    if (parts.length) {
+      setFirstName(parts[0] || '');
+      setLastName(parts.slice(1).join(' ') || '');
+    }
+
+    const national = normalizeUaeToNationalDigits(String(addr.phone || '').trim());
+    if (national) setPhoneNational(formatUaeNationalForInput(national));
+
+    setAddressDetails(addr);
+    setAddress(String(addr.address || '').trim());
+
+    if (addr?.emirate && typeof setSelectedEmirate === 'function') {
+      setSelectedEmirate(String(addr.emirate).trim());
+    }
+  }, [setSelectedEmirate]);
+
+  const clearSavedAddressSelection = useCallback(() => {
+    setSelectedSavedAddressId(null);
+    userPickedSavedAddressRef.current = false;
+    setAddressDetails(null);
+  }, []);
 
   const registerFieldLayout = (field) => (e) => {
     const y = e?.nativeEvent?.layout?.y;
@@ -550,7 +607,7 @@ export default function CheckoutScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#007AFF" />
+          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
@@ -627,13 +684,51 @@ export default function CheckoutScreen() {
               <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>
             </View>
 
+            {Array.isArray(savedAddresses) && savedAddresses.length > 0 ? (
+              <View style={styles.formGroup}>
+                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
+                <TouchableOpacity
+                  style={[styles.selectInput, isRTL && styles.inputRTL]}
+                  activeOpacity={0.8}
+                  onPress={() => setSavedAddressPickerOpen(true)}
+                >
+                  <Text
+                    style={[
+                      styles.selectText,
+                      isRTL && styles.textRTL,
+                      !selectedSavedAddressId && styles.selectPlaceholder,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {selectedSavedAddressId
+                      ? (() => {
+                          const found = savedAddresses.find((a) => String(a?.id) === String(selectedSavedAddressId));
+                          if (!found) return t('checkout.selectSavedAddress');
+                          const label = getSavedTypeLabel(found.type);
+                          const addrLine = String(found.address || '').trim();
+                          return `${label}${found.isDefault ? ' • ' + t('addresses.default') : ''} — ${addrLine}`;
+                        })()
+                      : t('checkout.selectSavedAddress')}
+                  </Text>
+                  <Ionicons
+                    name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                    size={18}
+                    color="#8E8E93"
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
             <View style={[styles.formRow, isRTL && styles.formRowRTL]}>
               <View style={styles.formHalf} onLayout={registerFieldLayout('firstName')}>
                 <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.firstName')} *</Text>
                 <TextInput
                   style={[styles.input, isRTL && styles.inputRTL, showError('firstName') && styles.inputError]}
                   value={firstName}
-                  onChangeText={setFirstName}
+                  onChangeText={(v) => {
+                    if (selectedSavedAddressId) clearSavedAddressSelection();
+                    setFirstName(v);
+                  }}
                   placeholder={t('checkout.enterFirstName')}
                   autoCapitalize="words"
                   onBlur={() => setTouched((p) => ({ ...p, firstName: true }))}
@@ -648,7 +743,10 @@ export default function CheckoutScreen() {
                 <TextInput
                   style={[styles.input, isRTL && styles.inputRTL, showError('lastName') && styles.inputError]}
                   value={lastName}
-                  onChangeText={setLastName}
+                  onChangeText={(v) => {
+                    if (selectedSavedAddressId) clearSavedAddressSelection();
+                    setLastName(v);
+                  }}
                   placeholder={t('checkout.enterLastName')}
                   autoCapitalize="words"
                   onBlur={() => setTouched((p) => ({ ...p, lastName: true }))}
@@ -706,7 +804,10 @@ export default function CheckoutScreen() {
                       showError('phone') && styles.inputError,
                     ]}
                     value={formatUaeNationalForInput(phoneNational)}
-                    onChangeText={(text) => setPhoneNational(normalizeUaeToNationalDigits(text))}
+                    onChangeText={(text) => {
+                      if (selectedSavedAddressId) clearSavedAddressSelection();
+                      setPhoneNational(normalizeUaeToNationalDigits(text));
+                    }}
                     placeholder={t('checkout.enterPhone')}
                     keyboardType="phone-pad"
                     onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
@@ -729,7 +830,10 @@ export default function CheckoutScreen() {
               <TextInput
                 style={[styles.input, styles.textArea, isRTL && styles.inputRTL, showError('address') && styles.inputError]}
                 value={address}
-                onChangeText={setAddress}
+                onChangeText={(text) => {
+                  if (selectedSavedAddressId) clearSavedAddressSelection();
+                  setAddress(text);
+                }}
                 placeholder={t('checkout.enterAddress')}
                 multiline
                 numberOfLines={3}
@@ -962,6 +1066,65 @@ export default function CheckoutScreen() {
 
         </View>
       </ScrollView>
+
+      <Modal
+        visible={savedAddressPickerOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSavedAddressPickerOpen(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, isRTL && styles.modalCardRTL]}>
+            <View style={[styles.modalHeader, isRTL && styles.modalHeaderRTL]}>
+              <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
+              <TouchableOpacity onPress={() => setSavedAddressPickerOpen(false)} style={styles.modalCloseButton}>
+                <Ionicons name="close" size={22} color="#111827" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                clearSavedAddressSelection();
+                setSavedAddressPickerOpen(false);
+              }}
+            >
+              <Text style={styles.modalOptionText}>{t('checkout.enterManually')}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalDivider} />
+
+            <ScrollView style={styles.modalList} showsVerticalScrollIndicator={false}>
+              {savedAddresses.map((a, idx) => {
+                const id = String(a?.id || '');
+                const label = getSavedTypeLabel(a?.type);
+                const addrLine = String(a?.address || '').trim();
+                const meta = [String(a?.city || '').trim(), String(a?.emirate || '').trim()].filter(Boolean).join(', ');
+                return (
+                  <TouchableOpacity
+                    key={id || `addr_${idx}`}
+                    style={[
+                      styles.modalAddressRow,
+                      selectedSavedAddressId && String(selectedSavedAddressId) === id ? styles.modalAddressRowActive : null,
+                    ]}
+                    onPress={() => {
+                      applySavedAddress(a);
+                      setSavedAddressPickerOpen(false);
+                    }}
+                  >
+                    <Text style={styles.modalAddressType}>
+                      {label}{a?.isDefault ? ` • ${t('addresses.default')}` : ''}
+                    </Text>
+                    {a?.name ? <Text style={styles.modalAddressName}>{String(a.name)}</Text> : null}
+                    <Text style={styles.modalAddressLine} numberOfLines={2}>{addrLine}</Text>
+                    {meta ? <Text style={styles.modalAddressMeta}>{meta}</Text> : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {/* Bottom Action */}
       <CollapsibleFooter
@@ -1300,6 +1463,26 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
     backgroundColor: '#ffffff',
   },
+  selectInput: {
+    borderWidth: 1,
+    borderColor: '#D1D1D6',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: '#ffffff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  selectText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1D1D1F',
+  },
+  selectPlaceholder: {
+    color: '#9CA3AF',
+  },
   phoneRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1362,6 +1545,94 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 80,
     paddingTop: 10,
+  },
+  // Saved address picker modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  modalCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    overflow: 'hidden',
+    maxHeight: '80%',
+  },
+  modalCardRTL: {},
+  modalHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  modalHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  modalCloseButton: {
+    padding: 6,
+  },
+  modalOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  modalOptionText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#dc2626',
+  },
+  modalDivider: {
+    height: 1,
+    backgroundColor: '#F1F5F9',
+  },
+  modalList: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+  modalAddressRow: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
+    marginBottom: 10,
+  },
+  modalAddressRowActive: {
+    borderColor: '#dc2626',
+    backgroundColor: '#FFF5F5',
+  },
+  modalAddressType: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  modalAddressName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  modalAddressLine: {
+    fontSize: 13,
+    color: '#374151',
+  },
+  modalAddressMeta: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '600',
   },
   pinButton: {
     flexDirection: 'row',

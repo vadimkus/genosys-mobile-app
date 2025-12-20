@@ -22,7 +22,7 @@ import ProductVariantSelector from '../../components/ProductVariantSelector';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../../utils/productRules';
 import { isBeautyBoxProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { getLocalizedProductName, getLocalizedProductDescription } from '../../utils/productLocalization';
+import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedProductSize } from '../../utils/productLocalization';
 import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
 import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
 import { createLogger } from '../../utils/logger';
@@ -657,7 +657,7 @@ export default function ProductDetailScreen() {
                     ? t('product.sizesAvailable', { count: product.variants.length })
                     : product.hasVariants 
                       ? t('product.multipleSizesAvailable')
-                      : t('product.sizeLine', { size: asText(product.size) })}
+                      : t('product.sizeLine', { size: getLocalizedProductSize(product, locale) })}
                 </Text>
                 {(product.stock || product.inStock) && (
                   <Text style={styles.stockInfo}>{t('product.inStock')}</Text>

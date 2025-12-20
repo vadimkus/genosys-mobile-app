@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
@@ -57,6 +58,13 @@ export default function AddressesScreen() {
   useEffect(() => {
     loadAddresses();
   }, []);
+
+  // Refresh list whenever user returns from Add/Edit Address screen.
+  useFocusEffect(
+    useCallback(() => {
+      loadAddresses();
+    }, [])
+  );
 
   const loadAddresses = async () => {
     try {

@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
+import { getLocalizedProductName, getLocalizedProductSize, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -162,7 +162,7 @@ export default function ProductGridItem({ product }) {
                   ? t('product.sizesCountShort', { count: product.variants.length })
                   : product.hasVariants 
                     ? t('product.multipleSizesShort')
-                    : t('product.sizeLine', { size: String(product.size || '').trim() })}
+                    : t('product.sizeLine', { size: getLocalizedProductSize(product, locale) })}
               </Text>
             </View>
             {(product.stock || product.inStock) && (
