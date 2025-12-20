@@ -469,6 +469,8 @@
     "arabic": "Arabic",
     "restartRequiredTitle": "Restart required",
     "restartRequiredMessage": "Arabic uses RTL layout. Please restart the app to apply it everywhere.",
+    "languageTipIOS": "Tip: iOS may require a restart for full RTL layout.",
+    "languageTipAndroid": "Tip: Android may require a restart for full RTL layout.",
     "accountTitle": "Account",
     "accountSection": "Account",
     "familyMember": "Family Member",

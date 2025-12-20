@@ -79,7 +79,7 @@ export default function LanguageScreen() {
         })}
 
         <Text style={[styles.note, isRTL && styles.textRTL]}>
-          {Platform.OS === 'ios' ? 'Tip: iOS may require a restart for full RTL layout.' : 'Tip: Android may require a restart for full RTL layout.'}
+          {Platform.OS === 'ios' ? t('profile.languageTipIOS') : t('profile.languageTipAndroid')}
         </Text>
       </View>
     </SafeAreaView>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,19 +7,65 @@ import {
   TouchableOpacity,
   Linking,
   Image,
+  Animated,
+  Easing,
+  I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import AUTH_CONFIG from '../../config/auth';
 
 export default function AboutScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const appVersion = String(Constants?.expoConfig?.version || Constants?.manifest?.version || '1.0.0');
+
+  // Small pulsing heart (one pulse every ~4 seconds) - match Contact screen
+  const heartScale = useRef(new Animated.Value(1)).current;
+  const heartOpacity = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.delay(3400),
+        Animated.parallel([
+          Animated.timing(heartScale, {
+            toValue: 1.18,
+            duration: 220,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(heartOpacity, {
+            toValue: 1,
+            duration: 220,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(heartScale, {
+            toValue: 1,
+            duration: 220,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(heartOpacity, {
+            toValue: 0.9,
+            duration: 220,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+      ])
+    );
+    anim.start();
+    return () => {
+      anim.stop();
+    };
+  }, [heartOpacity, heartScale]);
 
   const openUrl = async (url) => {
     const u = String(url || '').trim();
@@ -58,15 +104,19 @@ export default function AboutScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
-          <View style={styles.logoContainer}>
-            <Image
-              source={{ uri: AUTH_CONFIG.LOGO_URL || `${AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}/images/prd_logo.png` }}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
+          <Image
+            source={require('../../assets/splash-logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>{t('about.companyName')}</Text>
+          <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
+            <Text style={styles.flagText}>🇦🇪</Text>
+            <Text style={[styles.countryText, isRTL && styles.textRTL]}>{t('about.country')}</Text>
+            <Animated.View style={{ transform: [{ scale: heartScale }], opacity: heartOpacity }}>
+              <Ionicons name="heart" size={14} color="#dc2626" />
+            </Animated.View>
           </View>
-          <Text style={[styles.heroTitle, isRTL && styles.heroTitleRTL]}>{t('about.companyName')}</Text>
-          <Text style={[styles.heroSubtitle, isRTL && styles.heroSubtitleRTL]}>{t('about.country')}</Text>
         </View>
 
         {/* About Us */}
@@ -151,33 +201,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
   },
-  logoContainer: {
-    width: 86,
-    height: 86,
-    borderRadius: 18,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    padding: 10,
-  },
-  logoImage: {
-    width: '100%',
-    height: '100%',
+  logo: {
+    width: 240,
+    height: 72,
+    marginBottom: 14,
   },
   heroTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: '#000000',
-    marginBottom: 4,
-    letterSpacing: -0.5,
-  },
-  heroSubtitle: {
-    fontSize: 16,
-    color: '#1D1D1F',
+    textAlign: 'center',
     marginBottom: 8,
+    letterSpacing: -0.4,
+  },
+  countryRow: {
+    marginTop: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  countryRowRtl: {
+    flexDirection: 'row-reverse',
+  },
+  flagText: {
+    fontSize: 14,
+  },
+  countryText: {
+    fontSize: 16,
+    color: '#8E8E93',
   },
   versionText: {
     fontSize: 14,
@@ -308,5 +360,9 @@ const styles = StyleSheet.create({
   },
   footerSubtextRTL: {
     textAlign: 'center',
+  },
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
 });

@@ -469,6 +469,8 @@
     "arabic": "العربية",
     "restartRequiredTitle": "يلزم إعادة التشغيل",
     "restartRequiredMessage": "اللغة العربية تستخدم اتجاه RTL. يرجى إعادة تشغيل التطبيق لتطبيق التغيير بالكامل.",
+    "languageTipIOS": "ملاحظة: قد تتطلب iOS إعادة تشغيل لتطبيق RTL بالكامل.",
+    "languageTipAndroid": "ملاحظة: قد يتطلب Android إعادة تشغيل لتطبيق RTL بالكامل.",
     "accountTitle": "الحساب",
     "accountSection": "الحساب",
     "familyMember": "عضو العائلة",
