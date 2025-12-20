@@ -53,10 +53,8 @@ export default function ProfileScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
-  const [customerNumber, setCustomerNumber] = useState(0);
   const PUSH_PREF_KEY = '@genosys_push_enabled';
   const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
-  const LAST_CUSTOMER_NUMBER_KEY = '@genosys_last_customer_number';
 
   useEffect(() => {
     let cancelled = false;
@@ -72,39 +70,6 @@ export default function ProfileScreen() {
     return () => { cancelled = true; };
   }, []);
 
-  // Website parity: customer number is stored client-side (not in DB).
-  // Keep it stable per user id via AsyncStorage, and fall back to assigning the next number.
-  useEffect(() => {
-    if (!user?.id) {
-      setCustomerNumber(0);
-      return;
-    }
-    const CUSTOMER_NUMBER_KEY = `@genosys_customer_number:${user.id}`;
-    let cancelled = false;
-    (async () => {
-      try {
-        const saved = await AsyncStorage.getItem(CUSTOMER_NUMBER_KEY);
-        const parsed = saved ? parseInt(saved, 10) : 0;
-        if (parsed > 0) {
-          if (!cancelled) setCustomerNumber(parsed);
-          return;
-        }
-
-        const lastRaw = await AsyncStorage.getItem(LAST_CUSTOMER_NUMBER_KEY);
-        const last = lastRaw ? parseInt(lastRaw, 10) : 0;
-        const next = (Number.isFinite(last) && last > 0 ? last : 0) + 1;
-
-        await AsyncStorage.multiSet([
-          [CUSTOMER_NUMBER_KEY, String(next)],
-          [LAST_CUSTOMER_NUMBER_KEY, String(next)],
-        ]);
-        if (!cancelled) setCustomerNumber(next);
-      } catch {
-        // ignore
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user?.id]);
 
   // Local-only notification preferences (email/sms). Backend does not currently persist these.
   useEffect(() => {
@@ -363,27 +328,10 @@ export default function ProfileScreen() {
     subtitle,
     onPress,
     color = "#dc2626",
-    accessoryIcon,
-    onAccessoryPress,
   }) => (
     <TouchableOpacity style={[styles.quickActionCard, isRTL && styles.quickActionCardRTL]} onPress={onPress}>
-      <View style={[styles.quickActionTopRow, isRTL && styles.quickActionTopRowRTL]}>
-        <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
-          <Ionicons name={icon} size={24} color="#ffffff" />
-        </View>
-        {accessoryIcon && onAccessoryPress ? (
-          <TouchableOpacity
-            style={styles.quickActionAccessory}
-            onPress={(e) => {
-              // Prevent card onPress
-              e?.stopPropagation?.();
-              onAccessoryPress();
-            }}
-            activeOpacity={0.85}
-          >
-            <Ionicons name={accessoryIcon} size={18} color="#dc2626" />
-          </TouchableOpacity>
-        ) : null}
+      <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
+        <Ionicons name={icon} size={24} color="#ffffff" />
       </View>
       <Text style={[styles.quickActionTitle, isRTL && styles.quickActionTitleRTL]}>{title}</Text>
       <Text style={[styles.quickActionSubtitle, isRTL && styles.quickActionSubtitleRTL]}>{subtitle}</Text>
@@ -473,6 +421,13 @@ export default function ProfileScreen() {
         <View style={styles.profileHeader}>
           
           <View style={[styles.profileCard, isRTL && styles.profileCardRTL]}>
+            <TouchableOpacity
+              style={[styles.promoAvatarButton, isRTL ? styles.promoAvatarButtonRTL : styles.promoAvatarButtonLTR]}
+              onPress={() => router.push('/profile/promo')}
+              activeOpacity={0.9}
+            >
+              <Ionicons name="megaphone-outline" size={16} color="#dc2626" />
+            </TouchableOpacity>
             <View style={[styles.avatarWrap, isRTL && styles.avatarWrapRTL]}>
               <View style={[styles.avatarContainer, isRTL && styles.avatarContainerRTL]}>
                 {profileImageUri ? (
@@ -488,15 +443,15 @@ export default function ProfileScreen() {
                 <View style={styles.onlineDot} />
               </View>
 
-              {customerNumber > 0 && (
-                <View style={[styles.memberBadge, isRTL && styles.memberBadgeRTL, { marginTop: 10 }]}>
-                  <Ionicons name="sparkles-outline" size={12} color="#ffffff" />
+              {Number.isFinite(Number(user?.discountPercentage)) && Number(user?.discountPercentage) > 0 && (
+                <View style={[styles.discountBadge, isRTL && styles.memberBadgeRTL, { marginTop: 8 }]}>
+                  <Ionicons name="pricetag-outline" size={12} color="#ffffff" />
                   <Text
-                    style={[styles.memberBadgeText, isRTL && styles.memberBadgeTextRTL]}
+                    style={[styles.discountBadgeText, isRTL && styles.memberBadgeTextRTL]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {t('profile.familyMember')} #{customerNumber}
+                    {t('profile.discountLabel')}: {Number(user.discountPercentage)}%
                   </Text>
                 </View>
               )}
@@ -540,8 +495,6 @@ export default function ProfileScreen() {
                 await AsyncStorage.setItem('@genosys_nav_bag_source', 'profile').catch(() => {});
                 router.push('/(tabs)/bag');
               }}
-              accessoryIcon="pricetag-outline"
-              onAccessoryPress={() => router.push('/profile/promo')}
             />
           </View>
         </ProfileSection>
@@ -802,22 +755,24 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     flexShrink: 1,
   },
-  memberBadge: {
+  discountBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    backgroundColor: '#dc2626',
+    backgroundColor: '#27AE60',
     borderRadius: 999,
     maxWidth: '100%',
   },
-  memberBadgeText: {
+  discountBadgeText: {
     color: '#ffffff',
     fontSize: 12,
     fontWeight: '700',
     flexShrink: 1,
     minWidth: 0,
+    writingDirection: 'ltr',
+    textAlign: 'left',
   },
   userPhone: {
     fontSize: 14,
@@ -861,26 +816,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  quickActionTopRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    marginBottom: 12,
-  },
-  quickActionTopRowRTL: {
-    flexDirection: 'row-reverse',
-  },
-  quickActionAccessory: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  promoAvatarButton: {
+    position: 'absolute',
+    bottom: 12,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#FFF5F5',
     borderWidth: 1,
     borderColor: '#FECACA',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 10,
+  },
+  promoAvatarButtonLTR: {
+    right: 12,
+  },
+  promoAvatarButtonRTL: {
+    left: 12,
   },
   quickActionTitle: {
     fontSize: 17,

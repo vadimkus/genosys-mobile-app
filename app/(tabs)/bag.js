@@ -459,7 +459,7 @@ export default function BagScreen() {
           </View>
         </SafeAreaView>
         
-        <View style={styles.emptyContainer}>
+        <View style={[styles.emptyContainer, styles.emptyContainerTop]}>
           <View style={styles.iconContainer}>
             <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
           </View>
@@ -1140,12 +1140,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
   },
+  emptyContainerTop: {
+    justifyContent: 'flex-start',
+    paddingTop: 16,
+  },
   iconContainer: {
     marginBottom: 24,
   },
   emptyUniImage: {
-    width: 120,
-    height: 120,
+    width: 240,
+    height: 240,
   },
   emptyTitle: {
     fontSize: 22,

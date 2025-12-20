@@ -472,6 +472,7 @@
     "accountTitle": "Account",
     "accountSection": "Account",
     "familyMember": "Family Member",
+    "discountLabel": "Discount",
     "memberSince": "Since {year}",
     "viewAndEdit": "View & Edit",
     "loadingUserData": "Loading user data…",

@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { fetchPromo } from '../../services/api';
+import RenderHTML from 'react-native-render-html';
 
 export default function PromoScreen() {
   const router = useRouter();
   const { locale, t, dir } = useLocalization();
   const isRTL = dir === 'rtl' || locale === 'ar';
+  const { width } = useWindowDimensions();
 
   const [loading, setLoading] = useState(true);
   const [promo, setPromo] = useState(null);
@@ -83,7 +85,36 @@ export default function PromoScreen() {
                   {t('promo.dateLabel')}: {dateLine}
                 </Text>
               ) : null}
-              <Text style={[styles.body, isRTL && styles.textRTL]}>{promo.text}</Text>
+              <RenderHTML
+                contentWidth={width - 64}
+                source={{ html: promo.text }}
+                baseStyle={{
+                  fontSize: 15,
+                  lineHeight: 22,
+                  color: '#111827',
+                  textAlign: isRTL ? 'right' : 'left',
+                }}
+                tagsStyles={{
+                  p: { marginBottom: 8 },
+                  h2: { fontSize: 18, fontWeight: 'bold', marginTop: 12, marginBottom: 8 },
+                  h3: { fontSize: 16, fontWeight: 'bold', marginTop: 10, marginBottom: 6 },
+                  strong: { fontWeight: 'bold' },
+                  b: { fontWeight: 'bold' },
+                  em: { fontStyle: 'italic' },
+                  i: { fontStyle: 'italic' },
+                  u: { textDecorationLine: 'underline' },
+                  s: { textDecorationLine: 'line-through' },
+                  strike: { textDecorationLine: 'line-through' },
+                }}
+                defaultTextProps={{
+                  style: {
+                    fontSize: 15,
+                    lineHeight: 22,
+                    color: '#111827',
+                    textAlign: isRTL ? 'right' : 'left',
+                  },
+                }}
+              />
             </>
           ) : (
             <Text style={[styles.empty, isRTL && styles.textRTL]}>{t('promo.empty')}</Text>
@@ -149,7 +180,6 @@ const styles = StyleSheet.create({
   loadingText: { fontSize: 14, color: '#6B7280' },
   date: { fontSize: 12, color: '#6B7280', marginBottom: 10, writingDirection: 'ltr', textAlign: 'left' },
   dateRTL: { textAlign: 'right' },
-  body: { fontSize: 15, lineHeight: 22, color: '#111827' },
   empty: { fontSize: 14, color: '#6B7280' },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
