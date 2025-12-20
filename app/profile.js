@@ -44,15 +44,19 @@ export default function ProfileScreen() {
     disableBiometric
   } = useAuth();
   const { locale, t, dir } = useLocalization();
-  const isRTL = dir === 'rtl';
+  // Be defensive: some screens rely on `dir`, but if it's ever out of sync,
+  // Arabic locale should still force RTL layout for key typography (like the name).
+  const isRTL = dir === 'rtl' || locale === 'ar';
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [pushToggleLoading, setPushToggleLoading] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
+  const [customerNumber, setCustomerNumber] = useState(0);
   const PUSH_PREF_KEY = '@genosys_push_enabled';
   const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
+  const LAST_CUSTOMER_NUMBER_KEY = '@genosys_last_customer_number';
 
   useEffect(() => {
     let cancelled = false;
@@ -67,6 +71,40 @@ export default function ProfileScreen() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // Website parity: customer number is stored client-side (not in DB).
+  // Keep it stable per user id via AsyncStorage, and fall back to assigning the next number.
+  useEffect(() => {
+    if (!user?.id) {
+      setCustomerNumber(0);
+      return;
+    }
+    const CUSTOMER_NUMBER_KEY = `@genosys_customer_number:${user.id}`;
+    let cancelled = false;
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem(CUSTOMER_NUMBER_KEY);
+        const parsed = saved ? parseInt(saved, 10) : 0;
+        if (parsed > 0) {
+          if (!cancelled) setCustomerNumber(parsed);
+          return;
+        }
+
+        const lastRaw = await AsyncStorage.getItem(LAST_CUSTOMER_NUMBER_KEY);
+        const last = lastRaw ? parseInt(lastRaw, 10) : 0;
+        const next = (Number.isFinite(last) && last > 0 ? last : 0) + 1;
+
+        await AsyncStorage.multiSet([
+          [CUSTOMER_NUMBER_KEY, String(next)],
+          [LAST_CUSTOMER_NUMBER_KEY, String(next)],
+        ]);
+        if (!cancelled) setCustomerNumber(next);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   // Local-only notification preferences (email/sms). Backend does not currently persist these.
   useEffect(() => {
@@ -319,10 +357,33 @@ export default function ProfileScreen() {
   }, []);
 
   // Quick Action Card Component (Genosys brand style)
-  const QuickActionCard = ({ icon, title, subtitle, onPress, color = "#dc2626" }) => (
+  const QuickActionCard = ({
+    icon,
+    title,
+    subtitle,
+    onPress,
+    color = "#dc2626",
+    accessoryIcon,
+    onAccessoryPress,
+  }) => (
     <TouchableOpacity style={[styles.quickActionCard, isRTL && styles.quickActionCardRTL]} onPress={onPress}>
-      <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
-        <Ionicons name={icon} size={24} color="#ffffff" />
+      <View style={[styles.quickActionTopRow, isRTL && styles.quickActionTopRowRTL]}>
+        <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
+          <Ionicons name={icon} size={24} color="#ffffff" />
+        </View>
+        {accessoryIcon && onAccessoryPress ? (
+          <TouchableOpacity
+            style={styles.quickActionAccessory}
+            onPress={(e) => {
+              // Prevent card onPress
+              e?.stopPropagation?.();
+              onAccessoryPress();
+            }}
+            activeOpacity={0.85}
+          >
+            <Ionicons name={accessoryIcon} size={18} color="#dc2626" />
+          </TouchableOpacity>
+        ) : null}
       </View>
       <Text style={[styles.quickActionTitle, isRTL && styles.quickActionTitleRTL]}>{title}</Text>
       <Text style={[styles.quickActionSubtitle, isRTL && styles.quickActionSubtitleRTL]}>{subtitle}</Text>
@@ -392,7 +453,13 @@ export default function ProfileScreen() {
         >
           <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
             <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
-            <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+            <Text
+              style={[styles.backText, isRTL && styles.backTextRTL]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {t('tabs.home')}
+            </Text>
           </View>
         </TouchableOpacity>
         
@@ -406,18 +473,33 @@ export default function ProfileScreen() {
         <View style={styles.profileHeader}>
           
           <View style={[styles.profileCard, isRTL && styles.profileCardRTL]}>
-            <View style={[styles.avatarContainer, isRTL && styles.avatarContainerRTL]}>
-              {profileImageUri ? (
-                <Image 
-                  source={{ uri: profileImageUri }} 
-                  style={styles.avatarImage}
-                />
-              ) : (
-                <Text style={styles.avatarText}>
-                  {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'G'}
-                </Text>
+            <View style={[styles.avatarWrap, isRTL && styles.avatarWrapRTL]}>
+              <View style={[styles.avatarContainer, isRTL && styles.avatarContainerRTL]}>
+                {profileImageUri ? (
+                  <Image 
+                    source={{ uri: profileImageUri }} 
+                    style={styles.avatarImage}
+                  />
+                ) : (
+                  <Text style={styles.avatarText}>
+                    {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'G'}
+                  </Text>
+                )}
+                <View style={styles.onlineDot} />
+              </View>
+
+              {customerNumber > 0 && (
+                <View style={[styles.memberBadge, isRTL && styles.memberBadgeRTL, { marginTop: 10 }]}>
+                  <Ionicons name="sparkles-outline" size={12} color="#ffffff" />
+                  <Text
+                    style={[styles.memberBadgeText, isRTL && styles.memberBadgeTextRTL]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {t('profile.familyMember')} #{customerNumber}
+                  </Text>
+                </View>
               )}
-              <View style={styles.onlineDot} />
             </View>
             <View style={[styles.userInfo, isRTL && styles.userInfoRTL]}>
               <Text style={[styles.userName, isRTL && styles.userNameRTL]}>
@@ -453,7 +535,13 @@ export default function ProfileScreen() {
               title={t('profile.bag')}
               subtitle={cartCount > 0 ? t('profile.itemsCount', { count: cartCount }) : t('profile.empty')}
               color="#27AE60"
-              onPress={() => router.push('/(tabs)/bag')}
+              onPress={async () => {
+                // Ensure Bag header can route back to Account when opened from here.
+                await AsyncStorage.setItem('@genosys_nav_bag_source', 'profile').catch(() => {});
+                router.push('/(tabs)/bag');
+              }}
+              accessoryIcon="pricetag-outline"
+              onAccessoryPress={() => router.push('/profile/promo')}
             />
           </View>
         </ProfileSection>
@@ -607,16 +695,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   backButton: {
-    width: 40,
+    minWidth: 40,
     height: 40,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'flex-start',
+    maxWidth: 130,
   },
   backButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    minWidth: 0,
   },
   backButtonContentRTL: {
     flexDirection: 'row-reverse',
@@ -625,6 +715,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#dc2626',
     fontWeight: '600',
+    flexShrink: 1,
   },
   backTextRTL: {
     writingDirection: 'rtl',
@@ -638,7 +729,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 40,
+    width: 130,
   },
   
   // Apple Store Style Profile Header
@@ -660,6 +751,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  avatarWrap: {
+    alignItems: 'center',
+    marginEnd: 16,
+  },
   avatarContainer: {
     width: 80,
     height: 80,
@@ -667,7 +762,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
     justifyContent: 'center',
     alignItems: 'center',
-    marginEnd: 16,
     position: 'relative',
   },
   avatarText: {
@@ -707,6 +801,23 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     marginBottom: 4,
     flexShrink: 1,
+  },
+  memberBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#dc2626',
+    borderRadius: 999,
+    maxWidth: '100%',
+  },
+  memberBadgeText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+    flexShrink: 1,
+    minWidth: 0,
   },
   userPhone: {
     fontSize: 14,
@@ -749,6 +860,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  quickActionTopRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  quickActionTopRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  quickActionAccessory: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFF5F5',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   quickActionTitle: {
     fontSize: 17,
@@ -886,7 +1018,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   avatarContainerRTL: {
-    // In RTL the avatar sits on the right; ensure spacing is on the correct side so it never overlaps text.
+    // Avatar spacing handled by avatarWrapRTL
+  },
+  avatarWrapRTL: {
     marginEnd: 0,
     marginStart: 16,
   },
@@ -901,6 +1035,13 @@ const styles = StyleSheet.create({
   },
   userEmailRTL: {
     textAlign: 'right',
+  },
+  memberBadgeRTL: {
+    flexDirection: 'row-reverse',
+  },
+  memberBadgeTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   userPhoneRTL: {
     textAlign: 'right',

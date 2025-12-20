@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { calculateCartTotals } from '../utils/cartUtils';
 import { submitCODOrder, submitCardOrder, submitApplePayOrder, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
@@ -232,6 +233,13 @@ export default function CheckoutScreen() {
   useEffect(() => {
     loadSavedAddresses();
   }, [loadSavedAddresses]);
+
+  // Refresh saved addresses when returning to Checkout (e.g. after adding/editing an address).
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedAddresses();
+    }, [loadSavedAddresses])
+  );
 
   const getSavedTypeLabel = useCallback((typeRaw) => {
     const k = String(typeRaw || '').trim().toLowerCase();
@@ -684,40 +692,42 @@ export default function CheckoutScreen() {
               <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>
             </View>
 
-            {Array.isArray(savedAddresses) && savedAddresses.length > 0 ? (
-              <View style={styles.formGroup}>
-                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
-                <TouchableOpacity
-                  style={[styles.selectInput, isRTL && styles.inputRTL]}
-                  activeOpacity={0.8}
-                  onPress={() => setSavedAddressPickerOpen(true)}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
+              <TouchableOpacity
+                style={[styles.selectInput, isRTL && styles.selectInputRTL]}
+                activeOpacity={0.8}
+                onPress={async () => {
+                  // Ensure we have the latest list before opening.
+                  await loadSavedAddresses();
+                  setSavedAddressPickerOpen(true);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.selectText,
+                    isRTL && styles.textRTL,
+                    !selectedSavedAddressId && styles.selectPlaceholder,
+                  ]}
+                  numberOfLines={1}
                 >
-                  <Text
-                    style={[
-                      styles.selectText,
-                      isRTL && styles.textRTL,
-                      !selectedSavedAddressId && styles.selectPlaceholder,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {selectedSavedAddressId
-                      ? (() => {
-                          const found = savedAddresses.find((a) => String(a?.id) === String(selectedSavedAddressId));
-                          if (!found) return t('checkout.selectSavedAddress');
-                          const label = getSavedTypeLabel(found.type);
-                          const addrLine = String(found.address || '').trim();
-                          return `${label}${found.isDefault ? ' • ' + t('addresses.default') : ''} — ${addrLine}`;
-                        })()
-                      : t('checkout.selectSavedAddress')}
-                  </Text>
-                  <Ionicons
-                    name={isRTL ? 'chevron-back' : 'chevron-forward'}
-                    size={18}
-                    color="#8E8E93"
-                  />
-                </TouchableOpacity>
-              </View>
-            ) : null}
+                  {selectedSavedAddressId
+                    ? (() => {
+                        const found = savedAddresses.find((a) => String(a?.id) === String(selectedSavedAddressId));
+                        if (!found) return t('checkout.selectSavedAddress');
+                        const label = getSavedTypeLabel(found.type);
+                        const addrLine = String(found.address || '').trim();
+                        return `${label}${found.isDefault ? ' • ' + t('addresses.default') : ''} — ${addrLine}`;
+                      })()
+                    : t('checkout.selectSavedAddress')}
+                </Text>
+                <Ionicons
+                  name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                  size={18}
+                  color="#8E8E93"
+                />
+              </TouchableOpacity>
+            </View>
 
             <View style={[styles.formRow, isRTL && styles.formRowRTL]}>
               <View style={styles.formHalf} onLayout={registerFieldLayout('firstName')}>
@@ -1083,44 +1093,60 @@ export default function CheckoutScreen() {
             </View>
 
             <TouchableOpacity
-              style={styles.modalOption}
+              style={[styles.modalOption, isRTL && styles.modalOptionRTL]}
               onPress={() => {
                 clearSavedAddressSelection();
                 setSavedAddressPickerOpen(false);
               }}
             >
-              <Text style={styles.modalOptionText}>{t('checkout.enterManually')}</Text>
+              <Text style={[styles.modalOptionText, isRTL && styles.textRTL]}>{t('checkout.enterManually')}</Text>
             </TouchableOpacity>
 
             <View style={styles.modalDivider} />
 
             <ScrollView style={styles.modalList} showsVerticalScrollIndicator={false}>
-              {savedAddresses.map((a, idx) => {
-                const id = String(a?.id || '');
-                const label = getSavedTypeLabel(a?.type);
-                const addrLine = String(a?.address || '').trim();
-                const meta = [String(a?.city || '').trim(), String(a?.emirate || '').trim()].filter(Boolean).join(', ');
-                return (
-                  <TouchableOpacity
-                    key={id || `addr_${idx}`}
+              {Array.isArray(savedAddresses) && savedAddresses.length > 0 ? (
+                savedAddresses.map((a, idx) => {
+                  const id = String(a?.id || '');
+                  const label = getSavedTypeLabel(a?.type);
+                  const addrLine = String(a?.address || '').trim();
+                  const meta = [String(a?.city || '').trim(), String(a?.emirate || '').trim()].filter(Boolean).join(', ');
+                  return (
+                    <TouchableOpacity
+                      key={id || `addr_${idx}`}
                     style={[
                       styles.modalAddressRow,
-                      selectedSavedAddressId && String(selectedSavedAddressId) === id ? styles.modalAddressRowActive : null,
-                    ]}
+                      isRTL && styles.modalAddressRowRTL,
+                        selectedSavedAddressId && String(selectedSavedAddressId) === id ? styles.modalAddressRowActive : null,
+                      ]}
+                      onPress={() => {
+                        applySavedAddress(a);
+                        setSavedAddressPickerOpen(false);
+                      }}
+                    >
+                    <Text style={[styles.modalAddressType, isRTL && styles.textRTL]}>
+                        {label}{a?.isDefault ? ` • ${t('addresses.default')}` : ''}
+                      </Text>
+                    {a?.name ? <Text style={[styles.modalAddressName, isRTL && styles.textRTL]}>{String(a.name)}</Text> : null}
+                    <Text style={[styles.modalAddressLine, isRTL && styles.textRTL]} numberOfLines={2}>{addrLine}</Text>
+                    {meta ? <Text style={[styles.modalAddressMeta, isRTL && styles.textRTL]}>{meta}</Text> : null}
+                    </TouchableOpacity>
+                  );
+                })
+              ) : (
+                <View style={{ padding: 10 }}>
+                  <Text style={[styles.modalAddressLine, { color: '#6B7280' }, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
+                  <TouchableOpacity
+                    style={[styles.modalOption, { paddingHorizontal: 0 }, isRTL && styles.modalOptionRTL]}
                     onPress={() => {
-                      applySavedAddress(a);
                       setSavedAddressPickerOpen(false);
+                      router.push('/profile/addresses');
                     }}
                   >
-                    <Text style={styles.modalAddressType}>
-                      {label}{a?.isDefault ? ` • ${t('addresses.default')}` : ''}
-                    </Text>
-                    {a?.name ? <Text style={styles.modalAddressName}>{String(a.name)}</Text> : null}
-                    <Text style={styles.modalAddressLine} numberOfLines={2}>{addrLine}</Text>
-                    {meta ? <Text style={styles.modalAddressMeta}>{meta}</Text> : null}
+                    <Text style={[styles.modalOptionText, isRTL && styles.textRTL]}>{t('addresses.addNew')}</Text>
                   </TouchableOpacity>
-                );
-              })}
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -1475,6 +1501,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 10,
   },
+  selectInputRTL: {
+    flexDirection: 'row-reverse',
+  },
   selectText: {
     flex: 1,
     fontSize: 15,
@@ -1562,6 +1591,9 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
   },
   modalCardRTL: {},
+  modalOptionRTL: {
+    alignItems: 'flex-end',
+  },
   modalHeader: {
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -1607,6 +1639,9 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
     backgroundColor: '#ffffff',
     marginBottom: 10,
+  },
+  modalAddressRowRTL: {
+    alignItems: 'flex-end',
   },
   modalAddressRowActive: {
     borderColor: '#dc2626',

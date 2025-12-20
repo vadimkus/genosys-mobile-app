@@ -471,6 +471,8 @@
     "restartRequiredMessage": "Для арабского языка используется RTL. Перезапустите приложение, чтобы применить изменения везде.",
     "accountTitle": "Аккаунт",
     "accountSection": "Аккаунт",
+    "familyMember": "Участник семьи",
+    "memberSince": "С {year} года",
     "viewAndEdit": "Просмотр и редактирование",
     "loadingUserData": "Загрузка данных пользователя…",
     "orders": "Заказы",
@@ -1234,6 +1236,13 @@
   },
   "branding": {
     "companyName": "Genosys Middle East FZ-LLC"
+  },
+  "promo": {
+    "title": "Промо",
+    "infoTitle": "Промо-акции",
+    "infoSubtitle": "Последние новости и предложения",
+    "dateLabel": "Дата",
+    "empty": "Сейчас нет промо-акций."
   },
   "common": {
     "ok": "OK",

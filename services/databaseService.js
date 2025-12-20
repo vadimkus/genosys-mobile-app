@@ -324,6 +324,15 @@ export const updateAddress = async (token, addressId, addressData) => {
   log.debug('Updating address', { addressId });
 
   const id = String(addressId || '').trim();
+  // Legacy placeholder IDs come from the backend fallback when the user has no Address rows yet.
+  // Editing such a record should create a real Address row instead of calling /addresses/:id.
+  if (id === 'legacy' || id === 'primary') {
+    return await createAddress(token, {
+      ...(addressData || {}),
+      // best effort: promote legacy edit to be default unless explicitly false
+      isDefault: addressData?.isDefault !== undefined ? !!addressData.isDefault : true,
+    });
+  }
   return await apiRequest(`/user/addresses/${encodeURIComponent(id)}`, {
     method: 'PUT',
     headers: {
@@ -354,6 +363,15 @@ export const deleteAddress = async (token, addressId) => {
   log.debug('Deleting address');
 
   const id = String(addressId || '').trim();
+  if (id === 'legacy' || id === 'primary') {
+    // Legacy address is stored in User.address; backend supports clearing via DELETE /user/addresses.
+    return await apiRequest('/user/addresses', {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
   const endpoint = id ? `/user/addresses/${encodeURIComponent(id)}` : '/user/addresses';
   return await apiRequest(endpoint, {
     method: 'DELETE',

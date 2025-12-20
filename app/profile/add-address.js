@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Alert,
   Switch,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,6 +43,14 @@ export default function AddEditAddressScreen() {
     isDefault: addressData?.isDefault || false,
   });
   const [isSaving, setIsSaving] = useState(false);
+  const initialFormRef = useRef(null);
+
+  // Track the "last saved" snapshot so Cancel/Back doesn't prompt after a successful save.
+  useEffect(() => {
+    if (!initialFormRef.current) {
+      initialFormRef.current = formData;
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const emirates = [
     { value: 'Abu Dhabi', key: 'abuDhabi' },
@@ -99,13 +109,16 @@ export default function AddEditAddressScreen() {
       }
       
       if (result.success) {
+        // Mark current state as saved, so Cancel/Back won't ask to discard.
+        initialFormRef.current = payload;
+
         Alert.alert(
           t('addAddress.successTitle'),
           isEditing ? t('addAddress.updated') : t('addAddress.added'),
           [
             {
               text: t('contact.ok'),
-              onPress: () => router.back()
+              onPress: () => {}
             }
           ]
         );
@@ -121,7 +134,8 @@ export default function AddEditAddressScreen() {
   };
 
   const handleCancel = () => {
-    if (JSON.stringify(formData) !== JSON.stringify(addressData)) {
+    const baseline = initialFormRef.current ?? addressData;
+    if (JSON.stringify(formData) !== JSON.stringify(baseline)) {
       Alert.alert(
         t('addAddress.discardTitle'),
         t('addAddress.discardMessage'),
@@ -137,36 +151,43 @@ export default function AddEditAddressScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-          <Text style={styles.cancelText}>{t('addAddress.cancel')}</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {isEditing ? t('addAddress.editTitle') : t('addAddress.addTitle')}
-        </Text>
-        <TouchableOpacity 
-          onPress={handleSave} 
-          style={[styles.headerButton, isSaving && styles.headerButtonDisabled]}
-          disabled={isSaving}
-        >
-          <Text style={[styles.saveText, isSaving && styles.saveTextDisabled]}>
-            {isSaving ? t('addAddress.saving') : t('addAddress.save')}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView 
-        style={styles.scrollView} 
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoid}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        // Enough offset to keep multiline address visible below the header on iOS.
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 96 : 0}
       >
+        {/* Header */}
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
+            <Text style={[styles.cancelText, isRTL && styles.textRTL]}>{t('addAddress.cancel')}</Text>
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>
+            {isEditing ? t('addAddress.editTitle') : t('addAddress.addTitle')}
+          </Text>
+          <TouchableOpacity 
+            onPress={handleSave} 
+            style={[styles.headerButton, isSaving && styles.headerButtonDisabled]}
+            disabled={isSaving}
+          >
+            <Text style={[styles.saveText, isRTL && styles.textRTL, isSaving && styles.saveTextDisabled]}>
+              {isSaving ? t('addAddress.saving') : t('addAddress.save')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView 
+          style={styles.scrollView} 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
         {/* Address Type */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('addAddress.addressType')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('addAddress.addressType')}</Text>
           <View style={styles.formContent}>
-            <View style={styles.typeContainer}>
+            <View style={[styles.typeContainer, isRTL && styles.typeContainerRTL]}>
               {addressTypes.map((type) => (
                 <TouchableOpacity
                   key={type}
@@ -183,6 +204,7 @@ export default function AddEditAddressScreen() {
                   />
                   <Text style={[
                     styles.typeButtonText,
+                    isRTL && styles.textRTL,
                     formData.type === type && styles.activeTypeButtonText
                   ]}>
                     {type}
@@ -195,15 +217,15 @@ export default function AddEditAddressScreen() {
 
         {/* Contact Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('addAddress.contactInfo')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('addAddress.contactInfo')}</Text>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('addAddress.fullName')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputRTL]}
                 value={formData.name}
                 onChangeText={(text) => updateField('name', text)}
                 placeholder={t('addAddress.enterFullName')}
@@ -216,12 +238,12 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('addAddress.phoneNumber')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputValueLTR]}
                 value={formData.phone}
                 onChangeText={(text) => updateField('phone', text)}
                 placeholder={t('addAddress.phonePlaceholder')}
@@ -237,15 +259,15 @@ export default function AddEditAddressScreen() {
 
         {/* Address Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('addAddress.addressDetails')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('addAddress.addressDetails')}</Text>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('addAddress.streetAddress')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
-                style={[styles.textInput, styles.multilineInput]}
+                style={[styles.textInput, styles.multilineInput, isRTL && styles.inputRTL]}
                 value={formData.address}
                 onChangeText={(text) => updateField('address', text)}
                 placeholder={t('addAddress.enterAddressLine')}
@@ -260,9 +282,9 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>{t('addAddress.city')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('addAddress.city')}</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputRTL]}
                 value={formData.city}
                 onChangeText={(text) => updateField('city', text)}
                 placeholder={t('addAddress.defaultCity')}
@@ -275,20 +297,26 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>{t('addAddress.emirate')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('addAddress.emirate')}</Text>
               <View style={styles.pickerContainer}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={isRTL ? styles.pickerRowRTL : null}
+                >
                   {emirates.map((emirate) => (
                     <TouchableOpacity
                       key={emirate.value}
                       style={[
                         styles.emirateButton,
+                        isRTL && styles.emirateButtonRTL,
                         formData.emirate === emirate.value && styles.activeEmirateButton
                       ]}
                       onPress={() => updateField('emirate', emirate.value)}
                     >
                       <Text style={[
                         styles.emirateButtonText,
+                        isRTL && styles.textRTL,
                         formData.emirate === emirate.value && styles.activeEmirateButtonText
                       ]}>
                         {t(`addAddress.emirates.${emirate.key}`)}
@@ -300,9 +328,9 @@ export default function AddEditAddressScreen() {
             </View>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>{t('addAddress.country')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('addAddress.country')}</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputRTL]}
                 value={formData.country}
                 onChangeText={(text) => updateField('country', text)}
                 placeholder={t('addAddress.defaultCountry')}
@@ -318,12 +346,12 @@ export default function AddEditAddressScreen() {
 
         {/* Default Address */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('addAddress.preferences')}</Text>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('addAddress.preferences')}</Text>
           <View style={styles.formContent}>
-            <View style={styles.switchContainer}>
-              <View style={styles.switchLabel}>
-                <Text style={styles.fieldLabel}>{t('addAddress.setAsDefault')}</Text>
-                <Text style={styles.switchSubtext}>{t('addAddress.setAsDefaultHint')}</Text>
+            <View style={[styles.switchContainer, isRTL && styles.switchContainerRTL]}>
+              <View style={[styles.switchLabel, isRTL && styles.switchLabelRTL]}>
+                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('addAddress.setAsDefault')}</Text>
+                <Text style={[styles.switchSubtext, isRTL && styles.textRTL]}>{t('addAddress.setAsDefaultHint')}</Text>
               </View>
               <Switch
                 value={formData.isDefault}
@@ -337,13 +365,14 @@ export default function AddEditAddressScreen() {
         </View>
 
         {/* Delivery Note */}
-        <View style={styles.deliveryNote}>
+        <View style={[styles.deliveryNote, isRTL && styles.deliveryNoteRTL]}>
           <Ionicons name="information-circle-outline" size={16} color="#8E8E93" />
-          <Text style={styles.deliveryNoteText}>
+          <Text style={[styles.deliveryNoteText, isRTL && styles.textRTL]}>
             {t('addAddress.deliveryNote')}
           </Text>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -353,6 +382,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
+  keyboardAvoid: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -361,6 +393,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
+  },
+  headerRTL: {
+    flexDirection: 'row-reverse',
   },
   headerButton: {
     paddingVertical: 4,
@@ -389,6 +424,9 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 24,
+  },
 
   // Sections
   section: {
@@ -416,6 +454,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     gap: 12,
+  },
+  typeContainerRTL: {
+    flexDirection: 'row-reverse',
   },
   typeButton: {
     flex: 1,
@@ -472,6 +513,13 @@ const styles = StyleSheet.create({
     borderColor: '#D1D1D6',
     minHeight: 40,
   },
+  inputRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  inputValueLTR: {
+    writingDirection: 'ltr',
+  },
   multilineInput: {
     minHeight: 80,
     textAlignVertical: 'top',
@@ -489,7 +537,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#D1D1D6',
-    marginRight: 8,
+    marginEnd: 8,
+  },
+  emirateButtonRTL: {
+    marginEnd: 0,
+    marginStart: 8,
+  },
+  pickerRowRTL: {
+    flexDirection: 'row-reverse',
   },
   activeEmirateButton: {
     backgroundColor: '#dc2626',
@@ -512,9 +567,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
+  switchContainerRTL: {
+    flexDirection: 'row-reverse',
+  },
   switchLabel: {
     flex: 1,
-    marginRight: 16,
+    marginEnd: 16,
+  },
+  switchLabelRTL: {
+    marginEnd: 0,
+    marginStart: 16,
+    alignItems: 'flex-end',
   },
   switchSubtext: {
     fontSize: 14,
@@ -532,11 +595,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 8,
   },
+  deliveryNoteRTL: {
+    flexDirection: 'row-reverse',
+  },
   deliveryNoteText: {
     fontSize: 14,
     color: '#8E8E93',
     lineHeight: 18,
     flex: 1,
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
 });
 

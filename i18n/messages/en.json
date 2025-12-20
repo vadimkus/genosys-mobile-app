@@ -471,6 +471,8 @@
     "restartRequiredMessage": "Arabic uses RTL layout. Please restart the app to apply it everywhere.",
     "accountTitle": "Account",
     "accountSection": "Account",
+    "familyMember": "Family Member",
+    "memberSince": "Since {year}",
     "viewAndEdit": "View & Edit",
     "loadingUserData": "Loading user data…",
     "orders": "Orders",
@@ -1234,6 +1236,13 @@
   },
   "branding": {
     "companyName": "Genosys Middle East FZ-LLC"
+  },
+  "promo": {
+    "title": "Promo",
+    "infoTitle": "Promotions",
+    "infoSubtitle": "Latest updates and offers",
+    "dateLabel": "Date",
+    "empty": "No promotions right now."
   },
   "common": {
     "ok": "OK",

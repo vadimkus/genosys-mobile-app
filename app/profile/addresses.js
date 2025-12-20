@@ -143,17 +143,17 @@ export default function AddressesScreen() {
     const typeMeta = getTypeMeta(address?.type);
     return (
       <View style={styles.addressCard}>
-        <View style={styles.addressHeader}>
-          <View style={styles.addressTypeContainer}>
+        <View style={[styles.addressHeader, isRTL && styles.addressHeaderRTL]}>
+          <View style={[styles.addressTypeContainer, isRTL && styles.addressTypeContainerRTL]}>
             <Ionicons
               name={typeMeta.icon}
               size={20}
               color="#dc2626"
             />
-            <Text style={styles.addressType}>{typeMeta.label}</Text>
+            <Text style={[styles.addressType, isRTL && styles.textRTL]}>{typeMeta.label}</Text>
             {address.isDefault && (
-              <View style={styles.defaultBadge}>
-                <Text style={styles.defaultText}>{t('addresses.default')}</Text>
+              <View style={[styles.defaultBadge, isRTL && styles.defaultBadgeRTL]}>
+                <Text style={[styles.defaultText, isRTL && styles.textRTL]}>{t('addresses.default')}</Text>
               </View>
             )}
           </View>
@@ -176,12 +176,12 @@ export default function AddressesScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.addressDetails}>
-          <Text style={styles.addressName}>{address.name}</Text>
-          <Text style={styles.addressText}>{address.address}</Text>
-          <Text style={styles.addressText}>{address.city}, {formatEmirate(address.emirate)}</Text>
-          <Text style={styles.addressText}>{formatCountry(address.country)}</Text>
-          <Text style={styles.addressPhone}>{address.phone}</Text>
+        <View style={[styles.addressDetails, isRTL && styles.addressDetailsRTL]}>
+          <Text style={[styles.addressName, isRTL && styles.textRTL]}>{address.name}</Text>
+          <Text style={[styles.addressText, isRTL && styles.textRTL]}>{address.address}</Text>
+          <Text style={[styles.addressText, isRTL && styles.textRTL]}>{address.city}, {formatEmirate(address.emirate)}</Text>
+          <Text style={[styles.addressText, isRTL && styles.textRTL]}>{formatCountry(address.country)}</Text>
+          <Text style={[styles.addressPhone, isRTL && styles.valueLTR]}>{address.phone}</Text>
         </View>
       </View>
     );
@@ -190,11 +190,11 @@ export default function AddressesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('addresses.title')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('addresses.title')}</Text>
         <TouchableOpacity onPress={handleAddAddress} style={styles.addButton}>
           <Ionicons name="add" size={24} color="#dc2626" />
         </TouchableOpacity>
@@ -213,7 +213,7 @@ export default function AddressesScreen() {
       >
         {/* Info Section */}
         <View style={styles.infoSection}>
-          <Text style={styles.infoText}>
+          <Text style={[styles.infoText, isRTL && styles.textRTL]}>
             {t('addresses.manageHint')}
           </Text>
         </View>
@@ -232,8 +232,8 @@ export default function AddressesScreen() {
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyTitle}>{t('addresses.emptyTitle')}</Text>
-                <Text style={styles.emptySubtitle}>{t('addresses.emptySubtitle')}</Text>
+                <Text style={[styles.emptyTitle, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
+                <Text style={[styles.emptySubtitle, isRTL && styles.textRTL]}>{t('addresses.emptySubtitle')}</Text>
               </View>
             )}
           </View>
@@ -241,29 +241,35 @@ export default function AddressesScreen() {
 
         {/* Add New Address Button */}
         <TouchableOpacity style={styles.addNewButton} onPress={handleAddAddress}>
-          <View style={styles.addNewContent}>
-            <View style={styles.addIconContainer}>
+          <View style={[styles.addNewContent, isRTL && styles.rowRTL]}>
+            <View style={[styles.addIconContainer, isRTL && styles.addIconContainerRTL]}>
               <Ionicons name="add" size={24} color="#dc2626" />
             </View>
-            <Text style={styles.addNewText}>{t('addresses.addNew')}</Text>
+            <Text
+              style={[styles.addNewText, isRTL && styles.textRTL]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {t('addresses.addNew')}
+            </Text>
           </View>
         </TouchableOpacity>
 
         {/* Tips Section */}
         <View style={styles.tipsSection}>
-          <Text style={styles.tipsTitle}>{t('addresses.deliveryTips')}</Text>
+          <Text style={[styles.tipsTitle, isRTL && styles.textRTL]}>{t('addresses.deliveryTips')}</Text>
           <View style={styles.tipsList}>
-            <View style={styles.tipItem}>
+            <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
               <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.tipText}>{t('addresses.tipDefault')}</Text>
+              <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipDefault')}</Text>
             </View>
-            <View style={styles.tipItem}>
+            <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
               <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.tipText}>{t('addresses.tipApt')}</Text>
+              <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipApt')}</Text>
             </View>
-            <View style={styles.tipItem}>
+            <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
               <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.tipText}>{t('addresses.tipPhone')}</Text>
+              <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipPhone')}</Text>
             </View>
           </View>
         </View>
@@ -285,6 +291,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
+  },
+  headerRTL: {
+    flexDirection: 'row-reverse',
   },
   backButton: {
     padding: 4,
@@ -351,9 +360,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  addressHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
   addressTypeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  addressTypeContainerRTL: {
+    flexDirection: 'row-reverse',
   },
   addressType: {
     fontSize: 17,
@@ -368,6 +383,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginStart: 8,
   },
+  defaultBadgeRTL: {
+    marginStart: 0,
+    marginEnd: 8,
+  },
   defaultText: {
     fontSize: 12,
     color: '#ffffff',
@@ -378,6 +397,11 @@ const styles = StyleSheet.create({
   },
   addressDetails: {
     paddingStart: 28,
+  },
+  addressDetailsRTL: {
+    paddingStart: 0,
+    paddingEnd: 28,
+    alignItems: 'flex-end',
   },
   addressName: {
     fontSize: 16,
@@ -411,6 +435,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 20,
+    gap: 12,
+  },
+  rowRTL: {
+    flexDirection: 'row-reverse',
   },
   addIconContainer: {
     width: 40,
@@ -419,12 +447,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginEnd: 12,
+  },
+  addIconContainerRTL: {
+    // When the row is reversed, keep spacing on the correct side.
+    marginEnd: 0,
+    marginStart: 0,
   },
   addNewText: {
     fontSize: 17,
     color: '#dc2626',
     fontWeight: '500',
+    flexShrink: 1,
+    minWidth: 0,
   },
 
   // Tips Section
@@ -453,6 +487,14 @@ const styles = StyleSheet.create({
     marginStart: 8,
     flex: 1,
     lineHeight: 20,
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  valueLTR: {
+    writingDirection: 'ltr',
+    textAlign: 'left',
   },
 
   // Loading

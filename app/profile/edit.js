@@ -74,10 +74,17 @@ const getGenderLabel = (t, genderValue) => {
   }
 };
 
-function FormSection({ title, children }) {
+function FormSection({ title, children, isRTL, icon }) {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
+        {icon ? (
+          <View style={styles.sectionIconWrap}>
+            <Ionicons name={icon} size={18} color="#dc2626" />
+          </View>
+        ) : null}
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+      </View>
       {children}
     </View>
   );
@@ -323,7 +330,7 @@ export default function EditProfileScreen() {
     log.debug('Profile save started');
     
     // Validate form
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.address.trim()) {
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
       Alert.alert(t('common.error'), t('editProfile.validationMissingFields'));
       return;
     }
@@ -353,7 +360,6 @@ export default function EditProfileScreen() {
         birthday: formData.dateOfBirth,
         // Stable value (male/female/other/na)
         gender: formData.gender,
-        address: formData.address.trim(),
         profilePicture: formData.profilePicture,
         contactEmail: contactEmail || null,
       };
@@ -451,31 +457,34 @@ export default function EditProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         {isEditing ? (
           <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-            <Text style={styles.cancelText}>{t('editProfile.cancel')}</Text>
+            <Text style={[styles.cancelText, isRTL && styles.textRTL]}>{t('editProfile.cancel')}</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={handleBack} style={[styles.headerButton, styles.headerBackButton]}>
+          <TouchableOpacity
+            onPress={handleBack}
+            style={[styles.headerButton, styles.headerBackButton, isRTL && styles.rowRTL]}
+          >
             <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={18} color="#dc2626" />
-            <Text style={styles.backText}>{t('common.back')}</Text>
+            <Text style={[styles.backText, isRTL && styles.textRTL]}>{t('common.back')}</Text>
           </TouchableOpacity>
         )}
-        <Text style={styles.headerTitle}>{t('editProfile.headerTitle')}</Text>
+        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('editProfile.headerTitle')}</Text>
         {isEditing ? (
           <TouchableOpacity 
             onPress={handleSave} 
             style={[styles.headerButton, (isSaving || !isDirty) && styles.headerButtonDisabled]}
             disabled={isSaving || !isDirty}
           >
-            <Text style={[styles.saveText, (isSaving || !isDirty) && styles.saveTextDisabled]}>
+            <Text style={[styles.saveText, isRTL && styles.textRTL, (isSaving || !isDirty) && styles.saveTextDisabled]}>
               {isSaving ? t('editProfile.saving') : t('editProfile.save')}
             </Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.headerButton}>
-            <Text style={styles.saveText}>{t('common.edit')}</Text>
+            <Text style={[styles.saveText, isRTL && styles.textRTL]}>{t('common.edit')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -487,7 +496,7 @@ export default function EditProfileScreen() {
         keyboardDismissMode="on-drag"
       >
         {/* Profile Picture Section */}
-        <FormSection title={t('editProfile.profilePicture')}>
+        <FormSection title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline">
           <View style={styles.formContent}>
             <TouchableOpacity
               style={[styles.profilePictureContainer, !isEditing && styles.readOnlyBlock]}
@@ -506,7 +515,7 @@ export default function EditProfileScreen() {
                   <Ionicons name="camera" size={16} color="#ffffff" />
                 </View>
               </View>
-              <Text style={styles.profilePictureText}>
+              <Text style={[styles.profilePictureText, isRTL && styles.textRTL]}>
                 {isEditing ? t('editProfile.tapToChangePhoto') : t('common.edit')}
               </Text>
             </TouchableOpacity>
@@ -514,15 +523,15 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Personal Information */}
-        <FormSection title={t('editProfile.personalInfo')}>
+        <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline">
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.firstName')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputRTL]}
                 value={formData.firstName}
                 onChangeText={(text) => updateField('firstName', text)}
                 placeholder={t('editProfile.enterFirstName')}
@@ -537,12 +546,12 @@ export default function EditProfileScreen() {
             </View>
             
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.lastName')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputRTL]}
                 value={formData.lastName}
                 onChangeText={(text) => updateField('lastName', text)}
                 placeholder={t('editProfile.enterLastName')}
@@ -557,12 +566,12 @@ export default function EditProfileScreen() {
             </View>
             
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.emailAddress')}
                 <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputValueLTR]}
                 value={formData.email}
                 placeholder={t('editProfile.enterEmail')}
                 keyboardType="email-address"
@@ -575,21 +584,21 @@ export default function EditProfileScreen() {
                 editable={false}
               />
               {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
-                <View style={styles.infoBox}>
+                <View style={[styles.infoBox, isRTL && styles.rowRTL]}>
                   <Ionicons name="shield-checkmark" size={16} color="#2563EB" />
-                  <Text style={styles.infoBoxText}>{t('editProfile.appleRelayInfo')}</Text>
+                  <Text style={[styles.infoBoxText, isRTL && styles.textRTL]}>{t('editProfile.appleRelayInfo')}</Text>
                 </View>
               ) : null}
             </View>
 
             {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
               <View style={styles.fieldContainer}>
-                <Text style={styles.fieldLabel}>
+                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('editProfile.contactEmail')}
                   <Text style={styles.optionalMark}> {t('editProfile.optional')}</Text>
                 </Text>
                 <TextInput
-                  style={styles.textInput}
+                  style={[styles.textInput, isRTL && styles.inputValueLTR]}
                   value={formData.contactEmail}
                   onChangeText={(text) => updateField('contactEmail', text)}
                   placeholder={t('editProfile.contactEmailPlaceholder')}
@@ -603,18 +612,18 @@ export default function EditProfileScreen() {
                   editable={isEditing}
                 />
                 {!String(formData.contactEmail || '').trim() ? (
-                  <View style={styles.warningBox}>
+                  <View style={[styles.warningBox, isRTL && styles.rowRTL]}>
                     <Ionicons name="alert-circle" size={16} color="#B45309" />
-                    <Text style={styles.warningBoxText}>{t('editProfile.contactEmailHint')}</Text>
+                    <Text style={[styles.warningBoxText, isRTL && styles.textRTL]}>{t('editProfile.contactEmailHint')}</Text>
                   </View>
                 ) : null}
               </View>
             ) : null}
             
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>{t('editProfile.phoneNumber')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('editProfile.phoneNumber')}</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, isRTL && styles.inputValueLTR]}
                 value={formData.phone}
                 onChangeText={(text) => updateField('phone', text)}
                 placeholder={t('editProfile.enterPhone')}
@@ -631,75 +640,60 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Additional Information */}
-        <FormSection title={t('editProfile.additionalInformation')}>
+        <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline">
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>{t('editProfile.dateOfBirth')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('editProfile.dateOfBirth')}</Text>
               <TouchableOpacity
-                style={[styles.selectField, !isEditing && styles.readOnlyBlock]}
+                style={[styles.selectField, isRTL && styles.selectFieldRTL, !isEditing && styles.readOnlyBlock]}
                 onPress={showDatePickerModal}
                 disabled={!isEditing}
               >
-                <Text style={[styles.selectFieldText, !formData.dateOfBirth && styles.placeholderText]}>
+                <Text style={[styles.selectFieldText, isRTL && styles.textRTL, !formData.dateOfBirth && styles.placeholderText]}>
                   {formatDisplayDate(formData.dateOfBirth) || t('editProfile.selectDateOfBirthPlaceholder')}
                 </Text>
-                <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
+                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />
               </TouchableOpacity>
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>{t('editProfile.gender')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('editProfile.gender')}</Text>
               <TouchableOpacity
-                style={[styles.selectField, !isEditing && styles.readOnlyBlock]}
+                style={[styles.selectField, isRTL && styles.selectFieldRTL, !isEditing && styles.readOnlyBlock]}
                 onPress={showGenderSelector}
                 disabled={!isEditing}
               >
-                <Text style={styles.selectFieldText}>{getGenderLabel(t, formData.gender)}</Text>
-                <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
+                <Text style={[styles.selectFieldText, isRTL && styles.textRTL]}>{getGenderLabel(t, formData.gender)}</Text>
+                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />
               </TouchableOpacity>
-            </View>
-
-            <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>
-                {t('editProfile.deliveryAddress')}
-                <Text style={styles.requiredMark}> *</Text>
-              </Text>
-              <TextInput
-                style={[styles.textInput, styles.multilineInput]}
-                value={formData.address}
-                onChangeText={(text) => updateField('address', text)}
-                placeholder={t('editProfile.enterAddress')}
-                multiline={true}
-                numberOfLines={3}
-                autoCapitalize="words"
-                autoCorrect={false}
-                returnKeyType="default"
-                blurOnSubmit={false}
-                placeholderTextColor="#C7C7CC"
-                editable={isEditing}
-              />
             </View>
           </View>
         </FormSection>
 
         {/* Danger Zone */}
         <View style={styles.dangerZone}>
-          <Text style={styles.dangerTitle}>{t('editProfile.dangerZoneTitle')}</Text>
+          <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL, { marginHorizontal: 0, marginBottom: 12 }]}>
+            <View style={[styles.sectionIconWrap, { backgroundColor: '#FEE2E2' }]}>
+              <Ionicons name="warning-outline" size={18} color="#dc2626" />
+            </View>
+            <Text style={[styles.dangerTitle, isRTL && styles.textRTL]}>{t('editProfile.dangerZoneTitle')}</Text>
+          </View>
           <TouchableOpacity
             style={[styles.deleteAccountButton, isSaving && styles.deleteAccountButtonDisabled]}
             onPress={handleDeleteAccount}
             disabled={isSaving}
             activeOpacity={0.85}
           >
-            <Ionicons name="trash-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
-            <Text style={styles.deleteAccountText}>{t('editProfile.deleteAccountButton')}</Text>
+            <Ionicons name="trash-outline" size={18} color="#ffffff" style={{ marginEnd: 8 }} />
+            <Text style={[styles.deleteAccountText, isRTL && styles.textRTL]}>{t('editProfile.deleteAccountButton')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Privacy Note */}
         <View style={styles.privacyNote}>
-          <Text style={styles.privacyText}>
-            {t('editProfile.privacyNote')}
-          </Text>
+          <View style={[styles.privacyRow, isRTL && styles.rowRTL]}>
+            <Ionicons name="lock-closed-outline" size={16} color="#8E8E93" />
+            <Text style={[styles.privacyText, isRTL && styles.textRTL]}>{t('editProfile.privacyNote')}</Text>
+          </View>
         </View>
       </ScrollView>
 
@@ -756,8 +750,8 @@ export default function EditProfileScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('editProfile.selectGender')}</Text>
+            <View style={[styles.modalHeader, isRTL && styles.rowRTL]}>
+              <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('editProfile.selectGender')}</Text>
               <TouchableOpacity onPress={() => setShowGenderModal(false)}>
                 <Ionicons name="close" size={24} color="#000" />
               </TouchableOpacity>
@@ -768,12 +762,14 @@ export default function EditProfileScreen() {
                   key={option.value}
                   style={[
                     styles.genderOption,
+                    isRTL && styles.rowRTL,
                     formData.gender === option.value && styles.selectedGenderOption
                   ]}
                   onPress={() => handleGenderSelect(option.value)}
                 >
                   <Text style={[
                     styles.genderOptionText,
+                    isRTL && styles.textRTL,
                     formData.gender === option.value && styles.selectedGenderOptionText
                   ]}>
                     {option.label}
@@ -804,6 +800,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
+  },
+  headerRTL: {
+    flexDirection: 'row-reverse',
   },
   headerButton: {
     minWidth: 60,
@@ -837,7 +836,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#dc2626',
     fontWeight: '600',
-    textAlign: 'right',
   },
   readOnlyBlock: {
     opacity: 0.75,
@@ -886,13 +884,47 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#C6C6C8',
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+    marginHorizontal: 20,
+  },
+  sectionHeaderRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  sectionIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    backgroundColor: '#FFF5F5',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: '#000000',
-    marginBottom: 16,
-    marginHorizontal: 20,
     letterSpacing: -0.4,
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  inputRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  // For values that should remain LTR even in Arabic UI (emails, phone numbers)
+  inputValueLTR: {
+    textAlign: 'left',
+    writingDirection: 'ltr',
+  },
+  rowRTL: {
+    flexDirection: 'row-reverse',
   },
   formContent: {
     backgroundColor: '#F2F2F7',
@@ -975,6 +1007,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
+  selectFieldRTL: {
+    flexDirection: 'row-reverse',
+  },
   selectFieldText: {
     fontSize: 17,
     color: '#000000',
@@ -1005,11 +1040,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 24,
   },
+  privacyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
   privacyText: {
     fontSize: 15,
     color: '#8E8E93',
     lineHeight: 20,
     textAlign: 'center',
+    flex: 1,
   },
 
   dangerZone: {

@@ -42,11 +42,41 @@ const API_CONFIG = {
     PRODUCT_BY_ID: '/products',
     CATEGORIES: '/categories',
     SHIPPING_RATES: '/shipping-rates',
+    PROMO: '/promo',
   },
   HEADERS: {
     API_KEY: 'x-api-key',
     USER_ID: 'x-user-id',
     CONTENT_TYPE: 'Content-Type'
+  }
+};
+
+/**
+ * Fetch active promotion/announcement text (localized) from server
+ * GET /api/mobile/promo?locale=en|ru|ar
+ */
+export const fetchPromo = async (locale = 'en') => {
+  try {
+    const url = `${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.PROMO}?locale=${encodeURIComponent(String(locale || 'en'))}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const txt = await response.text().catch(() => '');
+      throw new Error(`Promo request failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim());
+    }
+
+    const body = await response.json();
+    return body?.data ?? null;
+  } catch (error) {
+    log.warn('Failed to fetch promo', error?.message || error);
+    return null;
   }
 };
 

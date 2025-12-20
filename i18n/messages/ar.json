@@ -471,6 +471,8 @@
     "restartRequiredMessage": "اللغة العربية تستخدم اتجاه RTL. يرجى إعادة تشغيل التطبيق لتطبيق التغيير بالكامل.",
     "accountTitle": "الحساب",
     "accountSection": "الحساب",
+    "familyMember": "عضو العائلة",
+    "memberSince": "منذ {year}",
     "viewAndEdit": "عرض وتعديل",
     "loadingUserData": "جارٍ تحميل بيانات المستخدم…",
     "orders": "الطلبات",
@@ -1234,6 +1236,13 @@
   },
   "branding": {
     "companyName": "Genosys Middle East FZ-LLC"
+  },
+  "promo": {
+    "title": "العروض",
+    "infoTitle": "العروض",
+    "infoSubtitle": "آخر الأخبار والعروض",
+    "dateLabel": "التاريخ",
+    "empty": "لا توجد عروض حالياً."
   },
   "common": {
     "ok": "موافق",

@@ -15,6 +15,7 @@ import ProgressCard from '../../components/ProgressCard';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
@@ -25,6 +26,7 @@ export default function BagScreen() {
   const { user } = useAuth();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const [openedFromAccount, setOpenedFromAccount] = useState(false);
   const { 
     items, 
     getTotalItems, 
@@ -43,6 +45,33 @@ export default function BagScreen() {
   const [footerCollapsed, setFooterCollapsed] = useState(true);
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        // One-time navigation source (set by Account page).
+        const src = await AsyncStorage.getItem('@genosys_nav_bag_source');
+        if (!cancelled && src === 'profile') setOpenedFromAccount(true);
+        // Always clear so footer/tab entry behaves normally next time.
+        await AsyncStorage.removeItem('@genosys_nav_bag_source');
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const headerBackLabel = openedFromAccount ? t('profile.accountTitle') : t('tabs.home');
+  const handleHeaderBack = () => {
+    if (openedFromAccount) {
+      router.replace('/profile');
+    } else {
+      router.replace('/(tabs)/shop');
+    }
+  };
+
+  const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
 
   const cartSummary = getCartSummary();
   const emirates = getAvailableEmirates();
@@ -384,10 +413,10 @@ export default function BagScreen() {
             <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
               <TouchableOpacity 
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
-                onPress={() => router.replace('/(tabs)/shop')}
+                onPress={handleHeaderBack}
               >
                 <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{headerBackLabel}</Text>
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
@@ -400,7 +429,7 @@ export default function BagScreen() {
           </View>
         </SafeAreaView>
         <View style={styles.emptyContainer}>
-          <Ionicons name="bag-outline" size={64} color="#D1D1D6" />
+          <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
         </View>
       </View>
     );
@@ -414,10 +443,10 @@ export default function BagScreen() {
             <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
               <TouchableOpacity 
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
-                onPress={() => router.replace('/(tabs)/shop')}
+                onPress={handleHeaderBack}
               >
                 <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{headerBackLabel}</Text>
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
@@ -432,7 +461,7 @@ export default function BagScreen() {
         
         <View style={styles.emptyContainer}>
           <View style={styles.iconContainer}>
-            <Ionicons name="bag-outline" size={64} color="#D1D1D6" />
+            <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
           </View>
           <Text style={[styles.emptyTitle, isRTL && styles.emptyTitleRTL]}>{t('bag.emptyTitle')}</Text>
           <Text style={[styles.emptyText, isRTL && styles.emptyTextRTL]}>
@@ -464,10 +493,10 @@ export default function BagScreen() {
             <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
               <TouchableOpacity 
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
-                onPress={() => router.replace('/(tabs)/shop')}
+                onPress={handleHeaderBack}
               >
                 <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{headerBackLabel}</Text>
               </TouchableOpacity>
 
               <View pointerEvents="none" style={styles.headerCenterAbsolute}>
@@ -1113,6 +1142,10 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginBottom: 24,
+  },
+  emptyUniImage: {
+    width: 120,
+    height: 120,
   },
   emptyTitle: {
     fontSize: 22,

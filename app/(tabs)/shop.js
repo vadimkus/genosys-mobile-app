@@ -394,7 +394,7 @@ export default function ShopScreen() {
             if (!badges.length) return null;
 
             return (
-              <View style={styles.badgeContainer}>
+              <View style={[styles.badgeContainer, isRTL && styles.badgeContainerRTL]}>
                 {badges.map((badge, badgeIndex) => (
                   <View
                     key={`${badge.text || 'badge'}-${badgeIndex}`}
@@ -1651,6 +1651,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     zIndex: 10,
+  },
+  badgeContainerRTL: {
+    alignItems: 'flex-end',
   },
   badge: {
     paddingHorizontal: 8,
