@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking, Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -9,6 +9,8 @@ import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../serv
 import { getPaymentUrlForExistingOrder } from '../../services/orderService';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
+
+const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -377,9 +379,17 @@ export default function OrdersScreen() {
             <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{error}</Text>
           </View>
         ) : sortedOrders.length === 0 ? (
-          <View style={[styles.center, isRTL && styles.centerRTL]}>
+          <View style={[styles.center, styles.centerTop, isRTL && styles.centerRTL]}>
+            <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
             <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersYet')}</Text>
             <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersHint')}</Text>
+            <TouchableOpacity
+              style={styles.shopButton}
+              onPress={() => router.replace('/(tabs)/shop')}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.shopButtonText, isRTL && styles.shopButtonTextRTL]}>{t('bag.startShopping')}</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.list}>
@@ -606,10 +616,29 @@ const styles = StyleSheet.create({
   refreshButton: { padding: 4 },
   scrollView: { flex: 1 },
   center: { padding: 24, alignItems: 'center', justifyContent: 'center' },
+  centerTop: { justifyContent: 'flex-start', paddingTop: 16 },
+  emptyUniImage: { width: 240, height: 240, marginBottom: 24 },
   centerRTL: { alignItems: 'flex-end' },
   loadingText: { marginTop: 12, color: '#8E8E93' },
   emptyTitle: { fontSize: 18, fontWeight: '600', color: '#1D1D1F', marginBottom: 6, textAlign: 'center' },
   emptyText: { fontSize: 14, color: '#8E8E93', textAlign: 'center', lineHeight: 20 },
+  shopButton: {
+    marginTop: 18,
+    backgroundColor: '#dc2626',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    minWidth: 180,
+    alignItems: 'center',
+  },
+  shopButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  shopButtonTextRTL: {
+    writingDirection: 'rtl',
+  },
   textRTL: {
     writingDirection: 'rtl',
     textAlign: 'center',
