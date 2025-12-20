@@ -165,7 +165,14 @@ export default function OrderDetailScreen() {
   const total = Number(order?.total ?? order?.totalAmount ?? order?.total_amount ?? order?.amount ?? 0) || 0;
   
   const customerName = order?.customerName || order?.customer_name || user?.name || '';
-  const customerEmail = order?.customerEmail || order?.customer_email || user?.email || '';
+  const orderEmailRaw = String(order?.customerEmail || order?.customer_email || '').trim();
+  const contactEmailRaw = String(user?.contactEmail || '').trim();
+  const isAppleRelayEmail = orderEmailRaw.includes('@privaterelay.appleid.com');
+  // If the order stored an Apple relay email but the user has provided a real contact email,
+  // show the real email in Order Details.
+  const customerEmail =
+    (isAppleRelayEmail && contactEmailRaw) ? contactEmailRaw
+    : (orderEmailRaw || contactEmailRaw || String(user?.email || '').trim() || '');
   const customerPhone = order?.customerPhone || order?.customer_phone || user?.phone || '';
   const customerAddress = order?.customerAddress || order?.customer_address || order?.address || '';
   const emirate = order?.emirate || '';

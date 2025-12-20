@@ -139,11 +139,18 @@ export default function EditProfileScreen() {
       const nameParts = user.name ? user.name.split(' ') : ['', ''];
       const parsedAddr = parseGenosysAddress(user.address || '');
       const birthday = user.birthday || user.dateOfBirth || '';
+      const authEmail = String(user.email || '').trim();
+      const isAppleRelay = authEmail.includes('@privaterelay.appleid.com');
+      const derivedContactEmail =
+        String(user.contactEmail || '').trim() ||
+        (!isAppleRelay ? authEmail : '');
       const nextForm = {
         firstName: nameParts[0] || '',
         lastName: nameParts.slice(1).join(' ') || '',
-        email: user.email || '',
-        contactEmail: user.contactEmail || '',
+        email: authEmail,
+        // "Real email" used for notifications/checkout. Mandatory for all login methods.
+        // For non-Apple-relay accounts, default to the auth email if contactEmail is empty.
+        contactEmail: derivedContactEmail,
         phone: user.phone || '',
         // Backend uses `birthday` (YYYY-MM-DD). Keep local field name for UI.
         dateOfBirth: birthday,
@@ -330,7 +337,13 @@ export default function EditProfileScreen() {
     log.debug('Profile save started');
     
     // Validate form
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
+    if (
+      !formData.firstName.trim() ||
+      !formData.lastName.trim() ||
+      !formData.email.trim() ||
+      !String(formData.contactEmail || '').trim() ||
+      !String(formData.phone || '').trim()
+    ) {
       Alert.alert(t('common.error'), t('editProfile.validationMissingFields'));
       return;
     }
@@ -342,9 +355,9 @@ export default function EditProfileScreen() {
       return;
     }
 
-    // Contact Email validation (optional)
+    // Contact Email validation (mandatory)
     const contactEmail = String(formData.contactEmail || '').trim();
-    if (contactEmail && !emailRegex.test(contactEmail)) {
+    if (!emailRegex.test(contactEmail)) {
       Alert.alert(t('common.error'), t('editProfile.validationInvalidContactEmail'));
       return;
     }
@@ -361,7 +374,7 @@ export default function EditProfileScreen() {
         // Stable value (male/female/other/na)
         gender: formData.gender,
         profilePicture: formData.profilePicture,
-        contactEmail: contactEmail || null,
+        contactEmail,
       };
 
       const result = await updateProfile(profileData);
@@ -591,37 +604,38 @@ export default function EditProfileScreen() {
               ) : null}
             </View>
 
-            {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
-              <View style={styles.fieldContainer}>
-                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
-                  {t('editProfile.contactEmail')}
-                  <Text style={styles.optionalMark}> {t('editProfile.optional')}</Text>
+            <View style={styles.fieldContainer}>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                {t('editProfile.contactEmail')}
+                <Text style={styles.requiredMark}> *</Text>
+              </Text>
+              <TextInput
+                style={[styles.textInput, isRTL && styles.inputValueLTR]}
+                value={formData.contactEmail}
+                onChangeText={(text) => updateField('contactEmail', text)}
+                placeholder={t('editProfile.contactEmailPlaceholder')}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                returnKeyType="next"
+                blurOnSubmit={false}
+                placeholderTextColor="#C7C7CC"
+                editable={isEditing}
+              />
+              <View style={[styles.infoBox, isRTL && styles.rowRTL, { marginTop: 10, backgroundColor: '#FFFBEB', borderColor: '#FDE68A' }]}>
+                <Ionicons name="mail-outline" size={16} color="#B45309" />
+                <Text style={[styles.infoBoxText, isRTL && styles.textRTL, { color: '#92400E' }]}>
+                  {t('editProfile.contactEmailHint')}
                 </Text>
-                <TextInput
-                  style={[styles.textInput, isRTL && styles.inputValueLTR]}
-                  value={formData.contactEmail}
-                  onChangeText={(text) => updateField('contactEmail', text)}
-                  placeholder={t('editProfile.contactEmailPlaceholder')}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  autoComplete="email"
-                  returnKeyType="next"
-                  blurOnSubmit={false}
-                  placeholderTextColor="#C7C7CC"
-                  editable={isEditing}
-                />
-                {!String(formData.contactEmail || '').trim() ? (
-                  <View style={[styles.warningBox, isRTL && styles.rowRTL]}>
-                    <Ionicons name="alert-circle" size={16} color="#B45309" />
-                    <Text style={[styles.warningBoxText, isRTL && styles.textRTL]}>{t('editProfile.contactEmailHint')}</Text>
-                  </View>
-                ) : null}
               </View>
-            ) : null}
+            </View>
             
             <View style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('editProfile.phoneNumber')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                {t('editProfile.phoneNumber')}
+                <Text style={styles.requiredMark}> *</Text>
+              </Text>
               <TextInput
                 style={[styles.textInput, isRTL && styles.inputValueLTR]}
                 value={formData.phone}

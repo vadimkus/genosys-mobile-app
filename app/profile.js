@@ -135,6 +135,8 @@ export default function ProfileScreen() {
     : (typeof user?.picture === 'string' && user.picture.trim()) ? user.picture.trim()
     : '';
 
+  const displayEmail = String(user?.contactEmail || user?.email || '').trim();
+
   const handleSignOut = () => {
     Alert.alert(
       t('profile.signOutTitle'),
@@ -437,7 +439,7 @@ export default function ProfileScreen() {
                   />
                 ) : (
                   <Text style={styles.avatarText}>
-                    {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'G'}
+                    {user?.name?.charAt(0)?.toUpperCase() || displayEmail?.charAt(0)?.toUpperCase() || 'G'}
                   </Text>
                 )}
                 <View style={styles.onlineDot} />
@@ -461,7 +463,7 @@ export default function ProfileScreen() {
                 {user?.name || t('common.loading')}
               </Text>
               <Text style={[styles.userEmail, isRTL && styles.userEmailRTL]}>
-                {user?.email || t('profile.loadingUserData')}
+                {displayEmail || t('profile.loadingUserData')}
               </Text>
               {user?.phone && (
                 <Text style={[styles.userPhone, isRTL && styles.userPhoneRTL]}>

@@ -887,7 +887,7 @@ export default function ShopScreen() {
             {user ? (
               <View style={styles.userAvatar}>
                 <Text style={styles.userInitials}>
-                  {(user.name?.charAt(0) || user.email?.charAt(0) || 'G').toUpperCase()}
+                  {(user.name?.charAt(0) || user.contactEmail?.charAt(0) || user.email?.charAt(0) || 'G').toUpperCase()}
                 </Text>
                 <View style={styles.onlineDot} />
               </View>

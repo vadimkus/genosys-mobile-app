@@ -198,7 +198,7 @@ export default function CheckoutScreen() {
       const nameParts = user.name?.split(' ') || [];
       setFirstName(nameParts[0] || '');
       setLastName(nameParts.slice(1).join(' ') || '');
-      setEmail(user.email || '');
+      setEmail(String(user.contactEmail || user.email || '').trim());
       // phone: prefer user.phone, else addressDetails.phone (both may be in different formats)
       const phoneRaw = String(user.phone || '').trim() || '';
       const parsed = parseGenosysAddress(user.address || '');
