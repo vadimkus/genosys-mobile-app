@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, useWindowDimensions, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -14,20 +14,31 @@ export default function PromoScreen() {
   const { width } = useWindowDimensions();
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [promo, setPromo] = useState(null);
+
+  const loadPromo = async ({ showLoading, isCancelled } = { showLoading: true, isCancelled: undefined }) => {
+    if (showLoading) setLoading(true);
+    const data = await fetchPromo(locale).catch(() => null);
+    if (typeof isCancelled === 'function' && isCancelled()) return;
+    setPromo(data);
+    if (showLoading) setLoading(false);
+  };
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      setLoading(true);
-      const data = await fetchPromo(locale).catch(() => null);
-      if (!cancelled) {
-        setPromo(data);
-        setLoading(false);
-      }
-    })();
+    loadPromo({ showLoading: true, isCancelled: () => cancelled });
     return () => { cancelled = true; };
   }, [locale]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadPromo({ showLoading: false });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const dateLine = useMemo(() => {
     const raw = promo?.date;
@@ -61,7 +72,11 @@ export default function PromoScreen() {
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <View style={[styles.card, isRTL && styles.cardRTL]}>
           <View style={[styles.cardHeader, isRTL && styles.rowRTL]}>
             <View style={styles.iconWrap}>
@@ -95,11 +110,14 @@ export default function PromoScreen() {
                   textAlign: isRTL ? 'right' : 'left',
                 }}
                 tagsStyles={{
-                  p: { marginBottom: 8 },
-                  h2: { fontSize: 18, fontWeight: 'bold', marginTop: 12, marginBottom: 8 },
-                  h3: { fontSize: 16, fontWeight: 'bold', marginTop: 10, marginBottom: 6 },
-                  strong: { fontWeight: 'bold' },
-                  b: { fontWeight: 'bold' },
+                  // Default text blocks
+                  p: { marginBottom: 8, fontWeight: '400' },
+                  // Headings
+                  h2: { fontSize: 18, fontWeight: '700', marginTop: 12, marginBottom: 8 },
+                  h3: { fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 6 },
+                  // Explicit bold
+                  strong: { fontWeight: '700' },
+                  b: { fontWeight: '700' },
                   em: { fontStyle: 'italic' },
                   i: { fontStyle: 'italic' },
                   u: { textDecorationLine: 'underline' },

@@ -42,6 +42,22 @@ const PROMO_THRESHOLDS = {
 
 const isPromotionItem = (item) => item?.isPromotionItem === true || item?.selectedSize === PROMO_VARIANT_SIZE;
 
+const pickDefaultVariantSize = (product) => {
+  const variants = product?.variants;
+  if (!Array.isArray(variants) || variants.length === 0) return '';
+  const v =
+    variants.find((x) => x?.isDefault) ||
+    variants.find((x) => x?.available) ||
+    variants[0];
+  return String(v?.size || '').trim();
+};
+
+const normalizeSizeKey = (product, selectedSize) => {
+  const s = String(selectedSize || '').trim();
+  if (s) return s;
+  return pickDefaultVariantSize(product) || '';
+};
+
 const inferOriginalFromUserDiscount = ({ discountedPrice, discountPct }) => {
   const pct = Number(discountPct);
   const base = Number(discountedPrice);
@@ -187,38 +203,75 @@ export const CartProvider = ({ children }) => {
 
       if (cartData) {
         const parsedCart = JSON.parse(cartData);
-        // Normalize any previously-saved variant items so their stored unit price matches the selected size.
-        const normalized = (Array.isArray(parsedCart) ? parsedCart : []).map((it) => {
-          const selectedSize = String(it?.selectedSize || '').trim();
+        const rawItems = Array.isArray(parsedCart) ? parsedCart : [];
+
+        // Normalize saved cart:
+        // - If product has variants but selectedSize is empty, pick a default variant size (fixes duplicates from Home -> Product flows)
+        // - Ensure stored unit price matches the selected size
+        // - Merge duplicates by (productId + color + size)
+        const normalized = rawItems.map((it) => {
           const product = it?.product;
-          if (!selectedSize || !product || !Array.isArray(product?.variants)) return it;
-          const v = product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize);
-          const vp = Number(v?.price);
-          if (!Number.isFinite(vp) || vp <= 0) return it;
-          const discountPct = Number(user?.discountPercentage);
-          const inferredOriginal = inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct });
-          const variantOriginal = Number(v?.originalPrice);
-          const productOriginal = Number(product?.originalPrice);
-          const keptOriginal =
-            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            // If backend doesn't give variant originalPrice, prefer the inferred original from user discount
-            // (otherwise we'd show the base product's originalPrice for all sizes, which is wrong for bigger sizes).
-            inferredOriginal ||
-            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
-            null;
-          return {
-            ...it,
-            product: {
-              ...product,
-              price: vp,
-              displayPrice: vp,
-              // Prefer variant originalPrice; otherwise keep product originalPrice if it still makes sense for this size.
-              // If neither exists but user has a discount, infer original so Bag doesn't "double-discount" the already-discounted price.
-              originalPrice: keptOriginal,
-            },
-          };
+          if (!product || isPromotionItem(it)) return it;
+
+          const selectedSize = normalizeSizeKey(product, it?.selectedSize);
+
+          if (selectedSize && Array.isArray(product?.variants)) {
+            const v = product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize);
+            const vp = Number(v?.price);
+            if (Number.isFinite(vp) && vp > 0) {
+              const discountPct = Number(user?.discountPercentage);
+              const inferredOriginal = inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct });
+              const variantOriginal = Number(v?.originalPrice);
+              const productOriginal = Number(product?.originalPrice);
+              const keptOriginal =
+                (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
+                inferredOriginal ||
+                (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
+                null;
+              return {
+                ...it,
+                selectedSize,
+                product: {
+                  ...product,
+                  price: vp,
+                  displayPrice: vp,
+                  originalPrice: keptOriginal,
+                },
+              };
+            }
+          }
+
+          return { ...it, selectedSize };
         });
-        setItems(normalized);
+
+        const merged = normalized.reduce((acc, it) => {
+          if (!it) return acc;
+          if (isPromotionItem(it)) {
+            acc.push(it);
+            return acc;
+          }
+          const pid = String(it?.product?.id || '');
+          const color = String(it?.selectedColor || '');
+          const size = normalizeSizeKey(it?.product, it?.selectedSize);
+          const key = `${pid}::${color}::${size}`;
+
+          const idx = acc.findIndex((x) => {
+            if (!x || isPromotionItem(x)) return false;
+            const xKey = `${String(x?.product?.id || '')}::${String(x?.selectedColor || '')}::${normalizeSizeKey(x?.product, x?.selectedSize)}`;
+            return xKey === key;
+          });
+
+          if (idx >= 0) {
+            const prevQty = Number(acc[idx]?.quantity) || 0;
+            const addQty = Number(it?.quantity) || 0;
+            acc[idx] = { ...acc[idx], quantity: prevQty + addQty };
+          } else {
+            acc.push({ ...it, selectedSize: size });
+          }
+          return acc;
+        }, []);
+
+        setItems(merged);
       }
 
       if (emirateData) {
@@ -294,7 +347,7 @@ export const CartProvider = ({ children }) => {
    */
   const addItem = (product, quantity = 1, selectedColor = '', selectedSize = '') => {
     const normalizedColor = selectedColor || '';
-    const normalizedSize = selectedSize || '';
+    const normalizedSize = normalizeSizeKey(product, selectedSize);
 
     // Ensure special products are stored in cart with canonical pricing fields
     // (so UI + order payloads stay consistent).

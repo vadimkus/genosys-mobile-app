@@ -483,7 +483,11 @@ export default function ProfileScreen() {
               title={t('profile.orders')}
               subtitle={ordersSubtitle}
               color="#dc2626"
-              onPress={() => router.push('/profile/orders')}
+              onPress={async () => {
+                // Ensure Orders header can route back to Account when opened from here.
+                await AsyncStorage.setItem('@genosys_nav_orders_source', 'profile').catch(() => {});
+                router.push('/profile/orders');
+              }}
             />
             <QuickActionCard
               icon="bag-outline"

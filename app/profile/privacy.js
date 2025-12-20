@@ -20,11 +20,16 @@ export default function PrivacyPolicyScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+        <TouchableOpacity onPress={() => router.replace('/profile')} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
+          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+            <Text style={[styles.backText, isRTL && styles.backTextRTL]} numberOfLines={1}>
+              {t('profile.accountTitle')}
+            </Text>
+          </View>
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('privacy.title')}</Text>
-        <View style={styles.placeholder} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <PrivacyPolicyContent showLastUpdated />
@@ -50,15 +55,34 @@ const styles = StyleSheet.create({
   headerRTL: { flexDirection: 'row-reverse' },
   backButton: {
     padding: 4,
+    width: 130,
+  },
+  backButtonRTL: {
+    alignItems: 'flex-end',
+  },
+  backButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  backButtonContentRTL: {
+    flexDirection: 'row-reverse',
+  },
+  backText: {
+    color: '#dc2626',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  backTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: '#1D1D1F',
   },
-  placeholder: {
-    width: 32,
-  },
+  headerSpacer: { width: 130 },
   textRTL: { writingDirection: 'rtl', textAlign: 'center' },
   // Body styles moved to `components/PrivacyPolicyContent`
 });

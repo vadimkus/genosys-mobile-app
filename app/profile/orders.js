@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOrders } from '../../contexts/OrdersContext';
 import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../services/api';
@@ -139,6 +140,24 @@ export default function OrdersScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
+
+  const [openedFromProfile, setOpenedFromProfile] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const src = await AsyncStorage.getItem('@genosys_nav_orders_source').catch(() => null);
+      if (mounted) setOpenedFromProfile(src === 'profile');
+      // Clear the source flag so Orders opened from the tab/footer behaves normally.
+      await AsyncStorage.removeItem('@genosys_nav_orders_source').catch(() => {});
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const backTo = openedFromProfile ? '/profile' : '/(tabs)/shop';
+  const backLabel = openedFromProfile ? t('profile.accountTitle') : t('tabs.home');
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -330,10 +349,10 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.replace('/(tabs)/shop')} style={styles.backButton}>
+          <TouchableOpacity onPress={() => router.replace(backTo)} style={styles.backButton}>
             <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
               <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-              <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+              <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{backLabel}</Text>
             </View>
           </TouchableOpacity>
           <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
@@ -350,10 +369,10 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/shop')} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.replace(backTo)} style={styles.backButton}>
           <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
             <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-            <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{t('tabs.home')}</Text>
+            <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{backLabel}</Text>
           </View>
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
