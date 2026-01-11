@@ -7,6 +7,31 @@ const MERCHANT_IDENTIFIER = 'merchant.ae.genosys.app';
 const APPLE_PAY_MERCHANT_COUNTRY_CODE = 'AE';
 const APPLE_PAY_CURRENCY_CODE = 'AED';
 
+// App Review Guideline 4.9 (Apple Pay branding / intermediary):
+// If the app is an intermediary for a third-party business, the Apple Pay sheet should clearly show:
+// "PAY END_MERCHANT_NAME (VIA YOUR_APP_NAME)".
+// We surface this via the *Total* summary item label which is displayed prominently in the Apple Pay sheet.
+const APP_NAME =
+  Constants.expoConfig?.extra?.applePayViaAppName ||
+  Constants.expoConfig?.name ||
+  Constants.expoConfig?.ios?.infoPlist?.CFBundleDisplayName ||
+  'Genosys UAE';
+const DEFAULT_END_MERCHANT =
+  Constants.expoConfig?.extra?.applePayEndMerchantName ||
+  'GENOSYS MIDDLE EAST FZ-LLC';
+
+export const getApplePayIntermediaryTotalLabel = (opts = {}) => {
+  const endMerchantName = String(opts.endMerchantName || DEFAULT_END_MERCHANT || '').trim();
+  const viaAppName = String(opts.viaAppName || APP_NAME || '').trim();
+  const safeEnd = endMerchantName || 'Merchant';
+  const safeVia = viaAppName || 'App';
+  // App Review requested format example: "PAY END_MERCHANT_NAME (VIA YOUR_APP_NAME)."
+  // Apple Pay sheet itself already prefixes the summary line with "Pay", so including "PAY" here
+  // results in "Pay PAY ...". We keep the same meaning but avoid duplication.
+  const label = `${safeEnd} (VIA ${safeVia})`;
+  return label.length > 60 ? label.slice(0, 57) + '…' : label;
+};
+
 function isUserCancelledPlatformPay(err) {
   const code = String(err?.code || '').toLowerCase();
   const message = String(err?.message || err?.localizedMessage || '').toLowerCase();
@@ -113,7 +138,15 @@ export const checkApplePayAvailability = async () => {
     if (!stripe?.isPlatformPaySupported) return false;
 
     // On iOS, `isPlatformPaySupported()` checks Apple Pay.
-    const isSupported = await stripe.isPlatformPaySupported();
+    // Some Stripe SDK versions accept params for Apple Pay; others don't.
+    let isSupported = false;
+    try {
+      isSupported = await stripe.isPlatformPaySupported({
+        applePay: { merchantCountryCode: APPLE_PAY_MERCHANT_COUNTRY_CODE },
+      });
+    } catch {
+      isSupported = await stripe.isPlatformPaySupported();
+    }
     debugLog('[ApplePay] Apple Pay (Platform Pay) supported:', isSupported);
     return !!isSupported;
   } catch (error) {
@@ -158,7 +191,10 @@ export const presentApplePaySheet = async ({
     }
 
     const safeLabels = labels || {};
-    const totalLabel = safeLabels.total || 'Total';
+    // Prefer explicit label passed from the caller; otherwise use the intermediary-friendly default.
+    const totalLabel =
+      String(safeLabels.total || '').trim() ||
+      getApplePayIntermediaryTotalLabel();
 
     // Stripe RN v0.50.x uses Platform Pay (Apple Pay on iOS).
     // Apple Pay expects cartItems with `paymentType` and `amount` as string.
@@ -196,16 +232,28 @@ export const presentApplePaySheet = async ({
     });
 
     if (error) {
-      errorLog('[ApplePay] Apple Pay payment failed:', error);
-      return { success: false, cancelled: isUserCancelledPlatformPay(error), error };
+      const cancelled = isUserCancelledPlatformPay(error);
+      // "Canceled" is a normal user action (dismissed sheet). Do not log as an error
+      // to avoid noisy red stack traces in dev builds and App Review logs.
+      if (cancelled) {
+        debugLog('[ApplePay] Apple Pay cancelled by user');
+      } else {
+        errorLog('[ApplePay] Apple Pay payment failed:', error);
+      }
+      return { success: false, cancelled, error };
     }
 
     debugLog('[ApplePay] Apple Pay payment confirmed successfully');
     return { success: true, paymentIntent, paymentMethod };
 
   } catch (error) {
-    errorLog('[ApplePay] Exception in presentApplePaySheet:', error);
-    return { success: false, cancelled: isUserCancelledPlatformPay(error), error };
+    const cancelled = isUserCancelledPlatformPay(error);
+    if (cancelled) {
+      debugLog('[ApplePay] Apple Pay cancelled by user (exception path)');
+    } else {
+      errorLog('[ApplePay] Exception in presentApplePaySheet:', error);
+    }
+    return { success: false, cancelled, error };
   }
 };
 

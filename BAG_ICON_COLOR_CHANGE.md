@@ -251,3 +251,4 @@ Bag Tab:   🛍️ (GREEN when items!) + 🔴 badge
 
 *Feature implemented on: December 19, 2025*
 
+

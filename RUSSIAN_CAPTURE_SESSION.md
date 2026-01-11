@@ -102,3 +102,4 @@ Then I'll run the automated capture script!
 *Waiting for app to fully load...*
 *This usually takes 30-60 seconds on first launch*
 
+

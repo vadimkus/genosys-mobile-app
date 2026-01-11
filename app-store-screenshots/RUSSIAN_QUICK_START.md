@@ -415,3 +415,4 @@ open app-store-screenshots/appstore-ready/ru-RU/  # View results
 *Language: Russian (Русский)*  
 *Ready for: App Store Connect*
 
+

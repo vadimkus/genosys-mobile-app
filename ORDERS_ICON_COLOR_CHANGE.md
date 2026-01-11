@@ -510,3 +510,4 @@ const ordersColor = ordersCount > 0 ? '#f59e0b' : color; // amber-500 (pending o
 *Feature implemented alongside bag icon color change feature*
 *Both features use consistent green color (#10b981) for active state*
 
+

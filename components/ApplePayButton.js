@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useLocalization } from '../contexts/LocalizationContext';
 
@@ -17,6 +17,39 @@ export default function ApplePayButton({ onPress, disabled = false, loading = fa
   // Apple Pay is iOS-only
   if (Platform.OS !== 'ios') {
     return null;
+  }
+
+  // Prefer Stripe's native PlatformPayButton (renders the official Apple Pay button).
+  // Fallback to legacy custom button only if Stripe native UI is unavailable (e.g., Expo Go).
+  let Stripe = null;
+  try {
+    // eslint-disable-next-line global-require
+    Stripe = require('@stripe/stripe-react-native');
+  } catch {
+    Stripe = null;
+  }
+
+  const PlatformPayButton = Stripe?.PlatformPayButton;
+  const PlatformPay = Stripe?.PlatformPay;
+
+  if (PlatformPayButton && PlatformPay) {
+    return (
+      <View style={[styles.nativeWrap, style, (disabled || loading) && styles.disabledWrap]}>
+        <PlatformPayButton
+          onPress={onPress}
+          type={PlatformPay.ButtonType.Pay}
+          appearance={PlatformPay.ButtonStyle.Black}
+          borderRadius={12}
+          style={styles.nativeButton}
+          disabled={disabled || loading}
+        />
+        {loading ? (
+          <View style={styles.loadingOverlay} pointerEvents="none">
+            <ActivityIndicator color="#fff" />
+          </View>
+        ) : null}
+      </View>
+    );
   }
 
   return (
@@ -48,6 +81,24 @@ export default function ApplePayButton({ onPress, disabled = false, loading = fa
 }
 
 const styles = StyleSheet.create({
+  nativeWrap: {
+    width: '100%',
+    minHeight: 56,
+    justifyContent: 'center',
+  },
+  nativeButton: {
+    width: '100%',
+    height: 56,
+  },
+  disabledWrap: {
+    opacity: 0.7,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    inset: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   applePayButton: {
     backgroundColor: '#000000',
     borderRadius: 12,

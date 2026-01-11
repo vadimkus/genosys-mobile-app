@@ -29,7 +29,7 @@ import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderC
 import { createLogger } from '../utils/logger';
 import { formatEmirateLabel } from '../utils/emirateUtils';
 import ApplePayButton from '../components/ApplePayButton';
-import { initializeStripe, checkApplePayAvailability, presentApplePaySheet, getStripeConfigStatus } from '../services/applePayService';
+import { initializeStripe, checkApplePayAvailability, presentApplePaySheet, getStripeConfigStatus, getApplePayIntermediaryTotalLabel } from '../services/applePayService';
 import {
   isValidEmail,
   normalizeUaeToNationalDigits,
@@ -198,7 +198,23 @@ export default function CheckoutScreen() {
       const nameParts = user.name?.split(' ') || [];
       setFirstName(nameParts[0] || '');
       setLastName(nameParts.slice(1).join(' ') || '');
-      setEmail(String(user.contactEmail || user.email || '').trim());
+      
+      // For Apple Sign In users: use contactEmail if set, otherwise leave empty (mandatory)
+      // For regular users: use contactEmail or fall back to auth email
+      const authEmail = String(user.email || '').trim();
+      const contactEmail = String(user.contactEmail || '').trim();
+      const isAppleRelay = authEmail.includes('@privaterelay.appleid.com') || authEmail.includes('@genosys.local');
+      
+      if (contactEmail) {
+        // User has set a contact email - always use it
+        setEmail(contactEmail);
+      } else if (isAppleRelay) {
+        // Apple user without contact email - leave empty (mandatory to fill)
+        setEmail('');
+      } else {
+        // Regular user - use auth email
+        setEmail(authEmail);
+      }
       // phone: prefer user.phone, else addressDetails.phone (both may be in different formats)
       const phoneRaw = String(user.phone || '').trim() || '';
       const parsed = parseGenosysAddress(user.address || '');
@@ -477,6 +493,7 @@ export default function CheckoutScreen() {
             { label: t('checkout.shipping'), amount: safeShipping.toFixed(2), type: 'final' },
           ];
 
+          const payStart = Date.now();
           const payRes = await presentApplePaySheet({
             clientSecret,
             cartItems: items,
@@ -489,13 +506,23 @@ export default function CheckoutScreen() {
               address: orderData.customerAddress,
             },
             labels: {
-              total: t('checkout.total'),
+              // App Review Guideline 4.9: show intermediary + end-merchant on Apple Pay sheet.
+              total: getApplePayIntermediaryTotalLabel(),
             },
           });
 
           if (!payRes?.success) {
             if (payRes?.cancelled) {
-              Alert.alert(t('applePay.cancelledTitle'), t('applePay.cancelledMessage'));
+              // If cancel happens immediately, it usually means Apple Pay sheet couldn't start
+              // (Wallet not ready, merchant config mismatch, simulator, etc).
+              // Show a helpful hint; for real user-cancel, stay silent.
+              const elapsed = Date.now() - payStart;
+              if (elapsed < 1200) {
+                Alert.alert(
+                  t('applePay.notConfiguredTitle'),
+                  'Apple Pay did not start on this device.\n\nPlease check:\n- You are on a real iPhone (not simulator)\n- Apple Pay is enabled in Wallet\n- Merchant ID is configured correctly for this build\n\nIf it still fails, we may need to re-check Stripe Apple Pay app registration/certificate.'
+                );
+              }
               return;
             }
             const details =
@@ -1205,12 +1232,11 @@ export default function CheckoutScreen() {
           selectedPaymentMethod === PAYMENT_METHODS.APPLE_PAY ? (
             <ApplePayButton
               onPress={handleSubmit}
-              disabled={!applePayConfigured}
+              disabled={!applePayConfigured || isProcessing}
               loading={isProcessing}
               style={[
-                styles.placeOrderButton,
-                footerCollapsed && styles.placeOrderButtonCollapsed,
-                isRTL && styles.placeOrderButtonRTL,
+                styles.applePayCta,
+                footerCollapsed && styles.applePayCtaCollapsed,
               ]}
             />
           ) : (
@@ -1972,6 +1998,13 @@ const styles = StyleSheet.create({
   placeOrderButtonCollapsed: {
     // No extra margin when collapsed
   },
+  applePayCta: {
+    // Do NOT apply the red CTA styling here — Stripe's PlatformPayButton must render as-is.
+    width: '100%',
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  applePayCtaCollapsed: {},
   reviewRow: {
     paddingBottom: 10,
     borderBottomWidth: 1,

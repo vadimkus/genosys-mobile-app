@@ -80,3 +80,4 @@ If supporting multiple languages, capture screenshots for:
 
 Create subdirectories: `en/`, `ar/`, `ru/` for localized screenshots.
 
+
