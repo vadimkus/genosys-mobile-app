@@ -448,4 +448,3 @@ Products already have Russian names in database!
 *For: Genosys Mobile App*  
 *Purpose: Russian App Store localization*
 
-

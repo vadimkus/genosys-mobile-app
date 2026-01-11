@@ -194,4 +194,3 @@ echo ""
 echo -e "${GREEN}✨ Professional screenshots ready for App Store submission!${NC}"
 echo ""
 
-

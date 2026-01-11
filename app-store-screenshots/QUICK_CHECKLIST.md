@@ -166,4 +166,3 @@ Make sure these 3 show:
 
 Ready to take screenshots? Go! 📸
 
-

@@ -247,4 +247,3 @@ Genosys UAE is an e-commerce mobile application for purchasing premium cosmetics
 
 For any questions or issues during review, please contact: sales@genosys.ae
 
-

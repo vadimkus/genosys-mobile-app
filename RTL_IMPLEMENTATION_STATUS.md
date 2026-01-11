@@ -160,4 +160,3 @@ For each page, verify:
 **Last Updated**: December 14, 2025
 **Status**: 4/6 pages complete, 2 pages in progress
 
-

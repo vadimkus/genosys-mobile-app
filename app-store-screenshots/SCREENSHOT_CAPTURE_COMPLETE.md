@@ -265,4 +265,3 @@ npm run screenshots:interactive
 
 All 6 professional screenshots have been captured and are ready to upload to App Store Connect.
 
-

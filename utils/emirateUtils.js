@@ -20,4 +20,3 @@ export const formatEmirateLabel = (t, emirate) => {
 
 
 
-

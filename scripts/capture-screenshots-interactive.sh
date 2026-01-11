@@ -135,4 +135,3 @@ echo ""
 echo -e "${GREEN}✨ All done! Screenshots are ready for submission.${NC}"
 echo ""
 
-

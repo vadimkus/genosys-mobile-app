@@ -307,4 +307,3 @@ open app-store-screenshots/appstore-ready/
 **Device:** iPhone 16 Pro Max → iPhone 14 Pro Max (converted)  
 **Status:** ✅ Ready for App Store Connect Upload
 
-

@@ -175,4 +175,3 @@ For each page:
 **Status**: 1/9 pages complete (About)
 **Next**: Complete Contact, then Help, Privacy, Terms, Addresses, Add Address, Edit, Payment
 
-

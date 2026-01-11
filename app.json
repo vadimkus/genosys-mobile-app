@@ -79,8 +79,6 @@
     "extra": {
       "supportUrl": "https://genosys.ae",
       "privacyPolicyUrl": "https://genosys.ae/privacy-policy",
-      "applePayEndMerchantName": "GENOSYS MIDDLE EAST FZ-LLC",
-      "applePayViaAppName": "Genosys UAE",
       "router": {},
       "eas": {
         "projectId": "b874a5c1-c47e-4c4e-9286-42e431978d51"

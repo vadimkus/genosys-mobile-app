@@ -475,4 +475,3 @@ npm run screenshots:russian
 *Estimated Time: 10 minutes*  
 *Difficulty: Easy - fully automated*
 
-

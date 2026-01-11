@@ -290,4 +290,3 @@ To complete the remaining 10 pages, each needs:
 **Localization**: Using LocalizationContext with `dir` property
 **Target Language**: Arabic (ar) with RTL support
 
-
