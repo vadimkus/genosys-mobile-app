@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
-import { fetchUserOrderById, fetchUserOrders } from '../../../services/api';
+import { useCart } from '../../../contexts/CartContext';
+import { fetchUserOrderById, fetchUserOrders, fetchProductById } from '../../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
 import { useLocalization } from '../../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../../utils/emirateUtils';
@@ -113,6 +114,7 @@ export default function OrderDetailScreen() {
   const idParam = String(params.id || '');
 
   const { user } = useAuth();
+  const { addItem } = useCart();
   const token = user?.token || user?.accessToken || '';
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -120,6 +122,7 @@ export default function OrderDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
   const [paying, setPaying] = useState(false);
+  const [reordering, setReordering] = useState(false);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -262,6 +265,69 @@ export default function OrderDetailScreen() {
     Linking.openURL(whatsappUrl).catch(() => {
       Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
     });
+  };
+
+  const onReorder = async () => {
+    if (!order || !user) return;
+    
+    const orderItems = Array.isArray(order?.items) ? order.items : [];
+    const itemsToReorder = orderItems.filter((it) => !isPromoItem(it));
+    
+    if (itemsToReorder.length === 0) {
+      Alert.alert(t('ordersDetail.reorderTitle'), t('ordersDetail.noItemsToReorder'));
+      return;
+    }
+    
+    setReordering(true);
+    let addedCount = 0;
+    let failedCount = 0;
+    
+    try {
+      for (const item of itemsToReorder) {
+        const productId = item?.productId || item?.id;
+        const qty = Number(item?.quantity) || 1;
+        const size = item?.size || item?.selectedSize || '';
+        const color = item?.color || item?.selectedColor || '';
+        
+        if (!productId) {
+          failedCount++;
+          continue;
+        }
+        
+        try {
+          // Fetch fresh product data
+          const product = await fetchProductById(productId, user, { locale });
+          if (product) {
+            // Add to cart with original size/color selection
+            await addItem(product, qty, color !== '__PROMO__' ? color : '', size !== '__PROMO__' ? size : '');
+            addedCount++;
+          } else {
+            failedCount++;
+          }
+        } catch (err) {
+          failedCount++;
+        }
+      }
+      
+      if (addedCount > 0) {
+        Alert.alert(
+          t('ordersDetail.reorderSuccessTitle'),
+          failedCount > 0
+            ? t('ordersDetail.reorderPartialSuccess', { added: addedCount, failed: failedCount })
+            : t('ordersDetail.reorderSuccess', { count: addedCount }),
+          [
+            { text: t('common.continueShopping'), style: 'cancel' },
+            { text: t('ordersDetail.viewBag'), onPress: () => router.push('/(tabs)/bag') }
+          ]
+        );
+      } else {
+        Alert.alert(t('ordersDetail.reorderTitle'), t('ordersDetail.reorderFailed'));
+      }
+    } catch (e) {
+      Alert.alert(t('common.error'), e?.message || t('ordersDetail.reorderFailed'));
+    } finally {
+      setReordering(false);
+    }
   };
 
   return (
@@ -576,6 +642,23 @@ export default function OrderDetailScreen() {
 
           {/* Actions */}
           <View style={styles.actionsSection}>
+            {/* Reorder Button */}
+            <TouchableOpacity
+              style={[styles.reorderButton, isRTL && styles.buttonRTL, reordering && styles.buttonDisabled]}
+              onPress={onReorder}
+              disabled={reordering}
+              activeOpacity={0.85}
+            >
+              {reordering ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Ionicons name="repeat" size={20} color="#ffffff" />
+              )}
+              <Text style={[styles.reorderButtonText, isRTL && styles.textRTL]}>
+                {reordering ? t('ordersDetail.reordering') : t('ordersDetail.reorderButton')}
+              </Text>
+            </TouchableOpacity>
+
             {showPay ? (
               <TouchableOpacity
                 style={[styles.payButton, isRTL && styles.buttonRTL, paying && styles.buttonDisabled]}
@@ -1057,6 +1140,25 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 32,
     gap: 12,
+  },
+  reorderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#007AFF',
+    paddingVertical: 16,
+    borderRadius: 14,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  reorderButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#ffffff',
   },
   payButton: {
     flexDirection: 'row',

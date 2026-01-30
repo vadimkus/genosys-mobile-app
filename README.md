@@ -1,80 +1,97 @@
 # Genosys Mobile App
 
-A high-fidelity iOS e-commerce app built with React Native (Expo) that mimics the Apple Store design system.
+A production-ready iOS e-commerce app for GENOSYS Professional skincare, built with React Native (Expo) featuring Apple Store design system aesthetics.
 
-## 🚀 Features
+## Features
 
-- **Apple Store Design System**: Large typography, clean cards, and smooth animations
-- **Live API Integration**: Connects to Genosys Vercel API with secure authentication
-- **Parallax Product Details**: Hero images with zoom animations
+### E-commerce
+- **Product Catalog**: Full product browsing with categories and search
+- **Shopping Cart**: Persistent cart with variant selection (size/color)
+- **Checkout**: Multi-step checkout with COD, Stripe, and Apple Pay
+- **Order Management**: Order history, details, and quick reorder
+- **Favorites/Wishlist**: Save products for later
+
+### User Experience
+- **Multi-language**: English, Russian, Arabic (RTL support)
+- **Authentication**: Email/Password, Google OAuth, Apple Sign-In, Biometrics
+- **Profile Management**: Edit profile, addresses, payment preferences
+- **Product Sharing**: Share products via native share sheet
+
+### Design
+- **Apple Store Design**: Large typography, clean cards, smooth animations
 - **Glass-morphism Tab Bar**: Transparent blur effects for iOS
-- **File-based Routing**: Clean navigation with Expo Router
+- **Parallax Product Details**: Hero images with zoom animations
+- **Pull-to-refresh**: On all main screens
 
-## 📱 Tech Stack
+## Tech Stack
 
-- **Framework**: React Native (Expo SDK 50+)
+- **Framework**: React Native (Expo SDK ~54.0)
 - **Router**: Expo Router (File-based routing)
-- **Styling**: StyleSheet (Standard React Native)
-- **Animations**: react-native-reanimated
-- **Blur Effects**: expo-blur
-- **Icons**: lucide-react-native
+- **State**: React Context API
+- **Storage**: AsyncStorage
+- **Payments**: Stripe React Native SDK + Apple Pay
+- **Icons**: Ionicons (Expo Vector Icons)
 
-## 🛠 Installation
+## Installation
 
-1. Install dependencies:
 ```bash
+# Install dependencies
 npm install
-```
 
-2. Start the development server:
-```bash
+# Start development server
 npm start
-```
 
-3. Run on iOS simulator:
-```bash
+# Run on iOS simulator
 npm run ios
 ```
 
-## 📂 Project Structure
+## Project Structure
 
 ```
-app/
-├── _layout.js              # Root stack layout
-├── (tabs)/
-│   ├── _layout.js          # Transparent tab bar with blur
-│   ├── shop.js             # Main shop screen with live API
-│   └── bag.js              # Cart screen
-└── product/
-    └── [id].js             # Product detail with parallax
-
-components/
-├── HeroCard.js             # Horizontal scroll card
-├── ProductGridItem.js      # Grid item component
-└── ParallaxScrollView.js   # Custom parallax wrapper
-
-services/
-└── api.js                  # Live API integration
+genosys-mobile-app/
+├── app/                    # Expo Router screens
+│   ├── (tabs)/             # Tab navigation (shop, orders, bag)
+│   ├── auth/               # Authentication screens
+│   ├── product/            # Product detail
+│   ├── profile/            # Profile and settings
+│   ├── checkout.js         # Checkout flow
+│   └── payment/            # Payment screens
+├── components/             # Reusable UI components
+├── contexts/               # React Context providers
+├── services/               # API and business logic
+├── utils/                  # Utility functions
+├── config/                 # Configuration files
+├── i18n/                   # Localization (en, ru, ar)
+├── docs/                   # All documentation
+│   ├── README.md           # Documentation index
+│   ├── app-store/          # App Store submission docs
+│   └── screenshots/        # Screenshot documentation
+└── assets/                 # Images and static assets
 ```
 
-## 🔗 API Integration
+## API Integration
 
-The app connects to the live Genosys API at:
-- **Endpoint**: `https://www.genosys.ae/api/mobile/products`
-- **Authentication**: Custom header `x-api-key: genosys_secure_mobile_2025_v1`
+- **Endpoint**: `https://genosys.ae/api/mobile`
+- **Authentication**: API key via `x-api-key` header
 
-## 🎨 Design System
+## Documentation
+
+All documentation is centralized in the `docs/` folder. See [docs/README.md](docs/README.md) for the full documentation index.
+
+## Design System
 
 - **Typography**: Large titles (34px), section headers (22px), body text (16px)
-- **Colors**: White background, grouped gray (#F5F5F7), accent red (#E74C3C)
-- **Cards**: 12px radius, soft shadows (0.08 opacity)
+- **Colors**: White background, grouped gray (#F5F5F7), accent red (#dc2626)
+- **Cards**: 12px radius, soft shadows
 
-## 📱 Screen Flow
+## Build & Submit
 
-1. **Shop Screen**: Displays "New Arrivals" horizontally and "All Products" in a grid
-2. **Product Detail**: Parallax hero image with sticky "Add to Bag" footer
-3. **Bag Screen**: Cart functionality (placeholder for now)
+```bash
+# Build for iOS
+eas build --platform ios --profile production
 
-## 🧪 Testing
+# Submit to App Store
+eas submit --platform ios
+```
 
-The app handles API errors gracefully - if the API is unavailable, it shows an empty state instead of crashing.
+See [docs/BUILD_AND_SUBMIT_COMMANDS.md](docs/BUILD_AND_SUBMIT_COMMANDS.md) for detailed instructions.

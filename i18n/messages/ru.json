@@ -743,7 +743,16 @@
     "payNow": "Оплатить",
     "startingPayment": "Запуск оплаты…",
     "supportWhatsapp": "Поддержка WhatsApp",
-    "orderNotes": "Комментарий к заказу"
+    "orderNotes": "Комментарий к заказу",
+    "reorderButton": "Повторить заказ",
+    "reordering": "Добавляем в корзину…",
+    "reorderTitle": "Повторный заказ",
+    "reorderSuccessTitle": "Добавлено в корзину",
+    "reorderSuccess": "{count} товаров добавлено в корзину.",
+    "reorderPartialSuccess": "{added} товаров добавлено. {failed} товаров не удалось добавить.",
+    "reorderFailed": "Не удалось добавить товары в корзину. Попробуйте ещё раз.",
+    "noItemsToReorder": "Нет товаров для повторного заказа.",
+    "viewBag": "Открыть корзину"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",

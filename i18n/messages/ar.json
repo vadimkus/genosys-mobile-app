@@ -743,7 +743,16 @@
     "payNow": "ادفع الآن",
     "startingPayment": "جاري بدء الدفع…",
     "supportWhatsapp": "الدعم عبر واتساب",
-    "orderNotes": "ملاحظات الطلب"
+    "orderNotes": "ملاحظات الطلب",
+    "reorderButton": "إعادة الطلب",
+    "reordering": "جارٍ الإضافة للسلة…",
+    "reorderTitle": "إعادة الطلب",
+    "reorderSuccessTitle": "تمت الإضافة للسلة",
+    "reorderSuccess": "تمت إضافة {count} عناصر إلى سلتك.",
+    "reorderPartialSuccess": "تمت إضافة {added} عناصر. {failed} عناصر لم تتم إضافتها.",
+    "reorderFailed": "تعذر إضافة العناصر للسلة. يرجى المحاولة مرة أخرى.",
+    "noItemsToReorder": "لا توجد عناصر لإعادة طلبها.",
+    "viewBag": "عرض السلة"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",

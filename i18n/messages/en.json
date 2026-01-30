@@ -743,7 +743,16 @@
     "payNow": "Pay Now",
     "startingPayment": "Starting Payment…",
     "supportWhatsapp": "Support via WhatsApp",
-    "orderNotes": "Order Notes"
+    "orderNotes": "Order Notes",
+    "reorderButton": "Reorder",
+    "reordering": "Adding to bag…",
+    "reorderTitle": "Reorder",
+    "reorderSuccessTitle": "Added to Bag",
+    "reorderSuccess": "{count} items have been added to your bag.",
+    "reorderPartialSuccess": "{added} items added to bag. {failed} items could not be added.",
+    "reorderFailed": "Could not add items to bag. Please try again.",
+    "noItemsToReorder": "No items to reorder.",
+    "viewBag": "View Bag"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Could not start payment",
