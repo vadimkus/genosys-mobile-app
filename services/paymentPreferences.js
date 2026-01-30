@@ -3,21 +3,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const DEFAULT_PAYMENT_METHOD_KEY = 'genosys_default_payment_method';
 
 // Supported values in the app
+// Note: Apple Pay was removed due to Apple's high in-app payment fees (15-30%)
 export const PAYMENT_METHODS = {
   COD: 'cod',
   CARD: 'card',
-  APPLE_PAY: 'apple_pay',
 };
 
 export async function getDefaultPaymentMethod() {
   try {
     const value = await AsyncStorage.getItem(DEFAULT_PAYMENT_METHOD_KEY);
     // Backward/forward compatibility: accept known values only.
-    if (
-      value === PAYMENT_METHODS.CARD ||
-      value === PAYMENT_METHODS.COD ||
-      value === PAYMENT_METHODS.APPLE_PAY
-    ) {
+    // If user had apple_pay saved, fall back to COD
+    if (value === PAYMENT_METHODS.CARD || value === PAYMENT_METHODS.COD) {
       return value;
     }
     return PAYMENT_METHODS.COD;
@@ -28,11 +25,9 @@ export async function getDefaultPaymentMethod() {
 
 export async function setDefaultPaymentMethod(method) {
   const safe =
-    method === PAYMENT_METHODS.APPLE_PAY
-      ? PAYMENT_METHODS.APPLE_PAY
-      : method === PAYMENT_METHODS.CARD
-        ? PAYMENT_METHODS.CARD
-        : PAYMENT_METHODS.COD;
+    method === PAYMENT_METHODS.CARD
+      ? PAYMENT_METHODS.CARD
+      : PAYMENT_METHODS.COD;
   await AsyncStorage.setItem(DEFAULT_PAYMENT_METHOD_KEY, safe);
   return safe;
 }

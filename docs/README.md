@@ -22,10 +22,6 @@ This folder contains all documentation for the Genosys Mobile App.
 - [Setup Authentication](./SETUP_AUTHENTICATION.md) - Auth setup guide
 - [Google OAuth Setup](./GOOGLE_OAUTH_SETUP.md) - Google sign-in configuration
 
-## Payments
-
-- [Apple Pay Implementation Guide](./APPLE_PAY_IMPLEMENTATION_GUIDE.md) - Apple Pay integration
-
 ## UI & Features
 
 - [Size Variants Implementation](./SIZE_VARIANTS_IMPLEMENTATION.md) - Product size variants

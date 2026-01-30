@@ -7,7 +7,7 @@ A production-ready iOS e-commerce app for GENOSYS Professional skincare, built w
 ### E-commerce
 - **Product Catalog**: Full product browsing with categories and search
 - **Shopping Cart**: Persistent cart with variant selection (size/color)
-- **Checkout**: Multi-step checkout with COD, Stripe, and Apple Pay
+- **Checkout**: Multi-step checkout with COD and Card (Stripe)
 - **Order Management**: Order history, details, and quick reorder
 - **Favorites/Wishlist**: Save products for later
 
@@ -29,7 +29,7 @@ A production-ready iOS e-commerce app for GENOSYS Professional skincare, built w
 - **Router**: Expo Router (File-based routing)
 - **State**: React Context API
 - **Storage**: AsyncStorage
-- **Payments**: Stripe React Native SDK + Apple Pay
+- **Payments**: Stripe (web checkout)
 - **Icons**: Ionicons (Expo Vector Icons)
 
 ## Installation

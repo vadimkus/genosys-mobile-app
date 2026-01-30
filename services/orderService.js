@@ -315,76 +315,12 @@ export function generateOrderNumber() {
   return `GEN${year}${month}${day}${sequence}`;
 }
 
-/**
- * Submit Apple Pay order (Stripe PaymentIntent via backend)
- * @param {Object} orderData - Order information
- * @returns {Promise<Object>} Apple Pay intent result: clientSecret + paymentIntentId
- */
-export async function submitApplePayOrder(orderData) {
-  log.debug('Submitting Apple Pay order', { orderNumber: orderData?.orderNumber });
-
-  try {
-    const orderPayload = {
-      orderNumber: orderData.orderNumber,
-      customer: {
-        name: orderData.customerName,
-        email: orderData.customerEmail,
-        phone: orderData.customerPhone,
-        address: orderData.customerAddress,
-      },
-      emirate: orderData.emirate,
-      items: orderData.items.map(item => ({
-        id: item.product?.id || item.id,
-        name: item.product?.name || item.name,
-        price: item.product?.displayPrice || item.product?.price || item.price,
-        quantity: item.quantity,
-        image: item.product?.image_url || item.product?.image || item.image,
-        size: item.isPromotionItem === true ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
-        color: item.selectedColor || item.color,
-      })),
-      orderNotes: orderData.orderNotes || '',
-      locale: orderData.locale || 'en',
-    };
-
-    const response = await fetch(`${API_BASE_URL}/payments/applepay/intent`, {
-      method: 'POST',
-      headers: getMobileHeaders(orderData),
-      body: JSON.stringify(orderPayload),
-    });
-
-    log.debug('Apple Pay intent response status', { status: response.status });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      let errorData = {};
-      try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
-      throw new Error(`Apple Pay intent failed: ${response.status} - ${errorData.error || errorData.message || errorText || 'Unknown error'}`);
-    }
-
-    const result = await response.json();
-    return {
-      success: !!result?.success,
-      orderId: result?.orderId || null,
-      orderNumber: result?.orderNumber || orderData.orderNumber,
-      paymentIntentId: result?.paymentIntentId || null,
-      clientSecret: result?.clientSecret || null,
-      reused: !!result?.reused,
-      meta: result?.meta || null,
-    };
-  } catch (error) {
-    log.error('Apple Pay intent failed', error?.message || error);
-    return {
-      success: false,
-      error: error.message || 'Failed to create Apple Pay payment intent',
-      details: error,
-    };
-  }
-}
+// Note: Apple Pay was removed due to Apple's high in-app payment fees (15-30%)
+// Use Card payment via Stripe checkout instead - this redirects to web and avoids the IAP fees
 
 export default {
   submitCODOrder,
   submitCardOrder,
-  submitApplePayOrder,
   getPaymentUrlForExistingOrder,
   generateOrderNumber,
 };
