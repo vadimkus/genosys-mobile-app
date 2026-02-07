@@ -34,6 +34,7 @@ import {
 import { loginWithGoogleDirect } from '../services/googleAuthService';
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
 
 const AuthContext = createContext({});
 const log = createLogger('Auth');
@@ -54,6 +55,16 @@ export const AuthProvider = ({ children }) => {
   const [biometricType, setBiometricType] = useState('Biometric Authentication');
 
   // Using direct Google OAuth instead of expo-auth-session to avoid "Expo" branding
+
+  // Register the auth-expired callback so authFetch can trigger logout on 401
+  useEffect(() => {
+    setOnAuthExpired(() => {
+      log.warn('Auth expired callback triggered - logging out user');
+      // Clear stored session and reset user state
+      AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY).catch(() => {});
+      setUser(null);
+    });
+  }, []);
 
   // Check for stored authentication and biometric setup on app launch
   useEffect(() => {
@@ -134,6 +145,41 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
+  /**
+   * Attempt to silently refresh the current JWT token.
+   * Returns the new token on success, or null on failure (which also logs out).
+   */
+  const refreshSession = async () => {
+    const currentToken = user?.token;
+    if (!currentToken) {
+      log.warn('refreshSession: no token to refresh');
+      return null;
+    }
+
+    try {
+      const result = await refreshToken(currentToken);
+      if (result && result.token) {
+        const updatedUser = await persistRefreshedToken(result);
+        if (updatedUser) {
+          setUser(updatedUser);
+          log.info('Session refreshed successfully');
+          return result.token;
+        }
+      }
+
+      // Refresh failed - force logout
+      log.warn('refreshSession: refresh failed, logging out');
+      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+      setUser(null);
+      return null;
+    } catch (error) {
+      log.error('refreshSession error', error?.message || error);
+      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+      setUser(null);
+      return null;
+    }
+  };
 
   const loginWithGoogle = async () => {
     try {
@@ -585,6 +631,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     deleteAccount,
     isAuthenticated: !!user,
+    refreshSession,
     // Biometric authentication
     biometricAvailable,
     biometricEnabled,

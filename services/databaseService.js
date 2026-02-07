@@ -5,6 +5,7 @@
 
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import { authenticatedFetch } from './authFetch';
 
 const log = createLogger('databaseService');
 
@@ -12,6 +13,9 @@ const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 
 /**
  * Generic API request handler
+ * Uses authenticatedFetch for token-bearing requests to automatically
+ * handle 401 responses with token refresh + retry.
+ * 
  * @param {string} endpoint - API endpoint
  * @param {Object} options - Request options
  * @returns {Promise<Object>} Response data
@@ -25,14 +29,21 @@ const apiRequest = async (endpoint, options = {}) => {
     // causing requests (e.g. wishlist) to miss `x-api-key` and fail with 401.
     const { headers: extraHeaders = {}, ...restOptions } = options || {};
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...restOptions,
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        ...extraHeaders,
-      },
-    });
+    const mergedHeaders = {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      ...extraHeaders,
+    };
+
+    const url = `${API_BASE_URL}${endpoint}`;
+    const fetchOptions = { ...restOptions, headers: mergedHeaders };
+
+    // Use authenticatedFetch for requests that include an Authorization header
+    // so that 401 responses trigger automatic token refresh + retry.
+    const hasAuthHeader = !!mergedHeaders['Authorization'] || !!mergedHeaders['authorization'];
+    const response = hasAuthHeader
+      ? await authenticatedFetch(url, fetchOptions)
+      : await fetch(url, fetchOptions);
 
     log.debug('API response', {
       endpoint,

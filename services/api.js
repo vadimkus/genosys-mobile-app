@@ -11,6 +11,7 @@
 
 import { createLogger } from '../utils/logger';
 import AUTH_CONFIG from '../config/auth';
+import { authenticatedFetch } from './authFetch';
 
 const log = createLogger('api');
 
@@ -348,14 +349,14 @@ export const fetchUserProfile = async (token) => {
   try {
     log.debug('Fetching user profile');
     
-    const response = await fetch(`${API_BASE_URL}/auth/validate`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/auth/validate`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
         'x-api-key': API_KEY,
       },
-    });
+    }, token);
 
     if (response.ok) {
       const result = await response.json();
@@ -387,7 +388,7 @@ export const fetchUserOrders = async (token, params = {}) => {
 
     log.debug('Fetching user orders:', url);
 
-    const response = await fetch(url, {
+    const response = await authenticatedFetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -395,7 +396,7 @@ export const fetchUserOrders = async (token, params = {}) => {
         'Authorization': `Bearer ${token}`,
         'x-api-key': API_KEY,
       },
-    });
+    }, token);
 
     if (!response.ok) {
       const txt = await response.text().catch(() => '');
@@ -424,7 +425,7 @@ export const fetchUserOrderById = async (token, orderId) => {
   const id = String(orderId || '').trim();
   if (!id) throw new Error('Missing order id');
 
-  const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
+  const response = await authenticatedFetch(`${API_BASE_URL}/orders/${id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -432,7 +433,7 @@ export const fetchUserOrderById = async (token, orderId) => {
       'Authorization': `Bearer ${token}`,
       'x-api-key': API_KEY,
     },
-  });
+  }, token);
 
   if (!response.ok) {
     const txt = await response.text().catch(() => '');
@@ -473,7 +474,7 @@ export const deleteUserOrder = async (token, orderId) => {
   for (const c of candidates) {
     try {
       log.debug('Delete order attempt', { method: c.method, url: c.url });
-      const res = await fetch(c.url, {
+      const res = await authenticatedFetch(c.url, {
         method: c.method,
         headers: {
           'Content-Type': 'application/json',
@@ -482,7 +483,7 @@ export const deleteUserOrder = async (token, orderId) => {
           'x-api-key': API_KEY,
         },
         ...(c.body ? { body: JSON.stringify(c.body) } : {}),
-      });
+      }, token);
       if (!res.ok) {
         const allow = res.headers.get('allow') || '';
         const txt = await res.text().catch(() => '');
