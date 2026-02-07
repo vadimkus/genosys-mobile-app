@@ -773,21 +773,8 @@ export default function ShopScreen() {
           if (typeof h === 'number' && Number.isFinite(h) && h > 0) setHeaderHeight(h);
         }}
       >
-        {/* Left: Language dropdown (like website) */}
+        {/* Left: Hamburger, then Language selector */}
         <View style={[styles.headerLeft, isRTL && styles.headerLeftRtl]}>
-          <TouchableOpacity
-            onPress={() => setLangOpen((v) => !v)}
-            disabled={langSwitching}
-            activeOpacity={0.85}
-            style={styles.langButton}
-            accessibilityRole="button"
-            accessibilityLabel="Switch language"
-          >
-            <Text style={styles.langButtonText}>{currentLangCode}</Text>
-            <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#16A34A" />
-          </TouchableOpacity>
-
-          {/* Hamburger menu (matching mobile web) */}
           <TouchableOpacity
             onPress={() => setMenuOpen((v) => !v)}
             activeOpacity={0.85}
@@ -798,15 +785,16 @@ export default function ShopScreen() {
             <Ionicons name={menuOpen ? 'close' : 'menu'} size={22} color={menuOpen ? '#16A34A' : '#374151'} />
           </TouchableOpacity>
 
-          {/* AI link (matching mobile web header) */}
           <TouchableOpacity
-            onPress={() => router.push('/skin-analysis')}
+            onPress={() => setLangOpen((v) => !v)}
+            disabled={langSwitching}
             activeOpacity={0.85}
-            style={styles.aiLinkBtn}
+            style={styles.langButton}
             accessibilityRole="button"
-            accessibilityLabel="AI Skin Analysis"
+            accessibilityLabel="Switch language"
           >
-            <Text style={styles.aiLinkText}>AI</Text>
+            <Text style={styles.langButtonText}>{currentLangCode}</Text>
+            <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#16A34A" />
           </TouchableOpacity>
         </View>
         
@@ -1238,12 +1226,13 @@ const styles = StyleSheet.create({
   headerLeft: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 4,
   },
   headerLeftRtl: {
-    alignItems: 'flex-end',
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-end',
   },
   headerCenter: {
     flex: 2,

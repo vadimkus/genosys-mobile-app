@@ -118,7 +118,7 @@ export default function AddEditAddressScreen() {
           [
             {
               text: t('contact.ok'),
-              onPress: () => {}
+              onPress: () => router.back()
             }
           ]
         );

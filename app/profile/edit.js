@@ -391,8 +391,7 @@ export default function EditProfileScreen() {
           [
             {
               text: t('common.ok'),
-              // Stay on the same page after saving.
-              onPress: () => {}
+              onPress: () => router.back()
             }
           ]
         );

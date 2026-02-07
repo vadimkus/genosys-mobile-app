@@ -228,7 +228,16 @@
     "landmarkPlaceholder": "مثال: بالقرب من Marina Mall، البوابة 2، مقابل Carrefour",
     "reviewLine": "التوصيل إلى {emirate} • {payment} • الإجمالي AED {total}",
     "couldNotOpenMaps": "تعذر فتح الخرائط. يرجى المحاولة مرة أخرى.",
-    "youSave": "وفرت"
+    "youSave": "وفرت",
+    "retailPrice": "سعر التجزئة",
+    "yourDiscount": "خصمك",
+    "bundleDiscount": "خصم الباقة",
+    "intermediateSubtotal": "المجموع الفرعي",
+    "netSubtotal": "المجموع الفرعي الصافي",
+    "youSaved": "وفرت",
+    "items": "منتجات",
+    "item": "منتج",
+    "freeMasks": "هدايا مجانية"
   },
   "applePay": {
     "applePay": "Apple Pay",

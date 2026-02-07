@@ -228,7 +228,16 @@
     "landmarkPlaceholder": "например: возле Marina Mall, ворота 2, напротив Carrefour",
     "reviewLine": "Доставка в {emirate} • {payment} • Итого AED {total}",
     "couldNotOpenMaps": "Не удалось открыть карты. Попробуйте ещё раз.",
-    "youSave": "Вы экономите"
+    "youSave": "Вы экономите",
+    "retailPrice": "Розничная цена",
+    "yourDiscount": "Ваша скидка",
+    "bundleDiscount": "Скидка набора",
+    "intermediateSubtotal": "Подытог",
+    "netSubtotal": "Подытог",
+    "youSaved": "Вы сэкономили",
+    "items": "товаров",
+    "item": "товар",
+    "freeMasks": "бесплатных масок"
   },
   "applePay": {
     "applePay": "Apple Pay",

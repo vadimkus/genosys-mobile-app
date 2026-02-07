@@ -616,7 +616,7 @@ export default function OrderDetailScreen() {
               <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderSummary')}</Text>
             </View>
 
-            {/* Discount Waterfall: show retail price → VIP discount → bundle discount when applicable */}
+            {/* Waterfall Discount Breakdown */}
             {(() => {
               const orderDiscPct = Number(order?.discountPercentage);
               const orderDiscAmt = Number(order?.discountAmount);
@@ -626,26 +626,36 @@ export default function OrderDetailScreen() {
               const hasBundleDiscount = Number.isFinite(bundleDiscAmt) && bundleDiscAmt > 0;
               const hasAnyDiscount = hasVipDiscount || hasBundleDiscount;
               const retailTotal = subtotal + (hasVipDiscount ? orderDiscAmt : 0) + (hasBundleDiscount ? bundleDiscAmt : 0);
+              const afterVipSubtotal = retailTotal - (hasVipDiscount ? orderDiscAmt : 0);
+              const totalSaved = (hasVipDiscount ? orderDiscAmt : 0) + (hasBundleDiscount ? bundleDiscAmt : 0);
 
               return hasAnyDiscount ? (
                 <>
-                  {/* Retail price (before any discounts) */}
+                  {/* Retail Price (strikethrough) */}
                   <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                     <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.retailPrice')}</Text>
                     <Text style={[styles.summaryValue, styles.summaryValueStrikethrough, isRTL && styles.valueLTR]}>AED {formatAED(retailTotal)}</Text>
                   </View>
 
-                  {/* VIP Discount line */}
+                  {/* VIP Discount (purple) */}
                   {hasVipDiscount ? (
                     <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                      <Text style={[styles.summaryLabelDiscount, isRTL && styles.textRTL]}>
+                      <Text style={[styles.summaryLabelPurple, isRTL && styles.textRTL]}>
                         {t('ordersDetail.vipDiscount')}{Number.isFinite(orderDiscPct) && orderDiscPct > 0 ? ` (${Math.round(orderDiscPct)}%)` : ''}
                       </Text>
-                      <Text style={[styles.summaryValueDiscount, isRTL && styles.valueLTR]}>-AED {formatAED(orderDiscAmt)}</Text>
+                      <Text style={[styles.summaryValuePurple, isRTL && styles.valueLTR]}>-AED {formatAED(orderDiscAmt)}</Text>
                     </View>
                   ) : null}
 
-                  {/* Bundle Discount line */}
+                  {/* Intermediate Subtotal (only when both VIP + Bundle) */}
+                  {hasVipDiscount && hasBundleDiscount ? (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelMuted, isRTL && styles.textRTL]}>{t('checkout.intermediateSubtotal')}</Text>
+                      <Text style={[styles.summaryValueMuted, isRTL && styles.valueLTR]}>AED {formatAED(afterVipSubtotal)}</Text>
+                    </View>
+                  ) : null}
+
+                  {/* Bundle Discount (green) */}
                   {hasBundleDiscount ? (
                     <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                       <Text style={[styles.summaryLabelDiscount, isRTL && styles.textRTL]}>
@@ -655,15 +665,14 @@ export default function OrderDetailScreen() {
                     </View>
                   ) : null}
 
-                  {/* Total saved */}
-                  {(hasVipDiscount || hasBundleDiscount) ? (
-                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                      <Text style={[styles.summaryLabelSaved, isRTL && styles.textRTL]}>{t('ordersDetail.totalSaved')}</Text>
-                      <Text style={[styles.summaryValueSaved, isRTL && styles.valueLTR]}>-AED {formatAED((hasVipDiscount ? orderDiscAmt : 0) + (hasBundleDiscount ? bundleDiscAmt : 0))}</Text>
+                  <View style={styles.summaryDividerLight} />
+
+                  {/* You Saved banner */}
+                  {totalSaved > 0 ? (
+                    <View style={styles.youSavedBanner}>
+                      <Text style={styles.youSavedText}>{t('checkout.youSaved')}: AED {formatAED(totalSaved)}</Text>
                     </View>
                   ) : null}
-
-                  <View style={styles.summaryDividerLight} />
                 </>
               ) : null;
             })()}
@@ -1174,6 +1183,26 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     color: '#9CA3AF',
   },
+  summaryLabelPurple: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  summaryValuePurple: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#7C3AED',
+  },
+  summaryLabelMuted: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#9CA3AF',
+  },
+  summaryValueMuted: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#9CA3AF',
+  },
   summaryLabelDiscount: {
     fontSize: 14,
     fontWeight: '600',
@@ -1184,15 +1213,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#16A34A',
   },
-  summaryLabelSaved: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#16A34A',
+  youSavedBanner: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
   },
-  summaryValueSaved: {
+  youSavedText: {
     fontSize: 13,
-    fontWeight: '800',
     color: '#16A34A',
+    fontWeight: '800',
   },
   summaryDividerLight: {
     height: 1,

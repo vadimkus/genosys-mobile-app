@@ -568,29 +568,42 @@ export default function OrdersScreen() {
 
                       <View style={styles.orderSummaryDivider} />
 
-                      {/* Discount waterfall (when applicable) */}
+                      {/* Waterfall Discount Breakdown */}
                       {(() => {
                         const discAmt = Number(o?.discountAmount);
                         const bundleDiscAmt = Number(o?.bundleDiscountAmount);
                         const bundleDiscPct = Number(o?.bundleDiscountPercentage);
                         const hasVip = Number.isFinite(discAmt) && discAmt > 0;
                         const hasBundle = Number.isFinite(bundleDiscAmt) && bundleDiscAmt > 0;
-                        if (!hasVip && !hasBundle) return null;
+                        const hasAnyDiscount = hasVip || hasBundle;
+                        if (!hasAnyDiscount) return null;
                         const retailTotal = Number(subtotal) + (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
+                        const afterVipSubtotal = retailTotal - (hasVip ? discAmt : 0);
+                        const totalSaved = (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
                         return (
                           <>
+                            {/* Retail Price (strikethrough) */}
                             <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
                               <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersDetail.retailPrice')}</Text>
                               <Text style={[styles.orderTotalsValueMuted, isRTL && styles.valueLTR]}>AED {formatAED(retailTotal)}</Text>
                             </View>
+                            {/* VIP Discount (purple) */}
                             {hasVip ? (
                               <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                                <Text style={[styles.orderTotalsLabelGreen, isRTL && styles.textRTLRight]}>
+                                <Text style={[styles.orderTotalsLabelPurple, isRTL && styles.textRTLRight]}>
                                   {t('ordersDetail.vipDiscount')}{Number.isFinite(discountPct) && discountPct > 0 ? ` (${Math.round(discountPct)}%)` : ''}
                                 </Text>
-                                <Text style={[styles.orderTotalsValueGreen, isRTL && styles.valueLTR]}>-AED {formatAED(discAmt)}</Text>
+                                <Text style={[styles.orderTotalsValuePurple, isRTL && styles.valueLTR]}>-AED {formatAED(discAmt)}</Text>
                               </View>
                             ) : null}
+                            {/* Intermediate Subtotal (only when both VIP + Bundle) */}
+                            {hasVip && hasBundle ? (
+                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                <Text style={[styles.orderTotalsLabelMuted, isRTL && styles.textRTLRight]}>{t('checkout.intermediateSubtotal')}</Text>
+                                <Text style={[styles.orderTotalsValueMutedSmall, isRTL && styles.valueLTR]}>AED {formatAED(afterVipSubtotal)}</Text>
+                              </View>
+                            ) : null}
+                            {/* Bundle Discount (green) */}
                             {hasBundle ? (
                               <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
                                 <Text style={[styles.orderTotalsLabelGreen, isRTL && styles.textRTLRight]}>
@@ -600,10 +613,17 @@ export default function OrdersScreen() {
                               </View>
                             ) : null}
                             <View style={styles.orderSummaryDividerLight} />
+                            {/* You Saved banner */}
+                            {totalSaved > 0 ? (
+                              <View style={styles.youSavedBanner}>
+                                <Text style={styles.youSavedText}>{t('checkout.youSaved')}: AED {formatAED(totalSaved)}</Text>
+                              </View>
+                            ) : null}
                           </>
                         );
                       })()}
 
+                      {/* Net Subtotal / Subtotal */}
                       <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
                         <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.subtotal')}</Text>
                         <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
@@ -796,11 +816,26 @@ const styles = StyleSheet.create({
   orderTotalsRowRTL: { flexDirection: 'row-reverse' },
   orderTotalsLabel: { fontSize: 12, color: '#3C3C43', fontWeight: '700' },
   orderTotalsLabelGreen: { fontSize: 12, color: '#16A34A', fontWeight: '700' },
+  orderTotalsLabelPurple: { fontSize: 12, color: '#7C3AED', fontWeight: '700' },
+  orderTotalsLabelMuted: { fontSize: 12, color: '#9CA3AF', fontWeight: '600' },
   orderTotalsValue: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
   orderTotalsValueMuted: { fontSize: 12, color: '#9CA3AF', fontWeight: '700', textDecorationLine: 'line-through' },
+  orderTotalsValueMutedSmall: { fontSize: 12, color: '#9CA3AF', fontWeight: '700' },
   orderTotalsValueGreen: { fontSize: 12, color: '#16A34A', fontWeight: '800' },
+  orderTotalsValuePurple: { fontSize: 12, color: '#7C3AED', fontWeight: '800' },
   orderTotalsLabelStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
   orderTotalsValueStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
+  youSavedBanner: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  youSavedText: { fontSize: 12, color: '#16A34A', fontWeight: '800' },
   payButton: {
     marginTop: 12,
     flexDirection: 'row',

@@ -18,7 +18,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
-import { calculateCartTotals } from '../utils/cartUtils';
+import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils';
 import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { useLocalization } from '../contexts/LocalizationContext';
@@ -93,6 +93,7 @@ export default function CheckoutScreen() {
   const safeVat = Number(totals.vatAmount) || 0;
   const safeTotal = Number(totals.total) || 0;
   const savingsAED = computeSavingsAED(items, safeSubtotal);
+  const waterfall = computeWaterfallBreakdown(items, user);
   const etaInfo = getDeliveryEtaInfo(selectedEmirate);
   const deliveryEtaText = etaInfo.isDubai
     ? t('checkout.deliveryEtaDubai')
@@ -903,34 +904,111 @@ export default function CheckoutScreen() {
             />
           </View>
 
-          {/* Order Summary */}
+          {/* Order Summary - Waterfall Discount Breakdown */}
           <View style={styles.section} onLayout={registerSectionLayout('review')}>
             <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
               <Ionicons name="receipt" size={20} color="#007AFF" />
               <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.orderSummary')}</Text>
             </View>
 
-            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
-                {t('checkout.subtotal')} ({t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })})
-              </Text>
-              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeSubtotal.toFixed(2)}</Text>
-            </View>
+            {/* Retail Price or Subtotal */}
+            {waterfall.hasAnyDiscount ? (
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
+                  {t('checkout.retailPrice')}: ({getTotalItems()} {getTotalItems() === 1 ? t('checkout.item') : t('checkout.items')})
+                  {(() => {
+                    const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
+                    return freeMaskCount > 0 ? `\n+ ${freeMaskCount} ${t('checkout.freeMasks')}` : '';
+                  })()}
+                </Text>
+                <Text style={[styles.summaryValue, styles.summaryValueStrikethrough, isRTL && styles.summaryValueRTL]}>
+                  AED {waterfall.retailTotal.toFixed(2)}
+                </Text>
+              </View>
+            ) : (
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
+                  {t('checkout.subtotal')} ({t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })})
+                  {(() => {
+                    const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
+                    return freeMaskCount > 0 ? `\n+ ${freeMaskCount} ${t('checkout.freeMasks')}` : '';
+                  })()}
+                </Text>
+                <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeSubtotal.toFixed(2)}</Text>
+              </View>
+            )}
 
+            {/* VIP / User Discount */}
+            {waterfall.hasUserDiscount && (
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabelDiscount, isRTL && styles.textRTL]}>
+                  {t('checkout.yourDiscount')}{waterfall.userDiscountPct > 0 ? ` (${Math.round(waterfall.userDiscountPct)}%)` : ''}
+                </Text>
+                <Text style={[styles.summaryValueDiscount, isRTL && styles.summaryValueRTL]}>
+                  -AED {waterfall.userDiscountTotal.toFixed(2)}
+                </Text>
+              </View>
+            )}
+
+            {/* Intermediate Subtotal (only when both VIP + Bundle exist) */}
+            {waterfall.hasUserDiscount && waterfall.hasBundleDiscount && (
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabelIntermediate, isRTL && styles.textRTL]}>
+                  {t('checkout.intermediateSubtotal')}
+                </Text>
+                <Text style={[styles.summaryValueIntermediate, isRTL && styles.summaryValueRTL]}>
+                  AED {waterfall.afterVipSubtotal.toFixed(2)}
+                </Text>
+              </View>
+            )}
+
+            {/* Bundle Discount */}
+            {waterfall.hasBundleDiscount && (
+              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                <Text style={[styles.summaryLabelBundle, isRTL && styles.textRTL]}>
+                  {t('checkout.bundleDiscount')}{waterfall.bundleDiscountPct > 0 ? ` (${Math.round(waterfall.bundleDiscountPct)}%)` : ''}
+                </Text>
+                <Text style={[styles.summaryValueBundle, isRTL && styles.summaryValueRTL]}>
+                  -AED {waterfall.bundleDiscountTotal.toFixed(2)}
+                </Text>
+              </View>
+            )}
+
+            {/* Net Subtotal (after all discounts) */}
+            {waterfall.hasAnyDiscount && (
+              <>
+                <View style={styles.summaryDividerLight} />
+                <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                  <Text style={[styles.summaryLabelBold, isRTL && styles.textRTL]}>
+                    {t('checkout.netSubtotal')}
+                  </Text>
+                  <Text style={[styles.summaryValueBold, isRTL && styles.summaryValueRTL]}>
+                    AED {safeSubtotal.toFixed(2)}
+                  </Text>
+                </View>
+              </>
+            )}
+
+            {/* Shipping */}
             <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
               <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
                 {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
               </Text>
-              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>
+              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL, safeShipping === 0 && styles.summaryValueFree]}>
                 {safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}
               </Text>
             </View>
 
+            {/* VAT */}
             <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
               <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('checkout.vatIncluded')}</Text>
               <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeVat.toFixed(2)}</Text>
             </View>
 
+            {/* VAT note */}
+            <Text style={[styles.vatNoteRed, isRTL && styles.textRTL]}>*{t('checkout.allPricesVatInclusive')}</Text>
+
+            {/* Free shipping banner */}
             {totals.hasFreeShipping && (
               <View style={[styles.freeShippingBanner, isRTL && styles.rowRTL]}>
                 <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
@@ -938,6 +1016,7 @@ export default function CheckoutScreen() {
               </View>
             )}
 
+            {/* Promo items banner */}
             {(() => {
               const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
               if (!freeMaskCount) return null;
@@ -950,12 +1029,20 @@ export default function CheckoutScreen() {
               );
             })()}
 
+            {/* Total */}
             <View style={[styles.totalRow, isRTL && styles.summaryRowRTL]}>
               <Text style={[styles.totalLabel, isRTL && styles.textRTL]}>{t('checkout.total')}</Text>
               <Text style={[styles.totalValue, isRTL && styles.summaryValueRTL]}>AED {safeTotal.toFixed(2)}</Text>
             </View>
 
-            <Text style={[styles.vatNote, isRTL && styles.textRTL]}>*{t('checkout.allPricesVatInclusive')}</Text>
+            {/* You Saved banner */}
+            {waterfall.hasAnyDiscount && waterfall.totalSaved > 0 && (
+              <View style={styles.youSavedBanner}>
+                <Text style={styles.youSavedText}>
+                  {t('checkout.youSaved')}: AED {waterfall.totalSaved.toFixed(2)}
+                </Text>
+              </View>
+            )}
           </View>
 
         </View>
@@ -1796,6 +1883,79 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
     fontStyle: 'italic',
+  },
+
+  // Waterfall discount breakdown styles
+  summaryValueStrikethrough: {
+    textDecorationLine: 'line-through',
+    color: '#9CA3AF',
+  },
+  summaryLabelDiscount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  summaryValueDiscount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  summaryLabelIntermediate: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  summaryValueIntermediate: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  summaryLabelBundle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16A34A',
+  },
+  summaryValueBundle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16A34A',
+  },
+  summaryDividerLight: {
+    height: 1,
+    backgroundColor: '#E5E5EA',
+    marginVertical: 6,
+  },
+  summaryLabelBold: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  summaryValueBold: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  summaryValueFree: {
+    color: '#16A34A',
+    fontWeight: '600',
+  },
+  vatNoteRed: {
+    fontSize: 11,
+    color: '#dc2626',
+    paddingVertical: 2,
+  },
+  youSavedBanner: {
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  youSavedText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#15803D',
   },
 
   // Bottom Action

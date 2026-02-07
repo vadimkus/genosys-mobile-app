@@ -228,7 +228,16 @@
     "landmarkPlaceholder": "e.g., near Marina Mall, gate 2, opposite Carrefour",
     "reviewLine": "Delivery to {emirate} • {payment} • Total AED {total}",
     "couldNotOpenMaps": "Could not open Maps. Please try again.",
-    "youSave": "You save"
+    "youSave": "You save",
+    "retailPrice": "Retail Price",
+    "yourDiscount": "Your Discount",
+    "bundleDiscount": "Bundle Discount",
+    "intermediateSubtotal": "Subtotal",
+    "netSubtotal": "Net Subtotal",
+    "youSaved": "You saved",
+    "items": "items",
+    "item": "item",
+    "freeMasks": "free masks"
   },
   "applePay": {
     "applePay": "Apple Pay",

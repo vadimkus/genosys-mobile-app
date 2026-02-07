@@ -21,6 +21,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import AUTH_CONFIG from '../../config/auth';
+import { computeWaterfallBreakdown } from '../../utils/cartUtils';
 
 export default function BagScreen() {
   const { user } = useAuth();
@@ -162,6 +163,9 @@ export default function BagScreen() {
   const discountAmount = originalSubtotal && originalSubtotal > safeSubtotal
     ? Math.max(0, originalSubtotal - safeSubtotal)
     : 0;
+
+  // Waterfall breakdown for order summary
+  const waterfall = computeWaterfallBreakdown(items, user);
 
   // Refresh DB-driven shipping rates when opening bag
   useEffect(() => {
@@ -624,24 +628,64 @@ export default function BagScreen() {
           chevronButtonStyle={styles.footerChevronBtn}
           details={
             <>
-              {Number.isFinite(discountPct) && discountPct > 0 && discountAmount > 0.01 ? (
+              {/* Waterfall Discount Breakdown */}
+              {waterfall.hasAnyDiscount ? (
                 <>
-                  <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                    <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('bag.subtotalBeforeDiscount')}</Text>
-                    <Text style={[styles.summaryValue, styles.summaryOriginalValue, isRTL && styles.summaryValueRTL]}>
-                      {Number(originalSubtotal).toFixed(2)} AED
-                    </Text>
-                  </View>
+                  {/* Retail Price (strikethrough) */}
                   <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                     <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>
-                      {t('bag.discountLabel')}{' '}
-                      <Text style={styles.discountPctGreen}>{`(${discountPct}% OFF)`}</Text>
+                      {t('checkout.retailPrice')} ({cartSummary.itemCount} {cartSummary.itemCount === 1 ? t('checkout.item') : t('checkout.items')})
                     </Text>
-                    <Text style={[styles.summaryDiscountValue, isRTL && styles.summaryValueRTL]}>-{discountAmount.toFixed(2)} AED</Text>
+                    <Text style={[styles.summaryValue, styles.summaryOriginalValue, styles.summaryValueStrikethrough, isRTL && styles.summaryValueRTL]}>
+                      {waterfall.retailTotal.toFixed(2)} AED
+                    </Text>
                   </View>
+
+                  {/* VIP / User Discount */}
+                  {waterfall.hasUserDiscount && (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelDiscount, isRTL && styles.summaryLabelRTL]}>
+                        {t('checkout.yourDiscount')}{waterfall.userDiscountPct > 0 ? ` (${Math.round(waterfall.userDiscountPct)}%)` : ''}
+                      </Text>
+                      <Text style={[styles.summaryValueDiscountPurple, isRTL && styles.summaryValueRTL]}>
+                        -{waterfall.userDiscountTotal.toFixed(2)} AED
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Intermediate Subtotal (only when both VIP + Bundle) */}
+                  {waterfall.hasUserDiscount && waterfall.hasBundleDiscount && (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelIntermediate, isRTL && styles.summaryLabelRTL]}>
+                        {t('checkout.intermediateSubtotal')}
+                      </Text>
+                      <Text style={[styles.summaryValueIntermediate, isRTL && styles.summaryValueRTL]}>
+                        {waterfall.afterVipSubtotal.toFixed(2)} AED
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Bundle Discount */}
+                  {waterfall.hasBundleDiscount && (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelBundle, isRTL && styles.summaryLabelRTL]}>
+                        {t('checkout.bundleDiscount')}{waterfall.bundleDiscountPct > 0 ? ` (${Math.round(waterfall.bundleDiscountPct)}%)` : ''}
+                      </Text>
+                      <Text style={[styles.summaryValueBundle, isRTL && styles.summaryValueRTL]}>
+                        -{waterfall.bundleDiscountTotal.toFixed(2)} AED
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Net Subtotal */}
+                  <View style={styles.waterfallDivider} />
                   <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                    <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('checkout.subtotal')}</Text>
-                    <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>{safeSubtotal.toFixed(2)} AED</Text>
+                    <Text style={[styles.summaryLabelBold, isRTL && styles.summaryLabelRTL]}>
+                      {t('checkout.netSubtotal')}
+                    </Text>
+                    <Text style={[styles.summaryValueBold, isRTL && styles.summaryValueRTL]}>
+                      {safeSubtotal.toFixed(2)} AED
+                    </Text>
                   </View>
                 </>
               ) : (
@@ -651,6 +695,7 @@ export default function BagScreen() {
                 </View>
               )}
 
+              {/* Shipping */}
               <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                 <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>
                   {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
@@ -660,12 +705,22 @@ export default function BagScreen() {
                 </Text>
               </View>
 
+              {/* VAT */}
               <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                 <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('checkout.vatIncluded')}</Text>
                 <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>{safeVat.toFixed(2)} AED</Text>
               </View>
 
               <View style={styles.divider} />
+
+              {/* You Saved banner */}
+              {waterfall.hasAnyDiscount && waterfall.totalSaved > 0 && (
+                <View style={styles.youSavedBanner}>
+                  <Text style={styles.youSavedText}>
+                    {t('checkout.youSaved')}: AED {waterfall.totalSaved.toFixed(2)}
+                  </Text>
+                </View>
+              )}
             </>
           }
           always={
@@ -1235,6 +1290,69 @@ const styles = StyleSheet.create({
   discountPctGreen: {
     color: '#27AE60',
     fontWeight: '700',
+  },
+  // Waterfall discount breakdown styles
+  summaryValueStrikethrough: {
+    textDecorationLine: 'line-through',
+    color: '#9CA3AF',
+  },
+  summaryLabelDiscount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  summaryValueDiscountPurple: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  summaryLabelIntermediate: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  summaryValueIntermediate: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  summaryLabelBundle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16A34A',
+  },
+  summaryValueBundle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16A34A',
+  },
+  waterfallDivider: {
+    height: 1,
+    backgroundColor: '#E5E5EA',
+    marginVertical: 4,
+  },
+  summaryLabelBold: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  summaryValueBold: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
+  youSavedBanner: {
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginBottom: 4,
+    alignItems: 'center',
+  },
+  youSavedText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#15803D',
   },
   freeText: {
     color: '#34C759',

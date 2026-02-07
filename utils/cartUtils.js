@@ -5,7 +5,7 @@
  * Server should handle final pricing calculations during checkout.
  */
 
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isUserDiscountExcludedProduct, isDeviceProduct } from './productRules';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isUserDiscountExcludedProduct, isDeviceProduct, isBeautyBoxProduct } from './productRules';
 
 // UAE Emirates for shipping - fallback data (used when /api/mobile/shipping-rates is unavailable).
 // MUST match backend mobileCheckoutConfig.ts to avoid display vs. charge mismatch.
@@ -177,9 +177,139 @@ export function getShippingCost(emirateName) {
   return emirate ? emirate.shippingCost : 0;
 }
 
+/**
+ * Compute waterfall discount breakdown for display in order summary.
+ * Mirrors the web checkout's waterfall logic (CheckoutClient.tsx).
+ *
+ * Returns retail total, user (VIP) discount, bundle discount, intermediate subtotal,
+ * and convenience booleans/totals for the UI.
+ *
+ * @param {Array} items - Cart items
+ * @param {Object} user - User object (needs discountPercentage)
+ * @returns {Object} Waterfall breakdown values
+ */
+export function computeWaterfallBreakdown(items, user) {
+  const empty = {
+    retailTotal: 0,
+    userDiscountTotal: 0,
+    bundleDiscountTotal: 0,
+    afterVipSubtotal: 0,
+    userDiscountPct: 0,
+    bundleDiscountPct: 0,
+    hasUserDiscount: false,
+    hasBundleDiscount: false,
+    hasAnyDiscount: false,
+    totalSaved: 0,
+  };
+  if (!items || items.length === 0) return empty;
+
+  let _retailTotal = 0;
+  let _userDiscountTotal = 0;
+  let _bundleDiscountTotal = 0;
+  let _userDiscountPct = 0;
+  let _bundleDiscountPct = 0;
+
+  const discountPct = Number(user?.discountPercentage);
+  const hasUserDiscountPct = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+
+  items.forEach((item) => {
+    // Skip promo items (free add-ons)
+    const isPromoItem = item?.isPromotionItem === true || String(item?.selectedSize || '').trim() === '__PROMO__';
+    if (isPromoItem) return;
+
+    const qty = Number(item.quantity) || 1;
+    const product = item.product;
+
+    // --- Determine the retail (original, pre-discount) unit price ---
+    const selectedSize = String(item?.selectedSize || '').trim();
+    const selectedVariant = selectedSize && Array.isArray(product?.variants)
+      ? product.variants.find((v) => String(v?.size || '').trim() === selectedSize)
+      : null;
+    const variantPrice = Number(selectedVariant?.price);
+    const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
+    const variantOriginal = Number(selectedVariant?.originalPrice);
+    const productOriginal = Number(product?.originalPrice);
+
+    const forceCanonicalPrice =
+      isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
+    const excludedFromUserDiscount = isUserDiscountExcludedProduct(product);
+    const beautyBox = isBeautyBoxProduct(product);
+
+    // Retail unit price: the price *before* any discounts
+    let retailUnitPrice;
+    if (forceCanonicalPrice) {
+      retailUnitPrice = getCanonicalUnitPrice(product);
+    } else if (hasVariantPrice) {
+      const orig = (Number.isFinite(variantOriginal) && variantOriginal > 0) ? variantOriginal
+        : (Number.isFinite(productOriginal) && productOriginal > 0) ? productOriginal
+        : variantPrice;
+      retailUnitPrice = Math.max(variantPrice, orig);
+    } else {
+      const displayPrice = Number(product?.displayPrice ?? product?.price ?? 0);
+      retailUnitPrice = (Number.isFinite(productOriginal) && productOriginal > 0)
+        ? productOriginal
+        : (Number.isFinite(displayPrice) ? displayPrice : 0);
+    }
+
+    _retailTotal += retailUnitPrice * qty;
+
+    // --- User (VIP) discount ---
+    if (!excludedFromUserDiscount && hasUserDiscountPct) {
+      const discountAmount = retailUnitPrice * (discountPct / 100);
+      _userDiscountTotal += discountAmount * qty;
+      _userDiscountPct = discountPct;
+    }
+
+    // --- Bundle discount (Beauty Boxes carry a 15% bundle discount) ---
+    if (beautyBox) {
+      const bbOriginal = (Number.isFinite(productOriginal) && productOriginal > 0)
+        ? productOriginal
+        : retailUnitPrice;
+      const bbDisplay = Number(product?.displayPrice ?? product?.price ?? 0);
+      if (Number.isFinite(bbOriginal) && Number.isFinite(bbDisplay) && bbOriginal > bbDisplay) {
+        _bundleDiscountTotal += (bbOriginal - bbDisplay) * qty;
+        const pct = Math.round(((bbOriginal - bbDisplay) / bbOriginal) * 100);
+        if (pct > 0) _bundleDiscountPct = pct;
+      }
+    }
+    // Also handle explicit fromBundle items (future-proofing)
+    if (item.fromBundle && item.bundleDiscountPercent && item.bundleDiscountPercent > 0) {
+      const afterVip = excludedFromUserDiscount
+        ? retailUnitPrice
+        : retailUnitPrice * (1 - discountPct / 100);
+      const bundleDiscount = (afterVip * item.bundleDiscountPercent) / 100;
+      _bundleDiscountTotal += bundleDiscount * qty;
+      if (item.bundleDiscountPercent > 0) _bundleDiscountPct = item.bundleDiscountPercent;
+    }
+  });
+
+  const retailTotal = Math.round(_retailTotal * 100) / 100;
+  const userDiscountTotal = Math.round(_userDiscountTotal * 100) / 100;
+  const bundleDiscountTotal = Math.round(_bundleDiscountTotal * 100) / 100;
+  const afterVipSubtotal = Math.round((_retailTotal - _userDiscountTotal) * 100) / 100;
+  const hasUserDiscount = userDiscountTotal > 0;
+  const hasBundleDiscount = bundleDiscountTotal > 0;
+  const hasAnyDiscount = hasUserDiscount || hasBundleDiscount;
+  const totalSaved = Math.round((userDiscountTotal + bundleDiscountTotal) * 100) / 100;
+
+  return {
+    retailTotal,
+    userDiscountTotal,
+    bundleDiscountTotal,
+    afterVipSubtotal,
+    userDiscountPct: _userDiscountPct,
+    bundleDiscountPct: _bundleDiscountPct,
+    hasUserDiscount,
+    hasBundleDiscount,
+    hasAnyDiscount,
+    totalSaved,
+  };
+}
+
 export default {
   calculateCartTotals,
   getShippingCost,
+  computeWaterfallBreakdown,
   UAE_EMIRATES
 };
 
