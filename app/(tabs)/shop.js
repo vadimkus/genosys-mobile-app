@@ -1064,8 +1064,8 @@ export default function ShopScreen() {
             </View>
           )}
 
-          {/* Build Your Set Banner */}
-          {selectedCategory === 'All' && !searchQuery && (
+          {/* Build Your Set Banner — only under Beauty Boxes category */}
+          {selectedCategory === 'Beauty Boxes' && !searchQuery && (
             <TouchableOpacity
               style={styles.buildSetBanner}
               activeOpacity={0.85}
