@@ -24,6 +24,7 @@ export const PRODUCT_CONFIG = {
   },
   '19': {
     images: ['/images/ASE.jpg', '/images/Second/allserum_big.jpg'],
+    videoUrl: '/videos/allserum.mp4',
   },
   '26': {
     images: ['/images/EGF.jpg', '/images/Second/egf_big.jpg'],
