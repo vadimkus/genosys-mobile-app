@@ -2,209 +2,257 @@
 
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
-**Version:** 1.0.0  
-**Build:** 32  
+**Version:** 1.1.0  
+**Build:** 34  
 **Platform:** iOS  
 
 ---
 
-## 📱 App Overview
+## App Overview
 
-Genosys UAE is an e-commerce mobile application for purchasing premium cosmetics and beauty products in the United Arab Emirates. The app provides a seamless shopping experience with multiple payment options, order tracking, and multilingual support (English, Arabic, Russian).
-
----
-
-## ✨ Key Features
-
-### 1. **Product Catalog**
-- Browse products with high-quality images
-- Product details with variants (size, color)
-- Real-time pricing and availability
-- Product badges and promotions
-- Search and category filtering
-
-### 2. **Shopping Cart & Checkout**
-- Add products to cart
-- Multiple delivery addresses
-- Free mask promotion (spend 500 AED = 1 free mask, 700 AED = 2 free masks)
-- Free delivery for orders over 1000 AED
-- Order summary with VAT breakdown
-
-### 3. **Payment Methods**
-- **Cash on Delivery (COD)** - Pay when delivered
-- **Card Payment** - Credit/debit card via Stripe
-- **Apple Pay** - One-tap payment (requires Apple Pay setup on device)
-
-### 4. **User Account**
-- User registration and login
-- Profile management (name, phone, email, birthday)
-- Multiple delivery addresses
-- Order history with tracking
-- Wishlist/favorites
-- Language selection (English, Arabic, Russian)
-
-### 5. **Order Management**
-- View order history
-- Order details with item breakdown
-- Order status tracking
-- Payment status (pending, paid, completed)
-
-### 6. **Multilingual Support**
-- English (default)
-- Arabic (RTL support)
-- Russian
+Genosys UAE is an e-commerce mobile application for purchasing professional Korean dermacosmetics and beauty products in the United Arab Emirates. The app provides a comprehensive shopping experience with AI-powered skin analysis, an intelligent chatbot, product video demonstrations, downloadable product guides, multiple payment options, order tracking, and multilingual support (English, Arabic, Russian).
 
 ---
 
-## 🧪 Testing Instructions
+## What's New in Version 1.1.0
 
-### Quick Test Flow (5 minutes)
+### AI Features
+- **AI Skin Analysis** - Personalized skin type quiz with product recommendations
+- **AI Camera Analysis** - Real-time camera-based skin analysis using device camera
+- **AI Chatbot** - Intelligent assistant for product questions and skincare advice
 
-1. **Browse Products**
-   - Open app → Shop tab
-   - Scroll through product catalog
-   - Tap any product to view details
-   - Select variant (size/color) if available
+### Product Experience
+- **Image Gallery** - Swipeable multi-image carousel on product pages with pagination dots
+- **Product Videos** - Embedded video demonstrations (available for select products)
+- **Product Documentation** - Downloadable PDF guides for professional application
 
-2. **Add to Cart**
-   - Tap "Add to Bag" on product detail page
-   - Go to Bag tab
-   - Verify items appear in cart
-   - Check totals and promotions
+### Navigation & UI
+- **Hamburger Menu** - Full navigation drawer with access to all app sections
+- **Skeleton Loading** - Shimmer placeholders instead of spinners for better perceived performance
+- **Haptic Feedback** - Tactile feedback on add-to-cart, favorites, and checkout actions
 
-3. **Checkout Process**
-   - Tap "Proceed to Checkout"
-   - Select delivery address (or add new)
-   - Choose payment method:
-     - **COD**: No payment required, order will be created
-     - **Card**: Test card `4242 4242 4242 4242` (any future date, any CVC)
-     - **Apple Pay**: Requires Apple Pay setup on device
-   - Complete order
+### Performance
+- **expo-image Migration** - Faster image loading with built-in caching and blurhash placeholders
+- **Offline Product Browsing** - Cached product catalog for browsing without internet
+- **Deep Linking** - Direct links open content in-app from emails and shared links
 
-4. **View Orders**
-   - Go to Profile tab → Orders
-   - View order history
-   - Tap order to see details
-
-5. **User Account**
-   - Profile tab → Edit Profile
-   - Update name, phone, birthday
-   - Add delivery address
-   - Change language
-
-### Test Account Credentials
-
-**Note:** The app uses real user registration. Reviewers can:
-- Create a new account (recommended)
-- Use existing account if provided separately
-
-**To Create Test Account:**
-1. Tap "Sign In" → "Create Account"
-2. Enter email, password, name, phone
-3. Complete registration
-4. Account is immediately active
-
-**Test Payment Cards:**
-- **Success:** `4242 4242 4242 4242` (any future expiry, any CVC)
-- **Decline:** `4000 0000 0000 0002`
+### Order Improvements
+- **Discount Tracking** - VIP and bundle discount fields included in order records
+- **Localized Emails** - Order confirmation emails sent in user's selected language
 
 ---
 
-## 🔐 Permissions Usage
+## Test Account Credentials
+
+| Field | Value |
+|-------|-------|
+| **Email** | appreview@genosys.ae |
+| **Password** | GenosysReview2026! |
+
+This account is pre-created and ready to use. No email verification required.
+
+---
+
+## Testing Instructions
+
+### Quick Test Flow (5-7 minutes)
+
+#### 1. Login
+- Open app > Tap "Sign In"
+- Enter email: `appreview@genosys.ae`
+- Enter password: `GenosysReview2026!`
+- Tap "Sign In"
+
+#### 2. Browse Products
+- Shop tab > Scroll through product catalog
+- Products display with images, prices, discount badges
+- Use search bar or category filters to find products
+
+#### 3. Product Detail Page
+- Tap any product to view details
+- **Swipe images** left/right to see gallery (products with multiple images show pagination dots)
+- **Watch video** on products like SNOW O2 Cleanser or EGF Repair Oxymask (scroll down)
+- **Download PDF guide** if available (scroll to Documentation section)
+- Select size variant if applicable
+- Tap "Add to Bag"
+
+#### 4. AI Skin Analysis
+- Open hamburger menu (top-left) > Tap "AI Skin Analysis"
+- **Quiz Mode:** Answer 4 skin type questions > View personalized product recommendations
+- **Camera Mode:** Tap "Live AR" > Allow camera access > Take a selfie for AI analysis
+
+#### 5. AI Chatbot
+- Open hamburger menu > Tap "AI Chatbot"
+- Ask questions like "What's good for dry skin?" or "Tell me about EGF Repair Oxymask"
+- Chatbot provides product recommendations with links
+
+#### 6. Checkout Process
+- Go to Bag tab > Review items
+- Tap "Proceed to Checkout"
+- Fill in delivery details:
+  - Name: App Review
+  - Phone: +971 50 123 4567
+  - Address: Test Address, Dubai
+  - Emirate: Dubai
+- Select payment method:
+  - **Cash on Delivery (COD):** Tap "Place Order" - no payment needed
+  - **Card Payment:** Uses Stripe test card `4242 4242 4242 4242` (any future date, any CVC)
+- Order confirmation displayed on success page
+
+#### 7. Order History
+- Profile tab > Orders
+- View past orders with status
+- Tap order for full details with item breakdown
+
+#### 8. Language Switching
+- Profile tab > Language
+- Switch between English, Arabic (RTL), Russian
+- App UI updates immediately
+
+---
+
+## Permissions Usage
 
 ### Face ID / Touch ID
 - **Purpose:** Secure authentication to access user account
 - **Usage:** Optional biometric login after initial password login
-- **Privacy:** Stored locally on device, never transmitted
+- **Privacy:** Biometric data stored locally on device, never transmitted
 
 ### Camera
-- **Purpose:** Take profile photo
-- **Usage:** Optional feature in Profile → Edit Profile
-- **Privacy:** Photo stored only if user chooses to upload
+- **Purpose:** AI Skin Analysis camera mode and profile photo
+- **Usage:** Used when user initiates camera-based skin analysis or profile photo
+- **Privacy:** Photos processed on-device, only uploaded with explicit consent
 
 ### Photo Library
-- **Purpose:** Select existing photo for profile picture
-- **Usage:** Optional feature in Profile → Edit Profile
-- **Privacy:** Only accessed when user explicitly chooses photo
+- **Purpose:** Select existing photo for profile picture or skin analysis
+- **Usage:** Only accessed when user explicitly chooses to select a photo
+- **Privacy:** Only the selected photo is accessed
 
 ---
 
-## 💳 Payment Testing
+## Payment Information
 
-### Apple Pay
-- **Setup Required:** Device must have Apple Pay configured
-- **Merchant ID:** merchant.ae.genosys.app
-- **Testing:** Use test Apple Pay card in Wallet app
-- **Note:** Apple Pay requires valid payment method in device Wallet
+### Cash on Delivery (COD)
+- No payment collected in-app
+- Payment collected upon physical delivery in the UAE
+- This is a standard payment method in the UAE market
 
 ### Stripe Card Payments
-- **Test Mode:** Uses Stripe test environment
-- **Test Cards:** Standard Stripe test cards work
-- **No Real Charges:** All test transactions are simulated
+- Uses Stripe test environment for review
+- Test card: `4242 4242 4242 4242` (any future expiry, any CVC)
+- No real charges are made during testing
 
-### Cash on Delivery
-- **No Payment Required:** Order is created without payment
-- **Payment Collected:** On actual delivery (not during review)
-
----
-
-## 🌍 Localization Testing
-
-### Language Switching
-1. Profile → Language
-2. Select language (English/Arabic/Russian)
-3. App UI updates immediately
-4. Arabic uses RTL (right-to-left) layout
-
-### RTL Support
-- Arabic interface fully supports RTL
-- Text alignment, navigation, and layouts adapt automatically
-- Test in Profile → Help & Support for full RTL experience
+### Apple Pay - NOT Available
+- Apple Pay has been intentionally removed from this app
+- All payments are processed via COD or Stripe card payments
+- No in-app purchase mechanism is used
 
 ---
 
-## 📍 Important Notes for Reviewers
+## Important Notes for Reviewers
 
-### 1. **Internet Connection Required**
-- App requires active internet connection
-- All data fetched from live API: `https://genosys.ae/api/mobile/`
+### 1. Internet Connection Required
+- App requires an active internet connection
+- All data is fetched from the live API: `https://genosys.ae/api/mobile/`
+- Offline mode allows browsing previously cached products
 
-### 2. **Real Product Data**
-- Products, prices, and availability are real
-- Orders created during testing are test orders (can be cancelled)
-
-### 3. **Delivery Address**
-- App requires UAE delivery address
-- Select emirate (Dubai, Abu Dhabi, etc.)
-- Address validation ensures UAE-only delivery
-
-### 4. **Promotions**
-- Free mask promotion: Spend 500 AED = 1 free mask, 700 AED = 2 free masks
-- Free delivery: Orders over 1000 AED
-- Promotions automatically applied at checkout
-
-### 5. **Order Processing**
-- Orders are created immediately upon checkout
-- Payment processing happens via Stripe (test mode)
-- Order status updates in real-time
-
-### 6. **No In-App Purchases**
-- All purchases are physical products
-- No subscriptions or digital goods
+### 2. Physical Products Only
+- All purchases are physical cosmetic products shipped within the UAE
+- No digital goods, subscriptions, or in-app purchases
 - Standard e-commerce transaction flow
 
+### 3. UAE Delivery Only
+- App requires a UAE delivery address
+- Shipping available to all 7 emirates (Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, Umm Al Quwain)
+- Free delivery for orders over 1,000 AED
+
+### 4. Promotions
+- Free mask promotion: Spend 500 AED = 1 free mask, 700 AED = 2 free masks
+- VIP discounts applied automatically for eligible accounts
+- Bundle discounts (15% off) when purchasing 3+ eligible products
+
+### 5. Real Product Data
+- Products, prices, and availability are real
+- Orders created during testing can be identified and cancelled by our team
+
+### 6. AI Features
+- AI Skin Analysis uses a quiz-based recommendation engine
+- Camera analysis processes images for skin type detection
+- AI Chatbot is powered by a language model trained on our product catalog
+
 ---
 
-## 🐛 Known Limitations (Not Bugs)
+## Localization Testing
 
-1. **Apple Pay:** Requires device with Apple Pay configured
-2. **Delivery:** Only available in UAE
-3. **Test Mode:** Payment processing uses Stripe test environment
-4. **Language:** Some third-party content may remain in English
+### Supported Languages
+| Language | Direction | Coverage |
+|----------|-----------|----------|
+| English | LTR | Full |
+| Arabic | RTL | Full (including layout mirroring) |
+| Russian | LTR | Full |
+
+### How to Test
+1. Profile tab > Language
+2. Select language
+3. Entire app UI updates immediately
+4. Arabic mode mirrors all layouts to right-to-left
 
 ---
 
-## 📞 Support Information
+## Compliance Notes
+
+- **Privacy Policy:** Available in-app (Profile > Privacy Policy) and at https://genosys.ae/privacy
+- **Terms & Conditions:** Available in-app (Profile > Terms & Conditions)
+- **Data Encryption:** All API communications use HTTPS/TLS
+- **User Data:** Stored securely on AWS servers in UAE (me-central-1 region)
+- **GDPR Compliant:** Users can request data deletion via support
+- **No Prohibited Content:** Professional cosmetics and beauty products only
+- **No In-App Purchases:** All transactions are for physical goods
+
+---
+
+## Technical Details
+
+| Detail | Value |
+|--------|-------|
+| Framework | React Native (Expo SDK 54) |
+| Min iOS Version | 16.0 |
+| Bundle ID | ae.genosys.app |
+| Backend API | https://genosys.ae/api/mobile/ |
+| Authentication | JWT tokens with optional biometric |
+| Image CDN | https://genosys.ae/images/ |
+
+---
+
+## Review Checklist
+
+- [x] App launches without crashes
+- [x] Login with test account works
+- [x] Products display correctly with images
+- [x] Image gallery swipe works
+- [x] Product videos play
+- [x] Product documentation downloads
+- [x] AI Skin Analysis quiz completes
+- [x] AI Camera analysis functions
+- [x] AI Chatbot responds to questions
+- [x] Cart functionality works
+- [x] Checkout process completes (COD)
+- [x] Checkout process completes (Card)
+- [x] User profile management works
+- [x] Order history displays
+- [x] Multilingual support works (EN/AR/RU)
+- [x] RTL layout works (Arabic)
+- [x] Hamburger menu navigation works
+- [x] Permissions properly requested
+- [x] Privacy policy accessible
+- [x] Terms accessible
+- [x] No broken links or errors
+- [x] Haptic feedback on actions
+- [x] Skeleton loading on screens
+
+---
+
+## Support Information
 
 - **Website:** https://genosys.ae
 - **Support Email:** sales@genosys.ae
@@ -213,37 +261,6 @@ Genosys UAE is an e-commerce mobile application for purchasing premium cosmetics
 
 ---
 
-## ✅ Compliance Notes
-
-- **Privacy Policy:** Available in-app (Profile → Privacy Policy)
-- **Terms & Conditions:** Available in-app (Profile → Terms & Conditions)
-- **Data Encryption:** All API communications use HTTPS
-- **User Data:** Stored securely, GDPR-compliant
-- **Apple Pay:** Properly configured with merchant ID
-- **No Prohibited Content:** Cosmetics and beauty products only
-
----
-
-## 🎯 Review Checklist
-
-- [x] App launches without crashes
-- [x] Products display correctly
-- [x] Cart functionality works
-- [x] Checkout process completes
-- [x] Payment methods function (test mode)
-- [x] User registration works
-- [x] Profile management works
-- [x] Order history displays
-- [x] Multilingual support works
-- [x] RTL layout works (Arabic)
-- [x] Permissions properly requested
-- [x] Privacy policy accessible
-- [x] Terms accessible
-- [x] No broken links or errors
-
----
-
 **Thank you for reviewing Genosys UAE!**
 
 For any questions or issues during review, please contact: sales@genosys.ae
-
