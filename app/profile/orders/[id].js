@@ -7,6 +7,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
 import { fetchUserOrderById, fetchUserOrders, fetchProductById } from '../../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
+import { Image } from 'expo-image';
 import { useLocalization } from '../../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../../utils/emirateUtils';
 
@@ -452,18 +453,35 @@ export default function OrderDetailScreen() {
               const originalLineTotal = canShowDiscountBreakdown ? (inferredOriginalUnit * qty) : null;
               const discountLineTotal = canShowDiscountBreakdown ? (discountUnit * qty) : null;
               
+              const imageUrl = it?.image || it?.imageUrl || it?.thumbnail || '';
+
               return (
                 <View key={`paid-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemCard}>
-                  <View style={styles.itemHeader}>
-                    <View style={styles.itemTitleWrap}>
-                      <Text style={[styles.itemName, isRTL && styles.textRTL]} numberOfLines={2}>{String(name)}</Text>
-                      {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
-                        <View style={styles.discountPill}>
-                          <Text style={styles.discountPillText}>{`${Math.round(discountPct)}%`}</Text>
-                        </View>
-                      ) : null}
+                  <View style={styles.itemHeaderWithImage}>
+                    {imageUrl ? (
+                      <Image
+                        source={{ uri: imageUrl }}
+                        style={styles.itemThumbnail}
+                        contentFit="cover"
+                        transition={200}
+                        recyclingKey={`paid-img-${it?.productId || idx}`}
+                      />
+                    ) : (
+                      <View style={[styles.itemThumbnail, styles.itemThumbnailPlaceholder]}>
+                        <Ionicons name="cube-outline" size={20} color="#C7C7CC" />
+                      </View>
+                    )}
+                    <View style={styles.itemHeaderContent}>
+                      <View style={styles.itemTitleWrap}>
+                        <Text style={[styles.itemName, isRTL && styles.textRTL]} numberOfLines={2}>{String(name)}</Text>
+                        {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
+                          <View style={styles.discountPill}>
+                            <Text style={styles.discountPillText}>{`${Math.round(discountPct)}%`}</Text>
+                          </View>
+                        ) : null}
+                      </View>
+                      <Text style={[styles.itemPrice, isRTL && styles.valueLTR]}>AED {formatAED(itemTotal)}</Text>
                     </View>
-                    <Text style={[styles.itemPrice, isRTL && styles.valueLTR]}>AED {formatAED(itemTotal)}</Text>
                   </View>
 
                   <View style={styles.itemDetails}>
@@ -544,16 +562,34 @@ export default function OrderDetailScreen() {
                 {promoItems.map((it, idx) => {
                   const qty = Number(it?.quantity) || 1;
                   const name = it?.name || it?.productName || t('common.freeItemWithNumber', { number: idx + 1 });
+                  const promoImageUrl = it?.image || it?.imageUrl || it?.thumbnail || '';
                   
                   return (
                     <View key={`promo-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.promoItemCard}>
-                      <View style={styles.itemHeader}>
-                        <Text style={[styles.promoItemName, isRTL && styles.textRTL]}>{String(name)}</Text>
-                        <View style={styles.freeBadge}>
-                          <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
+                      <View style={styles.promoItemRow}>
+                        {promoImageUrl ? (
+                          <Image
+                            source={{ uri: promoImageUrl }}
+                            style={styles.promoThumbnail}
+                            contentFit="cover"
+                            transition={200}
+                            recyclingKey={`promo-img-${it?.productId || idx}`}
+                          />
+                        ) : (
+                          <View style={[styles.promoThumbnail, styles.promoThumbnailPlaceholder]}>
+                            <Ionicons name="gift-outline" size={16} color="#16A34A" />
+                          </View>
+                        )}
+                        <View style={styles.promoItemContent}>
+                          <View style={styles.itemHeader}>
+                            <Text style={[styles.promoItemName, isRTL && styles.textRTL]}>{String(name)}</Text>
+                            <View style={styles.freeBadge}>
+                              <Text style={styles.freeBadgeText}>{t('common.free')}</Text>
+                            </View>
+                          </View>
+                          <Text style={[styles.promoItemQty, isRTL && styles.textRTL]}>{t('ordersDetail.qty')}: {qty}</Text>
                         </View>
                       </View>
-                      <Text style={[styles.promoItemQty, isRTL && styles.textRTL]}>{t('ordersDetail.qty')}: {qty}</Text>
                     </View>
                   );
                 })}
@@ -1000,6 +1036,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5EA',
   },
+  itemHeaderWithImage: {
+    flexDirection: FLEX_ROW,
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 8,
+  },
+  itemThumbnail: {
+    width: 56,
+    height: 56,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  itemThumbnailPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F2F2F7',
+  },
+  itemHeaderContent: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'column',
+    gap: 4,
+  },
   itemHeader: {
     flexDirection: FLEX_ROW,
     justifyContent: 'space-between',
@@ -1131,6 +1192,28 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#DCFCE7',
+  },
+  promoItemRow: {
+    flexDirection: FLEX_ROW,
+    alignItems: 'center',
+    gap: 10,
+  },
+  promoThumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+  },
+  promoThumbnailPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F0FDF4',
+  },
+  promoItemContent: {
+    flex: 1,
+    minWidth: 0,
   },
   promoItemName: {
     flex: 1,
