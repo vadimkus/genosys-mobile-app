@@ -54,6 +54,7 @@ export const PRODUCT_CONFIG = {
   },
   '21': {
     images: ['/images/RADS.jpg', '/images/Second/rd_big.jpg'],
+    videoUrl: '/videos/rserum.mp4',
   },
   '39': {
     images: ['/images/SPF50.jpg', '/images/Second/50big.jpg'],
