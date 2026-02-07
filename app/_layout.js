@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Constants from 'expo-constants';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -9,9 +9,16 @@ import { OrdersProvider } from '../contexts/OrdersContext';
 import { AnimationProvider } from '../contexts/AnimationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
+import { setupDeepLinkListener } from '../utils/deepLinking';
 
 export default function RootLayout() {
   const [showLaunch, setShowLaunch] = useState(true);
+
+  // Initialize deep link listener
+  useEffect(() => {
+    const cleanup = setupDeepLinkListener();
+    return cleanup;
+  }, []);
 
   // Expo Go always shows its own native loading screen first (app name text).
   // We only show an in-app branded launch screen in Expo Go to make it look nicer.

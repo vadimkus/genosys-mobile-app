@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { Image } from 'expo-image';
 
 export default function BrandedLaunchScreen({ onDone, minimumMs = 650 }) {
   // IMPORTANT: This screen is rendered before `LocalizationProvider` (Expo Go only),
@@ -37,7 +38,7 @@ export default function BrandedLaunchScreen({ onDone, minimumMs = 650 }) {
         <Image
           source={require('../assets/splash-logo.png')}
           style={styles.logo}
-          resizeMode="contain"
+          contentFit="contain"
         />
         <Text style={styles.companyText}>{COMPANY_NAME}</Text>
       </View>

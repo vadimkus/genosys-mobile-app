@@ -601,6 +601,20 @@ export default function ProfileScreen() {
               onPress={handleContactSupport}
             />
             <ProfileItem
+              icon="download-outline"
+              title={t('profile.trainingMaterials') || 'Training Materials'}
+              onPress={() => {
+                const prefix = locale === 'ar' ? '/ar' : locale === 'ru' ? '/ru' : '';
+                router.push({
+                  pathname: '/webview',
+                  params: {
+                    url: `https://genosys.ae${prefix}/training`,
+                    title: t('profile.trainingMaterials') || 'Training Materials',
+                  },
+                });
+              }}
+            />
+            <ProfileItem
               icon="information-circle-outline"
               title={t('profile.aboutGenosys')}
               onPress={handleAbout}

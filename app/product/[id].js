@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   Animated,
   TouchableOpacity,
-  Image,
   StyleSheet,
   Dimensions,
   ActivityIndicator,
   Alert,
   Share,
+  FlatList,
+  Linking,
 } from 'react-native';
+import { Video, ResizeMode } from 'expo-av';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,8 +28,13 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedProductSize } from '../../utils/productLocalization';
 import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
 import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
+import ProductReviews from '../../components/product/ProductReviews';
+import TrustBadges from '../../components/product/TrustBadges';
+import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
+import * as haptics from '../../utils/haptics';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
+import { getProductImages, getProductVideoUrl, getProductDocs } from '../../data/productConfig';
 import {
   formatPrice,
   asText,
@@ -98,8 +106,10 @@ export default function ProductDetailScreen() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addItem, isInCart, getItemQuantity } = useCart();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const galleryRef = useRef(null);
 
   useEffect(() => {
     loadProduct();
@@ -173,6 +183,7 @@ export default function ProductDetailScreen() {
       };
 
       addItem(productForCart, 1, selectedColor, selectedSize);
+      haptics.success();
       
       const safeName = getLocalizedProductName(product, locale) || product.name;
       let message = t('product.addedToBagMessage', { name: safeName });
@@ -225,6 +236,7 @@ export default function ProductDetailScreen() {
 
   const handleWishlistToggle = async () => {
     if (!product?.id) return;
+    haptics.lightTap();
     try {
       const displayName = asText(getLocalizedProductName(product, locale) || product.name);
       const unitPrice = getSelectedUnitPrice();
@@ -546,8 +558,7 @@ export default function ProductDetailScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#dc2626" />
-        <Text style={[styles.loadingText, isRTL && styles.textRTL]}>{t('productScreen.loadingDetails')}</Text>
+        <ProductDetailSkeleton />
       </SafeAreaView>
     );
   }
@@ -620,22 +631,76 @@ export default function ProductDetailScreen() {
           { useNativeDriver: true }
         )}
       >
-        {/* Hero Image */}
-        <View style={styles.imageContainer}>
-          {product.image ? (
-            <Image
-              source={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` }}
-              style={styles.heroImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.heroImagePlaceholder}>
-              <Text style={styles.heroPlaceholderText}>
-                {product.name?.charAt(0) || 'G'}
-              </Text>
+        {/* Image Gallery */}
+        {(() => {
+          const productId = String(product.productNumber || product.id || id);
+          const galleryImages = getProductImages(productId, product);
+          const hasMultipleImages = galleryImages.length > 1;
+          
+          if (galleryImages.length === 0) {
+            return (
+              <View style={styles.imageContainer}>
+                <View style={styles.heroImagePlaceholder}>
+                  <Text style={styles.heroPlaceholderText}>
+                    {product.name?.charAt(0) || 'G'}
+                  </Text>
+                </View>
+              </View>
+            );
+          }
+          
+          if (!hasMultipleImages) {
+            return (
+              <View style={styles.imageContainer}>
+                <Image
+                  source={galleryImages[0]}
+                  style={styles.heroImage}
+                  contentFit="cover"
+                  transition={300}
+                  cachePolicy="memory-disk"
+                />
+              </View>
+            );
+          }
+          
+          return (
+            <View style={styles.imageContainer}>
+              <FlatList
+                ref={galleryRef}
+                data={galleryImages}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => `gallery-${index}`}
+                onMomentumScrollEnd={(e) => {
+                  const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+                  setActiveImageIndex(newIndex);
+                }}
+                renderItem={({ item }) => (
+                  <Image
+                    source={item}
+                    style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT }}
+                    contentFit="cover"
+                    transition={300}
+                    cachePolicy="memory-disk"
+                  />
+                )}
+              />
+              {/* Pagination Dots */}
+              <View style={styles.paginationDots}>
+                {galleryImages.map((_, index) => (
+                  <View
+                    key={`dot-${index}`}
+                    style={[
+                      styles.dot,
+                      activeImageIndex === index && styles.activeDot,
+                    ]}
+                  />
+                ))}
+              </View>
             </View>
-          )}
-        </View>
+          );
+        })()}
 
         {/* Product Info */}
         <View style={styles.contentContainer}>
@@ -752,6 +817,58 @@ export default function ProductDetailScreen() {
               />
             )}
 
+          {/* Trust Badges */}
+          <TrustBadges />
+
+          {/* Product Video */}
+          {(() => {
+            const productId = String(product.productNumber || product.id || id);
+            const videoUrl = getProductVideoUrl(productId);
+            if (!videoUrl) return null;
+            return (
+              <View style={styles.videoSection}>
+                <View style={styles.videoContainer}>
+                  <Video
+                    source={{ uri: videoUrl }}
+                    style={styles.videoPlayer}
+                    useNativeControls
+                    resizeMode={ResizeMode.CONTAIN}
+                    isLooping={false}
+                    posterSource={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/Logo/BlackG.png` }}
+                    usePoster
+                  />
+                </View>
+              </View>
+            );
+          })()}
+
+          {/* Product Documentation */}
+          {(() => {
+            const productId = String(product.productNumber || product.id || id);
+            const docs = getProductDocs(productId);
+            if (!docs.length) return null;
+            return (
+              <View style={styles.docsSection}>
+                <Text style={[styles.docsSectionTitle, isRTL && styles.textRTL]}>
+                  {t('product.documentation') || 'Documentation'}
+                </Text>
+                {docs.map((doc, index) => (
+                  <TouchableOpacity
+                    key={`doc-${index}`}
+                    style={[styles.docLink, isRTL && { flexDirection: 'row-reverse' }]}
+                    onPress={() => Linking.openURL(doc.url)}
+                  >
+                    <Ionicons name="document-text-outline" size={20} color="#007AFF" />
+                    <Text style={[styles.docLinkText, isRTL && { textAlign: 'right' }]} numberOfLines={2}>
+                      {doc.title}
+                    </Text>
+                    <Ionicons name="open-outline" size={16} color="#8E8E93" />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            );
+          })()}
+
           {/* Product content sections from API */}
           {isBeautyBoxProduct(product) ? (
             <BeautyBoxDetails product={product} styles={styles} />
@@ -817,7 +934,8 @@ export default function ProductDetailScreen() {
             </>
           )}
 
-          {/* Rating Section removed (not needed for now) */}
+          {/* Customer Reviews */}
+          <ProductReviews productId={product.id} />
         </View>
       </Animated.ScrollView>
 
@@ -1518,5 +1636,70 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     minWidth: 0,
     textAlign: 'right',
+  },
+  // Image Gallery - Pagination Dots
+  paginationDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 12,
+    left: 0,
+    right: 0,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#1D1D1F',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  // Video Section
+  videoSection: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  videoContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+  },
+  videoPlayer: {
+    width: '100%',
+    height: 200,
+  },
+  // Documentation Section
+  docsSection: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  docsSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1D1D1F',
+    marginBottom: 10,
+  },
+  docLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F7',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    gap: 10,
+  },
+  docLinkText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
   },
 });

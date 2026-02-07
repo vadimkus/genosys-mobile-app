@@ -21,6 +21,10 @@
       "buildNumber": "32",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+      "associatedDomains": [
+        "applinks:genosys.ae",
+        "applinks:www.genosys.ae"
+      ],
       "entitlements": {
         "com.apple.developer.in-app-payments": [
           "merchant.ae.genosys.app"
@@ -54,6 +58,48 @@
         "foregroundImage": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
         "backgroundColor": "#ffffff"
       },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/products"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/cart"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/orders"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/profile"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/favorites"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/skin-recommendation"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "splash": {
         "image": "./assets/splash.png",
         "resizeMode": "contain",

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
@@ -291,7 +292,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
           <TouchableOpacity onPress={handleOpenRecommended} activeOpacity={0.9}>
           <View style={styles.pcImageWrap}>
             {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.pcImage} resizeMode="cover" />
+              <Image source={imageUri} style={styles.pcImage} contentFit="cover" transition={200} cachePolicy="memory-disk" />
             ) : (
               <View style={styles.pcImageFallback} />
             )}

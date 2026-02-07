@@ -29,6 +29,14 @@ This folder contains all documentation for the Genosys Mobile App.
 - [Bag Icon Color Change](./BAG_ICON_COLOR_CHANGE.md) - Cart icon styling
 - [Orders Icon Color Change](./ORDERS_ICON_COLOR_CHANGE.md) - Orders icon styling
 - [Orders Count Debug](./ORDERS_COUNT_DEBUG.md) - Orders badge debugging
+- [Skeleton Loading Screens](./SKELETON_LOADING_SCREENS.md) - Shimmer placeholders for loading states
+- [Haptic Feedback](./HAPTIC_FEEDBACK.md) - Tactile feedback on key actions
+
+## Performance & UX Enhancements
+
+- [expo-image Migration](./EXPO_IMAGE_MIGRATION.md) - Image caching and performance upgrade
+- [Offline Product Cache](./OFFLINE_PRODUCT_CACHE.md) - Browse products without internet
+- [Deep Linking](./DEEP_LINKING.md) - Universal links and custom URL scheme configuration
 
 ## RTL & Localization
 
@@ -77,8 +85,14 @@ This folder contains all documentation for the Genosys Mobile App.
 
 ```
 docs/
-├── README.md                      # This file
-├── *.md                           # Core documentation
+├── README.md                      # This file (documentation index)
+├── IMPLEMENTATION_SUMMARY.md      # Database integration summary
+├── DEEP_LINKING.md                # Universal links & custom URL scheme
+├── OFFLINE_PRODUCT_CACHE.md       # Offline product browsing
+├── SKELETON_LOADING_SCREENS.md    # Shimmer loading placeholders
+├── EXPO_IMAGE_MIGRATION.md        # expo-image performance upgrade
+├── HAPTIC_FEEDBACK.md             # Tactile feedback system
+├── *.md                           # Other documentation
 ├── app-store/                     # App Store submission docs
 │   ├── APP_STORE_ASSETS.md
 │   ├── APPLE_REVIEW_DOCUMENTATION.md

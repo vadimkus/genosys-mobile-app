@@ -24,6 +24,7 @@ import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } fro
 import { useLocalization } from '../contexts/LocalizationContext';
 import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
 import CollapsibleFooter from '../components/CollapsibleFooter';
+import * as haptics from '../utils/haptics';
 import EmirateFlagIcon from '../components/checkout/EmirateFlagIcon';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
 import { createLogger } from '../utils/logger';
@@ -345,10 +346,12 @@ export default function CheckoutScreen() {
       !address.trim();
 
     if (hasErrors) {
+      haptics.warning();
       await focusFirstInvalidField();
       return;
     }
 
+    haptics.mediumTap();
     setIsProcessing(true);
 
     try {
@@ -362,6 +365,7 @@ export default function CheckoutScreen() {
           : cleanedAddress;
 
       // Prepare order data
+      const userDiscountPct = Number(user?.discountPercentage) || 0;
       const orderData = {
         orderNumber,
         customerName: `${firstName.trim()} ${lastName.trim()}`,
@@ -380,6 +384,11 @@ export default function CheckoutScreen() {
         orderNotes: orderNotes.trim(),
         locale: locale || 'en',
         userToken: user?.token || user?.accessToken || null,
+        // Discount fields for accurate order records and email templates
+        discountPercentage: userDiscountPct,
+        discountAmount: 0, // Server recalculates from discountPercentage
+        bundleDiscountPercentage: 0,
+        bundleDiscountAmount: 0,
       };
 
       log.info('Submitting order:', {
@@ -403,6 +412,7 @@ export default function CheckoutScreen() {
 
         // COD: submit immediately (no payment step)
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
+          haptics.success();
           clearCart();
           Alert.alert(
             t('checkout.orderSubmittedTitle'),
@@ -921,7 +931,7 @@ export default function CheckoutScreen() {
               <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeVat.toFixed(2)}</Text>
             </View>
 
-            {totals.subtotal >= 1000 && (
+            {totals.hasFreeShipping && (
               <View style={[styles.freeShippingBanner, isRTL && styles.rowRTL]}>
                 <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
                 <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>{t('checkout.freeShippingApplied')}</Text>

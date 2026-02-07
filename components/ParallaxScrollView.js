@@ -1,5 +1,6 @@
 import React from 'react';
-import { ScrollView, View, Image, StyleSheet, Dimensions } from 'react-native';
+import { ScrollView, View, StyleSheet, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
@@ -31,7 +32,7 @@ export default function ParallaxScrollView({
         <Image
           source={imageSource}
           style={styles.headerImage}
-          resizeMode="cover"
+          contentFit="cover"
         />
       </View>
     </View>

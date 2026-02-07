@@ -1,0 +1,119 @@
+/**
+ * Product Configuration for Native App
+ * 
+ * Mirrors cosmetics-website/data/productConfig.ts for:
+ * - Additional images (gallery)
+ * - Video URLs
+ * - Documentation/PDF links
+ * 
+ * Images and videos are served from genosys.ae
+ */
+
+const ASSET_ORIGIN = 'https://genosys.ae';
+
+export const PRODUCT_CONFIG = {
+  '9': {
+    images: ['/images/AWS.jpg', '/images/Second/aws1.jpg', '/images/Second/aws2.jpg'],
+  },
+  '10': {
+    images: ['/images/SNOW.jpg', '/images/Second/cleanser_big.jpg'],
+    videoUrl: '/videos/Cleanser_02.mp4',
+  },
+  '13': {
+    images: ['/images/SRS.jpg', '/images/Second/sss1.jpg', '/images/Second/sss2.jpg'],
+  },
+  '19': {
+    images: ['/images/ASE.jpg', '/images/Second/allserum_big.jpg'],
+  },
+  '26': {
+    images: ['/images/EGF.jpg', '/images/Second/egf_big.jpg'],
+    videoUrl: '/videos/egf.mp4',
+  },
+  '38': {
+    images: ['/images/EZE.jpg', '/images/Second/ez.jpg', '/images/Second/ez1.jpg'],
+  },
+  '51': {
+    images: ['/images/BFAD.png', '/images/Second/ferment_big.jpg'],
+  },
+  '52': {
+    images: ['/images/PDRN.png', '/images/Second/pdrnnn.jpg'],
+  },
+};
+
+// Documentation links per product
+export const PRODUCT_DOCS = {
+  '1': [{ title: 'Overview of Microneedling', url: `${ASSET_ORIGIN}/documents/ppt/Overview%20of%20Microneedling_S.pdf` }],
+  '12': [{ title: 'EPI TURNOVER BOOSTING PEELING GEL Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20EPI%20TURNOVER%20BOOSTING%20PEELING%20GEL.pdf` }],
+  '14': [{ title: 'MICROBIOME ENERGY INFUSING MIST Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MICROBIOME%20ENERGY%20INFUSING%20MIST.pdf` }],
+  '18': [{ title: 'MOISTURE REPLENISHING HYALURON SERUM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MOISTURE%20REPLENISHING%20HYALURON%20SERUM.pdf` }],
+  '21': [{ title: 'MULTI VITA RADIANCE SERUM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MULTI%20VITA%20RADIANCE%20SERUM.pdf` }],
+  '29': [{ title: 'MOISTURE REPLENISHING HYALURON CREAM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MOISTURE%20REPLENISHING%20HYALURON%20CREAM.pdf` }],
+  '31': [{ title: 'MULTI VITA RADIANCE CREAM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MULTI%20VITA%20RADIANCE%20CREAM.pdf` }],
+  '33': [{ title: 'EyeCell EYE PEPTIDE GEL PATCH Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20EyeCell%20EYE%20PEPTIDE%20GEL%20PATCH.pdf` }],
+  '38': [{ title: 'EZ CO₂ MASK KIT Guide', url: `${ASSET_ORIGIN}/documents/ppt/Genosys%20Ez%20Co2%20Mask.pdf` }],
+  '39': [{ title: 'ULTRA SHIELD SUN CREAM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20ULTRA%20SHIELD%20SUN%20CREAM.pdf` }],
+  '41': [{ title: 'SKIN CARING BLEMISH BALM CUSHION Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20SKIN%20CARING%20BLEMISH%20BALM%20CUSHION.pdf` }],
+  '43': [{ title: 'HR³ MATRIX HAIR TONIC α Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20TONIC%20ALPHA.pdf` }],
+  '45': [{ title: 'HR³ MATRIX HAIR SOLUTION α Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20HR3%20MATRIX%20HAIR%20SOLUTION%20ALPHA.pdf` }],
+  '46': [{ title: 'HR³ MATRIX SCALP PEELING α Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20HR3%20MATRIX%20SCALP%20PEELING%20ALPHA.pdf` }],
+  '48': [{ title: 'Hair-GENTRON Guide', url: `${ASSET_ORIGIN}/documents/ppt/HAIR%20GENTRON.pdf` }],
+  '49': [{ title: 'GENO-LED IR II Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENO-LED%20IR%20II_2025.pdf` }],
+  '50': [{ title: 'EyeCell EYE ZONE CARE KIT Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20EyeCell%20EYE%20ZONE%20CARE%20SYSTEM.pdf` }],
+  '51': [{ title: 'BIO-FERMENT AGE DEFYING POWDER MASK Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20BIO-FERMENT%20AGE%20DEFYING%20POWDER%20MASK.pdf` }],
+  '52': [{ title: 'SKIN REBOOT PDRN MASK PACK Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20SKIN%20REBOOT%20PDRN%20MASK%20PACK.pdf` }],
+  '11': [{ title: 'SKIN DEFENDER Product Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20SKIN%20DEFENDER%20LIP%20%26%20EYE%20MAKEUP%20REMOVER.pdf` }],
+  '15': [{ title: 'INTENSIVE PROBLEM CONTROL TONER', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf` }],
+  '60': [{ title: 'BIO MESO PDRN EXPERT AMPOULE 60000 Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_BIO_MESO_PDRN_EXPERT_AMPOULE_60000.pdf` }],
+};
+
+/**
+ * Get all images for a product (config images + DB images merged)
+ * @param {string} productId 
+ * @param {Object} product - product data from API (may have .images JSON string)
+ * @returns {string[]} Array of full image URLs
+ */
+export function getProductImages(productId, product) {
+  const id = String(productId);
+  const config = PRODUCT_CONFIG[id];
+  
+  // Priority 1: Config images (manually curated)
+  if (config?.images?.length) {
+    return config.images.map(img => `${ASSET_ORIGIN}${img}`);
+  }
+  
+  // Priority 2: DB images field (JSON string array)
+  if (product?.images) {
+    try {
+      const parsed = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(img => img.startsWith('http') ? img : `${ASSET_ORIGIN}${img}`);
+      }
+    } catch {}
+  }
+  
+  // Priority 3: Single main image
+  if (product?.image) {
+    return [`${ASSET_ORIGIN}${product.image}`];
+  }
+  
+  return [];
+}
+
+/**
+ * Get video URL for a product
+ * @param {string} productId
+ * @returns {string|null}
+ */
+export function getProductVideoUrl(productId) {
+  const config = PRODUCT_CONFIG[String(productId)];
+  return config?.videoUrl ? `${ASSET_ORIGIN}${config.videoUrl}` : null;
+}
+
+/**
+ * Get documentation links for a product
+ * @param {string} productId
+ * @returns {Array<{title: string, url: string}>}
+ */
+export function getProductDocs(productId) {
+  return PRODUCT_DOCS[String(productId)] || [];
+}

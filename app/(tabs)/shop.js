@@ -5,7 +5,6 @@ import {
   StyleSheet, 
   ScrollView, 
   TouchableOpacity, 
-  Image, 
   ActivityIndicator,
   RefreshControl,
   Dimensions,
@@ -17,10 +16,14 @@ import {
   Easing,
   I18nManager,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchProductCategories, fetchProducts } from '../../services/api';
+import { cacheProducts, getCachedProducts } from '../../services/productCache';
+import { ShopSkeleton } from '../../components/SkeletonLoader';
+import * as haptics from '../../utils/haptics';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
@@ -36,6 +39,8 @@ import {
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { useAnimation } from '../../contexts/AnimationContext';
+import NavigationDrawer from '../../components/NavigationDrawer';
+
 
 const log = createLogger('Shop');
 
@@ -107,6 +112,7 @@ export default function ShopScreen() {
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [subtitleWidth, setSubtitleWidth] = useState(0);
   const isRTL = dir === 'rtl';
 
@@ -339,9 +345,11 @@ export default function ShopScreen() {
         <View style={styles.gridImageContainer}>
           {product.image ? (
             <Image
-              source={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` }}
+              source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
               style={styles.gridImage}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={200}
+              cachePolicy="memory-disk"
             />
           ) : (
             <View style={styles.gridImagePlaceholder}>
@@ -538,6 +546,23 @@ export default function ShopScreen() {
     }
   };
 
+  const applyProducts = (productList) => {
+    setProducts(productList);
+    setFilteredProducts(productList);
+    const normalizedCats = [];
+    const seen = new Set();
+    productList.forEach((product) => {
+      const tags = getCategoryTagsForProduct(product);
+      tags.forEach((tag) => {
+        if (tag && !seen.has(tag)) {
+          seen.add(tag);
+          normalizedCats.push(tag);
+        }
+      });
+    });
+    setCategories(buildAllowedCategoryList(normalizedCats));
+  };
+
   const loadProducts = async () => {
     try {
       log.debug('Loading products with user context...');
@@ -546,36 +571,29 @@ export default function ShopScreen() {
       const enhancedProducts = await fetchProducts(user, { locale });
       
       if (enhancedProducts && enhancedProducts.length > 0) {
-        setProducts(enhancedProducts);
-        setFilteredProducts(enhancedProducts);
-        log.debug('Products loaded', { count: enhancedProducts.length });
-        
-        // Debug first few products
-        log.debug('First 3 products badges (debug)');
-        enhancedProducts.slice(0, 3).forEach(p => {
-          log.debug('Product badges', { name: getLocalizedProductName(p, locale) || p.name, count: p.badges?.length || 0 });
-        });
+        applyProducts(enhancedProducts);
+        log.debug('Products loaded from API', { count: enhancedProducts.length });
         
         if (user?.discountPercentage) {
           log.debug('User discount applied', { discountPercentage: user.discountPercentage, discountType: user.discountType });
         }
         
-        // Extract categories from products (normalized, unique, allowed)
-        const normalizedCats = [];
-        const seen = new Set();
-        enhancedProducts.forEach((product) => {
-          const tags = getCategoryTagsForProduct(product);
-          tags.forEach((tag) => {
-            if (tag && !seen.has(tag)) {
-              seen.add(tag);
-              normalizedCats.push(tag);
-            }
-          });
-        });
-        setCategories(buildAllowedCategoryList(normalizedCats));
+        // Cache for offline use (fire-and-forget)
+        cacheProducts(enhancedProducts);
       }
     } catch (error) {
-      log.error('Error loading products', error?.message || error);
+      log.error('Error loading products from API', error?.message || error);
+      
+      // Offline fallback: try cached products
+      try {
+        const cached = await getCachedProducts(true); // ignoreExpiry for offline
+        if (cached && cached.length > 0) {
+          applyProducts(cached);
+          log.debug('Using cached products (offline)', { count: cached.length });
+        }
+      } catch (cacheErr) {
+        log.warn('Cache fallback also failed', cacheErr?.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -675,6 +693,7 @@ export default function ShopScreen() {
   };
 
   const handleCategoryPress = (category) => {
+    haptics.selectionTick();
     setSelectedCategory(category);
     // Clear search when selecting a category for better UX
     if (searchQuery) {
@@ -706,6 +725,7 @@ export default function ShopScreen() {
 
     try {
       await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
+      haptics.success();
       log.debug('Added to cart', { productId: product?.id });
     } catch (error) {
       log.error('Failed to add product to cart', error?.message || error);
@@ -723,6 +743,7 @@ export default function ShopScreen() {
   };
 
   const handleToggleFavorite = (product) => {
+    haptics.lightTap();
     const result = toggleFavorite(product);
     log.debug(
       result === 'added'
@@ -737,8 +758,7 @@ export default function ShopScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#dc2626" />
-        <Text style={styles.loadingText}>{t('shop.loading')}</Text>
+        <ShopSkeleton />
       </SafeAreaView>
     );
   }
@@ -767,28 +787,26 @@ export default function ShopScreen() {
             <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#16A34A" />
           </TouchableOpacity>
 
-          {/* Animation toggle (two vertical lines like website) */}
+          {/* Hamburger menu (matching mobile web) */}
           <TouchableOpacity
-            onPress={() => toggleAnimations?.()}
+            onPress={() => setMenuOpen((v) => !v)}
             activeOpacity={0.85}
-            style={styles.animToggleBtn}
+            style={styles.hamburgerBtn}
             accessibilityRole="button"
-            accessibilityLabel={`Animations ${animationsEnabled ? 'enabled' : 'disabled'}. Tap to ${animationsEnabled ? 'disable' : 'enable'} animations.`}
+            accessibilityLabel={menuOpen ? 'Close menu' : 'Open menu'}
           >
-            <View style={styles.animIcon}>
-              <View
-                style={[
-                  styles.animBar,
-                  { backgroundColor: animationsEnabled ? '#16A34A' : '#111827' },
-                ]}
-              />
-              <View
-                style={[
-                  styles.animBar,
-                  { backgroundColor: animationsEnabled ? '#16A34A' : '#111827' },
-                ]}
-              />
-            </View>
+            <Ionicons name={menuOpen ? 'close' : 'menu'} size={22} color={menuOpen ? '#16A34A' : '#374151'} />
+          </TouchableOpacity>
+
+          {/* AI link (matching mobile web header) */}
+          <TouchableOpacity
+            onPress={() => router.push('/skin-analysis')}
+            activeOpacity={0.85}
+            style={styles.aiLinkBtn}
+            accessibilityRole="button"
+            accessibilityLabel="AI Skin Analysis"
+          >
+            <Text style={styles.aiLinkText}>AI</Text>
           </TouchableOpacity>
         </View>
         
@@ -796,9 +814,10 @@ export default function ShopScreen() {
         <View style={styles.headerCenter}>
           <View style={[styles.logoContainer, isRTL && styles.logoContainerRtl]}>
             <Image 
-              source={{ uri: AUTH_CONFIG.LOGO_URL }}
+              source={AUTH_CONFIG.LOGO_URL}
               style={styles.logo}
-              resizeMode="contain"
+              contentFit="contain"
+              cachePolicy="memory-disk"
             />
             {/* Favorites Heart Icon - Close to Logo */}
             <TouchableOpacity 
@@ -1057,6 +1076,38 @@ export default function ShopScreen() {
             </View>
           )}
 
+          {/* Build Your Set Banner */}
+          {selectedCategory === 'All' && !searchQuery && (
+            <TouchableOpacity
+              style={styles.buildSetBanner}
+              activeOpacity={0.85}
+              onPress={() => {
+                const prefix = locale === 'ar' ? '/ar' : locale === 'ru' ? '/ru' : '';
+                router.push({
+                  pathname: '/webview',
+                  params: {
+                    url: `https://genosys.ae${prefix}/bundle-builder`,
+                    title: t('shop.buildYourSet') || 'Build Your Set',
+                  },
+                });
+              }}
+            >
+              <View style={[styles.buildSetContent, isRTL && styles.buildSetContentRTL]}>
+                <View style={styles.buildSetTextArea}>
+                  <Text style={[styles.buildSetTitle, isRTL && styles.textRTL]}>
+                    🎁 {t('shop.buildYourSet') || 'Build Your Set'}
+                  </Text>
+                  <Text style={[styles.buildSetSubtitle, isRTL && styles.textRTL]}>
+                    {t('shop.buildYourSetDesc') || 'Mix & match products and save up to 20%'}
+                  </Text>
+                </View>
+                <View style={styles.buildSetBadge}>
+                  <Text style={styles.buildSetBadgeText}>{t('shop.upTo20Off') || 'Up to 20% OFF'}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+
           {/* Products Grid */}
           <View style={styles.section}>
           
@@ -1132,6 +1183,13 @@ export default function ShopScreen() {
         </View>
         </View>
       </ScrollView>
+
+      {/* Navigation Drawer (hamburger menu) */}
+      <NavigationDrawer
+        visible={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        headerHeight={(insets?.top || 0) + (headerHeight || 56)}
+      />
     </SafeAreaView>
   );
 }
@@ -1224,23 +1282,22 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#16A34A', // matches website (green)
   },
-  animToggleBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 10,
+  hamburgerBtn: {
+    padding: 6,
+    borderRadius: 8,
+    marginStart: 2,
   },
-  animIcon: {
-    flexDirection: 'row',
-    gap: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 16,
-    width: 18,
+  aiLinkBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginStart: 2,
   },
-  animBar: {
-    width: 3,
-    height: 14,
-    borderRadius: 999,
+  aiLinkText: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#dc2626',
+    letterSpacing: 0.5,
   },
   langOverlay: {
     flex: 1,
@@ -1816,5 +1873,52 @@ const styles = StyleSheet.create({
   },
   addToCartButtonRTL: {
     flexDirection: 'row-reverse',
+  },
+  // Build Your Set Banner
+  buildSetBanner: {
+    marginHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 12,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#FECACA',
+    overflow: 'hidden',
+  },
+  buildSetContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  buildSetContentRTL: {
+    flexDirection: 'row-reverse',
+  },
+  buildSetTextArea: {
+    flex: 1,
+  },
+  buildSetTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    marginBottom: 2,
+  },
+  buildSetSubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
+  },
+  buildSetBadge: {
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  buildSetBadgeText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });

@@ -161,9 +161,9 @@ export default function OrderDetailScreen() {
   const status = order?.status || 'PENDING';
   const paymentStatus = order?.paymentStatus || order?.payment_status || '';
   const subtotal = Number(order?.subtotal ?? order?.subTotal ?? order?.sub_total ?? 0) || 0;
-  const shippingRaw = Number(order?.shipping ?? order?.shippingCost ?? 0) || 0;
-  const freeShipping = subtotal >= 1000;
-  const shipping = freeShipping ? 0 : shippingRaw;
+  const shipping = Number(order?.shipping ?? order?.shippingCost ?? 0) || 0;
+  // Trust the server-provided shipping value (already 0 when free shipping was applied)
+  const freeShipping = shipping === 0 && subtotal > 0;
   const vat = Number(order?.vat ?? order?.vatAmount ?? 0) || 0;
   const total = Number(order?.total ?? order?.totalAmount ?? order?.total_amount ?? order?.amount ?? 0) || 0;
   
@@ -439,7 +439,12 @@ export default function OrderDetailScreen() {
               const color = it?.color || it?.selectedColor || '';
               const itemTotal = qty * price;
 
-              const discountPct = Number(user?.discountPercentage);
+              // Prefer the discount% stored with the order (captures the rate at time of purchase),
+              // falling back to the user's current discount% for older orders that lack this field.
+              const orderDiscountPct = Number(order?.discountPercentage);
+              const discountPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0)
+                ? orderDiscountPct
+                : Number(user?.discountPercentage);
               const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
               const inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
               const canShowDiscountBreakdown = !isPromoItem(it) && !excludedFromUserDiscount && inferredOriginalUnit != null;
@@ -610,6 +615,58 @@ export default function OrderDetailScreen() {
               <Ionicons name="calculator" size={20} color="#007AFF" />
               <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderSummary')}</Text>
             </View>
+
+            {/* Discount Waterfall: show retail price → VIP discount → bundle discount when applicable */}
+            {(() => {
+              const orderDiscPct = Number(order?.discountPercentage);
+              const orderDiscAmt = Number(order?.discountAmount);
+              const bundleDiscPct = Number(order?.bundleDiscountPercentage);
+              const bundleDiscAmt = Number(order?.bundleDiscountAmount);
+              const hasVipDiscount = Number.isFinite(orderDiscAmt) && orderDiscAmt > 0;
+              const hasBundleDiscount = Number.isFinite(bundleDiscAmt) && bundleDiscAmt > 0;
+              const hasAnyDiscount = hasVipDiscount || hasBundleDiscount;
+              const retailTotal = subtotal + (hasVipDiscount ? orderDiscAmt : 0) + (hasBundleDiscount ? bundleDiscAmt : 0);
+
+              return hasAnyDiscount ? (
+                <>
+                  {/* Retail price (before any discounts) */}
+                  <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                    <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.retailPrice')}</Text>
+                    <Text style={[styles.summaryValue, styles.summaryValueStrikethrough, isRTL && styles.valueLTR]}>AED {formatAED(retailTotal)}</Text>
+                  </View>
+
+                  {/* VIP Discount line */}
+                  {hasVipDiscount ? (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelDiscount, isRTL && styles.textRTL]}>
+                        {t('ordersDetail.vipDiscount')}{Number.isFinite(orderDiscPct) && orderDiscPct > 0 ? ` (${Math.round(orderDiscPct)}%)` : ''}
+                      </Text>
+                      <Text style={[styles.summaryValueDiscount, isRTL && styles.valueLTR]}>-AED {formatAED(orderDiscAmt)}</Text>
+                    </View>
+                  ) : null}
+
+                  {/* Bundle Discount line */}
+                  {hasBundleDiscount ? (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelDiscount, isRTL && styles.textRTL]}>
+                        {t('ordersDetail.bundleDiscount')}{Number.isFinite(bundleDiscPct) && bundleDiscPct > 0 ? ` (${Math.round(bundleDiscPct)}%)` : ''}
+                      </Text>
+                      <Text style={[styles.summaryValueDiscount, isRTL && styles.valueLTR]}>-AED {formatAED(bundleDiscAmt)}</Text>
+                    </View>
+                  ) : null}
+
+                  {/* Total saved */}
+                  {(hasVipDiscount || hasBundleDiscount) ? (
+                    <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
+                      <Text style={[styles.summaryLabelSaved, isRTL && styles.textRTL]}>{t('ordersDetail.totalSaved')}</Text>
+                      <Text style={[styles.summaryValueSaved, isRTL && styles.valueLTR]}>-AED {formatAED((hasVipDiscount ? orderDiscAmt : 0) + (hasBundleDiscount ? bundleDiscAmt : 0))}</Text>
+                    </View>
+                  ) : null}
+
+                  <View style={styles.summaryDividerLight} />
+                </>
+              ) : null;
+            })()}
             
             <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
               <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.subtotal')}</Text>
@@ -1112,6 +1169,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#1D1D1F',
+  },
+  summaryValueStrikethrough: {
+    textDecorationLine: 'line-through',
+    color: '#9CA3AF',
+  },
+  summaryLabelDiscount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16A34A',
+  },
+  summaryValueDiscount: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#16A34A',
+  },
+  summaryLabelSaved: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#16A34A',
+  },
+  summaryValueSaved: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#16A34A',
+  },
+  summaryDividerLight: {
+    height: 1,
+    backgroundColor: '#F2F2F7',
+    marginVertical: 8,
   },
   summaryDivider: {
     height: 1,

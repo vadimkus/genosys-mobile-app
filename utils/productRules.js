@@ -42,11 +42,20 @@ export const isHydroCoolMask = (product) => {
 };
 
 // Devices: user discounts must NOT apply (Gentron, LED lamp, HairGen, etc.)
+// Matches backend mobileDiscountRules.ts: checks category first, then name fallback.
 export const isDeviceProduct = (product) => {
   const cat = String(product?.category || '').trim().toLowerCase();
   // Mobile API categories appear as "Device" (singular) in current dataset.
   // Use an inclusive check to handle potential "Devices" or composite categories.
-  return cat === 'device' || cat.includes('device');
+  if (cat === 'device' || cat.includes('device')) return true;
+
+  // Fallback by name (covers datasets where category is missing or different)
+  const name = normalizeProductName(product);
+  return (
+    name.includes('genoled') ||
+    name.includes('gentron') ||
+    name.includes('hairgen')
+  );
 };
 
 export const getFixedPriceOverride = (product) => {
@@ -67,11 +76,18 @@ export const getFixedPriceOverride = (product) => {
 export const hasFixedPriceOverride = (product) => getFixedPriceOverride(product) != null;
 
 // Products that should never use the user's percentage discount in the mobile UI.
-export const isUserDiscountExcludedProduct = (product) =>
-  isBeautyBoxProduct(product) ||
-  isHydroCoolMask(product) ||
-  isDeviceProduct(product) ||
-  hasFixedPriceOverride(product);
+// Matches backend mobileDiscountRules.ts for consistency.
+export const isUserDiscountExcludedProduct = (product) => {
+  if (!product) return false;
+  // Explicit noDiscount flag from DB (same check as backend)
+  if (product?.noDiscount === true) return true;
+  return (
+    isBeautyBoxProduct(product) ||
+    isHydroCoolMask(product) ||
+    isDeviceProduct(product) ||
+    hasFixedPriceOverride(product)
+  );
+};
 
 // For non-discountable products, prefer the "undiscounted" price:
 // - originalPrice if present (often represents the pre-discount/base price)

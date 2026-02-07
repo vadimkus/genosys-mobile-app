@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -8,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useOrders } from '../../contexts/OrdersContext';
 import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../services/orderService';
+import { OrdersSkeleton } from '../../components/SkeletonLoader';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 
@@ -388,10 +390,7 @@ export default function OrdersScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#dc2626" />}
       >
         {loading ? (
-          <View style={[styles.center, isRTL && styles.centerRTL]}>
-            <ActivityIndicator size="large" color="#dc2626" />
-            <Text style={[styles.loadingText, isRTL && styles.textRTLRight]}>{t('ordersScreen.loading')}</Text>
-          </View>
+          <OrdersSkeleton />
         ) : error ? (
           <View style={[styles.center, isRTL && styles.centerRTL]}>
             <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.couldNotLoad')}</Text>
@@ -399,7 +398,7 @@ export default function OrdersScreen() {
           </View>
         ) : sortedOrders.length === 0 ? (
           <View style={[styles.center, styles.centerTop, isRTL && styles.centerRTL]}>
-            <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
+            <Image source={EMPTY_UNI_IMAGE} style={styles.emptyUniImage} contentFit="contain" />
             <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersYet')}</Text>
             <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersHint')}</Text>
             <TouchableOpacity
@@ -422,8 +421,10 @@ export default function OrdersScreen() {
               const shippingRaw = o.shipping ?? o.shippingCost ?? 0;
               const vat = o.vat ?? o.vatAmount ?? 0;
               const subtotal = o.subtotal ?? o.subTotal ?? o.sub_total ?? 0;
-              const freeShipping = Number(subtotal) >= 1000;
-              const shipping = freeShipping ? 0 : shippingRaw;
+              // Use server-provided shipping (already 0 when free shipping applied)
+              // Fallback: check threshold for display purposes
+              const freeShipping = Number(shippingRaw) === 0 && Number(subtotal) > 0;
+              const shipping = Number(shippingRaw) || 0;
               const itemCount =
                 o.itemCount ??
                 (Array.isArray(o.items) ? o.items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0) : 0);
@@ -434,7 +435,12 @@ export default function OrdersScreen() {
               const keyId = String(o.id || orderNumber);
               const isPaying = payingOrderId === keyId;
               const isExpanded = expandedOrderKey === keyId;
-              const discountPct = Number(user?.discountPercentage);
+              // Prefer the discount% stored with the order (captures the rate at time of purchase),
+              // falling back to the user's current discount% for older orders without this field.
+              const orderDiscPct = Number(o?.discountPercentage);
+              const discountPct = (Number.isFinite(orderDiscPct) && orderDiscPct > 0)
+                ? orderDiscPct
+                : Number(user?.discountPercentage);
               return (
                 <View key={String(o.id || orderNumber)} style={styles.card}>
                   <View style={[styles.cardTop, isRTL && styles.cardTopRTL]}>
@@ -561,6 +567,43 @@ export default function OrdersScreen() {
                       })}
 
                       <View style={styles.orderSummaryDivider} />
+
+                      {/* Discount waterfall (when applicable) */}
+                      {(() => {
+                        const discAmt = Number(o?.discountAmount);
+                        const bundleDiscAmt = Number(o?.bundleDiscountAmount);
+                        const bundleDiscPct = Number(o?.bundleDiscountPercentage);
+                        const hasVip = Number.isFinite(discAmt) && discAmt > 0;
+                        const hasBundle = Number.isFinite(bundleDiscAmt) && bundleDiscAmt > 0;
+                        if (!hasVip && !hasBundle) return null;
+                        const retailTotal = Number(subtotal) + (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
+                        return (
+                          <>
+                            <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                              <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersDetail.retailPrice')}</Text>
+                              <Text style={[styles.orderTotalsValueMuted, isRTL && styles.valueLTR]}>AED {formatAED(retailTotal)}</Text>
+                            </View>
+                            {hasVip ? (
+                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                <Text style={[styles.orderTotalsLabelGreen, isRTL && styles.textRTLRight]}>
+                                  {t('ordersDetail.vipDiscount')}{Number.isFinite(discountPct) && discountPct > 0 ? ` (${Math.round(discountPct)}%)` : ''}
+                                </Text>
+                                <Text style={[styles.orderTotalsValueGreen, isRTL && styles.valueLTR]}>-AED {formatAED(discAmt)}</Text>
+                              </View>
+                            ) : null}
+                            {hasBundle ? (
+                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                <Text style={[styles.orderTotalsLabelGreen, isRTL && styles.textRTLRight]}>
+                                  {t('ordersDetail.bundleDiscount')}{Number.isFinite(bundleDiscPct) && bundleDiscPct > 0 ? ` (${Math.round(bundleDiscPct)}%)` : ''}
+                                </Text>
+                                <Text style={[styles.orderTotalsValueGreen, isRTL && styles.valueLTR]}>-AED {formatAED(bundleDiscAmt)}</Text>
+                              </View>
+                            ) : null}
+                            <View style={styles.orderSummaryDividerLight} />
+                          </>
+                        );
+                      })()}
+
                       <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
                         <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.subtotal')}</Text>
                         <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
@@ -748,10 +791,14 @@ const styles = StyleSheet.create({
   orderSummaryPriceStrike: { textDecorationLine: 'line-through', color: '#9CA3AF', fontWeight: '700' },
   orderSummaryPriceFinal: { color: '#dc2626', fontWeight: '800' },
   orderSummaryDivider: { height: 1, backgroundColor: '#E5E5EA', marginTop: 10, marginBottom: 6 },
+  orderSummaryDividerLight: { height: StyleSheet.hairlineWidth, backgroundColor: '#D1D5DB', marginVertical: 4 },
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   orderTotalsRowRTL: { flexDirection: 'row-reverse' },
   orderTotalsLabel: { fontSize: 12, color: '#3C3C43', fontWeight: '700' },
+  orderTotalsLabelGreen: { fontSize: 12, color: '#16A34A', fontWeight: '700' },
   orderTotalsValue: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
+  orderTotalsValueMuted: { fontSize: 12, color: '#9CA3AF', fontWeight: '700', textDecorationLine: 'line-through' },
+  orderTotalsValueGreen: { fontSize: 12, color: '#16A34A', fontWeight: '800' },
   orderTotalsLabelStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
   orderTotalsValueStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
   payButton: {

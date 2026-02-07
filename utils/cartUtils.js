@@ -7,15 +7,17 @@
 
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isUserDiscountExcludedProduct, isDeviceProduct } from './productRules';
 
-// UAE Emirates for shipping - minimal data needed for cart
+// UAE Emirates for shipping - fallback data (used when /api/mobile/shipping-rates is unavailable).
+// MUST match backend mobileCheckoutConfig.ts to avoid display vs. charge mismatch.
+// Last synced: 2026-02-06
 export const UAE_EMIRATES = [
-  { name: 'Dubai', shippingCost: 0 },
-  { name: 'Abu Dhabi', shippingCost: 25 },
-  { name: 'Sharjah', shippingCost: 15 },
-  { name: 'Ajman', shippingCost: 20 },
-  { name: 'Ras Al Khaimah', shippingCost: 45 },
-  { name: 'Fujairah', shippingCost: 50 },
-  { name: 'Umm Al Quwain', shippingCost: 30 }
+  { name: 'Dubai', shippingCost: 45 },
+  { name: 'Abu Dhabi', shippingCost: 70 },
+  { name: 'Sharjah', shippingCost: 70 },
+  { name: 'Ajman', shippingCost: 70 },
+  { name: 'Ras Al Khaimah', shippingCost: 70 },
+  { name: 'Fujairah', shippingCost: 70 },
+  { name: 'Umm Al Quwain', shippingCost: 70 }
 ];
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1000;

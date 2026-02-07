@@ -168,7 +168,12 @@ export async function submitCODOrder(orderData) {
       paymentMethod: 'cod',
       orderNotes: orderData.orderNotes || '',
       source: 'mobile_app',
-      locale: 'en',
+      locale: orderData.locale || 'en',
+      // Discount fields for email templates and order records
+      discountPercentage: orderData.discountPercentage || 0,
+      discountAmount: orderData.discountAmount || 0,
+      bundleDiscountPercentage: orderData.bundleDiscountPercentage || 0,
+      bundleDiscountAmount: orderData.bundleDiscountAmount || 0,
       // Email/notification hints (backend may use these)
       sendEmails: true,
       notifyAdmin: true,
@@ -259,6 +264,12 @@ export async function submitCardOrder(orderData) {
       subtotal: orderData.subtotal,
       total: orderData.total,
       orderNotes: orderData.orderNotes || '',
+      locale: orderData.locale || 'en',
+      // Discount fields for email templates and order records
+      discountPercentage: orderData.discountPercentage || 0,
+      discountAmount: orderData.discountAmount || 0,
+      bundleDiscountPercentage: orderData.bundleDiscountPercentage || 0,
+      bundleDiscountAmount: orderData.bundleDiscountAmount || 0,
     };
 
     const response = await fetch(`${API_BASE_URL}/checkout/stripe`, {
