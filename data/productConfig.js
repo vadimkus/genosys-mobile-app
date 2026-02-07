@@ -62,6 +62,9 @@ export const PRODUCT_CONFIG = {
   '42': {
     images: ['/images/BLEM.jpg', '/images/Second/bbbig.jpg'],
   },
+  '11': {
+    images: ['/images/DEF.jpg', '/images/Second/def_big.jpg'],
+  },
   '40': {
     images: ['/images/SSUN.jpg', '/images/Second/40big.jpg'],
   },
