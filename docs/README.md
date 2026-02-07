@@ -22,6 +22,13 @@ This folder contains all documentation for the Genosys Mobile App.
 - [Setup Authentication](./SETUP_AUTHENTICATION.md) - Auth setup guide
 - [Google OAuth Setup](./GOOGLE_OAUTH_SETUP.md) - Google sign-in configuration
 
+## Core Features
+
+- [Shop Page Features](./SHOP_PAGE_FEATURES.md) - Product catalog, categories, search, banners, product cards
+- [Checkout Flow](./CHECKOUT_FLOW.md) - Delivery details, payment methods, order submission
+- [Orders Pages](./ORDERS_PAGES.md) - Orders list, order detail, reorder functionality
+- [Waterfall Pricing](./WATERFALL_PRICING.md) - Transparent discount breakdown (VIP, bundle, savings)
+
 ## UI & Features
 
 - [Size Variants Implementation](./SIZE_VARIANTS_IMPLEMENTATION.md) - Product size variants
@@ -86,6 +93,10 @@ This folder contains all documentation for the Genosys Mobile App.
 ```
 docs/
 ├── README.md                      # This file (documentation index)
+├── SHOP_PAGE_FEATURES.md          # Shop page: categories, search, banners, product grid
+├── CHECKOUT_FLOW.md               # Checkout: delivery, payment, order submission
+├── ORDERS_PAGES.md                # Orders list & order detail pages
+├── WATERFALL_PRICING.md           # Waterfall pricing breakdown feature
 ├── IMPLEMENTATION_SUMMARY.md      # Database integration summary
 ├── DEEP_LINKING.md                # Universal links & custom URL scheme
 ├── OFFLINE_PRODUCT_CACHE.md       # Offline product browsing

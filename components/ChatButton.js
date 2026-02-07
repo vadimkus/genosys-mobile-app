@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Animated,
   Platform,
+  View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -61,7 +62,9 @@ export default function ChatButton({ visible = true }) {
         accessibilityRole="button"
         accessibilityLabel="Open chat with Genie"
       >
-        <Ionicons name="sparkles" size={26} color="#ffffff" />
+        <Ionicons name="chatbubble-ellipses" size={26} color="#ffffff" />
+        {/* Green notification dot (matches web) */}
+        <View style={styles.notificationDot} />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -92,5 +95,16 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
     }),
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#22c55e',
+    borderWidth: 2,
+    borderColor: '#ffffff',
   },
 });

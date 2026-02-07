@@ -53,8 +53,8 @@ import {
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-// Product detail hero/header is intentionally more compact than before.
-const HEADER_HEIGHT = 240;
+// Product detail hero image height
+const HEADER_HEIGHT = 280;
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -576,50 +576,30 @@ export default function ProductDetailScreen() {
 
   const isWishlisted = !!(product?.id && isFavorite(product.id));
 
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, 60],
-    outputRange: [0, -80],
-    extrapolate: 'clamp',
-  });
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 40, 80],
-    outputRange: [1, 0.9, 0],
-    extrapolate: 'clamp',
-  });
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Collapsing header (overlay) */}
-      <Animated.View
-        pointerEvents="box-none"
-        style={[
-          styles.headerOverlay,
-          { transform: [{ translateY: headerTranslateY }], opacity: headerOpacity },
-        ]}
-      >
-        <SafeAreaView style={styles.headerContainer}>
-          <View style={[styles.headerButtons, isRTL && styles.headerButtonsRTL]}>
-            <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
-              <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color="#1D1D1F" />
+      {/* Fixed header bar (not overlapping image) */}
+      <View style={styles.headerBar}>
+        <View style={[styles.headerButtons, isRTL && styles.headerButtonsRTL]}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color="#1D1D1F" />
+          </TouchableOpacity>
+
+          <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
+            <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
+              <Ionicons name="share-outline" size={20} color="#1D1D1F" />
             </TouchableOpacity>
 
-            <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
-              <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-                <Ionicons name="share-outline" size={20} color="#1D1D1F" />
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.headerButton} onPress={handleWishlistToggle}>
-                <Ionicons
-                  name={isWishlisted ? 'heart' : 'heart-outline'}
-                  size={20}
-                  color={isWishlisted ? '#dc2626' : '#1D1D1F'}
-                />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.headerButton} onPress={handleWishlistToggle}>
+              <Ionicons
+                name={isWishlisted ? 'heart' : 'heart-outline'}
+                size={20}
+                color={isWishlisted ? '#dc2626' : '#1D1D1F'}
+              />
+            </TouchableOpacity>
           </View>
-        </SafeAreaView>
-      </Animated.View>
+        </View>
+      </View>
 
       {/* Product Content */}
       <Animated.ScrollView
@@ -817,8 +797,8 @@ export default function ProductDetailScreen() {
               />
             )}
 
-          {/* Trust Badges */}
-          <TrustBadges />
+          {/* Trust Badges (hidden on Beauty Box pages) */}
+          {!isBeautyBoxProduct(product) && <TrustBadges />}
 
           {/* Product Video */}
           {(() => {
@@ -1006,17 +986,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  headerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-  },
-  headerContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.96)',
+  headerBar: {
+    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingBottom: 8,
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
   },
   headerButtons: {
     flexDirection: 'row',

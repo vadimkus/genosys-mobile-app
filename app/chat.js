@@ -1,9 +1,10 @@
 /**
  * Chat Screen - AI Chatbot "Genie"
- * Full-screen chat with product card rendering and Add to Bag.
+ * Full-screen chat with product card rendering, quick action buttons,
+ * contextual greetings, and Add to Bag. Aligned with mobile web ChatWidget.
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -30,6 +31,52 @@ import AUTH_CONFIG from '../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
+/** Get user context for personalised greetings (mirrors web getUserContext) */
+function getUserContext() {
+  const now = new Date();
+  const hour = now.getHours();
+  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+  let timeOfDay;
+  if (hour >= 5 && hour < 12) timeOfDay = 'morning';
+  else if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
+  else if (hour >= 17 && hour < 21) timeOfDay = 'evening';
+  else timeOfDay = 'night';
+
+  // UAE weekend = Friday / Saturday
+  const isWeekend = dayName === 'Friday' || dayName === 'Saturday';
+
+  return { timeOfDay, dayOfWeek: dayName, isWeekend };
+}
+
+/** Build the welcome message from i18n keys + time context */
+function buildWelcome(t, ctx) {
+  const greetingKey = {
+    morning: 'chat.greetingMorning',
+    afternoon: 'chat.greetingAfternoon',
+    evening: 'chat.greetingEvening',
+    night: 'chat.greetingNight',
+  }[ctx.timeOfDay] || 'chat.greetingAfternoon';
+
+  let contextKey;
+  if (ctx.isWeekend) {
+    contextKey = 'chat.contextWeekend';
+  } else {
+    contextKey = {
+      morning: 'chat.contextMorning',
+      afternoon: 'chat.contextAfternoon',
+      evening: 'chat.contextEvening',
+      night: 'chat.contextNight',
+    }[ctx.timeOfDay] || 'chat.contextAfternoon';
+  }
+
+  const greeting = t(greetingKey);
+  const context = t(contextKey);
+  const body = t('chat.welcome');
+
+  return `${greeting} ${context}\n\n${body}`;
+}
+
 export default function ChatScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -38,8 +85,11 @@ export default function ChatScreen() {
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
+  const userContext = useMemo(() => getUserContext(), []);
+  const welcomeText = useMemo(() => buildWelcome(t, userContext), [t, userContext]);
+
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: t('chat.welcome') },
+    { role: 'assistant', content: welcomeText },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -54,8 +104,29 @@ export default function ChatScreen() {
     scrollToBottom();
   }, [messages, loading]);
 
-  const handleSend = async () => {
-    const text = input.trim();
+  /* ─── Quick-action definitions (same 10 as mobile web) ─── */
+  const QUICK_ACTIONS_ROW1 = useMemo(() => [
+    { label: t('chat.quickDrySkin'), query: t('chat.quickDrySkinQuery'), emoji: '💧' },
+    { label: t('chat.quickOilySkin'), query: t('chat.quickOilySkinQuery'), emoji: '🧴' },
+    { label: t('chat.quickAntiAging'), query: t('chat.quickAntiAgingQuery'), emoji: '✨' },
+    { label: t('chat.quickGlassSkin'), query: t('chat.quickGlassSkinQuery'), emoji: '🪞' },
+  ], [t]);
+
+  const QUICK_ACTIONS_ROW2 = useMemo(() => [
+    { label: t('chat.quickAcne'), query: t('chat.quickAcneQuery'), emoji: '🌿' },
+    { label: t('chat.quickRoutine'), query: t('chat.quickRoutineQuery'), emoji: '📋' },
+    { label: t('chat.quickWhyGenosys'), query: t('chat.quickWhyGenosysQuery'), emoji: '🏆' },
+    { label: t('chat.quickSun'), query: t('chat.quickSunQuery'), emoji: '☀️' },
+  ], [t]);
+
+  const QUICK_ACTIONS_ROW3 = useMemo(() => [
+    { label: t('chat.quickDiscount'), query: t('chat.quickDiscountQuery'), emoji: '🎁', highlight: true },
+    { label: t('chat.quickAiSkin'), query: t('chat.quickAiSkinQuery'), emoji: '📸', highlight: true },
+  ], [t]);
+
+  /* ─── Chat API ─── */
+  const handleSend = async (overrideText) => {
+    const text = (overrideText || input).trim();
     if (!text || loading) return;
     Keyboard.dismiss();
 
@@ -66,7 +137,6 @@ export default function ChatScreen() {
     setLoading(true);
 
     try {
-      // Send conversation to API (skip the welcome message for API call)
       const apiMessages = updatedMessages
         .filter((m) => m.role === 'user' || (m.role === 'assistant' && m !== messages[0]))
         .map((m) => ({ role: m.role, content: m.content }));
@@ -77,7 +147,6 @@ export default function ChatScreen() {
         setMessages((prev) => [...prev, { role: 'assistant', content: t('chat.rateLimited') }]);
       } else {
         setMessages((prev) => [...prev, { role: 'assistant', content: response }]);
-        // Pre-fetch any product references
         prefetchProducts(response);
       }
     } catch {
@@ -85,6 +154,10 @@ export default function ChatScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuickAction = (query) => {
+    handleSend(query);
   };
 
   const prefetchProducts = async (text) => {
@@ -97,7 +170,7 @@ export default function ChatScreen() {
             setProductCache((prev) => ({ ...prev, [seg.content]: product }));
           }
         } catch {
-          // Product not found, skip
+          // skip
         }
       }
     }
@@ -116,10 +189,11 @@ export default function ChatScreen() {
         });
       }, 2000);
     } catch {
-      // Silent fail
+      // silent
     }
   };
 
+  /* ─── Product card renderer ─── */
   const renderProductCard = (productId) => {
     const product = productCache[productId];
     if (!product) {
@@ -174,56 +248,100 @@ export default function ChatScreen() {
     );
   };
 
+  /* ─── Quick-action button component ─── */
+  const renderQuickActionButton = (item, index) => (
+    <TouchableOpacity
+      key={index}
+      style={[
+        styles.quickActionBtn,
+        item.highlight && styles.quickActionBtnHighlight,
+      ]}
+      onPress={() => handleQuickAction(item.query)}
+      activeOpacity={0.8}
+    >
+      {item.emoji ? <Text style={styles.quickActionEmoji}>{item.emoji}</Text> : null}
+      <Text
+        style={[
+          styles.quickActionLabel,
+          item.highlight && styles.quickActionLabelHighlight,
+        ]}
+      >
+        {item.label}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  /* ─── Message renderer ─── */
   const renderMessage = (msg, index) => {
     const isUser = msg.role === 'user';
+    const isWelcome = !isUser && index === 0;
     const segments = isUser ? [{ type: 'text', content: msg.content }] : segmentChatResponse(msg.content);
 
     return (
-      <View
-        key={index}
-        style={[
-          styles.messageBubbleWrap,
-          isUser ? styles.userBubbleWrap : styles.assistantBubbleWrap,
-          isRTL && (isUser ? styles.assistantBubbleWrap : styles.userBubbleWrap),
-        ]}
-      >
-        {!isUser && (
-          <View style={styles.avatarCircle}>
-            <Ionicons name="sparkles" size={14} color="#dc2626" />
+      <View key={index}>
+        <View
+          style={[
+            styles.messageBubbleWrap,
+            isUser ? styles.userBubbleWrap : styles.assistantBubbleWrap,
+            isRTL && (isUser ? styles.assistantBubbleWrap : styles.userBubbleWrap),
+          ]}
+        >
+          {!isUser && (
+            <View style={styles.avatarCircle}>
+              <Ionicons name="sparkles" size={14} color="#dc2626" />
+            </View>
+          )}
+          <View style={[styles.bubble, isUser ? styles.userBubble : styles.assistantBubble]}>
+            {segments.map((seg, i) =>
+              seg.type === 'product' ? (
+                renderProductCard(seg.content)
+              ) : (
+                <Text
+                  key={i}
+                  style={[
+                    styles.messageText,
+                    isUser ? styles.userText : styles.assistantText,
+                    isRTL && styles.textRTL,
+                  ]}
+                >
+                  {seg.content}
+                </Text>
+              )
+            )}
+          </View>
+        </View>
+
+        {/* Quick-action buttons after the welcome message */}
+        {isWelcome && messages.length === 1 && (
+          <View style={styles.quickActionsContainer}>
+            {/* Row 1 – skin types */}
+            <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
+              {QUICK_ACTIONS_ROW1.map(renderQuickActionButton)}
+            </View>
+            {/* Row 2 – concerns & info */}
+            <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
+              {QUICK_ACTIONS_ROW2.map(renderQuickActionButton)}
+            </View>
+            {/* Row 3 – highlight: discount + AI */}
+            <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
+              {QUICK_ACTIONS_ROW3.map(renderQuickActionButton)}
+            </View>
           </View>
         )}
-        <View style={[styles.bubble, isUser ? styles.userBubble : styles.assistantBubble]}>
-          {segments.map((seg, i) =>
-            seg.type === 'product' ? (
-              renderProductCard(seg.content)
-            ) : (
-              <Text
-                key={i}
-                style={[
-                  styles.messageText,
-                  isUser ? styles.userText : styles.assistantText,
-                  isRTL && styles.textRTL,
-                ]}
-              >
-                {seg.content}
-              </Text>
-            )
-          )}
-        </View>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
+      {/* ─── Header (red, matches web) ─── */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#ffffff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <View style={styles.headerTitleRow}>
-            <Ionicons name="sparkles" size={18} color="#dc2626" />
+            <Ionicons name="sparkles" size={16} color="#ffffff" />
             <Text style={styles.headerTitle}>{t('chat.title')}</Text>
           </View>
           <Text style={styles.headerSubtitle}>{t('chat.subtitle')}</Text>
@@ -231,7 +349,7 @@ export default function ChatScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      {/* Messages */}
+      {/* ─── Messages ─── */}
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -261,7 +379,7 @@ export default function ChatScreen() {
           )}
         </ScrollView>
 
-        {/* Input */}
+        {/* ─── Input ─── */}
         <View style={[styles.inputBar, isRTL && styles.inputBarRTL]}>
           <TextInput
             ref={inputRef}
@@ -273,12 +391,12 @@ export default function ChatScreen() {
             multiline
             maxLength={500}
             returnKeyType="send"
-            onSubmitEditing={handleSend}
+            onSubmitEditing={() => handleSend()}
             blurOnSubmit={false}
           />
           <TouchableOpacity
             style={[styles.sendBtn, (!input.trim() || loading) && styles.sendBtnDisabled]}
-            onPress={handleSend}
+            onPress={() => handleSend()}
             disabled={!input.trim() || loading}
             activeOpacity={0.8}
           >
@@ -293,22 +411,23 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9FAFB' },
   flex: { flex: 1 },
+
+  /* ─── Header (red, matches mobile web) ─── */
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#dc2626',
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerCenter: { flex: 1, alignItems: 'center' },
   headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#1F2937' },
-  headerSubtitle: { fontSize: 11, color: '#6B7280', marginTop: 1 },
+  headerTitle: { fontSize: 15, fontWeight: '700', color: '#ffffff' },
+  headerSubtitle: { fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
 
+  /* ─── Messages ─── */
   messageList: { flex: 1 },
   messageListContent: { padding: 16, paddingBottom: 8 },
 
@@ -358,7 +477,49 @@ const styles = StyleSheet.create({
   typingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   typingText: { fontSize: 13, color: '#6B7280', fontStyle: 'italic' },
 
-  // Product card
+  /* ─── Quick-action buttons ─── */
+  quickActionsContainer: {
+    marginStart: 36, // align with bubble (avatar 28 + margin 8)
+    marginTop: 4,
+    marginBottom: 8,
+    gap: 8,
+  },
+  quickActionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  quickActionsRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  quickActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'transparent',
+  },
+  quickActionBtnHighlight: {
+    backgroundColor: '#dc2626',
+    borderColor: '#dc2626',
+  },
+  quickActionEmoji: {
+    fontSize: 13,
+  },
+  quickActionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  quickActionLabelHighlight: {
+    color: '#ffffff',
+  },
+
+  /* ─── Product card ─── */
   productCard: {
     flexDirection: 'row',
     backgroundColor: '#F9FAFB',
@@ -412,7 +573,7 @@ const styles = StyleSheet.create({
   },
   viewProductText: { fontSize: 11, fontWeight: '600', color: '#374151' },
 
-  // Input bar
+  /* ─── Input bar ─── */
   inputBar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -433,6 +594,8 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 10 : 8,
     maxHeight: 100,
     marginEnd: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   inputRTL: { textAlign: 'right', marginEnd: 0, marginStart: 8 },
   sendBtn: {

@@ -6,7 +6,7 @@ import LoginScreen from './auth/login';
 import ChatButton from '../components/ChatButton';
 
 // Screens where the chat button should be hidden
-const CHAT_HIDDEN_ROUTES = ['/chat', '/skin-analysis-camera', '/checkout', '/auth/', '/webview', '/payment/'];
+const CHAT_HIDDEN_ROUTES = ['/chat', '/skin-analysis-camera', '/checkout', '/auth/', '/webview', '/payment/', '/profile'];
 
 export default function AuthWrapper() {
   const { isAuthenticated, loading } = useAuth();

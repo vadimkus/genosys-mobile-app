@@ -10,6 +10,41 @@ const log = createLogger('ChatService');
 const CHAT_API_URL = 'https://genosys.ae/api/chat';
 
 /**
+ * Get user context for personalised greetings (time of day, weekend, etc.)
+ * Mirrors the web ChatWidget getUserContext helper.
+ */
+function getUserContext() {
+  const now = new Date();
+  const hour = now.getHours();
+  const dayOfWeek = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+  let timeOfDay;
+  if (hour >= 5 && hour < 12) timeOfDay = 'morning';
+  else if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
+  else if (hour >= 17 && hour < 21) timeOfDay = 'evening';
+  else timeOfDay = 'night';
+
+  const isWeekend = dayOfWeek === 'Friday' || dayOfWeek === 'Saturday';
+
+  return {
+    timeOfDay,
+    dayOfWeek,
+    isWeekend,
+    localTime: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+}
+
+/** Lazy-initialised session-level chat ID (persists for the app lifetime). */
+let _chatSessionId = null;
+function getChatSessionId() {
+  if (!_chatSessionId) {
+    _chatSessionId = `chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }
+  return _chatSessionId;
+}
+
+/**
  * Send a message to the Genie chatbot and get a response.
  *
  * @param {Array<{ role: string, content: string }>} messages - Conversation history
@@ -27,7 +62,12 @@ export async function sendChatMessage(messages, locale = 'en') {
         'Accept': 'text/plain, application/json',
         'x-locale': locale,
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({
+        messages,
+        locale,
+        context: getUserContext(),
+        chatId: getChatSessionId(),
+      }),
     });
 
     if (!response.ok) {
