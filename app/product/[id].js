@@ -770,41 +770,45 @@ export default function ProductDetailScreen() {
           }
           
           return (
-            <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
-              <FlatList
-                ref={galleryRef}
-                data={galleryImages}
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item, index) => `gallery-${index}`}
-                onMomentumScrollEnd={(e) => {
-                  const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-                  setActiveImageIndex(newIndex);
-                }}
-                renderItem={({ item }) => (
-                  <Image
-                    source={item}
-                    style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: '#ffffff' }}
-                    contentFit={imageFit}
-                    transition={300}
-                    cachePolicy="memory-disk"
-                  />
-                )}
-              />
-              {/* Pagination Dots */}
-              <View style={styles.paginationDots}>
-                {galleryImages.map((_, index) => (
-                  <View
-                    key={`dot-${index}`}
-                    style={[
-                      styles.dot,
-                      activeImageIndex === index && styles.activeDot,
-                    ]}
-                  />
-                ))}
+            <>
+              <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
+                <FlatList
+                  ref={galleryRef}
+                  data={galleryImages}
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => `gallery-${index}`}
+                  onMomentumScrollEnd={(e) => {
+                    const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+                    setActiveImageIndex(newIndex);
+                  }}
+                  renderItem={({ item }) => (
+                    <Image
+                      source={item}
+                      style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: '#ffffff' }}
+                      contentFit={imageFit}
+                      transition={300}
+                      cachePolicy="memory-disk"
+                    />
+                  )}
+                />
               </View>
-            </View>
+              {/* Pagination Dots – outside image container to avoid overlap */}
+              {galleryImages.length > 1 && (
+                <View style={styles.paginationDots}>
+                  {galleryImages.map((_, index) => (
+                    <View
+                      key={`dot-${index}`}
+                      style={[
+                        styles.dot,
+                        activeImageIndex === index && styles.activeDot,
+                      ]}
+                    />
+                  ))}
+                </View>
+              )}
+            </>
           );
         })()}
 
@@ -1784,23 +1788,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 12,
-    left: 0,
-    right: 0,
+    paddingVertical: 10,
+    backgroundColor: '#ffffff',
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: 'rgba(0,0,0,0.15)',
     marginHorizontal: 4,
   },
   activeDot: {
     backgroundColor: '#1D1D1F',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   // Video styles moved to videoStyles (ProductVideo component)
   // Documentation Section
