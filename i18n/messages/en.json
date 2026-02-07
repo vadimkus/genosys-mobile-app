@@ -318,6 +318,8 @@
     "sizesCountShort": "{count} sizes",
     "multipleSizesShort": "Multiple sizes",
     "sizeLine": "Size: {size}",
+    "size": "Size",
+    "loginToSeePrice": "Login to see price",
     "inStock": "✓ In Stock",
     "fullPrice": "Full Price: {price} AED",
     "bundleDiscount": "15% OFF (Bundle Discount)",
@@ -1045,6 +1047,14 @@
     "addToBag": "Add to Bag",
     "loginToBuy": "Login to Buy"
   },
+  "voiceSearch": {
+    "label": "Voice search",
+    "listening": "Listening...",
+    "hint": "Say a product name",
+    "stop": "Stop",
+    "permissionTitle": "Microphone Access",
+    "permissionMessage": "Please allow microphone access in Settings to use voice search."
+  },
   "shop": {
     "loading": "Loading...",
     "subtitle": "Premium Skincare & Beauty",
@@ -1396,6 +1406,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "login": "Login",
+    "logout": "Sign Out",
     "close": "Close",
     "save": "Save",
     "done": "Done",

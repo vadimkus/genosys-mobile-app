@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -13,11 +13,16 @@ import {
   Modal,
   Pressable,
   I18nManager,
+  Animated as RNAnimated,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  ExpoSpeechRecognitionModule,
+  useSpeechRecognitionEvent,
+} from 'expo-speech-recognition';
 import { fetchProductCategories, fetchProducts } from '../../services/api';
 import { cacheProducts, getCachedProducts } from '../../services/productCache';
 import { ShopSkeleton } from '../../components/SkeletonLoader';
@@ -111,6 +116,85 @@ export default function ShopScreen() {
   const [headerHeight, setHeaderHeight] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const isRTL = dir === 'rtl';
+
+  // ─── Voice Search ───
+  const [isListening, setIsListening] = useState(false);
+  const [voicePartial, setVoicePartial] = useState('');
+  const pulseAnim = useRef(new RNAnimated.Value(1)).current;
+
+  // Map app locale to BCP-47 for speech recognizer
+  const speechLocale = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-US';
+
+  useSpeechRecognitionEvent('start', () => {
+    setIsListening(true);
+    setVoicePartial('');
+  });
+
+  useSpeechRecognitionEvent('result', (ev) => {
+    const text = ev.results?.[0]?.transcript || '';
+    if (ev.isFinal) {
+      setSearchQuery(text);
+      setIsListening(false);
+      setVoicePartial('');
+    } else {
+      setVoicePartial(text);
+    }
+  });
+
+  useSpeechRecognitionEvent('end', () => {
+    setIsListening(false);
+  });
+
+  useSpeechRecognitionEvent('error', (ev) => {
+    log.warn('Voice search error', ev?.error || ev);
+    setIsListening(false);
+    setVoicePartial('');
+  });
+
+  // Pulse animation while listening
+  useEffect(() => {
+    if (isListening) {
+      const loop = RNAnimated.loop(
+        RNAnimated.sequence([
+          RNAnimated.timing(pulseAnim, { toValue: 1.25, duration: 600, useNativeDriver: true }),
+          RNAnimated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+        ])
+      );
+      loop.start();
+      return () => loop.stop();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [isListening]);
+
+  const startVoiceSearch = useCallback(async () => {
+    try {
+      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!granted) {
+        Alert.alert(
+          t('voiceSearch.permissionTitle') || 'Microphone Access',
+          t('voiceSearch.permissionMessage') || 'Please allow microphone access in Settings to use voice search.',
+        );
+        return;
+      }
+      haptics.lightTap();
+      ExpoSpeechRecognitionModule.start({
+        lang: speechLocale,
+        interimResults: true,
+        maxAlternatives: 1,
+      });
+    } catch (err) {
+      log.error('Voice search start error', err?.message || err);
+    }
+  }, [speechLocale, t]);
+
+  const stopVoiceSearch = useCallback(() => {
+    try {
+      ExpoSpeechRecognitionModule.stop();
+    } catch {}
+    setIsListening(false);
+    setVoicePartial('');
+  }, []);
 
   // Animations disabled — static values only
 
@@ -712,8 +796,45 @@ export default function ShopScreen() {
                   <Ionicons name="close" size={14} color="#ffffff" />
                 </TouchableOpacity>
               )}
+
+              {/* Voice Search Mic Button */}
+              <TouchableOpacity
+                style={[styles.micButton, isRTL && styles.micButtonRTL]}
+                onPress={isListening ? stopVoiceSearch : startVoiceSearch}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={t('voiceSearch.label') || 'Voice search'}
+              >
+                <RNAnimated.View style={isListening ? { transform: [{ scale: pulseAnim }] } : undefined}>
+                  <Ionicons
+                    name={isListening ? 'mic' : 'mic-outline'}
+                    size={20}
+                    color={isListening ? '#dc2626' : '#86868B'}
+                  />
+                </RNAnimated.View>
+              </TouchableOpacity>
             </View>
           </View>
+
+          {/* Voice Search Listening Overlay */}
+          <Modal visible={isListening} transparent animationType="fade" onRequestClose={stopVoiceSearch}>
+            <Pressable style={styles.voiceOverlay} onPress={stopVoiceSearch}>
+              <View style={styles.voiceModal}>
+                <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
+                  <Ionicons name="mic" size={40} color="#ffffff" />
+                </RNAnimated.View>
+                <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
+                {voicePartial ? (
+                  <Text style={styles.voicePartialText} numberOfLines={2}>{voicePartial}</Text>
+                ) : (
+                  <Text style={styles.voiceHintText}>{t('voiceSearch.hint') || 'Say a product name'}</Text>
+                )}
+                <TouchableOpacity style={styles.voiceStopBtn} onPress={stopVoiceSearch} activeOpacity={0.8}>
+                  <Text style={styles.voiceStopText}>{t('voiceSearch.stop') || 'Stop'}</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Modal>
 
           {/* Categories Filter */}
           {categories.length > 0 && (
@@ -1262,6 +1383,83 @@ const styles = StyleSheet.create({
     backgroundColor: '#86868B',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  // Voice Search Mic Button
+  micButton: {
+    marginLeft: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  micButtonRTL: {
+    marginLeft: 0,
+    marginRight: 10,
+  },
+
+  // Voice Listening Overlay
+  voiceOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  voiceModal: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    paddingVertical: 36,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+    width: 280,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  voicePulseCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#dc2626',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  voiceTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    marginBottom: 8,
+  },
+  voicePartialText: {
+    fontSize: 15,
+    color: '#dc2626',
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: 16,
+    minHeight: 20,
+  },
+  voiceHintText: {
+    fontSize: 14,
+    color: '#86868B',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  voiceStopBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+    borderRadius: 20,
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  voiceStopText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1D1D1F',
   },
 
   // No Results Styles

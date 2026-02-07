@@ -318,6 +318,8 @@
     "sizesCountShort": "{count} أحجام",
     "multipleSizesShort": "أحجام متعددة",
     "sizeLine": "الحجم: {size}",
+    "size": "الحجم",
+    "loginToSeePrice": "سجّل الدخول لرؤية السعر",
     "inStock": "✓ متوفر",
     "fullPrice": "السعر الكامل: {price} AED",
     "bundleDiscount": "خصم 15% (باقة)",
@@ -1045,6 +1047,14 @@
     "addToBag": "أضف إلى السلة",
     "loginToBuy": "سجّل الدخول للشراء"
   },
+  "voiceSearch": {
+    "label": "البحث الصوتي",
+    "listening": "جارٍ الاستماع...",
+    "hint": "انطق اسم المنتج",
+    "stop": "إيقاف",
+    "permissionTitle": "الوصول إلى الميكروفون",
+    "permissionMessage": "يرجى السماح بالوصول إلى الميكروفون في الإعدادات لاستخدام البحث الصوتي."
+  },
   "shop": {
     "loading": "جارٍ التحميل...",
     "subtitle": "عناية وبشرة فاخرة",
@@ -1396,6 +1406,7 @@
     "cancel": "إلغاء",
     "delete": "حذف",
     "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
     "close": "إغلاق",
     "save": "حفظ",
     "done": "تم",

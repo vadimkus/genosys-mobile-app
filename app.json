@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "32",
+      "buildNumber": "33",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
@@ -38,6 +38,8 @@
       "infoPlist": {
         "CFBundleDisplayName": "Genosys UAE",
         "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account.",
+        "NSSpeechRecognitionUsageDescription": "Genosys uses speech recognition for voice search to help you find products quickly.",
+        "NSMicrophoneUsageDescription": "Genosys uses the microphone for voice search to help you find products by speaking.",
         "NSCameraUsageDescription": "Genosys uses the camera to take a profile photo.",
         "NSPhotoLibraryUsageDescription": "Genosys uses your photo library to let you choose a profile photo.",
         "NSPhotoLibraryAddUsageDescription": "Genosys can save your profile photo to your photo library.",
@@ -116,7 +118,8 @@
         {
           "merchantIdentifier": "merchant.ae.genosys.app"
         }
-      ]
+      ],
+      "expo-speech-recognition"
     ],
     "experiments": {
       "typedRoutes": true

@@ -318,6 +318,8 @@
     "sizesCountShort": "{count} размера(ов)",
     "multipleSizesShort": "Несколько размеров",
     "sizeLine": "Размер: {size}",
+    "size": "Размер",
+    "loginToSeePrice": "Войдите, чтобы увидеть цену",
     "inStock": "✓ В наличии",
     "fullPrice": "Полная цена: {price} AED",
     "bundleDiscount": "Скидка 15% (набор)",
@@ -1045,6 +1047,14 @@
     "addToBag": "В корзину",
     "loginToBuy": "Войти для покупки"
   },
+  "voiceSearch": {
+    "label": "Голосовой поиск",
+    "listening": "Слушаю...",
+    "hint": "Назовите продукт",
+    "stop": "Стоп",
+    "permissionTitle": "Доступ к микрофону",
+    "permissionMessage": "Разрешите доступ к микрофону в настройках для голосового поиска."
+  },
   "shop": {
     "loading": "Загрузка...",
     "subtitle": "Премиальный уход и красота",
@@ -1396,6 +1406,7 @@
     "cancel": "Отмена",
     "delete": "Удалить",
     "login": "Войти",
+    "logout": "Выйти",
     "close": "Закрыть",
     "save": "Сохранить",
     "done": "Готово",
