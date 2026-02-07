@@ -44,6 +44,9 @@ export const PRODUCT_CONFIG = {
   '12': {
     images: ['/images/EPI.jpg', '/images/Second/eppi_big.jpg'],
   },
+  '6': {
+    images: ['/images/CTS.jpg', '/images/Second/cts_big.jpg', '/images/Second/cts_big2.jpg'],
+  },
 };
 
 // Documentation links per product
