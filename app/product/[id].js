@@ -616,10 +616,13 @@ export default function ProductDetailScreen() {
           const productId = String(product.productNumber || product.id || id);
           const galleryImages = getProductImages(productId, product);
           const hasMultipleImages = galleryImages.length > 1;
+          const isBox = isBeautyBoxProduct(product);
+          // Beauty boxes show multiple products in one image → "contain" avoids clipping
+          const imageFit = isBox ? 'contain' : 'cover';
           
           if (galleryImages.length === 0) {
             return (
-              <View style={styles.imageContainer}>
+              <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
                 <View style={styles.heroImagePlaceholder}>
                   <Text style={styles.heroPlaceholderText}>
                     {product.name?.charAt(0) || 'G'}
@@ -631,11 +634,11 @@ export default function ProductDetailScreen() {
           
           if (!hasMultipleImages) {
             return (
-              <View style={styles.imageContainer}>
+              <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
                 <Image
                   source={galleryImages[0]}
                   style={styles.heroImage}
-                  contentFit="cover"
+                  contentFit={imageFit}
                   transition={300}
                   cachePolicy="memory-disk"
                 />
@@ -644,7 +647,7 @@ export default function ProductDetailScreen() {
           }
           
           return (
-            <View style={styles.imageContainer}>
+            <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
               <FlatList
                 ref={galleryRef}
                 data={galleryImages}
@@ -659,8 +662,8 @@ export default function ProductDetailScreen() {
                 renderItem={({ item }) => (
                   <Image
                     source={item}
-                    style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT }}
-                    contentFit="cover"
+                    style={{ width: SCREEN_WIDTH, height: isBox ? HEADER_HEIGHT + 20 : HEADER_HEIGHT }}
+                    contentFit={imageFit}
                     transition={300}
                     cachePolicy="memory-disk"
                   />
@@ -1031,6 +1034,10 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     height: HEADER_HEIGHT,
     backgroundColor: '#F5F5F7',
+  },
+  imageContainerBeautyBox: {
+    height: HEADER_HEIGHT + 20,
+    backgroundColor: '#ffffff',
   },
   heroImage: {
     width: '100%',
