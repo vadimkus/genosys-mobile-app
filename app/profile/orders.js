@@ -576,70 +576,108 @@ export default function OrdersScreen() {
                         const hasVip = Number.isFinite(discAmt) && discAmt > 0;
                         const hasBundle = Number.isFinite(bundleDiscAmt) && bundleDiscAmt > 0;
                         const hasAnyDiscount = hasVip || hasBundle;
-                        if (!hasAnyDiscount) return null;
                         const retailTotal = Number(subtotal) + (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
                         const afterVipSubtotal = retailTotal - (hasVip ? discAmt : 0);
                         const totalSaved = (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
+                        const paidCount = Array.isArray(o.items) ? o.items.filter(it => !(it?.isPromotionItem === true || String(it?.selectedSize || '').trim() === '__PROMO__' || Number(it?.price || 0) === 0)).length : 0;
+
                         return (
                           <>
-                            {/* Retail Price (strikethrough) */}
+                            {hasAnyDiscount ? (
+                              <>
+                                {/* Retail Price (strikethrough) */}
+                                <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                  <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>
+                                    {t('ordersDetail.retailPrice')} ({paidCount} {paidCount === 1 ? t('checkout.item') : t('checkout.items')})
+                                  </Text>
+                                  <Text style={[styles.orderTotalsValueMuted, isRTL && styles.valueLTR]}>AED {formatAED(retailTotal)}</Text>
+                                </View>
+                                {/* VIP Discount (purple) */}
+                                {hasVip ? (
+                                  <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                    <Text style={[styles.orderTotalsLabelPurple, isRTL && styles.textRTLRight]}>
+                                      {t('ordersDetail.vipDiscount')}{Number.isFinite(discountPct) && discountPct > 0 ? ` (${Math.round(discountPct)}%)` : ''}
+                                    </Text>
+                                    <Text style={[styles.orderTotalsValuePurple, isRTL && styles.valueLTR]}>-AED {formatAED(discAmt)}</Text>
+                                  </View>
+                                ) : null}
+                                {/* Intermediate Subtotal (only when both VIP + Bundle) */}
+                                {hasVip && hasBundle ? (
+                                  <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                    <Text style={[styles.orderTotalsLabelMuted, isRTL && styles.textRTLRight]}>{t('checkout.intermediateSubtotal')}</Text>
+                                    <Text style={[styles.orderTotalsValueMutedSmall, isRTL && styles.valueLTR]}>AED {formatAED(afterVipSubtotal)}</Text>
+                                  </View>
+                                ) : null}
+                                {/* Bundle Discount (green) */}
+                                {hasBundle ? (
+                                  <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                    <Text style={[styles.orderTotalsLabelGreen, isRTL && styles.textRTLRight]}>
+                                      {t('ordersDetail.bundleDiscount')}{Number.isFinite(bundleDiscPct) && bundleDiscPct > 0 ? ` (${Math.round(bundleDiscPct)}%)` : ''}
+                                    </Text>
+                                    <Text style={[styles.orderTotalsValueGreen, isRTL && styles.valueLTR]}>-AED {formatAED(bundleDiscAmt)}</Text>
+                                  </View>
+                                ) : null}
+                                <View style={styles.orderSummaryDividerLight} />
+                                {/* Net Subtotal (bold) */}
+                                <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                  <Text style={[styles.orderTotalsLabelBold, isRTL && styles.textRTLRight]}>{t('checkout.netSubtotal')}</Text>
+                                  <Text style={[styles.orderTotalsValueBold, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
+                                </View>
+                              </>
+                            ) : (
+                              /* No discounts — simple subtotal */
+                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                                <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.subtotal')}</Text>
+                                <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
+                              </View>
+                            )}
+
+                            {/* Shipping */}
                             <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                              <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersDetail.retailPrice')}</Text>
-                              <Text style={[styles.orderTotalsValueMuted, isRTL && styles.valueLTR]}>AED {formatAED(retailTotal)}</Text>
+                              <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>
+                                {emirate ? t('checkout.shippingTo', { emirate: formatEmirateLabel(t, emirate) }) : t('ordersScreen.shipping')}
+                              </Text>
+                              <Text style={[styles.orderTotalsValue, freeShipping && styles.orderTotalsValueFree, isRTL && styles.valueLTR]}>
+                                {freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}
+                              </Text>
                             </View>
-                            {/* VIP Discount (purple) */}
-                            {hasVip ? (
-                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                                <Text style={[styles.orderTotalsLabelPurple, isRTL && styles.textRTLRight]}>
-                                  {t('ordersDetail.vipDiscount')}{Number.isFinite(discountPct) && discountPct > 0 ? ` (${Math.round(discountPct)}%)` : ''}
+
+                            {/* Free Shipping banner */}
+                            {freeShipping ? (
+                              <View style={styles.freeShippingBanner}>
+                                <Ionicons name="checkmark-circle" size={12} color="#27AE60" style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                                <Text style={[styles.freeShippingText, isRTL && styles.textRTLRight]}>
+                                  {t('checkout.freeShippingApplied')}
                                 </Text>
-                                <Text style={[styles.orderTotalsValuePurple, isRTL && styles.valueLTR]}>-AED {formatAED(discAmt)}</Text>
                               </View>
                             ) : null}
-                            {/* Intermediate Subtotal (only when both VIP + Bundle) */}
-                            {hasVip && hasBundle ? (
-                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                                <Text style={[styles.orderTotalsLabelMuted, isRTL && styles.textRTLRight]}>{t('checkout.intermediateSubtotal')}</Text>
-                                <Text style={[styles.orderTotalsValueMutedSmall, isRTL && styles.valueLTR]}>AED {formatAED(afterVipSubtotal)}</Text>
-                              </View>
-                            ) : null}
-                            {/* Bundle Discount (green) */}
-                            {hasBundle ? (
-                              <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                                <Text style={[styles.orderTotalsLabelGreen, isRTL && styles.textRTLRight]}>
-                                  {t('ordersDetail.bundleDiscount')}{Number.isFinite(bundleDiscPct) && bundleDiscPct > 0 ? ` (${Math.round(bundleDiscPct)}%)` : ''}
-                                </Text>
-                                <Text style={[styles.orderTotalsValueGreen, isRTL && styles.valueLTR]}>-AED {formatAED(bundleDiscAmt)}</Text>
-                              </View>
-                            ) : null}
-                            <View style={styles.orderSummaryDividerLight} />
-                            {/* You Saved banner */}
-                            {totalSaved > 0 ? (
+
+                            {/* VAT */}
+                            <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                              <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.vatIncluded')}</Text>
+                              <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(vat)}</Text>
+                            </View>
+                            <Text style={[styles.vatNoteRed, isRTL && styles.textRTLRight]}>
+                              {t('checkout.allPricesVatInclusive')}
+                            </Text>
+
+                            <View style={styles.orderSummaryDivider} />
+
+                            {/* Total */}
+                            <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
+                              <Text style={[styles.orderTotalsLabelStrong, isRTL && styles.textRTLRight]}>{t('ordersScreen.total')}</Text>
+                              <Text style={[styles.orderTotalsValueStrong, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
+                            </View>
+
+                            {/* You Saved banner (after total) */}
+                            {hasAnyDiscount && totalSaved > 0 ? (
                               <View style={styles.youSavedBanner}>
-                                <Text style={styles.youSavedText}>{t('checkout.youSaved')}: AED {formatAED(totalSaved)}</Text>
+                                <Text style={styles.youSavedText}>🎉 {t('checkout.youSaved')}: AED {formatAED(totalSaved)}</Text>
                               </View>
                             ) : null}
                           </>
                         );
                       })()}
-
-                      {/* Net Subtotal / Subtotal */}
-                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                        <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.subtotal')}</Text>
-                        <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>
-                      </View>
-                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                        <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.shipping')}</Text>
-                        <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>{freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}</Text>
-                      </View>
-                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                        <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.vatIncluded')}</Text>
-                        <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(vat)}</Text>
-                      </View>
-                      <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
-                        <Text style={[styles.orderTotalsLabelStrong, isRTL && styles.textRTLRight]}>{t('ordersScreen.total')}</Text>
-                        <Text style={[styles.orderTotalsValueStrong, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
-                      </View>
                     </View>
                   ) : null}
 
@@ -823,8 +861,30 @@ const styles = StyleSheet.create({
   orderTotalsValueMutedSmall: { fontSize: 12, color: '#9CA3AF', fontWeight: '700' },
   orderTotalsValueGreen: { fontSize: 12, color: '#16A34A', fontWeight: '800' },
   orderTotalsValuePurple: { fontSize: 12, color: '#7C3AED', fontWeight: '800' },
+  orderTotalsLabelBold: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
+  orderTotalsValueBold: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
+  orderTotalsValueFree: { color: '#16A34A', fontWeight: '800' },
   orderTotalsLabelStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
   orderTotalsValueStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
+  freeShippingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDF4',
+    borderRadius: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginVertical: 2,
+  },
+  freeShippingText: {
+    fontSize: 10,
+    color: '#27AE60',
+    fontWeight: '600',
+  },
+  vatNoteRed: {
+    fontSize: 10,
+    color: '#dc2626',
+    paddingVertical: 1,
+  },
   youSavedBanner: {
     backgroundColor: '#F0FDF4',
     borderRadius: 8,

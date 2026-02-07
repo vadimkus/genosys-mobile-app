@@ -705,34 +705,49 @@ export default function BagScreen() {
                 </Text>
               </View>
 
+              {/* Free Shipping banner */}
+              {cartSummary.hasFreeShipping && (
+                <View style={styles.freeShippingBannerGreen}>
+                  <Ionicons name="checkmark-circle" size={14} color="#27AE60" style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                  <Text style={[styles.freeShippingTextGreen, isRTL && styles.summaryLabelRTL]}>
+                    {t('checkout.freeShippingApplied')}
+                  </Text>
+                </View>
+              )}
+
               {/* VAT */}
               <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                 <Text style={[styles.summaryLabel, isRTL && styles.summaryLabelRTL]}>{t('checkout.vatIncluded')}</Text>
                 <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>{safeVat.toFixed(2)} AED</Text>
               </View>
+              <Text style={[styles.vatNoteRed, isRTL && styles.summaryLabelRTL]}>
+                {t('checkout.allPricesVatInclusive')}
+              </Text>
 
               <View style={styles.divider} />
+            </>
+          }
+          always={
+            <>
+              <View style={[styles.totalRow, isRTL && styles.totalRowRTL]}>
+                <Text style={[styles.totalLabel, isRTL && styles.totalLabelRTL]}>
+                  {t('bag.totalLine', {
+                    count: cartSummary.itemCount,
+                    label: cartSummary.itemCount === 1 ? t('bag.item') : t('bag.items'),
+                  })}
+                </Text>
+                <Text style={[styles.totalAmount, isRTL && styles.totalAmountRTL]}>{safeTotal.toFixed(2)} AED</Text>
+              </View>
 
-              {/* You Saved banner */}
+              {/* You Saved banner (after total) */}
               {waterfall.hasAnyDiscount && waterfall.totalSaved > 0 && (
                 <View style={styles.youSavedBanner}>
                   <Text style={styles.youSavedText}>
-                    {t('checkout.youSaved')}: AED {waterfall.totalSaved.toFixed(2)}
+                    🎉 {t('checkout.youSaved')}: AED {waterfall.totalSaved.toFixed(2)}
                   </Text>
                 </View>
               )}
             </>
-          }
-          always={
-            <View style={[styles.totalRow, isRTL && styles.totalRowRTL]}>
-              <Text style={[styles.totalLabel, isRTL && styles.totalLabelRTL]}>
-                {t('bag.totalLine', {
-                  count: cartSummary.itemCount,
-                  label: cartSummary.itemCount === 1 ? t('bag.item') : t('bag.items'),
-                })}
-              </Text>
-              <Text style={[styles.totalAmount, isRTL && styles.totalAmountRTL]}>{safeTotal.toFixed(2)} AED</Text>
-            </View>
           }
         />
         
@@ -1006,7 +1021,7 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
   },
   
-  // Free Shipping Banner
+  // Free Shipping Banner (legacy/cart top)
   freeShippingBanner: {
     backgroundColor: '#F2F2F7',
     borderRadius: 8,
@@ -1020,6 +1035,26 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
     fontSize: 14,
     fontWeight: '600',
+  },
+  // Free Shipping Banner (green, inside waterfall)
+  freeShippingBannerGreen: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDF4',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginVertical: 4,
+  },
+  freeShippingTextGreen: {
+    fontSize: 12,
+    color: '#27AE60',
+    fontWeight: '600',
+  },
+  vatNoteRed: {
+    fontSize: 11,
+    color: '#dc2626',
+    paddingVertical: 2,
   },
   cartItem: {
     flexDirection: 'row',

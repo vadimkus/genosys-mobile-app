@@ -119,7 +119,8 @@ computeWaterfallBreakdown(items, user) → {
 
 - Uses `computeWaterfallBreakdown(items, user)` directly
 - Waterfall is rendered inside the `CollapsibleFooter` component's `details` prop
-- Same visual structure as checkout
+- Full waterfall flow: Retail Price → VIP → Intermediate → Bundle → Net Subtotal → Shipping (free banner) → VAT (note) → divider → Total → You Saved
+- "You Saved" banner is in the `always` section (always visible, after Total)
 
 ### Orders List (`app/profile/orders.js`)
 
@@ -130,6 +131,7 @@ computeWaterfallBreakdown(items, user) → {
   - `order.discountPercentage` → VIP percentage label
   - `order.bundleDiscountPercentage` → Bundle percentage label
   - `retailTotal = subtotal + discountAmount + bundleDiscountAmount`
+- Full waterfall flow: Retail Price (with item count) → VIP → Intermediate → Bundle → Net Subtotal → Shipping (with emirate, free banner) → VAT (note) → divider → Total → You Saved
 - Displayed inside the expandable order card (chevron toggle)
 
 ### Order Detail (`app/profile/orders/[id].js`)
