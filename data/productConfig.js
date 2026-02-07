@@ -41,6 +41,9 @@ export const PRODUCT_CONFIG = {
   '35': {
     images: ['/images/HYDR.jpg', '/images/Second/hmask_big.jpg'],
   },
+  '12': {
+    images: ['/images/EPI.jpg', '/images/Second/eppi_big.jpg'],
+  },
 };
 
 // Documentation links per product
