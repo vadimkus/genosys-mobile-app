@@ -167,20 +167,23 @@ Color scheme: Purple (#7C3AED) for VIP, Green (#16A34A) for bundle. See [WATERFA
 │  │ Emirate: Dubai            │  │
 │  │ Address: Building A, ...  │  │
 │                                 │
-│  🧮 ORDER SUMMARY              │  ← Summary section
-│  │ (Waterfall pricing)       │  │  ← Same as orders list
-│  │ Retail Price  AED 500     │  │
-│  │ VIP Disc.    -AED 75      │  │
-│  │ Subtotal     AED 425      │  │
-│  │ Bundle Disc. -AED 64      │  │
-│  │ ─────────────────────     │  │
-│  │ You saved: AED 139        │  │
-│  │ ─────────────────────     │  │
-│  │ Subtotal     AED 361      │  │
-│  │ Shipping     FREE         │  │
-│  │ VAT          AED 17       │  │
-│  │ ═════════════════════     │  │
-│  │ TOTAL        AED 361.25   │  │
+│  🧮 ORDER SUMMARY              │  ← Summary section (waterfall)
+   │  │ Retail Price (3 items)    │  │  ← Strikethrough
+   │  │              AED 500      │  │
+   │  │ VIP Disc. (15%)           │  │  ← Purple
+   │  │             -AED 75       │  │
+   │  │ Subtotal    AED 425       │  │  ← Muted (when both discounts)
+   │  │ Bundle Disc. (15%)        │  │  ← Green
+   │  │             -AED 64       │  │
+   │  │ ─────────────────────     │  │
+   │  │ Net Subtotal AED 361      │  │  ← Bold
+   │  │ Shipping to Dubai  FREE   │  │  ← Green + banner
+   │  │ ✓ Free shipping applied!  │  │  ← Green checkmark banner
+   │  │ VAT (incl.)   AED 17     │  │
+   │  │ All prices VAT inclusive  │  │  ← Red note
+   │  │ ═════════════════════     │  │
+   │  │ TOTAL        AED 361.25   │  │  ← Bold red
+   │  │ 🎉 You saved: AED 139    │  │  ← Green celebration banner
 │                                 │
 │  [🔄 Reorder]                   │  ← Adds items back to cart
 │  [💳 Pay Now]                   │  ← Only for unpaid orders
