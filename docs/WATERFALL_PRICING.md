@@ -139,6 +139,8 @@ computeWaterfallBreakdown(items, user) → {
 - Same server-field approach as Orders List
 - Displayed in the dedicated "Order Summary" section card
 - Also includes per-item discount breakdown with inferred original prices
+- **Product thumbnails** shown next to each item (56×56 for paid, 40×40 for promo)
+- Image URLs resolved via `resolveImageUrl()` helper (handles relative paths by prepending `AUTH_CONFIG.ASSET_ORIGIN`)
 
 ## i18n Keys
 

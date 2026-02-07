@@ -28,6 +28,7 @@ All product and UI images have been migrated from React Native's built-in `Image
 | `app/product/[id].js` | Hero product image | Added `transition={300}` for smooth detail view |
 | `app/chat.js` | Product cards in AI chat | Product recommendation images |
 | `app/profile/orders.js` | Empty state illustration | |
+| `app/profile/orders/[id].js` | Item thumbnails (paid + promo) | 56×56 paid items, 40×40 promo items, with `resolveImageUrl()` for relative paths |
 | `components/product/PerfectCombinationCard.js` | Combo product images | |
 | `components/BrandedLaunchScreen.js` | Splash logo | Local asset via `require()` |
 | `components/ParallaxScrollView.js` | Parallax header image | |
@@ -76,6 +77,36 @@ Local assets (e.g., splash logo) use:
   contentFit="contain"
 />
 ```
+
+---
+
+## Image URL Resolution
+
+Product images in the database are stored as **relative paths** (e.g., `/images/products/anti-aging-beauty-box.jpg`). Since `expo-image` requires full URLs for remote images, these must be resolved before use.
+
+### Pattern
+
+```javascript
+import { AUTH_CONFIG } from '../config/auth';
+
+const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
+
+const resolveImageUrl = (raw) => {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (s.startsWith('http://') || s.startsWith('https://')) return s;
+  return `${ASSET_ORIGIN}${s.startsWith('/') ? '' : '/'}${s}`;
+};
+```
+
+### Where Used
+
+| File | Pattern |
+|---|---|
+| `components/product/PerfectCombinationCard.js` | Inline: `` `${AUTH_CONFIG.ASSET_ORIGIN}${product.image}` `` |
+| `app/profile/orders/[id].js` | `resolveImageUrl()` helper for paid + promo item thumbnails |
+
+When adding new image displays, always check if the source is a relative path and resolve it with the asset origin.
 
 ---
 

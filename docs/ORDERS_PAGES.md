@@ -146,8 +146,8 @@ Color scheme: Purple (#7C3AED) for VIP, Green (#16A34A) for bundle. See [WATERFA
 │                                 │
 │  🛍️ ITEMS                       │  ← Items section
 │  ┌───────────────────────────┐  │
-│  │ Product Name        [15%] │  │  ← Item card with discount pill
-│  │ AED 170.00                │  │
+│  │ [IMG] Product Name  [15%] │  │  ← Item card with thumbnail + discount pill
+│  │       AED 170.00          │  │
 │  │ Qty: 2 • Size: 50ml      │  │
 │  │ Each: AED 170.00          │  │
 │  │ Full Price: AED 200.00    │  │  ← Strikethrough
@@ -157,7 +157,7 @@ Color scheme: Purple (#7C3AED) for VIP, Green (#16A34A) for bundle. See [WATERFA
 │  └───────────────────────────┘  │
 │  ┌───────────────────────────┐  │
 │  │ 🎁 Free Items             │  │  ← Promo items (green)
-│  │ Hydro Cool Mask    FREE   │  │
+│  │ [IMG] Hydro Cool Mask FREE│  │  ← Smaller thumbnail
 │  └───────────────────────────┘  │
 │                                 │
 │  📍 SHIPPING DETAILS            │  ← Shipping section
@@ -216,6 +216,7 @@ setOrder(match)
 ### Item Card Features
 
 Each paid item shows:
+- **Product thumbnail** (56×56 rounded image) with placeholder icon when unavailable
 - Name with discount percentage pill badge (green)
 - Price per unit and total
 - Per-item discount breakdown:
@@ -224,7 +225,28 @@ Each paid item shows:
   - Price after discount
 - Line totals for qty > 1
 
-Promo/free items shown separately in a green section.
+Promo/free items shown separately in a green section with **smaller thumbnails** (40×40) and gift placeholder icon.
+
+### Image URL Resolution
+
+Order items may store image paths in different formats:
+- **Relative paths** (e.g., `/images/products/anti-aging-beauty-box.jpg`) — stored in the database
+- **Full URLs** (e.g., `https://genosys.ae/images/products/...`) — already complete
+
+The `resolveImageUrl()` helper function (defined in `orders/[id].js`) normalizes these:
+
+```javascript
+const resolveImageUrl = (raw) => {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (s.startsWith('http://') || s.startsWith('https://')) return s;
+  return `${ASSET_ORIGIN}${s.startsWith('/') ? '' : '/'}${s}`;
+};
+```
+
+Where `ASSET_ORIGIN` defaults to `AUTH_CONFIG.ASSET_ORIGIN` (typically `https://genosys.ae`).
+
+This pattern matches the approach used in `PerfectCombinationCard.js` and other components that successfully display product images.
 
 ### Discount Inference
 
@@ -281,6 +303,7 @@ For Apple Sign-In users, the order may contain an Apple relay email (`@privatere
 | `contexts/AuthContext.js` | User token and profile |
 | `contexts/CartContext.js` | Cart actions for reorder |
 | `utils/emirateUtils.js` | `formatEmirateLabel()` |
+| `config/auth.js` | `AUTH_CONFIG.ASSET_ORIGIN` for image URL resolution |
 | `components/SkeletonLoader.js` | `OrdersSkeleton` loading state |
 
 ## i18n
