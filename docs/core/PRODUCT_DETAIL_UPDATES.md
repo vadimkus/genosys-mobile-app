@@ -56,19 +56,22 @@ Added `hmask_big.jpg` as a second gallery image for the Hydro Cool Modeling Mask
 
 | Product # | Product Name | Video File |
 |-----------|-------------|------------|
-| 10 | Snow O2 Cleanser | `/videos/Cleanser_02.mp4` |
+| 10 | Snow O₂ Cleanser | `/videos/Cleanser_02.mp4` |
+| 19 | All For Sensitive Serum | `/videos/allserum.mp4` |
 | 26 | EGF Repair Oxymask Cream | `/videos/egf.mp4` |
 
 ## Products with Multiple Images
 
-| Product # | Images |
-|-----------|--------|
-| 9 | AWS.jpg, aws1.jpg, aws2.jpg |
-| 10 | SNOW.jpg, cleanser_big.jpg |
-| 13 | SRS.jpg, sss1.jpg, sss2.jpg |
-| 19 | ASE.jpg, allserum_big.jpg |
-| 26 | EGF.jpg, egf_big.jpg |
-| 35 | HYDR.jpg, hmask_big.jpg |
-| 38 | EZE.jpg, ez.jpg, ez1.jpg |
-| 51 | BFAD.png, ferment_big.jpg |
-| 52 | PDRN.png, pdrnnn.jpg |
+| Product # | Product Name | Images |
+|-----------|-------------|--------|
+| 6 | POWER SOLUTION CTS | CTS.jpg, cts_big.jpg, cts_big2.jpg |
+| 9 | POWER SOLUTION AWS | AWS.jpg, aws1.jpg, aws2.jpg |
+| 10 | Snow O₂ Cleanser | SNOW.jpg, cleanser_big.jpg |
+| 12 | EPI TURNOVER BOOSTING PEELING GEL | EPI.jpg, eppi_big.jpg |
+| 13 | SKIN RENEWAL PEELING SYSTEM (SRS) | SRS.jpg, sss1.jpg, sss2.jpg |
+| 19 | All For Sensitive Serum | ASE.jpg, allserum_big.jpg |
+| 26 | EGF Repair Oxymask Cream | EGF.jpg, egf_big.jpg |
+| 35 | Hydro Cool Modeling Mask | HYDR.jpg, hmask_big.jpg |
+| 38 | EZ CO₂ Mask Kit | EZE.jpg, ez.jpg, ez1.jpg |
+| 51 | Bio-Ferment Age Defying Powder Mask | BFAD.png, ferment_big.jpg |
+| 52 | Skin Reboot PDRN Mask Pack | PDRN.png, pdrnnn.jpg |
