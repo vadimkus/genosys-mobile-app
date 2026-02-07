@@ -1,14 +1,12 @@
 /**
  * Floating Chat Button - Opens AI chatbot ("Genie")
  * Positioned bottom-right, above the tab bar.
- * Animated entrance with scale + fade.
  */
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
-  Animated,
   Platform,
   View,
 } from 'react-native';
@@ -16,45 +14,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 export default function ChatButton({ visible = true }) {
-  const scale = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.spring(scale, {
-          toValue: 1,
-          friction: 5,
-          tension: 80,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(scale, { toValue: 0, duration: 150, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0, duration: 150, useNativeDriver: true }),
-      ]).start();
-    }
-  }, [visible]);
-
   if (!visible) return null;
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          transform: [{ scale }],
-          opacity,
-        },
-      ]}
-      pointerEvents="auto"
-    >
+    <View style={styles.container} pointerEvents="auto">
       <TouchableOpacity
         style={styles.button}
         onPress={() => router.push('/chat')}
@@ -66,7 +29,7 @@ export default function ChatButton({ visible = true }) {
         {/* Green notification dot (matches web) */}
         <View style={styles.notificationDot} />
       </TouchableOpacity>
-    </Animated.View>
+    </View>
   );
 }
 

@@ -12,8 +12,6 @@ import {
   Alert,
   Modal,
   Pressable,
-  Animated,
-  Easing,
   I18nManager,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -38,7 +36,6 @@ import {
 } from '../../utils/productLocalization';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
-import { useAnimation } from '../../contexts/AnimationContext';
 import NavigationDrawer from '../../components/NavigationDrawer';
 
 
@@ -97,7 +94,7 @@ const buildAllowedCategoryList = (foundCategories = []) => {
 export default function ShopScreen() {
   const { user } = useAuth();
   const { t, locale, setLocale, dir } = useLocalization();
-  const { enabled: animationsEnabled, toggle: toggleAnimations } = useAnimation();
+  // Animations disabled (kept only for header in bag.js)
   const { addItem } = useCart();
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
@@ -113,230 +110,10 @@ export default function ShopScreen() {
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [subtitleWidth, setSubtitleWidth] = useState(0);
   const isRTL = dir === 'rtl';
 
-  // Shared pulse for categories + hearts (visible but not disruptive).
-  const categoryPulse = React.useRef(new Animated.Value(0)).current;
-  const heartPulse = React.useRef(new Animated.Value(0)).current;
-  const pulseLoopsRef = React.useRef({ category: null, heart: null });
+  // Animations disabled — static values only
 
-  // Premium header subtitle animation (shimmer + breath)
-  const subtitleShine = React.useRef(new Animated.Value(0)).current;
-  const subtitleBreath = React.useRef(new Animated.Value(0)).current;
-  const subtitleLoopRef = React.useRef({ shine: null, breath: null });
-
-  // Card animation store keyed by product.id (no hooks inside list map)
-  const cardAnimRef = React.useRef(new Map());
-
-  const startFloatLoop = (anim) => {
-    try {
-      anim.loop?.stop?.();
-    } catch {}
-    anim.loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(anim.float, {
-          toValue: 1,
-          duration: 1600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(anim.pulse, {
-          toValue: 1,
-          duration: 1600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(anim.float, {
-          toValue: 0,
-          duration: 1600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(anim.pulse, {
-          toValue: 0,
-          duration: 1600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    anim.loop.start();
-  };
-
-  const getCardAnim = (id, index = 0) => {
-    const key = String(id || '');
-    if (!key) return null;
-    const existing = cardAnimRef.current.get(key);
-    if (existing) return existing;
-    const anim = {
-      opacity: new Animated.Value(1),
-      enterY: new Animated.Value(0),
-      float: new Animated.Value(0),
-      pulse: new Animated.Value(0),
-      loop: null,
-      didInit: false,
-    };
-    cardAnimRef.current.set(key, anim);
-
-    if (animationsEnabled) {
-      // Pop-in once when the card is first created (schedule to avoid doing work inline in render).
-      anim.didInit = true;
-      anim.opacity.setValue(0);
-      anim.enterY.setValue(8);
-      setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(anim.opacity, {
-            toValue: 1,
-            duration: 280 + Math.min(220, index * 18),
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-          }),
-          Animated.spring(anim.enterY, {
-            toValue: 0,
-            damping: 14,
-            stiffness: 180,
-            mass: 0.7,
-            useNativeDriver: true,
-          }),
-        ]).start();
-        startFloatLoop(anim);
-      }, 0);
-    }
-
-    return anim;
-  };
-
-  // When toggling animations on/off, start/stop loops and normalize values.
-  useEffect(() => {
-    cardAnimRef.current.forEach((anim) => {
-      try { anim.loop?.stop?.(); } catch {}
-      anim.loop = null;
-
-      if (!animationsEnabled) {
-        anim.didInit = false;
-        anim.opacity.setValue(1);
-        anim.enterY.setValue(0);
-        anim.float.setValue(0);
-        anim.pulse.setValue(0);
-        return;
-      }
-
-      startFloatLoop(anim);
-    });
-  }, [animationsEnabled]);
-
-  // Categories + heart "breathing/pumping" loops (enabled only when fun mode is ON).
-  useEffect(() => {
-    const stopAll = () => {
-      try { pulseLoopsRef.current.category?.stop?.(); } catch {}
-      try { pulseLoopsRef.current.heart?.stop?.(); } catch {}
-      pulseLoopsRef.current.category = null;
-      pulseLoopsRef.current.heart = null;
-    };
-
-    stopAll();
-    if (!animationsEnabled) {
-      categoryPulse.setValue(0);
-      heartPulse.setValue(0);
-      return;
-    }
-
-    pulseLoopsRef.current.category = Animated.loop(
-      Animated.sequence([
-        Animated.timing(categoryPulse, {
-          toValue: 1,
-          duration: 1700,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(categoryPulse, {
-          toValue: 0,
-          duration: 1700,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    pulseLoopsRef.current.category.start();
-
-    pulseLoopsRef.current.heart = Animated.loop(
-      Animated.sequence([
-        Animated.timing(heartPulse, {
-          toValue: 1,
-          duration: 520,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(heartPulse, {
-          toValue: 0,
-          duration: 520,
-          easing: Easing.in(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    pulseLoopsRef.current.heart.start();
-
-    return stopAll;
-  }, [animationsEnabled, categoryPulse, heartPulse]);
-
-  // Header subtitle shimmer/breath (enabled only when fun mode is ON).
-  useEffect(() => {
-    const stopAll = () => {
-      try { subtitleLoopRef.current.shine?.stop?.(); } catch {}
-      try { subtitleLoopRef.current.breath?.stop?.(); } catch {}
-      subtitleLoopRef.current.shine = null;
-      subtitleLoopRef.current.breath = null;
-    };
-
-    stopAll();
-    if (!animationsEnabled) {
-      subtitleShine.setValue(0);
-      subtitleBreath.setValue(0);
-      return;
-    }
-
-    // Breath (very subtle)
-    subtitleLoopRef.current.breath = Animated.loop(
-      Animated.sequence([
-        Animated.timing(subtitleBreath, {
-          toValue: 1,
-          duration: 2200,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(subtitleBreath, {
-          toValue: 0,
-          duration: 2200,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    subtitleLoopRef.current.breath.start();
-
-    // Shimmer sweep (runs even if width is 0; will become visible once measured)
-    subtitleLoopRef.current.shine = Animated.loop(
-      Animated.sequence([
-        Animated.timing(subtitleShine, {
-          toValue: 1,
-          duration: 1800,
-          easing: Easing.inOut(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.delay(900),
-        Animated.timing(subtitleShine, {
-          toValue: 0,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    subtitleLoopRef.current.shine.start();
-
-    return stopAll;
-  }, [animationsEnabled, subtitleShine, subtitleBreath]);
 
   const renderProductCardInner = (product) => {
     const isFav = !!isFavorite(product?.id);
@@ -424,21 +201,13 @@ export default function ShopScreen() {
             }}
             activeOpacity={0.8}
           >
-            <Animated.View
-              style={[
-                animationsEnabled && isFav && {
-                  transform: [{
-                        scale: heartPulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] }),
-                  }],
-                },
-              ]}
-            >
+            <View>
               <Ionicons
                 name={isFav ? 'heart' : 'heart-outline'}
                 size={20}
                 color={isFav ? '#dc2626' : '#ffffff'}
               />
-            </Animated.View>
+            </View>
           </TouchableOpacity>
 
           {/* Stock Status */}
@@ -813,22 +582,13 @@ export default function ShopScreen() {
               onPress={() => router.push('/favorites')}
               activeOpacity={0.7}
             >
-              <Animated.View
-                style={[
-                  animationsEnabled && {
-                    transform: [{
-                      scale: heartPulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] }),
-                    }],
-                  },
-                ]}
-              >
+              <View>
                 <Ionicons 
                   name={getFavoritesCount() > 0 ? "heart" : "heart-outline"} 
                   size={24} 
-                  // requested: red heart (even when empty, it stays outline but red)
                   color="#dc2626"
                 />
-              </Animated.View>
+              </View>
               {getFavoritesCount() > 0 && (
                 <View style={styles.favoritesBadge}>
                   <Text style={styles.favoritesBadgeText}>
@@ -838,48 +598,10 @@ export default function ShopScreen() {
               )}
             </TouchableOpacity>
           </View>
-          <View
-            style={styles.subtitleWrap}
-            onLayout={(e) => {
-              const w = e?.nativeEvent?.layout?.width;
-              if (typeof w === 'number' && Number.isFinite(w) && w > 0) setSubtitleWidth(w);
-            }}
-          >
-            <Animated.Text
-              style={[
-                styles.subtitle,
-                animationsEnabled && {
-                  opacity: subtitleBreath.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }),
-                  transform: [{
-                    translateY: subtitleBreath.interpolate({ inputRange: [0, 1], outputRange: [0, -1] }),
-                  }],
-                },
-              ]}
-            >
+          <View style={styles.subtitleWrap}>
+            <Text style={styles.subtitle}>
               {t('shop.subtitle')}
-            </Animated.Text>
-
-            {/* Shimmer highlight sweep */}
-            {animationsEnabled ? (
-              <Animated.View
-                pointerEvents="none"
-                style={[
-                  styles.subtitleShine,
-                  {
-                    transform: [
-                      { rotate: '18deg' },
-                      {
-                        translateX: subtitleShine.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-(Math.max(120, subtitleWidth) * 0.7), Math.max(120, subtitleWidth) * 0.9],
-                        }),
-                      },
-                    ],
-                    opacity: subtitleBreath.interpolate({ inputRange: [0, 1], outputRange: [0.18, 0.24] }),
-                  },
-                ]}
-              />
-            ) : null}
+            </Text>
           </View>
         </View>
         
@@ -1019,19 +741,7 @@ export default function ShopScreen() {
 
                   return [...picked, ...rest];
                 })().map((category) => (
-                  <Animated.View
-                    key={category}
-                    style={[
-                      animationsEnabled && {
-                        transform: [{
-                          scale: categoryPulse.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [1, selectedCategory === category ? 1.015 : 1.01],
-                          }),
-                        }],
-                      },
-                    ]}
-                  >
+                  <View key={category}>
                     <TouchableOpacity
                       style={[
                         styles.categoryButton,
@@ -1051,7 +761,7 @@ export default function ShopScreen() {
                         {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
                       </Text>
                     </TouchableOpacity>
-                  </Animated.View>
+                  </View>
                 ))}
               </View>
               
@@ -1136,36 +846,17 @@ export default function ShopScreen() {
             </View>
           ) : (
             <View style={styles.gridContainer}>
-              {filteredProducts.map((product, index) => {
-                const anim = getCardAnim(product.id, index);
-                
-                // Always use Animated.View to prevent remounting when toggling animations
-                // When animations disabled, anim values are already set to static (opacity: 1, translateY: 0, etc.)
-                const floatY = anim.float.interpolate({ inputRange: [0, 1], outputRange: [0, -4] });
-                const translateY = Animated.add(anim.enterY, floatY);
-                const scale = anim.pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.008] });
-
-                return (
-                  <Animated.View
-                    key={product.id}
-                    style={[
-                      styles.gridCard,
-                      {
-                        opacity: anim.opacity,
-                        transform: [{ translateY }, { scale }],
-                      },
-                    ]}
+              {filteredProducts.map((product) => (
+                <View key={product.id} style={styles.gridCard}>
+                  <TouchableOpacity
+                    style={{ flex: 1 }}
+                    onPress={() => handleProductPress(product)}
+                    activeOpacity={0.95}
                   >
-                    <TouchableOpacity
-                      style={{ flex: 1 }}
-                      onPress={() => handleProductPress(product)}
-                      activeOpacity={0.95}
-                    >
-                      {renderProductCardInner(product)}
-                    </TouchableOpacity>
-                  </Animated.View>
-                );
-              })}
+                    {renderProductCardInner(product)}
+                  </TouchableOpacity>
+                </View>
+              ))}
             </View>
           )}
         </View>
@@ -1341,14 +1032,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-  },
-  subtitleShine: {
-    position: 'absolute',
-    top: -10,
-    bottom: -10,
-    width: 44,
-    backgroundColor: '#16A34A',
-    borderRadius: 999,
   },
   
   // Elegant Favorites Heart Button - Bigger and Close to Logo

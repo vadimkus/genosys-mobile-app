@@ -5,10 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Alert,
   Dimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -23,6 +23,7 @@ import AUTH_CONFIG from '../config/auth';
 
 const log = createLogger('FavoritesScreen');
 
+const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function FavoritesScreen() {
@@ -105,7 +106,7 @@ export default function FavoritesScreen() {
         
         <View style={styles.emptyContainer}>
           <View style={styles.emptyContent}>
-            <Ionicons name="heart-outline" size={80} color="#E5E5EA" />
+            <Image source={EMPTY_UNI_IMAGE} style={styles.emptyUniImage} contentFit="contain" />
             <Text style={styles.emptyTitle}>{t('favorites.emptyTitle')}</Text>
             <Text style={styles.emptySubtitle}>
               {t('favorites.emptySubtitle')}
@@ -158,9 +159,11 @@ export default function FavoritesScreen() {
                 <View style={styles.gridImageContainer}>
                   {product.image ? (
                     <Image 
-                      source={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` }} 
+                      source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
                       style={styles.gridImage}
-                      resizeMode="cover"
+                      contentFit="cover"
+                      transition={200}
+                      cachePolicy="memory-disk"
                     />
                   ) : (
                     <View style={styles.gridImagePlaceholder}>
@@ -376,6 +379,11 @@ const styles = StyleSheet.create({
   emptyContent: {
     alignItems: 'center',
     maxWidth: 300,
+  },
+  emptyUniImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 24,
   },
   emptyTitle: {
     fontSize: 24,

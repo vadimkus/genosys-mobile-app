@@ -333,7 +333,7 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* ─── Header (red, matches web) ─── */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
@@ -353,7 +353,7 @@ export default function ChatScreen() {
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -34 : 0}
       >
         <ScrollView
           ref={scrollRef}
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
 
   /* ─── Messages ─── */
   messageList: { flex: 1 },
-  messageListContent: { padding: 16, paddingBottom: 8 },
+  messageListContent: { padding: 16, paddingBottom: 16 },
 
   messageBubbleWrap: {
     flexDirection: 'row',
@@ -578,7 +578,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingTop: 8,
+    paddingBottom: 10,
     backgroundColor: '#ffffff',
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#E5E7EB',

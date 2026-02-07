@@ -82,34 +82,52 @@ export async function sendChatMessage(messages, locale = 'en') {
     // The Vercel AI SDK streams text; we read the full response body
     const text = await response.text();
     
-    // The streamed response may contain data chunks in SSE format
-    // Each line starts with "0:" followed by a JSON-encoded string piece
-    // Or it could be plain text if not streaming
-    if (text.includes('\n0:')) {
-      // SSE / streaming format from AI SDK
-      const pieces = [];
-      const lines = text.split('\n');
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('0:')) {
-          try {
-            // 0:"piece of text"
-            const jsonStr = trimmed.slice(2);
-            const parsed = JSON.parse(jsonStr);
-            if (typeof parsed === 'string') {
-              pieces.push(parsed);
-            }
-          } catch {
-            // Not valid JSON, skip
+    // --- Parse SSE response (AI SDK v6 UI Message Stream) ---
+    // Format: data: {"type":"text-delta","delta":"Hello"}
+    const pieces = [];
+    const lines = text.split('\n');
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      // AI SDK v6 format: data: {"type":"text-delta","delta":"..."}
+      if (trimmed.startsWith('data: ')) {
+        const payload = trimmed.slice(6);
+        if (payload === '[DONE]') continue;
+        try {
+          const obj = JSON.parse(payload);
+          if (obj.type === 'text-delta' && typeof obj.delta === 'string') {
+            pieces.push(obj.delta);
           }
+          // Also handle older textDelta key
+          if (obj.type === 'text-delta' && typeof obj.textDelta === 'string') {
+            pieces.push(obj.textDelta);
+          }
+        } catch {
+          // Not valid JSON, skip
         }
+        continue;
       }
-      if (pieces.length > 0) {
-        return pieces.join('');
+
+      // Legacy AI SDK format: 0:"piece of text"
+      if (trimmed.startsWith('0:')) {
+        try {
+          const jsonStr = trimmed.slice(2);
+          const parsed = JSON.parse(jsonStr);
+          if (typeof parsed === 'string') {
+            pieces.push(parsed);
+          }
+        } catch {
+          // Not valid JSON, skip
+        }
       }
     }
 
-    // Plain text response
+    if (pieces.length > 0) {
+      return pieces.join('');
+    }
+
+    // Fallback: plain text response
     return text.trim();
   } catch (error) {
     log.error('Chat service error', error?.message || error);

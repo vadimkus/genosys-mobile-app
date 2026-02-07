@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   Linking,
   Image,
-  Animated,
-  Easing,
   I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,49 +21,7 @@ export default function AboutScreen() {
   const isRTL = dir === 'rtl';
   const appVersion = String(Constants?.expoConfig?.version || Constants?.manifest?.version || '1.0.0');
 
-  // Small pulsing heart (one pulse every ~4 seconds) - match Contact screen
-  const heartScale = useRef(new Animated.Value(1)).current;
-  const heartOpacity = useRef(new Animated.Value(0.9)).current;
 
-  useEffect(() => {
-    const anim = Animated.loop(
-      Animated.sequence([
-        Animated.delay(3400),
-        Animated.parallel([
-          Animated.timing(heartScale, {
-            toValue: 1.18,
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true,
-          }),
-          Animated.timing(heartOpacity, {
-            toValue: 1,
-            duration: 220,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.parallel([
-          Animated.timing(heartScale, {
-            toValue: 1,
-            duration: 220,
-            easing: Easing.in(Easing.quad),
-            useNativeDriver: true,
-          }),
-          Animated.timing(heartOpacity, {
-            toValue: 0.9,
-            duration: 220,
-            easing: Easing.in(Easing.quad),
-            useNativeDriver: true,
-          }),
-        ]),
-      ])
-    );
-    anim.start();
-    return () => {
-      anim.stop();
-    };
-  }, [heartOpacity, heartScale]);
 
   const openUrl = async (url) => {
     const u = String(url || '').trim();
@@ -118,9 +74,9 @@ export default function AboutScreen() {
           <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
             <Text style={styles.flagText}>🇦🇪</Text>
             <Text style={[styles.countryText, isRTL && styles.textRTL]}>{t('about.country')}</Text>
-            <Animated.View style={{ transform: [{ scale: heartScale }], opacity: heartOpacity }}>
+            <View>
               <Ionicons name="heart" size={14} color="#dc2626" />
-            </Animated.View>
+            </View>
           </View>
         </View>
 

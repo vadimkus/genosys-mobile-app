@@ -108,11 +108,12 @@ computeWaterfallBreakdown(items, user) → {
 
 ## Screen-Specific Implementation
 
-### Checkout (`app/checkout.js`)
+### Checkout (`app/checkout.js` + `CheckoutOrderHeaderCard`)
 
-- Uses `computeWaterfallBreakdown(items, user)` directly
-- Full waterfall display within the "Order Summary" section
-- Also displays: free shipping banner, promo items banner, VAT note
+- Waterfall computed in `checkout.js` via `computeWaterfallBreakdown(items, user)` and passed as `waterfall` prop to `CheckoutOrderHeaderCard`
+- The **collapsible header card** (red bar with chevron at top of page) contains the full waterfall breakdown when expanded
+- Includes: line items, promo items banner, free shipping banner, VAT note, "You Saved" banner
+- This is the **only** order summary on the checkout page (no duplicate inline section)
 
 ### Bag (`app/(tabs)/bag.js`)
 

@@ -238,7 +238,17 @@ export default function CheckoutScreen() {
     if (national) setPhoneNational(formatUaeNationalForInput(national));
 
     setAddressDetails(addr);
-    setAddress(String(addr.address || '').trim());
+
+    // Build full delivery address from saved address fields (street, city, emirate)
+    const streetLine = String(addr.address || '').trim();
+    const cityPart = String(addr.city || '').trim();
+    const emiratePart = String(addr.emirate || '').trim();
+    const fullAddress = [streetLine, cityPart, emiratePart].filter(Boolean).join(', ');
+    setAddress(fullAddress || streetLine);
+
+    if (addr?.landmark) {
+      setLandmark(String(addr.landmark).trim());
+    }
 
     if (addr?.emirate && typeof setSelectedEmirate === 'function') {
       setSelectedEmirate(String(addr.emirate).trim());
@@ -596,6 +606,7 @@ export default function CheckoutScreen() {
             safeVat={safeVat}
             safeTotal={safeTotal}
             selectedEmirate={selectedEmirate}
+            waterfall={waterfall}
           />
 
           {/* Shipping Information */}
@@ -904,146 +915,8 @@ export default function CheckoutScreen() {
             />
           </View>
 
-          {/* Order Summary - Waterfall Discount Breakdown */}
-          <View style={styles.section} onLayout={registerSectionLayout('review')}>
-            <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-              <Ionicons name="receipt" size={20} color="#007AFF" />
-              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.orderSummary')}</Text>
-            </View>
-
-            {/* Retail Price or Subtotal */}
-            {waterfall.hasAnyDiscount ? (
-              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
-                  {t('checkout.retailPrice')}: ({getTotalItems()} {getTotalItems() === 1 ? t('checkout.item') : t('checkout.items')})
-                  {(() => {
-                    const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
-                    return freeMaskCount > 0 ? `\n+ ${freeMaskCount} ${t('checkout.freeMasks')}` : '';
-                  })()}
-                </Text>
-                <Text style={[styles.summaryValue, styles.summaryValueStrikethrough, isRTL && styles.summaryValueRTL]}>
-                  AED {waterfall.retailTotal.toFixed(2)}
-                </Text>
-              </View>
-            ) : (
-              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
-                  {t('checkout.subtotal')} ({t('bag.header', { count: getTotalItems(), label: getTotalItems() === 1 ? t('bag.item') : t('bag.items') })})
-                  {(() => {
-                    const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
-                    return freeMaskCount > 0 ? `\n+ ${freeMaskCount} ${t('checkout.freeMasks')}` : '';
-                  })()}
-                </Text>
-                <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeSubtotal.toFixed(2)}</Text>
-              </View>
-            )}
-
-            {/* VIP / User Discount */}
-            {waterfall.hasUserDiscount && (
-              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                <Text style={[styles.summaryLabelDiscount, isRTL && styles.textRTL]}>
-                  {t('checkout.yourDiscount')}{waterfall.userDiscountPct > 0 ? ` (${Math.round(waterfall.userDiscountPct)}%)` : ''}
-                </Text>
-                <Text style={[styles.summaryValueDiscount, isRTL && styles.summaryValueRTL]}>
-                  -AED {waterfall.userDiscountTotal.toFixed(2)}
-                </Text>
-              </View>
-            )}
-
-            {/* Intermediate Subtotal (only when both VIP + Bundle exist) */}
-            {waterfall.hasUserDiscount && waterfall.hasBundleDiscount && (
-              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                <Text style={[styles.summaryLabelIntermediate, isRTL && styles.textRTL]}>
-                  {t('checkout.intermediateSubtotal')}
-                </Text>
-                <Text style={[styles.summaryValueIntermediate, isRTL && styles.summaryValueRTL]}>
-                  AED {waterfall.afterVipSubtotal.toFixed(2)}
-                </Text>
-              </View>
-            )}
-
-            {/* Bundle Discount */}
-            {waterfall.hasBundleDiscount && (
-              <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                <Text style={[styles.summaryLabelBundle, isRTL && styles.textRTL]}>
-                  {t('checkout.bundleDiscount')}{waterfall.bundleDiscountPct > 0 ? ` (${Math.round(waterfall.bundleDiscountPct)}%)` : ''}
-                </Text>
-                <Text style={[styles.summaryValueBundle, isRTL && styles.summaryValueRTL]}>
-                  -AED {waterfall.bundleDiscountTotal.toFixed(2)}
-                </Text>
-              </View>
-            )}
-
-            {/* Net Subtotal (after all discounts) */}
-            {waterfall.hasAnyDiscount && (
-              <>
-                <View style={styles.summaryDividerLight} />
-                <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-                  <Text style={[styles.summaryLabelBold, isRTL && styles.textRTL]}>
-                    {t('checkout.netSubtotal')}
-                  </Text>
-                  <Text style={[styles.summaryValueBold, isRTL && styles.summaryValueRTL]}>
-                    AED {safeSubtotal.toFixed(2)}
-                  </Text>
-                </View>
-              </>
-            )}
-
-            {/* Shipping */}
-            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>
-                {t('checkout.shippingTo', { emirate: formatEmirateLabel(t, selectedEmirate) })}
-              </Text>
-              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL, safeShipping === 0 && styles.summaryValueFree]}>
-                {safeShipping === 0 ? t('common.free') : `AED ${safeShipping.toFixed(2)}`}
-              </Text>
-            </View>
-
-            {/* VAT */}
-            <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
-              <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('checkout.vatIncluded')}</Text>
-              <Text style={[styles.summaryValue, isRTL && styles.summaryValueRTL]}>AED {safeVat.toFixed(2)}</Text>
-            </View>
-
-            {/* VAT note */}
-            <Text style={[styles.vatNoteRed, isRTL && styles.textRTL]}>*{t('checkout.allPricesVatInclusive')}</Text>
-
-            {/* Free shipping banner */}
-            {totals.hasFreeShipping && (
-              <View style={[styles.freeShippingBanner, isRTL && styles.rowRTL]}>
-                <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-                <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>{t('checkout.freeShippingApplied')}</Text>
-              </View>
-            )}
-
-            {/* Promo items banner */}
-            {(() => {
-              const freeMaskCount = promoItems.reduce((sum, it) => sum + (Number(it?.quantity) || 1), 0);
-              if (!freeMaskCount) return null;
-              const msg = freeMaskCount >= 2 ? t('bag.promoApplied2') : t('bag.promoApplied1');
-              return (
-                <View style={[styles.freeShippingBanner, isRTL && styles.rowRTL]}>
-                  <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-                  <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>{msg}</Text>
-                </View>
-              );
-            })()}
-
-            {/* Total */}
-            <View style={[styles.totalRow, isRTL && styles.summaryRowRTL]}>
-              <Text style={[styles.totalLabel, isRTL && styles.textRTL]}>{t('checkout.total')}</Text>
-              <Text style={[styles.totalValue, isRTL && styles.summaryValueRTL]}>AED {safeTotal.toFixed(2)}</Text>
-            </View>
-
-            {/* You Saved banner */}
-            {waterfall.hasAnyDiscount && waterfall.totalSaved > 0 && (
-              <View style={styles.youSavedBanner}>
-                <Text style={styles.youSavedText}>
-                  {t('checkout.youSaved')}: AED {waterfall.totalSaved.toFixed(2)}
-                </Text>
-              </View>
-            )}
-          </View>
+          {/* Review section layout anchor (for step indicator scroll detection) */}
+          <View onLayout={registerSectionLayout('review')} />
 
         </View>
       </ScrollView>

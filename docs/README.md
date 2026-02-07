@@ -28,6 +28,9 @@ This folder contains all documentation for the Genosys Mobile App.
 - [Checkout Flow](./CHECKOUT_FLOW.md) - Delivery details, payment methods, order submission
 - [Orders Pages](./ORDERS_PAGES.md) - Orders list, order detail, reorder functionality
 - [Waterfall Pricing](./WATERFALL_PRICING.md) - Transparent discount breakdown (VIP, bundle, savings)
+- [Chatbot (Genie)](./CHATBOT.md) - AI chatbot: contextual greetings, quick actions, product cards, SSE API
+- [Empty States](./EMPTY_STATES.md) - Unicorn mascot image on empty favorites/orders pages
+- [Animations](./ANIMATIONS.md) - Animation policy: what was removed and what remains
 
 ## UI & Features
 
@@ -97,6 +100,9 @@ docs/
 ├── CHECKOUT_FLOW.md               # Checkout: delivery, payment, order submission
 ├── ORDERS_PAGES.md                # Orders list & order detail pages
 ├── WATERFALL_PRICING.md           # Waterfall pricing breakdown feature
+├── CHATBOT.md                     # AI chatbot (Genie): greetings, quick actions, SSE API
+├── EMPTY_STATES.md                # Unicorn mascot on empty favorites/orders pages
+├── ANIMATIONS.md                  # Animation policy: removed vs retained
 ├── IMPLEMENTATION_SUMMARY.md      # Database integration summary
 ├── DEEP_LINKING.md                # Universal links & custom URL scheme
 ├── OFFLINE_PRODUCT_CACHE.md       # Offline product browsing

@@ -98,12 +98,21 @@ Full waterfall pricing breakdown. See [WATERFALL_PRICING.md](./WATERFALL_PRICING
 
 Uses `computeWaterfallBreakdown(items, user)` from `utils/cartUtils.js` and `calculateCartTotals()` for shipping/VAT.
 
-## Order Header Card
+## Order Header Card (Waterfall Pricing)
 
-`CheckoutOrderHeaderCard` component at the top:
-- Shows item count, total, and delivery ETA
-- Collapsible (chevron toggle) to show/hide item thumbnails
-- Displays delivery estimate via `getDeliveryEtaInfo()`
+`CheckoutOrderHeaderCard` component (`components/checkout/CheckoutOrderHeaderCard.js`) at the top:
+- **Red header bar** with order number, item count, and chevron toggle
+- When expanded, displays the **full waterfall pricing breakdown**:
+  1. **Line items** — each paid product with qty, size/color variants, and price
+  2. **Promo items banner** — free promotional add-ons (if any)
+  3. **Waterfall discount breakdown** (see [WATERFALL_PRICING.md](./WATERFALL_PRICING.md)):
+     - Retail Price (strikethrough) → VIP Discount (purple) → Intermediate Subtotal → Bundle Discount (green) → Net Subtotal (bold)
+  4. **Shipping** — with free shipping banner (green checkmark) when applicable
+  5. **VAT** — with "All prices are VAT inclusive" note
+  6. **Total** (bold)
+  7. **"You Saved" banner** — green celebration banner showing total savings
+- Uses `waterfall` prop computed via `computeWaterfallBreakdown(items, user)` from `utils/cartUtils.js`
+- This is the **only** order summary on the checkout page (no duplicate inline summary)
 
 ## Order Submission Flow
 
