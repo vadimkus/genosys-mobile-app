@@ -10,6 +10,23 @@ import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
 import { Image } from 'expo-image';
 import { useLocalization } from '../../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../../utils/emirateUtils';
+import { AUTH_CONFIG } from '../../../config/auth';
+
+const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
+
+/**
+ * Resolve an image path to a full URL.
+ * Order items may store relative paths (e.g. "/images/products/…") or already-full URLs.
+ * Returns '' when no usable value is available.
+ */
+const resolveImageUrl = (raw) => {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  // Already a full URL
+  if (s.startsWith('http://') || s.startsWith('https://')) return s;
+  // Relative path — prepend asset origin
+  return `${ASSET_ORIGIN}${s.startsWith('/') ? '' : '/'}${s}`;
+};
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -453,7 +470,7 @@ export default function OrderDetailScreen() {
               const originalLineTotal = canShowDiscountBreakdown ? (inferredOriginalUnit * qty) : null;
               const discountLineTotal = canShowDiscountBreakdown ? (discountUnit * qty) : null;
               
-              const imageUrl = it?.image || it?.imageUrl || it?.thumbnail || '';
+              const imageUrl = resolveImageUrl(it?.image || it?.imageUrl || it?.thumbnail);
 
               return (
                 <View key={`paid-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.itemCard}>
@@ -464,6 +481,7 @@ export default function OrderDetailScreen() {
                         style={styles.itemThumbnail}
                         contentFit="cover"
                         transition={200}
+                        cachePolicy="memory-disk"
                         recyclingKey={`paid-img-${it?.productId || idx}`}
                       />
                     ) : (
@@ -562,7 +580,7 @@ export default function OrderDetailScreen() {
                 {promoItems.map((it, idx) => {
                   const qty = Number(it?.quantity) || 1;
                   const name = it?.name || it?.productName || t('common.freeItemWithNumber', { number: idx + 1 });
-                  const promoImageUrl = it?.image || it?.imageUrl || it?.thumbnail || '';
+                  const promoImageUrl = resolveImageUrl(it?.image || it?.imageUrl || it?.thumbnail);
                   
                   return (
                     <View key={`promo-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.promoItemCard}>
@@ -573,6 +591,7 @@ export default function OrderDetailScreen() {
                             style={styles.promoThumbnail}
                             contentFit="cover"
                             transition={200}
+                            cachePolicy="memory-disk"
                             recyclingKey={`promo-img-${it?.productId || idx}`}
                           />
                         ) : (
