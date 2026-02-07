@@ -306,6 +306,9 @@
     "addToBag": "Добавить в корзину",
     "inBag": "В корзине ({count})",
     "addToBagFailed": "Не удалось добавить в корзину. Попробуйте ещё раз.",
+    "requestQuote": "Запросить цену",
+    "priceOnRequest": "Цена по запросу",
+    "requestQuoteMessage": "Здравствуйте, меня интересует {name}. Не могли бы вы предоставить информацию о ценах?",
     "error": "Ошибка",
     "productNotFound": "Товар не найден",
     "failedToLoad": "Не удалось загрузить товар",
@@ -1045,7 +1048,9 @@
     "added": "Добавлено!",
     "outOfStock": "Нет в наличии",
     "addToBag": "В корзину",
-    "loginToBuy": "Войти для покупки"
+    "loginToBuy": "Войти для покупки",
+    "requestQuote": "Запросить цену",
+    "priceOnRequest": "Цена по запросу"
   },
   "voiceSearch": {
     "label": "Голосовой поиск",
@@ -1093,7 +1098,8 @@
     "eyeCare": "Уход за областью вокруг глаз",
     "device": "Устройство",
     "holidayKits": "Праздничные наборы",
-    "beautyBoxes": "Бьюти-боксы"
+    "beautyBoxes": "Бьюти-боксы",
+    "bioMeso": "Био Мезо"
   },
   "support": {
     "whatsappOpenFailedTitle": "Не удалось открыть WhatsApp",

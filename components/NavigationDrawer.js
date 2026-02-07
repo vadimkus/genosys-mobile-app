@@ -73,173 +73,108 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Primary Navigation */}
+          {/* ─── Primary Navigation (core app screens) ─── */}
           <View style={[styles.grid, isRTL && styles.gridRTL]}>
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/(tabs)/shop')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/(tabs)/shop')} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.products') || 'Products'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/bundle-builder', t('navigation.bundleBuilder') || 'Bundle Builder')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.highlightLink, isRTL && styles.textRTL]}>
-                🎁 {t('navigation.bundleBuilder') || 'Bundle Builder'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/(tabs)/orders')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/(tabs)/orders')} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.orders') || 'Orders'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/favorites')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/favorites')} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.favorites') || 'Favorites'}
-                {favCount > 0 ? (
-                  <Text style={styles.badge}> {favCount}</Text>
-                ) : null}
+                {favCount > 0 ? <Text style={styles.badge}> {favCount}</Text> : null}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/profile')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/profile')} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.profile') || 'Profile'}
               </Text>
             </TouchableOpacity>
           </View>
 
-          {/* Divider */}
-          <View style={styles.divider} />
-
-          {/* Secondary Navigation */}
-          <View style={[styles.grid, isRTL && styles.gridRTL]}>
+          {/* ─── Highlight actions (full-width, prominent) ─── */}
+          <View style={[styles.highlightRow, isRTL && styles.gridRTL]}>
             <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/profile/about')}
+              style={styles.highlightBtn}
+              onPress={() => navigateWebView('/bundle-builder', t('navigation.bundleBuilder') || 'Bundle Builder')}
               activeOpacity={0.7}
             >
+              <Text style={styles.highlightBtnText}>🎁 {t('navigation.bundleBuilder') || 'Bundle Builder'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.highlightBtn}
+              onPress={() => navigateTo('/skin-analysis')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.highlightBtnText}>✨ {t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* ─── Divider ─── */}
+          <View style={styles.divider} />
+
+          {/* ─── Info & Pages (2-column grid, even pairs) ─── */}
+          <View style={[styles.grid, isRTL && styles.gridRTL]}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/profile/about')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.about') || 'About'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/brand', t('navigation.brand') || 'Brand')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/brand', t('navigation.brand') || 'Brand')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.brand') || 'Brand'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/delivery', t('navigation.delivery') || 'Delivery')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/delivery', t('navigation.delivery') || 'Delivery')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.delivery') || 'Delivery'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/profile/contact')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/profile/contact')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.contact') || 'Contact'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/faq', t('navigation.faq') || 'FAQ')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/faq', t('navigation.faq') || 'FAQ')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.faq') || 'FAQ'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/locations', t('navigation.locations') || 'Locations')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/locations', t('navigation.locations') || 'Locations')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.locations') || 'Locations'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/blog', t('navigation.blog') || 'Blog')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/blog', t('navigation.blog') || 'Blog')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.blog') || 'Blog'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/partners', t('navigation.partners') || 'Partners')}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/partners', t('navigation.partners') || 'Partners')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.partners') || 'Partners'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateWebView('/certificates', t('navigation.certificates') || 'Gift Certificates')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.highlightLink, isRTL && styles.textRTL]}>
-                🎫 {t('navigation.certificates') || 'Gift Certificates'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.gridItem}
-              onPress={() => navigateTo('/skin-analysis')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.highlightLink, isRTL && styles.textRTL]}>
-                {t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}
-              </Text>
-            </TouchableOpacity>
-
             {user ? (
-              <TouchableOpacity
-                style={styles.gridItem}
-                onPress={() => navigateWebView('/training', t('navigation.training') || 'Training')}
-                activeOpacity={0.7}
-              >
+              <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/training', t('navigation.training') || 'Training')} activeOpacity={0.7}>
                 <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                   {t('navigation.training') || 'Training'}
                 </Text>
@@ -247,29 +182,23 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
             ) : null}
           </View>
 
-          {/* Divider */}
+          {/* ─── Divider ─── */}
           <View style={styles.divider} />
 
-          {/* Login/Logout */}
+          {/* ─── Login / Logout ─── */}
           {user ? (
-            <TouchableOpacity
-              style={styles.authButton}
-              onPress={handleLogout}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.logoutText, isRTL && styles.textRTL]}>
-                {t('common.logout') || 'Sign Out'}
-              </Text>
+            <TouchableOpacity style={styles.authButton} onPress={handleLogout} activeOpacity={0.7}>
+              <View style={[styles.authRow, isRTL && styles.authRowRTL]}>
+                <Ionicons name="log-out-outline" size={18} color="#dc2626" />
+                <Text style={styles.logoutText}>{t('common.logout') || 'Sign Out'}</Text>
+              </View>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              style={styles.authButton}
-              onPress={() => navigateTo('/auth/login')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.highlightLink, isRTL && styles.textRTL]}>
-                {t('common.login') || 'Login'}
-              </Text>
+            <TouchableOpacity style={styles.authButton} onPress={() => navigateTo('/auth/login')} activeOpacity={0.7}>
+              <View style={[styles.authRow, isRTL && styles.authRowRTL]}>
+                <Ionicons name="log-in-outline" size={18} color="#dc2626" />
+                <Text style={styles.logoutText}>{t('common.login') || 'Login'}</Text>
+              </View>
             </TouchableOpacity>
           )}
 
@@ -309,8 +238,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuContent: {
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 8,
   },
+  /* ── 2-column grid ── */
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -320,23 +252,43 @@ const styles = StyleSheet.create({
   },
   gridItem: {
     width: '50%',
-    paddingVertical: 10,
+    paddingVertical: 11,
   },
+  /* ── Primary links (bold) ── */
   primaryLink: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#1F2937',
+    letterSpacing: -0.1,
   },
+  /* ── Secondary links (regular) ── */
   secondaryLink: {
     fontSize: 14,
     fontWeight: '400',
     color: '#4B5563',
   },
-  highlightLink: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#dc2626',
+  /* ── Highlight row (full-width cards) ── */
+  highlightRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 6,
+    marginBottom: 4,
   },
+  highlightBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#FEF2F2',
+    alignItems: 'center',
+  },
+  highlightBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#dc2626',
+    letterSpacing: -0.1,
+  },
+  /* ── Badge ── */
   badge: {
     fontSize: 12,
     fontWeight: '700',
@@ -347,13 +299,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 1,
   },
+  /* ── Dividers ── */
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#E5E7EB',
-    marginVertical: 8,
+    marginVertical: 10,
   },
+  /* ── Auth (login/logout) ── */
   authButton: {
     paddingVertical: 10,
+  },
+  authRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  authRowRTL: {
+    flexDirection: 'row-reverse',
   },
   logoutText: {
     fontSize: 14,

@@ -306,6 +306,9 @@
     "addToBag": "أضف إلى السلة",
     "inBag": "في السلة ({count})",
     "addToBagFailed": "تعذر الإضافة إلى السلة. يرجى المحاولة مرة أخرى.",
+    "requestQuote": "طلب عرض سعر",
+    "priceOnRequest": "السعر عند الطلب",
+    "requestQuoteMessage": "مرحبًا، أنا مهتم بـ {name}. هل يمكنكم تزويدي بمعلومات الأسعار؟",
     "error": "خطأ",
     "productNotFound": "المنتج غير موجود",
     "failedToLoad": "تعذر تحميل المنتج",
@@ -1045,7 +1048,9 @@
     "added": "تمت الإضافة!",
     "outOfStock": "غير متوفر",
     "addToBag": "أضف إلى السلة",
-    "loginToBuy": "سجّل الدخول للشراء"
+    "loginToBuy": "سجّل الدخول للشراء",
+    "requestQuote": "طلب عرض سعر",
+    "priceOnRequest": "السعر عند الطلب"
   },
   "voiceSearch": {
     "label": "البحث الصوتي",
@@ -1093,7 +1098,8 @@
     "eyeCare": "عناية بالعين",
     "device": "جهاز",
     "holidayKits": "مجموعات",
-    "beautyBoxes": "صناديق الجمال"
+    "beautyBoxes": "صناديق الجمال",
+    "bioMeso": "بيو ميزو"
   },
   "support": {
     "whatsappOpenFailedTitle": "تعذر فتح واتساب",

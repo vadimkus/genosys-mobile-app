@@ -14,15 +14,27 @@ import {
   Pressable,
   I18nManager,
   Animated as RNAnimated,
+  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  ExpoSpeechRecognitionModule,
-  useSpeechRecognitionEvent,
-} from 'expo-speech-recognition';
+// expo-speech-recognition requires a native build; gracefully degrade when
+// the native module isn't linked (e.g. Expo Go or an older binary).
+let ExpoSpeechRecognitionModule = null;
+let useSpeechRecognitionEvent = (_event, _cb) => {}; // no-op fallback
+let _speechAvailable = false;
+try {
+  const sr = require('expo-speech-recognition');
+  if (sr?.ExpoSpeechRecognitionModule) {
+    ExpoSpeechRecognitionModule = sr.ExpoSpeechRecognitionModule;
+    useSpeechRecognitionEvent = sr.useSpeechRecognitionEvent;
+    _speechAvailable = true;
+  }
+} catch {
+  // native module not available – voice search will be hidden
+}
 import { fetchProductCategories, fetchProducts } from '../../services/api';
 import { cacheProducts, getCachedProducts } from '../../services/productCache';
 import { ShopSkeleton } from '../../components/SkeletonLoader';
@@ -67,6 +79,7 @@ const ALLOWED_CATEGORY_ORDER = [
   'Scalp/Hair',
   'Eye Care',
   'Device',
+  'Bio Meso',
   'Holiday Kits',
   'Beauty Boxes',
 ];
@@ -117,7 +130,8 @@ export default function ShopScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
   const isRTL = dir === 'rtl';
 
-  // ─── Voice Search ───
+  // ─── Voice Search (only when native module is available) ───
+  const speechAvailable = _speechAvailable;
   const [isListening, setIsListening] = useState(false);
   const [voicePartial, setVoicePartial] = useState('');
   const pulseAnim = useRef(new RNAnimated.Value(1)).current;
@@ -125,6 +139,8 @@ export default function ShopScreen() {
   // Map app locale to BCP-47 for speech recognizer
   const speechLocale = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-US';
 
+  // Hook calls are unconditional (React rules-of-hooks) but the imported
+  // fallback is a harmless no-op when the native module isn't available.
   useSpeechRecognitionEvent('start', () => {
     setIsListening(true);
     setVoicePartial('');
@@ -168,6 +184,7 @@ export default function ShopScreen() {
   }, [isListening]);
 
   const startVoiceSearch = useCallback(async () => {
+    if (!ExpoSpeechRecognitionModule) return;
     try {
       const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
       if (!granted) {
@@ -190,7 +207,7 @@ export default function ShopScreen() {
 
   const stopVoiceSearch = useCallback(() => {
     try {
-      ExpoSpeechRecognitionModule.stop();
+      ExpoSpeechRecognitionModule?.stop();
     } catch {}
     setIsListening(false);
     setVoicePartial('');
@@ -316,8 +333,12 @@ export default function ShopScreen() {
             </Text>
           )}
 
-          {/* Beauty Boxes Special Pricing Display */}
-          {(() => {
+          {/* Pricing Display */}
+          {product.isPriceOnRequest ? (
+            <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+              <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest') || 'Price on Request'}</Text>
+            </View>
+          ) : (() => {
             const category = product.category;
             const nm = getLocalizedProductName(product, locale) || product.name || '';
             const hasBeautyBoxInName = nm.toUpperCase().includes('BEAUTY BOX');
@@ -350,33 +371,57 @@ export default function ShopScreen() {
             </View>
           )}
 
-          {/* Add to Cart Button */}
-          <TouchableOpacity
-            style={[
-              styles.addToCartButton,
-              isRTL && styles.addToCartButtonRTL,
-              (product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)) && styles.addToCartButtonDisabled,
-            ]}
-            onPress={() => handleAddToCart(product)}
-            disabled={product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name={addingProducts.has(product.id) ? 'checkmark' : 'bag-add'}
-              size={16}
-              color="#ffffff"
-              style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
-            />
-            <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
-              {addingProducts.has(product.id)
-                ? t('shop.added')
-                : (product.status === 'out_of_stock' || product.stock === false)
-                  ? t('stock.outOfStock')
-                  : user
-                    ? t('shop.addToBag')
-                    : t('shop.loginToBuy')}
-            </Text>
-          </TouchableOpacity>
+          {/* Add to Cart / Request Quote Button */}
+          {product.isPriceOnRequest ? (
+            <TouchableOpacity
+              style={[styles.requestQuoteButton, isRTL && styles.addToCartButtonRTL]}
+              onPress={() => {
+                const productName = getLocalizedProductName(product, locale) || product.name || '';
+                const message = encodeURIComponent(
+                  (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
+                );
+                Linking.openURL(`https://wa.me/971585487665?text=${message}`);
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="logo-whatsapp"
+                size={16}
+                color="#ffffff"
+                style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
+              />
+              <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
+                {t('shop.requestQuote') || 'Request Quote'}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[
+                styles.addToCartButton,
+                isRTL && styles.addToCartButtonRTL,
+                (product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)) && styles.addToCartButtonDisabled,
+              ]}
+              onPress={() => handleAddToCart(product)}
+              disabled={product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={addingProducts.has(product.id) ? 'checkmark' : 'bag-add'}
+                size={16}
+                color="#ffffff"
+                style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
+              />
+              <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
+                {addingProducts.has(product.id)
+                  ? t('shop.added')
+                  : (product.status === 'out_of_stock' || product.stock === false)
+                    ? t('stock.outOfStock')
+                    : user
+                      ? t('shop.addToBag')
+                      : t('shop.loginToBuy')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </>
     );
@@ -797,44 +842,48 @@ export default function ShopScreen() {
                 </TouchableOpacity>
               )}
 
-              {/* Voice Search Mic Button */}
-              <TouchableOpacity
-                style={[styles.micButton, isRTL && styles.micButtonRTL]}
-                onPress={isListening ? stopVoiceSearch : startVoiceSearch}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-                accessibilityLabel={t('voiceSearch.label') || 'Voice search'}
-              >
-                <RNAnimated.View style={isListening ? { transform: [{ scale: pulseAnim }] } : undefined}>
-                  <Ionicons
-                    name={isListening ? 'mic' : 'mic-outline'}
-                    size={20}
-                    color={isListening ? '#dc2626' : '#86868B'}
-                  />
-                </RNAnimated.View>
-              </TouchableOpacity>
+              {/* Voice Search Mic Button – only shown when native module is available */}
+              {speechAvailable && (
+                <TouchableOpacity
+                  style={[styles.micButton, isRTL && styles.micButtonRTL]}
+                  onPress={isListening ? stopVoiceSearch : startVoiceSearch}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('voiceSearch.label') || 'Voice search'}
+                >
+                  <RNAnimated.View style={isListening ? { transform: [{ scale: pulseAnim }] } : undefined}>
+                    <Ionicons
+                      name={isListening ? 'mic' : 'mic-outline'}
+                      size={20}
+                      color={isListening ? '#dc2626' : '#86868B'}
+                    />
+                  </RNAnimated.View>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
-          {/* Voice Search Listening Overlay */}
-          <Modal visible={isListening} transparent animationType="fade" onRequestClose={stopVoiceSearch}>
-            <Pressable style={styles.voiceOverlay} onPress={stopVoiceSearch}>
-              <View style={styles.voiceModal}>
-                <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
-                  <Ionicons name="mic" size={40} color="#ffffff" />
-                </RNAnimated.View>
-                <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
-                {voicePartial ? (
-                  <Text style={styles.voicePartialText} numberOfLines={2}>{voicePartial}</Text>
-                ) : (
-                  <Text style={styles.voiceHintText}>{t('voiceSearch.hint') || 'Say a product name'}</Text>
-                )}
-                <TouchableOpacity style={styles.voiceStopBtn} onPress={stopVoiceSearch} activeOpacity={0.8}>
-                  <Text style={styles.voiceStopText}>{t('voiceSearch.stop') || 'Stop'}</Text>
-                </TouchableOpacity>
-              </View>
-            </Pressable>
-          </Modal>
+          {/* Voice Search Listening Overlay – only rendered when native module is available */}
+          {speechAvailable && (
+            <Modal visible={isListening} transparent animationType="fade" onRequestClose={stopVoiceSearch}>
+              <Pressable style={styles.voiceOverlay} onPress={stopVoiceSearch}>
+                <View style={styles.voiceModal}>
+                  <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
+                    <Ionicons name="mic" size={40} color="#ffffff" />
+                  </RNAnimated.View>
+                  <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
+                  {voicePartial ? (
+                    <Text style={styles.voicePartialText} numberOfLines={2}>{voicePartial}</Text>
+                  ) : (
+                    <Text style={styles.voiceHintText}>{t('voiceSearch.hint') || 'Say a product name'}</Text>
+                  )}
+                  <TouchableOpacity style={styles.voiceStopBtn} onPress={stopVoiceSearch} activeOpacity={0.8}>
+                    <Text style={styles.voiceStopText}>{t('voiceSearch.stop') || 'Stop'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </Pressable>
+            </Modal>
+          )}
 
           {/* Categories Filter */}
           {categories.length > 0 && (
@@ -1679,6 +1728,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 8,
     minHeight: 36,
+  },
+  requestQuoteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#25D366',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    minHeight: 36,
+  },
+  priceOnRequestText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#dc2626',
+    letterSpacing: 0.3,
   },
   addToCartButtonDisabled: {
     backgroundColor: '#95A5A6',

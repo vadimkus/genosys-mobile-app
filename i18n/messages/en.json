@@ -306,6 +306,9 @@
     "addToBag": "Add to Bag",
     "inBag": "In Bag ({count})",
     "addToBagFailed": "Failed to add to bag. Please try again.",
+    "requestQuote": "Request Quote",
+    "priceOnRequest": "Price on Request",
+    "requestQuoteMessage": "Hi, I'm interested in {name}. Could you please provide pricing information?",
     "error": "Error",
     "productNotFound": "Product not found",
     "failedToLoad": "Failed to load product",
@@ -1045,7 +1048,9 @@
     "added": "Added!",
     "outOfStock": "Out of Stock",
     "addToBag": "Add to Bag",
-    "loginToBuy": "Login to Buy"
+    "loginToBuy": "Login to Buy",
+    "requestQuote": "Request Quote",
+    "priceOnRequest": "Price on Request"
   },
   "voiceSearch": {
     "label": "Voice search",
@@ -1093,7 +1098,8 @@
     "eyeCare": "Eye Care",
     "device": "Device",
     "holidayKits": "Holiday Kits",
-    "beautyBoxes": "Beauty Boxes"
+    "beautyBoxes": "Beauty Boxes",
+    "bioMeso": "Bio Meso"
   },
   "support": {
     "whatsappOpenFailedTitle": "Could not open WhatsApp",

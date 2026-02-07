@@ -47,6 +47,8 @@ const CATEGORY_CANONICAL_BY_KEY = {
   kits: 'Holiday Kits',
   'beauty boxes': 'Beauty Boxes',
   'beauty box': 'Beauty Boxes',
+  'bio meso': 'Bio Meso',
+  'bio-meso': 'Bio Meso',
 };
 
 export const normalizeCategoryCanonical = (rawCategory) => {
@@ -257,6 +259,8 @@ export const getCategoryTranslationKey = (category) => {
       return 'categories.holidayKits';
     case 'Beauty Boxes':
       return 'categories.beautyBoxes';
+    case 'Bio Meso':
+      return 'categories.bioMeso';
     default:
       return null;
   }

@@ -16,6 +16,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -271,6 +272,57 @@ export default function ChatScreen() {
     </TouchableOpacity>
   );
 
+  /* ─── Text with clickable links ─── */
+  const renderLinkedText = (text, baseStyle) => {
+    // Match markdown links [label](url) and bare URLs https://...
+    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s)]+)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      // Add text before the link
+      if (match.index > lastIndex) {
+        parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
+      }
+      if (match[1] && match[2]) {
+        // Markdown link: [label](url)
+        parts.push({ type: 'link', label: match[1], url: match[2] });
+      } else if (match[3]) {
+        // Bare URL
+        parts.push({ type: 'link', label: match[3], url: match[3] });
+      }
+      lastIndex = match.index + match[0].length;
+    }
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push({ type: 'text', content: text.slice(lastIndex) });
+    }
+
+    // If no links found, return plain text
+    if (parts.length === 0 || (parts.length === 1 && parts[0].type === 'text')) {
+      return <Text style={baseStyle}>{text}</Text>;
+    }
+
+    return (
+      <Text style={baseStyle}>
+        {parts.map((part, i) =>
+          part.type === 'link' ? (
+            <Text
+              key={i}
+              style={styles.linkText}
+              onPress={() => Linking.openURL(part.url)}
+            >
+              {part.label}
+            </Text>
+          ) : (
+            <Text key={i}>{part.content}</Text>
+          )
+        )}
+      </Text>
+    );
+  };
+
   /* ─── Message renderer ─── */
   const renderMessage = (msg, index) => {
     const isUser = msg.role === 'user';
@@ -296,16 +348,16 @@ export default function ChatScreen() {
               seg.type === 'product' ? (
                 renderProductCard(seg.content)
               ) : (
-                <Text
-                  key={i}
-                  style={[
-                    styles.messageText,
-                    isUser ? styles.userText : styles.assistantText,
-                    isRTL && styles.textRTL,
-                  ]}
-                >
-                  {seg.content}
-                </Text>
+                <React.Fragment key={i}>
+                  {renderLinkedText(
+                    seg.content,
+                    [
+                      styles.messageText,
+                      isUser ? styles.userText : styles.assistantText,
+                      isRTL && styles.textRTL,
+                    ]
+                  )}
+                </React.Fragment>
               )
             )}
           </View>
@@ -472,6 +524,7 @@ const styles = StyleSheet.create({
   messageText: { fontSize: 15, lineHeight: 22 },
   userText: { color: '#ffffff' },
   assistantText: { color: '#1F2937' },
+  linkText: { color: '#2563EB', textDecorationLine: 'underline', fontWeight: '600' },
   textRTL: { textAlign: 'right' },
 
   typingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },

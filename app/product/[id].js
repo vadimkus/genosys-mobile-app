@@ -837,7 +837,11 @@ export default function ProductDetailScreen() {
             )}
               
               {/* Enhanced Pricing with Beauty Boxes Special Display */}
-              {product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box')) ? (
+              {product.isPriceOnRequest ? (
+                <View style={styles.priceBlock}>
+                  <Text style={styles.priceOnRequestLabel}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                </View>
+              ) : product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box')) ? (
                 // Special pricing display for Beauty Boxes on detail page
                 <View style={styles.beautyBoxDetailPricing}>
                   <Text style={styles.beautyBoxDetailFullPrice}>
@@ -1039,7 +1043,29 @@ export default function ProductDetailScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
-        {(() => {
+        {product.isPriceOnRequest ? (
+          <TouchableOpacity
+            style={[styles.requestQuoteBottomButton, isRTL && styles.addToBagButtonRTL]}
+            onPress={() => {
+              const productName = getLocalizedProductName(product, locale) || product.name || '';
+              const message = encodeURIComponent(
+                (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
+              );
+              Linking.openURL(`https://wa.me/971585487665?text=${message}`);
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="logo-whatsapp"
+              size={20}
+              color="#ffffff"
+              style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
+            />
+            <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
+              {t('product.requestQuote') || 'Request Quote'}
+            </Text>
+          </TouchableOpacity>
+        ) : (() => {
           const inBagForSelection = isInCart(product.id, selectedColor, selectedSize);
           const qtyForSelection = getItemQuantity(product.id, selectedColor, selectedSize);
           return (
@@ -1636,6 +1662,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
+  },
+  requestQuoteBottomButton: {
+    backgroundColor: '#25D366',
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#25D366',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  priceOnRequestLabel: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#dc2626',
+    letterSpacing: 0.3,
   },
   addToBagButtonRTL: {
     flexDirection: 'row-reverse',
