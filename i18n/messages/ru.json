@@ -312,6 +312,7 @@
     "share": "Поделиться",
     "shareError": "Не удалось открыть окно «Поделиться». Попробуйте ещё раз.",
     "documentation": "Документация",
+    "video": "Видео",
     "sizesAvailable": "Доступно размеров: {count}",
     "multipleSizesAvailable": "Доступно несколько размеров",
     "sizesCountShort": "{count} размера(ов)",

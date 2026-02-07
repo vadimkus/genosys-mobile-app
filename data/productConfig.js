@@ -38,6 +38,9 @@ export const PRODUCT_CONFIG = {
   '52': {
     images: ['/images/PDRN.png', '/images/Second/pdrnnn.jpg'],
   },
+  '35': {
+    images: ['/images/HYDR.jpg', '/images/Second/hmask_big.jpg'],
+  },
 };
 
 // Documentation links per product
@@ -67,7 +70,13 @@ export const PRODUCT_DOCS = {
 };
 
 /**
- * Get all images for a product (config images + DB images merged)
+ * Get all images for a product (DB/API images preferred, config as fallback)
+ * 
+ * Priority order:
+ *   1. DB/API `images` field (dynamic – updated from backend without app resubmission)
+ *   2. Hardcoded PRODUCT_CONFIG images (static fallback)
+ *   3. Single main `image` field from API
+ *
  * @param {string} productId 
  * @param {Object} product - product data from API (may have .images JSON string)
  * @returns {string[]} Array of full image URLs
@@ -76,12 +85,7 @@ export function getProductImages(productId, product) {
   const id = String(productId);
   const config = PRODUCT_CONFIG[id];
   
-  // Priority 1: Config images (manually curated)
-  if (config?.images?.length) {
-    return config.images.map(img => `${ASSET_ORIGIN}${img}`);
-  }
-  
-  // Priority 2: DB images field (JSON string array)
+  // Priority 1: DB/API images field (dynamic – no app update needed)
   if (product?.images) {
     try {
       const parsed = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
@@ -91,7 +95,12 @@ export function getProductImages(productId, product) {
     } catch {}
   }
   
-  // Priority 3: Single main image
+  // Priority 2: Hardcoded config images (static fallback for products without DB images)
+  if (config?.images?.length) {
+    return config.images.map(img => `${ASSET_ORIGIN}${img}`);
+  }
+  
+  // Priority 3: Single main image from API
   if (product?.image) {
     return [`${ASSET_ORIGIN}${product.image}`];
   }
@@ -100,11 +109,24 @@ export function getProductImages(productId, product) {
 }
 
 /**
- * Get video URL for a product
+ * Get video URL for a product (API preferred, config as fallback)
+ * 
+ * Priority order:
+ *   1. product.videoUrl from API/DB (dynamic – no app update needed)
+ *   2. Hardcoded PRODUCT_CONFIG videoUrl (static fallback)
+ *
  * @param {string} productId
+ * @param {Object} [product] - product data from API (may have .videoUrl)
  * @returns {string|null}
  */
-export function getProductVideoUrl(productId) {
+export function getProductVideoUrl(productId, product) {
+  // Priority 1: API/DB videoUrl (dynamic)
+  if (product?.videoUrl) {
+    const url = product.videoUrl;
+    return url.startsWith('http') ? url : `${ASSET_ORIGIN}${url}`;
+  }
+  
+  // Priority 2: Hardcoded config (static fallback)
   const config = PRODUCT_CONFIG[String(productId)];
   return config?.videoUrl ? `${ASSET_ORIGIN}${config.videoUrl}` : null;
 }

@@ -252,6 +252,50 @@ This account is pre-created and ready to use. No email verification required.
 
 ---
 
+## App Store Screenshots - v1.1 Update Required
+
+### Current Screenshot Status
+
+The existing screenshots (captured December 18, 2025 for v1.0) are **outdated** and must be recaptured before submitting v1.1. Key issues:
+
+1. **Checkout screenshot shows Apple Pay** - Apple Pay has been removed in v1.1
+2. **No AI features shown** - AI Skin Analysis and AI Chatbot are headline v1.1 features
+3. **No image gallery/video** - New product gallery with pagination dots and embedded video not visible
+4. **No hamburger menu** - New navigation drawer not shown
+
+### Recommended v1.1 Screenshot Set
+
+| # | Screen | Key Features Shown |
+|---|---|---|
+| 1 | Shop Home | Product catalog, discount badges, hamburger menu |
+| 2 | Product Detail | Image gallery with pagination dots, video section |
+| 3 | AI Skin Analysis | Quiz results with personalized recommendations |
+| 4 | AI Chatbot | Product consultation conversation |
+| 5 | Checkout | COD and Card payment (NO Apple Pay) |
+| 6 | Order Detail | Order breakdown with discount fields |
+
+### Screenshot Specifications
+
+- **Resolution:** 1284 x 2778 px (iPhone 14 Pro Max / 6.7" display)
+- **Format:** PNG
+- **Location:** `app-store-screenshots/appstore-ready/`
+- **Full guide:** See `docs/SCREENSHOT_MISSION_COMPLETE.md`
+
+### How to Capture
+
+```bash
+# Option 1: Automated
+npm run ios                                    # Start simulator
+npm run screenshots                            # Capture screenshots
+bash scripts/convert-screenshots-appstore.sh   # Convert to App Store format
+
+# Option 2: Manual from Simulator
+# Press Cmd+S in Simulator to capture each screen
+# Then resize: sips -z 2778 1284 input.png --out output.png
+```
+
+---
+
 ## Support Information
 
 - **Website:** https://genosys.ae

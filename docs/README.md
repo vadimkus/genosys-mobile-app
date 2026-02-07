@@ -1,121 +1,165 @@
-# Genosys Mobile App Documentation
+# Genosys Mobile App — Documentation
 
-This folder contains all documentation for the Genosys Mobile App.
+> iOS app for GENOSYS Professional Korean Dermacosmetics (genosys.ae)
+>
+> Tech: React Native (Expo), TypeScript, expo-router, expo-image, expo-av
+
+---
 
 ## Quick Start
 
-- [Main README](../README.md) - Project overview and setup
-- [Implementation Summary](./IMPLEMENTATION_SUMMARY.md) - Current feature implementation status
-- [Build & Submit Commands](./BUILD_AND_SUBMIT_COMMANDS.md) - How to build and submit to App Store
+| Doc | Description |
+|-----|-------------|
+| [Main README](../README.md) | Project overview, install, and run |
+| [Build & Submit](./build/BUILD_AND_SUBMIT_COMMANDS.md) | How to build and submit to App Store |
+| [Build Status](./build/BUILD_STATUS.md) | Current build status |
 
-## API & Integration
-
-- [API Endpoints Needed](./API_ENDPOINTS_NEEDED.md) - List of required API endpoints
-- [API Connection Success](./API_CONNECTION_SUCCESS.md) - API integration verification
-- [Mobile API Implementation](./MOBILE_API_IMPLEMENTATION.md) - Mobile API details
-- [Database Integration](./DATABASE_INTEGRATION.md) - Database setup and integration
-- [Database Driven Integration](./DATABASE_DRIVEN_INTEGRATION_COMPLETE.md) - Database-driven features
-- [Existing Database Integration](./EXISTING_DATABASE_INTEGRATION.md) - Integration with existing DB
-
-## Authentication
-
-- [Setup Authentication](./SETUP_AUTHENTICATION.md) - Auth setup guide
-- [Google OAuth Setup](./GOOGLE_OAUTH_SETUP.md) - Google sign-in configuration
+---
 
 ## Core Features
 
-- [Shop Page Features](./SHOP_PAGE_FEATURES.md) - Product catalog, categories, search, banners, product cards
-- [Checkout Flow](./CHECKOUT_FLOW.md) - Delivery details, payment methods, order submission
-- [Orders Pages](./ORDERS_PAGES.md) - Orders list, order detail, reorder functionality
-- [Waterfall Pricing](./WATERFALL_PRICING.md) - Transparent discount breakdown (VIP, bundle, savings)
-- [Chatbot (Genie)](./CHATBOT.md) - AI chatbot: contextual greetings, quick actions, product cards, SSE API
-- [Empty States](./EMPTY_STATES.md) - Unicorn mascot image on empty favorites/orders pages
-- [Animations](./ANIMATIONS.md) - Animation policy: what was removed and what remains
+| Doc | Description |
+|-----|-------------|
+| [Shop Page](./core/SHOP_PAGE_FEATURES.md) | Product catalog, categories, search, banners |
+| [Product Detail Updates](./core/PRODUCT_DETAIL_UPDATES.md) | Image gallery, video player, trust badges (Feb 2026) |
+| [Dynamic Content](./core/DYNAMIC_CONTENT.md) | Backend-driven images & videos (no app rebuild needed) |
+| [Checkout Flow](./core/CHECKOUT_FLOW.md) | Delivery details, payment, order submission |
+| [Orders](./core/ORDERS_PAGES.md) | Orders list, order detail, reorder |
+| [Waterfall Pricing](./core/WATERFALL_PRICING.md) | Transparent discount breakdown (VIP, bundle) |
+| [Chatbot (Genie)](./core/CHATBOT.md) | AI chatbot: greetings, quick actions, SSE API |
+| [Deep Linking](./core/DEEP_LINKING.md) | Universal links and custom URL scheme |
+| [Offline Cache](./core/OFFLINE_PRODUCT_CACHE.md) | Browse products without internet |
+| [Empty States](./core/EMPTY_STATES.md) | Unicorn mascot on empty favorites/orders |
+| [Skeleton Loaders](./core/SKELETON_LOADING_SCREENS.md) | Shimmer placeholders for loading states |
+| [Haptic Feedback](./core/HAPTIC_FEEDBACK.md) | Tactile feedback on key actions |
+| [Animations](./core/ANIMATIONS.md) | Animation policy: what's kept vs removed |
 
-## UI & Features
+---
 
-- [Size Variants Implementation](./SIZE_VARIANTS_IMPLEMENTATION.md) - Product size variants
-- [Footer Icon Enhancements](./FOOTER_ICON_ENHANCEMENTS.md) - Tab bar improvements
-- [Bag Icon Color Change](./BAG_ICON_COLOR_CHANGE.md) - Cart icon styling
-- [Orders Icon Color Change](./ORDERS_ICON_COLOR_CHANGE.md) - Orders icon styling
-- [Orders Count Debug](./ORDERS_COUNT_DEBUG.md) - Orders badge debugging
-- [Skeleton Loading Screens](./SKELETON_LOADING_SCREENS.md) - Shimmer placeholders for loading states
-- [Haptic Feedback](./HAPTIC_FEEDBACK.md) - Tactile feedback on key actions
+## API & Backend
 
-## Performance & UX Enhancements
+| Doc | Description |
+|-----|-------------|
+| [API Endpoints](./api/API_ENDPOINTS_NEEDED.md) | Required API endpoints list |
+| [API Connection](./api/API_CONNECTION_SUCCESS.md) | API integration verification |
+| [Mobile API](./api/MOBILE_API_IMPLEMENTATION.md) | Mobile API details |
+| [Database Integration](./api/DATABASE_INTEGRATION.md) | Database setup and integration |
+| [DB-Driven Features](./api/DATABASE_DRIVEN_INTEGRATION_COMPLETE.md) | Database-driven features |
+| [Existing DB Integration](./api/EXISTING_DATABASE_INTEGRATION.md) | Integration with existing DB |
 
-- [expo-image Migration](./EXPO_IMAGE_MIGRATION.md) - Image caching and performance upgrade
-- [Offline Product Cache](./OFFLINE_PRODUCT_CACHE.md) - Browse products without internet
-- [Deep Linking](./DEEP_LINKING.md) - Universal links and custom URL scheme configuration
+---
+
+## Setup & Auth
+
+| Doc | Description |
+|-----|-------------|
+| [Authentication Setup](./setup/SETUP_AUTHENTICATION.md) | Auth setup guide |
+| [Google OAuth](./setup/GOOGLE_OAUTH_SETUP.md) | Google sign-in configuration |
+
+---
+
+## UI Components
+
+| Doc | Description |
+|-----|-------------|
+| [Size Variants](./ui/SIZE_VARIANTS_IMPLEMENTATION.md) | Product size variant selector |
+| [Footer Icons](./ui/FOOTER_ICON_ENHANCEMENTS.md) | Tab bar improvements |
+| [Bag Icon](./ui/BAG_ICON_COLOR_CHANGE.md) | Cart icon styling |
+| [Orders Icon](./ui/ORDERS_ICON_COLOR_CHANGE.md) | Orders icon styling |
+| [expo-image Migration](./ui/EXPO_IMAGE_MIGRATION.md) | Image caching and performance |
+
+---
 
 ## RTL & Localization
 
-- [Complete RTL Summary](./COMPLETE_RTL_SUMMARY.md) - Full RTL implementation overview
-- [RTL Implementation Status](./RTL_IMPLEMENTATION_STATUS.md) - RTL progress tracking
-- [Shop Screen RTL Support](./SHOP_SCREEN_RTL_SUPPORT.md) - Shop RTL layout
-- [Bag Page RTL Support](./BAG_PAGE_RTL_SUPPORT.md) - Cart RTL layout
-- [Login RTL Arabic Support](./LOGIN_RTL_ARABIC_SUPPORT.md) - Login RTL layout
-- [Login Buttons RTL Fix](./LOGIN_BUTTONS_RTL_FIX.md) - Auth buttons RTL
-- [Login Localization Fix](./LOGIN_LOCALIZATION_FIX.md) - Login translations
-- [Profile Subpages RTL Guide](./PROFILE_SUBPAGES_RTL_GUIDE.md) - Profile RTL guide
+| Doc | Description |
+|-----|-------------|
+| [RTL Summary](./rtl/COMPLETE_RTL_SUMMARY.md) | Full RTL implementation overview |
+| [RTL Status](./rtl/RTL_IMPLEMENTATION_STATUS.md) | RTL progress tracking |
+| [Shop RTL](./rtl/SHOP_SCREEN_RTL_SUPPORT.md) | Shop page RTL layout |
+| [Bag RTL](./rtl/BAG_PAGE_RTL_SUPPORT.md) | Cart page RTL layout |
+| [Login RTL](./rtl/LOGIN_RTL_ARABIC_SUPPORT.md) | Login page RTL layout |
+| [Login Buttons RTL](./rtl/LOGIN_BUTTONS_RTL_FIX.md) | Auth buttons RTL fix |
+| [Login Localization](./rtl/LOGIN_LOCALIZATION_FIX.md) | Login translations fix |
+| [Profile RTL](./rtl/PROFILE_SUBPAGES_RTL_GUIDE.md) | Profile subpages RTL guide |
 
-## Bag/Cart
+---
 
-- [Bag Page Best Practices Fix](./BAG_PAGE_BEST_PRACTICES_FIX.md) - Cart best practices
+## Build & Deploy
 
-## Build & Deployment
+| Doc | Description |
+|-----|-------------|
+| [Build Commands](./build/BUILD_AND_SUBMIT_COMMANDS.md) | Build and submit to App Store |
+| [Build Status](./build/BUILD_STATUS.md) | Current build status |
+| [Network Errors](./build/NETWORK_ERROR_RESOLUTION.md) | Network debugging |
 
-- [Build Status](./BUILD_STATUS.md) - Current build status
-- [Network Error Resolution](./NETWORK_ERROR_RESOLUTION.md) - Network debugging
+---
 
 ## App Store
 
-- [App Store Assets](./app-store/APP_STORE_ASSETS.md) - Assets for App Store
-- [Apple Review Documentation](./app-store/APPLE_REVIEW_DOCUMENTATION.md) - Review preparation
-- [Shotlist](./app-store/SHOTLIST.md) - Screenshot planning
+| Doc | Description |
+|-----|-------------|
+| [App Store Assets](./app-store/APP_STORE_ASSETS.md) | Assets for App Store listing |
+| [Apple Review](./app-store/APPLE_REVIEW_DOCUMENTATION.md) | Review preparation |
+| [Shotlist](./app-store/SHOTLIST.md) | Screenshot planning |
+
+---
 
 ## Screenshots
 
-- [Screenshots Overview](./screenshots/SCREENSHOTS.md) - Screenshot documentation
-- [Screenshot Guide](./screenshots/SCREENSHOT_GUIDE.md) - How to capture screenshots
-- [Screenshot Capture README](./screenshots/SCREENSHOT_CAPTURE_README.md) - Capture scripts
-- [Screenshot Capture Complete](./screenshots/SCREENSHOT_CAPTURE_COMPLETE.md) - Completion status
-- [Screenshot Mission Complete](./SCREENSHOT_MISSION_COMPLETE.md) - Mission summary
-- [Quick Checklist](./screenshots/QUICK_CHECKLIST.md) - Quick reference
-- [Upload Ready](./screenshots/UPLOAD_READY.md) - Ready for upload
+| Doc | Description |
+|-----|-------------|
+| [Overview](./screenshots/SCREENSHOTS.md) | Screenshot documentation |
+| [Guide](./screenshots/SCREENSHOT_GUIDE.md) | How to capture screenshots |
+| [Capture Scripts](./screenshots/SCREENSHOT_CAPTURE_README.md) | Automated capture scripts |
+| [Capture Complete](./screenshots/SCREENSHOT_CAPTURE_COMPLETE.md) | Completion status |
+| [Quick Checklist](./screenshots/QUICK_CHECKLIST.md) | Quick reference |
+| [Upload Ready](./screenshots/UPLOAD_READY.md) | Ready for upload |
+| [Russian Guide](./screenshots/RUSSIAN_SCREENSHOTS_GUIDE.md) | Russian localization screenshots |
+| [Russian Quick Start](./screenshots/RUSSIAN_QUICK_START.md) | Russian quick start |
+| [Russian Complete](./screenshots/RUSSIAN_IMPLEMENTATION_COMPLETE.md) | Russian completion |
 
-### Russian Screenshots
+---
 
-- [Russian Screenshots Guide](./screenshots/RUSSIAN_SCREENSHOTS_GUIDE.md) - Russian localization
-- [Russian Quick Start](./screenshots/RUSSIAN_QUICK_START.md) - Quick start for Russian
-- [Russian Implementation Complete](./screenshots/RUSSIAN_IMPLEMENTATION_COMPLETE.md) - Russian completion
-- [Russian Capture Session](./RUSSIAN_CAPTURE_SESSION.md) - Russian capture notes
+## Archive
 
-## File Organization
+Older docs kept for reference. These cover completed tasks or debugging sessions.
+
+| Doc | Description |
+|-----|-------------|
+| [Implementation Summary](./archive/IMPLEMENTATION_SUMMARY.md) | Original DB integration summary |
+| [Orders Count Debug](./archive/ORDERS_COUNT_DEBUG.md) | Orders badge debugging |
+| [Bag Best Practices](./archive/BAG_PAGE_BEST_PRACTICES_FIX.md) | Cart best practices fix |
+| [Screenshot Mission](./archive/SCREENSHOT_MISSION_COMPLETE.md) | Screenshot mission summary |
+| [Russian Capture Session](./archive/RUSSIAN_CAPTURE_SESSION.md) | Russian capture notes |
+
+---
+
+## Folder Structure
 
 ```
 docs/
-├── README.md                      # This file (documentation index)
-├── SHOP_PAGE_FEATURES.md          # Shop page: categories, search, banners, product grid
-├── CHECKOUT_FLOW.md               # Checkout: delivery, payment, order submission
-├── ORDERS_PAGES.md                # Orders list & order detail pages
-├── WATERFALL_PRICING.md           # Waterfall pricing breakdown feature
-├── CHATBOT.md                     # AI chatbot (Genie): greetings, quick actions, SSE API
-├── EMPTY_STATES.md                # Unicorn mascot on empty favorites/orders pages
-├── ANIMATIONS.md                  # Animation policy: removed vs retained
-├── IMPLEMENTATION_SUMMARY.md      # Database integration summary
-├── DEEP_LINKING.md                # Universal links & custom URL scheme
-├── OFFLINE_PRODUCT_CACHE.md       # Offline product browsing
-├── SKELETON_LOADING_SCREENS.md    # Shimmer loading placeholders
-├── EXPO_IMAGE_MIGRATION.md        # expo-image performance upgrade
-├── HAPTIC_FEEDBACK.md             # Tactile feedback system
-├── *.md                           # Other documentation
-├── app-store/                     # App Store submission docs
-│   ├── APP_STORE_ASSETS.md
-│   ├── APPLE_REVIEW_DOCUMENTATION.md
-│   └── SHOTLIST.md
-└── screenshots/                   # Screenshot documentation
-    ├── SCREENSHOTS.md
-    ├── SCREENSHOT_GUIDE.md
-    └── ...
+├── README.md                  # This file — documentation index
+├── core/                      # Core feature documentation
+│   ├── PRODUCT_DETAIL_UPDATES.md   # Image gallery, video, badges (Feb 2026)
+│   ├── DYNAMIC_CONTENT.md          # Backend-driven images & videos
+│   ├── SHOP_PAGE_FEATURES.md       # Shop page features
+│   ├── CHECKOUT_FLOW.md            # Checkout flow
+│   ├── ORDERS_PAGES.md             # Orders pages
+│   ├── WATERFALL_PRICING.md        # Pricing breakdown
+│   ├── CHATBOT.md                  # AI chatbot
+│   ├── DEEP_LINKING.md             # Universal links
+│   ├── OFFLINE_PRODUCT_CACHE.md    # Offline browsing
+│   ├── EMPTY_STATES.md             # Empty state screens
+│   ├── SKELETON_LOADING_SCREENS.md # Loading placeholders
+│   ├── HAPTIC_FEEDBACK.md          # Tactile feedback
+│   └── ANIMATIONS.md               # Animation policy
+├── api/                       # API and backend integration
+├── setup/                     # Auth and setup guides
+├── ui/                        # UI component documentation
+├── rtl/                       # RTL and localization
+├── build/                     # Build, deploy, and debugging
+├── app-store/                 # App Store submission
+├── screenshots/               # Screenshot capture guides
+└── archive/                   # Completed/legacy docs
 ```

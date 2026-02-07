@@ -29,7 +29,7 @@ import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedPr
 import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
 import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
 import ProductReviews from '../../components/product/ProductReviews';
-import TrustBadges from '../../components/product/TrustBadges';
+// TrustBadges removed from product pages
 import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
 import * as haptics from '../../utils/haptics';
 import { createLogger } from '../../utils/logger';
@@ -54,7 +54,7 @@ import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../uti
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Product detail hero image height
-const HEADER_HEIGHT = 280;
+const HEADER_HEIGHT = 320;
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -94,6 +94,129 @@ const getObjValueCaseInsensitive = (obj, keys) => {
 };
 
 const log = createLogger('ProductDetail');
+
+/**
+ * ProductVideo – shows a thumbnail with play button; loads video on tap.
+ */
+function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  const handlePlay = async () => {
+    setIsPlaying(true);
+    // Small delay so the Video component mounts before we call play
+    setTimeout(async () => {
+      try {
+        if (videoRef.current) {
+          await videoRef.current.playAsync();
+        }
+      } catch (e) {
+        log.error('Video play error', e?.message || e);
+      }
+    }, 300);
+  };
+
+  if (videoError) {
+    return null; // Hide section if video fails to load
+  }
+
+  return (
+    <View style={videoStyles.section}>
+      <View style={videoStyles.container}>
+        {!isPlaying ? (
+          <TouchableOpacity
+            style={videoStyles.thumbnailWrapper}
+            activeOpacity={0.8}
+            onPress={handlePlay}
+          >
+            {thumbnailUrl ? (
+              <Image
+                source={thumbnailUrl}
+                style={videoStyles.thumbnail}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+              />
+            ) : (
+              <View style={videoStyles.thumbnailPlaceholder} />
+            )}
+            <View style={videoStyles.playOverlay}>
+              <View style={videoStyles.playButton}>
+                <Ionicons name="play" size={32} color="#ffffff" style={{ marginLeft: 3 }} />
+              </View>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <Video
+            ref={videoRef}
+            source={{ uri: videoUrl }}
+            style={videoStyles.player}
+            useNativeControls
+            resizeMode={ResizeMode.CONTAIN}
+            shouldPlay={true}
+            isLooping={false}
+            onError={(error) => {
+              log.error('Video playback error', error);
+              setVideoError(true);
+            }}
+          />
+        )}
+      </View>
+    </View>
+  );
+}
+
+const VIDEO_HEIGHT = Math.round((SCREEN_WIDTH - 40) * 9 / 16);
+
+const videoStyles = StyleSheet.create({
+  section: {
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1D1D1F',
+    marginBottom: 16,
+    letterSpacing: -0.3,
+  },
+  container: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    height: VIDEO_HEIGHT,
+  },
+  thumbnailWrapper: {
+    width: '100%',
+    height: '100%',
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  thumbnailPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#1a1a1a',
+  },
+  playOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+  },
+  playButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(220, 38, 38, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  player: {
+    width: '100%',
+    height: '100%',
+  },
+});
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -617,8 +740,8 @@ export default function ProductDetailScreen() {
           const galleryImages = getProductImages(productId, product);
           const hasMultipleImages = galleryImages.length > 1;
           const isBox = isBeautyBoxProduct(product);
-          // Beauty boxes show multiple products in one image → "contain" avoids clipping
-          const imageFit = isBox ? 'contain' : 'cover';
+          // Use "contain" for all products so images fit within the container without cropping
+          const imageFit = 'contain';
           
           if (galleryImages.length === 0) {
             return (
@@ -662,7 +785,7 @@ export default function ProductDetailScreen() {
                 renderItem={({ item }) => (
                   <Image
                     source={item}
-                    style={{ width: SCREEN_WIDTH, height: isBox ? HEADER_HEIGHT + 20 : HEADER_HEIGHT }}
+                    style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: '#ffffff' }}
                     contentFit={imageFit}
                     transition={300}
                     cachePolicy="memory-disk"
@@ -800,28 +923,20 @@ export default function ProductDetailScreen() {
               />
             )}
 
-          {/* Trust Badges (hidden on Beauty Box pages) */}
-          {!isBeautyBoxProduct(product) && <TrustBadges />}
-
           {/* Product Video */}
           {(() => {
             const productId = String(product.productNumber || product.id || id);
-            const videoUrl = getProductVideoUrl(productId);
+            const videoUrl = getProductVideoUrl(productId, product);
             if (!videoUrl) return null;
+            const thumbnailUrl = product.image
+              ? `https://genosys.ae${product.image}`
+              : null;
             return (
-              <View style={styles.videoSection}>
-                <View style={styles.videoContainer}>
-                  <Video
-                    source={{ uri: videoUrl }}
-                    style={styles.videoPlayer}
-                    useNativeControls
-                    resizeMode={ResizeMode.CONTAIN}
-                    isLooping={false}
-                    posterSource={{ uri: `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/Logo/BlackG.png` }}
-                    usePoster
-                  />
-                </View>
-              </View>
+              <ProductVideo
+                videoUrl={videoUrl}
+                thumbnailUrl={thumbnailUrl}
+                isRTL={isRTL}
+              />
             );
           })()}
 
@@ -1033,7 +1148,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: SCREEN_WIDTH,
     height: HEADER_HEIGHT,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#ffffff',
   },
   imageContainerBeautyBox: {
     height: HEADER_HEIGHT + 20,
@@ -1642,21 +1757,7 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
   },
-  // Video Section
-  videoSection: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  videoContainer: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#000',
-  },
-  videoPlayer: {
-    width: '100%',
-    height: 200,
-  },
+  // Video styles moved to videoStyles (ProductVideo component)
   // Documentation Section
   docsSection: {
     paddingHorizontal: 20,
