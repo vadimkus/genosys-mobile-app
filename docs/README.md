@@ -24,6 +24,7 @@
 | [Product Detail Updates](./core/PRODUCT_DETAIL_UPDATES.md) | Image gallery, video player, trust badges (Feb 2026) |
 | [Dynamic Content](./core/DYNAMIC_CONTENT.md) | Backend-driven images & videos (no app rebuild needed) |
 | [Session Log 7 Feb 2026](./core/SESSION_LOG_2026_02_07.md) | Menu redesign, multi-category, images, videos |
+| [Session Log 7–8 Feb (cont.)](./core/SESSION_LOG_2026_02_07_continued.md) | Request Quote, Bio Meso, voice search, more images/videos, dot fix |
 | [Checkout Flow](./core/CHECKOUT_FLOW.md) | Delivery details, payment, order submission |
 | [Orders](./core/ORDERS_PAGES.md) | Orders list, order detail, reorder |
 | [Waterfall Pricing](./core/WATERFALL_PRICING.md) | Transparent discount breakdown (VIP, bundle) |
@@ -145,6 +146,7 @@ docs/
 │   ├── PRODUCT_DETAIL_UPDATES.md   # Image gallery, video, badges (Feb 2026)
 │   ├── DYNAMIC_CONTENT.md          # Backend-driven images & videos
 │   ├── SESSION_LOG_2026_02_07.md   # Menu redesign, categories, images, videos
+│   ├── SESSION_LOG_2026_02_07_continued.md  # Request Quote, voice search, more images
 │   ├── SHOP_PAGE_FEATURES.md       # Shop page features
 │   ├── CHECKOUT_FLOW.md            # Checkout flow
 │   ├── ORDERS_PAGES.md             # Orders pages
