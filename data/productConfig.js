@@ -51,6 +51,9 @@ export const PRODUCT_CONFIG = {
   '50': {
     images: ['/images/EYEZ.jpg', '/images/Second/ekit_big.jpg'],
   },
+  '21': {
+    images: ['/images/RADS.jpg', '/images/Second/rd_big.jpg'],
+  },
 };
 
 // Documentation links per product
