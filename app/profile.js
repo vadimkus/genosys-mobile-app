@@ -20,6 +20,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchUserOrders } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
+import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
 
 const { width } = Dimensions.get('window');
 
@@ -604,11 +605,11 @@ export default function ProfileScreen() {
               icon="download-outline"
               title={t('profile.trainingMaterials') || 'Training Materials'}
               onPress={() => {
-                const prefix = locale === 'ar' ? '/ar' : locale === 'ru' ? '/ru' : '';
+                const url = buildAuthenticatedWebViewUrl('/training', locale, user);
                 router.push({
                   pathname: '/webview',
                   params: {
-                    url: `https://genosys.ae${prefix}/training`,
+                    url,
                     title: t('profile.trainingMaterials') || 'Training Materials',
                   },
                 });

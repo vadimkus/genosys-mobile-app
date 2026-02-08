@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -42,6 +43,7 @@ export default function FavoritesScreen() {
   };
 
   const handleAddToCart = async (product) => {
+    if (product.isPriceOnRequest) return; // price-on-request products cannot be added to cart
     if (!user) {
       Alert.alert(
         t('favorites.loginRequiredTitle'),
@@ -258,7 +260,11 @@ export default function FavoritesScreen() {
                   </Text>
                   
                   {/* Pricing */}
-                  {(hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
+                  {product.isPriceOnRequest ? (
+                    <View style={styles.priceContainer}>
+                      <Text style={styles.priceOnRequestText}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                    </View>
+                  ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
                     <View style={styles.priceContainer}>
                       <Text style={styles.gridPrice}>{getCanonicalUnitPrice(product).toFixed(2)} AED</Text>
                       <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
@@ -281,33 +287,52 @@ export default function FavoritesScreen() {
                 </View>
               </TouchableOpacity>
               
-              {/* Add to Cart Button */}
-              <TouchableOpacity
-                style={[
-                  styles.addToCartButton,
-                  (product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)) && styles.addToCartButtonDisabled
-                ]}
-                onPress={() => handleAddToCart(product)}
-                disabled={product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)}
-                activeOpacity={0.7}
-              >
-                <Ionicons 
-                  name={addingProducts.has(product.id) ? "checkmark" : "bag-add"} 
-                  size={16} 
-                  color="#ffffff" 
-                  style={styles.addToCartIcon}
-                />
-                <Text style={styles.addToCartText}>
-                  {addingProducts.has(product.id) 
-                    ? t('favorites.added')
-                    : (product.status === 'out_of_stock' || product.stock === false) 
-                      ? t('favorites.outOfStock')
-                      : user 
-                        ? t('favorites.addToBag')
-                        : t('favorites.loginToBuy')
-                  }
-                </Text>
-              </TouchableOpacity>
+              {/* Add to Cart / Request Quote Button */}
+              {product.isPriceOnRequest ? (
+                <TouchableOpacity
+                  style={styles.requestQuoteButton}
+                  onPress={() => {
+                    const productName = getLocalizedProductName(product, locale) || product.name || '';
+                    const msg = encodeURIComponent(
+                      (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
+                    );
+                    Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="logo-whatsapp" size={16} color="#ffffff" style={styles.addToCartIcon} />
+                  <Text style={styles.addToCartText}>
+                    {t('product.requestQuote') || 'Request Quote'}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[
+                    styles.addToCartButton,
+                    (product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)) && styles.addToCartButtonDisabled
+                  ]}
+                  onPress={() => handleAddToCart(product)}
+                  disabled={product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons 
+                    name={addingProducts.has(product.id) ? "checkmark" : "bag-add"} 
+                    size={16} 
+                    color="#ffffff" 
+                    style={styles.addToCartIcon}
+                  />
+                  <Text style={styles.addToCartText}>
+                    {addingProducts.has(product.id) 
+                      ? t('favorites.added')
+                      : (product.status === 'out_of_stock' || product.stock === false) 
+                        ? t('favorites.outOfStock')
+                        : user 
+                          ? t('favorites.addToBag')
+                          : t('favorites.loginToBuy')
+                    }
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           ))}
         </View>
@@ -575,6 +600,22 @@ const styles = StyleSheet.create({
   addToCartButtonDisabled: {
     backgroundColor: '#BDC3C7',
     opacity: 0.7,
+  },
+  requestQuoteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#25D366',
+    marginHorizontal: 12,
+    marginBottom: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  priceOnRequestText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#25D366',
   },
   addToCartIcon: {
     marginRight: 4,

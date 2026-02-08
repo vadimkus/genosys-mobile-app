@@ -20,6 +20,7 @@ import { router } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
 
 export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }) {
   const { user, logout } = useAuth();
@@ -36,9 +37,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
 
   const navigateWebView = (urlPath, title) => {
     onClose();
-    const baseUrl = 'https://genosys.ae';
-    const prefix = locale === 'ar' ? '/ar' : locale === 'ru' ? '/ru' : '';
-    const url = `${baseUrl}${prefix}${urlPath}`;
+    const url = buildAuthenticatedWebViewUrl(urlPath, locale, user);
     setTimeout(() => {
       router.push({
         pathname: '/webview',

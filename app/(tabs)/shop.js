@@ -54,6 +54,7 @@ import {
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import NavigationDrawer from '../../components/NavigationDrawer';
+import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 
 
 const log = createLogger('Shop');
@@ -950,11 +951,11 @@ export default function ShopScreen() {
               style={styles.buildSetBanner}
               activeOpacity={0.85}
               onPress={() => {
-                const prefix = locale === 'ar' ? '/ar' : locale === 'ru' ? '/ru' : '';
+                const url = buildAuthenticatedWebViewUrl('/bundle-builder', locale, user);
                 router.push({
                   pathname: '/webview',
                   params: {
-                    url: `https://genosys.ae${prefix}/bundle-builder`,
+                    url,
                     title: t('shop.buildYourSet') || 'Build Your Set',
                   },
                 });

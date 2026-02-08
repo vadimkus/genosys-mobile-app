@@ -178,7 +178,7 @@ export default function ChatScreen() {
   };
 
   const handleAddToBag = async (product) => {
-    if (!product || addedProducts.has(product.id)) return;
+    if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
     try {
       await addItem(product, 1, '', '');
       setAddedProducts((prev) => new Set([...prev, product.id]));
@@ -223,19 +223,39 @@ export default function ChatScreen() {
           <Text style={[styles.productName, isRTL && styles.textRTL]} numberOfLines={2}>
             {name}
           </Text>
-          <Text style={styles.productPrice}>AED {Number(price).toFixed(2)}</Text>
+          {product.isPriceOnRequest ? (
+            <Text style={styles.productPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+          ) : (
+            <Text style={styles.productPrice}>AED {Number(price).toFixed(2)}</Text>
+          )}
           <View style={styles.productActions}>
-            <TouchableOpacity
-              style={[styles.addToBagBtn, isAdded && styles.addToBagBtnAdded]}
-              onPress={() => handleAddToBag(product)}
-              activeOpacity={0.8}
-              disabled={isAdded}
-            >
-              <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
-              <Text style={styles.addToBagText}>
-                {isAdded ? t('chat.added') : t('chat.addToBag')}
-              </Text>
-            </TouchableOpacity>
+            {product.isPriceOnRequest ? (
+              <TouchableOpacity
+                style={styles.requestQuoteBtn}
+                onPress={() => {
+                  const msg = encodeURIComponent(
+                    (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name)
+                  );
+                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="logo-whatsapp" size={14} color="#fff" />
+                <Text style={styles.addToBagText}>{t('product.requestQuote') || 'Request Quote'}</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.addToBagBtn, isAdded && styles.addToBagBtnAdded]}
+                onPress={() => handleAddToBag(product)}
+                activeOpacity={0.8}
+                disabled={isAdded}
+              >
+                <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                <Text style={styles.addToBagText}>
+                  {isAdded ? t('chat.added') : t('chat.addToBag')}
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={styles.viewProductBtn}
               onPress={() => router.push({ pathname: '/product/[id]', params: { id: product.id } })}
@@ -616,6 +636,16 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   addToBagBtnAdded: { backgroundColor: '#16A34A' },
+  requestQuoteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#25D366',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  productPriceOnRequest: { fontSize: 13, fontWeight: '700', color: '#25D366', marginTop: 2 },
   addToBagText: { fontSize: 11, fontWeight: '700', color: '#ffffff' },
   viewProductBtn: {
     paddingHorizontal: 10,

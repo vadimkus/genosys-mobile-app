@@ -1072,6 +1072,8 @@
     "added": "تمت الإضافة!",
     "addToBag": "أضف إلى السلة",
     "loginToBuy": "سجّل الدخول للشراء",
+    "requestQuote": "طلب عرض سعر",
+    "priceOnRequest": "السعر عند الطلب",
     "buildYourSet": "كوّن مجموعتك",
     "buildYourSetDesc": "اختر وامزج المنتجات ووفّر حتى 20%",
     "upTo20Off": "خصم حتى 20%",

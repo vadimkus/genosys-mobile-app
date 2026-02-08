@@ -83,6 +83,7 @@ export default function WebViewScreen() {
         domStorageEnabled
         allowsBackForwardNavigationGestures
         sharedCookiesEnabled
+        thirdPartyCookiesEnabled
       />
     </SafeAreaView>
   );
