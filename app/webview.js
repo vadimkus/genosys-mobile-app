@@ -4,7 +4,7 @@
  * Usage: router.push({ pathname: '/webview', params: { url, title } })
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -18,7 +18,37 @@ export default function WebViewScreen() {
   const isRTL = dir === 'rtl';
   const [loading, setLoading] = useState(true);
   const [pageTitle, setPageTitle] = useState(title || '');
+  const [httpError, setHttpError] = useState(null);
+  const [loadError, setLoadError] = useState(null);
   const webViewRef = useRef(null);
+
+  // Handle HTTP errors (4xx, 5xx)
+  const handleHttpError = useCallback((syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    setHttpError({
+      statusCode: nativeEvent.statusCode,
+      description: nativeEvent.description || 'Server error',
+    });
+    setLoading(false);
+  }, []);
+
+  // Handle load errors (network, DNS, etc.)
+  const handleError = useCallback((syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    setLoadError({
+      code: nativeEvent.code,
+      description: nativeEvent.description || 'Failed to load page',
+    });
+    setLoading(false);
+  }, []);
+
+  // Retry loading the page
+  const handleRetry = useCallback(() => {
+    setHttpError(null);
+    setLoadError(null);
+    setLoading(true);
+    webViewRef.current?.reload();
+  }, []);
 
   const displayUrl = typeof url === 'string' ? url : '';
 
@@ -66,13 +96,36 @@ export default function WebViewScreen() {
         </View>
       )}
 
-      {/* WebView */}
+      {/* Error State */}
+      {(httpError || loadError) ? (
+        <View style={styles.errorContainer}>
+          <Ionicons name="cloud-offline-outline" size={48} color="#9CA3AF" />
+          <Text style={styles.errorTitle}>
+            {httpError ? `Error ${httpError.statusCode}` : 'Connection Error'}
+          </Text>
+          <Text style={styles.errorDescription}>
+            {httpError
+              ? 'The page could not be loaded. This is usually temporary.'
+              : loadError?.description || 'Please check your connection and try again.'}
+          </Text>
+          <TouchableOpacity onPress={handleRetry} style={styles.retryButton} activeOpacity={0.7}>
+            <Ionicons name="reload" size={18} color="#ffffff" />
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+      /* WebView */
       <WebView
         ref={webViewRef}
         source={{ uri: displayUrl }}
         style={styles.webview}
-        onLoadStart={() => setLoading(true)}
+        onLoadStart={() => { setLoading(true); setHttpError(null); setLoadError(null); }}
         onLoadEnd={() => setLoading(false)}
+        onHttpError={handleHttpError}
+        onError={handleError}
         onNavigationStateChange={(navState) => {
           if (navState.title && navState.title !== displayUrl) {
             setPageTitle(navState.title);
@@ -85,6 +138,7 @@ export default function WebViewScreen() {
         sharedCookiesEnabled
         thirdPartyCookiesEnabled
       />
+      )}
     </SafeAreaView>
   );
 }
@@ -135,10 +189,50 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
+    paddingHorizontal: 32,
+    gap: 8,
   },
   errorText: {
     fontSize: 16,
     color: '#6B7280',
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginTop: 8,
+  },
+  errorDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1F2937',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    width: '100%',
+    maxWidth: 260,
+  },
+  retryButtonText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  backButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+  },
+  backButtonText: {
+    color: '#6B7280',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
