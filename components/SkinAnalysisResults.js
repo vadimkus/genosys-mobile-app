@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -92,7 +93,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
   }, [result]);
 
   const handleAddToBag = async (product) => {
-    if (!product || addedProducts.has(product.id)) return;
+    if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
     try {
       await addItem(product, 1, '', '');
       setAddedProducts((prev) => new Set([...prev, product.id]));
@@ -205,17 +206,37 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                   )}
                   <View style={styles.recInfo}>
                     <Text style={[styles.recName, isRTL && styles.textRTL]} numberOfLines={2}>{name}</Text>
-                    <Text style={styles.recPrice}>AED {Number(price).toFixed(2)}</Text>
+                    {product.isPriceOnRequest ? (
+                      <Text style={styles.recPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                    ) : (
+                      <Text style={styles.recPrice}>AED {Number(price).toFixed(2)}</Text>
+                    )}
                     <View style={styles.recActions}>
-                      <TouchableOpacity
-                        style={[styles.recAddBtn, isAdded && styles.recAddBtnAdded]}
-                        onPress={() => handleAddToBag(product)}
-                        disabled={isAdded}
-                        activeOpacity={0.8}
-                      >
-                        <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
-                        <Text style={styles.recAddText}>{isAdded ? t('chat.added') : t('chat.addToBag')}</Text>
-                      </TouchableOpacity>
+                      {product.isPriceOnRequest ? (
+                        <TouchableOpacity
+                          style={styles.recQuoteBtn}
+                          onPress={() => {
+                            const msg = encodeURIComponent(
+                              (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name)
+                            );
+                            Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                          }}
+                          activeOpacity={0.8}
+                        >
+                          <Ionicons name="logo-whatsapp" size={14} color="#fff" />
+                          <Text style={styles.recAddText}>{t('product.requestQuote') || 'Request Quote'}</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          style={[styles.recAddBtn, isAdded && styles.recAddBtnAdded]}
+                          onPress={() => handleAddToBag(product)}
+                          disabled={isAdded}
+                          activeOpacity={0.8}
+                        >
+                          <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                          <Text style={styles.recAddText}>{isAdded ? t('chat.added') : t('chat.addToBag')}</Text>
+                        </TouchableOpacity>
+                      )}
                       <TouchableOpacity
                         style={styles.recViewBtn}
                         onPress={() => router.push({ pathname: '/product/[id]', params: { id: product.id } })}
@@ -361,6 +382,16 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   recAddBtnAdded: { backgroundColor: '#16A34A' },
+  recQuoteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#25D366',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  recPriceOnRequest: { fontSize: 13, fontWeight: '700', color: '#25D366', marginTop: 2 },
   recAddText: { fontSize: 12, fontWeight: '700', color: '#fff' },
   recViewBtn: {
     paddingHorizontal: 12,

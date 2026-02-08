@@ -602,6 +602,7 @@ export default function ShopScreen() {
 
   // Handle add to cart functionality
   const handleAddToCart = async (product) => {
+    if (product?.isPriceOnRequest) return; // price-on-request products cannot be added
     if (!user) {
       Alert.alert(
         t('checkout.loginRequiredTitle'),

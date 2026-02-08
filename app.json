@@ -6,7 +6,7 @@
     "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+    "icon": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -20,7 +20,7 @@
       "bundleIdentifier": "ae.genosys.app",
       "buildNumber": "33",
       "usesAppleSignIn": true,
-      "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+      "icon": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
       "associatedDomains": [
         "applinks:genosys.ae",
         "applinks:www.genosys.ae"
@@ -57,7 +57,7 @@
       "package": "com.genosys.mobile",
       "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+        "foregroundImage": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
         "backgroundColor": "#ffffff"
       },
       "intentFilters": [

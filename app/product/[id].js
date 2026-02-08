@@ -287,7 +287,7 @@ export default function ProductDetailScreen() {
   };
 
   const handleAddToBag = () => {
-    if (product) {
+    if (product && !product.isPriceOnRequest) {
       // Ensure selected size variant pricing is respected in bag/checkout
       const unitPrice = (() => {
         if (selectedSize && Array.isArray(product.variants) && product.variants.length > 0) {
@@ -1555,6 +1555,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     fontWeight: '600',
+    marginBottom: 6,
+  },
+  pcPriceOnRequest: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#25D366',
     marginBottom: 6,
   },
   pcViewDetails: {

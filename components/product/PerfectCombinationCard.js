@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -226,7 +226,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
   }, [getItemQuantity, recommendedProduct?.id, defaultRecSize]);
 
   const handleAddRecommendedToBag = useCallback(() => {
-    if (!recommendedProduct) return;
+    if (!recommendedProduct || recommendedProduct.isPriceOnRequest) return;
     try {
       // If recommended product has variants, add the default variant to keep cart keys consistent.
       addItem(recommendedProduct, 1, '', defaultRecSize || '');
@@ -308,7 +308,9 @@ export default function PerfectCombinationCard({ product, user, styles }) {
             </Text>
           ) : null}
 
-          {canSeePrices ? (
+          {recommendedProduct.isPriceOnRequest ? (
+            <Text style={styles.pcPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+          ) : canSeePrices ? (
             <View style={styles.pcPriceRow}>
               <Text style={styles.pcPriceMain}>{recBase.toFixed(2)} AED</Text>
               {recHasDiscount ? <Text style={styles.pcPriceOld}>{recOrig.toFixed(2)} AED</Text> : null}
@@ -320,16 +322,34 @@ export default function PerfectCombinationCard({ product, user, styles }) {
           <Text style={styles.pcViewDetails}>{t('product.clickToViewDetails')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.pcAddBtn, inBagForRec ? { backgroundColor: '#27AE60' } : null]}
-            onPress={handleAddRecommendedToBag}
-            activeOpacity={0.9}
-          >
-            <Ionicons name={inBagForRec ? 'checkmark' : 'bag-add'} size={16} color="#ffffff" />
-            <Text style={styles.pcAddBtnText}>
-              {inBagForRec ? t('product.inBag', { count: recQty || 1 }) : t('product.addToBag')}
-            </Text>
-          </TouchableOpacity>
+          {recommendedProduct.isPriceOnRequest ? (
+            <TouchableOpacity
+              style={[styles.pcAddBtn, { backgroundColor: '#25D366' }]}
+              onPress={() => {
+                const msg = encodeURIComponent(
+                  (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', recName)
+                );
+                Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+              }}
+              activeOpacity={0.9}
+            >
+              <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
+              <Text style={styles.pcAddBtnText}>
+                {t('product.requestQuote') || 'Request Quote'}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.pcAddBtn, inBagForRec ? { backgroundColor: '#27AE60' } : null]}
+              onPress={handleAddRecommendedToBag}
+              activeOpacity={0.9}
+            >
+              <Ionicons name={inBagForRec ? 'checkmark' : 'bag-add'} size={16} color="#ffffff" />
+              <Text style={styles.pcAddBtnText}>
+                {inBagForRec ? t('product.inBag', { count: recQty || 1 }) : t('product.addToBag')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.pcBenefitsCard}>

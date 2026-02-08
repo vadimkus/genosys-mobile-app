@@ -346,6 +346,9 @@ export const CartProvider = ({ children }) => {
    * Add item to cart with variant support
    */
   const addItem = (product, quantity = 1, selectedColor = '', selectedSize = '') => {
+    // Prevent price-on-request products from being added to cart
+    if (product?.isPriceOnRequest) return;
+
     const normalizedColor = selectedColor || '';
     const normalizedSize = normalizeSizeKey(product, selectedSize);
 
