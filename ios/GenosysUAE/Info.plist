@@ -53,7 +53,9 @@
     <key>NSFaceIDUsageDescription</key>
     <string>This app uses Face ID for secure and convenient authentication to access your Genosys account.</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your microphone</string>
+    <string>Genosys uses the microphone for voice search to help you find products by speaking.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Genosys uses speech recognition for voice search to help you find products quickly.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>Genosys can save your profile photo to your photo library.</string>
     <key>NSPhotoLibraryUsageDescription</key>
