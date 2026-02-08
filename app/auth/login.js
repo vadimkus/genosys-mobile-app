@@ -50,12 +50,22 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [emirate, setEmirate] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [showEmiratePicker, setShowEmiratePicker] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
+
+  const UAE_EMIRATES = [
+    'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman',
+    'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain',
+  ];
   
   const { 
     loginWithGoogle, 
@@ -210,6 +220,22 @@ export default function LoginScreen() {
       return;
     }
 
+    // Registration-specific validation
+    if (!isLogin) {
+      if (!phone.trim()) {
+        Alert.alert(t('common.error'), t('authScreen.phoneRequired'));
+        return;
+      }
+      if (!address.trim()) {
+        Alert.alert(t('common.error'), t('authScreen.addressRequired'));
+        return;
+      }
+      if (!emirate) {
+        Alert.alert(t('common.error'), t('authScreen.emirateRequired'));
+        return;
+      }
+    }
+
     if (!isValidEmail(email)) {
       Alert.alert(t('common.error'), t('authScreen.invalidEmail'));
       return;
@@ -233,7 +259,12 @@ export default function LoginScreen() {
       if (isLogin) {
         result = await loginWithEmail(email, password);
       } else {
-        result = await register(name, email, password);
+        result = await register(name, email, password, {
+          phone: phone.trim(),
+          address: address.trim(),
+          emirate,
+          birthday: birthday.trim(),
+        });
       }
 
       if (result.success) {
@@ -262,6 +293,10 @@ export default function LoginScreen() {
     setEmail('');
     setPassword('');
     setName('');
+    setPhone('');
+    setAddress('');
+    setEmirate('');
+    setBirthday('');
     setShowPassword(false);
     setPrivacyConsent(false);
   };
@@ -461,6 +496,84 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </View>
+
+            {/* Registration-only fields */}
+            {!isLogin && (
+              <>
+                {/* Phone */}
+                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
+                    {t('authScreen.phoneLabel')} <Text style={styles.requiredStar}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={[styles.textInput, isRTL && styles.textInputRTL]}
+                    placeholder={t('authScreen.phonePlaceholder')}
+                    value={phone}
+                    onChangeText={setPhone}
+                    keyboardType="phone-pad"
+                    autoComplete="tel"
+                    placeholderTextColor="#86868B"
+                    textAlign="left"
+                  />
+                </View>
+
+                {/* Address */}
+                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
+                    {t('authScreen.addressLabel')} <Text style={styles.requiredStar}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={[styles.textInput, isRTL && styles.textInputRTL]}
+                    placeholder={t('authScreen.addressPlaceholder')}
+                    value={address}
+                    onChangeText={setAddress}
+                    autoComplete="street-address"
+                    placeholderTextColor="#86868B"
+                    textAlign={isRTL ? 'right' : 'left'}
+                  />
+                </View>
+
+                {/* Emirate */}
+                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
+                    {t('authScreen.emirateLabel')} <Text style={styles.requiredStar}>*</Text>
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.selectButton, isRTL && styles.selectButtonRTL]}
+                    onPress={() => setShowEmiratePicker(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[
+                      styles.selectButtonText,
+                      !emirate && styles.selectButtonPlaceholder,
+                      isRTL && styles.selectButtonTextRTL,
+                    ]}>
+                      {emirate || t('authScreen.selectEmirate')}
+                    </Text>
+                    <Ionicons name="chevron-down" size={18} color="#86868B" />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Birthday (optional) */}
+                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
+                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
+                    {t('authScreen.birthdayLabel')}
+                  </Text>
+                  <TextInput
+                    style={[styles.textInput, isRTL && styles.textInputRTL]}
+                    placeholder={t('authScreen.birthdayPlaceholder')}
+                    value={birthday}
+                    onChangeText={setBirthday}
+                    placeholderTextColor="#86868B"
+                    textAlign={isRTL ? 'right' : 'left'}
+                    keyboardType="numbers-and-punctuation"
+                  />
+                  <Text style={[styles.birthdayHint, isRTL && styles.birthdayHintRTL]}>
+                    {t('authScreen.birthdayHint')}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
 
           {/* Privacy Policy Consent */}
@@ -517,11 +630,11 @@ export default function LoginScreen() {
           )}
 
           {/* Switch Mode */}
-          <View style={[styles.switchMode, isRTL && styles.switchModeRTL]}>
+          <View style={styles.switchMode}>
             <Text style={[styles.switchModeText, isRTL && styles.switchModeTextRTL]}>
               {isLogin ? t('authScreen.dontHaveAccount') : t('authScreen.alreadyHaveAccount')}
             </Text>
-            <TouchableOpacity onPress={toggleMode} activeOpacity={0.7}>
+            <TouchableOpacity onPress={toggleMode} activeOpacity={0.7} style={styles.switchModeButtonWrap}>
               <Text style={styles.switchModeButton}>
                 {isLogin ? t('authScreen.signUp') : t('authScreen.signIn')}
               </Text>
@@ -529,6 +642,37 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Emirate Picker Modal */}
+      <Modal
+        visible={showEmiratePicker}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowEmiratePicker(false)}
+      >
+        <Pressable style={styles.emirateOverlay} onPress={() => setShowEmiratePicker(false)}>
+          <View style={styles.emirateMenu}>
+            <Text style={styles.emirateMenuTitle}>{t('authScreen.selectEmirate')}</Text>
+            {UAE_EMIRATES.map((em) => (
+              <TouchableOpacity
+                key={em}
+                onPress={() => { setEmirate(em); setShowEmiratePicker(false); }}
+                activeOpacity={0.85}
+                style={[styles.emirateMenuItem, emirate === em && styles.emirateMenuItemActive]}
+              >
+                <Text style={[
+                  styles.emirateMenuItemText,
+                  isRTL && styles.emirateMenuItemTextRtl,
+                  emirate === em && styles.emirateMenuItemTextActive,
+                ]}>
+                  {em}
+                </Text>
+                {emirate === em && <Ionicons name="checkmark" size={18} color="#dc2626" />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
 
       {/* Privacy Policy Modal */}
       <PrivacyPolicyModal
@@ -883,7 +1027,7 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 0,
   },
   forgotPasswordText: {
     fontSize: 14,
@@ -891,19 +1035,111 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   switchMode: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
   },
   switchModeText: {
     fontSize: 14,
     color: '#86868B',
+    textAlign: 'center',
+  },
+  switchModeButtonWrap: {
+    marginTop: 6,
   },
   switchModeButton: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#dc2626',
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+
+  // Required field star
+  requiredStar: {
+    color: '#dc2626',
+    fontWeight: '700',
+  },
+  // Select button (emirate picker)
+  selectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  selectButtonRTL: {
+    flexDirection: 'row-reverse',
+  },
+  selectButtonText: {
+    fontSize: 16,
+    color: '#1D1D1F',
+  },
+  selectButtonTextRTL: {
+    textAlign: 'right',
+  },
+  selectButtonPlaceholder: {
+    color: '#86868B',
+  },
+  // Birthday hint
+  birthdayHint: {
+    fontSize: 12,
+    color: '#86868B',
+    marginTop: 6,
+  },
+  birthdayHintRTL: {
+    textAlign: 'right',
+  },
+  // Emirate picker modal
+  emirateOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  emirateMenu: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  emirateMenuTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    textAlign: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  emirateMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5EA',
+  },
+  emirateMenuItemActive: {
+    backgroundColor: '#fef2f2',
+  },
+  emirateMenuItemText: {
+    fontSize: 16,
+    color: '#1D1D1F',
+    fontWeight: '500',
+  },
+  emirateMenuItemTextRtl: {
+    textAlign: 'right',
+  },
+  emirateMenuItemTextActive: {
+    color: '#dc2626',
+    fontWeight: '700',
   },
 
   // Privacy Policy Consent
@@ -996,11 +1232,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
   },
-  switchModeRTL: {
-    flexDirection: 'row-reverse',
-  },
   switchModeTextRTL: {
-    textAlign: 'right',
+    textAlign: 'center',
   },
   
   // Button RTL styles

@@ -1170,7 +1170,19 @@
     "privacyConsentSuffix": "and consent to the collection and use of my personal information as described.",
     "googleSignInIssueTitle": "Google Sign-In Issue",
     "googleSignInIssueMessage": "Google authentication is being configured. Please use email & password login for now, or try Google sign-in again later.",
-    "useEmailLogin": "Use Email Login"
+    "useEmailLogin": "Use Email Login",
+    "phoneLabel": "UAE Phone Number",
+    "phonePlaceholder": "+971 50 123 4567",
+    "phoneRequired": "Please enter your phone number",
+    "addressLabel": "Delivery Address",
+    "addressPlaceholder": "Building, street, area",
+    "addressRequired": "Please enter your address",
+    "emirateLabel": "Emirate",
+    "selectEmirate": "Select Emirate",
+    "emirateRequired": "Please select your emirate",
+    "birthdayLabel": "Birthday (optional)",
+    "birthdayPlaceholder": "YYYY-MM-DD",
+    "birthdayHint": "Get a special gift on your birthday! 🎁"
   },
   "privacy": {
     "title": "Privacy Policy",

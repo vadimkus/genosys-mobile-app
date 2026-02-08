@@ -270,11 +270,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, extra = {}) => {
     try {
       setLoading(true);
       
-      const result = await apiRegisterUser(name, String(email || '').trim(), password);
+      const result = await apiRegisterUser(name, String(email || '').trim(), password, extra);
       
       if (result.success) {
         await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));

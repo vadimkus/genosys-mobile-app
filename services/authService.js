@@ -74,9 +74,14 @@ export const loginWithEmail = async (email, password) => {
  * @param {string} name - User full name
  * @param {string} email - User email
  * @param {string} password - User password
+ * @param {Object} [extra] - Optional additional fields
+ * @param {string} [extra.phone] - UAE phone number
+ * @param {string} [extra.address] - Delivery address
+ * @param {string} [extra.emirate] - UAE emirate
+ * @param {string} [extra.birthday] - Birthday (YYYY-MM-DD)
  * @returns {Promise<Object>} Registration result
  */
-export const registerUser = async (name, email, password) => {
+export const registerUser = async (name, email, password, extra = {}) => {
   try {
     log.debug('Registering new user');
     
@@ -89,7 +94,11 @@ export const registerUser = async (name, email, password) => {
       body: JSON.stringify({ 
         name,
         email, 
-        password
+        password,
+        phone: extra.phone || '',
+        address: extra.address || '',
+        emirate: extra.emirate || '',
+        birthday: extra.birthday || '',
       }),
     });
 
