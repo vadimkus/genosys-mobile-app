@@ -12,6 +12,7 @@
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 		CA95131B277E4216915B122E /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1746E87524BE4B7C9E0EFEE0 /* noop-file.swift */; };
+		A1B2C3D4E5F60718GENOSYS1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GenosysUAE/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* GenosysUAE-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "GenosysUAE-Bridging-Header.h"; path = "GenosysUAE/GenosysUAE-Bridging-Header.h"; sourceTree = "<group>"; };
 		1746E87524BE4B7C9E0EFEE0 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AppIcon.icon; path = GenosysUAE/AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +46,7 @@
 				F11748442D0722820044C1D9 /* GenosysUAE-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				1746E87524BE4B7C9E0EFEE0 /* noop-file.swift */,
@@ -157,6 +160,7 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				A1B2C3D4E5F60718GENOSYS1 /* AppIcon.icon in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
