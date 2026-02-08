@@ -25,8 +25,10 @@ export default function WebViewScreen() {
   // Handle HTTP errors (4xx, 5xx)
   const handleHttpError = useCallback((syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
+    console.error('[WebView] HTTP Error:', nativeEvent.statusCode, nativeEvent.url, nativeEvent.description);
     setHttpError({
       statusCode: nativeEvent.statusCode,
+      url: nativeEvent.url || '',
       description: nativeEvent.description || 'Server error',
     });
     setLoading(false);
@@ -108,6 +110,11 @@ export default function WebViewScreen() {
               ? 'The page could not be loaded. This is usually temporary.'
               : loadError?.description || 'Please check your connection and try again.'}
           </Text>
+          {httpError?.url ? (
+            <Text style={styles.errorUrl} numberOfLines={2} selectable>
+              {httpError.url}
+            </Text>
+          ) : null}
           <TouchableOpacity onPress={handleRetry} style={styles.retryButton} activeOpacity={0.7}>
             <Ionicons name="reload" size={18} color="#ffffff" />
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -207,7 +214,14 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 20,
+    marginBottom: 8,
+  },
+  errorUrl: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    textAlign: 'center',
     marginBottom: 16,
+    paddingHorizontal: 8,
   },
   retryButton: {
     flexDirection: 'row',
