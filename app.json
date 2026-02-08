@@ -20,7 +20,7 @@
       "bundleIdentifier": "ae.genosys.app",
       "buildNumber": "39",
       "usesAppleSignIn": true,
-      "icon": "./assets/app-icon-1024-native-matched.png",
+      "icon": "./assets/AppIcon.icon",
       "associatedDomains": [
         "applinks:genosys.ae",
         "applinks:www.genosys.ae"
