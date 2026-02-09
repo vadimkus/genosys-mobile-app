@@ -118,6 +118,8 @@ export default function WebViewScreen() {
         'button[aria-label*="Genie" i], button[aria-label*="Beauty Genie" i], button[aria-label*="chat" i] { display: none !important; }',
         // Hide PWA bottom tab bar if it appears
         '[class*="fixed"][class*="bottom-0"] { display: none !important; }',
+        // Remove large bottom padding added for PWA/mobile-web tab bar (pb-32 = 8rem, pb-24 = 6rem, etc.)
+        '[class*="pb-32"], [class*="pb-24"], [class*="pb-20"] { padding-bottom: 0 !important; }',
       ].join('\\n');
       document.head.appendChild(css);
 
