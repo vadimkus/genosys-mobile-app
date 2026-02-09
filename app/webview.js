@@ -146,17 +146,33 @@ export default function WebViewScreen() {
         });
         // Hide in-page navigation headers (< Products | Title | profile icon)
         // These are rendered by PWAPageWrapper and individual page components
+        // Use BOTH class-name matching AND structure-based detection for reliability
         document.querySelectorAll('div').forEach(function(el) {
           var cs = el.className || '';
-          // Pattern 1: flex row with justify-between + SVG back arrow (with or without border-b)
+          // Class-name pattern: flex + justify-between + padding
           if (cs.includes('flex') && cs.includes('items-center') && cs.includes('justify-between') && (cs.includes('px-5') || cs.includes('px-4'))) {
             if (el.querySelector('svg') && el.children.length >= 2 && el.children.length <= 5) {
               el.style.display = 'none';
             }
           }
-          // Pattern 2: sticky border-b wrapper (Training page style)
+          // Sticky wrapper pattern (Training page)
           if (cs.includes('border-b') && cs.includes('bg-white') && cs.includes('sticky')) {
             el.style.display = 'none';
+          }
+        });
+        // Structure-based detection: find divs that look like sub-nav bars
+        // (3 children: button/link with SVG, text span, button with avatar circle)
+        document.querySelectorAll('div').forEach(function(el) {
+          if (el.children.length === 3 && el.querySelector('svg')) {
+            var style = window.getComputedStyle(el);
+            if (style.display === 'flex' && style.justifyContent === 'space-between' && style.alignItems === 'center') {
+              // Verify it contains a back-arrow SVG and short text (title)
+              var hasBackArrow = el.querySelector('svg path[d*="M15 19l-7-7"]') || el.querySelector('svg[class*="w-5"][class*="h-5"]');
+              var hasAvatar = el.querySelector('div[class*="rounded-full"]');
+              if (hasBackArrow || hasAvatar) {
+                el.style.display = 'none';
+              }
+            }
           }
         });
         // Strip excessive bottom padding (pb-32 = 8rem added for PWA/mobile tab bar)
