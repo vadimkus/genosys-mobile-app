@@ -91,9 +91,38 @@ export default function WebViewScreen() {
     return false;
   }, [displayUrl]);
 
-  // Inject JS to intercept PDF button clicks (PDFDownloadButton uses window.open)
+  // Inject JS to intercept PDF button clicks and hide website's own chat widget
   const injectedJS = `
     (function() {
+      // Hide the website's floating chat widget (native app has its own)
+      function hideChatWidget() {
+        // Target the fixed-position chat button and panel by aria-label and styling
+        document.querySelectorAll('button[aria-label]').forEach(function(btn) {
+          var label = (btn.getAttribute('aria-label') || '').toLowerCase();
+          if (label.includes('genie') || label.includes('beauty genie') || label.includes('chat')) {
+            // Hide the button and its parent container if it's a fixed/absolute wrapper
+            var el = btn.closest('[class*="fixed"]') || btn.parentElement;
+            if (el) el.style.display = 'none';
+            btn.style.display = 'none';
+          }
+        });
+        // Also hide any fixed z-50 chat panels
+        document.querySelectorAll('[class*="z-50"]').forEach(function(el) {
+          var style = window.getComputedStyle(el);
+          if (style.position === 'fixed' && el.querySelector('svg')) {
+            var text = el.textContent || '';
+            if (text.includes('Genie') || text.includes('Beauty Genie')) {
+              el.style.display = 'none';
+            }
+          }
+        });
+      }
+      // Run immediately and again after content loads
+      hideChatWidget();
+      setTimeout(hideChatWidget, 1000);
+      setTimeout(hideChatWidget, 3000);
+      new MutationObserver(function() { hideChatWidget(); }).observe(document.body, { childList: true, subtree: true });
+
       // Override window.open to send messages to React Native
       var originalOpen = window.open;
       window.open = function(url, target, features) {
