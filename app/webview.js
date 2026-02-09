@@ -94,31 +94,37 @@ export default function WebViewScreen() {
   // Inject JS to hide website chrome (headers, nav, chat) and intercept PDF clicks
   const injectedJS = `
     (function() {
-      // CSS to hide website headers, navigation, and chat widget inside native app WebView
+      // CSS to hide ALL website chrome (headers, nav, chat, footers) inside native app WebView
       var css = document.createElement('style');
       css.textContent = [
+        // === HEADERS ===
         // Hide main desktop header
-        '.main-header { display: none !important; }',
-        // Hide all sticky/fixed headers at top (PWAHeader, MobileWebHeader)
+        '.main-header { display: none !important; height: 0 !important; }',
+        // Hide ALL <header> elements (PWAHeader, MobileWebHeader, desktop Header)
         'header { display: none !important; height: 0 !important; min-height: 0 !important; overflow: hidden !important; }',
+        // Hide all sticky/fixed elements at top (catches any header variation)
         '[class*="sticky"][class*="top-0"] { display: none !important; height: 0 !important; }',
         '[class*="fixed"][class*="top-0"] { display: none !important; height: 0 !important; }',
-        // Hide hamburger-based mobile nav overlays
+        // Hide hamburger-based mobile nav overlays and menus
         '[class*="z-50"][class*="fixed"][class*="inset-0"] { display: none !important; }',
+        '[class*="z-40"][class*="fixed"][class*="inset-0"] { display: none !important; }',
+        // === SPACERS & PADDING ===
         // Remove top padding/margin that headers leave behind
         '#main-content { padding-top: 0 !important; margin-top: 0 !important; }',
         'body { padding-top: 0 !important; margin-top: 0 !important; }',
         'main { padding-top: 0 !important; margin-top: 0 !important; }',
-        // Hide the header spacer div (PWAHeader/MobileWebHeader render a spacer with aria-hidden and inline height)
-        'div[aria-hidden="true"][class*="md:hidden"] { display: none !important; height: 0 !important; }',
-        // Hide in-page sub-navigation headers (Partners, Training, etc.)
-        // Target the specific pattern: flex row with back arrow, title, and profile icon
+        // Hide header spacer divs (aria-hidden placeholders for fixed headers)
+        'div[aria-hidden="true"] { display: none !important; height: 0 !important; }',
+        // === IN-PAGE SUB-NAVIGATION (< Products | Title | Profile icon) ===
+        // These are rendered by PWAPageWrapper and individual page components
         'div[class*="border-b"][class*="justify-between"][class*="px-5"][class*="py-4"] { display: none !important; }',
-        // Hide floating chat widget button and panel
+        'div[class*="border-b"][class*="justify-between"][class*="px-4"][class*="py-3"] { display: none !important; }',
+        // === CHAT WIDGET ===
         'button[aria-label*="Genie" i], button[aria-label*="Beauty Genie" i], button[aria-label*="chat" i] { display: none !important; }',
-        // Hide PWA bottom tab bar if it appears
+        // === BOTTOM BARS ===
+        // Hide PWA/mobile-web bottom tab bars and footers
         '[class*="fixed"][class*="bottom-0"] { display: none !important; }',
-        // Remove large bottom padding added for PWA/mobile-web tab bar (pb-32 = 8rem, pb-24 = 6rem, etc.)
+        // Remove large bottom padding added for PWA/mobile-web tab bar
         '[class*="pb-32"], [class*="pb-24"], [class*="pb-20"] { padding-bottom: 0 !important; }',
       ].join('\\n');
       document.head.appendChild(css);
@@ -132,24 +138,24 @@ export default function WebViewScreen() {
             el.style.display = 'none';
           }
         });
-        // Hide header spacer divs (empty divs with inline height for safe-area)
+        // Hide ALL aria-hidden spacer divs (placed after fixed headers)
         document.querySelectorAll('div[aria-hidden="true"]').forEach(function(el) {
-          var h = el.style.height || '';
-          if (h.includes('safe-area') || h.includes('80px') || h.includes('env(')) {
-            el.style.display = 'none';
-            el.style.height = '0px';
-          }
+          el.style.display = 'none';
+          el.style.height = '0px';
         });
-        // Hide in-page navigation headers (< Products | Partners | profile icon)
-        // These are div elements with flex layout, border-bottom, and contain an SVG back arrow
+        // Hide in-page navigation headers (< Products | Contact | profile icon)
+        // These are rendered by PWAPageWrapper and individual page components
         document.querySelectorAll('div').forEach(function(el) {
           var cs = el.className || '';
-          // Match divs that have border-b, flex layout, and look like nav bars
+          // Pattern 1: border-b + flex row with justify-between (standard sub-nav)
           if (cs.includes('border-b') && cs.includes('flex') && cs.includes('items-center') && cs.includes('justify-between')) {
-            // Check if this looks like a page-level nav (has SVG icon and short text)
             if (el.querySelector('svg') && el.children.length >= 2 && el.children.length <= 5) {
               el.style.display = 'none';
             }
+          }
+          // Pattern 2: border-b + flex row that wraps a sub-nav (Training page style)
+          if (cs.includes('border-b') && cs.includes('bg-white') && cs.includes('sticky')) {
+            el.style.display = 'none';
           }
         });
       }
