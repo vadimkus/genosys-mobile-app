@@ -384,6 +384,14 @@ export default function ChatButton({ visible = true }) {
                 </View>
               </View>
               <View style={s.headerActions}>
+                <TouchableOpacity
+                  onPress={() => { setIsOpen(false); router.push('/chat'); }}
+                  style={s.headerActionBtn}
+                  activeOpacity={0.7}
+                  accessibilityLabel="Expand chat to full screen"
+                >
+                  <Ionicons name="expand-outline" size={18} color="#ffffff" />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={() => setIsOpen(false)} style={s.headerActionBtn} activeOpacity={0.7}>
                   <Ionicons name="close" size={20} color="#ffffff" />
                 </TouchableOpacity>

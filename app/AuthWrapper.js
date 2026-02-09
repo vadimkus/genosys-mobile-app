@@ -5,8 +5,18 @@ import { useAuth } from '../contexts/AuthContext';
 import LoginScreen from './auth/login';
 import ChatButton from '../components/ChatButton';
 
-// Screens where the chat button should be hidden
-const CHAT_HIDDEN_ROUTES = ['/skin-analysis-camera', '/checkout', '/auth/', '/webview', '/payment/'];
+// Screens where the chat button should be hidden (matches mobile web ChatWidget hidden pages)
+// Web hides on: /cart, /bag, /checkout, /profile, /login, /bundle-builder, /success, /forgot-password, /reset-password
+const CHAT_HIDDEN_ROUTES = [
+  '/profile',            // profile page and sub-pages
+  '/(tabs)/bag',         // bag/cart tab (matches web /cart, /bag)
+  '/(tabs)/orders',      // orders tab
+  '/checkout',           // checkout flow
+  '/payment/',           // payment screens
+  '/auth/',              // login, register, forgot-password, reset-password
+  '/webview',            // webview screens (bundle-builder, training, etc.)
+  '/skin-analysis-camera', // camera screen
+];
 
 export default function AuthWrapper() {
   const { isAuthenticated, loading } = useAuth();

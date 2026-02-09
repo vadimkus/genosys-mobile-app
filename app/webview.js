@@ -56,10 +56,16 @@ export default function WebViewScreen() {
 
   // Intercept navigation requests: handle PDF downloads & external links
   const handleNavigationRequest = useCallback((request) => {
-    const { url: reqUrl } = request;
+    const { url: reqUrl, isTopFrame } = request;
 
     // Allow the initial page load
     if (reqUrl === displayUrl) return true;
+
+    // Allow iframe loads (YouTube embeds, etc.) — don't intercept sub-frame navigation
+    if (isTopFrame === false) return true;
+
+    // Allow YouTube embed URLs (used in training page iframes)
+    if (reqUrl.includes('youtube.com/embed') || reqUrl.includes('youtube-nocookie.com/embed')) return true;
 
     // Detect PDF links (direct .pdf files or pcloud downloads)
     const isPdf = /\.pdf(\?|$)/i.test(reqUrl);
@@ -77,10 +83,47 @@ export default function WebViewScreen() {
     // Allow same-domain navigation within WebView
     if (reqUrl.includes('genosys.ae')) return true;
 
+    // Allow Google-related domains (reCAPTCHA, analytics, fonts, etc.)
+    if (reqUrl.includes('google.com') || reqUrl.includes('googleapis.com') || reqUrl.includes('gstatic.com')) return true;
+
     // External links: open in system browser
     Linking.openURL(reqUrl).catch(() => {});
     return false;
   }, [displayUrl]);
+
+  // Inject JS to intercept PDF button clicks (PDFDownloadButton uses window.open)
+  const injectedJS = `
+    (function() {
+      // Override window.open to send messages to React Native
+      var originalOpen = window.open;
+      window.open = function(url, target, features) {
+        if (url && (url.match(/\\.pdf(\\?|$)/i) || url.includes('pcloud.link') || url.includes('pcloud.com'))) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'open-url', url: url }));
+          return null;
+        }
+        // For other URLs, also send to React Native
+        if (url && !url.includes('genosys.ae')) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'open-url', url: url }));
+          return null;
+        }
+        return originalOpen.call(window, url, target, features);
+      };
+
+      // Also intercept programmatic <a> click downloads
+      document.addEventListener('click', function(e) {
+        var el = e.target.closest('a[href]');
+        if (el && el.href) {
+          var href = el.href;
+          if (href.match(/\\.pdf(\\?|$)/i) || href.includes('pcloud.link') || href.includes('pcloud.com')) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'open-url', url: href }));
+          }
+        }
+      }, true);
+    })();
+    true;
+  `;
 
   if (!displayUrl) {
     return (
@@ -174,6 +217,18 @@ export default function WebViewScreen() {
             Linking.openURL(nativeEvent.targetUrl).catch(() => {});
           }
         }}
+        onMessage={(event) => {
+          // Handle messages from injected JavaScript
+          try {
+            const data = JSON.parse(event.nativeEvent.data);
+            if (data.type === 'open-url' && data.url) {
+              Linking.openURL(data.url).catch(() => {
+                Alert.alert('Error', 'Could not open the file.');
+              });
+            }
+          } catch { /* ignore non-JSON messages */ }
+        }}
+        injectedJavaScript={injectedJS}
         startInLoadingState={false}
         javaScriptEnabled
         domStorageEnabled
