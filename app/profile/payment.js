@@ -15,7 +15,7 @@ import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } fro
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling } from '../../services/databaseService';
-import { lightTap } from '../../utils/haptics';
+import { mediumTap } from '../../utils/haptics';
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function PaymentScreen() {
   );
 
   const selectDefault = async (method) => {
-    lightTap();
+    mediumTap();
     try {
       const saved = await setDefaultPaymentMethod(method);
       setDefaultMethodState(saved);

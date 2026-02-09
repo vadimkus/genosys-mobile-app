@@ -152,6 +152,7 @@ export default function CheckoutScreen() {
   }, []);
 
   const selectPaymentMethod = async (method) => {
+    haptics.mediumTap();
     const safe =
       method === PAYMENT_METHODS.CARD
         ? PAYMENT_METHODS.CARD
