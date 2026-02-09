@@ -22,6 +22,7 @@ import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import AUTH_CONFIG from '../../config/auth';
 import { computeWaterfallBreakdown } from '../../utils/cartUtils';
+import { mediumTap } from '../../utils/haptics';
 
 export default function BagScreen() {
   const { user } = useAuth();
@@ -182,6 +183,7 @@ export default function BagScreen() {
   };
 
   const handleCheckout = () => {
+    mediumTap();
     if (!user) {
       Alert.alert(
         t('checkout.loginRequiredTitle'),
