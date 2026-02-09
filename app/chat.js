@@ -28,6 +28,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
+import { handleDeepLink } from '../utils/deepLinking';
 import AUTH_CONFIG from '../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
@@ -105,22 +106,25 @@ export default function ChatScreen() {
     scrollToBottom();
   }, [messages, loading]);
 
-  /* ─── Quick-action definitions (same 10 as mobile web) ─── */
+  /* ─── Quick-action definitions (same 10 as mobile web, arranged in rows of 3-3-2-2) ─── */
   const QUICK_ACTIONS_ROW1 = useMemo(() => [
     { label: t('chat.quickDrySkin'), query: t('chat.quickDrySkinQuery'), emoji: '💧' },
     { label: t('chat.quickOilySkin'), query: t('chat.quickOilySkinQuery'), emoji: '🧴' },
     { label: t('chat.quickAntiAging'), query: t('chat.quickAntiAgingQuery'), emoji: '✨' },
-    { label: t('chat.quickGlassSkin'), query: t('chat.quickGlassSkinQuery'), emoji: '🪞' },
   ], [t]);
 
   const QUICK_ACTIONS_ROW2 = useMemo(() => [
+    { label: t('chat.quickGlassSkin'), query: t('chat.quickGlassSkinQuery'), emoji: '🪞' },
     { label: t('chat.quickAcne'), query: t('chat.quickAcneQuery'), emoji: '🌿' },
     { label: t('chat.quickRoutine'), query: t('chat.quickRoutineQuery'), emoji: '📋' },
+  ], [t]);
+
+  const QUICK_ACTIONS_ROW3 = useMemo(() => [
     { label: t('chat.quickWhyGenosys'), query: t('chat.quickWhyGenosysQuery'), emoji: '🏆' },
     { label: t('chat.quickSun'), query: t('chat.quickSunQuery'), emoji: '☀️' },
   ], [t]);
 
-  const QUICK_ACTIONS_ROW3 = useMemo(() => [
+  const QUICK_ACTIONS_ROW4 = useMemo(() => [
     { label: t('chat.quickDiscount'), query: t('chat.quickDiscountQuery'), emoji: '🎁', highlight: true },
     { label: t('chat.quickAiSkin'), query: t('chat.quickAiSkinQuery'), emoji: '📸', highlight: true },
   ], [t]);
@@ -292,6 +296,22 @@ export default function ChatScreen() {
     </TouchableOpacity>
   );
 
+  /* ─── Handle link press: open genosys.ae URLs in-app, others externally ─── */
+  const handleLinkPress = useCallback((url) => {
+    if (!url) return;
+    // If it's a genosys.ae URL, try to navigate in-app
+    if (url.includes('genosys.ae')) {
+      const handled = handleDeepLink(url);
+      if (!handled) {
+        // Fallback: open in WebView inside the app
+        router.push({ pathname: '/webview', params: { url, title: '' } });
+      }
+    } else {
+      // External URL — open in browser
+      Linking.openURL(url);
+    }
+  }, []);
+
   /* ─── Text with clickable links ─── */
   const renderLinkedText = (text, baseStyle) => {
     // Match markdown links [label](url) and bare URLs https://...
@@ -331,7 +351,7 @@ export default function ChatScreen() {
             <Text
               key={i}
               style={styles.linkText}
-              onPress={() => Linking.openURL(part.url)}
+              onPress={() => handleLinkPress(part.url)}
             >
               {part.label}
             </Text>
@@ -390,13 +410,17 @@ export default function ChatScreen() {
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW1.map(renderQuickActionButton)}
             </View>
-            {/* Row 2 – concerns & info */}
+            {/* Row 2 – skin types + concerns */}
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW2.map(renderQuickActionButton)}
             </View>
-            {/* Row 3 – highlight: discount + AI */}
+            {/* Row 3 – info */}
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW3.map(renderQuickActionButton)}
+            </View>
+            {/* Row 4 – highlight: discount + AI */}
+            <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
+              {QUICK_ACTIONS_ROW4.map(renderQuickActionButton)}
             </View>
           </View>
         )}

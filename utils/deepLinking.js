@@ -27,6 +27,12 @@ export function handleDeepLink(url) {
     // Strip locale prefix (en/, ar/, ru/)
     const cleanPath = path.replace(/^(en|ar|ru)\//, '');
 
+    // Products listing page
+    if (cleanPath === 'products') {
+      router.push('/(tabs)/shop');
+      return true;
+    }
+
     // Product detail: products/[id] or products/[slug]
     if (cleanPath.startsWith('products/')) {
       const id = cleanPath.replace('products/', '');
