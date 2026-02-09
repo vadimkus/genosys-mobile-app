@@ -340,6 +340,7 @@ export default function CheckoutScreen() {
   }, [user]);
 
   const handleSubmit = async () => {
+    haptics.mediumTap();
     setSubmitAttempted(true);
     setTouched({
       firstName: true,
