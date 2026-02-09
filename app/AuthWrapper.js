@@ -9,8 +9,8 @@ import ChatButton from '../components/ChatButton';
 // Web hides on: /cart, /bag, /checkout, /profile, /login, /bundle-builder, /success, /forgot-password, /reset-password
 const CHAT_HIDDEN_ROUTES = [
   '/profile',            // profile page and sub-pages
-  '/(tabs)/bag',         // bag/cart tab (matches web /cart, /bag)
-  '/(tabs)/orders',      // orders tab
+  '/bag',                // bag/cart tab (matches web /cart, /bag)
+  '/orders',             // orders tab
   '/checkout',           // checkout flow
   '/payment/',           // payment screens
   '/auth/',              // login, register, forgot-password, reset-password
