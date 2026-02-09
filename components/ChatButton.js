@@ -36,6 +36,7 @@ import AUTH_CONFIG from '../config/auth';
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PANEL_HEIGHT = Math.round(SCREEN_HEIGHT * 0.82);
+const PANEL_HEIGHT_EXPANDED = SCREEN_HEIGHT;
 
 /** Get user context for personalised greetings */
 function getUserContext() {
@@ -76,6 +77,7 @@ function buildWelcome(t, ctx) {
 
 export default function ChatButton({ visible = true }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
@@ -364,18 +366,20 @@ export default function ChatButton({ visible = true }) {
         animationType="slide"
         onRequestClose={() => setIsOpen(false)}
       >
-        <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
-          <View style={s.overlay} />
-        </TouchableWithoutFeedback>
+        {!isExpanded && (
+          <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
+            <View style={s.overlay} />
+          </TouchableWithoutFeedback>
+        )}
 
         <KeyboardAvoidingView
           style={s.panelContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
-          <View style={s.panel}>
+          <View style={[s.panel, { height: isExpanded ? PANEL_HEIGHT_EXPANDED : PANEL_HEIGHT, borderTopLeftRadius: isExpanded ? 0 : 20, borderTopRightRadius: isExpanded ? 0 : 20 }]}>
             {/* Header */}
-            <View style={[s.panelHeader, isRTL && s.panelHeaderRTL]}>
+            <View style={[s.panelHeader, isRTL && s.panelHeaderRTL, isExpanded && { borderTopLeftRadius: 0, borderTopRightRadius: 0, paddingTop: Platform.OS === 'ios' ? 54 : 12 }]}>
               <View style={s.headerLeft}>
                 <Ionicons name="sparkles" size={16} color="#ffffff" />
                 <View style={{ marginStart: 6 }}>
@@ -385,14 +389,14 @@ export default function ChatButton({ visible = true }) {
               </View>
               <View style={s.headerActions}>
                 <TouchableOpacity
-                  onPress={() => { setIsOpen(false); router.push('/chat'); }}
+                  onPress={() => setIsExpanded((prev) => !prev)}
                   style={s.headerActionBtn}
                   activeOpacity={0.7}
-                  accessibilityLabel="Expand chat to full screen"
+                  accessibilityLabel={isExpanded ? 'Collapse chat' : 'Expand chat to full screen'}
                 >
-                  <Ionicons name="expand-outline" size={18} color="#ffffff" />
+                  <Ionicons name={isExpanded ? 'contract-outline' : 'expand-outline'} size={18} color="#ffffff" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setIsOpen(false)} style={s.headerActionBtn} activeOpacity={0.7}>
+                <TouchableOpacity onPress={() => { setIsOpen(false); setIsExpanded(false); }} style={s.headerActionBtn} activeOpacity={0.7}>
                   <Ionicons name="close" size={20} color="#ffffff" />
                 </TouchableOpacity>
               </View>
