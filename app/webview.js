@@ -91,37 +91,39 @@ export default function WebViewScreen() {
     return false;
   }, [displayUrl]);
 
-  // Inject JS to intercept PDF button clicks and hide website's own chat widget
+  // Inject JS to hide website chrome (headers, nav, chat) and intercept PDF clicks
   const injectedJS = `
     (function() {
-      // Hide the website's floating chat widget (native app has its own)
-      function hideChatWidget() {
-        // Target the fixed-position chat button and panel by aria-label and styling
-        document.querySelectorAll('button[aria-label]').forEach(function(btn) {
-          var label = (btn.getAttribute('aria-label') || '').toLowerCase();
-          if (label.includes('genie') || label.includes('beauty genie') || label.includes('chat')) {
-            // Hide the button and its parent container if it's a fixed/absolute wrapper
-            var el = btn.closest('[class*="fixed"]') || btn.parentElement;
-            if (el) el.style.display = 'none';
-            btn.style.display = 'none';
-          }
-        });
-        // Also hide any fixed z-50 chat panels
-        document.querySelectorAll('[class*="z-50"]').forEach(function(el) {
-          var style = window.getComputedStyle(el);
-          if (style.position === 'fixed' && el.querySelector('svg')) {
-            var text = el.textContent || '';
-            if (text.includes('Genie') || text.includes('Beauty Genie')) {
-              el.style.display = 'none';
-            }
+      // CSS to hide website headers, navigation, and chat widget inside native app WebView
+      var css = document.createElement('style');
+      css.textContent = [
+        // Hide main desktop header
+        '.main-header { display: none !important; }',
+        // Hide all sticky/fixed headers at top (PWAHeader, MobileWebHeader)
+        'header, [class*="sticky"][class*="top-0"], [class*="fixed"][class*="top-0"] { display: none !important; }',
+        // Hide hamburger-based mobile nav overlays
+        '[class*="z-50"][class*="fixed"][class*="inset-0"] { display: none !important; }',
+        // Remove top padding/margin that headers leave behind
+        '#main-content { padding-top: 0 !important; margin-top: 0 !important; }',
+        'body { padding-top: 0 !important; margin-top: 0 !important; }',
+        // Hide floating chat widget button and panel
+        'button[aria-label*="Genie" i], button[aria-label*="Beauty Genie" i], button[aria-label*="chat" i] { display: none !important; }',
+      ].join('\\n');
+      document.head.appendChild(css);
+
+      // Additional JS cleanup for dynamically rendered elements
+      function hideWebsiteChrome() {
+        // Hide chat widget containers (fixed position with Genie text)
+        document.querySelectorAll('[class*="fixed"]').forEach(function(el) {
+          var text = el.textContent || '';
+          if ((text.includes('Genie') || text.includes('Beauty Genie')) && el.querySelector('svg')) {
+            el.style.display = 'none';
           }
         });
       }
-      // Run immediately and again after content loads
-      hideChatWidget();
-      setTimeout(hideChatWidget, 1000);
-      setTimeout(hideChatWidget, 3000);
-      new MutationObserver(function() { hideChatWidget(); }).observe(document.body, { childList: true, subtree: true });
+      hideWebsiteChrome();
+      setTimeout(hideWebsiteChrome, 1500);
+      new MutationObserver(function() { hideWebsiteChrome(); }).observe(document.body, { childList: true, subtree: true });
 
       // Override window.open to send messages to React Native
       var originalOpen = window.open;
