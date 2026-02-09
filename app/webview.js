@@ -100,14 +100,24 @@ export default function WebViewScreen() {
         // Hide main desktop header
         '.main-header { display: none !important; }',
         // Hide all sticky/fixed headers at top (PWAHeader, MobileWebHeader)
-        'header, [class*="sticky"][class*="top-0"], [class*="fixed"][class*="top-0"] { display: none !important; }',
+        'header { display: none !important; height: 0 !important; min-height: 0 !important; overflow: hidden !important; }',
+        '[class*="sticky"][class*="top-0"] { display: none !important; height: 0 !important; }',
+        '[class*="fixed"][class*="top-0"] { display: none !important; height: 0 !important; }',
         // Hide hamburger-based mobile nav overlays
         '[class*="z-50"][class*="fixed"][class*="inset-0"] { display: none !important; }',
         // Remove top padding/margin that headers leave behind
         '#main-content { padding-top: 0 !important; margin-top: 0 !important; }',
         'body { padding-top: 0 !important; margin-top: 0 !important; }',
+        'main { padding-top: 0 !important; margin-top: 0 !important; }',
+        // Hide the header spacer div (PWAHeader/MobileWebHeader render a spacer with aria-hidden and inline height)
+        'div[aria-hidden="true"][class*="md:hidden"] { display: none !important; height: 0 !important; }',
+        // Hide in-page sub-navigation headers (Partners, Training, etc.)
+        // Target the specific pattern: flex row with back arrow, title, and profile icon
+        'div[class*="border-b"][class*="justify-between"][class*="px-5"][class*="py-4"] { display: none !important; }',
         // Hide floating chat widget button and panel
         'button[aria-label*="Genie" i], button[aria-label*="Beauty Genie" i], button[aria-label*="chat" i] { display: none !important; }',
+        // Hide PWA bottom tab bar if it appears
+        '[class*="fixed"][class*="bottom-0"] { display: none !important; }',
       ].join('\\n');
       document.head.appendChild(css);
 
@@ -120,9 +130,31 @@ export default function WebViewScreen() {
             el.style.display = 'none';
           }
         });
+        // Hide header spacer divs (empty divs with inline height for safe-area)
+        document.querySelectorAll('div[aria-hidden="true"]').forEach(function(el) {
+          var h = el.style.height || '';
+          if (h.includes('safe-area') || h.includes('80px') || h.includes('env(')) {
+            el.style.display = 'none';
+            el.style.height = '0px';
+          }
+        });
+        // Hide in-page navigation headers (< Products | Partners | profile icon)
+        // These are div elements with flex layout, border-bottom, and contain an SVG back arrow
+        document.querySelectorAll('div').forEach(function(el) {
+          var cs = el.className || '';
+          // Match divs that have border-b, flex layout, and look like nav bars
+          if (cs.includes('border-b') && cs.includes('flex') && cs.includes('items-center') && cs.includes('justify-between')) {
+            // Check if this looks like a page-level nav (has SVG icon and short text)
+            if (el.querySelector('svg') && el.children.length >= 2 && el.children.length <= 5) {
+              el.style.display = 'none';
+            }
+          }
+        });
       }
       hideWebsiteChrome();
+      setTimeout(hideWebsiteChrome, 500);
       setTimeout(hideWebsiteChrome, 1500);
+      setTimeout(hideWebsiteChrome, 3000);
       new MutationObserver(function() { hideWebsiteChrome(); }).observe(document.body, { childList: true, subtree: true });
 
       // Override window.open to send messages to React Native
