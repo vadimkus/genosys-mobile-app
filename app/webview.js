@@ -117,8 +117,9 @@ export default function WebViewScreen() {
         'div[aria-hidden="true"] { display: none !important; height: 0 !important; }',
         // === IN-PAGE SUB-NAVIGATION (< Products | Title | Profile icon) ===
         // These are rendered by PWAPageWrapper and individual page components
-        'div[class*="border-b"][class*="justify-between"][class*="px-5"][class*="py-4"] { display: none !important; }',
-        'div[class*="border-b"][class*="justify-between"][class*="px-4"][class*="py-3"] { display: none !important; }',
+        // Some pages have border-b, some don't — match all variations
+        'div[class*="justify-between"][class*="px-5"][class*="py-4"] { display: none !important; }',
+        'div[class*="justify-between"][class*="px-4"][class*="py-3"] { display: none !important; }',
         // === CHAT WIDGET ===
         'button[aria-label*="Genie" i], button[aria-label*="Beauty Genie" i], button[aria-label*="chat" i] { display: none !important; }',
         // === BOTTOM BARS ===
@@ -143,20 +144,24 @@ export default function WebViewScreen() {
           el.style.display = 'none';
           el.style.height = '0px';
         });
-        // Hide in-page navigation headers (< Products | Contact | profile icon)
+        // Hide in-page navigation headers (< Products | Title | profile icon)
         // These are rendered by PWAPageWrapper and individual page components
         document.querySelectorAll('div').forEach(function(el) {
           var cs = el.className || '';
-          // Pattern 1: border-b + flex row with justify-between (standard sub-nav)
-          if (cs.includes('border-b') && cs.includes('flex') && cs.includes('items-center') && cs.includes('justify-between')) {
+          // Pattern 1: flex row with justify-between + SVG back arrow (with or without border-b)
+          if (cs.includes('flex') && cs.includes('items-center') && cs.includes('justify-between') && (cs.includes('px-5') || cs.includes('px-4'))) {
             if (el.querySelector('svg') && el.children.length >= 2 && el.children.length <= 5) {
               el.style.display = 'none';
             }
           }
-          // Pattern 2: border-b + flex row that wraps a sub-nav (Training page style)
+          // Pattern 2: sticky border-b wrapper (Training page style)
           if (cs.includes('border-b') && cs.includes('bg-white') && cs.includes('sticky')) {
             el.style.display = 'none';
           }
+        });
+        // Strip excessive bottom padding (pb-32 = 8rem added for PWA/mobile tab bar)
+        document.querySelectorAll('[class*="pb-32"], [class*="pb-24"], [class*="pb-20"]').forEach(function(el) {
+          el.style.paddingBottom = '0px';
         });
       }
       hideWebsiteChrome();
