@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform, Linking, Share, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
@@ -53,6 +53,34 @@ export default function WebViewScreen() {
   }, []);
 
   const displayUrl = typeof url === 'string' ? url : '';
+
+  // Intercept navigation requests: handle PDF downloads & external links
+  const handleNavigationRequest = useCallback((request) => {
+    const { url: reqUrl } = request;
+
+    // Allow the initial page load
+    if (reqUrl === displayUrl) return true;
+
+    // Detect PDF links (direct .pdf files or pcloud downloads)
+    const isPdf = /\.pdf(\?|$)/i.test(reqUrl);
+    const isPcloud = reqUrl.includes('pcloud.link') || reqUrl.includes('pcloud.com');
+    const isDownload = isPdf || isPcloud;
+
+    if (isDownload) {
+      // Open PDF in native viewer / browser (triggers iOS Share Sheet or preview)
+      Linking.openURL(reqUrl).catch(() => {
+        Alert.alert('Download Error', 'Could not open the PDF. Please try again.');
+      });
+      return false; // Prevent WebView from loading it
+    }
+
+    // Allow same-domain navigation within WebView
+    if (reqUrl.includes('genosys.ae')) return true;
+
+    // External links: open in system browser
+    Linking.openURL(reqUrl).catch(() => {});
+    return false;
+  }, [displayUrl]);
 
   if (!displayUrl) {
     return (
@@ -138,12 +166,21 @@ export default function WebViewScreen() {
             setPageTitle(navState.title);
           }
         }}
+        onShouldStartLoadWithRequest={handleNavigationRequest}
+        onOpenWindow={(syntheticEvent) => {
+          // Intercept window.open() calls (used by PDFDownloadButton for external links)
+          const { nativeEvent } = syntheticEvent;
+          if (nativeEvent.targetUrl) {
+            Linking.openURL(nativeEvent.targetUrl).catch(() => {});
+          }
+        }}
         startInLoadingState={false}
         javaScriptEnabled
         domStorageEnabled
         allowsBackForwardNavigationGestures
         sharedCookiesEnabled
         thirdPartyCookiesEnabled
+        allowsInlineMediaPlayback
       />
       )}
     </SafeAreaView>
