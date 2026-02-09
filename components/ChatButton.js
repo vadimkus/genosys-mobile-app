@@ -1,7 +1,7 @@
 /**
  * Floating Chat Button + Expandable Chat Panel
  * Opens an overlay chat panel (like mobile web) instead of navigating to full-screen.
- * Panel takes ~65% of screen height, anchored to bottom.
+ * Panel takes ~82% of screen height, anchored to bottom.
  */
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
@@ -35,7 +35,7 @@ import AUTH_CONFIG from '../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const PANEL_HEIGHT = Math.round(SCREEN_HEIGHT * 0.65);
+const PANEL_HEIGHT = Math.round(SCREEN_HEIGHT * 0.82);
 
 /** Get user context for personalised greetings */
 function getUserContext() {
