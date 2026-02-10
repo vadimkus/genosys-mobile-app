@@ -24,7 +24,7 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
-import { AUTH_CONFIG } from '../config/auth';
+import AUTH_CONFIG from '../config/auth';
 
 export default function TrainingScreen() {
   const router = useRouter();

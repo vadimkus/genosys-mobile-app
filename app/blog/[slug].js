@@ -27,7 +27,7 @@ import RenderHtml from 'react-native-render-html';
 import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { AUTH_CONFIG } from '../../config/auth';
+import AUTH_CONFIG from '../../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CONTENT_WIDTH = SCREEN_WIDTH - 40; // 20px padding each side

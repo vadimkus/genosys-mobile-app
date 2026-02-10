@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { AUTH_CONFIG } from '../../config/auth';
+import AUTH_CONFIG from '../../config/auth';
 
 export default function BlogScreen() {
   const router = useRouter();

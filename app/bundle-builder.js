@@ -26,7 +26,7 @@ import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { AUTH_CONFIG } from '../config/auth';
+import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;

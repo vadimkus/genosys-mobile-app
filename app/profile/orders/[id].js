@@ -10,7 +10,7 @@ import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
 import { Image } from 'expo-image';
 import { useLocalization } from '../../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../../utils/emirateUtils';
-import { AUTH_CONFIG } from '../../../config/auth';
+import AUTH_CONFIG from '../../../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
