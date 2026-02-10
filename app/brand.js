@@ -172,6 +172,27 @@ export default function BrandScreen() {
           ))}
         </View>
 
+        {/* Product Showcase */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+            {locale === 'ar' ? 'مجموعة المنتجات المهنية' : locale === 'ru' ? 'Профессиональная линейка продуктов' : 'Professional Product Line'}
+          </Text>
+          <View style={styles.productImageCard}>
+            <Image
+              source={{ uri: 'https://genosys.ae/images/genosys-products.jpg' }}
+              style={styles.productImage}
+              resizeMode="contain"
+            />
+            <Text style={[styles.productCaption, isRTL && styles.textRTL]}>
+              {locale === 'ar'
+                ? 'مجموعة منتجات جينوسيس المهنية للعناية بالبشرة — منتجات مختبرة طبيًا'
+                : locale === 'ru'
+                ? 'Профессиональная линейка средств GENOSYS — дерматологически протестированные продукты'
+                : 'GENOSYS Professional Skincare Line — Dermatologically Tested Products'}
+            </Text>
+          </View>
+        </View>
+
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={[styles.footerText, isRTL && styles.textRTL]}>
@@ -229,6 +250,11 @@ const styles = StyleSheet.create({
   videoThumbnail: { width: '100%', height: '100%' },
   playOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' },
   playButton: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(220,38,38,0.9)', justifyContent: 'center', alignItems: 'center' },
+
+  // Product Showcase
+  productImageCard: { backgroundColor: '#F9FAFB', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#F3F4F6' },
+  productImage: { width: '100%', height: SCREEN_WIDTH * 0.65, backgroundColor: '#ffffff' },
+  productCaption: { fontSize: 13, color: '#6B7280', textAlign: 'center', paddingHorizontal: 16, paddingVertical: 12, lineHeight: 18 },
 
   // Footer
   footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
