@@ -142,7 +142,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/profile/contact')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/contact')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.contact') || 'Contact'}
               </Text>

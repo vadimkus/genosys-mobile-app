@@ -44,13 +44,13 @@ export default function DeliveryScreen() {
   ];
 
   const shippingRates = [
-    { emirate: l('Dubai', 'دبي', 'Дубай'), rate: l('25 AED', '٢٥ د.إ', '25 AED') },
-    { emirate: l('Abu Dhabi', 'أبو ظبي', 'Абу-Даби'), rate: l('35 AED', '٣٥ د.إ', '35 AED') },
-    { emirate: l('Sharjah', 'الشارقة', 'Шарджа'), rate: l('30 AED', '٣٠ د.إ', '30 AED') },
-    { emirate: l('Ajman', 'عجمان', 'Аджман'), rate: l('30 AED', '٣٠ د.إ', '30 AED') },
-    { emirate: l('Ras Al Khaimah', 'رأس الخيمة', 'Рас-эль-Хайма'), rate: l('35 AED', '٣٥ د.إ', '35 AED') },
-    { emirate: l('Fujairah', 'الفجيرة', 'Фуджейра'), rate: l('35 AED', '٣٥ د.إ', '35 AED') },
-    { emirate: l('Umm Al Quwain', 'أم القيوين', 'Умм-эль-Кайвайн'), rate: l('35 AED', '٣٥ د.إ', '35 AED') },
+    { emirate: l('Dubai', 'دبي', 'Дубай'), rate: l('45 AED', '٤٥ د.إ', '45 AED') },
+    { emirate: l('Abu Dhabi', 'أبو ظبي', 'Абу-Даби'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
+    { emirate: l('Sharjah', 'الشارقة', 'Шарджа'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
+    { emirate: l('Ajman', 'عجمان', 'Аджман'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
+    { emirate: l('Ras Al Khaimah', 'رأس الخيمة', 'Рас-эль-Хайма'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
+    { emirate: l('Fujairah', 'الفجيرة', 'Фуджейра'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
+    { emirate: l('Umm Al Quwain', 'أم القيوين', 'Умм-эль-Кайвайн'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
   ];
 
   return (
