@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
-**Version:** 1.1.0  
-**Build:** 34  
+**Version:** 1.3.0  
+**Build:** 53  
 **Platform:** iOS  
 
 ---
@@ -14,31 +14,35 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.1.0
+## What's New in Version 1.3.0
 
-### AI Features
-- **AI Skin Analysis** - Personalized skin type quiz with product recommendations
-- **AI Camera Analysis** - Real-time camera-based skin analysis using device camera
-- **AI Chatbot** - Intelligent assistant for product questions and skincare advice
+### AI Skin Analysis (Enhanced)
+- **AI Expert Analysis** - Take a selfie and receive instant AI-powered skin assessment using GPT-4 Vision
+- **Health Score** - Get a 1-10 skin health rating with visual indicator
+- **Personalized Routine** - Receive custom AM/PM skincare routines based on your analysis
+- **Product Recommendations** - AI suggests specific products with personalized reasons
+- **Tips** - Get customized skincare tips for your skin type and concerns
+- **Quiz Mode** - 4-step questionnaire with API-driven product recommendations
 
-### Product Experience
-- **Image Gallery** - Swipeable multi-image carousel on product pages with pagination dots
-- **Product Videos** - Embedded video demonstrations (available for select products)
-- **Product Documentation** - Downloadable PDF guides for professional application
+### Build Your Set (New)
+- **Native Bundle Builder** - Create your perfect skincare routine in-app
+- **8-Step Process** - Select products across Cleanse, Tone, Serum, Eye Care, Cream, Mask, Sun Care, Special Care
+- **Tiered Discounts** - 5% off 2 items, 10% off 3, 15% off 4, up to 20% off 5+ items
+- **Visual Summary** - See your bundle with product images, sizes, and total savings
 
-### Navigation & UI
-- **Hamburger Menu** - Full navigation drawer with access to all app sections
-- **Skeleton Loading** - Shimmer placeholders instead of spinners for better perceived performance
-- **Haptic Feedback** - Tactile feedback on add-to-cart, favorites, and checkout actions
+### Native Blog (New)
+- **In-App Reading** - Read skincare articles directly in the app
+- **Comments** - Leave comments on articles (requires login)
+- **Localized Content** - Articles available in English, Arabic, and Russian
 
-### Performance
-- **expo-image Migration** - Faster image loading with built-in caching and blurhash placeholders
-- **Offline Product Browsing** - Cached product catalog for browsing without internet
-- **Deep Linking** - Direct links open content in-app from emails and shared links
+### Push Notifications (New)
+- **Order Updates** - Receive notifications when order status changes
+- **Beautiful Alerts** - In-app notification banners with order details
 
-### Order Improvements
-- **Discount Tracking** - VIP and bundle discount fields included in order records
-- **Localized Emails** - Order confirmation emails sent in user's selected language
+### Performance & Stability
+- **Faster Startup** - Improved app initialization
+- **Enhanced Stability** - Better error handling throughout
+- **Smoother Navigation** - Native screens replace WebView wrappers
 
 ---
 
@@ -55,7 +59,7 @@ This account is pre-created and ready to use. No email verification required.
 
 ## Testing Instructions
 
-### Quick Test Flow (5-7 minutes)
+### Quick Test Flow (8-10 minutes)
 
 #### 1. Login
 - Open app > Tap "Sign In"
@@ -63,31 +67,50 @@ This account is pre-created and ready to use. No email verification required.
 - Enter password: `GenosysReview2026!`
 - Tap "Sign In"
 
-#### 2. Browse Products
+#### 2. AI Skin Analysis (New Feature)
+- Open hamburger menu (top-left) > Tap "AI Skin Analysis"
+- **Option A - AI Camera Analysis:**
+  - Tap "AI Camera" button
+  - Allow camera access
+  - Position your face in the oval guide
+  - Tap capture button
+  - Wait for AI analysis (5-10 seconds)
+  - View results: Health Score, Skin Type, Concerns, Product Recommendations with prices, AM/PM Routine, Tips
+  - Tap "Add to Bag" on recommended products
+- **Option B - Quiz Mode:**
+  - Tap "Start Quiz"
+  - Answer 4 questions (Skin Type, Age Group, Concerns, Usage)
+  - View personalized product recommendations
+
+#### 3. Build Your Set (New Feature)
+- Open hamburger menu > Tap "Build Your Set"
+- Select products for each skincare step (swipe through steps at top)
+- Watch discount increase as you add items (5% → 10% → 15% → 20%)
+- Tap center to view "Your Bundle" summary
+- Swipe footer up to see pricing breakdown
+- Tap "Add to Bag" to add entire set to cart
+
+#### 4. Native Blog (New Feature)
+- Open hamburger menu > Tap "Blog"
+- Browse article list
+- Tap any article to read full content
+- Scroll down to leave a comment (logged-in users)
+
+#### 5. Browse Products
 - Shop tab > Scroll through product catalog
 - Products display with images, prices, discount badges
 - Use search bar or category filters to find products
 
-#### 3. Product Detail Page
+#### 6. Product Detail Page
 - Tap any product to view details
-- **Swipe images** left/right to see gallery (products with multiple images show pagination dots)
-- **Watch video** on products like SNOW O2 Cleanser or EGF Repair Oxymask (scroll down)
-- **Download PDF guide** if available (scroll to Documentation section)
+- **Swipe images** left/right to see gallery
+- **Watch video** on products like SNOW O2 Cleanser (scroll down)
+- **Download PDF guide** if available
 - Select size variant if applicable
 - Tap "Add to Bag"
 
-#### 4. AI Skin Analysis
-- Open hamburger menu (top-left) > Tap "AI Skin Analysis"
-- **Quiz Mode:** Answer 4 skin type questions > View personalized product recommendations
-- **Camera Mode:** Tap "Live AR" > Allow camera access > Take a selfie for AI analysis
-
-#### 5. AI Chatbot
-- Open hamburger menu > Tap "AI Chatbot"
-- Ask questions like "What's good for dry skin?" or "Tell me about EGF Repair Oxymask"
-- Chatbot provides product recommendations with links
-
-#### 6. Checkout Process
-- Go to Bag tab > Review items
+#### 7. Checkout Process
+- Go to Bag tab > Review items (including any bundle items)
 - Tap "Proceed to Checkout"
 - Fill in delivery details:
   - Name: App Review
@@ -99,12 +122,12 @@ This account is pre-created and ready to use. No email verification required.
   - **Card Payment:** Uses Stripe test card `4242 4242 4242 4242` (any future date, any CVC)
 - Order confirmation displayed on success page
 
-#### 7. Order History
+#### 8. Order History
 - Profile tab > Orders
 - View past orders with status
 - Tap order for full details with item breakdown
 
-#### 8. Language Switching
+#### 9. Language Switching
 - Profile tab > Language
 - Switch between English, Arabic (RTL), Russian
 - App UI updates immediately
@@ -121,12 +144,22 @@ This account is pre-created and ready to use. No email verification required.
 ### Camera
 - **Purpose:** AI Skin Analysis camera mode and profile photo
 - **Usage:** Used when user initiates camera-based skin analysis or profile photo
-- **Privacy:** Photos processed on-device, only uploaded with explicit consent
+- **Privacy:** Photos processed by AI for skin analysis, not stored permanently
 
 ### Photo Library
 - **Purpose:** Select existing photo for profile picture or skin analysis
 - **Usage:** Only accessed when user explicitly chooses to select a photo
 - **Privacy:** Only the selected photo is accessed
+
+### Push Notifications
+- **Purpose:** Order status updates (shipped, delivered, etc.)
+- **Usage:** Notifications sent when order status changes
+- **Privacy:** Only order-related notifications, no marketing without consent
+
+### Speech Recognition
+- **Purpose:** Voice search for products
+- **Usage:** Optional feature activated by tapping microphone icon in search
+- **Privacy:** Audio processed on-device for search query
 
 ---
 
@@ -164,21 +197,26 @@ This account is pre-created and ready to use. No email verification required.
 ### 3. UAE Delivery Only
 - App requires a UAE delivery address
 - Shipping available to all 7 emirates (Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, Umm Al Quwain)
+- Dubai: 45 AED, Other Emirates: 70 AED
 - Free delivery for orders over 1,000 AED
 
-### 4. Promotions
-- Free mask promotion: Spend 500 AED = 1 free mask, 700 AED = 2 free masks
-- VIP discounts applied automatically for eligible accounts
-- Bundle discounts (15% off) when purchasing 3+ eligible products
+### 4. Bundle Discounts (New)
+- Build Your Set feature offers tiered discounts:
+  - 2 items: 5% off
+  - 3 items: 10% off
+  - 4 items: 15% off
+  - 5+ items: 20% off
+- Discounts applied automatically when bundle is added to cart
 
 ### 5. Real Product Data
 - Products, prices, and availability are real
 - Orders created during testing can be identified and cancelled by our team
 
 ### 6. AI Features
-- AI Skin Analysis uses a quiz-based recommendation engine
-- Camera analysis processes images for skin type detection
+- AI Skin Analysis uses GPT-4 Vision for camera analysis
+- Quiz mode uses our recommendation API with scoring algorithm
 - AI Chatbot is powered by a language model trained on our product catalog
+- AI features require internet connection
 
 ---
 
@@ -205,7 +243,7 @@ This account is pre-created and ready to use. No email verification required.
 - **Terms & Conditions:** Available in-app (Profile > Terms & Conditions)
 - **Data Encryption:** All API communications use HTTPS/TLS
 - **User Data:** Stored securely on AWS servers in UAE (me-central-1 region)
-- **GDPR Compliant:** Users can request data deletion via support
+- **GDPR Compliant:** Users can request data deletion via support or in-app
 - **No Prohibited Content:** Professional cosmetics and beauty products only
 - **No In-App Purchases:** All transactions are for physical goods
 
@@ -216,30 +254,40 @@ This account is pre-created and ready to use. No email verification required.
 | Detail | Value |
 |--------|-------|
 | Framework | React Native (Expo SDK 54) |
-| Min iOS Version | 16.0 |
+| Min iOS Version | 15.1 |
 | Bundle ID | ae.genosys.app |
 | Backend API | https://genosys.ae/api/mobile/ |
 | Authentication | JWT tokens with optional biometric |
 | Image CDN | https://genosys.ae/images/ |
+| AI Provider | OpenAI GPT-4 Vision |
 
 ---
 
 ## Review Checklist
 
+### Core Functionality
 - [x] App launches without crashes
 - [x] Login with test account works
 - [x] Products display correctly with images
 - [x] Image gallery swipe works
 - [x] Product videos play
 - [x] Product documentation downloads
-- [x] AI Skin Analysis quiz completes
-- [x] AI Camera analysis functions
-- [x] AI Chatbot responds to questions
 - [x] Cart functionality works
 - [x] Checkout process completes (COD)
 - [x] Checkout process completes (Card)
 - [x] User profile management works
 - [x] Order history displays
+
+### New v1.3.0 Features
+- [x] AI Camera Analysis completes with results
+- [x] AI Skin Analysis quiz completes
+- [x] Build Your Set bundle builder works
+- [x] Bundle discounts apply correctly
+- [x] Native blog articles display
+- [x] Blog comments can be posted
+- [x] Push notification permission requested
+
+### General
 - [x] Multilingual support works (EN/AR/RU)
 - [x] RTL layout works (Arabic)
 - [x] Hamburger menu navigation works
@@ -248,51 +296,6 @@ This account is pre-created and ready to use. No email verification required.
 - [x] Terms accessible
 - [x] No broken links or errors
 - [x] Haptic feedback on actions
-- [x] Skeleton loading on screens
-
----
-
-## App Store Screenshots - v1.1 Update Required
-
-### Current Screenshot Status
-
-The existing screenshots (captured December 18, 2025 for v1.0) are **outdated** and must be recaptured before submitting v1.1. Key issues:
-
-1. **Checkout screenshot shows Apple Pay** - Apple Pay has been removed in v1.1
-2. **No AI features shown** - AI Skin Analysis and AI Chatbot are headline v1.1 features
-3. **No image gallery/video** - New product gallery with pagination dots and embedded video not visible
-4. **No hamburger menu** - New navigation drawer not shown
-
-### Recommended v1.1 Screenshot Set
-
-| # | Screen | Key Features Shown |
-|---|---|---|
-| 1 | Shop Home | Product catalog, discount badges, hamburger menu |
-| 2 | Product Detail | Image gallery with pagination dots, video section |
-| 3 | AI Skin Analysis | Quiz results with personalized recommendations |
-| 4 | AI Chatbot | Product consultation conversation |
-| 5 | Checkout | COD and Card payment (NO Apple Pay) |
-| 6 | Order Detail | Order breakdown with discount fields |
-
-### Screenshot Specifications
-
-- **Resolution:** 1284 x 2778 px (iPhone 14 Pro Max / 6.7" display)
-- **Format:** PNG
-- **Location:** `app-store-screenshots/appstore-ready/`
-- **Full guide:** See `docs/SCREENSHOT_MISSION_COMPLETE.md`
-
-### How to Capture
-
-```bash
-# Option 1: Automated
-npm run ios                                    # Start simulator
-npm run screenshots                            # Capture screenshots
-bash scripts/convert-screenshots-appstore.sh   # Convert to App Store format
-
-# Option 2: Manual from Simulator
-# Press Cmd+S in Simulator to capture each screen
-# Then resize: sips -z 2778 1284 input.png --out output.png
-```
 
 ---
 
