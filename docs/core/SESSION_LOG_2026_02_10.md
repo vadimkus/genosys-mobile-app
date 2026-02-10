@@ -2,7 +2,7 @@
 
 ## Summary
 
-Completed the WebView-to-native migration for 8 of 9 screens. Moved FAQ data from hardcoded translation files to a database-driven API. Added standalone About and Contact pages for hamburger menu navigation. Updated delivery pricing across all screens.
+Completed the WebView-to-native migration for ALL 9 screens. The final screen — Bundle Builder ("Build Your Set") — is now fully native with API-driven product data, 8-step routine selection, tiered discounts, and cart integration. Also moved FAQ data from hardcoded translation files to a database-driven API. Added standalone About and Contact pages for hamburger menu navigation. Updated delivery pricing across all screens.
 
 ---
 
@@ -115,9 +115,108 @@ All 3 locale pages (`/faq`, `/ar/faq`, `/ru/faq`) now fetch FAQ data from the da
 | 7 | Blog | ✅ Native + API | **Database** (blog_posts) |
 | 8 | About | ✅ Native (standalone + profile) | Translations |
 | 9 | Contact | ✅ Native (standalone + profile) | Translations |
-| 10 | Bundle Builder | 🟡 Pending | Still WebView |
+| 10 | Bundle Builder | ✅ Native + API | **API** (bundle-builder endpoint) |
 
-**8 of 9 WebView screens are now fully native.**
+**All 9 WebView screens are now fully native.**
+
+---
+
+## Bundle Builder - Native Implementation
+
+### 9. Bundle Builder Screen (`app/bundle-builder.js`)
+
+**Complete native implementation** of the "Build Your Set" feature, replacing the last remaining WebView.
+
+#### Features
+
+- **8-Step Skincare Routine:**
+  1. 🧴 Cleanser (required)
+  2. ✨ Peeling
+  3. 💧 Toner / Mist
+  4. 💎 Serum (required)
+  5. 🤍 Cream (required)
+  6. 👁️ Eye Care
+  7. 🧖 Mask
+  8. ☀️ Sun Protection
+
+- **Discount Tiers:**
+  - 2 products → 5% off
+  - 3 products → 10% off
+  - 4 products → 15% off
+  - 5+ products → 20% off
+
+- **UI Components:**
+  - Horizontal step indicator with emoji icons and active highlighting
+  - Required steps marked with red dot
+  - Product grid (2 columns) with images, names, sizes, pricing
+  - Toggle selection with checkmark badges and haptic feedback
+  - Progress bar showing current tier and milestones
+  - Next-tier hint ("Add 1 more for 10% off!")
+  - Active discount badge when discount applies
+  - Bottom navigation with Previous/Next/Add to Cart
+  - Summary overlay (bottom sheet) with selected items and pricing breakdown
+  - User-specific pricing (strikethrough original + green discounted)
+  - Login-required message for guests
+  - Loading, error, and retry states
+  - Full RTL support for Arabic
+
+- **Cart Integration:**
+  - Adds all selected products to cart via CartContext
+  - Each item tagged with `fromBundle: true` and `bundleDiscountPercent`
+  - Navigates to bag after adding
+
+#### API Endpoint
+
+**Endpoint:** `GET /api/mobile/bundle-builder`  
+**File:** `cosmetics-website/app/api/mobile/bundle-builder/route.ts`
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | Yes | Mobile app API key |
+| `x-locale` | No | `en` / `ar` / `ru` (default: `en`) |
+| `x-user-id` | No | User ID for personalized pricing |
+
+**Response:**
+```json
+{
+  "steps": [
+    {
+      "id": "cleanser",
+      "name": "Cleanser",
+      "description": "Start with a clean slate",
+      "required": true,
+      "icon": "🧴",
+      "products": [...],
+      "productCount": 8
+    }
+  ],
+  "discountTiers": [
+    { "minItems": 2, "discount": 5 },
+    { "minItems": 3, "discount": 10 },
+    { "minItems": 4, "discount": 15 },
+    { "minItems": 5, "discount": 20 }
+  ],
+  "stats": {
+    "totalProducts": 45,
+    "totalSteps": 8,
+    "requiredSteps": 3,
+    "maxDiscount": 20
+  },
+  "locale": "en"
+}
+```
+
+**Product filtering (same as website):**
+- Excludes: Beauty Boxes, PRO Solution, hidden, out of stock, price-on-request
+- Excludes: "SKIN RENEWAL PEELING SYSTEM"
+- Applies user-specific discount when userId provided
+
+#### Navigation Updates
+
+| File | Change |
+|------|--------|
+| `components/NavigationDrawer.js` | Bundle Builder → `/bundle-builder` (native) |
+| `app/(tabs)/shop.js` | "Build Your Set" banner → `/bundle-builder` (native) |
 
 ---
 

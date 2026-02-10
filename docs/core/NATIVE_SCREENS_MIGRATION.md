@@ -10,7 +10,7 @@ The Genosys UAE iOS app previously used WebView wrappers to display 9 website pa
 - Inconsistent UX (web styles vs native feel)
 - Layout issues (overlapping headers, missing functionality)
 
-We systematically replaced 8 of 9 WebView screens with fully native React Native implementations.
+We systematically replaced all 9 WebView screens with fully native React Native implementations.
 
 ## Migration Status
 
@@ -24,7 +24,7 @@ We systematically replaced 8 of 9 WebView screens with fully native React Native
 | 6 | Training | ✅ Native + API | `app/training.js` | Auth-gated, 7 guides + 23 product docs + 11 videos |
 | 7 | Blog | ✅ Native | `app/blog.js` | API-driven, image cards |
 | 8 | Certificates | 🔵 Skipped | — | Low priority, rarely used |
-| 9 | Bundle Builder | 🟡 Pending | Still WebView | Complex feature, needs API |
+| 9 | Bundle Builder | ✅ Native + API | `app/bundle-builder.js` | 8-step routine, tiered discounts, cart integration via `/api/mobile/bundle-builder` |
 
 ## Architecture Changes
 

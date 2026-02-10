@@ -952,14 +952,7 @@ export default function ShopScreen() {
               style={styles.buildSetBanner}
               activeOpacity={0.85}
               onPress={() => {
-                const url = buildAuthenticatedWebViewUrl('/bundle-builder', locale, user);
-                router.push({
-                  pathname: '/webview',
-                  params: {
-                    url,
-                    title: t('shop.buildYourSet') || 'Build Your Set',
-                  },
-                });
+                router.push('/bundle-builder');
               }}
             >
               <View style={[styles.buildSetContent, isRTL && styles.buildSetContentRTL]}>

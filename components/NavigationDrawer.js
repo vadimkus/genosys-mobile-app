@@ -104,7 +104,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
           <View style={[styles.highlightRow, isRTL && styles.gridRTL]}>
             <TouchableOpacity
               style={styles.highlightBtn}
-              onPress={() => navigateWebView('/bundle-builder', t('navigation.bundleBuilder') || 'Bundle Builder')}
+              onPress={() => navigateTo('/bundle-builder')}
               activeOpacity={0.7}
             >
               <Text style={styles.highlightBtnText}>🎁 {t('navigation.bundleBuilder') || 'Bundle Builder'}</Text>
