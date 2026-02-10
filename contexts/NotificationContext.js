@@ -38,62 +38,75 @@ export function NotificationProvider({ children }) {
   const responseListener = useRef();
 
   useEffect(() => {
-    // Setup Android channel
-    setupOrdersChannel();
+    try {
+      // Setup Android channel
+      setupOrdersChannel();
 
-    // Listener for notifications received while app is foregrounded
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      log.debug('📩 Notification received in foreground:', notification.request.content.title);
-      setLastNotification(notification);
-      
-      // Vibrate briefly to get attention
-      if (Platform.OS === 'android') {
-        Vibration.vibrate(200);
-      }
-      
-      // The notification will automatically show as a banner because of setNotificationHandler
-      // configured in pushNotificationsService.js
-    });
-
-    // Listener for when user taps on a notification
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      log.debug('👆 Notification tapped:', response.notification.request.content.data);
-      
-      const data = response.notification.request.content.data;
-      
-      // Handle navigation based on notification type
-      if (data?.type === 'order_status' && data?.orderId) {
-        // Navigate to orders page when user taps order notification
-        log.debug('Navigating to orders for order:', data.orderId);
-        
-        // Small delay to ensure app is fully foregrounded
-        setTimeout(() => {
-          router.push('/profile/orders');
-        }, 100);
-      }
-    });
-
-    // Check if app was opened from a notification (cold start)
-    Notifications.getLastNotificationResponseAsync().then(response => {
-      if (response) {
-        log.debug('App opened from notification:', response.notification.request.content.data);
-        
-        const data = response.notification.request.content.data;
-        if (data?.type === 'order_status' && data?.orderId) {
-          // Delay navigation to ensure app is mounted
-          setTimeout(() => {
-            router.push('/profile/orders');
-          }, 500);
+      // Listener for notifications received while app is foregrounded
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        try {
+          log.debug('📩 Notification received in foreground:', notification.request.content.title);
+          setLastNotification(notification);
+          
+          // Vibrate briefly to get attention
+          if (Platform.OS === 'android') {
+            Vibration.vibrate(200);
+          }
+        } catch (e) {
+          log.warn('Error handling foreground notification:', e.message);
         }
-      }
-    });
+      });
+
+      // Listener for when user taps on a notification
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        try {
+          log.debug('👆 Notification tapped:', response.notification.request.content.data);
+          
+          const data = response.notification.request.content.data;
+          
+          // Handle navigation based on notification type
+          if (data?.type === 'order_status' && data?.orderId) {
+            log.debug('Navigating to orders for order:', data.orderId);
+            setTimeout(() => {
+              router.push('/profile/orders');
+            }, 100);
+          }
+        } catch (e) {
+          log.warn('Error handling notification tap:', e.message);
+        }
+      });
+
+      // Check if app was opened from a notification (cold start)
+      Notifications.getLastNotificationResponseAsync()
+        .then(response => {
+          if (response) {
+            log.debug('App opened from notification:', response.notification.request.content.data);
+            const data = response.notification.request.content.data;
+            if (data?.type === 'order_status' && data?.orderId) {
+              setTimeout(() => {
+                router.push('/profile/orders');
+              }, 500);
+            }
+          }
+        })
+        .catch(e => {
+          log.warn('Error checking last notification:', e.message);
+        });
+    } catch (e) {
+      // If expo-notifications fails to initialize, don't crash the app
+      log.warn('Failed to setup notification listeners:', e.message);
+    }
 
     return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
+      try {
+        if (notificationListener.current) {
+          Notifications.removeNotificationSubscription(notificationListener.current);
+        }
+        if (responseListener.current) {
+          Notifications.removeNotificationSubscription(responseListener.current);
+        }
+      } catch (e) {
+        // silent cleanup
       }
     };
   }, []);
