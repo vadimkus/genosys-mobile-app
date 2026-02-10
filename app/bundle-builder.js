@@ -4,7 +4,7 @@
  * Fetches products from /api/mobile/bundle-builder and adds to cart.
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import {
   Dimensions,
   Alert,
   FlatList,
+  Animated,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,6 +60,7 @@ export default function BundleBuilderScreen() {
   const { addItem } = useCart();
   const isRTL = dir === 'rtl';
   const stepsScrollRef = useRef(null);
+  const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
 
@@ -68,6 +71,58 @@ export default function BundleBuilderScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedItems, setSelectedItems] = useState({}); // { [productId]: { product, stepId } }
   const [showSummary, setShowSummary] = useState(false);
+  const [footerExpanded, setFooterExpanded] = useState(false);
+
+  // Animated values for swipable summary sheet
+  const summaryTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  // Open / close summary with spring animation
+  const openSummary = useCallback(() => {
+    setShowSummary(true);
+    Animated.spring(summaryTranslateY, { toValue: 0, useNativeDriver: true, tension: 65, friction: 11 }).start();
+  }, []);
+  const closeSummary = useCallback(() => {
+    Animated.timing(summaryTranslateY, { toValue: SCREEN_HEIGHT, duration: 250, useNativeDriver: true }).start(() => {
+      setShowSummary(false);
+    });
+  }, []);
+
+  // PanResponder for summary sheet drag-to-dismiss
+  const summaryPan = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 8,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) summaryTranslateY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 100 || g.vy > 0.5) {
+          closeSummary();
+        } else {
+          Animated.spring(summaryTranslateY, { toValue: 0, useNativeDriver: true, tension: 65, friction: 11 }).start();
+        }
+      },
+    })
+  ).current;
+
+  // Toggle footer expand/collapse with swipe
+  const footerPan = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 10,
+      onPanResponderRelease: (_, g) => {
+        if (g.dy < -30 || g.vy < -0.3) {
+          // Swiped up → expand
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setFooterExpanded(true);
+        } else if (g.dy > 30 || g.vy > 0.3) {
+          // Swiped down → collapse
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setFooterExpanded(false);
+        }
+      },
+    })
+  ).current;
 
   // Fetch bundle data
   const fetchBundleData = useCallback(async () => {
@@ -287,7 +342,7 @@ export default function BundleBuilderScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{l('Build Your Set', 'ابنِ مجموعتك', 'Собери свой набор')}</Text>
         {itemCount > 0 ? (
-          <TouchableOpacity onPress={() => setShowSummary(!showSummary)} style={styles.cartBadgeBtn} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => showSummary ? closeSummary() : openSummary()} style={styles.cartBadgeBtn} activeOpacity={0.7}>
             <Ionicons name="bag-outline" size={22} color="#dc2626" />
             <View style={styles.cartBadge}><Text style={styles.cartBadgeText}>{itemCount}</Text></View>
           </TouchableOpacity>
@@ -404,8 +459,39 @@ export default function BundleBuilderScreen() {
         />
       )}
 
-      {/* Navigation + Summary Bottom Bar */}
-      <View style={styles.bottomBar}>
+      {/* Swipable Bottom Bar */}
+      <View style={styles.bottomBar} {...footerPan.panHandlers}>
+        {/* Chevron toggle */}
+        <TouchableOpacity
+          style={styles.footerChevron}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setFooterExpanded(v => !v); }}
+          activeOpacity={0.7}
+          hitSlop={{ top: 12, bottom: 12, left: 20, right: 20 }}
+        >
+          <View style={styles.footerHandle} />
+          <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
+        </TouchableOpacity>
+
+        {/* Expanded pricing breakdown */}
+        {footerExpanded && user && itemCount > 0 && (
+          <View style={styles.footerPricing}>
+            <View style={styles.pricingRow}>
+              <Text style={styles.pricingLabel}>{l('Subtotal', 'المجموع الفرعي', 'Подытог')}</Text>
+              <Text style={styles.pricingValue}>{Math.round(subtotal)} AED</Text>
+            </View>
+            {discountPercent > 0 && (
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabelGreen}>{l('Bundle Discount', 'خصم المجموعة', 'Скидка набора')} ({discountPercent}%)</Text>
+                <Text style={styles.pricingValueGreen}>-{Math.round(discountAmount)} AED</Text>
+              </View>
+            )}
+            <View style={[styles.pricingRow, styles.pricingRowTotal]}>
+              <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
+              <Text style={styles.pricingTotalValue}>{Math.round(total)} AED</Text>
+            </View>
+          </View>
+        )}
+
         {/* Navigation arrows */}
         <View style={styles.navRow}>
           <TouchableOpacity
@@ -419,7 +505,7 @@ export default function BundleBuilderScreen() {
           </TouchableOpacity>
 
           {/* Center: total */}
-          <View style={styles.navCenter}>
+          <TouchableOpacity style={styles.navCenter} onPress={() => itemCount > 0 ? openSummary() : null} activeOpacity={0.7}>
             {user && itemCount > 0 ? (
               <>
                 {discountPercent > 0 && (
@@ -430,7 +516,7 @@ export default function BundleBuilderScreen() {
             ) : (
               <Text style={styles.navItems}>{itemCount} {l('items', 'منتجات', 'товаров')}</Text>
             )}
-          </View>
+          </TouchableOpacity>
 
           {currentStep < steps.length - 1 ? (
             <TouchableOpacity
@@ -462,15 +548,18 @@ export default function BundleBuilderScreen() {
         )}
       </View>
 
-      {/* Summary Overlay */}
+      {/* Swipable Summary Overlay */}
       {showSummary && (
         <View style={styles.summaryOverlay}>
-          <TouchableOpacity style={styles.summaryBackdrop} onPress={() => setShowSummary(false)} activeOpacity={1} />
-          <View style={styles.summarySheet}>
+          <TouchableOpacity style={styles.summaryBackdrop} onPress={closeSummary} activeOpacity={1} />
+          <Animated.View
+            style={[styles.summarySheet, { transform: [{ translateY: summaryTranslateY }] }]}
+            {...summaryPan.panHandlers}
+          >
             <View style={styles.summaryHandle} />
             <View style={styles.summaryHeader}>
               <Text style={styles.summaryTitle}>{l('Your Bundle', 'مجموعتك', 'Ваш набор')} ({itemCount})</Text>
-              <TouchableOpacity onPress={() => setShowSummary(false)}><Ionicons name="close" size={24} color="#374151" /></TouchableOpacity>
+              <TouchableOpacity onPress={closeSummary}><Ionicons name="close" size={24} color="#374151" /></TouchableOpacity>
             </View>
 
             <ScrollView style={styles.summaryScroll} showsVerticalScrollIndicator={false}>
@@ -478,7 +567,10 @@ export default function BundleBuilderScreen() {
                 const step = steps.find(s => s.id === stepId);
                 return (
                   <View key={product.id} style={styles.summaryItem}>
-                    <Image source={{ uri: product.image }} style={styles.summaryItemImage} resizeMode="contain" />
+                    <View style={styles.summaryImageWrap}>
+                      <Image source={{ uri: product.image }} style={styles.summaryItemImage} resizeMode="contain" />
+                      {product.size ? <Text style={styles.summaryImageSize}>{product.size}</Text> : null}
+                    </View>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.summaryItemName} numberOfLines={1}>{product.name}</Text>
                       <Text style={styles.summaryItemStep}>{step?.icon} {step?.name}</Text>
@@ -515,13 +607,13 @@ export default function BundleBuilderScreen() {
             {/* Clear all */}
             <TouchableOpacity
               style={styles.clearAllBtn}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSelectedItems({}); setShowSummary(false); }}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSelectedItems({}); closeSummary(); }}
               activeOpacity={0.7}
             >
               <Ionicons name="trash-outline" size={16} color="#EF4444" />
               <Text style={styles.clearAllText}>{l('Clear All', 'مسح الكل', 'Очистить всё')}</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
       )}
     </SafeAreaView>
@@ -558,12 +650,12 @@ const styles = StyleSheet.create({
   discountActiveText: { fontSize: 12, fontWeight: '700', color: '#16a34a' },
 
   // Step indicator
-  stepIndicator: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
-  stepIndicatorContent: { paddingHorizontal: 12, gap: 6, alignItems: 'center', paddingVertical: 8 },
-  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6' },
+  stepIndicator: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', height: 52 },
+  stepIndicatorContent: { paddingHorizontal: 12, gap: 8, alignItems: 'center', paddingVertical: 10 },
+  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6', height: 32 },
   stepPillActive: { backgroundColor: '#FEF2F2', borderColor: '#dc2626' },
-  stepEmoji: { fontSize: 13 },
-  stepPillText: { fontSize: 12, fontWeight: '600', color: '#6B7280' },
+  stepEmoji: { fontSize: 14 },
+  stepPillText: { fontSize: 11, fontWeight: '600', color: '#6B7280' },
   stepPillTextActive: { color: '#dc2626' },
   requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#dc2626' },
   stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
@@ -609,7 +701,10 @@ const styles = StyleSheet.create({
   addBtnTextSelected: { color: '#fff' },
 
   // Bottom bar
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingBottom: 34, paddingTop: 8, paddingHorizontal: 16 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
+  footerChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
+  footerHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 2 },
+  footerPricing: { paddingHorizontal: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 4 },
   navRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   navBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 4, minWidth: 80 },
   navBtnDisabled: { opacity: 0.4 },
@@ -632,7 +727,9 @@ const styles = StyleSheet.create({
   summaryTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
   summaryScroll: { paddingHorizontal: 20, maxHeight: 280 },
   summaryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6' },
+  summaryImageWrap: { alignItems: 'center' },
   summaryItemImage: { width: 44, height: 44, borderRadius: 8, backgroundColor: '#F9FAFB' },
+  summaryImageSize: { fontSize: 9, color: '#9CA3AF', marginTop: 2, fontWeight: '500' },
   summaryItemName: { fontSize: 13, fontWeight: '600', color: '#374151' },
   summaryItemStep: { fontSize: 11, color: '#9CA3AF', marginTop: 2 },
   summaryItemPrice: { fontSize: 14, fontWeight: '700', color: '#111827' },

@@ -1,222 +1,123 @@
-# Session Log — February 10, 2026
+# Session Log - February 10, 2026
 
-## Summary
+## Native Blog Reading & Commenting
 
-Completed the WebView-to-native migration for ALL 9 screens. The final screen — Bundle Builder ("Build Your Set") — is now fully native with API-driven product data, 8-step routine selection, tiered discounts, and cart integration. Also moved FAQ data from hardcoded translation files to a database-driven API. Added standalone About and Contact pages for hamburger menu navigation. Updated delivery pricing across all screens.
+### Summary
+Converted the blog feature from "open in Safari" to a fully native in-app experience. Users can now read full blog articles and submit comments directly within the app.
 
----
+### Changes Made
 
-## Changes
+#### 1. Website Backend - New API Endpoints
 
-### 1. FAQ Screen → API-Driven (`app/faq.js`)
+**`GET /api/mobile/blog/[slug]`** — Blog Post Detail
+- Returns full HTML content with localization (EN/AR/RU)
+- Sanitizes HTML to prevent XSS
+- Removes duplicate featured image from content body
+- Parses tags from JSON
+- Auto-increments view count (non-blocking)
+- Returns approved comments
 
-**Before:** FAQ content was hardcoded in the app's translation files (`i18n/messages/*.json`).  
-**After:** FAQ content is fetched from `GET /api/mobile/faq` on the website backend, which reads from the `faq_items` database table.
+**`GET/POST /api/mobile/blog/comments`** — Comments API
+- GET: Fetch approved comments for a post
+- POST: Submit a comment (requires JWT authentication)
+- Auto-approves comments from registered users
+- Input sanitization via `sanitizeText()`
 
-- Loading spinner while fetching
-- Error state with retry button
-- Pull-to-refresh to reload data
-- Haptic feedback on accordion toggle (Light) and CTA buttons (Medium)
-- Question mark icon removed from hero section
-- Formatted answers support: bullet lists, numbered lists, paragraphs
+Files created:
+- `cosmetics-website/app/api/mobile/blog/[slug]/route.ts`
+- `cosmetics-website/app/api/mobile/blog/comments/route.ts`
 
-### 2. Standalone About Page (`app/about.js`)
+#### 2. Mobile App - File Restructure
 
-Created a new standalone About page for the hamburger menu with a generic back arrow instead of "< Account" text.
+Moved blog list to directory format for Expo Router compatibility:
+- `app/blog.js` → `app/blog/index.js`
+- Fixed relative imports: `../contexts/` → `../../contexts/`
 
-- Same content as `app/profile/about.js`
-- Footer: GENOSYS Middle East FZ-LLC, tappable `www.genosys.ae`, copyright, app version
-- `app/profile/about.js` unchanged — still shows "< Account" for profile navigation
+#### 3. Mobile App - Blog Post Detail Screen
 
-### 3. Standalone Contact Page (`app/contact.js`)
+**New file:** `app/blog/[slug].js`
 
-Created earlier in the session — standalone Contact page for hamburger menu with generic back arrow.
+Features:
+- **HTML rendering** via `react-native-render-html`:
+  - Custom tag styles (h2, h3, h4, p, lists, blockquotes, links)
+  - Inline images with auto URL resolution
+  - Selectable text
+- Featured image hero
+- Article metadata (author, date, views, tags)
+- **Comments section:**
+  - Avatar initials with user name
+  - "Time ago" formatting (e.g., "5m ago", "2h ago", "3d ago")
+  - Comment input for logged-in users
+  - Login prompt for guests
+  - Haptic feedback on submit
+- Pull-to-refresh
+- Full RTL support (Arabic)
+- Tri-language UI (EN/AR/RU)
+- Loading, error, retry states
 
-- Same content as `app/profile/contact.js`
-- `app/profile/contact.js` unchanged — still shows "< Account"
+#### 4. URL Resolution Fix
 
-### 4. NavigationDrawer Updates (`components/NavigationDrawer.js`)
+Blog content from the API contains relative URLs like `src="/blog/post_app/app.png"`. These were causing errors in React Native (`about:///blog/...`).
 
-- "About" link → `/about` (standalone, was `/profile/about`)
-- "Contact" link → `/contact` (standalone, was `/profile/contact`)
+**Fix:** In `fetchPost()`, convert all relative URLs to absolute before setting state:
 
-### 5. Brand Page Improvements (`app/brand.js`)
-
-- YouTube WebView embeds → thumbnail images that open externally
-- Replaced placeholder YouTube IDs with actual video IDs
-- Added "Product Showcase" section with product image
-- Added footer: company info, tappable `www.genosys.ae`, copyright
-
-### 6. Delivery Pricing Updates (`app/delivery.js`, `app/locations.js`)
-
-| Emirate | Old Price | New Price |
-|---------|-----------|-----------|
-| Dubai | 25 AED | 45 AED |
-| All others | 30-35 AED | 70 AED |
-
-### 7. Locations Page UX (`app/locations.js`)
-
-- Emirate cards are now selectable with visual highlighting
-- Haptic feedback on card selection
-
-### 8. Partners Page → API-Driven (`app/partners.js`)
-
-- Fetches partner data from `/api/mobile/partners` API
-- Dynamic theming based on partner data
-- Expandable cards with Call, Directions, Website actions
-- Pull-to-refresh support
-
----
-
-## Website Backend Changes (cosmetics-website)
-
-### New Database Model: `FaqItem`
-
-```prisma
-model FaqItem {
-  id, sortOrder, isActive
-  questionEn, answerEn (required)
-  questionAr, answerAr (optional)
-  questionRu, answerRu (optional)
-  createdAt, updatedAt
-}
+```javascript
+const origin = AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae';
+data.post.content = data.post.content
+  .replace(/src="\/(?!\/)/g, `src="${origin}/`)
+  .replace(/src='\/(?!\/)/g, `src='${origin}/`)
+  .replace(/href="\/(?!\/)/g, `href="${origin}/`)
+  .replace(/href='\/(?!\/)/g, `href='${origin}/`);
 ```
 
-18 items seeded from existing translation files.
+#### 5. Navigation Update
 
-### New API Endpoints
+Changed blog list to navigate to native detail instead of opening Safari:
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/mobile/faq` | GET | FAQ data for mobile app |
-| `/api/admin/faq-items` | GET, POST | Admin list + create FAQ |
-| `/api/admin/faq-items/[id]` | PUT, DELETE | Admin update + delete FAQ |
+```javascript
+// Before
+const openPost = (slug) => {
+  Linking.openURL(`https://genosys.ae/blog/${slug}`);
+};
 
-### Admin Panel: FAQ Tab
-
-New FAQ management tab in the admin dashboard with full CRUD, reordering, multilingual support, and active/inactive toggling.
-
-### Website FAQ Pages
-
-All 3 locale pages (`/faq`, `/ar/faq`, `/ru/faq`) now fetch FAQ data from the database server-side instead of translation files.
-
----
-
-## Migration Status
-
-| # | Screen | Status | Data Source |
-|---|--------|--------|-------------|
-| 1 | Brand | ✅ Native | Hardcoded |
-| 2 | Delivery | ✅ Native | Hardcoded |
-| 3 | FAQ | ✅ Native + API | **Database** (faq_items) |
-| 4 | Partners | ✅ Native + API | **API** (partners endpoint) |
-| 5 | Locations | ✅ Native | Hardcoded |
-| 6 | Training | ✅ Native | Hardcoded |
-| 7 | Blog | ✅ Native + API | **Database** (blog_posts) |
-| 8 | About | ✅ Native (standalone + profile) | Translations |
-| 9 | Contact | ✅ Native (standalone + profile) | Translations |
-| 10 | Bundle Builder | ✅ Native + API | **API** (bundle-builder endpoint) |
-
-**All 9 WebView screens are now fully native.**
-
----
-
-## Bundle Builder - Native Implementation
-
-### 9. Bundle Builder Screen (`app/bundle-builder.js`)
-
-**Complete native implementation** of the "Build Your Set" feature, replacing the last remaining WebView.
-
-#### Features
-
-- **8-Step Skincare Routine:**
-  1. 🧴 Cleanser (required)
-  2. ✨ Peeling
-  3. 💧 Toner / Mist
-  4. 💎 Serum (required)
-  5. 🤍 Cream (required)
-  6. 👁️ Eye Care
-  7. 🧖 Mask
-  8. ☀️ Sun Protection
-
-- **Discount Tiers:**
-  - 2 products → 5% off
-  - 3 products → 10% off
-  - 4 products → 15% off
-  - 5+ products → 20% off
-
-- **UI Components:**
-  - Horizontal step indicator with emoji icons and active highlighting
-  - Required steps marked with red dot
-  - Product grid (2 columns) with images, names, sizes, pricing
-  - Toggle selection with checkmark badges and haptic feedback
-  - Progress bar showing current tier and milestones
-  - Next-tier hint ("Add 1 more for 10% off!")
-  - Active discount badge when discount applies
-  - Bottom navigation with Previous/Next/Add to Cart
-  - Summary overlay (bottom sheet) with selected items and pricing breakdown
-  - User-specific pricing (strikethrough original + green discounted)
-  - Login-required message for guests
-  - Loading, error, and retry states
-  - Full RTL support for Arabic
-
-- **Cart Integration:**
-  - Adds all selected products to cart via CartContext
-  - Each item tagged with `fromBundle: true` and `bundleDiscountPercent`
-  - Navigates to bag after adding
-
-#### API Endpoint
-
-**Endpoint:** `GET /api/mobile/bundle-builder`  
-**File:** `cosmetics-website/app/api/mobile/bundle-builder/route.ts`
-
-| Header | Required | Description |
-|--------|----------|-------------|
-| `x-api-key` | Yes | Mobile app API key |
-| `x-locale` | No | `en` / `ar` / `ru` (default: `en`) |
-| `x-user-id` | No | User ID for personalized pricing |
-
-**Response:**
-```json
-{
-  "steps": [
-    {
-      "id": "cleanser",
-      "name": "Cleanser",
-      "description": "Start with a clean slate",
-      "required": true,
-      "icon": "🧴",
-      "products": [...],
-      "productCount": 8
-    }
-  ],
-  "discountTiers": [
-    { "minItems": 2, "discount": 5 },
-    { "minItems": 3, "discount": 10 },
-    { "minItems": 4, "discount": 15 },
-    { "minItems": 5, "discount": 20 }
-  ],
-  "stats": {
-    "totalProducts": 45,
-    "totalSteps": 8,
-    "requiredSteps": 3,
-    "maxDiscount": 20
-  },
-  "locale": "en"
-}
+// After
+const openPost = (slug) => {
+  router.push(`/blog/${slug}`);
+};
 ```
 
-**Product filtering (same as website):**
-- Excludes: Beauty Boxes, PRO Solution, hidden, out of stock, price-on-request
-- Excludes: "SKIN RENEWAL PEELING SYSTEM"
-- Applies user-specific discount when userId provided
+Removed unused `Linking` import from `app/blog/index.js`.
 
-#### Navigation Updates
+### API Authentication
 
-| File | Change |
-|------|--------|
-| `components/NavigationDrawer.js` | Bundle Builder → `/bundle-builder` (native) |
-| `app/(tabs)/shop.js` | "Build Your Set" banner → `/bundle-builder` (native) |
+| Endpoint | Auth Required |
+|----------|---------------|
+| `GET /api/mobile/blog` | API key only |
+| `GET /api/mobile/blog/[slug]` | API key only |
+| `GET /api/mobile/blog/comments` | API key only |
+| `POST /api/mobile/blog/comments` | API key + JWT token |
+
+### Testing Notes
+
+1. Blog list should still work as before
+2. Tapping a blog post opens native detail screen
+3. Full article content renders with images
+4. Comments display below article
+5. Logged-in users can submit comments
+6. Guests see "Log in to leave a comment" prompt
+7. Pull-to-refresh works on detail screen
+
+### Files Changed
+
+**Website (cosmetics-website):**
+- `app/api/mobile/blog/[slug]/route.ts` — NEW
+- `app/api/mobile/blog/comments/route.ts` — NEW
+
+**Mobile App (genosys-mobile-app):**
+- `app/blog.js` → `app/blog/index.js` — MOVED + MODIFIED
+- `app/blog/[slug].js` — NEW
+- `docs/core/NATIVE_SCREENS_MIGRATION.md` — UPDATED
+- `docs/core/SESSION_LOG_2026_02_10.md` — NEW
 
 ---
 

@@ -30,7 +30,9 @@ export default function ProductGridItem({ product }) {
 
   const imageUrl =
     product.image_url ||
-    (product.image ? `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}` : null);
+    (product.image
+      ? (product.image.startsWith('http') ? product.image : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`)
+      : null);
   const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
   const nameLower = (product?.name || '').trim().toLowerCase();
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');

@@ -13,13 +13,12 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
-  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useLocalization } from '../contexts/LocalizationContext';
-import { AUTH_CONFIG } from '../config/auth';
+import { useLocalization } from '../../contexts/LocalizationContext';
+import { AUTH_CONFIG } from '../../config/auth';
 
 export default function BlogScreen() {
   const router = useRouter();
@@ -71,10 +70,7 @@ export default function BlogScreen() {
   };
 
   const openPost = (slug) => {
-    const url = locale === 'en'
-      ? `https://genosys.ae/blog/${slug}`
-      : `https://genosys.ae/${locale}/blog/${slug}`;
-    Linking.openURL(url);
+    router.push(`/blog/${slug}`);
   };
 
   return (

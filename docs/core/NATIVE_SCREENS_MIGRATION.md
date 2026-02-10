@@ -22,7 +22,7 @@ We systematically replaced all 9 WebView screens with fully native React Native 
 | 4 | Partners | ✅ Native + API | `app/partners.js` | DB-driven via `/api/mobile/partners` |
 | 5 | Locations | ✅ Native | `app/locations.js` | 7 UAE emirates, office location |
 | 6 | Training | ✅ Native + API | `app/training.js` | Auth-gated, 7 guides + 23 product docs + 11 videos |
-| 7 | Blog | ✅ Native | `app/blog.js` | API-driven, image cards |
+| 7 | Blog | ✅ Native + API | `app/blog/index.js` + `[slug].js` | Full native reading & commenting |
 | 8 | Certificates | 🔵 Skipped | — | Low priority, rarely used |
 | 9 | Bundle Builder | ✅ Native + API | `app/bundle-builder.js` | 8-step routine, tiered discounts, cart integration via `/api/mobile/bundle-builder` |
 
@@ -62,7 +62,7 @@ All secondary links changed from `navigateWebView()` to `navigateTo()`:
 | Partners | `navigateWebView('/partners', ...)` | `navigateTo('/partners')` |
 | Training | `navigateWebView('/training', ...)` | `navigateTo('/training')` |
 
-**Bundle Builder** still uses `navigateWebView()` — pending Phase 3.
+**Bundle Builder** now uses `navigateTo('/bundle-builder')` — fully native.
 
 ### Standalone vs Profile Screens
 
@@ -107,6 +107,105 @@ Some screens have two versions — one for the hamburger menu (standalone with b
 ```
 
 **File:** `cosmetics-website/app/api/mobile/blog/route.ts`
+
+### Blog Post Detail API (Website → Mobile App)
+
+**Endpoint:** `GET /api/mobile/blog/[slug]`
+
+**Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+- `x-locale: en|ar|ru` (optional, default: en)
+
+**Response:**
+```json
+{
+  "post": {
+    "id": "cmju2jrx...",
+    "title": "Post Title",
+    "slug": "post-slug",
+    "excerpt": "Short description...",
+    "content": "<div>Full HTML content...</div>",
+    "featuredImage": "https://genosys.ae/blog/image.png",
+    "authorName": "GENOSYS Team",
+    "publishedAt": "2026-02-09T06:00:00.000Z",
+    "views": 65,
+    "tags": ["iOS App", "Mobile Shopping"]
+  },
+  "comments": [
+    {
+      "id": "comment-id",
+      "userName": "User Name",
+      "content": "Comment text...",
+      "createdAt": "2026-02-10T10:30:00.000Z"
+    }
+  ],
+  "commentCount": 5,
+  "locale": "en"
+}
+```
+
+**Features:**
+- Returns full HTML content with localization (EN/AR/RU)
+- Sanitizes HTML for safe rendering
+- Removes duplicate featured image from content
+- Parses JSON tags array
+- Auto-increments view count
+- Returns approved comments only
+
+**File:** `cosmetics-website/app/api/mobile/blog/[slug]/route.ts`
+
+### Blog Comments API (Website → Mobile App)
+
+**Endpoints:**
+- `GET /api/mobile/blog/comments?postId=xxx` — Fetch approved comments
+- `POST /api/mobile/blog/comments` — Submit a comment (requires JWT auth)
+
+**GET Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+
+**GET Response:**
+```json
+{
+  "success": true,
+  "comments": [
+    { "id": "...", "userName": "User", "content": "...", "createdAt": "..." }
+  ],
+  "total": 5
+}
+```
+
+**POST Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+- `Authorization: Bearer <JWT_TOKEN>` (required)
+
+**POST Body:**
+```json
+{
+  "postId": "blog-post-id",
+  "content": "Comment text"
+}
+```
+
+**POST Response:**
+```json
+{
+  "success": true,
+  "comment": {
+    "id": "new-comment-id",
+    "userName": "User Name",
+    "content": "Comment text",
+    "createdAt": "2026-02-10T..."
+  }
+}
+```
+
+**Features:**
+- JWT token authentication for comment submission
+- Auto-approves comments from registered users
+- Input sanitization
+- User lookup via `findUserByEmail`
+
+**File:** `cosmetics-website/app/api/mobile/blog/comments/route.ts`
 
 ### FAQ API (Website DB → Mobile App)
 
@@ -270,12 +369,32 @@ Some screens have two versions — one for the hamburger menu (standalone with b
 - Stats badges in hero (guides count, products count, videos count)
 - Haptic feedback on document and video taps
 
-### Blog (`app/blog.js`)
+### Blog List (`app/blog/index.js`)
 - Fetches posts from `/api/mobile/blog`
 - Pull-to-refresh
 - Image card layout with title, excerpt, date, views
-- Opens full post in browser
+- Tapping a post navigates to native detail screen (`/blog/[slug]`)
 - Loading and error states
+
+### Blog Post Detail (`app/blog/[slug].js`)
+- **Fully native article reader** — no WebView, no external browser
+- Fetches full post content from `/api/mobile/blog/[slug]`
+- **HTML rendering** via `react-native-render-html`:
+  - Styled headings (h2, h3, h4), paragraphs, lists, blockquotes
+  - Inline images with auto URL resolution (relative → absolute)
+  - Tappable links
+  - Selectable text
+- Featured image hero with safe aspect ratio
+- Article metadata: author, date, view count, tags
+- **Comments section:**
+  - Displays approved comments with avatar initials, username, time ago
+  - Comment input for logged-in users (with JWT auth)
+  - Login prompt for guests
+  - Haptic feedback on comment submit
+- Pull-to-refresh to reload post and comments
+- Full RTL support (Arabic)
+- Tri-language (EN/AR/RU) localized UI
+- Loading, error, and retry states
 
 ## All Screens Follow These Patterns
 
@@ -285,16 +404,75 @@ Some screens have two versions — one for the hamburger menu (standalone with b
 4. **Safe Area:** `SafeAreaView` wrapper
 5. **iOS-native feel:** Card-based layout, system colors, smooth scrolling
 
-## Remaining Work
+## Bundle Builder API
 
-### Bundle Builder (Phase 3)
-The only remaining WebView screen. Requires:
-1. New API: `GET /api/mobile/bundle-builder/products` (eligible products by step)
-2. New API: `POST /api/mobile/bundle-builder/calculate` (pricing with tiers)
-3. Native 8-step stepper UI
-4. Product selection grid
-5. Running total + discount progress bar
-6. Cart integration with bundle metadata
+**Endpoint:** `GET /api/mobile/bundle-builder`
+
+**Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+- `x-locale: en|ar|ru` (optional, default: en)
+- `x-user-id: <USER_ID>` (optional, for personalized pricing)
+
+**Response:**
+```json
+{
+  "steps": [
+    {
+      "id": "cleanser",
+      "name": "Cleanser",
+      "description": "Start with a clean slate",
+      "required": true,
+      "icon": "🧴",
+      "products": [
+        {
+          "id": "...",
+          "name": "PURIFYING CLEANSER",
+          "image": "https://genosys.ae/images/...",
+          "price": 150,
+          "displayPrice": 75,
+          "originalPrice": 150,
+          "userDiscountPct": 50,
+          "size": "180ml",
+          "variants": [...]
+        }
+      ],
+      "productCount": 8
+    }
+  ],
+  "discountTiers": [
+    { "minItems": 2, "discount": 5 },
+    { "minItems": 3, "discount": 10 },
+    { "minItems": 4, "discount": 15 },
+    { "minItems": 5, "discount": 20 }
+  ],
+  "stats": {
+    "totalProducts": 45,
+    "totalSteps": 8,
+    "requiredSteps": 3,
+    "maxDiscount": 20
+  },
+  "locale": "en"
+}
+```
+
+**File:** `cosmetics-website/app/api/mobile/bundle-builder/route.ts`
+
+### Bundle Builder Screen (`app/bundle-builder.js`)
+
+**Features:**
+- 8-step skincare routine (Cleanser, Peeling, Toner/Mist, Serum, Cream, Eye Care, Mask, Sun Protection)
+- Horizontal step indicator with emoji icons and selection counts
+- Required steps marked with red dot
+- Product grid (2 columns) with images, names, sizes, pricing
+- Toggle selection with checkmark badges and haptic feedback
+- Progress bar showing discount tier milestones (5%/10%/15%/20%)
+- Next-tier hint ("Add 1 more for 10% off!")
+- **Swipable bottom bar** with chevron — swipe up to expand pricing breakdown
+- **Swipable summary sheet** ("Your Bundle") — drag down to dismiss
+- User-specific pricing (strikethrough original + discounted)
+- Login-required message for guests
+- Cart integration via CartContext (`fromBundle: true`, `bundleDiscountPercent`)
+- Full RTL support for Arabic
 
 ---
 
@@ -308,11 +486,34 @@ The only remaining WebView screen. Requires:
 | Partners | **API** (`lib/partners.ts` on website) | Edit partners file |
 | Locations | Hardcoded in `app/locations.js` | Code change |
 | Training | **API** (`/api/mobile/training`) | Update API route on website |
-| Blog | **Database** (`blog_posts` table) | Admin panel |
+| Blog List | **Database** (`blog_posts` table) | Admin panel |
+| Blog Post | **Database** (`blog_posts` + `blog_comments`) | Admin panel |
 | About | Hardcoded + translations | Code change |
 | Contact | Hardcoded + translations | Code change |
+| Bundle Builder | **API** (`/api/mobile/bundle-builder`) | Products in website DB |
+
+---
+
+## Migration Complete
+
+All 9 WebView screens have been successfully converted to native React Native implementations:
+
+| # | Screen | Implementation |
+|---|--------|----------------|
+| 1 | Brand | Native (hardcoded) |
+| 2 | Delivery | Native (hardcoded) |
+| 3 | FAQ | Native + API (database) |
+| 4 | Partners | Native + API |
+| 5 | Locations | Native (hardcoded) |
+| 6 | Training | Native + API |
+| 7 | Blog | Native + API (database) |
+| 8 | About | Native (standalone + profile) |
+| 9 | Contact | Native (standalone + profile) |
+| 10 | Bundle Builder | Native + API |
+
+**The app is now 100% WebView-free for content screens.**
 
 ---
 
 *Document created: February 10, 2026*  
-*Last updated: February 10, 2026*
+*Last updated: February 10, 2026 — Added native blog reading & commenting*

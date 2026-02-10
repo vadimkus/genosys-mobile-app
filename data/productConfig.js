@@ -129,7 +129,7 @@ export function getProductImages(productId, product) {
   
   // Priority 3: Single main image from API
   if (product?.image) {
-    return [`${ASSET_ORIGIN}${product.image}`];
+    return [product.image.startsWith('http') ? product.image : `${ASSET_ORIGIN}${product.image}`];
   }
   
   return [];

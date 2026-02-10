@@ -224,7 +224,10 @@ export default function BagScreen() {
   const renderCartItem = useCallback(
     ({ item }) => {
       const itemKey = `${item.product.id}-${item.selectedColor}-${item.selectedSize}`;
-      const imageUrl = item.product.image ? `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${item.product.image}` : null;
+      const rawImage = item.product.image || '';
+      const imageUrl = rawImage
+        ? (rawImage.startsWith('http') ? rawImage : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${rawImage}`)
+        : null;
       const rawSizeLabel = item.selectedSize || item.product?.size || '';
       const sizeLabel = rawSizeLabel === '__PROMO__' ? (item.product?.size || '') : rawSizeLabel;
       const promo = isPromoItem(item);
@@ -264,19 +267,12 @@ export default function BagScreen() {
               })()}
             </Text>
 
-            {/* Variants Display */}
-            {!promo && (item.selectedSize || item.selectedColor) && (
+            {/* Variants Display - only show color here (size is shown below image) */}
+            {!promo && item.selectedColor && (
               <View style={[styles.variantsContainer, isRTL && styles.variantsContainerRTL]}>
-                {item.selectedSize && (
-                  <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
-                    {t('common.size')}: {item.selectedSize}
-                  </Text>
-                )}
-                {item.selectedColor && (
-                  <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
-                    {t('common.color')}: {item.selectedColor}
-                  </Text>
-                )}
+                <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
+                  {t('common.color')}: {item.selectedColor}
+                </Text>
               </View>
             )}
 
