@@ -3,7 +3,7 @@
  * Displays delivery locations across UAE with shipping costs and delivery times.
  */
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,26 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import * as Haptics from 'expo-haptics';
 
 export default function LocationsScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const [selectedSlug, setSelectedSlug] = useState(null);
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
+
+  const handleSelectLocation = useCallback((slug) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedSlug((prev) => (prev === slug ? null : slug));
+  }, []);
 
   const locations = [
     {
@@ -33,7 +41,6 @@ export default function LocationsScreen() {
       delivery: l('1–2 hours', '١-٢ ساعة', '1–2 часа'),
       icon: 'business',
       color: '#dc2626',
-      highlight: true,
     },
     {
       slug: 'abu-dhabi',
@@ -128,29 +135,40 @@ export default function LocationsScreen() {
 
         {/* Locations */}
         <View style={styles.section}>
-          {locations.map((loc, index) => (
-            <View key={loc.slug} style={[styles.locationCard, loc.highlight && styles.locationCardHighlight]}>
-              <View style={[styles.locationHeader, isRTL && styles.locationHeaderRTL]}>
-                <View style={[styles.locationIcon, { backgroundColor: `${loc.color}15` }]}>
-                  <Ionicons name={loc.icon} size={22} color={loc.color} />
+          {locations.map((loc) => {
+            const isSelected = selectedSlug === loc.slug;
+            return (
+              <TouchableOpacity
+                key={loc.slug}
+                style={[
+                  styles.locationCard,
+                  isSelected && { borderColor: loc.color, borderWidth: 2, backgroundColor: `${loc.color}08` },
+                ]}
+                onPress={() => handleSelectLocation(loc.slug)}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.locationHeader, isRTL && styles.locationHeaderRTL]}>
+                  <View style={[styles.locationIcon, { backgroundColor: isSelected ? `${loc.color}25` : `${loc.color}15` }]}>
+                    <Ionicons name={isSelected ? 'checkmark-circle' : loc.icon} size={22} color={loc.color} />
+                  </View>
+                  <View style={styles.locationInfo}>
+                    <Text style={[styles.locationName, isRTL && styles.textRTL, isSelected && { color: loc.color }]}>{loc.name}</Text>
+                    <Text style={[styles.locationDesc, isRTL && styles.textRTL]}>{loc.desc}</Text>
+                  </View>
                 </View>
-                <View style={styles.locationInfo}>
-                  <Text style={[styles.locationName, isRTL && styles.textRTL]}>{loc.name}</Text>
-                  <Text style={[styles.locationDesc, isRTL && styles.textRTL]}>{loc.desc}</Text>
+                <View style={[styles.locationMeta, isRTL && styles.locationMetaRTL]}>
+                  <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                    <Ionicons name="time" size={14} color={isSelected ? loc.color : '#6B7280'} />
+                    <Text style={[styles.metaText, isSelected && { color: loc.color, fontWeight: '700' }]}>{loc.delivery}</Text>
+                  </View>
+                  <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                    <Ionicons name="card" size={14} color={isSelected ? loc.color : '#6B7280'} />
+                    <Text style={[styles.metaText, isSelected && { color: loc.color, fontWeight: '700' }]}>{loc.shipping}</Text>
+                  </View>
                 </View>
-              </View>
-              <View style={[styles.locationMeta, isRTL && styles.locationMetaRTL]}>
-                <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                  <Ionicons name="time" size={14} color="#6B7280" />
-                  <Text style={styles.metaText}>{loc.delivery}</Text>
-                </View>
-                <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                  <Ionicons name="card" size={14} color="#6B7280" />
-                  <Text style={styles.metaText}>{loc.shipping}</Text>
-                </View>
-              </View>
-            </View>
-          ))}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Office Location */}
@@ -207,7 +225,6 @@ const styles = StyleSheet.create({
 
   // Location Cards
   locationCard: { backgroundColor: '#F9FAFB', borderRadius: 14, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#F3F4F6' },
-  locationCardHighlight: { borderColor: '#FECACA', backgroundColor: '#FFFBFB' },
   locationHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
   locationHeaderRTL: { flexDirection: 'row-reverse' },
   locationIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
