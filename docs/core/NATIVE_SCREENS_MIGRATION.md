@@ -21,7 +21,7 @@ We systematically replaced 8 of 9 WebView screens with fully native React Native
 | 3 | FAQ | ✅ Native + API | `app/faq.js` | DB-driven via `/api/mobile/faq`, 18 Q&As |
 | 4 | Partners | ✅ Native + API | `app/partners.js` | DB-driven via `/api/mobile/partners` |
 | 5 | Locations | ✅ Native | `app/locations.js` | 7 UAE emirates, office location |
-| 6 | Training | ✅ Native | `app/training.js` | Auth-gated, docs + videos |
+| 6 | Training | ✅ Native + API | `app/training.js` | Auth-gated, 7 guides + 23 product docs + 11 videos |
 | 7 | Blog | ✅ Native | `app/blog.js` | API-driven, image cards |
 | 8 | Certificates | 🔵 Skipped | — | Low priority, rarely used |
 | 9 | Bundle Builder | 🟡 Pending | Still WebView | Complex feature, needs API |
@@ -162,6 +162,57 @@ Some screens have two versions — one for the hamburger menu (standalone with b
 
 **File:** `cosmetics-website/app/api/mobile/partners/route.ts`
 
+### Training API (Website → Mobile App)
+
+**Endpoint:** `GET /api/mobile/training`
+
+**Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+- `x-locale: en|ar|ru` (optional, default: en)
+
+**Response:**
+```json
+{
+  "trainingDocuments": [
+    {
+      "id": "product-catalogue",
+      "title": "Product Catalogue 2026",
+      "description": "Complete product catalog...",
+      "downloadUrl": "https://...",
+      "fileSize": "235.5 MB",
+      "icon": "book",
+      "category": "training"
+    }
+  ],
+  "productDocuments": [
+    {
+      "id": "radiance-cream",
+      "title": "MULTI VITA RADIANCE CREAM",
+      "downloadUrl": "https://genosys.ae/documents/ppt/...",
+      "fileSize": "2.1 MB",
+      "image": "https://genosys.ae/images/RAA.jpg",
+      "productId": "31",
+      "category": "product"
+    }
+  ],
+  "videos": [
+    {
+      "id": "bodycell-stretch-mark",
+      "title": "Genosys Bodycell Stretch Mark Treatment",
+      "youtubeId": "SvjziVjhb8s",
+      "thumbnail": "https://img.youtube.com/vi/SvjziVjhb8s/mqdefault.jpg",
+      "duration": "15-20 min",
+      "level": "Professional",
+      "category": "Body Treatments"
+    }
+  ],
+  "stats": { "totalDocuments": 7, "totalProductDocs": 23, "totalVideos": 11 },
+  "locale": "en"
+}
+```
+
+**File:** `cosmetics-website/app/api/mobile/training/route.ts`
+
 ## Screen Details
 
 ### Brand (`app/brand.js`)
@@ -209,10 +260,15 @@ Some screens have two versions — one for the hamburger menu (standalone with b
 - Office location with Google Maps link
 
 ### Training (`app/training.js`)
+- **API-driven** — fetches from `/api/mobile/training` (website backend)
 - Auth-gated (shows login required for non-authenticated users)
-- 7 training document cards with download links
-- 5 training video cards
-- Opens PDFs in native viewer, videos in YouTube
+- 7 training guides with real download URLs and Ionicons per doc type
+- 23 product documentation PDFs with product thumbnail images from website
+- 11 video lessons with YouTube thumbnails, duration badges, and level indicators
+- Opens videos in YouTube app or browser, PDFs in device native viewer
+- Loading, error, and pull-to-refresh states
+- Stats badges in hero (guides count, products count, videos count)
+- Haptic feedback on document and video taps
 
 ### Blog (`app/blog.js`)
 - Fetches posts from `/api/mobile/blog`
@@ -251,7 +307,7 @@ The only remaining WebView screen. Requires:
 | FAQ | **Database** (`faq_items` table) | Admin panel |
 | Partners | **API** (`lib/partners.ts` on website) | Edit partners file |
 | Locations | Hardcoded in `app/locations.js` | Code change |
-| Training | Hardcoded in `app/training.js` | Code change |
+| Training | **API** (`/api/mobile/training`) | Update API route on website |
 | Blog | **Database** (`blog_posts` table) | Admin panel |
 | About | Hardcoded + translations | Code change |
 | Contact | Hardcoded + translations | Code change |
