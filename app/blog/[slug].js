@@ -23,7 +23,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import RenderHtml from 'react-native-render-html';
+// Lazy-safe import: react-native-render-html may crash on some RN versions
+let RenderHtml = null;
+try {
+  RenderHtml = require('react-native-render-html').default;
+} catch {
+  // Will fall back to plain text rendering
+}
 import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -322,7 +328,7 @@ export default function BlogPostScreen() {
 
           {/* Article Content (HTML) */}
           <View style={styles.contentContainer}>
-            {post.content ? (
+            {post.content && RenderHtml ? (
               <RenderHtml
                 contentWidth={CONTENT_WIDTH}
                 source={{ html: post.content }}
@@ -333,6 +339,8 @@ export default function BlogPostScreen() {
                 enableExperimentalMarginCollapsing
                 defaultTextProps={{ selectable: true }}
               />
+            ) : post.content ? (
+              <Text style={styles.noContent} selectable>{post.content.replace(/<[^>]*>/g, '')}</Text>
             ) : (
               <Text style={styles.noContent}>{l('No content available', 'لا يوجد محتوى', 'Содержимое недоступно')}</Text>
             )}
