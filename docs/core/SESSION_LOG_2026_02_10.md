@@ -186,4 +186,51 @@ Upgraded the native Skin Recommendation feature from local-only processing to us
 
 ---
 
+## Critical Crash Fix — Builds 49-51 Crashed on Launch
+
+### Problem
+Builds 49, 50, and 51 (all v1.3.0) crashed immediately on launch, before the login screen could render. The app was unusable.
+
+### Root Cause
+**`contexts/NotificationContext.js`** — The `NotificationProvider` wraps the entire app in `_layout.js`. Its `useEffect` called `expo-notifications` APIs (`addNotificationReceivedListener`, `addNotificationResponseReceivedListener`, `getLastNotificationResponseAsync`) without any error handling. If any of these calls threw an error during initialization (e.g., notification entitlement issues, native module initialization failure), the entire app crashed because the error propagated up through the provider tree.
+
+This was introduced in commit `b7cccf5` (push notifications feature) and was included in every build since, but was never tested on TestFlight until now.
+
+### Fix (Build 52 — Working)
+Wrapped all `expo-notifications` calls in `NotificationContext.js` with try-catch blocks:
+- Outer try-catch around the entire `useEffect` body
+- Inner try-catch for each listener callback
+- `.catch()` on the `getLastNotificationResponseAsync()` promise
+- Try-catch on cleanup in the return function
+
+If `expo-notifications` fails, the app continues to work normally — push notifications are gracefully degraded instead of crashing the app.
+
+### Additional Fix (Build 53)
+- **`app/blog/[slug].js`** — Wrapped `react-native-render-html` import in try-catch with fallback to plain text rendering. The library (v6.3.4, 4 years old) has known compatibility issues with React Native 0.78+.
+- **5 files** — Fixed `import { AUTH_CONFIG }` (named import) to `import AUTH_CONFIG` (default import). `config/auth.js` uses `export default`, so the named import resulted in `undefined`. Files fixed: `app/blog/index.js`, `app/blog/[slug].js`, `app/bundle-builder.js`, `app/training.js`, `app/profile/orders/[id].js`.
+
+### Build History
+| Build | Version | Status | Issue |
+|-------|---------|--------|-------|
+| 47 | 1.1.0 | ✅ Working | App Store approved |
+| 48 | 1.2.0 | ❌ Crash | Never tested (same bug) |
+| 49 | 1.3.0 | ❌ Crash | NotificationContext crash |
+| 50 | 1.3.0 | ❌ Crash | Same (clean cache rebuild) |
+| 51 | 1.3.0 | ❌ Crash | AUTH_CONFIG fix alone insufficient |
+| 52 | 1.3.0 | ✅ Working | NotificationContext try-catch fix |
+| 53 | 1.3.0 | ✅ Working | + react-native-render-html safe-load |
+
+### Files Changed
+- `contexts/NotificationContext.js` — All notification listeners wrapped in try-catch
+- `app/blog/[slug].js` — Safe-load `react-native-render-html`, fallback to plain text
+- `app/blog/index.js` — Fixed AUTH_CONFIG import
+- `app/bundle-builder.js` — Fixed AUTH_CONFIG import
+- `app/training.js` — Fixed AUTH_CONFIG import
+- `app/profile/orders/[id].js` — Fixed AUTH_CONFIG import
+
+### Lesson Learned
+Any code that runs at app startup (context providers, module-level imports) must be wrapped in try-catch. A single unhandled error in a provider that wraps the app tree will crash the entire app before any UI renders.
+
+---
+
 *Session updated: February 10, 2026*
