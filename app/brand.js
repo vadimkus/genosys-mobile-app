@@ -201,6 +201,10 @@ export default function BrandScreen() {
           <Text style={[styles.footerSub, isRTL && styles.textRTL]}>
             {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
           </Text>
+          <TouchableOpacity onPress={() => Linking.openURL('https://www.genosys.ae')} activeOpacity={0.7} style={{ marginTop: 8 }}>
+            <Text style={styles.footerLink}>www.genosys.ae</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -260,6 +264,8 @@ const styles = StyleSheet.create({
   footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
   footerText: { fontSize: 15, fontWeight: '600', color: '#6B7280' },
   footerSub: { fontSize: 13, color: '#9CA3AF', marginTop: 4 },
+  footerLink: { fontSize: 14, color: '#dc2626', fontWeight: '600' },
+  footerCopyright: { fontSize: 12, color: '#C7C7CC', marginTop: 12 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
