@@ -18,8 +18,8 @@ We systematically replaced 8 of 9 WebView screens with fully native React Native
 |---|--------|--------|------|-------|
 | 1 | Brand | ✅ Native | `app/brand.js` | Tech cards, brand info, videos |
 | 2 | Delivery | ✅ Native | `app/delivery.js` | Shipping rates, return policy |
-| 3 | FAQ | ✅ Native | `app/faq.js` | 17 Q&As, expandable accordion |
-| 4 | Partners | ✅ Native | `app/partners.js` | Partner list, CTA |
+| 3 | FAQ | ✅ Native + API | `app/faq.js` | DB-driven via `/api/mobile/faq`, 18 Q&As |
+| 4 | Partners | ✅ Native + API | `app/partners.js` | DB-driven via `/api/mobile/partners` |
 | 5 | Locations | ✅ Native | `app/locations.js` | 7 UAE emirates, office location |
 | 6 | Training | ✅ Native | `app/training.js` | Auth-gated, docs + videos |
 | 7 | Blog | ✅ Native | `app/blog.js` | API-driven, image cards |
@@ -52,8 +52,10 @@ All secondary links changed from `navigateWebView()` to `navigateTo()`:
 
 | Link | Before | After |
 |------|--------|-------|
+| About | `navigateTo('/profile/about')` | `navigateTo('/about')` |
 | Brand | `navigateWebView('/brand', ...)` | `navigateTo('/brand')` |
 | Delivery | `navigateWebView('/delivery', ...)` | `navigateTo('/delivery')` |
+| Contact | `navigateTo('/profile/contact')` | `navigateTo('/contact')` |
 | FAQ | `navigateWebView('/faq', ...)` | `navigateTo('/faq')` |
 | Locations | `navigateWebView('/locations', ...)` | `navigateTo('/locations')` |
 | Blog | `navigateWebView('/blog', ...)` | `navigateTo('/blog')` |
@@ -61,6 +63,15 @@ All secondary links changed from `navigateWebView()` to `navigateTo()`:
 | Training | `navigateWebView('/training', ...)` | `navigateTo('/training')` |
 
 **Bundle Builder** still uses `navigateWebView()` — pending Phase 3.
+
+### Standalone vs Profile Screens
+
+Some screens have two versions — one for the hamburger menu (standalone with back arrow) and one for the profile section (with "< Account" navigation):
+
+| Screen | Hamburger Menu Route | Profile Route | Difference |
+|--------|---------------------|---------------|------------|
+| About | `/about` (`app/about.js`) | `/profile/about` | Back arrow vs "< Account" |
+| Contact | `/contact` (`app/contact.js`) | `/profile/contact` | Back arrow vs "< Account" |
 
 ## New API Endpoints
 
@@ -97,6 +108,60 @@ All secondary links changed from `navigateWebView()` to `navigateTo()`:
 
 **File:** `cosmetics-website/app/api/mobile/blog/route.ts`
 
+### FAQ API (Website DB → Mobile App)
+
+**Endpoint:** `GET /api/mobile/faq`
+
+**Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+- `x-locale: en|ar|ru` (optional, default: en)
+
+**Response:**
+```json
+{
+  "title": "FAQ",
+  "subtitle": "Frequently Asked Questions",
+  "description": "Find answers to common questions...",
+  "items": [
+    { "id": 1, "question": "What is GENOSYS?", "answer": "GENOSYS is..." }
+  ],
+  "total": 18,
+  "locale": "en"
+}
+```
+
+**File:** `cosmetics-website/app/api/mobile/faq/route.ts`  
+**Source:** `faq_items` database table (managed via admin panel)
+
+### Partners API (Website → Mobile App)
+
+**Endpoint:** `GET /api/mobile/partners`
+
+**Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+
+**Response:**
+```json
+{
+  "partners": [
+    {
+      "id": "salon-name",
+      "name": "Salon Name",
+      "type": "Beauty Salon",
+      "description": "Description...",
+      "location": "Dubai, UAE",
+      "phone": "+971...",
+      "website": "https://...",
+      "directions": "https://maps...",
+      "theme": "emerald"
+    }
+  ],
+  "total": 33
+}
+```
+
+**File:** `cosmetics-website/app/api/mobile/partners/route.ts`
+
 ## Screen Details
 
 ### Brand (`app/brand.js`)
@@ -104,31 +169,42 @@ All secondary links changed from `navigateWebView()` to `navigateTo()`:
 - About the Brand section
 - Our Mission section
 - Key Technologies cards (Stem Cell, Peptide, Bio Growth)
-- Brand videos section (YouTube embeds via WebView)
-- Footer with company info
+- Brand videos section (YouTube thumbnails, opens externally with haptic)
+- Product Showcase section with localized caption
+- Footer with company info, tappable `www.genosys.ae` link, and copyright
 
 ### Delivery (`app/delivery.js`)
-- Express (Dubai, 1-2 hours) and Standard (UAE, 24-36 hours) delivery cards
+- Express (Dubai, 1-2 hours, 45 AED) and Standard (UAE, 24-36 hours, 70 AED) delivery cards
 - Free shipping banner (orders above 1,000 AED)
-- Shipping rates table for all 7 emirates
+- Shipping rates table for all 7 emirates (Dubai: 45 AED, others: 70 AED)
 - Return policy section (10 days, unopened, 3-5 day refund)
 - WhatsApp help button
 
 ### FAQ (`app/faq.js`)
-- Hero section with icon
-- 17 expandable Q&A items (reuses `help.faqItems` translation keys)
+- **Database-driven** — fetches from `/api/mobile/faq` (website DB)
+- 18 expandable Q&A items with haptic feedback
 - Formatted answers (bullets, numbered lists, paragraphs)
-- CTA section (WhatsApp + Email buttons)
+- Loading, error, and pull-to-refresh states
+- CTA section (WhatsApp + Email buttons with haptics)
+- FAQ content managed via admin panel — no code changes needed
 
 ### Partners (`app/partners.js`)
-- Hero section
-- 8 partner salons with icons, types, and locations
-- "Become a Partner" CTA with email link
+- **Database-driven** — fetches from `/api/mobile/partners` (website DB)
+- 33 partner locations with dynamic theming
+- Expandable cards with Call, Directions, Website actions
+- Loading, error, and pull-to-refresh states
+- Partners managed via website `lib/partners.ts` — add there, appears in app
+
+### About (`app/about.js`) — Standalone
+- Same content as `app/profile/about.js` but with generic back arrow
+- Accessed from hamburger menu (route: `/about`)
+- Footer with tappable `www.genosys.ae` link + copyright + app version
+- The profile version (`app/profile/about.js`) retains "< Account" navigation
 
 ### Locations (`app/locations.js`)
 - UAE flag hero
 - Free shipping banner
-- 7 emirate cards with delivery times and shipping costs
+- 7 selectable emirate cards with haptic feedback (Dubai: 45 AED, others: 70 AED)
 - Dubai highlighted as primary location
 - Office location with Google Maps link
 
@@ -166,4 +242,21 @@ The only remaining WebView screen. Requires:
 
 ---
 
-*Document created: February 10, 2026*
+## Data Sources Summary
+
+| Screen | Data Source | Update Method |
+|--------|-----------|---------------|
+| Brand | Hardcoded in `app/brand.js` | Code change |
+| Delivery | Hardcoded in `app/delivery.js` | Code change |
+| FAQ | **Database** (`faq_items` table) | Admin panel |
+| Partners | **API** (`lib/partners.ts` on website) | Edit partners file |
+| Locations | Hardcoded in `app/locations.js` | Code change |
+| Training | Hardcoded in `app/training.js` | Code change |
+| Blog | **Database** (`blog_posts` table) | Admin panel |
+| About | Hardcoded + translations | Code change |
+| Contact | Hardcoded + translations | Code change |
+
+---
+
+*Document created: February 10, 2026*  
+*Last updated: February 10, 2026*

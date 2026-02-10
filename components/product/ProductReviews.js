@@ -279,8 +279,8 @@ export default function ProductReviews({ productId }) {
         </View>
       ) : reviews.length > 0 ? (
         <View style={styles.reviewsList}>
-          {reviews.map((review) => (
-            <View key={review.id} style={styles.reviewCard}>
+          {reviews.map((review, index) => (
+            <View key={`${review.id}-${index}`} style={styles.reviewCard}>
               <View style={[styles.reviewHeader, isRTL && styles.reviewHeaderRTL]}>
                 <View style={{ flex: 1 }}>
                   <View style={[styles.reviewNameRow, isRTL && styles.reviewNameRowRTL]}>

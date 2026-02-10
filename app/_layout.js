@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
+import { LogBox } from 'react-native';
 import Constants from 'expo-constants';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -10,6 +11,14 @@ import { AnimationProvider } from '../contexts/AnimationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
 import { setupDeepLinkListener } from '../utils/deepLinking';
+
+// Suppress known warnings that don't affect functionality
+// Push notifications on Android require Firebase (google-services.json) for production
+// In Expo Go / dev builds without Firebase, this warning is expected and can be ignored
+LogBox.ignoreLogs([
+  'expo-notifications: Android Push notifications',
+  'expo-notifications',
+]);
 
 export default function RootLayout() {
   const [showLaunch, setShowLaunch] = useState(true);

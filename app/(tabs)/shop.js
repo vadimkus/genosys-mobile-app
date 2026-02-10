@@ -1018,8 +1018,8 @@ export default function ShopScreen() {
             </View>
           ) : (
             <View style={styles.gridContainer}>
-              {filteredProducts.map((product) => (
-                <View key={product.id} style={styles.gridCard}>
+              {filteredProducts.map((product, index) => (
+                <View key={`${product.id}-${index}`} style={styles.gridCard}>
                   <TouchableOpacity
                     style={{ flex: 1 }}
                     onPress={() => handleProductPress(product)}

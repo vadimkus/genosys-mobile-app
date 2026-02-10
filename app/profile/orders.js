@@ -411,7 +411,7 @@ export default function OrdersScreen() {
           </View>
         ) : (
           <View style={styles.list}>
-            {sortedOrders.map((o) => {
+            {sortedOrders.map((o, orderIndex) => {
               const orderNumber = o.orderNumber || o.order_number || o.number || o.id;
               const createdAt = o.createdAt || o.created_at || o.date;
               const status = o.status || 'PENDING';
@@ -442,7 +442,7 @@ export default function OrdersScreen() {
                 ? orderDiscPct
                 : Number(user?.discountPercentage);
               return (
-                <View key={String(o.id || orderNumber)} style={styles.card}>
+                <View key={`${String(o.id || orderNumber)}-${orderIndex}`} style={styles.card}>
                   <View style={[styles.cardTop, isRTL && styles.cardTopRTL]}>
                     <TouchableOpacity
                       style={[styles.orderToggle, isRTL && styles.orderToggleRTL]}

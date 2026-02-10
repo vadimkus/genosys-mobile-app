@@ -1,6 +1,6 @@
 # Genosys Mobile App — Documentation
 
-> iOS app for GENOSYS Professional Korean Dermacosmetics (genosys.ae)
+> **iOS and Android** app for GENOSYS Professional Korean Dermacosmetics (genosys.ae)
 >
 > Tech: React Native (Expo), TypeScript, expo-router, expo-image, expo-av
 
@@ -11,7 +11,8 @@
 | Doc | Description |
 |-----|-------------|
 | [Main README](../README.md) | Project overview, install, and run |
-| [Build & Submit](./build/BUILD_AND_SUBMIT_COMMANDS.md) | How to build and submit to App Store |
+| [Build & Submit (iOS)](./build/BUILD_AND_SUBMIT_COMMANDS.md) | Build and submit to App Store |
+| [Android Build Guide](./build/ANDROID_BUILD_GUIDE.md) | Build and run on Android (emulator/device) |
 | [Build Status](./build/BUILD_STATUS.md) | Current build status |
 
 ---
@@ -26,6 +27,9 @@
 | [Session Log 7 Feb 2026](./core/SESSION_LOG_2026_02_07.md) | Menu redesign, multi-category, images, videos |
 | [Session Log 7–8 Feb (cont.)](./core/SESSION_LOG_2026_02_07_continued.md) | Request Quote, Bio Meso, voice search, more images/videos, dot fix |
 | [Session Log 8 Feb 2026](./core/SESSION_LOG_2026_02_08.md) | WebView auth bridge, translation fixes, isPriceOnRequest on all pages |
+| [Session Log 9 Feb 2026](./core/SESSION_LOG_2026_02_09.md) | Android app setup, SDK tools, emulator, code fixes |
+| [Session Log 10 Feb 2026](./core/SESSION_LOG_2026_02_10.md) | **NEW** FAQ → DB API, standalone About/Contact, delivery pricing, 8/9 native |
+| [Native Screens Migration](./core/NATIVE_SCREENS_MIGRATION.md) | **NEW** WebView → Native: 8 screens migrated, API-driven FAQ & Partners |
 | [Checkout Flow](./core/CHECKOUT_FLOW.md) | Delivery details, payment, order submission |
 | [Orders](./core/ORDERS_PAGES.md) | Orders list, order detail, reorder |
 | [Waterfall Pricing](./core/WATERFALL_PRICING.md) | Transparent discount breakdown (VIP, bundle) |
@@ -93,6 +97,7 @@
 | Doc | Description |
 |-----|-------------|
 | [Build Commands](./build/BUILD_AND_SUBMIT_COMMANDS.md) | Build and submit to App Store |
+| [Android Build Guide](./build/ANDROID_BUILD_GUIDE.md) | Build and run on Android (Feb 2026) |
 | [Build Status](./build/BUILD_STATUS.md) | Current build status |
 | [Network Errors](./build/NETWORK_ERROR_RESOLUTION.md) | Network debugging |
 
@@ -114,6 +119,7 @@
 |-----|-------------|
 | [Overview](./screenshots/SCREENSHOTS.md) | Screenshot documentation |
 | [Guide](./screenshots/SCREENSHOT_GUIDE.md) | How to capture screenshots |
+| [Resizing for App Store](./screenshots/SCREENSHOT_RESIZING_FOR_APP_STORE.md) | Resizing screenshots to Apple requirements (Feb 2026) |
 | [Capture Scripts](./screenshots/SCREENSHOT_CAPTURE_README.md) | Automated capture scripts |
 | [Capture Complete](./screenshots/SCREENSHOT_CAPTURE_COMPLETE.md) | Completion status |
 | [Quick Checklist](./screenshots/QUICK_CHECKLIST.md) | Quick reference |

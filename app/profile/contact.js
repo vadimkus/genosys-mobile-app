@@ -139,8 +139,8 @@ export default function ContactScreen() {
         {/* Contact Methods */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('contact.contactMethods')}</Text>
-          {contactMethods.map((method) => (
-            <ContactMethodCard key={method.id} method={method} />
+          {contactMethods.map((method, index) => (
+            <ContactMethodCard key={`${method.id}-${index}`} method={method} />
           ))}
         </View>
 

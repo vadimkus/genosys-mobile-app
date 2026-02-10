@@ -232,8 +232,8 @@ export default function HelpSupportScreen() {
         {/* Contact Options */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.contactUs')}</Text>
-          {supportOptions.map((option) => (
-            <SupportOptionCard key={option.id} option={option} />
+          {supportOptions.map((option, index) => (
+            <SupportOptionCard key={`${option.id}-${index}`} option={option} />
           ))}
         </View>
 
@@ -241,8 +241,8 @@ export default function HelpSupportScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.faqTitle')}</Text>
           <View style={styles.faqContainer}>
-            {faqData.map((faq) => (
-              <FaqItem key={faq.id} faq={faq} />
+            {faqData.map((faq, index) => (
+              <FaqItem key={`${faq.id}-${index}`} faq={faq} />
             ))}
           </View>
         </View>

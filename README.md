@@ -1,6 +1,6 @@
 # Genosys Mobile App
 
-A production-ready iOS e-commerce app for GENOSYS Professional skincare, built with React Native (Expo) featuring Apple Store design system aesthetics.
+A production-ready **iOS and Android** e-commerce app for GENOSYS Professional skincare, built with React Native (Expo) featuring Apple Store design system aesthetics.
 
 ## Features
 
@@ -43,6 +43,9 @@ npm start
 
 # Run on iOS simulator
 npm run ios
+
+# Run on Android emulator
+npm run android
 ```
 
 ## Project Structure
@@ -86,12 +89,28 @@ All documentation is centralized in the `docs/` folder. See [docs/README.md](doc
 
 ## Build & Submit
 
+### iOS (App Store)
+
 ```bash
 # Build for iOS
-eas build --platform ios --profile production
+npm run build:ios:production
 
 # Submit to App Store
-eas submit --platform ios
+npm run submit:ios
 ```
 
-See [docs/BUILD_AND_SUBMIT_COMMANDS.md](docs/BUILD_AND_SUBMIT_COMMANDS.md) for detailed instructions.
+### Android (Google Play)
+
+```bash
+# Build preview APK for testing
+npm run build:android:preview
+
+# Build for Google Play
+npm run build:android:production
+
+# Submit to Google Play
+npm run submit:android
+```
+
+See [docs/build/BUILD_AND_SUBMIT_COMMANDS.md](docs/build/BUILD_AND_SUBMIT_COMMANDS.md) for iOS instructions.
+See [docs/build/ANDROID_BUILD_GUIDE.md](docs/build/ANDROID_BUILD_GUIDE.md) for Android instructions.

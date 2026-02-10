@@ -21,6 +21,12 @@
     "android": "EXPO_USE_POLLING=1 expo start --android",
     "ios": "EXPO_USE_POLLING=1 expo start --ios",
     "web": "EXPO_USE_POLLING=1 expo start --web",
+    "build:android:dev": "eas build --platform android --profile development:android",
+    "build:android:preview": "eas build --platform android --profile preview:android",
+    "build:android:production": "eas build --platform android --profile production:android",
+    "build:ios:production": "eas build --platform ios --profile production",
+    "submit:android": "eas submit --platform android --profile production",
+    "submit:ios": "eas submit --platform ios --profile production",
     "screenshots": "bash scripts/capture-appstore-screenshots.sh",
     "screenshots:interactive": "bash scripts/capture-screenshots-interactive.sh",
     "screenshots:russian": "bash scripts/capture-russian-screenshots.sh"

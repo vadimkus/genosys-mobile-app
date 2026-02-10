@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { createLogger } from '../utils/logger';
 import { apiRequest } from './pushRequestShim';
@@ -6,15 +7,28 @@ import { apiRequest } from './pushRequestShim';
 const log = createLogger('Push');
 
 // Configure default notification behavior (foreground)
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: true,
-  }),
-});
+// Wrapped in try-catch to prevent warning banner on Android without Firebase
+try {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: true,
+    }),
+  });
+} catch (e) {
+  log.warn('Could not set notification handler:', e?.message);
+}
 
 export async function registerForPushNotificationsAsync() {
+  // Android channel (required for proper behavior) - create first before requesting token
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+
   // Request permissions
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
@@ -31,19 +45,29 @@ export async function registerForPushNotificationsAsync() {
     };
   }
 
-  // Get Expo push token
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-
-  // Android channel (required for proper behavior)
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.DEFAULT,
+  // Get Expo push token with projectId (required for Android without Firebase)
+  try {
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    if (!projectId) {
+      log.warn('No EAS projectId found, push notifications may not work');
+    }
+    
+    const tokenResponse = await Notifications.getExpoPushTokenAsync({
+      projectId: projectId || 'b874a5c1-c47e-4c4e-9286-42e431978d51',
     });
+    const token = tokenResponse.data;
+    
+    log.debug('Got Expo push token');
+    return { success: true, token };
+  } catch (error) {
+    // On Android without Firebase, push tokens won't work in dev - this is expected
+    log.warn('Could not get push token (expected in dev without Firebase):', error?.message);
+    return {
+      success: false,
+      errorKey: 'profile.pushTokenError',
+      error: error?.message || 'Could not get push token',
+    };
   }
-
-  log.debug('Got Expo push token');
-  return { success: true, token };
 }
 
 export async function savePushTokenToBackend(authToken, expoPushToken) {

@@ -151,7 +151,7 @@ export default function FavoritesScreen() {
         <View style={styles.grid}>
           {favorites.map((product, index) => (
             <View
-              key={product.id}
+              key={`${product.id}-${index}`}
               style={[styles.gridCard, index % 2 === 0 ? styles.gridCardLeft : styles.gridCardRight]}
             >
               <TouchableOpacity 

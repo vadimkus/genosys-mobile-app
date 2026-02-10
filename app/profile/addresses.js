@@ -227,8 +227,8 @@ export default function AddressesScreen() {
         ) : (
           <View style={styles.addressesList}>
             {Array.isArray(addresses) && addresses.length > 0 ? (
-              addresses.map((address) => (
-                <AddressCard key={address.id} address={address} />
+              addresses.map((address, index) => (
+                <AddressCard key={`${address.id}-${index}`} address={address} />
               ))
             ) : (
               <View style={styles.emptyState}>

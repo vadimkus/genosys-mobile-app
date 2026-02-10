@@ -54,12 +54,19 @@
       }
     },
     "android": {
-      "package": "com.genosys.mobile",
-      "versionCode": 2,
+      "package": "ae.genosys.app",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
+        "foregroundImage": "./assets/icon-foreground-1024.png",
+        "backgroundImage": "./assets/icon-background-1024.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": [
+        "INTERNET",
+        "VIBRATE",
+        "RECORD_AUDIO",
+        "CAMERA"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",
