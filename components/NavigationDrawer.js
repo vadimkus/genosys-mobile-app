@@ -124,7 +124,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
 
           {/* ─── Info & Pages (2-column grid, even pairs) ─── */}
           <View style={[styles.grid, isRTL && styles.gridRTL]}>
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/profile/about')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/about')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.about') || 'About'}
               </Text>

@@ -1,10 +1,10 @@
 /**
- * FAQ Screen - Native (replaces WebView)
- * Displays frequently asked questions with expandable accordion.
- * Reuses FAQ data from help.faqItems translations.
+ * FAQ Screen - Native (fetches from API)
+ * Data is loaded dynamically from /api/mobile/faq on the website.
+ * When FAQ content is updated on the website, it appears here automatically.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,30 +12,63 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import AUTH_CONFIG from '../config/auth';
 import * as Haptics from 'expo-haptics';
 
 export default function FAQScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+
+  const [faqData, setFaqData] = useState([]);
+  const [subtitle, setSubtitle] = useState('');
+  const [description, setDescription] = useState('');
   const [expandedId, setExpandedId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
 
-  // Reuse the same FAQ data that help.js uses
-  const faqData = [];
-  for (let i = 1; i <= 17; i++) {
-    const q = t(`help.faqItems.q${i}`);
-    const a = t(`help.faqItems.a${i}`);
-    if (q && q !== `help.faqItems.q${i}`) {
-      faqData.push({ id: i, question: q, answer: a });
+  const fetchFAQ = useCallback(async (isRefresh = false) => {
+    try {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+      setError(null);
+
+      const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
+      const res = await fetch(`${baseUrl}/api/mobile/faq`, {
+        headers: {
+          'x-api-key': AUTH_CONFIG.API_KEY,
+          'x-locale': locale || 'en',
+        },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      setFaqData(data.items || []);
+      setSubtitle(data.subtitle || '');
+      setDescription(data.description || '');
+    } catch (err) {
+      console.warn('Failed to fetch FAQ:', err.message);
+      setError(l('Failed to load FAQ', 'فشل تحميل الأسئلة الشائعة', 'Не удалось загрузить FAQ'));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-  }
+  }, [locale]);
+
+  useEffect(() => {
+    fetchFAQ();
+  }, [fetchFAQ]);
 
   const toggleItem = useCallback((id) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -86,6 +119,53 @@ export default function FAQScreen() {
     );
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {t('navigation.faq') || 'FAQ'}
+          </Text>
+          <View style={styles.backBtn} />
+        </View>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#dc2626" />
+          <Text style={styles.loadingText}>
+            {l('Loading...', 'جارٍ التحميل...', 'Загрузка...')}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error && faqData.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {t('navigation.faq') || 'FAQ'}
+          </Text>
+          <View style={styles.backBtn} />
+        </View>
+        <View style={styles.centered}>
+          <Ionicons name="cloud-offline" size={48} color="#9CA3AF" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => fetchFAQ()} activeOpacity={0.7}>
+            <Text style={styles.retryBtnText}>{l('Try Again', 'حاول مرة أخرى', 'Попробовать снова')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -99,18 +179,23 @@ export default function FAQScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={() => fetchFAQ(true)} tintColor="#dc2626" />
+        }
+      >
         {/* Hero */}
         <View style={styles.heroSection}>
-          <Ionicons name="help-circle" size={48} color="#dc2626" />
           <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>
-            {l('Frequently Asked Questions', 'الأسئلة الشائعة', 'Часто задаваемые вопросы')}
+            {subtitle || l('Frequently Asked Questions', 'الأسئلة الشائعة', 'Часто задаваемые вопросы')}
           </Text>
-          <Text style={[styles.heroSubtitle, isRTL && styles.textRTL]}>
-            {l('Find answers to common questions about our products and services',
-               'اعثر على إجابات للأسئلة الشائعة حول منتجاتنا وخدماتنا',
-               'Ответы на частые вопросы о наших продуктах и услугах')}
-          </Text>
+          {description ? (
+            <Text style={[styles.heroSubtitle, isRTL && styles.textRTL]}>
+              {description}
+            </Text>
+          ) : null}
         </View>
 
         {/* FAQ List */}
@@ -185,9 +270,16 @@ const styles = StyleSheet.create({
   headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
+  // Loading / Error
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
+  loadingText: { marginTop: 12, fontSize: 15, color: '#6B7280' },
+  errorText: { marginTop: 12, fontSize: 15, color: '#6B7280', textAlign: 'center' },
+  retryBtn: { marginTop: 16, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  retryBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#FAFAFA' },
-  heroTitle: { fontSize: 24, fontWeight: '700', color: '#000', textAlign: 'center', marginTop: 12, marginBottom: 8, letterSpacing: -0.4 },
+  heroTitle: { fontSize: 24, fontWeight: '700', color: '#000', textAlign: 'center', marginBottom: 8, letterSpacing: -0.4 },
   heroSubtitle: { fontSize: 15, color: '#6B7280', textAlign: 'center', lineHeight: 22 },
 
   // Section
