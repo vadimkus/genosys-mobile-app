@@ -18,10 +18,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { WebView } from 'react-native-webview';
+import * as Haptics from 'expo-haptics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const VIDEO_HEIGHT = (SCREEN_WIDTH - 40) * (9 / 16);
+const VIDEO_WIDTH = SCREEN_WIDTH - 68; // 20 section padding + 14 card padding each side
+const VIDEO_HEIGHT = VIDEO_WIDTH * (9 / 16);
 
 export default function BrandScreen() {
   const router = useRouter();
@@ -74,9 +75,14 @@ export default function BrandScreen() {
   };
 
   const videos = [
-    { id: 'brand-intro', title: sectionLabels.brandIntro, youtubeId: 'GENOSYS_BRAND_VIDEO' },
-    { id: 'pro-treatment', title: sectionLabels.proTreatment, youtubeId: 'GENOSYS_PRO_VIDEO' },
+    { id: 'brand-intro', title: sectionLabels.brandIntro, youtubeId: '4L9xZc7wAjI' },
+    { id: 'pro-treatment', title: sectionLabels.proTreatment, youtubeId: 'v-i6CHJfWIg' },
   ];
+
+  const openVideo = useCallback((youtubeId) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -142,33 +148,28 @@ export default function BrandScreen() {
         <View style={[styles.section, styles.sectionAlt]}>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{sectionLabels.videos}</Text>
           
-          {/* Video 1 - Brand Introduction */}
-          <View style={styles.videoCard}>
-            <Text style={[styles.videoTitle, isRTL && styles.textRTL]}>{sectionLabels.brandIntro}</Text>
-            <View style={styles.videoWrapper}>
-              <WebView
-                source={{ uri: 'https://www.youtube.com/embed/JNjh1CHANNEL1?autoplay=0&rel=0' }}
-                style={styles.videoPlayer}
-                allowsInlineMediaPlayback
-                mediaPlaybackRequiresUserAction
-                javaScriptEnabled
-              />
-            </View>
-          </View>
-
-          {/* Video 2 - Professional Treatment */}
-          <View style={styles.videoCard}>
-            <Text style={[styles.videoTitle, isRTL && styles.textRTL]}>{sectionLabels.proTreatment}</Text>
-            <View style={styles.videoWrapper}>
-              <WebView
-                source={{ uri: 'https://www.youtube.com/embed/JNjh1CHANNEL2?autoplay=0&rel=0' }}
-                style={styles.videoPlayer}
-                allowsInlineMediaPlayback
-                mediaPlaybackRequiresUserAction
-                javaScriptEnabled
-              />
-            </View>
-          </View>
+          {videos.map((video) => (
+            <TouchableOpacity
+              key={video.id}
+              style={styles.videoCard}
+              onPress={() => openVideo(video.youtubeId)}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.videoTitle, isRTL && styles.textRTL]}>{video.title}</Text>
+              <View style={styles.videoWrapper}>
+                <Image
+                  source={{ uri: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` }}
+                  style={styles.videoThumbnail}
+                  resizeMode="cover"
+                />
+                <View style={styles.playOverlay}>
+                  <View style={styles.playButton}>
+                    <Ionicons name="play" size={32} color="#ffffff" style={{ marginLeft: 3 }} />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Footer */}
@@ -224,8 +225,10 @@ const styles = StyleSheet.create({
   // Videos
   videoCard: { marginBottom: 20, backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#E5E7EB' },
   videoTitle: { fontSize: 16, fontWeight: '600', color: '#111827', padding: 14, paddingBottom: 0 },
-  videoWrapper: { height: VIDEO_HEIGHT, margin: 14, borderRadius: 10, overflow: 'hidden', backgroundColor: '#000' },
-  videoPlayer: { flex: 1 },
+  videoWrapper: { height: VIDEO_HEIGHT, margin: 14, borderRadius: 10, overflow: 'hidden', backgroundColor: '#000', position: 'relative' },
+  videoThumbnail: { width: '100%', height: '100%' },
+  playOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' },
+  playButton: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(220,38,38,0.9)', justifyContent: 'center', alignItems: 'center' },
 
   // Footer
   footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
