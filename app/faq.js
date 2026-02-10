@@ -4,7 +4,7 @@
  * Reuses FAQ data from help.faqItems translations.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import * as Haptics from 'expo-haptics';
 
 export default function FAQScreen() {
   const router = useRouter();
@@ -36,9 +37,10 @@ export default function FAQScreen() {
     }
   }
 
-  const toggleItem = (id) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
+  const toggleItem = useCallback((id) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setExpandedId((prev) => (prev === id ? null : id));
+  }, []);
 
   const renderFormattedAnswer = (answer) => {
     const raw = String(answer || '');
@@ -148,7 +150,7 @@ export default function FAQScreen() {
           <View style={styles.ctaButtons}>
             <TouchableOpacity
               style={[styles.ctaBtn, styles.ctaBtnPrimary]}
-              onPress={() => Linking.openURL('https://wa.me/971585487665')}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); Linking.openURL('https://wa.me/971585487665'); }}
               activeOpacity={0.7}
             >
               <Ionicons name="logo-whatsapp" size={18} color="#ffffff" />
@@ -156,7 +158,7 @@ export default function FAQScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.ctaBtn, styles.ctaBtnSecondary]}
-              onPress={() => Linking.openURL('mailto:sales@genosys.ae')}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); Linking.openURL('mailto:sales@genosys.ae'); }}
               activeOpacity={0.7}
             >
               <Ionicons name="mail" size={18} color="#dc2626" />
