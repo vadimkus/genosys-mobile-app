@@ -107,9 +107,6 @@ export default function DeliveryScreen() {
                   <Text style={[styles.methodDesc, isRTL && styles.textRTL]}>{method.desc}</Text>
                   <Text style={[styles.methodPartner, isRTL && styles.textRTL]}>{method.partner}</Text>
                 </View>
-                {isSelected && (
-                  <Ionicons name="checkmark-circle" size={22} color={method.iconColor} style={{ marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }} />
-                )}
               </TouchableOpacity>
             );
           })}
