@@ -121,4 +121,69 @@ Removed unused `Linking` import from `app/blog/index.js`.
 
 ---
 
-*Session completed: February 10, 2026*
+## Skin Recommendation — Upgraded to API + AI Expert Analysis
+
+### Summary
+Upgraded the native Skin Recommendation feature from local-only processing to use the website's backend APIs. The 4-step questionnaire now calls `/api/skin-recommendations` for database-driven product recommendations. The camera analysis now sends photos to `/api/skin-analysis/ai` (GPT-4o-mini vision) for professional AI skin assessment with product recommendations, routines, and tips.
+
+### Changes Made
+
+#### 1. Quiz → Website API (`app/skin-analysis.js`)
+- Removed `fetchProducts()` + local `getRecommendations()` matching
+- Now calls `GET /api/skin-recommendations?skinType=X&ageGroup=Y&targetConcerns=A,B,C`
+- Added haptic feedback to all quiz interactions
+- Added error handling with retry UI
+- Fixed image URL handling for products (handles both relative and absolute URLs)
+- Cleaned up unused imports
+
+#### 2. Camera → AI Expert Analysis (`app/skin-analysis-camera.js`)
+- Complete rewrite of the camera results flow
+- Captures selfie and resizes to 512px, converts to base64
+- Sends to `POST /api/skin-analysis/ai` with locale for localized results
+- Displays rich AI results:
+  - Health score circle (1-10) with color coding
+  - Skin type badge
+  - Professional analysis text
+  - Key concerns as chips
+  - Product recommendations with personalized reasons + "Add to Bag" / "View" buttons
+  - AM/PM skincare routine with numbered steps
+  - Personalized tips
+- Falls back to on-device heuristic analysis if AI endpoint fails
+- Haptic feedback throughout
+
+#### 3. Chat Button Hidden (`app/AuthWrapper.js`)
+- Added `/skin-analysis` to `CHAT_HIDDEN_ROUTES`
+
+### Files Modified
+- `app/skin-analysis.js` — Quiz now calls website API
+- `app/skin-analysis-camera.js` — Camera now uses AI Expert Analysis
+- `app/AuthWrapper.js` — Hide chat on skin analysis page
+- `docs/core/NATIVE_SCREENS_MIGRATION.md` — Added documentation
+- `docs/core/SESSION_LOG_2026_02_10.md` — Updated
+
+### APIs Used
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/skin-recommendations` | GET | Quiz-based product recommendations |
+| `/api/skin-analysis/ai` | POST | AI vision analysis (GPT-4o-mini) |
+| `/api/products/{id}` | GET | Fetch product for cart integration |
+
+#### 4. AI Recommendations — Product Images, Sizes & Prices (`app/skin-analysis-camera.js`)
+- After AI analysis completes, fetches full product details from `/api/products/{id}` for each recommended product
+- Recommendation cards now display:
+  - Product image (72x72 thumbnail)
+  - Size below the image (e.g. "30ml")
+  - Price in red (e.g. "AED 330") or "Price on Request" in green
+  - Product name, AI reason, and Add to Bag / View buttons
+- State renamed from `productImages` → `productDetails` to store `{ image, size, price, isPriceOnRequest }`
+
+### Testing
+- iOS export: ✅ Compiles successfully
+- API `/api/skin-recommendations`: ✅ Returns product array
+- API `/api/skin-analysis/ai`: ✅ Responds (returns 400 for missing image as expected)
+- API `/api/products/{id}`: ✅ Returns image, size, price fields
+- Navigation: ✅ Hamburger → Skin Analysis → Quiz/Camera flows intact
+
+---
+
+*Session updated: February 10, 2026*

@@ -5,7 +5,7 @@
  * Then: Results with personalized product recommendations.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -14,18 +14,16 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  Animated,
   Platform,
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { fetchProducts } from '../services/api';
-import { getRecommendations } from '../utils/skinRecommendations';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 
@@ -53,21 +51,9 @@ export default function SkinAnalysisScreen() {
   const [concerns, setConcerns] = useState([]);
   const [usage, setUsage] = useState('');
   const [results, setResults] = useState([]);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [addedProducts, setAddedProducts] = useState(new Set());
-
-  // Load products for recommendations
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await fetchProducts(user, { locale });
-        if (data?.length) setProducts(data);
-      } catch {
-        // Silent fail
-      }
-    })();
-  }, []);
+  const [apiError, setApiError] = useState(null);
 
   const progress = step > 0 && step <= TOTAL_STEPS ? step / TOTAL_STEPS : 0;
 
@@ -79,18 +65,40 @@ export default function SkinAnalysisScreen() {
     return false;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (step < TOTAL_STEPS) {
       setStep(step + 1);
     } else if (step === TOTAL_STEPS) {
-      // Calculate results
       setLoading(true);
+      setApiError(null);
       setStep(5);
-      setTimeout(() => {
-        const recs = getRecommendations(products, { skinType, ageGroup, concerns, usage });
-        setResults(recs);
+      try {
+        // Call the website API for recommendations
+        const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
+        const params = new URLSearchParams({
+          skinType,
+          ageGroup,
+          targetConcerns: concerns.join(','),
+        });
+        const res = await fetch(`${baseUrl}/api/skin-recommendations?${params.toString()}`, {
+          headers: { 'Accept': 'application/json' },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        // API returns an array of product objects directly
+        const mapped = (Array.isArray(data) ? data : []).map((p) => ({
+          product: p,
+          score: p.score || 0,
+        }));
+        setResults(mapped);
+      } catch (err) {
+        console.warn('Skin recommendations API failed, using empty results:', err.message);
+        setApiError(err.message);
+        setResults([]);
+      } finally {
         setLoading(false);
-      }, 600);
+      }
     }
   };
 
@@ -110,6 +118,7 @@ export default function SkinAnalysisScreen() {
   };
 
   const toggleConcern = (c) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setConcerns((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
   };
 
@@ -223,13 +232,25 @@ export default function SkinAnalysisScreen() {
               {t('skinAnalysis.recommendedProducts')}
             </Text>
 
-            {results.length === 0 ? (
+            {apiError ? (
+              <View style={styles.errorBox}>
+                <Ionicons name="cloud-offline-outline" size={28} color="#dc2626" />
+                <Text style={styles.errorText}>Could not load recommendations. Please check your connection and try again.</Text>
+                <TouchableOpacity style={styles.retryBtn} onPress={handleReset} activeOpacity={0.85}>
+                  <Ionicons name="refresh" size={16} color="#fff" />
+                  <Text style={styles.retryBtnText}>Try Again</Text>
+                </TouchableOpacity>
+              </View>
+            ) : results.length === 0 ? (
               <Text style={styles.noResults}>{t('skinAnalysis.noResults')}</Text>
             ) : (
               results.map(({ product, score }, idx) => {
                 const name = getLocalizedProductName(product, locale) || product.name || '';
                 const price = product.displayPrice ?? product.price ?? 0;
-                const imageUri = product.image ? `${ASSET_ORIGIN}${product.image}` : null;
+                const rawImg = product.image || '';
+                const imageUri = rawImg
+                  ? (rawImg.startsWith('http') ? rawImg : `${ASSET_ORIGIN}${rawImg}`)
+                  : null;
                 const isAdded = addedProducts.has(product.id);
 
                 return (
@@ -672,6 +693,27 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
   },
   recViewText: { fontSize: 12, fontWeight: '600', color: '#374151' },
+
+  errorBox: {
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+  },
+  errorText: { fontSize: 14, color: '#991B1B', textAlign: 'center', lineHeight: 20 },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  retryBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
 
   resetButton: {
     flexDirection: 'row',

@@ -1,9 +1,11 @@
 /**
  * Skin Analysis Camera Screen
- * Captures a selfie photo and runs client-side skin analysis.
+ * Captures a selfie photo and offers:
+ *   1. Quick on-device analysis (heuristic-based)
+ *   2. AI Expert Analysis (GPT-4o vision via /api/skin-analysis/ai)
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,27 +14,91 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  ScrollView,
+  Image,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 import SkinAnalysisResults from '../components/SkinAnalysisResults';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
+import AUTH_CONFIG from '../config/auth';
+
+const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
+
+// Helper: parse product IDs from AI recommendation text
+// Format: [PRODUCT NAME](url){{id:ID}}
+function parseProductId(text) {
+  const match = text?.match(/\{\{id:(\d+)\}\}/);
+  return match ? parseInt(match[1], 10) : null;
+}
+function cleanProductText(text) {
+  return (text || '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\{\{id:\d+\}\}/g, '')
+    .trim();
+}
 
 export default function SkinAnalysisCameraScreen() {
-  const { t, dir } = useLocalization();
+  const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [capturing, setCapturing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null);
+  const [localResult, setLocalResult] = useState(null);
+  const [aiResult, setAiResult] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
+  const [capturedBase64, setCapturedBase64] = useState(null);
+  const [capturedUri, setCapturedUri] = useState(null);
+  const [addedProducts, setAddedProducts] = useState(new Set());
+  const [productDetails, setProductDetails] = useState({}); // { id: { image, size, price, isPriceOnRequest } }
+  const { user } = useAuth();
+  const { addItem } = useCart();
 
+  // Fetch product details (image, size, price) for AI recommendations
+  const fetchProductDetails = useCallback(async (recommendations) => {
+    const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
+    const ids = recommendations
+      .map((r) => {
+        const match = r.product?.match(/\{\{id:(\d+)\}\}/);
+        return match ? match[1] : null;
+      })
+      .filter(Boolean);
+
+    const details = {};
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const res = await fetch(`${baseUrl}/api/products/${id}`);
+          if (res.ok) {
+            const product = await res.json();
+            const img = product.image || '';
+            details[parseInt(id, 10)] = {
+              image: img.startsWith('http') ? img : `${ASSET_ORIGIN}${img}`,
+              size: product.size || null,
+              price: product.displayPrice ?? product.price ?? null,
+              isPriceOnRequest: product.isPriceOnRequest || false,
+            };
+          }
+        } catch { /* silent */ }
+      })
+    );
+    setProductDetails((prev) => ({ ...prev, ...details }));
+  }, []);
+
+  // Quick on-device analysis
   const handleCapture = async () => {
     if (!cameraRef.current || capturing) return;
     setCapturing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
       const photo = await cameraRef.current.takePictureAsync({
@@ -41,20 +107,87 @@ export default function SkinAnalysisCameraScreen() {
         skipProcessing: false,
       });
 
-      setAnalyzing(true);
+      setCapturedUri(photo.uri);
 
-      // Run analysis
-      const result = await analyzeSkinImage(photo.uri);
-      setAnalysisResult(result);
+      // Get base64 for AI analysis later
+      const resized = await ImageManipulator.manipulateAsync(
+        photo.uri,
+        [{ resize: { width: 512 } }],
+        { format: ImageManipulator.SaveFormat.JPEG, base64: true, compress: 0.8 }
+      );
+      setCapturedBase64(`data:image/jpeg;base64,${resized.base64}`);
+
+      // Run AI Expert Analysis directly
+      setAiAnalyzing(true);
+      try {
+        const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
+        const res = await fetch(`${baseUrl}/api/skin-analysis/ai`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: `data:image/jpeg;base64,${resized.base64}`,
+            locale: locale || 'en',
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          setAiResult(json.data);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          // Fetch product details (images, sizes, prices) in background
+          fetchProductDetails(json.data.recommendations || []);
+        } else {
+          throw new Error(json.error || 'AI analysis failed');
+        }
+      } catch (err) {
+        console.warn('AI analysis failed:', err.message);
+        // Fall back to on-device analysis
+        setAnalyzing(true);
+        try {
+          const result = await analyzeSkinImage(photo.uri);
+          setLocalResult(result);
+        } catch {
+          Alert.alert('Error', 'Analysis failed. Please try again.');
+        }
+        setAnalyzing(false);
+      } finally {
+        setAiAnalyzing(false);
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to capture photo. Please try again.');
     } finally {
       setCapturing(false);
-      setAnalyzing(false);
     }
   };
 
-  // Permission not determined yet
+  const handleReset = useCallback(() => {
+    setLocalResult(null);
+    setAiResult(null);
+    setCapturedBase64(null);
+    setCapturedUri(null);
+    setAddedProducts(new Set());
+    setProductDetails({});
+  }, []);
+
+  const handleAddToBag = useCallback(async (productId, productName) => {
+    if (!productId || addedProducts.has(productId)) return;
+    try {
+      // Fetch the real product data to add to cart properly
+      const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
+      const res = await fetch(`${baseUrl}/api/products/${productId}`);
+      if (res.ok) {
+        const product = await res.json();
+        await addItem(product, 1, '', '');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setAddedProducts((prev) => new Set([...prev, productId]));
+        setTimeout(() => {
+          setAddedProducts((prev) => { const n = new Set(prev); n.delete(productId); return n; });
+        }, 2000);
+      }
+    } catch { /* silent */ }
+  }, [addItem, addedProducts]);
+
+  // Permission loading
   if (!permission) {
     return (
       <SafeAreaView style={styles.container}>
@@ -87,20 +220,214 @@ export default function SkinAnalysisCameraScreen() {
     );
   }
 
-  // Show results if analysis is complete
-  if (analysisResult) {
+  // Show on-device results (fallback)
+  if (localResult) {
     return (
       <SkinAnalysisResults
-        result={analysisResult}
-        onReset={() => setAnalysisResult(null)}
+        result={localResult}
+        onReset={handleReset}
         onBack={() => router.back()}
       />
     );
   }
 
-  // Camera view
+  // Show AI Expert Analysis results
+  if (aiResult) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t('skinAnalysis.yourResults')}</Text>
+          <View style={styles.backBtn} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.aiContent} showsVerticalScrollIndicator={false}>
+          {/* Health Score Circle */}
+          <View style={styles.aiScoreCard}>
+            <View style={[styles.aiScoreCircle, { borderColor: scoreColor(aiResult.healthScore) }]}>
+              <Text style={[styles.aiScoreNum, { color: scoreColor(aiResult.healthScore) }]}>
+                {aiResult.healthScore || '—'}
+              </Text>
+              <Text style={styles.aiScoreMax}>/10</Text>
+            </View>
+            <Text style={styles.aiScoreLabel}>Skin Health Score</Text>
+            <View style={styles.aiSkinTypeBadge}>
+              <Text style={styles.aiSkinTypeText}>{capitalize(aiResult.skinType || 'Unknown')}</Text>
+            </View>
+          </View>
+
+          {/* AI Analysis Text */}
+          {aiResult.analysis && (
+            <View style={styles.aiSection}>
+              <View style={styles.aiSectionHeader}>
+                <Ionicons name="sparkles" size={18} color="#dc2626" />
+                <Text style={styles.aiSectionTitle}>AI Analysis</Text>
+              </View>
+              <Text style={styles.aiAnalysisText}>{aiResult.analysis}</Text>
+            </View>
+          )}
+
+          {/* Concerns */}
+          {aiResult.concerns?.length > 0 && (
+            <View style={styles.aiSection}>
+              <View style={styles.aiSectionHeader}>
+                <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+                <Text style={styles.aiSectionTitle}>Key Concerns</Text>
+              </View>
+              <View style={styles.concernChips}>
+                {aiResult.concerns.map((c, i) => (
+                  <View key={i} style={styles.concernChip}>
+                    <Ionicons name="ellipse" size={6} color="#dc2626" />
+                    <Text style={styles.concernChipText}>{c}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Product Recommendations */}
+          {aiResult.recommendations?.length > 0 && (
+            <View style={styles.aiSection}>
+              <View style={styles.aiSectionHeader}>
+                <Ionicons name="bag-outline" size={18} color="#dc2626" />
+                <Text style={styles.aiSectionTitle}>Recommended Products</Text>
+              </View>
+              {aiResult.recommendations.map((rec, idx) => {
+                const productId = parseProductId(rec.product);
+                const productName = cleanProductText(rec.product);
+                const isAdded = productId ? addedProducts.has(productId) : false;
+                const details = productId ? productDetails[productId] : null;
+
+                return (
+                  <View style={styles.aiRecCard} key={idx}>
+                    <View style={styles.aiRecRow}>
+                      {details?.image ? (
+                        <View style={styles.aiRecImageWrap}>
+                          <Image source={{ uri: details.image }} style={styles.aiRecImage} resizeMode="cover" />
+                          {details.size ? <Text style={styles.aiRecSize}>{details.size}</Text> : null}
+                        </View>
+                      ) : (
+                        <View style={[styles.aiRecImage, styles.aiRecImagePlaceholder]}>
+                          <Ionicons name="leaf-outline" size={24} color="#D1D5DB" />
+                        </View>
+                      )}
+                      <View style={styles.aiRecBody}>
+                        <Text style={styles.aiRecName} numberOfLines={2}>{productName}</Text>
+                        {details?.isPriceOnRequest ? (
+                          <Text style={styles.aiRecPriceOnRequest}>Price on Request</Text>
+                        ) : details?.price ? (
+                          <Text style={styles.aiRecPrice}>AED {Number(details.price).toFixed(0)}</Text>
+                        ) : null}
+                        <Text style={styles.aiRecReason} numberOfLines={3}>{rec.reason}</Text>
+                        {productId && (
+                          <View style={styles.aiRecActions}>
+                            <TouchableOpacity
+                              style={[styles.aiRecAddBtn, isAdded && styles.aiRecAddBtnAdded]}
+                              onPress={() => handleAddToBag(productId, productName)}
+                              disabled={isAdded}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                              <Text style={styles.aiRecAddText}>{isAdded ? 'Added' : 'Add to Bag'}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.aiRecViewBtn}
+                              onPress={() => router.push({ pathname: '/product/[id]', params: { id: productId } })}
+                              activeOpacity={0.8}
+                            >
+                              <Text style={styles.aiRecViewText}>View</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Skincare Routine */}
+          {(aiResult.routine?.am?.length > 0 || aiResult.routine?.pm?.length > 0) && (
+            <View style={styles.aiSection}>
+              <View style={styles.aiSectionHeader}>
+                <Ionicons name="sunny-outline" size={18} color="#dc2626" />
+                <Text style={styles.aiSectionTitle}>Your Skincare Routine</Text>
+              </View>
+
+              {aiResult.routine?.am?.length > 0 && (
+                <View style={styles.routineBlock}>
+                  <View style={styles.routineLabelRow}>
+                    <Ionicons name="sunny" size={14} color="#F59E0B" />
+                    <Text style={styles.routineLabel}>Morning (AM)</Text>
+                  </View>
+                  {aiResult.routine.am.map((step, i) => (
+                    <View key={i} style={styles.routineStep}>
+                      <Text style={styles.routineStepNum}>{i + 1}</Text>
+                      <Text style={styles.routineStepText}>{step}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {aiResult.routine?.pm?.length > 0 && (
+                <View style={styles.routineBlock}>
+                  <View style={styles.routineLabelRow}>
+                    <Ionicons name="moon" size={14} color="#6366F1" />
+                    <Text style={styles.routineLabel}>Evening (PM)</Text>
+                  </View>
+                  {aiResult.routine.pm.map((step, i) => (
+                    <View key={i} style={styles.routineStep}>
+                      <Text style={styles.routineStepNum}>{i + 1}</Text>
+                      <Text style={styles.routineStepText}>{step}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Tips */}
+          {aiResult.tips?.length > 0 && (
+            <View style={styles.aiSection}>
+              <View style={styles.aiSectionHeader}>
+                <Ionicons name="bulb-outline" size={18} color="#dc2626" />
+                <Text style={styles.aiSectionTitle}>Personalized Tips</Text>
+              </View>
+              {aiResult.tips.map((tip, i) => (
+                <View key={i} style={styles.tipRow}>
+                  <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+                  <Text style={styles.tipText}>{tip}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Bottom Actions */}
+          <View style={styles.aiActionsRow}>
+            <TouchableOpacity style={styles.retakeBtn} onPress={handleReset} activeOpacity={0.85}>
+              <Ionicons name="camera-outline" size={18} color="#dc2626" />
+              <Text style={styles.retakeBtnText}>Retake Photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.quizBtn}
+              onPress={() => { handleReset(); router.replace('/skin-analysis'); }}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="clipboard-outline" size={18} color="#374151" />
+              <Text style={styles.quizBtnText}>Take Quiz Instead</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // Camera view (main)
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.cameraContainer} edges={['top']}>
       <View style={[styles.header, styles.headerOverCamera, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
           <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#ffffff" />
@@ -109,7 +436,7 @@ export default function SkinAnalysisCameraScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      <View style={styles.cameraContainer}>
+      <View style={styles.cameraFlex}>
         <CameraView
           ref={cameraRef}
           style={styles.camera}
@@ -121,7 +448,7 @@ export default function SkinAnalysisCameraScreen() {
               <View style={styles.faceOval} />
             </View>
             <Text style={styles.guideText}>
-              {analyzing ? t('skinAnalysis.analyzing') : 'Position your face in the oval'}
+              {aiAnalyzing ? 'Analyzing with AI...' : analyzing ? t('skinAnalysis.analyzing') : 'Position your face in the oval'}
             </Text>
           </View>
         </CameraView>
@@ -129,28 +456,49 @@ export default function SkinAnalysisCameraScreen() {
 
       {/* Capture button */}
       <View style={styles.captureArea}>
-        {analyzing ? (
-          <ActivityIndicator size="large" color="#dc2626" />
+        {(analyzing || aiAnalyzing) ? (
+          <View style={styles.analyzingBox}>
+            <ActivityIndicator size="large" color="#dc2626" />
+            <Text style={styles.analyzingText}>
+              {aiAnalyzing ? 'AI Expert is analyzing your skin...' : 'Analyzing...'}
+            </Text>
+          </View>
         ) : (
-          <TouchableOpacity
-            style={styles.captureBtn}
-            onPress={handleCapture}
-            disabled={capturing}
-            activeOpacity={0.8}
-          >
-            <View style={styles.captureInner}>
-              <Ionicons name="camera" size={32} color="#dc2626" />
-            </View>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={styles.captureBtn}
+              onPress={handleCapture}
+              disabled={capturing}
+              activeOpacity={0.8}
+            >
+              <View style={styles.captureInner}>
+                <Ionicons name="camera" size={32} color="#dc2626" />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.captureLabel}>
+              AI Expert Analysis
+            </Text>
+          </>
         )}
-        <Text style={styles.captureLabel}>{t('skinAnalysis.capturePhoto')}</Text>
       </View>
     </SafeAreaView>
   );
 }
 
+// Helpers
+function scoreColor(score) {
+  if (!score) return '#9CA3AF';
+  if (score >= 7) return '#16A34A';
+  if (score >= 5) return '#F59E0B';
+  return '#dc2626';
+}
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
+  container: { flex: 1, backgroundColor: '#ffffff' },
+  cameraContainer: { flex: 1, backgroundColor: '#000000' },
   centerContent: {
     flex: 1,
     alignItems: 'center',
@@ -164,6 +512,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
     zIndex: 10,
   },
   headerOverCamera: {
@@ -172,6 +522,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'transparent',
+    borderBottomWidth: 0,
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
@@ -187,7 +538,7 @@ const styles = StyleSheet.create({
   },
   permissionBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
 
-  cameraContainer: { flex: 1 },
+  cameraFlex: { flex: 1 },
   camera: { flex: 1 },
 
   overlay: {
@@ -249,4 +600,205 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 8,
   },
+  analyzingBox: {
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+  },
+  analyzingText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // AI Results
+  aiContent: { padding: 16, paddingBottom: 48 },
+
+  aiScoreCard: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginBottom: 8,
+  },
+  aiScoreCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  aiScoreNum: { fontSize: 32, fontWeight: '900' },
+  aiScoreMax: { fontSize: 13, color: '#9CA3AF', fontWeight: '600', marginTop: -4 },
+  aiScoreLabel: { fontSize: 14, fontWeight: '700', color: '#374151', marginBottom: 8 },
+  aiSkinTypeBadge: {
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  aiSkinTypeText: { fontSize: 13, fontWeight: '700', color: '#dc2626' },
+
+  aiSection: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 14,
+  },
+  aiSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  aiSectionTitle: { fontSize: 16, fontWeight: '800', color: '#1F2937' },
+  aiAnalysisText: { fontSize: 14, color: '#374151', lineHeight: 22 },
+
+  // Concerns
+  concernChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  concernChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  concernChipText: { fontSize: 13, fontWeight: '600', color: '#991B1B' },
+
+  // AI Recommendations
+  aiRecCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#E5E7EB',
+    ...Platform.select({
+      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 },
+      android: { elevation: 1 },
+    }),
+  },
+  aiRecRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  aiRecImageWrap: {
+    alignItems: 'center',
+  },
+  aiRecImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+  },
+  aiRecImagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aiRecSize: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    marginTop: 3,
+  },
+  aiRecBody: { flex: 1 },
+  aiRecName: { fontSize: 14, fontWeight: '700', color: '#1F2937', marginBottom: 2 },
+  aiRecPrice: { fontSize: 14, fontWeight: '800', color: '#dc2626', marginBottom: 4 },
+  aiRecPriceOnRequest: { fontSize: 12, fontWeight: '700', color: '#25D366', marginBottom: 4 },
+  aiRecReason: { fontSize: 12, color: '#6B7280', lineHeight: 17, marginBottom: 8 },
+  aiRecActions: { flexDirection: 'row', gap: 8 },
+  aiRecAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 8,
+  },
+  aiRecAddBtnAdded: { backgroundColor: '#16A34A' },
+  aiRecAddText: { fontSize: 12, fontWeight: '700', color: '#fff' },
+  aiRecViewBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+  },
+  aiRecViewText: { fontSize: 12, fontWeight: '600', color: '#374151' },
+
+  // Routine
+  routineBlock: { marginBottom: 14 },
+  routineLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  routineLabel: { fontSize: 14, fontWeight: '700', color: '#374151' },
+  routineStep: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    paddingVertical: 4,
+  },
+  routineStepNum: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#dc2626',
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
+    lineHeight: 22,
+    overflow: 'hidden',
+  },
+  routineStepText: { flex: 1, fontSize: 13, color: '#374151', lineHeight: 20 },
+
+  // Tips
+  tipRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginBottom: 8,
+  },
+  tipText: { flex: 1, fontSize: 13, color: '#374151', lineHeight: 20 },
+
+  // Bottom actions
+  aiActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  retakeBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#dc2626',
+  },
+  retakeBtnText: { fontSize: 14, fontWeight: '700', color: '#dc2626' },
+  quizBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+  },
+  quizBtnText: { fontSize: 14, fontWeight: '700', color: '#374151' },
 });

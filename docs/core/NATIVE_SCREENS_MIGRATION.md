@@ -515,5 +515,80 @@ All 9 WebView screens have been successfully converted to native React Native im
 
 ---
 
+## Skin Recommendation Feature — API Integration
+
+### Overview
+
+The existing native Skin Recommendation feature (`app/skin-analysis.js` + `app/skin-analysis-camera.js`) was upgraded from local-only processing to use the website's backend APIs for consistent, database-driven results.
+
+### Changes (February 10, 2026)
+
+#### Phase 1: Questionnaire → Website API
+
+**Before:** Quiz results used `utils/skinRecommendations.js` (local product matching with in-memory product list from `fetchProducts()`).
+
+**After:** Quiz results call `GET /api/skin-recommendations?skinType=X&ageGroup=Y&targetConcerns=A,B,C` — the website's scoring-based recommendation engine that uses the live product database.
+
+**Benefits:**
+- Product data is always fresh (prices, descriptions, availability)
+- Scoring algorithm is centralized (website = source of truth)
+- No need to fetch and cache all products client-side
+
+**Files changed:**
+- `app/skin-analysis.js` — Replaced `fetchProducts` + `getRecommendations` with API call
+- Added haptic feedback to quiz interactions
+- Added error handling with retry UI when API fails
+- Fixed image URL handling (supports both relative and absolute URLs)
+
+#### Phase 2: Camera → AI Expert Analysis
+
+**Before:** Camera capture used `utils/skinImageAnalysis.js` (on-device heuristic pixel analysis — color-based scores for blemishes, wrinkles, hydration, etc.). Results were approximate.
+
+**After:** Camera capture sends base64 image to `POST /api/skin-analysis/ai` (GPT-4o-mini vision). Returns professional skin assessment including:
+- Skin type identification
+- Health score (1-10)
+- Key concerns
+- Professional analysis text
+- Product recommendations with personalized reasons
+- AM/PM skincare routine
+- Personalized tips
+
+**Fallback:** If AI analysis fails (network error, rate limit), automatically falls back to on-device heuristic analysis.
+
+**Files changed:**
+- `app/skin-analysis-camera.js` — Complete rewrite:
+  - Captures photo and resizes to 512px for efficient upload
+  - Sends base64 to AI endpoint with locale
+  - Rich results UI: health score circle, skin type badge, analysis text, concerns chips, product cards with images/sizes/prices + "Add to Bag" + "View" buttons, AM/PM routine steps, personalized tips
+  - Fetches full product details (image, size, price) from `/api/products/{id}` after AI results
+  - Falls back to on-device `SkinAnalysisResults` component if AI fails
+  - Haptic feedback throughout
+
+### API Endpoints Used
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/skin-recommendations` | GET | Quiz-based product recommendations |
+| `/api/skin-analysis/ai` | POST | AI vision analysis (GPT-4o-mini) |
+| `/api/products/{id}` | GET | Fetch product data for cart integration |
+
+### Navigation Flow
+
+```
+Hamburger Menu → "AI Skin Analysis"
+  → /skin-analysis (landing)
+    ├── "Start Quiz" → 4-step questionnaire → /api/skin-recommendations → Product results
+    └── "AI Camera" → /skin-analysis-camera
+         → Capture selfie → /api/skin-analysis/ai → AI Expert Results
+           (fallback: on-device analysis if API fails)
+```
+
+### Additional Changes
+
+- **Chat button hidden** on `/skin-analysis` route (added to `CHAT_HIDDEN_ROUTES` in `AuthWrapper.js`)
+- Removed unused imports (`fetchProducts`, `getRecommendations`, `Animated`, `useEffect`, `useCallback`)
+
+---
+
 *Document created: February 10, 2026*  
-*Last updated: February 10, 2026 — Added native blog reading & commenting*
+*Last updated: February 10, 2026 — Added Skin Recommendation API integration*

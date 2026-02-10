@@ -15,6 +15,7 @@ const CHAT_HIDDEN_ROUTES = [
   '/payment/',             // payment screens
   '/auth/',                // login, register, forgot-password, reset-password
   '/webview',              // legacy webview screens
+  '/skin-analysis',        // skin analysis quiz
   '/skin-analysis-camera', // camera screen
   '/bundle-builder',       // build your set
   '/partners',             // partners page
