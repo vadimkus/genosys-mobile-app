@@ -558,12 +558,12 @@ const styles = StyleSheet.create({
   discountActiveText: { fontSize: 12, fontWeight: '700', color: '#16a34a' },
 
   // Step indicator
-  stepIndicator: { maxHeight: 50, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
-  stepIndicatorContent: { paddingHorizontal: 12, gap: 8, alignItems: 'center', paddingVertical: 8 },
-  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6' },
+  stepIndicator: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  stepIndicatorContent: { paddingHorizontal: 12, gap: 6, alignItems: 'center', paddingVertical: 8 },
+  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6' },
   stepPillActive: { backgroundColor: '#FEF2F2', borderColor: '#dc2626' },
-  stepEmoji: { fontSize: 14 },
-  stepPillText: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
+  stepEmoji: { fontSize: 13 },
+  stepPillText: { fontSize: 12, fontWeight: '600', color: '#6B7280' },
   stepPillTextActive: { color: '#dc2626' },
   requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#dc2626' },
   stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
