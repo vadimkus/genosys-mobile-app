@@ -3,7 +3,7 @@
  * Displays delivery information, shipping rates, and return policy.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -15,12 +15,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 
 export default function DeliveryScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+
+  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [selectedRate, setSelectedRate] = useState(null);
+
+  const selectMethod = (index) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedMethod(selectedMethod === index ? null : index);
+  };
+
+  const selectRate = (index) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedRate(selectedRate === index ? null : index);
+  };
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
 
@@ -72,18 +86,33 @@ export default function DeliveryScreen() {
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
             {l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')}
           </Text>
-          {deliveryMethods.map((method, index) => (
-            <View key={index} style={[styles.methodCard, isRTL && styles.methodCardRTL]}>
-              <View style={[styles.methodIcon, { backgroundColor: method.bgColor }]}>
-                <Ionicons name={method.icon} size={24} color={method.iconColor} />
-              </View>
-              <View style={styles.methodContent}>
-                <Text style={[styles.methodTitle, isRTL && styles.textRTL]}>{method.title}</Text>
-                <Text style={[styles.methodDesc, isRTL && styles.textRTL]}>{method.desc}</Text>
-                <Text style={[styles.methodPartner, isRTL && styles.textRTL]}>{method.partner}</Text>
-              </View>
-            </View>
-          ))}
+          {deliveryMethods.map((method, index) => {
+            const isSelected = selectedMethod === index;
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.methodCard,
+                  isRTL && styles.methodCardRTL,
+                  isSelected && styles.methodCardSelected,
+                ]}
+                onPress={() => selectMethod(index)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.methodIcon, { backgroundColor: isSelected ? method.iconColor + '20' : method.bgColor }]}>
+                  <Ionicons name={method.icon} size={24} color={method.iconColor} />
+                </View>
+                <View style={styles.methodContent}>
+                  <Text style={[styles.methodTitle, isRTL && styles.textRTL]}>{method.title}</Text>
+                  <Text style={[styles.methodDesc, isRTL && styles.textRTL]}>{method.desc}</Text>
+                  <Text style={[styles.methodPartner, isRTL && styles.textRTL]}>{method.partner}</Text>
+                </View>
+                {isSelected && (
+                  <Ionicons name="checkmark-circle" size={22} color={method.iconColor} style={{ marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }} />
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Free Shipping Banner */}
@@ -103,12 +132,28 @@ export default function DeliveryScreen() {
             {l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')}
           </Text>
           <View style={styles.ratesCard}>
-            {shippingRates.map((item, index) => (
-              <View key={index} style={[styles.rateRow, isRTL && styles.rateRowRTL, index < shippingRates.length - 1 && styles.rateRowBorder]}>
-                <Text style={[styles.rateEmirate, isRTL && styles.textRTL]}>{item.emirate}</Text>
-                <Text style={styles.rateAmount}>{item.rate}</Text>
-              </View>
-            ))}
+            {shippingRates.map((item, index) => {
+              const isSelected = selectedRate === index;
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.rateRow,
+                    isRTL && styles.rateRowRTL,
+                    index < shippingRates.length - 1 && styles.rateRowBorder,
+                    isSelected && styles.rateRowSelected,
+                  ]}
+                  onPress={() => selectRate(index)}
+                  activeOpacity={0.7}
+                >
+                  {isSelected && (
+                    <Ionicons name="location" size={16} color="#dc2626" style={{ marginRight: isRTL ? 0 : 6, marginLeft: isRTL ? 6 : 0 }} />
+                  )}
+                  <Text style={[styles.rateEmirate, isRTL && styles.textRTL, isSelected && styles.rateEmirateSelected]}>{item.emirate}</Text>
+                  <Text style={[styles.rateAmount, isSelected && styles.rateAmountSelected]}>{item.rate}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -149,7 +194,7 @@ export default function DeliveryScreen() {
           </Text>
           <TouchableOpacity
             style={[styles.helpBtn, isRTL && styles.helpBtnRTL]}
-            onPress={() => Linking.openURL('https://wa.me/971585487665')}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); Linking.openURL('https://wa.me/971585487665'); }}
             activeOpacity={0.7}
           >
             <Ionicons name="logo-whatsapp" size={20} color="#ffffff" />
@@ -183,8 +228,9 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 16, letterSpacing: -0.4 },
 
   // Delivery Methods
-  methodCard: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14, backgroundColor: '#F9FAFB', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#F3F4F6' },
+  methodCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, backgroundColor: '#F9FAFB', borderRadius: 14, padding: 16, borderWidth: 2, borderColor: '#F3F4F6' },
   methodCardRTL: { flexDirection: 'row-reverse' },
+  methodCardSelected: { borderColor: '#dc2626', backgroundColor: '#FFF5F5' },
   methodIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   methodContent: { flex: 1 },
   methodTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
@@ -201,8 +247,11 @@ const styles = StyleSheet.create({
   rateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 },
   rateRowRTL: { flexDirection: 'row-reverse' },
   rateRowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
-  rateEmirate: { fontSize: 15, fontWeight: '500', color: '#374151' },
+  rateRowSelected: { backgroundColor: '#FEF2F2' },
+  rateEmirate: { flex: 1, fontSize: 15, fontWeight: '500', color: '#374151' },
+  rateEmirateSelected: { fontWeight: '700', color: '#111827' },
   rateAmount: { fontSize: 15, fontWeight: '700', color: '#111827' },
+  rateAmountSelected: { color: '#dc2626' },
 
   // Return Policy
   policyHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
