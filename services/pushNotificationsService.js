@@ -7,12 +7,13 @@ import { apiRequest } from './pushRequestShim';
 const log = createLogger('Push');
 
 // Configure default notification behavior (foreground)
+// When app is in foreground, show alert banner with sound
 // Wrapped in try-catch to prevent warning banner on Android without Firebase
 try {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
-      shouldPlaySound: false,
+      shouldPlaySound: true,  // Play sound for order updates
       shouldSetBadge: true,
     }),
   });

@@ -8,6 +8,7 @@ import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { LocalizationProvider } from '../contexts/LocalizationContext';
 import { OrdersProvider } from '../contexts/OrdersContext';
 import { AnimationProvider } from '../contexts/AnimationContext';
+import { NotificationProvider } from '../contexts/NotificationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
 import { setupDeepLinkListener } from '../utils/deepLinking';
@@ -42,14 +43,16 @@ export default function RootLayout() {
     <AuthProvider>
       <LocalizationProvider>
         <AnimationProvider>
-          <FavoritesProvider>
-            <CartProvider>
-              <OrdersProvider>
-                <StatusBar style="dark" backgroundColor="#ffffff" />
-                <AuthWrapper />
-              </OrdersProvider>
-            </CartProvider>
-          </FavoritesProvider>
+          <NotificationProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <OrdersProvider>
+                  <StatusBar style="dark" backgroundColor="#ffffff" />
+                  <AuthWrapper />
+                </OrdersProvider>
+              </CartProvider>
+            </FavoritesProvider>
+          </NotificationProvider>
         </AnimationProvider>
       </LocalizationProvider>
     </AuthProvider>
