@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "49",
+      "buildNumber": "50",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
