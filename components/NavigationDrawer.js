@@ -130,13 +130,13 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/brand', t('navigation.brand') || 'Brand')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/brand')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.brand') || 'Brand'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/delivery', t('navigation.delivery') || 'Delivery')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/delivery')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.delivery') || 'Delivery'}
               </Text>
@@ -148,32 +148,32 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/faq', t('navigation.faq') || 'FAQ')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/faq')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.faq') || 'FAQ'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/locations', t('navigation.locations') || 'Locations')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/locations')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.locations') || 'Locations'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/blog', t('navigation.blog') || 'Blog')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/blog')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.blog') || 'Blog'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/partners', t('navigation.partners') || 'Partners')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/partners')} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.partners') || 'Partners'}
               </Text>
             </TouchableOpacity>
 
             {user ? (
-              <TouchableOpacity style={styles.gridItem} onPress={() => navigateWebView('/training', t('navigation.training') || 'Training')} activeOpacity={0.7}>
+              <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/training')} activeOpacity={0.7}>
                 <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                   {t('navigation.training') || 'Training'}
                 </Text>
