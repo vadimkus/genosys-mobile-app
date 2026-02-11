@@ -534,10 +534,32 @@ export default function ShopScreen() {
     setRefreshing(false);
   };
 
+  // Track whether initial load has happened
+  const initialLoadDone = useRef(false);
+
   useEffect(() => {
     loadProducts();
     loadCategories();
+    initialLoadDone.current = true;
   }, []);
+
+  // Re-fetch products when user becomes available (login) to get personalized pricing.
+  // Uses fetchProducts directly to avoid stale closure over `user`.
+  useEffect(() => {
+    if (!initialLoadDone.current || !user?.id) return;
+    log.debug('User context available, re-fetching products for personalized pricing');
+    (async () => {
+      try {
+        const enhancedProducts = await fetchProducts(user, { locale });
+        if (enhancedProducts && enhancedProducts.length > 0) {
+          applyProducts(enhancedProducts);
+          cacheProducts(enhancedProducts);
+        }
+      } catch (err) {
+        log.warn('Re-fetch for user pricing failed', err?.message);
+      }
+    })();
+  }, [user?.id]);
 
   // Combined search and category filter effect
   useEffect(() => {

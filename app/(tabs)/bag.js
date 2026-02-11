@@ -308,16 +308,11 @@ export default function BagScreen() {
                 const isBundleItem = item?.fromBundle === true || item?.product?.fromBundle === true;
                 const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;
 
-                // "Build Your Set" bundle items: show waterfall (VIP + Bundle) matching website
+                // "Build Your Set" bundle items: bundle discount ONLY (no VIP)
                 if (isBundleItem && bundlePct > 0 && Number.isFinite(base) && base > 0) {
                   // Retail price = originalPrice stored when adding to cart
                   const retailPrice = (Number.isFinite(original) && original > base) ? original : base / (1 - bundlePct / 100);
-                  const userPct = Number(user?.discountPercentage) || 0;
-                  const hasVip = userPct > 0 && userPct < 100 && !isUserDiscountExcludedProduct(item.product);
-                  // Combined label: "50% + 20%" or just "20%"
-                  const discountLabel = hasVip
-                    ? `${userPct}% + ${bundlePct}%`
-                    : `${bundlePct}%`;
+                  const discountLabel = `${bundlePct}%`;
                   return (
                     <View style={styles.itemPriceContainer}>
                       <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>

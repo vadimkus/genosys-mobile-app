@@ -163,14 +163,11 @@ export default function BundleBuilderScreen() {
   const discountPercent = getDiscountForCount(itemCount);
   const nextTier = getNextTier(itemCount);
 
-  // Waterfall pricing matching website: retail → VIP discount → bundle discount
-  const retailTotal = selectedArray.reduce((sum, item) => sum + (item.product.originalPrice || item.product.price), 0);
-  const subtotal = selectedArray.reduce((sum, item) => sum + (item.product.displayPrice || item.product.price), 0);
-  const userDiscountAmount = Math.round((retailTotal - subtotal) * 100) / 100;
-  const hasUserDiscount = userDiscountAmount > 0.5; // threshold to avoid rounding noise
-  const discountAmount = Math.round((subtotal * discountPercent) / 100 * 100) / 100;
-  const total = Math.round((subtotal - discountAmount) * 100) / 100;
-  const totalSaved = Math.round((retailTotal - total) * 100) / 100;
+  // Bundle pricing: bundle discount ONLY on retail price — NO VIP/user discount stacking
+  const retailTotal = selectedArray.reduce((sum, item) => sum + (item.product.price), 0);
+  const discountAmount = Math.round((retailTotal * discountPercent) / 100 * 100) / 100;
+  const total = Math.round((retailTotal - discountAmount) * 100) / 100;
+  const totalSaved = discountAmount;
 
   const toggleProduct = (product, stepId) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -209,13 +206,11 @@ export default function BundleBuilderScreen() {
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    // Add each selected product to cart with bundle discount applied on top of user discount (waterfall)
-    // Matches website: VIP discount first → then bundle discount on the VIP-discounted price
+    // Add each selected product to cart with bundle discount ONLY (no VIP stacking)
     selectedArray.forEach(({ product }) => {
-      // Step 1: User's VIP-discounted price (displayPrice already includes VIP discount from API)
-      const vipPrice = product.displayPrice || product.price;
-      // Step 2: Apply bundle discount on top of VIP price
-      const finalPrice = Math.round(vipPrice * (1 - discountPercent / 100) * 100) / 100;
+      // Bundle discount applied to retail price only
+      const retailPrice = product.price;
+      const finalPrice = Math.round(retailPrice * (1 - discountPercent / 100) * 100) / 100;
 
       // Build a cart-compatible product object
       const cartProduct = {
@@ -224,7 +219,7 @@ export default function BundleBuilderScreen() {
         name: product.name,
         price: finalPrice,
         displayPrice: finalPrice,
-        originalPrice: product.originalPrice || product.price, // retail price for waterfall display
+        originalPrice: product.price, // retail price for reference
         image: product.image,
         category: product.category,
         size: product.size,
@@ -248,7 +243,7 @@ export default function BundleBuilderScreen() {
   // Render product card
   const renderProductCard = ({ item: product }) => {
     const selected = isSelected(product.id);
-    const hasUserDiscount = product.userDiscountPct > 0;
+    // No VIP discount shown in bundle builder — only retail price displayed
 
     return (
       <TouchableOpacity
@@ -280,14 +275,11 @@ export default function BundleBuilderScreen() {
           ) : null}
           {product.size ? <Text style={styles.productSize}>{product.size}</Text> : null}
 
-          {/* Price */}
+          {/* Price — retail only, no VIP in bundle builder */}
           {user ? (
             <View style={styles.priceRow}>
-              {hasUserDiscount && (
-                <Text style={styles.priceOriginal}>{Math.round(product.price)} AED</Text>
-              )}
-              <Text style={[styles.priceMain, hasUserDiscount && styles.priceDiscounted]}>
-                {Math.round(product.displayPrice || product.price)} AED
+              <Text style={styles.priceMain}>
+                {Math.round(product.price)} AED
               </Text>
             </View>
           ) : (
@@ -490,28 +482,14 @@ export default function BundleBuilderScreen() {
           <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
         </TouchableOpacity>
 
-        {/* Expanded pricing breakdown — waterfall matching website */}
+        {/* Expanded pricing breakdown — bundle discount only */}
         {footerExpanded && user && itemCount > 0 && (
           <View style={styles.footerPricing}>
-            {/* Retail Price (before any discounts) — only shown when discounts exist */}
-            {(hasUserDiscount || discountPercent > 0) && (
+            {/* Retail Price (before bundle discount) */}
+            {discountPercent > 0 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
                 <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{retailTotal.toFixed(2)} AED</Text>
-              </View>
-            )}
-            {/* VIP Discount */}
-            {hasUserDiscount && (
-              <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabelPurple}>{l('Your Discount', 'خصمك', 'Ваша скидка')} ({Math.round(Number(user?.discountPercentage) || 0)}%)</Text>
-                <Text style={styles.pricingValuePurple}>-{userDiscountAmount.toFixed(2)} AED</Text>
-              </View>
-            )}
-            {/* Subtotal (after VIP) */}
-            {hasUserDiscount && (
-              <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabel}>{l('Subtotal', 'المجموع الفرعي', 'Подытог')}</Text>
-                <Text style={styles.pricingValue}>{subtotal.toFixed(2)} AED</Text>
               </View>
             )}
             {/* Bundle Discount */}
@@ -627,28 +605,16 @@ export default function BundleBuilderScreen() {
               })}
             </ScrollView>
 
-            {/* Pricing breakdown — waterfall matching website */}
+            {/* Pricing breakdown — bundle discount only */}
             {user && (
               <View style={styles.summaryPricing}>
                 {/* Retail Price */}
-                {(hasUserDiscount || discountPercent > 0) && (
+                {discountPercent > 0 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
                     <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{retailTotal.toFixed(2)} AED</Text>
                   </View>
                 )}
-                {/* VIP Discount */}
-                {hasUserDiscount && (
-                  <View style={styles.pricingRow}>
-                    <Text style={styles.pricingLabelPurple}>{l('Your Discount', 'خصمك', 'Ваша скидка')} ({Math.round(Number(user?.discountPercentage) || 0)}%)</Text>
-                    <Text style={styles.pricingValuePurple}>-{userDiscountAmount.toFixed(2)} AED</Text>
-                  </View>
-                )}
-                {/* Subtotal (after VIP) */}
-                <View style={styles.pricingRow}>
-                  <Text style={styles.pricingLabel}>{l('Subtotal', 'المجموع الفرعي', 'Подытог')}</Text>
-                  <Text style={styles.pricingValue}>{subtotal.toFixed(2)} AED</Text>
-                </View>
                 {/* Bundle Discount */}
                 {discountPercent > 0 && (
                   <View style={styles.pricingRow}>
