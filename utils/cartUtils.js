@@ -282,7 +282,7 @@ export function computeWaterfallBreakdown(items, user) {
       _userDiscountPct = discountPct;
     }
 
-    // --- Bundle discount (waterfall step 2): applied on the VIP-discounted price ---
+    // --- Bundle discount (step 2): applied on retail price (VIP excluded for bundle items) ---
     if (beautyBox) {
       const bbOriginal = (Number.isFinite(productOriginal) && productOriginal > 0)
         ? productOriginal
