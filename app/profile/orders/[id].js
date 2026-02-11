@@ -525,13 +525,12 @@ export default function OrderDetailScreen() {
               let canShowDiscountBreakdown;
 
               if (isBundleItem && hasBundleOnOrder) {
-                // Bundle item: waterfall — VIP first, then bundle on top
-                // Stored price = retail × (1 - vipPct/100) × (1 - bundlePct/100)
-                // Reverse to get retail: price / (1 - bundlePct/100) / (1 - vipPct/100)
-                const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
-                const combinedFactor = (1 - vipPct / 100) * (1 - orderBundleDiscPct / 100);
-                inferredOriginalUnit = combinedFactor > 0 ? Math.round(price / combinedFactor * 100) / 100 : null;
-                discountPct = vipPct > 0 ? vipPct + orderBundleDiscPct : orderBundleDiscPct; // combined for display
+                // Bundle item: ONLY bundle discount on retail price (no VIP stacking)
+                // Stored price = retail × (1 - bundlePct/100)
+                // Reverse to get retail: price / (1 - bundlePct/100)
+                const bundleFactor = 1 - orderBundleDiscPct / 100;
+                inferredOriginalUnit = bundleFactor > 0 ? Math.round(price / bundleFactor * 100) / 100 : null;
+                discountPct = orderBundleDiscPct;
                 canShowDiscountBreakdown = !isPromoItem(it) && inferredOriginalUnit != null;
               } else {
                 // Regular item: use VIP discount
@@ -572,12 +571,7 @@ export default function OrderDetailScreen() {
                           <View style={[styles.discountPill, isBundleItem && { backgroundColor: '#F0FDF4' }]}>
                             <Text style={[styles.discountPillText, isBundleItem && { color: '#16a34a' }]}>
                               {isBundleItem
-                                ? (() => {
-                                    const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
-                                    return vipPct > 0
-                                      ? `${Math.round(vipPct)}% + ${Math.round(orderBundleDiscPct)}% Bundle`
-                                      : `${Math.round(orderBundleDiscPct)}% Bundle`;
-                                  })()
+                                ? `${Math.round(orderBundleDiscPct)}% Bundle`
                                 : `${Math.round(discountPct)}%`}
                             </Text>
                           </View>
@@ -614,21 +608,11 @@ export default function OrderDetailScreen() {
                         </View>
                         <View style={styles.itemPriceRow}>
                           <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>
-                            {(() => {
-                              if (!isBundleItem) return t('ordersDetail.discount');
-                              const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
-                              return vipPct > 0
-                                ? `${t('ordersDetail.discount')} + ${t('ordersDetail.bundleDiscount') || 'Bundle Discount'}`
-                                : (t('ordersDetail.bundleDiscount') || 'Bundle Discount');
-                            })()}
+                            {isBundleItem
+                              ? (t('ordersDetail.bundleDiscount') || 'Bundle Discount')
+                              : t('ordersDetail.discount')}
                             {Number.isFinite(discountPct) ? (
-                              <Text style={[styles.discountPctText, isRTL && styles.valueLTR]}> {(() => {
-                                if (!isBundleItem) return `(${Math.round(discountPct)}%)`;
-                                const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
-                                return vipPct > 0
-                                  ? `(${Math.round(vipPct)}% + ${Math.round(orderBundleDiscPct)}%)`
-                                  : `(${Math.round(orderBundleDiscPct)}%)`;
-                              })()}</Text>
+                              <Text style={[styles.discountPctText, isRTL && styles.valueLTR]}> ({Math.round(discountPct)}%)</Text>
                             ) : null}
                           </Text>
                           <Text style={[styles.itemPriceValue, styles.discountValue, isRTL && styles.valueLTR]}>-AED {formatAED(discountUnit)}</Text>

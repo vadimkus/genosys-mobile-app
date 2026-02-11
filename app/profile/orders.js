@@ -543,10 +543,22 @@ export default function OrdersScreen() {
                           String(size || '').trim() === '__PROMO__' ||
                           Number(price) === 0;
                         const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
+                        // Detect bundle items — bundle discount is mutually exclusive with VIP per item
+                        const orderBundleDiscPct = Number(o?.bundleDiscountPercentage);
+                        const orderBundleDiscAmt = Number(o?.bundleDiscountAmount);
+                        const hasBundleOnOrder = Number.isFinite(orderBundleDiscPct) && orderBundleDiscPct > 0 && Number.isFinite(orderBundleDiscAmt) && orderBundleDiscAmt > 0;
+                        const itemFromBundle = it?.fromBundle === true;
+                        const isBundleItem = itemFromBundle || (hasBundleOnOrder && !excludedFromUserDiscount);
+
+                        // For bundle items use bundle discount; for regular items use VIP discount
+                        const effectiveDiscountPct = isBundleItem && hasBundleOnOrder ? orderBundleDiscPct : discountPct;
                         const originalUnit = (!isPromo && !excludedFromUserDiscount)
-                          ? inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct })
+                          ? inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct: effectiveDiscountPct })
                           : null;
                         const showDiscount = originalUnit != null;
+                        const discountLabel = isBundleItem && hasBundleOnOrder
+                          ? `${Math.round(orderBundleDiscPct)}% Bundle`
+                          : (Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : '');
                         return (
                           <View
                             key={`${String(it?.productId || it?.id || name)}-${idx}`}
@@ -560,7 +572,7 @@ export default function OrdersScreen() {
                             ) : showDiscount ? (
                               <Text style={[styles.orderSummaryLineMuted, isRTL && styles.textRTLRight]}>
                                 {t('ordersDetail.fullPrice')}: <Text style={[styles.orderSummaryPriceStrike, isRTL && styles.valueLTR]}>AED {formatAED(originalUnit)}</Text>{' '}
-                                • {t('ordersDetail.discount')}: {Number.isFinite(discountPct) ? `${Math.round(discountPct)}%` : ''}{' '}
+                                • {t('ordersDetail.discount')}: {discountLabel}{' '}
                                 • {t('ordersDetail.priceAfterDiscount')}: <Text style={[styles.orderSummaryPriceFinal, isRTL && styles.valueLTR]}>AED {formatAED(price)}</Text>
                               </Text>
                             ) : (
