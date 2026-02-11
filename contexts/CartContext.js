@@ -359,7 +359,12 @@ export const CartProvider = ({ children }) => {
 
     // Ensure special products are stored in cart with canonical pricing fields
     // (so UI + order payloads stay consistent).
+    const isBundleAdd = itemMeta?.fromBundle === true;
     const normalizedProduct = (() => {
+      // Bundle items already have correct pricing from the bundle builder —
+      // skip variant/discount inference to avoid inflating originalPrice.
+      if (isBundleAdd) return product;
+
       // If a size variant is selected and the product includes variant pricing, store the selected variant price
       // as the product unit price in the cart item.
       if (normalizedSize && Array.isArray(product?.variants) && product.variants.length > 0) {
