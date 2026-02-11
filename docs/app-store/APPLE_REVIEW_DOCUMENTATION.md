@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
-**Version:** 1.3.0  
-**Build:** 53  
+**Version:** 1.4.0  
+**Build:** 58  
 **Platform:** iOS  
 
 ---
@@ -14,35 +14,60 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.3.0
+## What's New in Version 1.4.0
 
-### AI Skin Analysis (Enhanced)
-- **AI Expert Analysis** - Take a selfie and receive instant AI-powered skin assessment using GPT-4 Vision
-- **Health Score** - Get a 1-10 skin health rating with visual indicator
-- **Personalized Routine** - Receive custom AM/PM skincare routines based on your analysis
-- **Product Recommendations** - AI suggests specific products with personalized reasons
-- **Tips** - Get customized skincare tips for your skin type and concerns
-- **Quiz Mode** - 4-step questionnaire with API-driven product recommendations
+### Pricing & Discount Logic Overhaul
+- **Mutually Exclusive Discounts** — Bundle discounts and VIP discounts no longer stack. Bundle items receive only the bundle discount on retail price; regular items receive only the VIP discount on retail price.
+- **Consistent Cross-Platform Pricing** — All pricing calculations are now fully aligned between the website and native app across cart, checkout, order details, and email confirmations.
+- **Corrected Order History** — Order detail screens now display accurate per-item discounts (bundle items show only "Bundle Discount", VIP items show only their VIP percentage).
 
-### Build Your Set (New)
-- **Native Bundle Builder** - Create your perfect skincare routine in-app
-- **8-Step Process** - Select products across Cleanse, Tone, Serum, Eye Care, Cream, Mask, Sun Care, Special Care
-- **Tiered Discounts** - 5% off 2 items, 10% off 3, 15% off 4, up to 20% off 5+ items
-- **Visual Summary** - See your bundle with product images, sizes, and total savings
+### Checkout Improvements
+- **Auto-Populate Delivery Address** — Saved addresses are now automatically populated in the checkout form, eliminating the need to re-enter delivery details for returning customers.
+- **Checkout Footer Summary** — The checkout screen now displays a total summary in the footer, including item count, total price, and shipping information (e.g., "Free shipping" or "Incl. shipping 45 AED").
 
-### Native Blog (New)
-- **In-App Reading** - Read skincare articles directly in the app
-- **Comments** - Leave comments on articles (requires login)
-- **Localized Content** - Articles available in English, Arabic, and Russian
+### Localization & Translation
+- **Fully Translated UI** — 26+ previously hardcoded English strings in the AI Skin Analysis camera and WebView screens are now translated into Arabic and Russian.
+- **New Translation Keys** — Added missing keys for checkout footer, shipping info, skin camera UI, and error messages.
+- **Complete 3-Language Coverage** — All 1,355+ translation keys verified across English, Arabic, and Russian with zero missing keys.
 
-### Push Notifications (New)
-- **Order Updates** - Receive notifications when order status changes
-- **Beautiful Alerts** - In-app notification banners with order details
+### Bug Fixes
+- **Bundle Item Pricing in Cart** — Fixed an issue where adding items from "Build Your Set" could show inflated retail prices due to variant size auto-selection.
+- **Product Price Refresh on Login** — The shop page now re-fetches products when a user logs in, ensuring VIP discounts appear immediately without requiring a manual refresh.
+- **Keyboard Behavior on Android** — Fixed `KeyboardAvoidingView` behavior for chat, address form, and blog comment screens on Android.
+- **Card Shadows on Android** — Added proper elevation values for cards that were missing shadows on Android.
 
-### Performance & Stability
-- **Faster Startup** - Improved app initialization
-- **Enhanced Stability** - Better error handling throughout
-- **Smoother Navigation** - Native screens replace WebView wrappers
+### Stability & Performance
+- **Safe Import for Apple Authentication** — Apple Sign-In module now uses safe loading to prevent potential issues.
+- **Notification Badge Clearing** — App badge count now clears automatically when the app is opened or brought to foreground.
+
+---
+
+## What's New in Previous Versions
+
+### Version 1.3.0 (Build 53)
+
+#### AI Skin Analysis
+- **AI Expert Analysis** — Take a selfie and receive instant AI-powered skin assessment using GPT-4 Vision
+- **Health Score** — Get a 1-10 skin health rating with visual indicator
+- **Personalized Routine** — Receive custom AM/PM skincare routines based on your analysis
+- **Product Recommendations** — AI suggests specific products with personalized reasons
+- **Tips** — Get customized skincare tips for your skin type and concerns
+- **Quiz Mode** — 4-step questionnaire with API-driven product recommendations
+
+#### Build Your Set
+- **Native Bundle Builder** — Create your perfect skincare routine in-app
+- **8-Step Process** — Select products across Cleanse, Tone, Serum, Eye Care, Cream, Mask, Sun Care, Special Care
+- **Tiered Discounts** — 5% off 2 items, 10% off 3, 15% off 4, up to 20% off 5+ items
+- **Visual Summary** — See your bundle with product images, sizes, and total savings
+
+#### Native Blog
+- **In-App Reading** — Read skincare articles directly in the app
+- **Comments** — Leave comments on articles (requires login)
+- **Localized Content** — Articles available in English, Arabic, and Russian
+
+#### Push Notifications
+- **Order Updates** — Receive notifications when order status changes
+- **Beautiful Alerts** — In-app notification banners with order details
 
 ---
 
@@ -55,11 +80,13 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 This account is pre-created and ready to use. No email verification required.
 
+**Note:** This test account has a 50% VIP discount applied, which will be visible on regular (non-bundle) product prices. Bundle items will show only their tiered bundle discount.
+
 ---
 
 ## Testing Instructions
 
-### Quick Test Flow (8-10 minutes)
+### Quick Test Flow (10-12 minutes)
 
 #### 1. Login
 - Open app > Tap "Sign In"
@@ -67,8 +94,23 @@ This account is pre-created and ready to use. No email verification required.
 - Enter password: `GenosysReview2026!`
 - Tap "Sign In"
 
-#### 2. AI Skin Analysis (New Feature)
-- Open hamburger menu (top-left) > Tap "AI Skin Analysis"
+#### 2. Verify VIP Pricing (New in 1.4.0)
+- After login, browse the Shop tab
+- Products should display discounted prices with the VIP discount applied
+- Discount badges should appear on product cards (e.g., "-50%")
+
+#### 3. Build Your Set (Updated in 1.4.0)
+- Open hamburger menu (top-left) > Tap "Build Your Set"
+- Select products for each skincare step (swipe through steps at top)
+- **Note:** Products display at retail price (no VIP discount in bundle builder)
+- Watch discount increase as you add items (5% → 10% → 15% → 20%)
+- Tap center to view "Your Bundle" summary
+- Swipe footer up to see pricing breakdown showing only bundle discount
+- Tap "Add to Bag" to add entire set to cart
+- **Verify in Bag:** Bundle items should show only the bundle discount (not VIP + bundle stacked)
+
+#### 4. AI Skin Analysis
+- Open hamburger menu > Tap "AI Skin Analysis"
 - **Option A - AI Camera Analysis:**
   - Tap "AI Camera" button
   - Allow camera access
@@ -77,31 +119,24 @@ This account is pre-created and ready to use. No email verification required.
   - Wait for AI analysis (5-10 seconds)
   - View results: Health Score, Skin Type, Concerns, Product Recommendations with prices, AM/PM Routine, Tips
   - Tap "Add to Bag" on recommended products
+  - **Note (1.4.0):** All camera UI labels are now translated when using Arabic or Russian
 - **Option B - Quiz Mode:**
   - Tap "Start Quiz"
   - Answer 4 questions (Skin Type, Age Group, Concerns, Usage)
   - View personalized product recommendations
 
-#### 3. Build Your Set (New Feature)
-- Open hamburger menu > Tap "Build Your Set"
-- Select products for each skincare step (swipe through steps at top)
-- Watch discount increase as you add items (5% → 10% → 15% → 20%)
-- Tap center to view "Your Bundle" summary
-- Swipe footer up to see pricing breakdown
-- Tap "Add to Bag" to add entire set to cart
-
-#### 4. Native Blog (New Feature)
+#### 5. Native Blog
 - Open hamburger menu > Tap "Blog"
 - Browse article list
 - Tap any article to read full content
 - Scroll down to leave a comment (logged-in users)
 
-#### 5. Browse Products
+#### 6. Browse Products
 - Shop tab > Scroll through product catalog
 - Products display with images, prices, discount badges
 - Use search bar or category filters to find products
 
-#### 6. Product Detail Page
+#### 7. Product Detail Page
 - Tap any product to view details
 - **Swipe images** left/right to see gallery
 - **Watch video** on products like SNOW O2 Cleanser (scroll down)
@@ -109,10 +144,12 @@ This account is pre-created and ready to use. No email verification required.
 - Select size variant if applicable
 - Tap "Add to Bag"
 
-#### 7. Checkout Process
+#### 8. Checkout Process (Updated in 1.4.0)
 - Go to Bag tab > Review items (including any bundle items)
 - Tap "Proceed to Checkout"
-- Fill in delivery details:
+- **Verify (1.4.0):** Delivery address form should auto-populate with saved address if available
+- **Verify (1.4.0):** Footer shows total summary with item count and shipping info
+- Fill in or verify delivery details:
   - Name: App Review
   - Phone: +971 50 123 4567
   - Address: Test Address, Dubai
@@ -122,15 +159,19 @@ This account is pre-created and ready to use. No email verification required.
   - **Card Payment:** Uses Stripe test card `4242 4242 4242 4242` (any future date, any CVC)
 - Order confirmation displayed on success page
 
-#### 8. Order History
+#### 9. Order History (Updated in 1.4.0)
 - Profile tab > Orders
 - View past orders with status
 - Tap order for full details with item breakdown
+- **Verify (1.4.0):** Bundle items show only "Bundle Discount (X%)" — not stacked with VIP
+- **Verify (1.4.0):** Regular items show only VIP discount percentage
 
-#### 9. Language Switching
+#### 10. Language Switching
 - Profile tab > Language
 - Switch between English, Arabic (RTL), Russian
 - App UI updates immediately
+- **Verify (1.4.0):** AI Skin Analysis camera screen is fully translated
+- **Verify (1.4.0):** WebView screens show translated UI elements
 
 ---
 
@@ -200,19 +241,25 @@ This account is pre-created and ready to use. No email verification required.
 - Dubai: 45 AED, Other Emirates: 70 AED
 - Free delivery for orders over 1,000 AED
 
-### 4. Bundle Discounts (New)
+### 4. Bundle Discounts
 - Build Your Set feature offers tiered discounts:
   - 2 items: 5% off
   - 3 items: 10% off
   - 4 items: 15% off
   - 5+ items: 20% off
 - Discounts applied automatically when bundle is added to cart
+- **Bundle discounts and VIP discounts are mutually exclusive** — bundle items receive only the bundle discount on retail price
 
-### 5. Real Product Data
+### 5. VIP Discounts
+- The test account (`appreview@genosys.ae`) has a 50% VIP discount
+- VIP discount is applied to regular (non-bundle) products only
+- Discount badges and strikethrough pricing are shown on product cards and in cart
+
+### 6. Real Product Data
 - Products, prices, and availability are real
 - Orders created during testing can be identified and cancelled by our team
 
-### 6. AI Features
+### 7. AI Features
 - AI Skin Analysis uses GPT-4 Vision for camera analysis
 - Quiz mode uses our recommendation API with scoring algorithm
 - AI Chatbot is powered by a language model trained on our product catalog
@@ -225,7 +272,7 @@ This account is pre-created and ready to use. No email verification required.
 ### Supported Languages
 | Language | Direction | Coverage |
 |----------|-----------|----------|
-| English | LTR | Full |
+| English | LTR | Full (1,355+ keys) |
 | Arabic | RTL | Full (including layout mirroring) |
 | Russian | LTR | Full |
 
@@ -234,6 +281,7 @@ This account is pre-created and ready to use. No email verification required.
 2. Select language
 3. Entire app UI updates immediately
 4. Arabic mode mirrors all layouts to right-to-left
+5. All screens including AI Skin Analysis camera, WebView, and checkout are fully translated
 
 ---
 
@@ -263,12 +311,23 @@ This account is pre-created and ready to use. No email verification required.
 
 ---
 
+## Version History
+
+| Version | Build | Key Changes |
+|---------|-------|-------------|
+| 1.4.0 | 58 | Mutually exclusive discounts, auto-populate address, checkout footer, full translation coverage, bundle pricing fixes |
+| 1.3.1 | 56 | Bundle discount alignment, Stripe/Apple Pay bundle processing |
+| 1.3.0 | 53 | AI Skin Analysis, Build Your Set, Native Blog, Push Notifications |
+| 1.2.0 | — | Blog reading, chatbot improvements |
+
+---
+
 ## Review Checklist
 
 ### Core Functionality
 - [x] App launches without crashes
 - [x] Login with test account works
-- [x] Products display correctly with images
+- [x] Products display correctly with images and VIP pricing
 - [x] Image gallery swipe works
 - [x] Product videos play
 - [x] Product documentation downloads
@@ -278,7 +337,18 @@ This account is pre-created and ready to use. No email verification required.
 - [x] User profile management works
 - [x] Order history displays
 
-### New v1.3.0 Features
+### v1.4.0 Features
+- [x] VIP discount shows on regular products after login
+- [x] Bundle builder shows only bundle discount (no VIP)
+- [x] Bundle items in cart show only bundle discount badge
+- [x] Order details show correct per-item discount (bundle OR VIP)
+- [x] Checkout auto-populates saved delivery address
+- [x] Checkout footer shows total summary with shipping info
+- [x] AI Skin Analysis camera screen fully translated (AR/RU)
+- [x] WebView screens fully translated (AR/RU)
+- [x] Product prices refresh when user logs in
+
+### v1.3.0 Features
 - [x] AI Camera Analysis completes with results
 - [x] AI Skin Analysis quiz completes
 - [x] Build Your Set bundle builder works
@@ -296,6 +366,7 @@ This account is pre-created and ready to use. No email verification required.
 - [x] Terms accessible
 - [x] No broken links or errors
 - [x] Haptic feedback on actions
+- [x] Notification badge clears on app open
 
 ---
 
