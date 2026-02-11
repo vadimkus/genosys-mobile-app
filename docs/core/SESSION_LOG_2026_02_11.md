@@ -671,4 +671,154 @@ return fallback
 
 ---
 
+## 10. VIP + Bundle Discount Stacking Fix — Email Templates & Order Screens
+
+### Problem Identified
+
+After the earlier waterfall discount alignment, we discovered that **VIP and Bundle discounts should be mutually exclusive per item** (not stacked). The new business rule is:
+
+- **Bundle items** (from "Build Your Set"): Get **only** the bundle discount on retail price
+- **Regular items**: Get **only** the VIP discount on retail price
+- **No stacking** of VIP + Bundle for any item
+
+However, several places in the codebase were still showing stacked discounts:
+
+### Fixes Applied
+
+#### Fix 1: Email Templates (Customer Order Confirmation)
+
+**File:** `cosmetics-website/lib/email/htmlGenerators.ts`
+
+**Before:**
+```javascript
+// Per-item original price reverse-calculation — stacked both discounts
+if (hasUserDiscount) {
+  originalPrice = originalPrice / (1 - userDiscountPct / 100)
+}
+if (hasBundleDiscount) {
+  originalPrice = originalPrice / (1 - bundleDiscountPct / 100)
+}
+
+// Badges — showed BOTH badges on every item
+if (hasUserDiscount) { badges.push(`-${userDiscountPct}% VIP`) }
+if (hasBundleDiscount) { badges.push(`-${bundleDiscountPct}% Bundle`) }
+```
+
+**After:**
+```javascript
+// Per-item: mutually exclusive — use bundle OR VIP, not both
+if (hasBundleDiscount) {
+  originalPrice = originalPrice / (1 - bundleDiscountPct / 100)
+  showDiscount = true
+} else if (hasUserDiscount) {
+  originalPrice = originalPrice / (1 - userDiscountPct / 100)
+  showDiscount = true
+}
+
+// Badges — show ONLY one badge per item
+if (hasBundleDiscount) {
+  badges.push(`-${bundleDiscountPct}% Bundle`)
+} else if (hasUserDiscount) {
+  badges.push(`-${userDiscountPct}% VIP`)
+}
+```
+
+Also removed unused `hasAnyDiscount` variable.
+
+#### Fix 2: Email Templates (Admin Order Confirmation)
+
+**File:** `cosmetics-website/lib/email/templates.ts`
+
+Same changes as `htmlGenerators.ts`:
+- Per-item original price: apply EITHER bundle OR VIP discount (mutually exclusive)
+- Badges: show ONLY one discount badge per item
+- Removed unused `hasAnyDiscount` variable
+
+#### Fix 3: Native App Order Detail Screen
+
+**File:** `genosys-mobile-app/app/profile/orders/[id].js`
+
+**Before:**
+```javascript
+// Bundle items: waterfall VIP + bundle (WRONG)
+const vipPct = orderDiscountPct > 0 ? orderDiscountPct : 0
+const combinedFactor = (1 - vipPct / 100) * (1 - orderBundleDiscPct / 100)
+inferredOriginalUnit = price / combinedFactor
+discountPct = vipPct + orderBundleDiscPct // Combined display
+
+// Badge showed "50% + 20% Bundle"
+// Label showed "Discount + Bundle Discount (50% + 20%)"
+```
+
+**After:**
+```javascript
+// Bundle items: ONLY bundle discount on retail (correct)
+const bundleFactor = 1 - orderBundleDiscPct / 100
+inferredOriginalUnit = price / bundleFactor
+discountPct = orderBundleDiscPct
+
+// Badge shows only "20% Bundle"
+// Label shows only "Bundle Discount (20%)"
+```
+
+#### Fix 4: Native App Orders List (Expanded Summary)
+
+**File:** `genosys-mobile-app/app/profile/orders.js`
+
+**Before:**
+```javascript
+// Used VIP discount for ALL items, even bundle items
+const originalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct })
+// Label: "{discountPct}%"
+```
+
+**After:**
+```javascript
+// Detect bundle items and use appropriate discount
+const isBundleItem = itemFromBundle || (hasBundleOnOrder && !excludedFromUserDiscount)
+const effectiveDiscountPct = isBundleItem ? orderBundleDiscPct : discountPct
+const originalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct: effectiveDiscountPct })
+// Label: "20% Bundle" for bundle items, "50%" for VIP items
+```
+
+### Business Rule Summary
+
+| Item Type | Discount Applied | Retail Price Calculation |
+|-----------|-----------------|--------------------------|
+| Bundle item (from Build Your Set) | Bundle discount ONLY | `price / (1 - bundlePct/100)` |
+| Regular item (VIP user) | VIP discount ONLY | `price / (1 - vipPct/100)` |
+| Excluded items (Beauty Box, Hydro Cool Mask, Devices) | No discount | N/A (price = retail) |
+| Promo/Free items | No discount | N/A (price = 0) |
+
+### Waterfall Summary (Unchanged)
+
+The order-level waterfall summary sections (Retail Total → VIP Discount → Bundle Discount → Net Subtotal) remain unchanged because they use **pre-computed server-side amounts** stored with the order. These amounts are already calculated correctly by the server.
+
+### Files Changed
+
+| File | Repository | Change |
+|------|------------|--------|
+| `lib/email/htmlGenerators.ts` | cosmetics-website | Per-item: bundle OR VIP (not both) |
+| `lib/email/templates.ts` | cosmetics-website | Per-item: bundle OR VIP (not both) |
+| `app/profile/orders/[id].js` | genosys-mobile-app | Bundle items use only bundle discount |
+| `app/profile/orders.js` | genosys-mobile-app | Bundle items use only bundle discount |
+
+### Commits
+
+| Repository | Commit | Message |
+|------------|--------|---------|
+| cosmetics-website | `d0036024` | fix: email templates no longer stack VIP+Bundle discounts per item |
+| genosys-mobile-app | `748ce3e` | fix: order detail + order list no longer stack VIP+Bundle discounts |
+
+### Testing
+
+- [ ] Place order with bundle items → verify customer email shows only "Bundle" badge per item
+- [ ] Verify admin notification email shows only one discount badge per item
+- [ ] Open order in native app Orders tab → expand order → verify bundle items show "X% Bundle" label
+- [ ] Open order detail screen → verify bundle items show only "Bundle Discount (X%)"
+- [ ] Verify VIP-only orders (no bundle) still show VIP badges correctly
+- [ ] Verify strikethrough prices are correct (not inflated by stacked discount calculation)
+
+---
+
 *Session: February 11, 2026*
