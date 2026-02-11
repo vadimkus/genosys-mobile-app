@@ -615,4 +615,60 @@ Full comparison of all business logic between the website (cosmetics-website) an
 
 ---
 
+## 6. Website Deployment Fixes
+
+### TypeScript Build Errors (Vercel)
+
+The website deployment to Vercel failed due to TypeScript strict mode errors. Fixed in commit `d0341fc9`:
+
+| File | Error | Fix |
+|------|-------|-----|
+| `app/actions/profile.ts:23` | Unused `AddressInput` import | Removed |
+| `app/actions/profile.ts:117` | `label` could be `undefined` (Prisma expects `string \| null`) | Added `?? null` |
+| `components/header/MobileWebHeader.tsx:141` | `e.touches[0]` possibly undefined | Added optional chaining |
+| `lib/jwt.ts:4` | Unused `ENV_DATABASE_URL` import | Removed |
+| `lib/cartStore.ts:190` | Invalid type cast for promo item filter | Removed no-op filter |
+
+### CRITICAL: JWT Authentication Bug
+
+**Symptom**: After deploying bundle discount fixes, Google login on production appeared to work but users remained logged out.
+
+**Root Cause**: The `fb5d1f52` commit changed `lib/jwt.ts` to use `Date.now()` in the production JWT fallback:
+
+```javascript
+// BROKEN — different secret every millisecond
+return `insecure-fallback-${Date.now()}`
+```
+
+This meant:
+1. Token signed at login with secret `insecure-fallback-1739295000000`
+2. Token verified on next request with `insecure-fallback-1739295000001`
+3. Verification fails → user appears logged out
+
+**Fix** (commit `c7fcf9da`): Restored deterministic fallback derived from `DATABASE_URL`:
+
+```javascript
+const dbUrl = process.env.DATABASE_URL
+const fallback = dbUrl 
+  ? `fallback-${Buffer.from(dbUrl).toString('base64').slice(0, 32)}`
+  : 'fallback-secret-for-development-only'
+return fallback
+```
+
+**Permanent Solution**: Added `JWT_SECRET` environment variable:
+- Vercel dashboard: ✅ (64-character secure random string)
+- Local `.env.local`: ✅
+
+---
+
+## Website Commits (This Session)
+
+| Commit | Message |
+|--------|---------|
+| `fb5d1f52` | feat: align bundle discount logic across all mobile API routes |
+| `d0341fc9` | fix: resolve TypeScript build errors for Vercel deployment |
+| `c7fcf9da` | fix: restore deterministic JWT fallback — fixes Google login on production |
+
+---
+
 *Session: February 11, 2026*
