@@ -223,7 +223,7 @@ export default function BundleBuilderScreen() {
         image: product.image,
         category: product.category,
         size: product.size,
-        variants: product.variants || [],
+        variants: [],  // no variant pricing in bundle — prices are pre-calculated
         inStock: true,
         fromBundle: true,
         bundleDiscountPercent: discountPercent,

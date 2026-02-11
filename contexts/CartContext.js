@@ -355,11 +355,10 @@ export const CartProvider = ({ children }) => {
     if (product?.isPriceOnRequest) return;
 
     const normalizedColor = selectedColor || '';
-    const normalizedSize = normalizeSizeKey(product, selectedSize);
-
-    // Ensure special products are stored in cart with canonical pricing fields
-    // (so UI + order payloads stay consistent).
     const isBundleAdd = itemMeta?.fromBundle === true;
+    // Bundle items already have correct pricing — don't auto-pick a variant size
+    // (which would cause the bag to read variant prices instead of bundle prices).
+    const normalizedSize = isBundleAdd ? '' : normalizeSizeKey(product, selectedSize);
     const normalizedProduct = (() => {
       // Bundle items already have correct pricing from the bundle builder —
       // skip variant/discount inference to avoid inflating originalPrice.
