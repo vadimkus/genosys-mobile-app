@@ -267,7 +267,9 @@
     "youSaved": "وفرت",
     "items": "منتجات",
     "item": "منتج",
-    "freeMasks": "هدايا مجانية"
+    "freeMasks": "هدايا مجانية",
+    "inclShipping": "شامل التوصيل",
+    "freeShipping": "توصيل مجاني"
   },
   "applePay": {
     "applePay": "Apple Pay",

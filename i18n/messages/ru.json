@@ -267,7 +267,9 @@
     "youSaved": "Вы сэкономили",
     "items": "товаров",
     "item": "товар",
-    "freeMasks": "бесплатных масок"
+    "freeMasks": "бесплатных масок",
+    "inclShipping": "Вкл. доставку",
+    "freeShipping": "Бесплатная доставка"
   },
   "applePay": {
     "applePay": "Apple Pay",

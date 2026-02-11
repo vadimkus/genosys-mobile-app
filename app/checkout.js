@@ -216,6 +216,18 @@ export default function CheckoutScreen() {
     }, [loadSavedAddresses])
   );
 
+  // Auto-populate the default saved address (or the only saved address) into the form
+  useEffect(() => {
+    if (userPickedSavedAddressRef.current) return;          // user already picked manually
+    if (!savedAddresses || savedAddresses.length === 0) return;
+
+    const defaultAddr = savedAddresses.find(a => a.isDefault === true)
+                     || (savedAddresses.length === 1 ? savedAddresses[0] : null);
+    if (defaultAddr) {
+      applySavedAddress(defaultAddr);
+    }
+  }, [savedAddresses, applySavedAddress]);
+
   const getSavedTypeLabel = useCallback((typeRaw) => {
     const k = String(typeRaw || '').trim().toLowerCase();
     if (k === 'work') return t('addAddress.typeWork');
@@ -708,25 +720,44 @@ export default function CheckoutScreen() {
           </View>
         }
         action={
-          <TouchableOpacity
-            style={[
-              styles.placeOrderButton,
-              footerCollapsed && styles.placeOrderButtonCollapsed,
-              isProcessing && styles.placeOrderButtonDisabled,
-              isRTL && styles.placeOrderButtonRTL,
-            ]}
-            onPress={handleSubmit}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <ActivityIndicator color="#ffffff" size="small" />
-            ) : (
-              <Ionicons name="bag-check" size={20} color="#ffffff" />
+          <View>
+            {/* Order total summary above Place Order button */}
+            <View style={[styles.footerTotalRow, isRTL && { flexDirection: 'row-reverse' }]}>
+              <Text style={styles.footerTotalLabel}>
+                {t('checkout.total') || 'Total'} ({items.filter(i => !(i?.isPromotionItem || String(i?.selectedSize || '').trim() === '__PROMO__')).reduce((s, i) => s + (i.quantity || 1), 0)} {items.length === 1 ? (t('checkout.item') || 'item') : (t('checkout.items') || 'items')})
+              </Text>
+              <Text style={styles.footerTotalValue}>{safeTotal.toFixed(2)} AED</Text>
+            </View>
+            {safeShipping > 0 && (
+              <Text style={styles.footerShippingNote}>
+                {t('checkout.inclShipping') || 'Incl. shipping'} {safeShipping.toFixed(2)} AED
+              </Text>
             )}
-            <Text style={[styles.placeOrderButtonText, isRTL && styles.placeOrderButtonTextRTL]}>
-              {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
-            </Text>
-          </TouchableOpacity>
+            {safeShipping === 0 && safeTotal > 0 && (
+              <Text style={[styles.footerShippingNote, { color: '#16A34A' }]}>
+                {t('checkout.freeShipping') || 'Free shipping'}
+              </Text>
+            )}
+            <TouchableOpacity
+              style={[
+                styles.placeOrderButton,
+                footerCollapsed && styles.placeOrderButtonCollapsed,
+                isProcessing && styles.placeOrderButtonDisabled,
+                isRTL && styles.placeOrderButtonRTL,
+              ]}
+              onPress={handleSubmit}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Ionicons name="bag-check" size={20} color="#ffffff" />
+              )}
+              <Text style={[styles.placeOrderButtonText, isRTL && styles.placeOrderButtonTextRTL]}>
+                {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         }
       />
     </SafeAreaView>
@@ -1537,6 +1568,29 @@ const styles = StyleSheet.create({
   },
   placeOrderButtonCollapsed: {
     // No extra margin when collapsed
+  },
+  footerTotalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    marginBottom: 4,
+  },
+  footerTotalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  footerTotalValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  footerShippingNote: {
+    fontSize: 11,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginBottom: 8,
   },
   reviewRow: {
     paddingBottom: 10,

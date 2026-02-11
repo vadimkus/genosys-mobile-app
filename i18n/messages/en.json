@@ -267,7 +267,9 @@
     "youSaved": "You saved",
     "items": "items",
     "item": "item",
-    "freeMasks": "free masks"
+    "freeMasks": "free masks",
+    "inclShipping": "Incl. shipping",
+    "freeShipping": "Free shipping"
   },
   "applePay": {
     "applePay": "Apple Pay",
