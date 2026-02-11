@@ -821,4 +821,189 @@ The order-level waterfall summary sections (Retail Total → VIP Discount → Bu
 
 ---
 
+## 11. Comprehensive Cross-Platform Pricing Audit
+
+### Audit Scope
+
+Full automated audit of 30+ files across both repositories to verify pricing logic, discount calculations, and order flow consistency.
+
+### Files Audited
+
+**Website (`cosmetics-website`) — 20 files:**
+
+| Area | Files | Status |
+|------|-------|--------|
+| Discount logic | `cartStore.ts`, `pricingEngine.ts`, `discountUtils.ts`, `bundleStore.ts`, `bundleOptimization.ts`, `products.ts`, `orderStorageDb.ts` | PASS |
+| Checkout APIs | `api/checkout/route.ts`, `api/mobile/checkout/stripe/route.ts`, `api/mobile/orders/route.ts`, `api/mobile/payments/applepay/intent/route.ts`, `api/orders/support-link/route.ts`, `api/orders/cod-confirmation/route.ts`, `api/mobile/bundle-builder/route.ts`, `api/stripe/create-payment-intent/route.ts` | PASS |
+| UI Components | `BundleBuilderClient.tsx`, `CheckoutClient.tsx`, `CartItem.tsx`, `SuccessClient.tsx` | PASS |
+| Email - Customer | `lib/email/htmlGenerators.ts` | PASS |
+| Email - Admin | `lib/email/templates.ts` | **1 bug found & fixed** |
+
+**Native App (`genosys-mobile-app`) — 8 files:**
+
+| Area | Files | Status |
+|------|-------|--------|
+| Cart logic | `cartUtils.js`, `CartContext.js` | PASS |
+| Bundle builder | `bundle-builder.js` | PASS |
+| Bag display | `bag.js` | PASS |
+| Checkout + order | `checkout.js`, `orderService.js` | PASS |
+| Order display | `orders.js`, `orders/[id].js` | PASS |
+
+### Cross-Platform Consistency Verified
+
+| Check | Website | Native App | Match? |
+|-------|---------|------------|--------|
+| Discount tiers | 2=5%, 3=10%, 4=15%, 5=20% | 2=5%, 3=10%, 4=15%, 5=20% | YES |
+| Shipping (Dubai) | 45 AED | 45 AED | YES |
+| Shipping (other) | 70 AED | 70 AED | YES |
+| Free shipping | >= 1000 AED | >= 1000 AED | YES |
+| VAT | 5% inclusive | 5% inclusive | YES |
+| Promo masks | 500=1, 700=2 | 500=1, 700=2 | YES |
+| VIP/Bundle rule | Mutually exclusive | Mutually exclusive | YES |
+
+### Bugs Found & Fixed
+
+**1. Admin email template — 2nd rich section** (`lib/email/templates.ts` ~line 1247)
+
+The admin email had a **second** per-item section (rich HTML template) that was still stacking VIP+Bundle discounts:
+
+```typescript
+// BEFORE (wrong — sequential stacking)
+if (hasUserDiscount) originalPrice = originalPrice / (1 - userDiscountPct / 100)
+if (hasBundleDiscount) originalPrice = originalPrice / (1 - bundleDiscountPct / 100)
+
+// AFTER (correct — mutually exclusive)
+if (hasBundleDiscount) {
+  originalPrice = originalPrice / (1 - bundleDiscountPct / 100)
+  showDiscount = true
+} else if (hasUserDiscount) {
+  originalPrice = originalPrice / (1 - userDiscountPct / 100)
+  showDiscount = true
+}
+```
+
+Also fixed badge stacking in the same section — now shows only one badge per item.
+
+**2. Misleading comments corrected** (3 files):
+
+| File | Old Comment | New Comment |
+|------|-------------|-------------|
+| `cod-confirmation/route.ts` | "after both VIP and bundle" | "mutually exclusive per item" |
+| `support-link/route.ts` | "after both VIP and bundle" | "mutually exclusive per item" |
+| `cartUtils.js` | "applied on VIP-discounted price" | "applied on retail price" |
+
+### Commits
+
+| Repository | Commit | Message |
+|------------|--------|---------|
+| cosmetics-website | `148daafd` | fix: admin email template 2nd section still stacked VIP+Bundle per item |
+| genosys-mobile-app | `4ede041` | fix: correct misleading comment about bundle discount on VIP price |
+
+---
+
+## 12. Translation Audit & Fixes
+
+### Audit Summary
+
+Comprehensive audit of all translation keys across both repositories for all 3 languages (English, Arabic, Russian).
+
+### Website (`cosmetics-website`) — 1,928 keys
+
+| Check | Result |
+|-------|--------|
+| EN/AR/RU key parity | **Perfect** (all 1,928 synced) |
+| Interpolation `{variable}` placeholders | **0 mismatches** |
+| Empty string values | **1 found & fixed** |
+
+**Issues Found & Fixed:**
+
+1. **27 missing `training.*` keys** — Used by Arabic training page but not defined in message files:
+   - Document keys: `productCatalogue`, `viewPdf`, `homeCareGuide`, `professionalManual`, `facialTreatmentHomecare`, `facialTreatmentProfessional`, `achieveKoreanGlassSkin`, `bioMesoPdrnGuide`
+   - Lesson UI: `whatYoullLearn`, `lessonDetails`, `duration`, `level`, `professional`, `category`, `availableUponCompletion`, `advancedProfessional`
+   - Categories: `bodyTreatments`, `specializedTreatments`, `specializedEyeTreatments`, `matrixTreatments`, `facialTreatments`, `productUsage`, `hairTreatments`, `eyeTreatments`, `hairLossTreatments`
+   - Placeholder: `moreLessonsComingSoon`, `checkBackRegularly`
+
+2. **Empty `success.supportLinkMessage`** in Russian — Added: "Наша служба поддержки отправит вам безопасную ссылку для оплаты."
+
+3. **Missing `auth.registrationTimeout`** — Added to all 3 languages:
+   - EN: "Registration is taking too long. Please try again."
+   - AR: "التسجيل يستغرق وقتاً طويلاً. يرجى المحاولة مرة أخرى."
+   - RU: "Регистрация занимает слишком много времени. Пожалуйста, попробуйте снова."
+
+### Native App (`genosys-mobile-app`) — 1,355 keys
+
+| Check | Result |
+|-------|--------|
+| EN/AR/RU key parity | **Perfect** (all 1,355 synced) |
+| Interpolation placeholders | **0 mismatches** |
+| Empty string values | **0** |
+
+**Issues Found & Fixed:**
+
+1. **Hardcoded English in `skin-analysis-camera.js`** — 20+ strings replaced with `t()` calls:
+
+   | Hardcoded String | Translation Key |
+   |------------------|-----------------|
+   | "Grant Permission" | `skinCamera.grantPermission` |
+   | "Skin Health Score" | `skinCamera.skinHealthScore` |
+   | "Key Concerns" | `skinCamera.keyConcerns` |
+   | "Recommended Products" | `skinCamera.recommendedProducts` |
+   | "Price on Request" | `skinCamera.priceOnRequest` |
+   | "Your Skincare Routine" | `skinCamera.yourSkincareRoutine` |
+   | "Personalized Tips" | `skinCamera.personalizedTips` |
+   | "Retake Photo" | `skinCamera.retakePhoto` |
+   | "Take Quiz Instead" | `skinCamera.takeQuizInstead` |
+   | Alert.alert("Error", ...) | `skinCamera.errorTitle`, `skinCamera.errorAnalysisFailed` |
+   | + 10 more strings | `skinCamera.*` namespace |
+
+2. **Hardcoded English in `webview.js`** — 6 strings replaced with `t()` calls:
+
+   | Hardcoded String | Translation Key |
+   |------------------|-----------------|
+   | "No URL provided" | `webview.noUrlProvided` |
+   | "Try Again" | `webview.tryAgain` |
+   | "Go Back" | `webview.goBack` |
+   | Alert.alert("Download Error", ...) | `webview.downloadError` |
+   | Alert.alert("Error", ...) | `webview.errorTitle`, `webview.couldNotOpenFile` |
+
+3. **Missing `auth.loginRequired`** — Added to all 3 languages:
+   - EN: "Login required"
+   - AR: "تسجيل الدخول مطلوب"
+   - RU: "Требуется вход"
+
+4. **Added `error.*` namespace** for future `ErrorBoundary.js` localization:
+   - `error.somethingWentWrong`, `error.tryAgain`
+
+**Skipped (by design):**
+- `ErrorBoundary.js` — Class component that cannot use hooks, and must work even when localization context fails during error scenarios.
+
+### Files Changed
+
+**Website:**
+
+| File | Change |
+|------|--------|
+| `messages/en.json` | +29 keys (training.*, auth.registrationTimeout) |
+| `messages/ar.json` | +29 keys with Arabic translations |
+| `messages/ru.json` | +29 keys + fixed empty supportLinkMessage |
+
+**Native App:**
+
+| File | Change |
+|------|--------|
+| `app/skin-analysis-camera.js` | 20+ hardcoded strings → `t()` calls |
+| `app/webview.js` | 6 hardcoded strings → `t()` calls |
+| `i18n/messages/en.json` | +27 keys (skinCamera.*, webview.*, auth.*, error.*) |
+| `i18n/messages/ar.json` | +27 keys with Arabic translations |
+| `i18n/messages/ru.json` | +27 keys with Russian translations |
+
+### Commits
+
+| Repository | Commit | Message |
+|------------|--------|---------|
+| cosmetics-website | `f5998263` | fix: add 29 missing translation keys across en/ar/ru |
+| genosys-mobile-app | `a1f425d` | fix: translate hardcoded English strings + add missing keys |
+
+---
+
 *Session: February 11, 2026*
