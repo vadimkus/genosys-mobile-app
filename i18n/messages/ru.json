@@ -1483,5 +1483,46 @@
     "secure": "Безопасная оплата",
     "shipping": "Быстрая доставка",
     "professional": "Профессиональный уровень"
+  },
+  "auth": {
+    "loginRequired": "Требуется вход"
+  },
+  "skinCamera": {
+    "grantPermission": "Разрешить доступ",
+    "skinHealthScore": "Оценка здоровья кожи",
+    "aiAnalysis": "AI Анализ",
+    "keyConcerns": "Основные проблемы",
+    "recommendedProducts": "Рекомендуемые продукты",
+    "priceOnRequest": "Цена по запросу",
+    "added": "Добавлено",
+    "addToBag": "В корзину",
+    "view": "Смотреть",
+    "yourSkincareRoutine": "Ваш уход за кожей",
+    "morningAM": "Утро (AM)",
+    "eveningPM": "Вечер (PM)",
+    "personalizedTips": "Персональные советы",
+    "retakePhoto": "Переснять фото",
+    "takeQuizInstead": "Пройти тест",
+    "analyzingWithAI": "Анализ с помощью AI...",
+    "positionFace": "Расположите лицо в овале",
+    "aiExpertAnalyzing": "AI-эксперт анализирует вашу кожу...",
+    "analyzing": "Анализ...",
+    "aiExpertAnalysis": "AI Экспертный анализ",
+    "errorAnalysisFailed": "Анализ не удался. Попробуйте ещё раз.",
+    "errorCaptureFailed": "Не удалось сделать снимок. Попробуйте ещё раз.",
+    "errorTitle": "Ошибка"
+  },
+  "webview": {
+    "noUrlProvided": "URL не указан",
+    "errorTitle": "Ошибка",
+    "tryAgain": "Повторить",
+    "goBack": "Назад",
+    "downloadError": "Ошибка загрузки",
+    "couldNotOpenPdf": "Не удалось открыть PDF. Попробуйте ещё раз.",
+    "couldNotOpenFile": "Не удалось открыть файл."
+  },
+  "error": {
+    "somethingWentWrong": "Что-то пошло не так",
+    "tryAgain": "Повторить"
   }
 }

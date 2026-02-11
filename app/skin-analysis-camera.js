@@ -150,14 +150,14 @@ export default function SkinAnalysisCameraScreen() {
           const result = await analyzeSkinImage(photo.uri);
           setLocalResult(result);
         } catch {
-          Alert.alert('Error', 'Analysis failed. Please try again.');
+          Alert.alert(t('skinCamera.errorTitle'), t('skinCamera.errorAnalysisFailed'));
         }
         setAnalyzing(false);
       } finally {
         setAiAnalyzing(false);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to capture photo. Please try again.');
+      Alert.alert(t('skinCamera.errorTitle'), t('skinCamera.errorCaptureFailed'));
     } finally {
       setCapturing(false);
     }
@@ -216,7 +216,7 @@ export default function SkinAnalysisCameraScreen() {
           <Ionicons name="camera-outline" size={64} color="#D1D5DB" />
           <Text style={styles.permissionText}>{t('skinAnalysis.cameraPermission')}</Text>
           <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission} activeOpacity={0.85}>
-            <Text style={styles.permissionBtnText}>Grant Permission</Text>
+            <Text style={styles.permissionBtnText}>{t('skinCamera.grantPermission')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -255,7 +255,7 @@ export default function SkinAnalysisCameraScreen() {
               </Text>
               <Text style={styles.aiScoreMax}>/10</Text>
             </View>
-            <Text style={styles.aiScoreLabel}>Skin Health Score</Text>
+            <Text style={styles.aiScoreLabel}>{t('skinCamera.skinHealthScore')}</Text>
             <View style={styles.aiSkinTypeBadge}>
               <Text style={styles.aiSkinTypeText}>{capitalize(aiResult.skinType || 'Unknown')}</Text>
             </View>
@@ -266,7 +266,7 @@ export default function SkinAnalysisCameraScreen() {
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
                 <Ionicons name="sparkles" size={18} color="#dc2626" />
-                <Text style={styles.aiSectionTitle}>AI Analysis</Text>
+                <Text style={styles.aiSectionTitle}>{t('skinCamera.aiAnalysis')}</Text>
               </View>
               <Text style={styles.aiAnalysisText}>{aiResult.analysis}</Text>
             </View>
@@ -277,7 +277,7 @@ export default function SkinAnalysisCameraScreen() {
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
                 <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
-                <Text style={styles.aiSectionTitle}>Key Concerns</Text>
+                <Text style={styles.aiSectionTitle}>{t('skinCamera.keyConcerns')}</Text>
               </View>
               <View style={styles.concernChips}>
                 {aiResult.concerns.map((c, i) => (
@@ -295,7 +295,7 @@ export default function SkinAnalysisCameraScreen() {
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
                 <Ionicons name="bag-outline" size={18} color="#dc2626" />
-                <Text style={styles.aiSectionTitle}>Recommended Products</Text>
+                <Text style={styles.aiSectionTitle}>{t('skinCamera.recommendedProducts')}</Text>
               </View>
               {aiResult.recommendations.map((rec, idx) => {
                 const productId = parseProductId(rec.product);
@@ -319,7 +319,7 @@ export default function SkinAnalysisCameraScreen() {
                       <View style={styles.aiRecBody}>
                         <Text style={styles.aiRecName} numberOfLines={2}>{productName}</Text>
                         {details?.isPriceOnRequest ? (
-                          <Text style={styles.aiRecPriceOnRequest}>Price on Request</Text>
+                          <Text style={styles.aiRecPriceOnRequest}>{t('skinCamera.priceOnRequest')}</Text>
                         ) : details?.price ? (
                           <Text style={styles.aiRecPrice}>AED {Number(details.price).toFixed(0)}</Text>
                         ) : null}
@@ -333,14 +333,14 @@ export default function SkinAnalysisCameraScreen() {
                               activeOpacity={0.8}
                             >
                               <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
-                              <Text style={styles.aiRecAddText}>{isAdded ? 'Added' : 'Add to Bag'}</Text>
+                              <Text style={styles.aiRecAddText}>{isAdded ? t('skinCamera.added') : t('skinCamera.addToBag')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={styles.aiRecViewBtn}
                               onPress={() => router.push({ pathname: '/product/[id]', params: { id: productId } })}
                               activeOpacity={0.8}
                             >
-                              <Text style={styles.aiRecViewText}>View</Text>
+                              <Text style={styles.aiRecViewText}>{t('skinCamera.view')}</Text>
                             </TouchableOpacity>
                           </View>
                         )}
@@ -357,14 +357,14 @@ export default function SkinAnalysisCameraScreen() {
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
                 <Ionicons name="sunny-outline" size={18} color="#dc2626" />
-                <Text style={styles.aiSectionTitle}>Your Skincare Routine</Text>
+                <Text style={styles.aiSectionTitle}>{t('skinCamera.yourSkincareRoutine')}</Text>
               </View>
 
               {aiResult.routine?.am?.length > 0 && (
                 <View style={styles.routineBlock}>
                   <View style={styles.routineLabelRow}>
                     <Ionicons name="sunny" size={14} color="#F59E0B" />
-                    <Text style={styles.routineLabel}>Morning (AM)</Text>
+                    <Text style={styles.routineLabel}>{t('skinCamera.morningAM')}</Text>
                   </View>
                   {aiResult.routine.am.map((step, i) => (
                     <View key={i} style={styles.routineStep}>
@@ -379,7 +379,7 @@ export default function SkinAnalysisCameraScreen() {
                 <View style={styles.routineBlock}>
                   <View style={styles.routineLabelRow}>
                     <Ionicons name="moon" size={14} color="#6366F1" />
-                    <Text style={styles.routineLabel}>Evening (PM)</Text>
+                    <Text style={styles.routineLabel}>{t('skinCamera.eveningPM')}</Text>
                   </View>
                   {aiResult.routine.pm.map((step, i) => (
                     <View key={i} style={styles.routineStep}>
@@ -397,7 +397,7 @@ export default function SkinAnalysisCameraScreen() {
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
                 <Ionicons name="bulb-outline" size={18} color="#dc2626" />
-                <Text style={styles.aiSectionTitle}>Personalized Tips</Text>
+                <Text style={styles.aiSectionTitle}>{t('skinCamera.personalizedTips')}</Text>
               </View>
               {aiResult.tips.map((tip, i) => (
                 <View key={i} style={styles.tipRow}>
@@ -412,7 +412,7 @@ export default function SkinAnalysisCameraScreen() {
           <View style={styles.aiActionsRow}>
             <TouchableOpacity style={styles.retakeBtn} onPress={handleReset} activeOpacity={0.85}>
               <Ionicons name="camera-outline" size={18} color="#dc2626" />
-              <Text style={styles.retakeBtnText}>Retake Photo</Text>
+              <Text style={styles.retakeBtnText}>{t('skinCamera.retakePhoto')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.quizBtn}
@@ -420,7 +420,7 @@ export default function SkinAnalysisCameraScreen() {
               activeOpacity={0.85}
             >
               <Ionicons name="clipboard-outline" size={18} color="#374151" />
-              <Text style={styles.quizBtnText}>Take Quiz Instead</Text>
+              <Text style={styles.quizBtnText}>{t('skinCamera.takeQuizInstead')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -451,7 +451,7 @@ export default function SkinAnalysisCameraScreen() {
               <View style={styles.faceOval} />
             </View>
             <Text style={styles.guideText}>
-              {aiAnalyzing ? 'Analyzing with AI...' : analyzing ? t('skinAnalysis.analyzing') : 'Position your face in the oval'}
+              {aiAnalyzing ? t('skinCamera.analyzingWithAI') : analyzing ? t('skinAnalysis.analyzing') : t('skinCamera.positionFace')}
             </Text>
           </View>
         </CameraView>
@@ -463,7 +463,7 @@ export default function SkinAnalysisCameraScreen() {
           <View style={styles.analyzingBox}>
             <ActivityIndicator size="large" color="#dc2626" />
             <Text style={styles.analyzingText}>
-              {aiAnalyzing ? 'AI Expert is analyzing your skin...' : 'Analyzing...'}
+              {aiAnalyzing ? t('skinCamera.aiExpertAnalyzing') : t('skinCamera.analyzing')}
             </Text>
           </View>
         ) : (
@@ -479,7 +479,7 @@ export default function SkinAnalysisCameraScreen() {
               </View>
             </TouchableOpacity>
             <Text style={styles.captureLabel}>
-              AI Expert Analysis
+              {t('skinCamera.aiExpertAnalysis')}
             </Text>
           </>
         )}

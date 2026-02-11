@@ -1483,5 +1483,46 @@
     "secure": "دفع آمن",
     "shipping": "توصيل سريع",
     "professional": "درجة احترافية"
+  },
+  "auth": {
+    "loginRequired": "تسجيل الدخول مطلوب"
+  },
+  "skinCamera": {
+    "grantPermission": "منح الإذن",
+    "skinHealthScore": "درجة صحة البشرة",
+    "aiAnalysis": "تحليل الذكاء الاصطناعي",
+    "keyConcerns": "المشاكل الرئيسية",
+    "recommendedProducts": "المنتجات الموصى بها",
+    "priceOnRequest": "السعر عند الطلب",
+    "added": "تمت الإضافة",
+    "addToBag": "أضف إلى السلة",
+    "view": "عرض",
+    "yourSkincareRoutine": "روتين العناية بالبشرة",
+    "morningAM": "صباحاً (AM)",
+    "eveningPM": "مساءً (PM)",
+    "personalizedTips": "نصائح مخصصة",
+    "retakePhoto": "إعادة التقاط الصورة",
+    "takeQuizInstead": "خذ الاختبار بدلاً من ذلك",
+    "analyzingWithAI": "جاري التحليل بالذكاء الاصطناعي...",
+    "positionFace": "ضع وجهك في الشكل البيضاوي",
+    "aiExpertAnalyzing": "خبير الذكاء الاصطناعي يحلل بشرتك...",
+    "analyzing": "جاري التحليل...",
+    "aiExpertAnalysis": "تحليل خبير الذكاء الاصطناعي",
+    "errorAnalysisFailed": "فشل التحليل. يرجى المحاولة مرة أخرى.",
+    "errorCaptureFailed": "فشل في التقاط الصورة. يرجى المحاولة مرة أخرى.",
+    "errorTitle": "خطأ"
+  },
+  "webview": {
+    "noUrlProvided": "لم يتم توفير رابط",
+    "errorTitle": "خطأ",
+    "tryAgain": "حاول مرة أخرى",
+    "goBack": "رجوع",
+    "downloadError": "خطأ في التنزيل",
+    "couldNotOpenPdf": "تعذر فتح ملف PDF. يرجى المحاولة مرة أخرى.",
+    "couldNotOpenFile": "تعذر فتح الملف."
+  },
+  "error": {
+    "somethingWentWrong": "حدث خطأ ما",
+    "tryAgain": "حاول مرة أخرى"
   }
 }

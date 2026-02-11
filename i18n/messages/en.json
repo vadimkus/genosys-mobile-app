@@ -1483,5 +1483,46 @@
     "secure": "Secure Payment",
     "shipping": "Fast Delivery",
     "professional": "Professional Grade"
+  },
+  "auth": {
+    "loginRequired": "Login required"
+  },
+  "skinCamera": {
+    "grantPermission": "Grant Permission",
+    "skinHealthScore": "Skin Health Score",
+    "aiAnalysis": "AI Analysis",
+    "keyConcerns": "Key Concerns",
+    "recommendedProducts": "Recommended Products",
+    "priceOnRequest": "Price on Request",
+    "added": "Added",
+    "addToBag": "Add to Bag",
+    "view": "View",
+    "yourSkincareRoutine": "Your Skincare Routine",
+    "morningAM": "Morning (AM)",
+    "eveningPM": "Evening (PM)",
+    "personalizedTips": "Personalized Tips",
+    "retakePhoto": "Retake Photo",
+    "takeQuizInstead": "Take Quiz Instead",
+    "analyzingWithAI": "Analyzing with AI...",
+    "positionFace": "Position your face in the oval",
+    "aiExpertAnalyzing": "AI Expert is analyzing your skin...",
+    "analyzing": "Analyzing...",
+    "aiExpertAnalysis": "AI Expert Analysis",
+    "errorAnalysisFailed": "Analysis failed. Please try again.",
+    "errorCaptureFailed": "Failed to capture photo. Please try again.",
+    "errorTitle": "Error"
+  },
+  "webview": {
+    "noUrlProvided": "No URL provided",
+    "errorTitle": "Error",
+    "tryAgain": "Try Again",
+    "goBack": "Go Back",
+    "downloadError": "Download Error",
+    "couldNotOpenPdf": "Could not open the PDF. Please try again.",
+    "couldNotOpenFile": "Could not open the file."
+  },
+  "error": {
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try Again"
   }
 }

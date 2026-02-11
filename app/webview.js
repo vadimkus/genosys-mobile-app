@@ -17,7 +17,7 @@ const log = createLogger('WebView');
 
 export default function WebViewScreen() {
   const { url, title } = useLocalSearchParams();
-  const { dir } = useLocalization();
+  const { dir, t } = useLocalization();
   const isRTL = dir === 'rtl';
   const [loading, setLoading] = useState(true);
   const [pageTitle, setPageTitle] = useState(title || '');
@@ -79,7 +79,7 @@ export default function WebViewScreen() {
       // Open PDF in native viewer / browser (triggers iOS Share Sheet or preview)
       Linking.openURL(reqUrl).catch((e) => {
         log.warn('Failed to open PDF URL', e?.message);
-        Alert.alert('Download Error', 'Could not open the PDF. Please try again.');
+        Alert.alert(t('webview.downloadError'), t('webview.couldNotOpenPdf'));
       });
       return false; // Prevent WebView from loading it
     }
@@ -228,12 +228,12 @@ export default function WebViewScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
             <Ionicons name="arrow-back" size={24} color="#1F2937" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Error</Text>
+          <Text style={styles.headerTitle}>{t('webview.errorTitle')}</Text>
           <View style={styles.backBtn} />
         </View>
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={48} color="#9CA3AF" />
-          <Text style={styles.errorText}>No URL provided</Text>
+          <Text style={styles.errorText}>{t('webview.noUrlProvided')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -284,10 +284,10 @@ export default function WebViewScreen() {
           ) : null}
           <TouchableOpacity onPress={handleRetry} style={styles.retryButton} activeOpacity={0.7}>
             <Ionicons name="reload" size={18} color="#ffffff" />
-            <Text style={styles.retryButtonText}>Try Again</Text>
+            <Text style={styles.retryButtonText}>{t('webview.tryAgain')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
-            <Text style={styles.backButtonText}>Go Back</Text>
+            <Text style={styles.backButtonText}>{t('webview.goBack')}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -320,7 +320,7 @@ export default function WebViewScreen() {
             if (data.type === 'open-url' && data.url) {
               Linking.openURL(data.url).catch((e) => {
                 log.warn('Failed to open file URL', e?.message);
-                Alert.alert('Error', 'Could not open the file.');
+                Alert.alert(t('webview.errorTitle'), t('webview.couldNotOpenFile'));
               });
             }
           } catch { /* ignore non-JSON messages */ }
