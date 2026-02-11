@@ -180,6 +180,7 @@
     "discountLabel": "Discount",
     "deliveryCostLabel": "Delivery cost",
     "bundleDiscount15": "15% OFF (Bundle Discount)",
+    "bundleOff": "OFF (Bundle)",
     "discount100": "100% OFF",
     "promotionTag": "Promotion",
     "emptyCartTitle": "Empty Cart",
@@ -887,7 +888,10 @@
     "retailPrice": "Retail Price",
     "vipDiscount": "VIP Discount",
     "bundleDiscount": "Bundle Discount",
-    "totalSaved": "Total Saved"
+    "totalSaved": "Total Saved",
+    "viewBoxContents": "View Box Contents",
+    "hideBoxContents": "Hide Box Contents",
+    "boxDetailsUnavailable": "Box contents details are not available."
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Could not start payment",

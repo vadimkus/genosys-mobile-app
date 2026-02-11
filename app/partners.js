@@ -21,6 +21,9 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import * as Haptics from 'expo-haptics';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('Partners');
 
 const THEME_COLORS = {
   emerald: '#10b981',
@@ -105,7 +108,7 @@ export default function PartnersScreen() {
       const data = await res.json();
       setPartners(data.partners || []);
     } catch (err) {
-      console.warn('Failed to fetch partners:', err.message);
+      log.warn('Failed to fetch partners:', err.message);
       setError(l('Failed to load partners', 'فشل تحميل الشركاء', 'Не удалось загрузить партнёров'));
     } finally {
       setLoading(false);

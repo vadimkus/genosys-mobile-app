@@ -7,7 +7,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
-import { Platform, Alert, Vibration } from 'react-native';
+import { Platform, AppState, Vibration } from 'react-native';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Notification');
@@ -37,6 +37,31 @@ export function NotificationProvider({ children }) {
   const notificationListener = useRef();
   const responseListener = useRef();
 
+  // Clear the app icon badge when the app comes to the foreground.
+  // This ensures the badge disappears once the user opens the app,
+  // regardless of how many notifications were received while it was in the background.
+  useEffect(() => {
+    const clearBadge = () => {
+      try {
+        Notifications.setBadgeCountAsync(0);
+      } catch (e) {
+        log.warn('Failed to clear badge:', e?.message);
+      }
+    };
+
+    // Clear badge immediately on mount (app open / cold start)
+    clearBadge();
+
+    // Clear badge when app returns from background
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        clearBadge();
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
+
   useEffect(() => {
     try {
       // Setup Android channel
@@ -62,6 +87,9 @@ export function NotificationProvider({ children }) {
         try {
           log.debug('👆 Notification tapped:', response.notification.request.content.data);
           
+          // Clear badge when user interacts with a notification
+          Notifications.setBadgeCountAsync(0);
+          
           const data = response.notification.request.content.data;
           
           // Handle navigation based on notification type
@@ -81,6 +109,8 @@ export function NotificationProvider({ children }) {
         .then(response => {
           if (response) {
             log.debug('App opened from notification:', response.notification.request.content.data);
+            // Clear badge on cold start from notification
+            Notifications.setBadgeCountAsync(0);
             const data = response.notification.request.content.data;
             if (data?.type === 'order_status' && data?.orderId) {
               setTimeout(() => {

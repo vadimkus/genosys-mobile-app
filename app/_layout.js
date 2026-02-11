@@ -11,6 +11,7 @@ import { AnimationProvider } from '../contexts/AnimationContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { setupDeepLinkListener } from '../utils/deepLinking';
 
 // Suppress known warnings that don't affect functionality
@@ -48,7 +49,9 @@ export default function RootLayout() {
               <CartProvider>
                 <OrdersProvider>
                   <StatusBar style="dark" backgroundColor="#ffffff" />
-                  <AuthWrapper />
+                  <ErrorBoundary screenName="AppRoot">
+                    <AuthWrapper />
+                  </ErrorBoundary>
                 </OrdersProvider>
               </CartProvider>
             </FavoritesProvider>

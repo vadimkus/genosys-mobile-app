@@ -10,6 +10,9 @@ import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
 import { Image } from 'expo-image';
 import { useLocalization } from '../../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../../utils/emirateUtils';
+import { isBeautyBoxProduct } from '../../../utils/productRules';
+import { parseBeautyBoxDescription } from '../../../utils/beautyBoxDescription';
+import { asText } from '../../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
@@ -141,6 +144,9 @@ export default function OrderDetailScreen() {
   const [order, setOrder] = useState(null);
   const [paying, setPaying] = useState(false);
   const [reordering, setReordering] = useState(false);
+  // Beauty box expanded details: { [productId]: { items: [...], title: string } | null }
+  const [beautyBoxDetails, setBeautyBoxDetails] = useState({});
+  const [expandedBoxes, setExpandedBoxes] = useState({});
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -231,6 +237,47 @@ export default function OrderDetailScreen() {
     if (!pm) return t('ordersDetail.paymentMethodUnknown');
     return t('ordersDetail.paymentMethodOther', { method: pm.toUpperCase() });
   };
+
+  // Detect beauty box items by name and offer expandable details
+  const isBeautyBoxItem = useCallback((item) => {
+    const name = String(item?.name || item?.productName || '').trim();
+    return isBeautyBoxProduct({ name, category: item?.category || '' });
+  }, []);
+
+  // Fetch beauty box product details to parse the "Kit Includes" section
+  const fetchBeautyBoxDetails = useCallback(async (productId) => {
+    if (!productId || beautyBoxDetails[productId] !== undefined) return;
+    // Mark as loading
+    setBeautyBoxDetails((prev) => ({ ...prev, [productId]: null }));
+    try {
+      const product = await fetchProductById(productId, user, { locale });
+      if (product?.description) {
+        const parsed = parseBeautyBoxDescription(product.description);
+        if (parsed?.items?.length > 0) {
+          setBeautyBoxDetails((prev) => ({
+            ...prev,
+            [productId]: { items: parsed.items, title: parsed.title || '' },
+          }));
+          return;
+        }
+      }
+      // No parseable details — store empty so we don't re-fetch
+      setBeautyBoxDetails((prev) => ({ ...prev, [productId]: { items: [], title: '' } }));
+    } catch {
+      setBeautyBoxDetails((prev) => ({ ...prev, [productId]: { items: [], title: '' } }));
+    }
+  }, [beautyBoxDetails, user, locale]);
+
+  const toggleBeautyBox = useCallback((productId) => {
+    setExpandedBoxes((prev) => {
+      const isExpanded = !prev[productId];
+      if (isExpanded) {
+        // Fetch details on first expand
+        fetchBeautyBoxDetails(productId);
+      }
+      return { ...prev, [productId]: isExpanded };
+    });
+  }, [fetchBeautyBoxDetails]);
 
   const items = Array.isArray(order?.items) ? order.items : [];
   const paidItems = items.filter((it) => !isPromoItem(it));
@@ -460,12 +507,41 @@ export default function OrderDetailScreen() {
               // Prefer the discount% stored with the order (captures the rate at time of purchase),
               // falling back to the user's current discount% for older orders that lack this field.
               const orderDiscountPct = Number(order?.discountPercentage);
-              const discountPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0)
-                ? orderDiscountPct
-                : Number(user?.discountPercentage);
+              const orderBundleDiscPct = Number(order?.bundleDiscountPercentage);
+              const orderBundleDiscAmt = Number(order?.bundleDiscountAmount);
+              const hasBundleOnOrder = Number.isFinite(orderBundleDiscPct) && orderBundleDiscPct > 0 && Number.isFinite(orderBundleDiscAmt) && orderBundleDiscAmt > 0;
+
+              // Check if this item is a bundle item (from "Build Your Set")
+              // Bundle items: item has fromBundle flag, or order has bundle discount and item is not excluded
+              const itemFromBundle = it?.fromBundle === true;
               const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
-              const inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
-              const canShowDiscountBreakdown = !isPromoItem(it) && !excludedFromUserDiscount && inferredOriginalUnit != null;
+
+              // If order has bundle discount but no VIP discount, individual items are likely bundle items
+              // (unless they are beauty boxes / devices / hydro cool mask)
+              const isBundleItem = itemFromBundle || (hasBundleOnOrder && !excludedFromUserDiscount);
+
+              let discountPct;
+              let inferredOriginalUnit;
+              let canShowDiscountBreakdown;
+
+              if (isBundleItem && hasBundleOnOrder) {
+                // Bundle item: waterfall — VIP first, then bundle on top
+                // Stored price = retail × (1 - vipPct/100) × (1 - bundlePct/100)
+                // Reverse to get retail: price / (1 - bundlePct/100) / (1 - vipPct/100)
+                const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
+                const combinedFactor = (1 - vipPct / 100) * (1 - orderBundleDiscPct / 100);
+                inferredOriginalUnit = combinedFactor > 0 ? Math.round(price / combinedFactor * 100) / 100 : null;
+                discountPct = vipPct > 0 ? vipPct + orderBundleDiscPct : orderBundleDiscPct; // combined for display
+                canShowDiscountBreakdown = !isPromoItem(it) && inferredOriginalUnit != null;
+              } else {
+                // Regular item: use VIP discount
+                discountPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0)
+                  ? orderDiscountPct
+                  : Number(user?.discountPercentage);
+                inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
+                canShowDiscountBreakdown = !isPromoItem(it) && !excludedFromUserDiscount && inferredOriginalUnit != null;
+              }
+
               const discountUnit = canShowDiscountBreakdown ? (inferredOriginalUnit - price) : 0;
               const originalLineTotal = canShowDiscountBreakdown ? (inferredOriginalUnit * qty) : null;
               const discountLineTotal = canShowDiscountBreakdown ? (discountUnit * qty) : null;
@@ -493,8 +569,17 @@ export default function OrderDetailScreen() {
                       <View style={styles.itemTitleWrap}>
                         <Text style={[styles.itemName, isRTL && styles.textRTL]} numberOfLines={2}>{String(name)}</Text>
                         {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
-                          <View style={styles.discountPill}>
-                            <Text style={styles.discountPillText}>{`${Math.round(discountPct)}%`}</Text>
+                          <View style={[styles.discountPill, isBundleItem && { backgroundColor: '#F0FDF4' }]}>
+                            <Text style={[styles.discountPillText, isBundleItem && { color: '#16a34a' }]}>
+                              {isBundleItem
+                                ? (() => {
+                                    const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
+                                    return vipPct > 0
+                                      ? `${Math.round(vipPct)}% + ${Math.round(orderBundleDiscPct)}% Bundle`
+                                      : `${Math.round(orderBundleDiscPct)}% Bundle`;
+                                  })()
+                                : `${Math.round(discountPct)}%`}
+                            </Text>
                           </View>
                         ) : null}
                       </View>
@@ -529,9 +614,21 @@ export default function OrderDetailScreen() {
                         </View>
                         <View style={styles.itemPriceRow}>
                           <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>
-                            {t('ordersDetail.discount')}
+                            {(() => {
+                              if (!isBundleItem) return t('ordersDetail.discount');
+                              const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
+                              return vipPct > 0
+                                ? `${t('ordersDetail.discount')} + ${t('ordersDetail.bundleDiscount') || 'Bundle Discount'}`
+                                : (t('ordersDetail.bundleDiscount') || 'Bundle Discount');
+                            })()}
                             {Number.isFinite(discountPct) ? (
-                              <Text style={[styles.discountPctText, isRTL && styles.valueLTR]}> {`(${Math.round(discountPct)}%)`}</Text>
+                              <Text style={[styles.discountPctText, isRTL && styles.valueLTR]}> {(() => {
+                                if (!isBundleItem) return `(${Math.round(discountPct)}%)`;
+                                const vipPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0 && !excludedFromUserDiscount) ? orderDiscountPct : 0;
+                                return vipPct > 0
+                                  ? `(${Math.round(vipPct)}% + ${Math.round(orderBundleDiscPct)}%)`
+                                  : `(${Math.round(orderBundleDiscPct)}%)`;
+                              })()}</Text>
                             ) : null}
                           </Text>
                           <Text style={[styles.itemPriceValue, styles.discountValue, isRTL && styles.valueLTR]}>-AED {formatAED(discountUnit)}</Text>
@@ -566,6 +663,75 @@ export default function OrderDetailScreen() {
                       </View>
                     ) : null}
                   </View>
+
+                  {/* Beauty Box: expandable kit contents */}
+                  {isBeautyBoxItem(it) ? (
+                    <View style={styles.beautyBoxSection}>
+                      <TouchableOpacity
+                        style={[styles.beautyBoxToggle, isRTL && styles.rowRTL]}
+                        onPress={() => toggleBeautyBox(it?.productId || it?.id || `box-${idx}`)}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons name="gift-outline" size={16} color="#dc2626" />
+                        <Text style={[styles.beautyBoxToggleText, isRTL && styles.textRTL]}>
+                          {expandedBoxes[it?.productId || it?.id || `box-${idx}`]
+                            ? t('ordersDetail.hideBoxContents') || 'Hide Box Contents'
+                            : t('ordersDetail.viewBoxContents') || 'View Box Contents'}
+                        </Text>
+                        <Ionicons
+                          name={expandedBoxes[it?.productId || it?.id || `box-${idx}`] ? 'chevron-up' : 'chevron-down'}
+                          size={16}
+                          color="#dc2626"
+                        />
+                      </TouchableOpacity>
+
+                      {expandedBoxes[it?.productId || it?.id || `box-${idx}`] ? (
+                        <View style={styles.beautyBoxContents}>
+                          {(() => {
+                            const boxKey = it?.productId || it?.id || `box-${idx}`;
+                            const details = beautyBoxDetails[boxKey];
+                            if (details === undefined || details === null) {
+                              return (
+                                <View style={styles.beautyBoxLoading}>
+                                  <ActivityIndicator size="small" color="#dc2626" />
+                                  <Text style={styles.beautyBoxLoadingText}>{t('common.loading') || 'Loading...'}</Text>
+                                </View>
+                              );
+                            }
+                            if (!details?.items?.length) {
+                              return (
+                                <Text style={[styles.beautyBoxNoDetails, isRTL && styles.textRTL]}>
+                                  {t('ordersDetail.boxDetailsUnavailable') || 'Box contents details are not available.'}
+                                </Text>
+                              );
+                            }
+                            return (
+                              <>
+                                <Text style={[styles.beautyBoxKitTitle, isRTL && styles.textRTL]}>
+                                  {t('product.kitIncludes') || 'Kit Includes:'}
+                                </Text>
+                                {details.items.map((kitItem) => (
+                                  <View key={`kit-${kitItem.index}-${kitItem.header}`} style={[styles.beautyBoxKitItem, isRTL && { alignItems: 'flex-end' }]}>
+                                    <View style={[styles.beautyBoxKitItemHeader, isRTL && styles.rowRTL]}>
+                                      <View style={styles.beautyBoxKitBullet}>
+                                        <Text style={styles.beautyBoxKitBulletText}>{kitItem.index}</Text>
+                                      </View>
+                                      <Text style={[styles.beautyBoxKitItemName, isRTL && styles.textRTL]} numberOfLines={2}>
+                                        {asText(kitItem.header)}
+                                      </Text>
+                                    </View>
+                                    {kitItem.body ? (
+                                      <Text style={[styles.beautyBoxKitItemBody, isRTL && styles.textRTL]}>{kitItem.body}</Text>
+                                    ) : null}
+                                  </View>
+                                ))}
+                              </>
+                            );
+                          })()}
+                        </View>
+                      ) : null}
+                    </View>
+                  ) : null}
                 </View>
               );
             })}
@@ -1490,6 +1656,96 @@ const styles = StyleSheet.create({
   valueLTR: {
     writingDirection: 'ltr',
     textAlign: 'left',
+  },
+  
+  // Beauty Box expandable contents
+  beautyBoxSection: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5EA',
+  },
+  beautyBoxToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+  beautyBoxToggleText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#dc2626',
+  },
+  beautyBoxContents: {
+    marginTop: 12,
+    backgroundColor: '#FFF7ED',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+  },
+  beautyBoxLoading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+  },
+  beautyBoxLoadingText: {
+    fontSize: 13,
+    color: '#8E8E93',
+  },
+  beautyBoxNoDetails: {
+    fontSize: 13,
+    color: '#8E8E93',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 8,
+  },
+  beautyBoxKitTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#9A3412',
+    marginBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  beautyBoxKitItem: {
+    marginBottom: 10,
+  },
+  beautyBoxKitItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  beautyBoxKitBullet: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#dc2626',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  beautyBoxKitBulletText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  beautyBoxKitItemName: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    lineHeight: 18,
+  },
+  beautyBoxKitItemBody: {
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 17,
+    marginTop: 4,
+    marginStart: 30,
   },
 });
 

@@ -25,6 +25,9 @@ import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('Training');
 
 export default function TrainingScreen() {
   const router = useRouter();
@@ -64,7 +67,7 @@ export default function TrainingScreen() {
       setVideos(data.videos || []);
       setStats(data.stats || null);
     } catch (err) {
-      console.warn('Failed to fetch training:', err.message);
+      log.warn('Failed to fetch training:', err.message);
       setError(l(
         'Failed to load training materials',
         'فشل تحميل مواد التدريب',
@@ -393,7 +396,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
     borderRadius: 14, padding: 14, marginBottom: 8,
     borderWidth: 1, borderColor: '#F3F4F6',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1,
   },
   docCardRTL: { flexDirection: 'row-reverse' },
   docIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
@@ -412,7 +415,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
     borderRadius: 14, padding: 10, marginBottom: 8,
     borderWidth: 1, borderColor: '#F3F4F6',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1,
   },
   productDocCardRTL: { flexDirection: 'row-reverse' },
   productImageWrap: {
@@ -427,7 +430,7 @@ const styles = StyleSheet.create({
   videoCard: {
     backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden',
     borderWidth: 1, borderColor: '#E5E7EB',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 4,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
   },
   videoThumb: {
     height: 180, backgroundColor: '#1F2937',

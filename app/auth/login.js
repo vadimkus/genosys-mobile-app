@@ -23,8 +23,15 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
-import * as AppleAuthentication from 'expo-apple-authentication';
 import Constants from 'expo-constants';
+
+// expo-apple-authentication is iOS-only; safe-load to prevent Android build/runtime issues
+let AppleAuthentication = null;
+try {
+  AppleAuthentication = require('expo-apple-authentication');
+} catch (e) {
+  // Expected on Android — module may not resolve
+}
 
 const log = createLogger('Login');
 
@@ -115,6 +122,11 @@ export default function LoginScreen() {
   const handleAppleLogin = async () => {
     if (!privacyConsent) {
       Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
+      return;
+    }
+    if (!AppleAuthentication) {
+      // Should never happen since the button is only shown on iOS, but guard anyway
+      Alert.alert(t('authScreen.authFailedTitle'), 'Apple Sign-In is only available on iOS.');
       return;
     }
     try {

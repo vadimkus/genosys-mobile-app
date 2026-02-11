@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 // Using direct Google OAuth implementation instead of expo-auth-session
 import { 
   loginWithEmail as apiLoginWithEmail, 
@@ -32,9 +31,9 @@ import {
   testBiometricAuth
 } from '../services/biometricService';
 import { loginWithGoogleDirect } from '../services/googleAuthService';
-import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
 import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
+import { storeUserSession, getUserSession, clearUserSession } from '../services/secureTokenStorage';
 
 const AuthContext = createContext({});
 const log = createLogger('Auth');
@@ -61,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     setOnAuthExpired(() => {
       log.warn('Auth expired callback triggered - logging out user');
       // Clear stored session and reset user state
-      AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY).catch(() => {});
+      clearUserSession().catch(() => {});
       setUser(null);
     });
   }, []);
@@ -109,9 +108,8 @@ export const AuthProvider = ({ children }) => {
         // User can manually use biometric login from login screen
       }
       
-      const storedUser = await AsyncStorage.getItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
+      const userData = await getUserSession();
+      if (userData) {
         
         // Validate session with server if we have a token
         if (userData.token) {
@@ -123,11 +121,11 @@ export const AuthProvider = ({ children }) => {
               ? { ...validation.user, token: userData.token }
               : userData;
             setUser(mergedUser);
-            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(mergedUser));
+            await storeUserSession(mergedUser);
             await checkBiometricAvailability();
           } else if (validation.success && validation.valid === false) {
             // Session expired, clear stored data
-            await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+            await clearUserSession();
             setUser(null);
           } else {
             // Validation failed for other reasons: keep stored session to avoid forced logout loops.
@@ -139,7 +137,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       log.error('Error checking stored auth', error?.message || error);
-      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY); // Clear corrupted data
+      await clearUserSession(); // Clear corrupted data
     } finally {
       setLoading(false);
     }
@@ -170,12 +168,12 @@ export const AuthProvider = ({ children }) => {
 
       // Refresh failed - force logout
       log.warn('refreshSession: refresh failed, logging out');
-      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+      await clearUserSession();
       setUser(null);
       return null;
     } catch (error) {
       log.error('refreshSession error', error?.message || error);
-      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+      await clearUserSession();
       setUser(null);
       return null;
     }
@@ -196,7 +194,7 @@ export const AuthProvider = ({ children }) => {
         const authResult = await apiProcessGoogleAuth(result.idToken);
         
         if (authResult.success) {
-          await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(authResult.user));
+          await storeUserSession(authResult.user);
           setUser(authResult.user);
           
           if (authResult.isNewUser) {
@@ -227,7 +225,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const result = await apiProcessAppleAuth(identityToken, { fullName });
       if (result.success) {
-        await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));
+        await storeUserSession(result.user);
         setUser(result.user);
         return { success: true };
       }
@@ -247,7 +245,7 @@ export const AuthProvider = ({ children }) => {
       const result = await apiLoginWithEmail(String(email || '').trim(), password);
       
       if (result.success) {
-        await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));
+        await storeUserSession(result.user);
         setUser(result.user);
         
         // Offer biometric setup after successful login (if available and not enabled)
@@ -277,7 +275,7 @@ export const AuthProvider = ({ children }) => {
       const result = await apiRegisterUser(name, String(email || '').trim(), password, extra);
       
       if (result.success) {
-        await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(result.user));
+        await storeUserSession(result.user);
         setUser(result.user);
         return { success: true };
       } else {
@@ -313,7 +311,7 @@ export const AuthProvider = ({ children }) => {
               email: baseUser.email || creds.email || baseUser.userEmail || '',
               authType: baseUser.authType || 'biometric',
             };
-            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(userWithToken));
+            await storeUserSession(userWithToken);
             setUser(userWithToken);
             return { success: true };
           }
@@ -331,7 +329,7 @@ export const AuthProvider = ({ children }) => {
         if (creds.email && creds.password) {
           const loginResult = await apiLoginWithEmail(creds.email, creds.password);
           if (loginResult.success) {
-            await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(loginResult.user));
+            await storeUserSession(loginResult.user);
             setUser(loginResult.user);
             return { success: true };
           }
@@ -411,13 +409,13 @@ export const AuthProvider = ({ children }) => {
         await apiLogoutUser(user.token);
       }
       
-      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+      await clearUserSession();
       setUser(null);
       return { success: true };
     } catch (error) {
       log.error('Logout error', error?.message || error);
       // Still complete logout locally even if server logout fails
-      await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+      await clearUserSession();
       setUser(null);
       return { success: true };
     }
@@ -430,7 +428,7 @@ export const AuthProvider = ({ children }) => {
       const result = await apiDeleteUserAccount(user.token);
       // Always log out locally after successful delete.
       if (result.success) {
-        await AsyncStorage.removeItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
+        await clearUserSession();
         setUser(null);
       }
       return result;
@@ -467,13 +465,12 @@ export const AuthProvider = ({ children }) => {
         log.error('User token is missing - re-authentication required');
         // Try to get token from storage as fallback
         try {
-          const storedUser = await AsyncStorage.getItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
-          if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            if (userData.token) {
+          const storedData = await getUserSession();
+          if (storedData) {
+            if (storedData.token) {
               log.debug('Found token in storage, attempting to restore session...');
               // Update user with token and retry
-              const userWithToken = { ...user, token: userData.token };
+              const userWithToken = { ...user, token: storedData.token };
               setUser(userWithToken);
               // Continue with the profile update
             } else {
@@ -527,7 +524,7 @@ export const AuthProvider = ({ children }) => {
           token: user.token  // Always preserve the token
         };
         setUser(updatedUser);
-        await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(updatedUser));
+        await storeUserSession(updatedUser);
         log.debug('User profile updated (token preserved)');
       }
       

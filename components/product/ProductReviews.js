@@ -18,6 +18,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('ProductReviews');
 
 const WEB_ORIGIN = AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae';
 
@@ -52,7 +55,7 @@ export default function ProductReviews({ productId }) {
       }
     } catch (error) {
       // Silently fail - reviews are non-critical
-      console.warn('Could not load reviews:', error?.message);
+      log.warn('Could not load reviews:', error?.message);
     } finally {
       setLoading(false);
     }

@@ -28,7 +28,11 @@ Configured in `app.json` under `ios.associatedDomains`:
     "details": [
       {
         "appID": "TEAM_ID.ae.genosys.app",
-        "paths": ["/products/*", "/cart", "/orders", "/profile", "/favorites", "/skin-recommendation"]
+        "paths": [
+          "/products/*", "/cart", "/orders", "/profile", "/favorites",
+          "/skin-recommendation", "/skin-analysis", "/blog/*",
+          "/bundle-builder", "/training", "/chat", "/checkout"
+        ]
       }
     ]
   }
@@ -39,11 +43,23 @@ Replace `TEAM_ID` with the Apple Developer Team ID.
 
 ### Android - Intent Filters
 
-Configured in `app.json` under `android.intentFilters`:
+Configured in `app.json` under `android.intentFilters` (updated Feb 11, 2026):
 
 - **Action**: `VIEW`
 - **Auto-verify**: `true`
-- **Supported paths**: `/products/*`, `/cart`, `/orders`, `/profile`, `/favorites`, `/skin-recommendation`
+- **Supported paths** (13 total):
+  - `/products/*` (including `www.genosys.ae`)
+  - `/cart`
+  - `/orders`
+  - `/profile`
+  - `/favorites`
+  - `/skin-recommendation`
+  - `/skin-analysis`
+  - `/blog`
+  - `/bundle-builder`
+  - `/training`
+  - `/chat`
+  - `/checkout`
 
 **Requirement**: A Digital Asset Links file must be hosted at `https://genosys.ae/.well-known/assetlinks.json`.
 
@@ -60,18 +76,32 @@ Examples:
 
 ## Route Mapping
 
+Updated February 11, 2026 — all screens now route to **native implementations** (no WebView).
+
 | Incoming URL Pattern | App Route | Description |
 |---|---|---|
+| `*/products` | `/(tabs)/shop` | Product catalog |
 | `*/products/{id}` | `/product/[id]` | Product detail page |
 | `*/cart` or `*/bag` | `/(tabs)/bag` | Shopping bag |
 | `*/orders` | `/(tabs)/orders` | Order history |
 | `*/track/{orderNumber}` | `/(tabs)/orders` | Order tracking |
 | `*/profile` | `/profile` | User profile |
 | `*/favorites` | `/favorites` | Wishlist |
-| `*/skin-recommendation` | `/skin-analysis` | AI skin analysis |
+| `*/skin-recommendation` or `*/skin-analysis` | `/skin-analysis` | AI skin analysis |
 | `*/chat` | `/chat` | AI chatbot |
 | `*/checkout` | `/checkout` | Checkout screen |
-| `*/blog/*`, `*/training`, `*/brand`, etc. | `/webview` | Opens in in-app WebView |
+| `*/bundle-builder` | `/bundle-builder` | Build Your Set |
+| `*/blog` | `/blog` | Blog listing |
+| `*/blog/{slug}` | `/blog/[slug]` | Blog article detail |
+| `*/training` | `/training` | Professional training |
+| `*/locations` | `/locations` | Store locations |
+| `*/brand` | `/brand` | Brand page |
+| `*/delivery` | `/delivery` | Delivery info |
+| `*/faq` | `/faq` | FAQ page |
+| `*/partners` | `/partners` | Partners page |
+| `*/about` | `/about` | About page |
+| `*/contact` | `/contact` | Contact page |
+| `*/certificates` | `/webview` | Opens in WebView (only remaining WebView route) |
 
 Locale prefixes (`/en/`, `/ar/`, `/ru/`) are automatically stripped before routing.
 

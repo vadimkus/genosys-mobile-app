@@ -344,8 +344,13 @@ export const CartProvider = ({ children }) => {
 
   /**
    * Add item to cart with variant support
+   * @param {Object} product - Product object
+   * @param {number} quantity - Quantity to add
+   * @param {string} selectedColor - Selected color variant
+   * @param {string} selectedSize - Selected size variant
+   * @param {Object} itemMeta - Optional item-level metadata (e.g. { fromBundle, bundleDiscountPercent })
    */
-  const addItem = (product, quantity = 1, selectedColor = '', selectedSize = '') => {
+  const addItem = (product, quantity = 1, selectedColor = '', selectedSize = '', itemMeta = null) => {
     // Prevent price-on-request products from being added to cart
     if (product?.isPriceOnRequest) return;
 
@@ -414,7 +419,9 @@ export const CartProvider = ({ children }) => {
         quantity,
         selectedColor: normalizedColor,
         selectedSize: normalizedSize,
-        addedAt: new Date().toISOString()
+        addedAt: new Date().toISOString(),
+        // Preserve bundle metadata at the item level (used by waterfall pricing)
+        ...(itemMeta?.fromBundle ? { fromBundle: true, bundleDiscountPercent: itemMeta.bundleDiscountPercent || 0 } : {}),
       };
       setItems(prev => [...prev, newItem]);
     }
@@ -566,6 +573,9 @@ export const CartProvider = ({ children }) => {
           discount: item.product.discount || 0,
           isPromotionItem: isPromotionItem(item),
           promotionKey: item.promotionKey || null,
+          fromBundle: item.fromBundle || item.product?.fromBundle || false,
+          bundleDiscountPercent: item.bundleDiscountPercent || item.product?.bundleDiscountPercent || 0,
+          originalPrice: item.product?.originalPrice || null,
         }))
       };
       

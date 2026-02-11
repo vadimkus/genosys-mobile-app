@@ -8,9 +8,9 @@
  * the user is actively using the app.
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import { getSecureToken, updateSecureToken, clearUserSession, getUserSession, storeUserSession } from './secureTokenStorage';
 
 const log = createLogger('authFetch');
 
@@ -86,21 +86,20 @@ async function refreshToken(expiredToken) {
 }
 
 /**
- * Persist a refreshed token+user into AsyncStorage and return the merged user object.
+ * Persist a refreshed token+user into secure storage and return the merged user object.
  * 
  * @param {{token: string, user: object|null}} refreshResult
  * @returns {Promise<object>} The updated user object with new token
  */
 async function persistRefreshedToken(refreshResult) {
   try {
-    const storedRaw = await AsyncStorage.getItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
-    const storedUser = storedRaw ? JSON.parse(storedRaw) : {};
+    const storedUser = await getUserSession() || {};
     const updatedUser = {
       ...storedUser,
       ...(refreshResult.user || {}),
       token: refreshResult.token,
     };
-    await AsyncStorage.setItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, JSON.stringify(updatedUser));
+    await storeUserSession(updatedUser);
     log.debug('Persisted refreshed token to storage');
     return updatedUser;
   } catch (e) {
@@ -179,17 +178,12 @@ function _handleAuthExpired() {
 }
 
 /**
- * Get the latest token from AsyncStorage.
+ * Get the latest token from secure storage.
  * Useful after a refresh has happened in another call.
  */
 export async function getLatestToken() {
   try {
-    const raw = await AsyncStorage.getItem(AUTH_CONFIG.TOKEN_STORAGE_KEY);
-    if (raw) {
-      const user = JSON.parse(raw);
-      return user?.token || null;
-    }
-    return null;
+    return await getSecureToken();
   } catch {
     return null;
   }

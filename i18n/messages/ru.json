@@ -180,6 +180,7 @@
     "discountLabel": "Скидка",
     "deliveryCostLabel": "Стоимость доставки",
     "bundleDiscount15": "Скидка 15% (набор)",
+    "bundleOff": "СКИДКА (набор)",
     "discount100": "100% СКИДКА",
     "promotionTag": "Промо",
     "emptyCartTitle": "Корзина пуста",
@@ -887,7 +888,10 @@
     "retailPrice": "Розничная цена",
     "vipDiscount": "VIP скидка",
     "bundleDiscount": "Скидка за набор",
-    "totalSaved": "Итого сэкономлено"
+    "totalSaved": "Итого сэкономлено",
+    "viewBoxContents": "Показать состав набора",
+    "hideBoxContents": "Скрыть состав набора",
+    "boxDetailsUnavailable": "Детали состава набора недоступны."
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",

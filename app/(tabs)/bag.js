@@ -305,6 +305,27 @@ export default function BagScreen() {
                 // Do not apply user-discount math from a mismatched originalPrice; rely on variant price directly.
                 const original = hasVariantPrice ? Number(selectedVariant?.originalPrice) : Number(item.product?.originalPrice);
                 const isBeautyBox = isBeautyBoxProduct(item.product);
+                const isBundleItem = item?.fromBundle === true || item?.product?.fromBundle === true;
+                const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;
+
+                // "Build Your Set" bundle items: show waterfall (VIP + Bundle) matching website
+                if (isBundleItem && bundlePct > 0 && Number.isFinite(base) && base > 0) {
+                  // Retail price = originalPrice stored when adding to cart
+                  const retailPrice = (Number.isFinite(original) && original > base) ? original : base / (1 - bundlePct / 100);
+                  const userPct = Number(user?.discountPercentage) || 0;
+                  const hasVip = userPct > 0 && userPct < 100 && !isUserDiscountExcludedProduct(item.product);
+                  // Combined label: "50% + 20%" or just "20%"
+                  const discountLabel = hasVip
+                    ? `${userPct}% + ${bundlePct}%`
+                    : `${bundlePct}%`;
+                  return (
+                    <View style={styles.itemPriceContainer}>
+                      <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>
+                      <Text style={styles.itemBundleLabel}>{discountLabel} {t('bag.bundleOff') || 'OFF'}</Text>
+                      <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
+                    </View>
+                  );
+                }
 
                 // Beauty Boxes: show bundle discount (15%) explicitly, ignore user discount
                 if (isBeautyBox && Number.isFinite(base) && base > 0) {

@@ -374,7 +374,7 @@ export default function ChatButton({ visible = true }) {
 
         <KeyboardAvoidingView
           style={s.panelContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
           <View style={[s.panel, { height: isExpanded ? PANEL_HEIGHT_EXPANDED : PANEL_HEIGHT, borderTopLeftRadius: isExpanded ? 0 : 20, borderTopRightRadius: isExpanded ? 0 : 20 }]}>

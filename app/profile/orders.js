@@ -12,6 +12,9 @@ import { getPaymentUrlForExistingOrder } from '../../services/orderService';
 import { OrdersSkeleton } from '../../components/SkeletonLoader';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('Orders');
 
 const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
 
@@ -151,7 +154,7 @@ export default function OrdersScreen() {
       const src = await AsyncStorage.getItem('@genosys_nav_orders_source').catch(() => null);
       if (mounted) setOpenedFromProfile(src === 'profile');
       // Clear the source flag so Orders opened from the tab/footer behaves normally.
-      await AsyncStorage.removeItem('@genosys_nav_orders_source').catch(() => {});
+      await AsyncStorage.removeItem('@genosys_nav_orders_source').catch((e) => log.warn('Failed to clear nav source', e?.message));
     })();
     return () => {
       mounted = false;
@@ -173,8 +176,8 @@ export default function OrdersScreen() {
     setError('');
     try {
       // Prefer pending orders first if backend supports status filter.
-      const pending = await fetchUserOrders(token, { status: 'pending', page: 1, limit: 20 }).catch(() => []);
-      const recent = await fetchUserOrders(token, { page: 1, limit: 30 }).catch(() => []);
+      const pending = await fetchUserOrders(token, { status: 'pending', page: 1, limit: 20 }).catch((e) => { log.warn('Failed to fetch pending orders', e?.message); return []; });
+      const recent = await fetchUserOrders(token, { page: 1, limit: 30 }).catch((e) => { log.warn('Failed to fetch recent orders', e?.message); return []; });
       const merged = [
         ...(Array.isArray(pending) ? pending : []),
         ...(Array.isArray(recent) ? recent : []),
@@ -301,7 +304,8 @@ export default function OrdersScreen() {
     const phoneNumber = '971585487665';
     const message = t('support.whatsappOrderHelpMessage', { orderNumber: String(orderNumber) });
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    Linking.openURL(whatsappUrl).catch(() => {
+    Linking.openURL(whatsappUrl).catch((e) => {
+      log.warn('Failed to open WhatsApp', e?.message);
       Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
     });
   };

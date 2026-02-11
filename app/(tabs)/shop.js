@@ -348,7 +348,7 @@ export default function ShopScreen() {
             return isBeautyBox;
           })() ? (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.originalPrice}>{((product.displayPrice || product.price || 0) / 0.85).toFixed(2)} AED</Text>
+              <Text style={styles.originalPrice}>{(product.originalPrice || ((product.displayPrice || product.price || 0) / 0.85)).toFixed(2)} AED</Text>
               <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
               <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>

@@ -145,6 +145,7 @@ export async function submitCODOrder(orderData) {
         const price = Number(rawPrice);
         const quantity = Number(item.quantity) || 0;
         const isPromo = item.isPromotionItem === true;
+        const isBundleItem = item.fromBundle === true || item.product?.fromBundle === true;
         return {
           // Required by backend
           productId,
@@ -159,6 +160,10 @@ export async function submitCODOrder(orderData) {
           color: item.selectedColor || item.color,
           isPromotionItem: isPromo,
           promotionKey: item.promotionKey || null,
+          // Bundle metadata (Build Your Set) — server needs per-item flags
+          fromBundle: isBundleItem,
+          bundleDiscountPercent: isBundleItem ? (Number(item.bundleDiscountPercent || item.product?.bundleDiscountPercent) || 0) : 0,
+          originalPrice: isBundleItem ? (Number(item.product?.originalPrice) || 0) : 0,
         };
       }),
       subtotal: orderData.subtotal,
@@ -248,17 +253,24 @@ export async function submitCardOrder(orderData) {
         address: orderData.customerAddress,
       },
       emirate: orderData.emirate,
-      items: orderData.items.map(item => ({
-        id: item.product?.id || item.id,
-        name: item.product?.name || item.name,
-        price: item.product?.displayPrice || item.product?.price || item.price,
-        quantity: item.quantity,
-        image: item.product?.image_url || item.product?.image || item.image,
-        size: item.isPromotionItem === true ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
-        color: item.selectedColor || item.color,
-        isPromotionItem: item.isPromotionItem === true,
-        promotionKey: item.promotionKey || null,
-      })),
+      items: orderData.items.map(item => {
+        const isBundleItem = item.fromBundle === true || item.product?.fromBundle === true;
+        return {
+          id: item.product?.id || item.id,
+          name: item.product?.name || item.name,
+          price: item.product?.displayPrice || item.product?.price || item.price,
+          quantity: item.quantity,
+          image: item.product?.image_url || item.product?.image || item.image,
+          size: item.isPromotionItem === true ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
+          color: item.selectedColor || item.color,
+          isPromotionItem: item.isPromotionItem === true,
+          promotionKey: item.promotionKey || null,
+          // Bundle metadata (Build Your Set) — server needs per-item flags
+          fromBundle: isBundleItem,
+          bundleDiscountPercent: isBundleItem ? (Number(item.bundleDiscountPercent || item.product?.bundleDiscountPercent) || 0) : 0,
+          originalPrice: isBundleItem ? (Number(item.product?.originalPrice) || 0) : 0,
+        };
+      }),
       shippingCost: orderData.shippingCost,
       vatAmount: orderData.vatAmount,
       subtotal: orderData.subtotal,

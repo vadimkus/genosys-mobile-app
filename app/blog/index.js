@@ -19,6 +19,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('Blog');
 
 export default function BlogScreen() {
   const router = useRouter();
@@ -49,7 +52,7 @@ export default function BlogScreen() {
       const data = await res.json();
       setPosts(data.posts || []);
     } catch (err) {
-      console.error('Blog fetch error:', err);
+      log.error('Blog fetch error', err?.message);
       setError(err.message);
     } finally {
       setLoading(false);

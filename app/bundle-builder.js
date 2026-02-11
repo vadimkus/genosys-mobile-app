@@ -27,6 +27,9 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('BundleBuilder');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
@@ -143,7 +146,7 @@ export default function BundleBuilderScreen() {
 
       setSteps(data.steps || []);
     } catch (err) {
-      console.warn('Failed to fetch bundle data:', err.message);
+      log.warn('Failed to fetch bundle data:', err.message);
       setError(l('Failed to load products', 'فشل تحميل المنتجات', 'Не удалось загрузить товары'));
     } finally {
       setLoading(false);
@@ -160,9 +163,14 @@ export default function BundleBuilderScreen() {
   const discountPercent = getDiscountForCount(itemCount);
   const nextTier = getNextTier(itemCount);
 
+  // Waterfall pricing matching website: retail → VIP discount → bundle discount
+  const retailTotal = selectedArray.reduce((sum, item) => sum + (item.product.originalPrice || item.product.price), 0);
   const subtotal = selectedArray.reduce((sum, item) => sum + (item.product.displayPrice || item.product.price), 0);
+  const userDiscountAmount = Math.round((retailTotal - subtotal) * 100) / 100;
+  const hasUserDiscount = userDiscountAmount > 0.5; // threshold to avoid rounding noise
   const discountAmount = Math.round((subtotal * discountPercent) / 100 * 100) / 100;
   const total = Math.round((subtotal - discountAmount) * 100) / 100;
+  const totalSaved = Math.round((retailTotal - total) * 100) / 100;
 
   const toggleProduct = (product, stepId) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -201,15 +209,22 @@ export default function BundleBuilderScreen() {
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    // Add each selected product to cart
+    // Add each selected product to cart with bundle discount applied on top of user discount (waterfall)
+    // Matches website: VIP discount first → then bundle discount on the VIP-discounted price
     selectedArray.forEach(({ product }) => {
+      // Step 1: User's VIP-discounted price (displayPrice already includes VIP discount from API)
+      const vipPrice = product.displayPrice || product.price;
+      // Step 2: Apply bundle discount on top of VIP price
+      const finalPrice = Math.round(vipPrice * (1 - discountPercent / 100) * 100) / 100;
+
       // Build a cart-compatible product object
       const cartProduct = {
         id: product.id,
         productNumber: product.productNumber,
         name: product.name,
-        price: product.displayPrice || product.price,
-        originalPrice: product.originalPrice || product.price,
+        price: finalPrice,
+        displayPrice: finalPrice,
+        originalPrice: product.originalPrice || product.price, // retail price for waterfall display
         image: product.image,
         category: product.category,
         size: product.size,
@@ -218,7 +233,7 @@ export default function BundleBuilderScreen() {
         fromBundle: true,
         bundleDiscountPercent: discountPercent,
       };
-      addItem(cartProduct, 1, '', '');
+      addItem(cartProduct, 1, '', '', { fromBundle: true, bundleDiscountPercent: discountPercent });
     });
 
     // Clear selection
@@ -260,6 +275,9 @@ export default function BundleBuilderScreen() {
         {/* Product info */}
         <View style={styles.productInfo}>
           <Text style={[styles.productName, isRTL && styles.textRTL]} numberOfLines={2}>{product.name}</Text>
+          {product.description ? (
+            <Text style={[styles.productDesc, isRTL && styles.textRTL]} numberOfLines={2}>{product.description}</Text>
+          ) : null}
           {product.size ? <Text style={styles.productSize}>{product.size}</Text> : null}
 
           {/* Price */}
@@ -472,23 +490,48 @@ export default function BundleBuilderScreen() {
           <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
         </TouchableOpacity>
 
-        {/* Expanded pricing breakdown */}
+        {/* Expanded pricing breakdown — waterfall matching website */}
         {footerExpanded && user && itemCount > 0 && (
           <View style={styles.footerPricing}>
-            <View style={styles.pricingRow}>
-              <Text style={styles.pricingLabel}>{l('Subtotal', 'المجموع الفرعي', 'Подытог')}</Text>
-              <Text style={styles.pricingValue}>{Math.round(subtotal)} AED</Text>
-            </View>
+            {/* Retail Price (before any discounts) — only shown when discounts exist */}
+            {(hasUserDiscount || discountPercent > 0) && (
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
+                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{retailTotal.toFixed(2)} AED</Text>
+              </View>
+            )}
+            {/* VIP Discount */}
+            {hasUserDiscount && (
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabelPurple}>{l('Your Discount', 'خصمك', 'Ваша скидка')} ({Math.round(Number(user?.discountPercentage) || 0)}%)</Text>
+                <Text style={styles.pricingValuePurple}>-{userDiscountAmount.toFixed(2)} AED</Text>
+              </View>
+            )}
+            {/* Subtotal (after VIP) */}
+            {hasUserDiscount && (
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>{l('Subtotal', 'المجموع الفرعي', 'Подытог')}</Text>
+                <Text style={styles.pricingValue}>{subtotal.toFixed(2)} AED</Text>
+              </View>
+            )}
+            {/* Bundle Discount */}
             {discountPercent > 0 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabelGreen}>{l('Bundle Discount', 'خصم المجموعة', 'Скидка набора')} ({discountPercent}%)</Text>
-                <Text style={styles.pricingValueGreen}>-{Math.round(discountAmount)} AED</Text>
+                <Text style={styles.pricingValueGreen}>-{discountAmount.toFixed(2)} AED</Text>
               </View>
             )}
             <View style={[styles.pricingRow, styles.pricingRowTotal]}>
               <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
-              <Text style={styles.pricingTotalValue}>{Math.round(total)} AED</Text>
+              <Text style={styles.pricingTotalValue}>{total.toFixed(2)} AED</Text>
             </View>
+            {/* You Save badge */}
+            {totalSaved > 0.5 && (
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabelGreen}>{l('You Save', 'توفر', 'Вы экономите')}</Text>
+                <Text style={styles.pricingValueGreen}>{totalSaved.toFixed(2)} AED</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -584,23 +627,45 @@ export default function BundleBuilderScreen() {
               })}
             </ScrollView>
 
-            {/* Pricing breakdown */}
+            {/* Pricing breakdown — waterfall matching website */}
             {user && (
               <View style={styles.summaryPricing}>
+                {/* Retail Price */}
+                {(hasUserDiscount || discountPercent > 0) && (
+                  <View style={styles.pricingRow}>
+                    <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
+                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{retailTotal.toFixed(2)} AED</Text>
+                  </View>
+                )}
+                {/* VIP Discount */}
+                {hasUserDiscount && (
+                  <View style={styles.pricingRow}>
+                    <Text style={styles.pricingLabelPurple}>{l('Your Discount', 'خصمك', 'Ваша скидка')} ({Math.round(Number(user?.discountPercentage) || 0)}%)</Text>
+                    <Text style={styles.pricingValuePurple}>-{userDiscountAmount.toFixed(2)} AED</Text>
+                  </View>
+                )}
+                {/* Subtotal (after VIP) */}
                 <View style={styles.pricingRow}>
                   <Text style={styles.pricingLabel}>{l('Subtotal', 'المجموع الفرعي', 'Подытог')}</Text>
-                  <Text style={styles.pricingValue}>{Math.round(subtotal)} AED</Text>
+                  <Text style={styles.pricingValue}>{subtotal.toFixed(2)} AED</Text>
                 </View>
+                {/* Bundle Discount */}
                 {discountPercent > 0 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabelGreen}>{l('Bundle Discount', 'خصم المجموعة', 'Скидка набора')} ({discountPercent}%)</Text>
-                    <Text style={styles.pricingValueGreen}>-{Math.round(discountAmount)} AED</Text>
+                    <Text style={styles.pricingValueGreen}>-{discountAmount.toFixed(2)} AED</Text>
                   </View>
                 )}
                 <View style={[styles.pricingRow, styles.pricingRowTotal]}>
                   <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
-                  <Text style={styles.pricingTotalValue}>{Math.round(total)} AED</Text>
+                  <Text style={styles.pricingTotalValue}>{total.toFixed(2)} AED</Text>
                 </View>
+                {totalSaved > 0.5 && (
+                  <View style={styles.pricingRow}>
+                    <Text style={styles.pricingLabelGreen}>{l('You Save', 'توفر', 'Вы экономите')}</Text>
+                    <Text style={styles.pricingValueGreen}>{totalSaved.toFixed(2)} AED</Text>
+                  </View>
+                )}
               </View>
             )}
 
@@ -676,7 +741,7 @@ const styles = StyleSheet.create({
   productCard: {
     width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 14,
     borderWidth: 1.5, borderColor: '#F3F4F6', overflow: 'hidden',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1,
   },
   productCardSelected: { borderColor: '#dc2626', backgroundColor: '#FFF5F5' },
   selectedBadge: {
@@ -688,6 +753,7 @@ const styles = StyleSheet.create({
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
   productName: { fontSize: 12, fontWeight: '600', color: '#374151', lineHeight: 16, minHeight: 32 },
+  productDesc: { fontSize: 10, color: '#6B7280', lineHeight: 14, marginTop: 2 },
   productSize: { fontSize: 11, color: '#9CA3AF', marginTop: 2 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   priceOriginal: { fontSize: 11, color: '#9CA3AF', textDecorationLine: 'line-through' },
@@ -740,6 +806,8 @@ const styles = StyleSheet.create({
   pricingRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   pricingLabel: { fontSize: 14, color: '#6B7280' },
   pricingValue: { fontSize: 14, fontWeight: '600', color: '#374151' },
+  pricingLabelPurple: { fontSize: 14, color: '#7c3aed', fontWeight: '600' },
+  pricingValuePurple: { fontSize: 14, fontWeight: '700', color: '#7c3aed' },
   pricingLabelGreen: { fontSize: 14, color: '#16a34a', fontWeight: '600' },
   pricingValueGreen: { fontSize: 14, fontWeight: '700', color: '#16a34a' },
   pricingRowTotal: { borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 8, marginTop: 4 },

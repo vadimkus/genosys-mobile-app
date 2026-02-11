@@ -19,6 +19,33 @@ const WEB_DOMAIN = 'genosys.ae';
 export function handleDeepLink(url) {
   if (!url) return false;
 
+  // Security: validate URL origin
+  const ALLOWED_HOSTS = ['genosys.ae', 'www.genosys.ae'];
+  const ALLOWED_SCHEMES = ['genosys', 'https', 'http'];
+  
+  try {
+    // For custom scheme URLs (genosys://), skip host validation
+    if (!url.startsWith('genosys://')) {
+      const urlObj = new URL(url);
+      if (!ALLOWED_HOSTS.includes(urlObj.hostname)) {
+        log.warn('Deep link rejected: untrusted host', { url, host: urlObj.hostname });
+        return false;
+      }
+      if (!ALLOWED_SCHEMES.includes(urlObj.protocol.replace(':', ''))) {
+        log.warn('Deep link rejected: untrusted scheme', { url, scheme: urlObj.protocol });
+        return false;
+      }
+    }
+  } catch {
+    // URL parsing failed for custom scheme - that's OK, Linking.parse handles it
+  }
+
+  // Sanitize: reject URLs with suspicious patterns
+  if (url.includes('javascript:') || url.includes('data:') || url.includes('<script')) {
+    log.warn('Deep link rejected: suspicious content', { url });
+    return false;
+  }
+
   try {
     const parsed = Linking.parse(url);
     log.debug('Deep link received', { url, path: parsed.path, params: parsed.queryParams });

@@ -25,12 +25,15 @@ export function buildAuthenticatedWebViewUrl(urlPath, locale, user) {
   const localePrefix = locale === 'ar' ? '/ar' : locale === 'ru' ? '/ru' : '';
 
   // If user is logged in, route through the mobile-session bridge
+  // SECURITY: Use POST-based redirect with headers instead of URL query params
+  // to avoid leaking tokens/API keys in server logs, referrer headers, and browser history.
+  // The WebView will be loaded with a POST request via injectedJavaScript if needed.
+  // For GET-based compatibility, we send token in URL but API key via the WebView headers.
   if (user?.token) {
     const localeParam = locale === 'ar' || locale === 'ru' ? locale : '';
     return (
       `${BASE_URL}/api/auth/mobile-session` +
       `?token=${encodeURIComponent(user.token)}` +
-      `&apiKey=${encodeURIComponent(AUTH_CONFIG.API_KEY)}` +
       `&redirect=${encodeURIComponent(urlPath)}` +
       (localeParam ? `&locale=${encodeURIComponent(localeParam)}` : '')
     );
@@ -38,4 +41,17 @@ export function buildAuthenticatedWebViewUrl(urlPath, locale, user) {
 
   // Not logged in – load the page directly
   return `${BASE_URL}${localePrefix}${urlPath}`;
+}
+
+/**
+ * Get custom headers for authenticated WebView requests.
+ * API key is sent via headers instead of URL query params for security.
+ *
+ * @returns {Object} Headers object for WebView source prop
+ */
+export function getWebViewHeaders() {
+  return {
+    'x-api-key': AUTH_CONFIG.API_KEY,
+    'x-mobile-app': 'genosys-mobile',
+  };
 }

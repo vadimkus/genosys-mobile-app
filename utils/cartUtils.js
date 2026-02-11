@@ -69,7 +69,9 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
 
     const discountPct = Number(user?.discountPercentage);
     const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
-    const excludedFromUserDiscount = isUserDiscountExcludedProduct(item.product);
+    // Bundle items (Build Your Set) already have BOTH VIP + bundle discounts baked into price — don't re-apply
+    const isBundleItem = item?.fromBundle === true || item?.product?.fromBundle === true;
+    const excludedFromUserDiscount = isBundleItem || isUserDiscountExcludedProduct(item.product);
     const forceCanonicalPrice =
       isHydroCoolMask(item.product) || isDeviceProduct(item.product) || hasFixedPriceOverride(item.product);
 
@@ -232,6 +234,8 @@ export function computeWaterfallBreakdown(items, user) {
 
     const forceCanonicalPrice =
       isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
+    const isBundleItem = item?.fromBundle === true || product?.fromBundle === true;
+    // Bundle items get BOTH VIP + bundle discounts (waterfall), but non-bundle excluded products still skip VIP
     const excludedFromUserDiscount = isUserDiscountExcludedProduct(product);
     const beautyBox = isBeautyBoxProduct(product);
 
@@ -244,6 +248,11 @@ export function computeWaterfallBreakdown(items, user) {
         : (Number.isFinite(productOriginal) && productOriginal > 0) ? productOriginal
         : variantPrice;
       retailUnitPrice = Math.max(variantPrice, orig);
+    } else if (isBundleItem) {
+      // For bundle items, retailUnitPrice = originalPrice (the full retail, pre-any-discount)
+      retailUnitPrice = (Number.isFinite(productOriginal) && productOriginal > 0)
+        ? productOriginal
+        : Number(product?.displayPrice ?? product?.price ?? 0);
     } else {
       const displayPrice = Number(product?.displayPrice ?? product?.price ?? 0);
       retailUnitPrice = (Number.isFinite(productOriginal) && productOriginal > 0)
@@ -253,14 +262,15 @@ export function computeWaterfallBreakdown(items, user) {
 
     _retailTotal += retailUnitPrice * qty;
 
-    // --- User (VIP) discount ---
+    // --- User (VIP) discount (waterfall step 1) ---
+    // Bundle items also get VIP discount (matching website waterfall: VIP first, then bundle)
     if (!excludedFromUserDiscount && hasUserDiscountPct) {
       const discountAmount = retailUnitPrice * (discountPct / 100);
       _userDiscountTotal += discountAmount * qty;
       _userDiscountPct = discountPct;
     }
 
-    // --- Bundle discount (Beauty Boxes carry a 15% bundle discount) ---
+    // --- Bundle discount (waterfall step 2): applied on the VIP-discounted price ---
     if (beautyBox) {
       const bbOriginal = (Number.isFinite(productOriginal) && productOriginal > 0)
         ? productOriginal
@@ -272,14 +282,19 @@ export function computeWaterfallBreakdown(items, user) {
         if (pct > 0) _bundleDiscountPct = pct;
       }
     }
-    // Also handle explicit fromBundle items (future-proofing)
-    if (item.fromBundle && item.bundleDiscountPercent && item.bundleDiscountPercent > 0) {
-      const afterVip = excludedFromUserDiscount
-        ? retailUnitPrice
-        : retailUnitPrice * (1 - discountPct / 100);
-      const bundleDiscount = (afterVip * item.bundleDiscountPercent) / 100;
-      _bundleDiscountTotal += bundleDiscount * qty;
-      if (item.bundleDiscountPercent > 0) _bundleDiscountPct = item.bundleDiscountPercent;
+    // Handle "Build Your Set" bundle items — waterfall: bundle discount applied on VIP-discounted price
+    const bundlePct = Number(item?.bundleDiscountPercent || product?.bundleDiscountPercent) || 0;
+    if (isBundleItem && bundlePct > 0) {
+      // After VIP discount: vipPrice = retailUnitPrice * (1 - vipPct / 100)
+      const vipDiscountedPrice = (!excludedFromUserDiscount && hasUserDiscountPct)
+        ? retailUnitPrice * (1 - discountPct / 100)
+        : retailUnitPrice;
+      // Bundle discount is applied on the VIP-discounted price
+      const bundleDiscountAmount = vipDiscountedPrice * (bundlePct / 100);
+      if (Number.isFinite(bundleDiscountAmount) && bundleDiscountAmount > 0) {
+        _bundleDiscountTotal += bundleDiscountAmount * qty;
+        _bundleDiscountPct = bundlePct;
+      }
     }
   });
 

@@ -180,6 +180,7 @@
     "discountLabel": "الخصم",
     "deliveryCostLabel": "تكلفة التوصيل",
     "bundleDiscount15": "خصم 15% (باقة)",
+    "bundleOff": "خصم (مجموعة)",
     "discount100": "خصم 100%",
     "promotionTag": "عرض",
     "emptyCartTitle": "السلة فارغة",
@@ -887,7 +888,10 @@
     "retailPrice": "سعر التجزئة",
     "vipDiscount": "خصم VIP",
     "bundleDiscount": "خصم الباقة",
-    "totalSaved": "إجمالي التوفير"
+    "totalSaved": "إجمالي التوفير",
+    "viewBoxContents": "عرض محتويات العلبة",
+    "hideBoxContents": "إخفاء محتويات العلبة",
+    "boxDetailsUnavailable": "تفاصيل محتويات العلبة غير متاحة."
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",

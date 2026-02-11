@@ -30,6 +30,9 @@ import { useCart } from '../contexts/CartContext';
 import SkinAnalysisResults from '../components/SkinAnalysisResults';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('SkinAnalysisCamera');
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -140,7 +143,7 @@ export default function SkinAnalysisCameraScreen() {
           throw new Error(json.error || 'AI analysis failed');
         }
       } catch (err) {
-        console.warn('AI analysis failed:', err.message);
+        log.warn('AI analysis failed:', err.message);
         // Fall back to on-device analysis
         setAnalyzing(true);
         try {

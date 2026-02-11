@@ -153,7 +153,7 @@ export default function AddEditAddressScreen() {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         // Enough offset to keep multiline address visible below the header on iOS.
         keyboardVerticalOffset={Platform.OS === 'ios' ? 96 : 0}
       >

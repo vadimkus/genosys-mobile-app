@@ -5,7 +5,7 @@
 
 ## Overview
 
-The Genosys UAE iOS app previously used WebView wrappers to display 9 website pages inside the app. This resulted in:
+The Genosys UAE app (iOS + Android) previously used WebView wrappers to display 9 website pages inside the app. This resulted in:
 - Slow loading (website had to render + inject CSS to hide chrome)
 - Inconsistent UX (web styles vs native feel)
 - Layout issues (overlapping headers, missing functionality)
@@ -602,5 +602,23 @@ All native screen migrations documented here are part of the production release.
 
 ---
 
+## Android Alignment (February 11, 2026)
+
+The Android version has been fully aligned with the iOS app:
+
+- **versionCode** updated from `1` to `53` to match iOS build number
+- **All 8 migrated native screens** are accessible on Android (same codebase)
+- **Deep linking** updated: all 10 native screens route directly to native implementations (previously fell back to WebView in `utils/deepLinking.js`)
+- **Intent filters** added for all new native screen paths (`/blog`, `/bundle-builder`, `/training`, `/skin-analysis`, `/chat`, `/checkout`)
+- **Android plugins** configured: `expo-notifications` (icon + color), `expo-camera`, `expo-image-picker`, `expo-local-authentication`
+- **Android permissions** expanded: `POST_NOTIFICATIONS`, `READ_MEDIA_IMAGES`, `USE_BIOMETRIC`, `USE_FINGERPRINT`, `ACCESS_NETWORK_STATE`
+- **Android bundle** compiled successfully: 1966 modules, 0 errors
+
+Both iOS and Android now have identical feature sets (except Apple Sign-In which is iOS-only by design).
+
+See: [Session Log 11 Feb 2026](./SESSION_LOG_2026_02_11.md) and [Google Play Review Documentation](../app-store/GOOGLE_PLAY_REVIEW_DOCUMENTATION.md)
+
+---
+
 *Document created: February 10, 2026*  
-*Last updated: February 11, 2026 — v1.3.0 live on App Store*
+*Last updated: February 11, 2026 — Android aligned with iOS v1.3.0*

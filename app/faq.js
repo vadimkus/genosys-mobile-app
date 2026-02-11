@@ -21,6 +21,9 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import * as Haptics from 'expo-haptics';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('FAQ');
 
 export default function FAQScreen() {
   const router = useRouter();
@@ -58,7 +61,7 @@ export default function FAQScreen() {
       setSubtitle(data.subtitle || '');
       setDescription(data.description || '');
     } catch (err) {
-      console.warn('Failed to fetch FAQ:', err.message);
+      log.warn('Failed to fetch FAQ:', err.message);
       setError(l('Failed to load FAQ', 'فشل تحميل الأسئلة الشائعة', 'Не удалось загрузить FAQ'));
     } finally {
       setLoading(false);

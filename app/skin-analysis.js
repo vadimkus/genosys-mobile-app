@@ -26,6 +26,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('SkinAnalysis');
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -93,7 +96,7 @@ export default function SkinAnalysisScreen() {
         }));
         setResults(mapped);
       } catch (err) {
-        console.warn('Skin recommendations API failed, using empty results:', err.message);
+        log.warn('Skin recommendations API failed, using empty results:', err.message);
         setApiError(err.message);
         setResults([]);
       } finally {

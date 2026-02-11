@@ -34,6 +34,9 @@ import * as Haptics from 'expo-haptics';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('BlogPost');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CONTENT_WIDTH = SCREEN_WIDTH - 40; // 20px padding each side
@@ -95,7 +98,7 @@ export default function BlogPostScreen() {
         setPost(data.post);
         setComments(data.comments || []);
       } catch (err) {
-        console.warn('Blog post fetch error:', err.message);
+        log.warn('Blog post fetch error:', err.message);
         setError(l('Failed to load article', 'فشل تحميل المقال', 'Не удалось загрузить статью'));
       } finally {
         setLoading(false);
@@ -273,7 +276,7 @@ export default function BlogPostScreen() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
         <ScrollView

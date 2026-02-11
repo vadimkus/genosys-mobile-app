@@ -55,7 +55,8 @@ export const AUTH_CONFIG = {
     WEB_ORIGIN
   ),
   
-  // Mobile App API Key - matches backend authentication
+  // SECURITY: Set EXPO_PUBLIC_API_KEY in EAS secrets for production builds.
+  // The fallback value below is for development only and should be rotated.
   API_KEY: env('EXPO_PUBLIC_API_KEY', 'genosys_secure_mobile_2025_v1'),
 
   // Canonical web origins used across the app for image/link building.
@@ -78,7 +79,14 @@ export const AUTH_CONFIG = {
       'EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID',
       '998688135686-qmhvfcksth50r9ukk0pefqu1r7cqil73.apps.googleusercontent.com'
     ),
-    // If/when you add Android sign-in, set EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID.
+    // TODO: Google Sign-In on Android requires a separate OAuth 2.0 Android client ID.
+    // Steps to enable:
+    //   1. Go to Google Cloud Console > APIs & Services > Credentials
+    //   2. Create an OAuth 2.0 client ID for Android
+    //   3. Use package name: ae.genosys.app
+    //   4. Add the SHA-1 fingerprint from your signing key (debug + production)
+    //   5. Set EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID in your .env
+    // Without this, Google Sign-In will not work on Android builds.
     androidClientId: env('EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID', ''),
     // Used by Expo Go / web contexts
     webClientId: env(

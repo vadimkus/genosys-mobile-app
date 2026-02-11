@@ -19,6 +19,9 @@
  */
 
 import * as ImageManipulator from 'expo-image-manipulator';
+import { createLogger } from './logger';
+
+const log = createLogger('SkinImageAnalysis');
 
 const ANALYSIS_SIZE = 200; // Downscale to this width for fast analysis
 
@@ -133,7 +136,7 @@ export async function analyzeSkinImage(imageUri) {
       imageUri,
     };
   } catch (error) {
-    console.warn('Skin analysis error:', error);
+    log.warn('Skin analysis error:', error?.message);
     return createDefaultResult();
   }
 }

@@ -174,14 +174,16 @@ export const uploadProfilePicture = async (token, imageUri) => {
       try {
         result = JSON.parse(rawText);
       } catch (_e) {
-        // fall through; we'll report a better error below
+        /* JSON parse failed, trying raw text fallback */
       }
     }
     // If server returned JSON but content-type was wrong, try parsing anyway.
     if (!result && rawText) {
       try {
         result = JSON.parse(rawText);
-      } catch (_e) {}
+      } catch (_e) {
+        /* Raw text is not JSON, continuing with null result */
+      }
     }
     
     if (response.ok) {

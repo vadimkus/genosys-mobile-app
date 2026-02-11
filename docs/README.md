@@ -28,7 +28,8 @@
 | [Session Log 7–8 Feb (cont.)](./core/SESSION_LOG_2026_02_07_continued.md) | Request Quote, Bio Meso, voice search, more images/videos, dot fix |
 | [Session Log 8 Feb 2026](./core/SESSION_LOG_2026_02_08.md) | WebView auth bridge, translation fixes, isPriceOnRequest on all pages |
 | [Session Log 9 Feb 2026](./core/SESSION_LOG_2026_02_09.md) | Android app setup, SDK tools, emulator, code fixes |
-| [Session Log 10 Feb 2026](./core/SESSION_LOG_2026_02_10.md) | **NEW** FAQ → DB API, standalone About/Contact, delivery pricing, 8/9 native |
+| [Session Log 10 Feb 2026](./core/SESSION_LOG_2026_02_10.md) | Native blog, AI skin analysis upgrade, crash fix (Builds 49-53) |
+| [Session Log 11 Feb 2026](./core/SESSION_LOG_2026_02_11.md) | **NEW** Android alignment, code review (7 bugs), badge fix, beauty box details |
 | [Native Screens Migration](./core/NATIVE_SCREENS_MIGRATION.md) | **NEW** WebView → Native: 8 screens migrated, API-driven FAQ & Partners |
 | [Checkout Flow](./core/CHECKOUT_FLOW.md) | Delivery details, payment, order submission |
 | [Orders](./core/ORDERS_PAGES.md) | Orders list, order detail, reorder |
@@ -103,12 +104,13 @@
 
 ---
 
-## App Store
+## App Store & Google Play
 
 | Doc | Description |
 |-----|-------------|
 | [App Store Assets](./app-store/APP_STORE_ASSETS.md) | Assets for App Store listing |
-| [Apple Review](./app-store/APPLE_REVIEW_DOCUMENTATION.md) | Review preparation |
+| [Apple Review](./app-store/APPLE_REVIEW_DOCUMENTATION.md) | Apple App Store review preparation |
+| [Google Play Review](./app-store/GOOGLE_PLAY_REVIEW_DOCUMENTATION.md) | **NEW** Google Play Store review documentation |
 | [Shotlist](./app-store/SHOTLIST.md) | Screenshot planning |
 
 ---

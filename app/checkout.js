@@ -5,12 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Alert,
   ActivityIndicator,
   Linking,
   Platform,
-  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,10 +23,12 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
 import CollapsibleFooter from '../components/CollapsibleFooter';
 import * as haptics from '../utils/haptics';
-import EmirateFlagIcon from '../components/checkout/EmirateFlagIcon';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
+import CheckoutSteps from '../components/checkout/CheckoutSteps';
+import CheckoutAddressForm from '../components/checkout/CheckoutAddressForm';
+import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
+import OrderSummaryCard from '../components/checkout/OrderSummaryCard';
 import { createLogger } from '../utils/logger';
-import { formatEmirateLabel } from '../utils/emirateUtils';
 import {
   isValidEmail,
   normalizeUaeToNationalDigits,
@@ -400,8 +400,15 @@ export default function CheckoutScreen() {
         // Discount fields for accurate order records and email templates
         discountPercentage: userDiscountPct,
         discountAmount: 0, // Server recalculates from discountPercentage
-        bundleDiscountPercentage: 0,
-        bundleDiscountAmount: 0,
+        // Bundle discount: computed from "Build Your Set" items in cart
+        bundleDiscountPercentage: (() => {
+          const bundleItem = items.find(it => it?.fromBundle || it?.product?.fromBundle);
+          return Number(bundleItem?.bundleDiscountPercent || bundleItem?.product?.bundleDiscountPercent) || 0;
+        })(),
+        bundleDiscountAmount: (() => {
+          const wf = computeWaterfallBreakdown(items, user);
+          return wf?.bundleDiscountTotal || 0;
+        })(),
       };
 
       log.info('Submitting order:', {
@@ -533,36 +540,12 @@ export default function CheckoutScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity 
-          style={[styles.backButton, isRTL && styles.backButtonRTL]}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
-        </TouchableOpacity>
-
-        <View style={styles.headerCenter}>
-          <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('checkout.title')}</Text>
-          <View style={[styles.stepsRow, isRTL && styles.stepsRowRTL]}>
-            {(['delivery', 'payment', 'review']).map((k) => (
-              <View key={k} style={styles.stepItem}>
-                <Text style={[styles.stepText, isRTL && styles.textRTL, activeStep === k && styles.stepTextActive]}>
-                  {k === 'delivery'
-                    ? t('checkout.stepDelivery')
-                    : k === 'payment'
-                      ? t('checkout.stepPayment')
-                      : t('checkout.stepReview')}
-                </Text>
-                {activeStep === k ? <View style={styles.stepUnderline} /> : <View style={styles.stepUnderlineSpacer} />}
-              </View>
-            ))}
-          </View>
-        </View>
-        
-        <View style={styles.headerSpacer} />
-      </View>
+      {/* Header with Step Indicator */}
+      <CheckoutSteps
+        activeStep={activeStep}
+        onBack={() => router.back()}
+        styles={styles}
+      />
 
       <ScrollView
         ref={scrollRef}
@@ -611,392 +594,71 @@ export default function CheckoutScreen() {
             waterfall={waterfall}
           />
 
-          {/* Shipping Information */}
-          <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
-            <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-              <Ionicons name="location" size={20} color="#dc2626" />
-              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>
-            </View>
-
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
-              <TouchableOpacity
-                style={[styles.selectInput, isRTL && styles.selectInputRTL]}
-                activeOpacity={0.8}
-                onPress={async () => {
-                  // Ensure we have the latest list before opening.
-                  await loadSavedAddresses();
-                  setSavedAddressPickerOpen(true);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.selectText,
-                    isRTL && styles.textRTL,
-                    !selectedSavedAddressId && styles.selectPlaceholder,
-                  ]}
-                  numberOfLines={1}
-                >
-                  {selectedSavedAddressId
-                    ? (() => {
-                        const found = savedAddresses.find((a) => String(a?.id) === String(selectedSavedAddressId));
-                        if (!found) return t('checkout.selectSavedAddress');
-                        const label = getSavedTypeLabel(found.type);
-                        const addrLine = String(found.address || '').trim();
-                        return `${label}${found.isDefault ? ' • ' + t('addresses.default') : ''} — ${addrLine}`;
-                      })()
-                    : t('checkout.selectSavedAddress')}
-                </Text>
-                <Ionicons
-                  name={isRTL ? 'chevron-back' : 'chevron-forward'}
-                  size={18}
-                  color="#8E8E93"
-                />
-              </TouchableOpacity>
-            </View>
-
-            <View style={[styles.formRow, isRTL && styles.formRowRTL]}>
-              <View style={styles.formHalf} onLayout={registerFieldLayout('firstName')}>
-                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.firstName')} *</Text>
-                <TextInput
-                  style={[styles.input, isRTL && styles.inputRTL, showError('firstName') && styles.inputError]}
-                  value={firstName}
-                  onChangeText={(v) => {
-                    if (selectedSavedAddressId) clearSavedAddressSelection();
-                    setFirstName(v);
-                  }}
-                  placeholder={t('checkout.enterFirstName')}
-                  autoCapitalize="words"
-                  onBlur={() => setTouched((p) => ({ ...p, firstName: true }))}
-                  ref={firstNameRef}
-                  returnKeyType="next"
-                  onSubmitEditing={() => lastNameRef.current?.focus?.()}
-                />
-                {showError('firstName') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.firstName}</Text> : null}
-              </View>
-              <View style={styles.formHalf} onLayout={registerFieldLayout('lastName')}>
-                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.lastName')} *</Text>
-                <TextInput
-                  style={[styles.input, isRTL && styles.inputRTL, showError('lastName') && styles.inputError]}
-                  value={lastName}
-                  onChangeText={(v) => {
-                    if (selectedSavedAddressId) clearSavedAddressSelection();
-                    setLastName(v);
-                  }}
-                  placeholder={t('checkout.enterLastName')}
-                  autoCapitalize="words"
-                  onBlur={() => setTouched((p) => ({ ...p, lastName: true }))}
-                  ref={lastNameRef}
-                  returnKeyType="next"
-                  onSubmitEditing={() => emailRef.current?.focus?.()}
-                />
-                {showError('lastName') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.lastName}</Text> : null}
-              </View>
-            </View>
-
-            <View style={styles.formGroup} onLayout={registerFieldLayout('email')}>
-              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.emailAddress')} *</Text>
-              <View style={styles.inputWrap}>
-                <TextInput
-                  style={[
-                    styles.input,
-                    styles.inputWithRightIcon,
-                    isRTL && styles.inputRTL,
-                    isRTL && styles.inputValueLTR,
-                    showError('email') && styles.inputError,
-                  ]}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder={t('checkout.enterEmail')}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
-                  ref={emailRef}
-                  returnKeyType="next"
-                  onSubmitEditing={() => phoneRef.current?.focus?.()}
-                />
-                {isValidEmail(email) ? (
-                  <View style={styles.inputRightIcon}>
-                    <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
-                  </View>
-                ) : null}
-              </View>
-              {showError('email') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.email}</Text> : null}
-            </View>
-
-            <View style={styles.formGroup} onLayout={registerFieldLayout('phone')}>
-              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.phoneNumber')} *</Text>
-              <View style={[styles.phoneRow, isRTL && styles.phoneRowRTL]}>
-                <View style={styles.phonePrefix}>
-                  <Text style={styles.phonePrefixText}>+971</Text>
-                </View>
-                <View style={[styles.inputWrap, { flex: 1 }]}>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      styles.inputWithRightIcon,
-                      isRTL && styles.inputRTL,
-                      isRTL && styles.inputValueLTR,
-                      showError('phone') && styles.inputError,
-                    ]}
-                    value={formatUaeNationalForInput(phoneNational)}
-                    onChangeText={(text) => {
-                      if (selectedSavedAddressId) clearSavedAddressSelection();
-                      setPhoneNational(normalizeUaeToNationalDigits(text));
-                    }}
-                    placeholder={t('checkout.enterPhone')}
-                    keyboardType="phone-pad"
-                    onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
-                    ref={phoneRef}
-                    returnKeyType="next"
-                    onSubmitEditing={() => addressRef.current?.focus?.()}
-                  />
-                  {isValidUaeMobileNational(phoneNational) ? (
-                    <View style={styles.inputRightIcon}>
-                      <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
-                    </View>
-                  ) : null}
-                </View>
-              </View>
-              {showError('phone') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.phone}</Text> : null}
-            </View>
-
-            <View style={styles.formGroup} onLayout={registerFieldLayout('address')}>
-              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.deliveryAddress')} *</Text>
-              <TextInput
-                style={[styles.input, styles.textArea, isRTL && styles.inputRTL, showError('address') && styles.inputError]}
-                value={address}
-                onChangeText={(text) => {
-                  if (selectedSavedAddressId) clearSavedAddressSelection();
-                  setAddress(text);
-                }}
-                placeholder={t('checkout.enterAddress')}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-                onBlur={() => setTouched((p) => ({ ...p, address: true }))}
-                ref={addressRef}
-              />
-              {showError('address') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.address}</Text> : null}
-
-              <View style={styles.landmarkWrap}>
-                <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.landmarkOptional')}</Text>
-                <TextInput
-                  style={[styles.input, isRTL && styles.inputRTL]}
-                  value={landmark}
-                  onChangeText={setLandmark}
-                  placeholder={t('checkout.landmarkPlaceholder')}
-                  returnKeyType="done"
-                />
-              </View>
-            </View>
-
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.emirate')} *</Text>
-              <Text style={[styles.deliveryEtaHint, isRTL && styles.textRTL]}>{deliveryEtaText}</Text>
-              <View style={[styles.emirateGrid, isRTL && styles.emirateGridRTL]}>
-                {getAvailableEmirates().map((emirate) => (
-                  <TouchableOpacity
-                    key={emirate.name}
-                    style={[
-                      styles.emirateOption,
-                      selectedEmirate === emirate.name && styles.emirateOptionSelected
-                    ]}
-                    onPress={async () => {
-                      await triggerEmirateHaptic();
-                      setSelectedEmirate(emirate.name);
-                    }}
-                  >
-                    <View style={[styles.emirateTopRow, isRTL && styles.rowRTL]}>
-                      <View style={[styles.emirateTopLeft, isRTL && styles.emirateTopLeftRTL]}>
-                        <EmirateFlagIcon name={emirate.name} />
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          style={[
-                            styles.emirateText,
-                            isRTL && styles.textRTL,
-                            selectedEmirate === emirate.name && styles.emirateTextSelected,
-                          ]}
-                        >
-                          {formatEmirateLabel(t, emirate.name)}
-                        </Text>
-                      </View>
-                      {selectedEmirate === emirate.name ? (
-                        <Ionicons name="checkmark" size={16} color="#dc2626" />
-                      ) : null}
-                    </View>
-                    <View style={[styles.emirateBottomRow, isRTL && styles.emirateBottomRowRTL]}>
-                      {(!!totals?.hasFreeShipping || Number(emirate.shippingCost) === 0) ? (
-                        <View style={styles.freeBadge}>
-                          <Text style={[styles.freeBadgeText, isRTL && styles.textRTL]}>{t('common.free')}</Text>
-                        </View>
-                      ) : (
-                        <Text style={[styles.emirateShipping, isRTL && styles.textRTL]}>AED {emirate.shippingCost}</Text>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          </View>
+          {/* Shipping / Address Form */}
+          <CheckoutAddressForm
+            firstName={firstName}
+            lastName={lastName}
+            email={email}
+            phoneNational={phoneNational}
+            address={address}
+            landmark={landmark}
+            setFirstName={setFirstName}
+            setLastName={setLastName}
+            setEmail={setEmail}
+            setPhoneNational={setPhoneNational}
+            setAddress={setAddress}
+            setLandmark={setLandmark}
+            errors={errors}
+            showError={showError}
+            savedAddresses={savedAddresses}
+            selectedSavedAddressId={selectedSavedAddressId}
+            savedAddressPickerOpen={savedAddressPickerOpen}
+            setSavedAddressPickerOpen={setSavedAddressPickerOpen}
+            applySavedAddress={applySavedAddress}
+            clearSavedAddressSelection={clearSavedAddressSelection}
+            loadSavedAddresses={loadSavedAddresses}
+            getSavedTypeLabel={getSavedTypeLabel}
+            selectedEmirate={selectedEmirate}
+            setSelectedEmirate={setSelectedEmirate}
+            availableEmirates={getAvailableEmirates()}
+            deliveryEtaText={deliveryEtaText}
+            hasFreeShipping={totals?.hasFreeShipping}
+            totals={totals}
+            triggerEmirateHaptic={triggerEmirateHaptic}
+            setTouched={setTouched}
+            registerFieldLayout={registerFieldLayout}
+            registerSectionLayout={registerSectionLayout}
+            firstNameRef={firstNameRef}
+            lastNameRef={lastNameRef}
+            emailRef={emailRef}
+            phoneRef={phoneRef}
+            addressRef={addressRef}
+            styles={styles}
+            onNavigateToAddresses={() => router.push('/profile/addresses')}
+            openAddressInMaps={openAddressInMaps}
+          />
 
           {/* Payment Method */}
-          <View style={styles.section} onLayout={registerSectionLayout('payment')}>
-            <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-              <Ionicons name="card" size={20} color="#27AE60" />
-              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.paymentMethod')}</Text>
-            </View>
-
-            <Text style={[styles.paymentHint, isRTL && styles.textRTL]}>
-              {t('checkout.defaultPaymentMethod')}:{' '}
-              <Text style={styles.paymentHintStrong}>
-                {selectedPaymentMethod === PAYMENT_METHODS.CARD
-                  ? t('checkout.cardPayment')
-                  : t('checkout.cashOnDelivery')}
-              </Text>
-              {' '}• {t('checkout.tapToChange')}
-            </Text>
-
-            <View style={styles.paymentOptions}>
-              <TouchableOpacity
-                style={[
-                  styles.paymentOption,
-                  selectedPaymentMethod === PAYMENT_METHODS.COD && styles.paymentOptionSelected
-                ]}
-                onPress={() => selectPaymentMethod(PAYMENT_METHODS.COD)}
-              >
-                <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
-                  <Ionicons 
-                    name={selectedPaymentMethod === PAYMENT_METHODS.COD ? "radio-button-on" : "radio-button-off"} 
-                    size={20} 
-                    color={selectedPaymentMethod === PAYMENT_METHODS.COD ? "#dc2626" : "#C7C7CC"} 
-                  />
-                  <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('checkout.cashOnDelivery')}</Text>
-                </View>
-                <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>{t('checkout.payWhenDelivered')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.paymentOption,
-                  selectedPaymentMethod === PAYMENT_METHODS.CARD && styles.paymentOptionSelected
-                ]}
-                onPress={() => selectPaymentMethod(PAYMENT_METHODS.CARD)}
-              >
-                <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
-                  <Ionicons 
-                    name={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "radio-button-on" : "radio-button-off"} 
-                    size={20} 
-                    color={selectedPaymentMethod === PAYMENT_METHODS.CARD ? "#dc2626" : "#C7C7CC"} 
-                  />
-                  <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('checkout.cardPayment')}</Text>
-                </View>
-                <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>{t('checkout.paySecurelyStripe')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={[styles.trustRow, isRTL && styles.rowRTL]}>
-              <Ionicons name="lock-closed" size={14} color="#6B7280" />
-              <Text style={[styles.trustText, isRTL && styles.textRTL]}>{t('checkout.trustStripe')}</Text>
-            </View>
-            <Text style={[styles.trustTextSecondary, isRTL && styles.trustTextSecondaryRTL]}>{t('checkout.trustStripeSecondary')}</Text>
+          <View onLayout={registerSectionLayout('payment')}>
+            <PaymentMethodSelector
+              selectedMethod={selectedPaymentMethod}
+              onMethodChange={selectPaymentMethod}
+              styles={styles}
+            />
           </View>
 
           {/* Order Notes */}
-          <View style={styles.section}>
-            <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.orderNotesOptional')}</Text>
-            <TextInput
-              style={[styles.input, styles.textArea, isRTL && styles.inputRTL]}
-              value={orderNotes}
-              onChangeText={setOrderNotes}
-              placeholder={t('checkout.orderNotesPlaceholder')}
-              multiline
-              numberOfLines={2}
-              textAlignVertical="top"
-            />
-          </View>
+          <OrderSummaryCard
+            orderNotes={orderNotes}
+            setOrderNotes={setOrderNotes}
+            styles={styles}
+          />
 
           {/* Review section layout anchor (for step indicator scroll detection) */}
           <View onLayout={registerSectionLayout('review')} />
 
         </View>
       </ScrollView>
-
-      <Modal
-        visible={savedAddressPickerOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setSavedAddressPickerOpen(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, isRTL && styles.modalCardRTL]}>
-            <View style={[styles.modalHeader, isRTL && styles.modalHeaderRTL]}>
-              <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
-              <TouchableOpacity onPress={() => setSavedAddressPickerOpen(false)} style={styles.modalCloseButton}>
-                <Ionicons name="close" size={22} color="#111827" />
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-              style={[styles.modalOption, isRTL && styles.modalOptionRTL]}
-              onPress={() => {
-                clearSavedAddressSelection();
-                setSavedAddressPickerOpen(false);
-              }}
-            >
-              <Text style={[styles.modalOptionText, isRTL && styles.textRTL]}>{t('checkout.enterManually')}</Text>
-            </TouchableOpacity>
-
-            <View style={styles.modalDivider} />
-
-            <ScrollView style={styles.modalList} showsVerticalScrollIndicator={false}>
-              {Array.isArray(savedAddresses) && savedAddresses.length > 0 ? (
-                savedAddresses.map((a, idx) => {
-                  const id = String(a?.id || '');
-                  const label = getSavedTypeLabel(a?.type);
-                  const addrLine = String(a?.address || '').trim();
-                  const meta = [String(a?.city || '').trim(), String(a?.emirate || '').trim()].filter(Boolean).join(', ');
-                  return (
-                    <TouchableOpacity
-                      key={id || `addr_${idx}`}
-                    style={[
-                      styles.modalAddressRow,
-                      isRTL && styles.modalAddressRowRTL,
-                        selectedSavedAddressId && String(selectedSavedAddressId) === id ? styles.modalAddressRowActive : null,
-                      ]}
-                      onPress={() => {
-                        applySavedAddress(a);
-                        setSavedAddressPickerOpen(false);
-                      }}
-                    >
-                    <Text style={[styles.modalAddressType, isRTL && styles.textRTL]}>
-                        {label}{a?.isDefault ? ` • ${t('addresses.default')}` : ''}
-                      </Text>
-                    {a?.name ? <Text style={[styles.modalAddressName, isRTL && styles.textRTL]}>{String(a.name)}</Text> : null}
-                    <Text style={[styles.modalAddressLine, isRTL && styles.textRTL]} numberOfLines={2}>{addrLine}</Text>
-                    {meta ? <Text style={[styles.modalAddressMeta, isRTL && styles.textRTL]}>{meta}</Text> : null}
-                    </TouchableOpacity>
-                  );
-                })
-              ) : (
-                <View style={{ padding: 10 }}>
-                  <Text style={[styles.modalAddressLine, { color: '#6B7280' }, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
-                  <TouchableOpacity
-                    style={[styles.modalOption, { paddingHorizontal: 0 }, isRTL && styles.modalOptionRTL]}
-                    onPress={() => {
-                      setSavedAddressPickerOpen(false);
-                      router.push('/profile/addresses');
-                    }}
-                  >
-                    <Text style={[styles.modalOptionText, isRTL && styles.textRTL]}>{t('addresses.addNew')}</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
       {/* Bottom Action */}
       <CollapsibleFooter
@@ -1977,4 +1639,3 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
 });
-

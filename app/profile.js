@@ -21,6 +21,9 @@ import { fetchUserOrders } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
 import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('Profile');
 
 const { width } = Dimensions.get('window');
 
@@ -245,7 +248,7 @@ export default function ProfileScreen() {
     const prev = notificationsEnabled;
     setNotificationsEnabled(!!value);
     setPushToggleLoading(true);
-    await AsyncStorage.setItem(PUSH_PREF_KEY, value ? '1' : '0').catch(() => {});
+    await AsyncStorage.setItem(PUSH_PREF_KEY, value ? '1' : '0').catch((e) => log.warn('Failed to save push pref', e?.message));
 
     try {
       if (value) {
@@ -272,7 +275,7 @@ export default function ProfileScreen() {
     } catch {
       // Revert UI + local pref on failure
       setNotificationsEnabled(prev);
-      await AsyncStorage.setItem(PUSH_PREF_KEY, prev ? '1' : '0').catch(() => {});
+      await AsyncStorage.setItem(PUSH_PREF_KEY, prev ? '1' : '0').catch((e) => log.warn('Failed to revert push pref', e?.message));
       Alert.alert(t('common.error'), t('profile.pushEnableFailed'));
     } finally {
       setPushToggleLoading(false);
@@ -281,7 +284,7 @@ export default function ProfileScreen() {
 
   const handleEmailNotifToggle = useCallback(async (value) => {
     setEmailNotifications(!!value);
-    await AsyncStorage.setItem(EMAIL_NOTIF_PREF_KEY, value ? '1' : '0').catch(() => {});
+    await AsyncStorage.setItem(EMAIL_NOTIF_PREF_KEY, value ? '1' : '0').catch((e) => log.warn('Failed to save email notif pref', e?.message));
   }, []);
 
   // Memoized switch row to prevent unrelated switches from re-rendering and flickering on iOS.
@@ -488,7 +491,7 @@ export default function ProfileScreen() {
               color="#dc2626"
               onPress={async () => {
                 // Ensure Orders header can route back to Account when opened from here.
-                await AsyncStorage.setItem('@genosys_nav_orders_source', 'profile').catch(() => {});
+                await AsyncStorage.setItem('@genosys_nav_orders_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
                 router.push('/profile/orders');
               }}
             />
@@ -499,7 +502,7 @@ export default function ProfileScreen() {
               color="#27AE60"
               onPress={async () => {
                 // Ensure Bag header can route back to Account when opened from here.
-                await AsyncStorage.setItem('@genosys_nav_bag_source', 'profile').catch(() => {});
+                await AsyncStorage.setItem('@genosys_nav_bag_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
                 router.push('/(tabs)/bag');
               }}
             />

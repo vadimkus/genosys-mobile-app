@@ -11,6 +11,9 @@ import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('WebView');
 
 export default function WebViewScreen() {
   const { url, title } = useLocalSearchParams();
@@ -25,7 +28,7 @@ export default function WebViewScreen() {
   // Handle HTTP errors (4xx, 5xx)
   const handleHttpError = useCallback((syntheticEvent) => {
     const { nativeEvent } = syntheticEvent;
-    console.error('[WebView] HTTP Error:', nativeEvent.statusCode, nativeEvent.url, nativeEvent.description);
+    log.error('HTTP Error: ' + nativeEvent.statusCode + ' ' + nativeEvent.url, nativeEvent.description);
     setHttpError({
       statusCode: nativeEvent.statusCode,
       url: nativeEvent.url || '',
@@ -74,7 +77,8 @@ export default function WebViewScreen() {
 
     if (isDownload) {
       // Open PDF in native viewer / browser (triggers iOS Share Sheet or preview)
-      Linking.openURL(reqUrl).catch(() => {
+      Linking.openURL(reqUrl).catch((e) => {
+        log.warn('Failed to open PDF URL', e?.message);
         Alert.alert('Download Error', 'Could not open the PDF. Please try again.');
       });
       return false; // Prevent WebView from loading it
@@ -87,7 +91,7 @@ export default function WebViewScreen() {
     if (reqUrl.includes('google.com') || reqUrl.includes('googleapis.com') || reqUrl.includes('gstatic.com')) return true;
 
     // External links: open in system browser
-    Linking.openURL(reqUrl).catch(() => {});
+    Linking.openURL(reqUrl).catch((e) => log.warn('Failed to open external URL', e?.message));
     return false;
   }, [displayUrl]);
 
@@ -306,7 +310,7 @@ export default function WebViewScreen() {
           // Intercept window.open() calls (used by PDFDownloadButton for external links)
           const { nativeEvent } = syntheticEvent;
           if (nativeEvent.targetUrl) {
-            Linking.openURL(nativeEvent.targetUrl).catch(() => {});
+            Linking.openURL(nativeEvent.targetUrl).catch((e) => log.warn('Failed to open window URL', e?.message));
           }
         }}
         onMessage={(event) => {
@@ -314,7 +318,8 @@ export default function WebViewScreen() {
           try {
             const data = JSON.parse(event.nativeEvent.data);
             if (data.type === 'open-url' && data.url) {
-              Linking.openURL(data.url).catch(() => {
+              Linking.openURL(data.url).catch((e) => {
+                log.warn('Failed to open file URL', e?.message);
                 Alert.alert('Error', 'Could not open the file.');
               });
             }

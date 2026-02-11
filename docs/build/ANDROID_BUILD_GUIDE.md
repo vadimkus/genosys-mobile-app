@@ -62,7 +62,7 @@ npm run submit:android
   "expo": {
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 1,
+      "versionCode": 53,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -72,12 +72,56 @@ npm run submit:android
         "INTERNET",
         "VIBRATE",
         "RECORD_AUDIO",
-        "CAMERA"
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "ACCESS_NETWORK_STATE"
       ],
-      "googleServicesFile": "./google-services.json",
-      "intentFilters": [/* deep links */]
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/products" },
+            { "scheme": "https", "host": "www.genosys.ae", "pathPrefix": "/products" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/cart" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/orders" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/profile" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/favorites" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/skin-recommendation" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/skin-analysis" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/blog" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/bundle-builder" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/training" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/chat" },
+            { "scheme": "https", "host": "genosys.ae", "pathPrefix": "/checkout" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     }
   }
+}
+```
+
+### Android Plugins (in app.json)
+
+```json
+{
+  "plugins": [
+    "expo-router",
+    "expo-secure-store",
+    "expo-font",
+    "expo-apple-authentication",
+    ["@stripe/stripe-react-native", { "merchantIdentifier": "merchant.ae.genosys.app" }],
+    "expo-speech-recognition",
+    ["expo-notifications", { "icon": "./assets/icon-foreground-1024.png", "color": "#dc2626" }],
+    ["expo-camera", { "cameraPermission": "Genosys uses the camera for AI Skin Analysis and profile photos." }],
+    ["expo-image-picker", { "photosPermission": "Genosys uses your photo library to let you choose a profile photo or skin analysis image." }],
+    "expo-local-authentication"
+  ]
 }
 ```
 
@@ -93,22 +137,34 @@ npm run submit:android
 
 ## Feature Parity with iOS
 
-The Android app has **full feature parity** with iOS:
+The Android app has **full feature parity** with iOS (aligned February 11, 2026):
 
 | Feature | iOS | Android | Notes |
 |---------|-----|---------|-------|
 | Product Catalog | ✅ | ✅ | Same UI |
 | Shopping Cart | ✅ | ✅ | Same functionality |
 | **COD Payment** | ✅ | ✅ | Same flow |
-| **Stripe Payment** | ✅ | ✅ | WebView checkout |
+| **Stripe Payment** | ✅ | ✅ | Stripe SDK |
 | Google Sign-In | ✅ | ✅ | Uses web client ID |
-| Apple Sign-In | ✅ | ❌ | iOS only |
-| Biometric Auth | Face ID | Fingerprint | Platform-specific |
+| Apple Sign-In | ✅ | ❌ | iOS only (hidden on Android) |
+| Biometric Auth | Face ID / Touch ID | Fingerprint | Platform-specific |
 | Multi-language | ✅ | ✅ | EN, AR, RU |
-| RTL Support | ✅ | ✅ | Arabic layout |
-| Deep Linking | Universal Links | Intent Filters | Platform-specific |
+| RTL Support | ✅ | ✅ | Arabic layout mirroring |
+| Deep Linking | Universal Links | Intent Filters | 13 paths each |
 | Voice Search | ✅ | ✅ | expo-speech-recognition |
 | Haptic Feedback | ✅ | ✅ | expo-haptics |
+| **AI Skin Analysis (Camera)** | ✅ | ✅ | GPT-4 Vision |
+| **AI Skin Analysis (Quiz)** | ✅ | ✅ | API-driven recommendations |
+| **Build Your Set** | ✅ | ✅ | 8-step bundle builder |
+| **Native Blog + Comments** | ✅ | ✅ | API-driven, react-native-render-html |
+| **Push Notifications** | ✅ (APNs) | ✅ (FCM) | Expo push tokens |
+| **AI Chatbot** | ✅ | ✅ | SSE streaming |
+| **Product Videos** | ✅ | ✅ | expo-av |
+| **PDF Downloads** | ✅ | ✅ | WebView |
+| **Offline Cache** | ✅ | ✅ | AsyncStorage |
+| **Training (API)** | ✅ | ✅ | Auth-gated |
+| **FAQ (API)** | ✅ | ✅ | Database-driven |
+| **Partners (API)** | ✅ | ✅ | Database-driven |
 
 ---
 
@@ -134,21 +190,50 @@ The foreground image should have ~66% padding for the safe zone.
 
 ### Deep Linking
 
-Intent filters are configured for:
-- `https://genosys.ae/products/*`
+Intent filters are configured for 13 paths (updated Feb 11, 2026):
+- `https://genosys.ae/products/*` + `www.genosys.ae/products/*`
 - `https://genosys.ae/cart`
 - `https://genosys.ae/orders`
 - `https://genosys.ae/profile`
 - `https://genosys.ae/favorites`
 - `https://genosys.ae/skin-recommendation`
+- `https://genosys.ae/skin-analysis`
+- `https://genosys.ae/blog`
+- `https://genosys.ae/bundle-builder`
+- `https://genosys.ae/training`
+- `https://genosys.ae/chat`
+- `https://genosys.ae/checkout`
+
+All deep links route to **native screens** (not WebView). The deep link handler in `utils/deepLinking.js` maps each URL to the corresponding native app route.
+
+**Server-side requirement:** Host Digital Asset Links file at `https://genosys.ae/.well-known/assetlinks.json` for Android app link verification.
 
 ### Permissions
 
-Required permissions (auto-added by Expo):
-- `INTERNET` - API calls
-- `VIBRATE` - Haptic feedback
-- `RECORD_AUDIO` - Voice search
-- `CAMERA` - Profile photo
+Required permissions (9 total, updated Feb 11, 2026):
+
+| Permission | Purpose | Android Version |
+|------------|---------|-----------------|
+| `INTERNET` | API calls, content loading | All |
+| `VIBRATE` | Haptic feedback, notification alerts | All |
+| `RECORD_AUDIO` | Voice search | All |
+| `CAMERA` | AI Skin Analysis, profile photo | All |
+| `READ_MEDIA_IMAGES` | Photo library for profile picture | 13+ (API 33) |
+| `POST_NOTIFICATIONS` | Push notifications for order updates | 13+ (API 33) |
+| `USE_BIOMETRIC` | Fingerprint authentication | 9+ (API 28) |
+| `USE_FINGERPRINT` | Legacy fingerprint (older devices) | 6+ (API 23) |
+| `ACCESS_NETWORK_STATE` | Network connectivity checks | All |
+
+### Notification Channels
+
+Android uses notification channels (required Android 8+):
+
+| Channel | Importance | Description |
+|---------|------------|-------------|
+| `orders` | HIGH | Order status updates (vibration, LED, sound) |
+| `default` | DEFAULT | General notifications |
+
+Configured in `contexts/NotificationContext.js` and `services/pushNotificationsService.js`.
 
 ---
 
@@ -374,11 +459,13 @@ npm run android
 
 ### "expo-notifications: Android Push notifications" Warning
 
-This warning appears because push notifications require Firebase. The warning is suppressed via `LogBox.ignoreLogs()` in `app/_layout.js`. For production push notifications:
+This warning appears because push notifications require Firebase for production delivery. The warning is suppressed via `LogBox.ignoreLogs()` in `app/_layout.js`. Push notifications work via Expo Push Tokens without Firebase, but for production FCM delivery:
 
-1. Create a Firebase project
-2. Add `google-services.json` to project root
-3. Uncomment `googleServicesFile` in `app.json`
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Add an Android app with package name `ae.genosys.app`
+3. Download `google-services.json` to project root
+4. Add `"googleServicesFile": "./google-services.json"` to `android` section in `app.json`
+5. Add `google-services.json` to `.gitignore` (contains private keys)
 
 ### Build Fails
 
@@ -462,6 +549,78 @@ adb -s emulator-5554 reboot
 
 # Get boot status
 adb -s emulator-5554 shell getprop sys.boot_completed
+```
+
+---
+
+## Common Android-Specific Issues (Fixed Feb 11, 2026)
+
+### KeyboardAvoidingView Behavior
+
+**Problem:** Input fields get covered by keyboard on Android.
+
+**Solution:** Always use `behavior='height'` on Android, not `undefined`:
+
+```javascript
+// ✅ Correct - works on both platforms
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+>
+
+// ❌ Wrong - keyboard overlaps inputs on Android
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+>
+```
+
+### Shadow Styles Without Elevation
+
+**Problem:** iOS shadow properties (`shadowColor`, `shadowOffset`, `shadowOpacity`, `shadowRadius`) have no effect on Android.
+
+**Solution:** Always include `elevation` alongside iOS shadow properties:
+
+```javascript
+// ✅ Correct - shadows work on both platforms
+cardStyle: {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 2,  // Required for Android
+}
+
+// ❌ Wrong - shadow only visible on iOS
+cardStyle: {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  // Missing elevation!
+}
+```
+
+### iOS-Only Module Imports
+
+**Problem:** Importing iOS-only modules (like `expo-apple-authentication`) at top-level can cause issues on Android.
+
+**Solution:** Use safe dynamic import with try-catch:
+
+```javascript
+// ✅ Safe - won't crash on Android
+let AppleAuthentication = null;
+try {
+  AppleAuthentication = require('expo-apple-authentication');
+} catch (e) {
+  // Expected on Android
+}
+
+// Then guard usage
+if (AppleAuthentication && Platform.OS === 'ios') {
+  // Use Apple Sign-In
+}
+
+// ❌ Potentially risky on Android
+import * as AppleAuthentication from 'expo-apple-authentication';
 ```
 
 ---
