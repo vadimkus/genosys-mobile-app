@@ -92,11 +92,57 @@ export function handleDeepLink(url) {
       return true;
     }
 
-    // Web content pages → open in WebView
-    const webViewPaths = [
-      'bundle-builder', 'blog', 'training', 'locations',
-      'brand', 'delivery', 'faq', 'partners', 'certificates',
-    ];
+    // Native screens (migrated from WebView)
+    if (cleanPath === 'bundle-builder') {
+      router.push('/bundle-builder');
+      return true;
+    }
+    if (cleanPath === 'blog' || cleanPath === 'blog/') {
+      router.push('/blog');
+      return true;
+    }
+    if (cleanPath.startsWith('blog/')) {
+      const slug = cleanPath.replace('blog/', '');
+      if (slug) {
+        router.push(`/blog/${slug}`);
+        return true;
+      }
+    }
+    if (cleanPath === 'training') {
+      router.push('/training');
+      return true;
+    }
+    if (cleanPath === 'locations') {
+      router.push('/locations');
+      return true;
+    }
+    if (cleanPath === 'brand') {
+      router.push('/brand');
+      return true;
+    }
+    if (cleanPath === 'delivery') {
+      router.push('/delivery');
+      return true;
+    }
+    if (cleanPath === 'faq') {
+      router.push('/faq');
+      return true;
+    }
+    if (cleanPath === 'partners') {
+      router.push('/partners');
+      return true;
+    }
+    if (cleanPath === 'about') {
+      router.push('/about');
+      return true;
+    }
+    if (cleanPath === 'contact') {
+      router.push('/contact');
+      return true;
+    }
+
+    // Remaining web content pages → open in WebView as fallback
+    const webViewPaths = ['certificates'];
     for (const wp of webViewPaths) {
       if (cleanPath === wp || cleanPath.startsWith(`${wp}/`)) {
         const webUrl = `https://${WEB_DOMAIN}/${path}`;

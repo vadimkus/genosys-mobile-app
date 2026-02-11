@@ -55,7 +55,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 1,
+      "versionCode": 53,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -65,7 +65,12 @@
         "INTERNET",
         "VIBRATE",
         "RECORD_AUDIO",
-        "CAMERA"
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "ACCESS_NETWORK_STATE"
       ],
       "intentFilters": [
         {
@@ -75,6 +80,11 @@
             {
               "scheme": "https",
               "host": "genosys.ae",
+              "pathPrefix": "/products"
+            },
+            {
+              "scheme": "https",
+              "host": "www.genosys.ae",
               "pathPrefix": "/products"
             },
             {
@@ -101,6 +111,36 @@
               "scheme": "https",
               "host": "genosys.ae",
               "pathPrefix": "/skin-recommendation"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/skin-analysis"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/blog"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/bundle-builder"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/training"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/chat"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/checkout"
             }
           ],
           "category": [
@@ -126,7 +166,27 @@
           "merchantIdentifier": "merchant.ae.genosys.app"
         }
       ],
-      "expo-speech-recognition"
+      "expo-speech-recognition",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon-foreground-1024.png",
+          "color": "#dc2626"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Genosys uses the camera for AI Skin Analysis and profile photos."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Genosys uses your photo library to let you choose a profile photo or skin analysis image."
+        }
+      ],
+      "expo-local-authentication"
     ],
     "experiments": {
       "typedRoutes": true

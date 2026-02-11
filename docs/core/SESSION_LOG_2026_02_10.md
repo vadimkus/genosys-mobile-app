@@ -233,4 +233,36 @@ Any code that runs at app startup (context providers, module-level imports) must
 
 ---
 
-*Session updated: February 10, 2026*
+---
+
+## App Store Release — v1.3.0 Live
+
+**Date:** February 11, 2026
+
+Build 53 (v1.3.0) was submitted to App Store Connect and approved. The app is now live on the App Store.
+
+### What's New in v1.3.0
+
+- **AI Skin Analysis** — Take a selfie for instant AI-powered skin assessment with health score, concerns, product recommendations, AM/PM routine, and personalized tips
+- **Build Your Set** — Native 8-step bundle builder with tiered discounts (up to 20% off)
+- **Native Blog** — Read articles and leave comments directly in the app
+- **Push Notifications** — Order status updates (shipped, delivered, etc.)
+- **Performance** — Faster startup, enhanced stability, smoother navigation
+
+### App Store Links
+
+- **App Store URL:** https://apps.apple.com/app/id6756648064
+- **Bundle ID:** ae.genosys.app
+- **Version:** 1.3.0 (Build 53)
+
+### Version History
+
+| Version | Build | Status | Release Date | Key Features |
+|---------|-------|--------|--------------|--------------|
+| 1.0.0 | — | Released | Dec 2025 | Initial release |
+| 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
+| 1.3.0 | 53 | **Live** | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
+
+---
+
+*Session updated: February 11, 2026*

@@ -590,5 +590,17 @@ Hamburger Menu → "AI Skin Analysis"
 
 ---
 
+---
+
+## App Store Release
+
+**Version 1.3.0 (Build 53)** is now live on the App Store as of February 11, 2026.
+
+All native screen migrations documented here are part of the production release.
+
+**App Store URL:** https://apps.apple.com/app/id6756648064
+
+---
+
 *Document created: February 10, 2026*  
-*Last updated: February 10, 2026 — Added Skin Recommendation API integration*
+*Last updated: February 11, 2026 — v1.3.0 live on App Store*

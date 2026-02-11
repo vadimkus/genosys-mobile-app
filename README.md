@@ -1,8 +1,29 @@
 # Genosys Mobile App
 
+[![App Store](https://img.shields.io/badge/App%20Store-Live-blue?logo=apple)](https://apps.apple.com/app/id6756648064)
+[![Version](https://img.shields.io/badge/version-1.3.0-green)](https://apps.apple.com/app/id6756648064)
+
 A production-ready **iOS and Android** e-commerce app for GENOSYS Professional skincare, built with React Native (Expo) featuring Apple Store design system aesthetics.
 
+**Download:** [App Store](https://apps.apple.com/app/id6756648064)
+
 ## Features
+
+### AI-Powered (v1.3.0)
+- **AI Skin Analysis**: Take a selfie for instant AI assessment with GPT-4 Vision
+- **Health Score**: Get a 1-10 skin health rating with concerns and analysis
+- **Personalized Routine**: Custom AM/PM skincare routines based on your skin
+- **Smart Recommendations**: Quiz-based and AI-driven product suggestions
+
+### Build Your Set
+- **8-Step Bundle Builder**: Create your perfect skincare routine
+- **Tiered Discounts**: Up to 20% off when building a complete set
+- **Visual Summary**: See your bundle with prices and savings
+
+### Native Blog
+- **In-App Reading**: Full article reading without leaving the app
+- **Comments**: Leave and read comments on articles
+- **Localized Content**: EN/AR/RU support
 
 ### E-commerce
 - **Product Catalog**: Full product browsing with categories and search
@@ -10,6 +31,7 @@ A production-ready **iOS and Android** e-commerce app for GENOSYS Professional s
 - **Checkout**: Multi-step checkout with COD and Card (Stripe)
 - **Order Management**: Order history, details, and quick reorder
 - **Favorites/Wishlist**: Save products for later
+- **Push Notifications**: Order status updates (shipped, delivered)
 
 ### User Experience
 - **Multi-language**: English, Russian, Arabic (RTL support)
@@ -19,6 +41,7 @@ A production-ready **iOS and Android** e-commerce app for GENOSYS Professional s
 
 ### Design
 - **Apple Store Design**: Large typography, clean cards, smooth animations
+- **100% Native**: All content screens are native React Native (no WebViews)
 - **Glass-morphism Tab Bar**: Transparent blur effects for iOS
 - **Parallax Product Details**: Hero images with zoom animations
 - **Pull-to-refresh**: On all main screens
