@@ -52,6 +52,23 @@ Added `hmask_big.jpg` as a second gallery image for the Hydro Cool Modeling Mask
 - `data/productConfig.js` — added product 35 entry
 - Website: `data/productConfig.ts`, `public/images/Second/hmask_big.jpg`
 
+### 5. Video Sound Fix — iOS Silent Mode (Feb 13, 2026)
+
+**Problem:** Product videos played without sound in the native app, while web/mobile web had audio. Users reported no sound when playing product videos on product cards.
+
+**Root cause:** On iOS, `expo-av`'s `<Video>` component defaults to `playsInSilentModeIOS: false` — it respects the device's physical mute switch. When the iPhone silent switch is on (which is very common), videos play muted. The web `<video>` element does not have this limitation.
+
+**Fix:** Call `Audio.setAudioModeAsync({ playsInSilentModeIOS: true })` before playing the video in `ProductVideo`'s `handlePlay`. This enables audio playback even when the iOS silent switch is on.
+
+**Files changed:** `app/product/[id].js`
+
+**Rebuild required:** Yes — this is a client-side change. Rebuild and submit to TestFlight for the fix to take effect.
+
+**Technical details:**
+- Import `Audio` from `expo-av` alongside `Video` and `ResizeMode`
+- In `handlePlay`, call `Audio.setAudioModeAsync({ playsInSilentModeIOS: true })` before `setIsPlaying(true)`
+- Wrapped in try/catch with logging; failure does not block video playback
+
 ## Products with Video
 
 | Product # | Product Name | Video File |
