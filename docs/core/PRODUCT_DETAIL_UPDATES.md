@@ -76,6 +76,8 @@ Added `hmask_big.jpg` as a second gallery image for the Hydro Cool Modeling Mask
 | 10 | Snow O₂ Cleanser | `/videos/Cleanser_02.mp4` |
 | 19 | All For Sensitive Serum | `/videos/allserum.mp4` |
 | 26 | EGF Repair Oxymask Cream | `/videos/egf.mp4` |
+| 27 | Skin Barrier Protecting Cream | `/videos/barrier.mp4` |
+| 40 | Multi Sun Cream SPF 40 | `/videos/sun.mp4` |
 
 ## Products with Multiple Images
 
@@ -88,7 +90,8 @@ Added `hmask_big.jpg` as a second gallery image for the Hydro Cool Modeling Mask
 | 13 | SKIN RENEWAL PEELING SYSTEM (SRS) | SRS.jpg, sss1.jpg, sss2.jpg |
 | 19 | All For Sensitive Serum | ASE.jpg, allserum_big.jpg |
 | 26 | EGF Repair Oxymask Cream | EGF.jpg, egf_big.jpg |
+| 31 | Multi Vita Radiance Cream | RAA.jpg, radiance_both.jpg |
 | 35 | Hydro Cool Modeling Mask | HYDR.jpg, hmask_big.jpg |
 | 38 | EZ CO₂ Mask Kit | EZE.jpg, ez.jpg, ez1.jpg |
 | 51 | Bio-Ferment Age Defying Powder Mask | BFAD.png, ferment_big.jpg |
-| 52 | Skin Reboot PDRN Mask Pack | PDRN.png, pdrnnn.jpg |
+| 52 | Skin Reboot PDRN Mask Pack | PDRN.png, pdrnnn.jpg, pdrn_big2.jpg |
