@@ -12,7 +12,7 @@ import {
   FlatList,
   Linking,
 } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
+import { Audio, Video, ResizeMode } from 'expo-av';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -104,6 +104,14 @@ function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
   const [videoError, setVideoError] = useState(false);
 
   const handlePlay = async () => {
+    // Enable audio playback even when the iOS silent switch is on
+    try {
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+      });
+    } catch (e) {
+      log.warn('Audio mode set failed', e?.message || e);
+    }
     setIsPlaying(true);
     // Small delay so the Video component mounts before we call play
     setTimeout(async () => {
