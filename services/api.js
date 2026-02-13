@@ -244,7 +244,7 @@ export const fetchProductCategories = async () => {
 
     const data = await response.json();
     // Support backend shapes:
-    // - { success: true, data: string[] }
+    // - { success: true, data: string[], categoriesWithBadges: [{name, badge}] }
     // - { categories: string[] }
     // - string[]
     const categories =
@@ -252,6 +252,17 @@ export const fetchProductCategories = async () => {
       (Array.isArray(data?.categories) ? data.categories : null) ||
       (Array.isArray(data) ? data : []);
     
+    // Attach badge metadata if available from API
+    // categoriesWithBadges: [{ name: "Cream", badge: "new" }, { name: "Serum", badge: null }, ...]
+    if (Array.isArray(data?.categoriesWithBadges)) {
+      categories._badgeMap = {};
+      data.categoriesWithBadges.forEach((item) => {
+        if (item?.name && item?.badge) {
+          categories._badgeMap[item.name] = item.badge;
+        }
+      });
+    }
+
     log.debug('Categories received', { count: categories.length });
     return categories;
     

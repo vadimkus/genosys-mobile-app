@@ -123,6 +123,7 @@ export default function ShopScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
+  const [categoryBadges, setCategoryBadges] = useState({}); // { "Cream": "new", "Beauty Boxes": "new" }
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [addingProducts, setAddingProducts] = useState(new Set()); // Track which products are being added
   const [langOpen, setLangOpen] = useState(false);
@@ -504,6 +505,11 @@ export default function ShopScreen() {
       const categoryData = await fetchProductCategories();
       log.debug('Categories received', { hasData: !!categoryData });
       
+      // Extract badge metadata from API response (e.g. { "Cream": "new", "Beauty Boxes": "new" })
+      if (categoryData?._badgeMap && typeof categoryData._badgeMap === 'object') {
+        setCategoryBadges(categoryData._badgeMap);
+      }
+
       // Add "All" as the first option
       const allCategories = ['All', ...categoryData];
       setCategories(prev => {
@@ -934,14 +940,28 @@ export default function ShopScreen() {
                   rest.sort((a, b) => String(getLabel(a)).length - String(getLabel(b)).length);
 
                   return [...picked, ...rest];
-                })().map((category) => (
-                  <View key={category}>
+                })().map((category) => {
+                  const hasBadge = categoryBadges[category] === 'new';
+                  const isActive = selectedCategory === category;
+                  return (
+                  <View key={category} style={{ position: 'relative' }}>
+                    {hasBadge && (
+                      <View style={[
+                        styles.categoryNewBadge,
+                        isActive && styles.categoryNewBadgeActive
+                      ]}>
+                        <Text style={[
+                          styles.categoryNewBadgeText,
+                          isActive && styles.categoryNewBadgeTextActive
+                        ]}>{t('common.new')}</Text>
+                      </View>
+                    )}
                     <TouchableOpacity
                       style={[
                         styles.categoryButton,
                         isRTL && styles.categoryButtonRTL,
                         locale === 'ru' && styles.ruCategoryButton,
-                        selectedCategory === category && styles.activeCategoryButton
+                        isActive && styles.activeCategoryButton
                       ]}
                       onPress={() => handleCategoryPress(category)}
                       activeOpacity={0.7}
@@ -950,12 +970,14 @@ export default function ShopScreen() {
                         styles.categoryButtonText,
                         isRTL && styles.categoryButtonTextRTL,
                         locale === 'ru' && styles.ruCategoryButtonText,
-                        selectedCategory === category && styles.activeCategoryButtonText
+                        isActive && styles.activeCategoryButtonText
                       ]}>
                         {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
                       </Text>
                     </TouchableOpacity>
                   </View>
+                  );
+                }
                 ))}
               </View>
               
@@ -1612,6 +1634,30 @@ const styles = StyleSheet.create({
   activeCategoryButton: {
     backgroundColor: '#dc2626',
     borderColor: '#dc2626',
+  },
+  categoryNewBadge: {
+    position: 'absolute',
+    top: -4,
+    alignSelf: 'center',
+    left: '50%',
+    transform: [{ translateX: -12 }],
+    backgroundColor: '#22C55E',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 6,
+    zIndex: 10,
+  },
+  categoryNewBadgeActive: {
+    backgroundColor: '#ffffff',
+  },
+  categoryNewBadgeText: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+  },
+  categoryNewBadgeTextActive: {
+    color: '#dc2626',
   },
   categoryButtonText: {
     fontSize: 14,
