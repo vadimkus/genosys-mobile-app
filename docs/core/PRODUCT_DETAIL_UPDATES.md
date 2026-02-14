@@ -94,4 +94,20 @@ Added `hmask_big.jpg` as a second gallery image for the Hydro Cool Modeling Mask
 | 35 | Hydro Cool Modeling Mask | HYDR.jpg, hmask_big.jpg |
 | 38 | EZ CO₂ Mask Kit | EZE.jpg, ez.jpg, ez1.jpg |
 | 51 | Bio-Ferment Age Defying Powder Mask | BFAD.png, ferment_big.jpg |
-| 52 | Skin Reboot PDRN Mask Pack | PDRN.png, pdrnnn.jpg, pdrn_big2.jpg |
+| 52 | Skin Reboot PDRN Mask Pack | PDRN.png, pdrnnn.jpg, pdrn_big2.jpg, pdrn22.jpg |
+
+### 6. Product Documentation — API-First (Feb 13, 2026)
+
+**Problem:** Product documentation (PDF guides) did not show for all products. Product 63 (REVITA GLOW BB CREAM) had docs on the website but no download section in the native app.
+
+**Root cause:** The app used only a hardcoded local `PRODUCT_DOCS` object; product 63 was missing. The mobile API did not include documentation in its response.
+
+**Fix:**
+
+- **API side** (`cosmetics-website`): Added `documentation` field to `EnhancedProductData`, populated from `getProductDocumentation(configKey)`
+- **App side:** Updated `getProductDocs(productId, product)` to prefer API-provided `product.documentation` over local `PRODUCT_DOCS`
+- Added product 63 to local `PRODUCT_DOCS` as fallback
+
+**Documentation priority:** 1) API `product.documentation`, 2) Local `PRODUCT_DOCS`
+
+**Rebuild required:** Yes — client-side change. Future documentation additions on the website will appear in the app without rebuild.

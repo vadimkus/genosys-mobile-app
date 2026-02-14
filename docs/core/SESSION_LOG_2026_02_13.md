@@ -65,3 +65,52 @@ const handlePlay = async () => {
 ### Git Commit
 
 `314f899` — fix(video): Enable audio playback when iOS silent switch is on
+
+---
+
+## Product Documentation Fix — API-First with Local Fallback
+
+### Summary
+
+Product documentation (PDF guides) was not showing in the native app for all products. Product 63 (REVITA GLOW BLEMISH BALM CREAM) had documentation on the website but no download section on the product detail page.
+
+### Root Cause
+
+- The native app used only a hardcoded local `PRODUCT_DOCS` object in `data/productConfig.js`
+- Product 63 was missing from `PRODUCT_DOCS` (website had 23 products with docs, app had 22)
+- The mobile API did not include `documentation` in its response
+
+### Fix Applied
+
+**1. API side** (`cosmetics-website`):
+
+- Added `documentation` field to `EnhancedProductData` in `lib/pricingEngine.ts`
+- Populated from `getProductDocumentation(configKey)` — all 23 products with docs now served via API
+
+**2. Native app side** (`genosys-mobile-app`):
+
+- Updated `getProductDocs(productId, product)` to accept optional `product` parameter
+- **Priority 1:** API-provided `product.documentation` (dynamic — no app update for future docs)
+- **Priority 2:** Hardcoded `PRODUCT_DOCS` (static fallback)
+- Added product 63 to local `PRODUCT_DOCS` as fallback
+- Product detail page passes `product` to `getProductDocs(productId, product)`
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `data/productConfig.js` | `getProductDocs` now prefers API docs; added product 63 to `PRODUCT_DOCS` |
+| `app/product/[id].js` | Pass `product` to `getProductDocs(productId, product)` |
+
+### Deployment
+
+**App rebuild required** — client-side change to read API-provided documentation.
+
+### Future Documentation Additions
+
+Once this version is deployed, **no app rebuild needed** for new documentation — add to website's `productConfig.ts`, API serves it, app displays it automatically.
+
+### Related Documentation
+
+- [PRODUCT_DETAIL_UPDATES.md](./PRODUCT_DETAIL_UPDATES.md) — Section 6: Product Documentation
+- [DYNAMIC_CONTENT.md](./DYNAMIC_CONTENT.md) — Documentation priority (API first, config fallback)

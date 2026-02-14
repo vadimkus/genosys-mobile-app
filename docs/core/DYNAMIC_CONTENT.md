@@ -21,6 +21,13 @@ The `getProductVideoUrl()` function checks in this order:
 1. **`product.videoUrl`** from API response — dynamic, no app update needed
 2. **Hardcoded `PRODUCT_CONFIG.videoUrl`** in `data/productConfig.js` — static fallback
 
+### Documentation Priority
+
+The `getProductDocs(productId, product)` function checks in this order:
+
+1. **`product.documentation`** from API response — dynamic, no app update needed for future docs
+2. **Hardcoded `PRODUCT_DOCS`** in `data/productConfig.js` — static fallback
+
 ## Adding a New Image to a Product
 
 ### Option A: Via Database (No App Rebuild)
@@ -65,6 +72,31 @@ The `getProductVideoUrl()` function checks in this order:
    ```
 3. Rebuild the app
 
+## Adding Product Documentation (PDF Guides)
+
+### Via API (No App Rebuild for Future Additions)
+
+1. Add PDF file to `cosmetics-website/public/documents/ppt/` (e.g., `GENOSYS_PRODUCT_GUIDE.pdf`)
+2. Update `cosmetics-website/data/productConfig.ts`:
+   ```typescript
+   'XX': {
+     documentation: [
+       { title: 'Product Name Guide', url: '/documents/ppt/GENOSYS_PRODUCT_GUIDE.pdf', type: 'pdf' }
+     ],
+     ...
+   }
+   ```
+3. Push to main — API will include `documentation` in product response
+4. The app displays it automatically (no rebuild needed for new docs — app prefers API data)
+
+### Via Hardcoded Config (Requires App Rebuild)
+
+1. Add entry to `PRODUCT_DOCS` in `data/productConfig.js`:
+   ```js
+   '99': [{ title: 'Product Guide', url: `${ASSET_ORIGIN}/documents/ppt/GUIDE.pdf` }],
+   ```
+2. Rebuild the app
+
 ## Backend Changes (Cosmetics Website)
 
 These changes were made to support dynamic content:
@@ -100,4 +132,4 @@ These changes were made to support dynamic content:
 | `genosys-mobile-app/data/productConfig.js` | Hardcoded image/video fallback config for the app |
 | `cosmetics-website/data/productConfig.ts` | Website product config (images, videos, pricing) |
 | `app/product/[id].js` | Product detail screen (gallery + video player) |
-| `cosmetics-website/lib/pricingEngine.ts` | API response builder (includes `videoUrl` and `images`) |
+| `cosmetics-website/lib/pricingEngine.ts` | API response builder (includes `videoUrl`, `images`, and `documentation`) |
