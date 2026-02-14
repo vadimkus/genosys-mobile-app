@@ -94,6 +94,7 @@ export const PRODUCT_DOCS = {
   '11': [{ title: 'SKIN DEFENDER Product Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20SKIN%20DEFENDER%20LIP%20%26%20EYE%20MAKEUP%20REMOVER.pdf` }],
   '15': [{ title: 'INTENSIVE PROBLEM CONTROL TONER', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20INTENSIVE%20PROBLEM%20CONTROL%20TONER.pdf` }],
   '60': [{ title: 'BIO MESO PDRN EXPERT AMPOULE 60000 Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_BIO_MESO_PDRN_EXPERT_AMPOULE_60000.pdf` }],
+  '63': [{ title: 'REVITA GLOW BLEMISH BALM CREAM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_REVITA_GLOW_BB_CREAM.pdf` }],
 };
 
 /**
@@ -159,10 +160,25 @@ export function getProductVideoUrl(productId, product) {
 }
 
 /**
- * Get documentation links for a product
+ * Get documentation links for a product (API preferred, local config as fallback)
+ * 
+ * Priority order:
+ *   1. product.documentation from API/DB (dynamic – no app update needed)
+ *   2. Hardcoded PRODUCT_DOCS (static fallback)
+ *
  * @param {string} productId
+ * @param {Object} [product] - product data from API (may have .documentation array)
  * @returns {Array<{title: string, url: string}>}
  */
-export function getProductDocs(productId) {
+export function getProductDocs(productId, product) {
+  // Priority 1: API-provided documentation (dynamic – no app update needed)
+  if (product?.documentation && Array.isArray(product.documentation) && product.documentation.length > 0) {
+    return product.documentation.map(doc => ({
+      title: doc.title,
+      url: doc.url.startsWith('http') ? doc.url : `${ASSET_ORIGIN}${doc.url}`,
+    }));
+  }
+  
+  // Priority 2: Hardcoded local config (static fallback)
   return PRODUCT_DOCS[String(productId)] || [];
 }

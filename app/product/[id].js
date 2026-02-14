@@ -959,7 +959,7 @@ export default function ProductDetailScreen() {
           {/* Product Documentation */}
           {(() => {
             const productId = String(product.productNumber || product.id || id);
-            const docs = getProductDocs(productId);
+            const docs = getProductDocs(productId, product);
             if (!docs.length) return null;
             return (
               <View style={styles.docsSection}>
