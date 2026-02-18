@@ -73,7 +73,14 @@ export const PRODUCT_CONFIG = {
 // Documentation links per product
 export const PRODUCT_DOCS = {
   '1': [{ title: 'Overview of Microneedling', url: `${ASSET_ORIGIN}/documents/ppt/Overview%20of%20Microneedling_S.pdf` }],
+  '4': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
+  '5': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
+  '6': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
+  '7': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
+  '8': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
+  '9': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
   '12': [{ title: 'EPI TURNOVER BOOSTING PEELING GEL Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20EPI%20TURNOVER%20BOOSTING%20PEELING%20GEL.pdf` }],
+  '13': [{ title: 'Microneedling Protocols (Carboxy + Power Solutions)', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS_Microneedling_Protocols.pdf` }],
   '14': [{ title: 'MICROBIOME ENERGY INFUSING MIST Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MICROBIOME%20ENERGY%20INFUSING%20MIST.pdf` }],
   '18': [{ title: 'MOISTURE REPLENISHING HYALURON SERUM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MOISTURE%20REPLENISHING%20HYALURON%20SERUM.pdf` }],
   '21': [{ title: 'MULTI VITA RADIANCE SERUM Guide', url: `${ASSET_ORIGIN}/documents/ppt/GENOSYS%20MULTI%20VITA%20RADIANCE%20SERUM.pdf` }],
