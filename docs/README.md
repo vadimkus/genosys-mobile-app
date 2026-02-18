@@ -31,7 +31,8 @@
 | [Session Log 10 Feb 2026](./core/SESSION_LOG_2026_02_10.md) | Native blog, AI skin analysis upgrade, crash fix (Builds 49-53) |
 | [Session Log 11 Feb 2026](./core/SESSION_LOG_2026_02_11.md) | Android alignment, v58, full audit (checkout/orders/success), haptics fix, badge fix, beauty box |
 | [Session Log 12 Feb 2026](./core/SESSION_LOG_2026_02_12.md) | v1.4.0 TestFlight, Apple Review doc update, App Store release notes |
-| [Session Log 13 Feb 2026](./core/SESSION_LOG_2026_02_13.md) | **NEW** Product video sound fix, product documentation API-first fix |
+| [Session Log 13 Feb 2026](./core/SESSION_LOG_2026_02_13.md) | Product video sound fix, product documentation API-first fix |
+| [Session Log 14 Feb 2026](./core/SESSION_LOG_2026_02_14.md) | **NEW** Android app review, Google Play prep, 13 code fixes, full documentation |
 | [Native Screens Migration](./core/NATIVE_SCREENS_MIGRATION.md) | **NEW** WebView → Native: 8 screens migrated, API-driven FAQ & Partners |
 | [Checkout Flow](./core/CHECKOUT_FLOW.md) | Delivery details, payment, order submission |
 | [Orders](./core/ORDERS_PAGES.md) | Orders list, order detail, reorder |
@@ -112,7 +113,8 @@
 |-----|-------------|
 | [App Store Assets](./app-store/APP_STORE_ASSETS.md) | Assets for App Store listing |
 | [Apple Review](./app-store/APPLE_REVIEW_DOCUMENTATION.md) | Apple App Store review preparation |
-| [Google Play Review](./app-store/GOOGLE_PLAY_REVIEW_DOCUMENTATION.md) | **NEW** Google Play Store review documentation |
+| [Google Play Review](./app-store/GOOGLE_PLAY_REVIEW_DOCUMENTATION.md) | Google Play Store review documentation |
+| [Google Play Console Setup](./app-store/GOOGLE_PLAY_CONSOLE_SETUP.md) | **NEW** Developer account setup, build, submit, release details (Feb 2026) |
 | [Shotlist](./app-store/SHOTLIST.md) | Screenshot planning |
 
 ---

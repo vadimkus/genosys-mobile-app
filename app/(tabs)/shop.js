@@ -977,8 +977,7 @@ export default function ShopScreen() {
                     </TouchableOpacity>
                   </View>
                   );
-                }
-                ))}
+                })}
               </View>
               
               {/* Product Count under Categories */}

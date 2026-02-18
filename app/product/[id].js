@@ -378,7 +378,7 @@ export default function ProductDetailScreen() {
         price: unitPrice || product.displayPrice || product.price || 0,
       });
     } catch (e) {
-      Alert.alert(t('common.error'), 'Failed to update favorites');
+      Alert.alert(t('common.error'), t('product.failedToUpdateFavorites'));
     }
   };
 
@@ -786,6 +786,7 @@ export default function ProductDetailScreen() {
                   horizontal
                   pagingEnabled
                   showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled={true}
                   keyExtractor={(item, index) => `gallery-${index}`}
                   onMomentumScrollEnd={(e) => {
                     const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
@@ -1706,6 +1707,7 @@ const styles = StyleSheet.create({
   inCartButton: {
     backgroundColor: '#27AE60',
     shadowColor: '#27AE60',
+    elevation: 6,
   },
   buttonIcon: {
     marginEnd: 8,

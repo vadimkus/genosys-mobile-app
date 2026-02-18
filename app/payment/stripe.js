@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -43,6 +43,7 @@ export default function StripePaymentScreen() {
   const [checking, setChecking] = useState(false);
   const [paid, setPaid] = useState(false);
   const [statusText, setStatusText] = useState('');
+  const hasShownSuccessRef = useRef(false);
 
   const canCheck = !!token && (!!orderId || !!orderNumber);
 
@@ -119,11 +120,13 @@ export default function StripePaymentScreen() {
     }
     setOpening(true);
     try {
-      // In-app browser (SFSafariViewController / Chrome Custom Tabs).
+      // In-app browser (SFSafariViewController on iOS / Chrome Custom Tabs on Android).
       await WebBrowser.openBrowserAsync(paymentUrl, {
-        presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+        ...(Platform.OS === 'ios' && {
+          presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+          enableBarCollapsing: true,
+        }),
         showTitle: true,
-        enableBarCollapsing: true,
       });
       // When user returns from the payment sheet, automatically check status once.
       if (canCheck) {
@@ -145,7 +148,8 @@ export default function StripePaymentScreen() {
   }, [openPayment]);
 
   useEffect(() => {
-    if (!paid) return;
+    if (!paid || hasShownSuccessRef.current) return;
+    hasShownSuccessRef.current = true;
     Alert.alert(
       t('payment.paymentReceivedTitle'),
       orderNumber ? t('payment.paymentSuccessMessageWithOrder', { orderNumber }) : t('payment.paymentSuccessMessage'),

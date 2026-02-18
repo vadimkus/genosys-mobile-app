@@ -62,7 +62,7 @@ npm run submit:android
   "expo": {
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 53,
+      "versionCode": 58,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -621,6 +621,24 @@ if (AppleAuthentication && Platform.OS === 'ios') {
 
 // ❌ Potentially risky on Android
 import * as AppleAuthentication from 'expo-apple-authentication';
+```
+
+### Haptics (Don't Restrict to iOS)
+
+**Problem:** Guarding haptic feedback with `if (Platform.OS !== 'ios') return` prevents Android users from feeling feedback.
+
+**Solution:** Use `utils/haptics` (cross-platform) or call `expo-haptics` directly without platform guards:
+
+```javascript
+// ✅ Correct - works on both platforms
+import * as haptics from '../utils/haptics';
+const triggerHaptic = () => haptics.lightTap();
+
+// ❌ Wrong - Android users get no feedback
+const triggerHaptic = async () => {
+  if (Platform.OS !== 'ios') return;
+  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+};
 ```
 
 ---

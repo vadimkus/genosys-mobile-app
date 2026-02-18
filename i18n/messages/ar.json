@@ -184,7 +184,9 @@
     "discount100": "خصم 100%",
     "promotionTag": "عرض",
     "emptyCartTitle": "السلة فارغة",
-    "emptyCartMessage": "يرجى إضافة عناصر إلى السلة قبل المتابعة."
+    "emptyCartMessage": "يرجى إضافة عناصر إلى السلة قبل المتابعة.",
+    "off": "خصم",
+    "qty": "الكمية"
   },
   "checkout": {
     "title": "الدفع",
@@ -315,6 +317,7 @@
     "error": "خطأ",
     "productNotFound": "المنتج غير موجود",
     "failedToLoad": "تعذر تحميل المنتج",
+    "failedToUpdateFavorites": "تعذر تحديث المفضلة",
     "share": "مشاركة",
     "shareError": "تعذر فتح نافذة المشاركة. يرجى المحاولة مرة أخرى.",
     "documentation": "المستندات",

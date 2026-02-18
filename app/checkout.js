@@ -141,12 +141,16 @@ export default function CheckoutScreen() {
   // Load default payment method preference
   useEffect(() => {
     (async () => {
-      const saved = await getDefaultPaymentMethod();
-      // If user had Apple Pay saved, fall back to COD (Apple Pay removed)
-      if (saved === 'apple_pay') {
+      try {
+        const saved = await getDefaultPaymentMethod();
+        // If user had Apple Pay saved, fall back to COD (Apple Pay removed)
+        if (saved === 'apple_pay') {
+          setSelectedPaymentMethod(PAYMENT_METHODS.COD);
+        } else {
+          setSelectedPaymentMethod(saved || PAYMENT_METHODS.COD);
+        }
+      } catch {
         setSelectedPaymentMethod(PAYMENT_METHODS.COD);
-      } else {
-        setSelectedPaymentMethod(saved);
       }
     })();
   }, []);
@@ -319,16 +323,8 @@ export default function CheckoutScreen() {
     }, 250);
   };
 
-  const triggerEmirateHaptic = async () => {
-    if (Platform.OS !== 'ios') return;
-    try {
-      const Haptics = await import('expo-haptics');
-      if (Haptics?.impactAsync && Haptics?.ImpactFeedbackStyle) {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-    } catch {
-      // ignore if module not available
-    }
+  const triggerEmirateHaptic = () => {
+    haptics.lightTap();
   };
 
   // Redirect if cart is empty
@@ -346,7 +342,7 @@ export default function CheckoutScreen() {
         t('checkout.loginRequiredMessage'),
         [
           { text: t('common.cancel'), style: 'cancel', onPress: () => router.back() },
-          { text: 'Login', onPress: () => router.push('/auth/login') }
+          { text: t('common.login'), onPress: () => router.push('/auth/login') }
         ]
       );
     }
@@ -563,6 +559,7 @@ export default function CheckoutScreen() {
         ref={scrollRef}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         scrollEventThrottle={16}
         onScroll={(e) => {
           const y = Number(e?.nativeEvent?.contentOffset?.y) || 0;

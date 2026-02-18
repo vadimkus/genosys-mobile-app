@@ -1006,4 +1006,101 @@ Comprehensive audit of all translation keys across both repositories for all 3 l
 
 ---
 
+## Android Version Update (v1.4.0 Build 58)
+
+### Summary
+Bumped Android `versionCode` from 54 to 58 to align with iOS build number after native app changes (bundle discount fixes, auto-populate address, translation fixes, etc.).
+
+### Change
+| Platform | Before | After |
+|----------|--------|-------|
+| App Version | 1.4.0 | 1.4.0 |
+| iOS Build | 58 | 58 |
+| Android versionCode | 54 | **58** |
+
+### Reason
+iOS had progressed through builds 54–58 (bundle discount stacking, VIP exclusion in bundle builder, auto-populate saved address, variant normalization for bundle items, translation fixes). Android versionCode was lagging; the shared React Native codebase already contained all fixes, so versionCode was updated for parity.
+
+### File Changed
+- `app.json` — `android.versionCode`: 54 → 58
+
+### Build Verification
+```bash
+$ npx expo export --platform android
+Android Bundled 2808ms node_modules/expo-router/entry.js (1972 modules)
+# 0 errors, 0 warnings
+# Bundle size: 5.51 MB (HBC compiled)
+```
+
+---
+
+## Android Full Audit (Checkout, Orders, Success, Logic, Templates)
+
+### Summary
+Performed comprehensive Android audit of 76 files across the app, focusing on checkout success flow, order details page, orders list, cart logic, and all templates/components. One bug fixed.
+
+### Scope
+| Area | Files | Notes |
+|------|-------|-------|
+| **Checkout flow** | `checkout.js` | Full checkout, COD/Card success via Alert, maps URL (Apple/Google) |
+| **Order details** | `profile/orders/[id].js` | Waterfall pricing, reorder, pay now, beauty box expansion |
+| **Orders list** | `profile/orders.js` | Order cards, expandable summary, delete, pay |
+| **Stripe payment** | `payment/stripe.js` | In-app browser (Chrome Custom Tabs on Android), status polling |
+| **Bag/Cart** | `(tabs)/bag.js` | Cart items, waterfall breakdown, promotions |
+| **Cart logic** | `CartContext.js`, `cartUtils.js` | Bundle/VIP discounts, shipping, promo masks |
+| **All app screens** | 44 files in `/app/` | Scanned |
+| **All components** | 25 files in `/components/` | Scanned |
+| **All contexts** | 7 files in `/contexts/` | Scanned |
+
+### Bug Fixed
+
+**Haptics restricted to iOS in checkout.**
+
+| File | Issue | Fix |
+|------|-------|-----|
+| `app/checkout.js` | `triggerEmirateHaptic()` used `if (Platform.OS !== 'ios') return;` — Android users got no haptic feedback when selecting emirate | Replaced with `haptics.lightTap()` from `utils/haptics` (already imported, cross-platform) |
+
+**Before:**
+```javascript
+const triggerEmirateHaptic = async () => {
+  if (Platform.OS !== 'ios') return;
+  try {
+    const Haptics = await import('expo-haptics');
+    if (Haptics?.impactAsync && Haptics?.ImpactFeedbackStyle) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  } catch { /* ignore */ }
+};
+```
+
+**After:**
+```javascript
+const triggerEmirateHaptic = () => {
+  haptics.lightTap();
+};
+```
+
+### Verified Clean (No Action Needed)
+
+| Check | Result |
+|-------|--------|
+| Shadow styles + `elevation` | All 21 files with shadows include `elevation` |
+| `KeyboardAvoidingView` behavior | All 5 instances use `'height'` on Android |
+| `ActionSheetIOS` | Properly guarded with `Alert.alert()` fallback for Android |
+| Apple Sign-In | Hidden on Android, safe `require()` import |
+| Platform-specific code | All instances provide Android alternatives |
+| Success page | COD uses `Alert.alert()`; Card uses Stripe screen → Alert on paid |
+| Order details logic | Waterfall pricing, bundle/VIP breakdown, reorder all cross-platform |
+| Cart/bag logic | Pure JS, no platform dependencies |
+
+### Build Verification
+```bash
+$ npx expo export --platform android
+Android Bundled 2808ms node_modules/expo-router/entry.js (1972 modules)
+# 0 errors, 0 warnings
+# Bundle size: 5.51 MB
+```
+
+---
+
 *Session: February 11, 2026*

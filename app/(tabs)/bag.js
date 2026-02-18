@@ -378,7 +378,7 @@ export default function BagScreen() {
                   return (
                     <View style={styles.itemPriceContainer}>
                       <Text style={styles.itemOriginalPrice}>{originalForDisplay.toFixed(2)} AED</Text>
-                      {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% OFF</Text> : null}
+                      {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% {t('bag.off')}</Text> : null}
                       <Text style={styles.itemDiscountedPrice}>{discountedForDisplay.toFixed(2)} AED</Text>
                     </View>
                   );
@@ -391,7 +391,7 @@ export default function BagScreen() {
 
           {promo ? (
             <View style={[styles.itemRightActions, isRTL && styles.itemRightActionsRTL]}>
-              <Text style={[styles.promoQtyRight, isRTL && styles.promoQtyRightRTL]}>Qty {item.quantity || 1}</Text>
+              <Text style={[styles.promoQtyRight, isRTL && styles.promoQtyRightRTL]}>{t('bag.qty')} {item.quantity || 1}</Text>
               <Text style={[styles.promoItemPriceRight, isRTL && styles.promoItemPriceRightRTL]}>{t('common.free')}</Text>
             </View>
           ) : (

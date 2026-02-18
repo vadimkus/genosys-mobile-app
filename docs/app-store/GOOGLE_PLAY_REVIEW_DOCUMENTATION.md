@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Package Name:** ae.genosys.app  
-**Version:** 1.3.0  
-**Version Code:** 53  
+**Version:** 1.4.0  
+**Version Code:** 58  
 **Platform:** Android  
 
 ---
@@ -14,9 +14,48 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.3.0
+## What's New in Version 1.4.0
 
-### AI Skin Analysis (Enhanced)
+### Pricing & Discount Logic Overhaul
+- **Mutually Exclusive Discounts** — Bundle discounts and VIP discounts no longer stack. Bundle items receive only the bundle discount on retail price; regular items receive only the VIP discount on retail price.
+- **Consistent Cross-Platform Pricing** — All pricing calculations are now fully aligned between the website and native app across cart, checkout, order details, and email confirmations.
+- **Corrected Order History** — Order detail screens now display accurate per-item discounts (bundle items show only "Bundle Discount", VIP items show only their VIP percentage).
+
+### Checkout Improvements
+- **Auto-Populate Delivery Address** — Saved addresses are now automatically populated in the checkout form, eliminating the need to re-enter delivery details for returning customers.
+- **Checkout Footer Summary** — The checkout screen now displays a total summary in the footer, including item count, total price, and shipping information.
+- **Improved Keyboard Handling** — ScrollView now persists taps on Android, preventing accidental input dismissal.
+
+### Localization & Translation
+- **Fully Translated UI** — 26+ previously hardcoded English strings in the AI Skin Analysis camera and WebView screens are now translated into Arabic and Russian.
+- **Complete 3-Language Coverage** — All 1,390+ translation keys verified across English, Arabic, and Russian with zero missing keys.
+
+### Bug Fixes
+- **Bundle Item Pricing in Cart** — Fixed issue where adding items from "Build Your Set" could show inflated retail prices.
+- **Product Price Refresh on Login** — Shop page now re-fetches products when a user logs in.
+- **Product Video Sound** — Videos now play with audio even when the iOS/Android silent mode is on.
+- **Product Documentation** — PDF guides now load from API first (future-proof), with local fallback.
+- **Stripe Payment Stability** — Prevented duplicate success alerts on payment completion; iOS-only presentation styles now properly guarded.
+
+### Android-Specific Fixes
+- **Keyboard Behavior** — Fixed `KeyboardAvoidingView` behavior for chat, address form, and blog comment screens.
+- **Card Shadows** — Added proper elevation values for cards that were missing shadows on Android.
+- **Nested Scroll** — Gallery FlatList inside product detail now uses `nestedScrollEnabled` for smooth scrolling on Android.
+- **Haptic Feedback** — All haptic feedback now works cross-platform (previously some were iOS-only).
+- **Chrome Custom Tabs** — Stripe payment opens cleanly in Chrome Custom Tabs without iOS-only presentation styles.
+
+### Stability & Performance
+- **Safe Import for Apple Authentication** — Apple Sign-In module uses safe loading to prevent crashes on Android.
+- **Notification Badge Clearing** — App badge count clears automatically when the app is opened.
+- **Error Recovery** — Added fallback for payment method preferences loading.
+
+---
+
+## What's New in Previous Versions
+
+### Version 1.3.0 (Build 53)
+
+#### AI Skin Analysis
 - **AI Expert Analysis** - Take a selfie and receive instant AI-powered skin assessment using GPT-4 Vision
 - **Health Score** - Get a 1-10 skin health rating with visual indicator
 - **Personalized Routine** - Receive custom AM/PM skincare routines based on your analysis
@@ -24,23 +63,23 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 - **Tips** - Get customized skincare tips for your skin type and concerns
 - **Quiz Mode** - 4-step questionnaire with API-driven product recommendations
 
-### Build Your Set (New)
+#### Build Your Set
 - **Native Bundle Builder** - Create your perfect skincare routine in-app
 - **8-Step Process** - Select products across Cleanse, Tone, Serum, Eye Care, Cream, Mask, Sun Care, Special Care
 - **Tiered Discounts** - 5% off 2 items, 10% off 3, 15% off 4, up to 20% off 5+ items
 - **Visual Summary** - See your bundle with product images, sizes, and total savings
 
-### Native Blog (New)
+#### Native Blog
 - **In-App Reading** - Read skincare articles directly in the app
 - **Comments** - Leave comments on articles (requires login)
 - **Localized Content** - Articles available in English, Arabic, and Russian
 
-### Push Notifications (New)
+#### Push Notifications
 - **Order Updates** - Receive notifications when order status changes
 - **Beautiful Alerts** - In-app notification banners with order details
 - **Android Notification Channels** - Dedicated "Order Updates" channel with high priority
 
-### Performance & Stability
+#### Performance & Stability
 - **Faster Startup** - Improved app initialization
 - **Enhanced Stability** - Better error handling throughout
 - **Smoother Navigation** - All native screens (no WebView wrappers)
@@ -333,15 +372,22 @@ This account is pre-created and ready to use. No email verification required.
 - [x] Login with test account works
 - [x] Products display correctly with images
 - [x] Image gallery swipe works
-- [x] Product videos play
-- [x] Product documentation downloads
+- [x] Product videos play with sound
+- [x] Product documentation downloads (API-driven)
 - [x] Cart functionality works
 - [x] Checkout process completes (COD)
-- [x] Checkout process completes (Card)
+- [x] Checkout process completes (Card via Stripe)
 - [x] User profile management works
-- [x] Order history displays
+- [x] Order history displays with correct pricing
 
-### New v1.3.0 Features
+### New v1.4.0 Features
+- [x] Bundle and VIP discounts mutually exclusive (no stacking)
+- [x] Checkout auto-populates saved delivery address
+- [x] Checkout footer shows total summary with shipping info
+- [x] All UI strings translated (zero hardcoded English)
+- [x] Product videos play with audio in silent mode
+
+### v1.3.0 Features (Verified)
 - [x] AI Camera Analysis completes with results
 - [x] AI Skin Analysis quiz completes
 - [x] Build Your Set bundle builder works
@@ -358,6 +404,10 @@ This account is pre-created and ready to use. No email verification required.
 - [x] Notification channels visible in system settings
 - [x] Back button navigation works properly
 - [x] Keyboard handling correct on all forms
+- [x] Card shadows display with proper elevation
+- [x] Stripe opens in Chrome Custom Tabs
+- [x] Haptic feedback works on Android
+- [x] Nested scroll in product gallery works
 
 ### General
 - [x] Multilingual support works (EN/AR/RU)
@@ -368,6 +418,17 @@ This account is pre-created and ready to use. No email verification required.
 - [x] Terms accessible
 - [x] No broken links or errors
 - [x] Haptic feedback on actions
+
+---
+
+## Version History
+
+| Version | Build | Status | Release Date | Key Features |
+|---------|-------|--------|--------------|--------------|
+| 1.0.0 | — | Released | Dec 2025 | Initial release |
+| 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
+| 1.3.0 | 53 | Released | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
+| 1.4.0 | 58 | **Current** | Feb 14, 2026 | Pricing overhaul, checkout improvements, full translation, Android polish |
 
 ---
 

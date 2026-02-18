@@ -1,10 +1,10 @@
-# ✅ Mobile App Build Status: LIVE ON APP STORE
+# ✅ Mobile App Build Status: LIVE ON APP STORE / GOOGLE PLAY READY
 
-## 🎉 Version 1.3.0 (Build 53) — Released February 11, 2026
+## 🎉 Version 1.5.0 (Build 60) — February 17, 2026
 
 **App Store URL:** https://apps.apple.com/app/id6756648064
 
-The Genosys UAE mobile app is now **live on the App Store** and available for download.
+The Genosys UAE mobile app is **live on the App Store** and the Android build is **ready for Google Play submission**.
 
 ---
 
@@ -123,12 +123,55 @@ The Genosys UAE mobile app is now **live on the App Store** and available for do
 ✅ 0 lint errors after fixes
 ```
 
+### **Android Full Audit + Version 58 ✅** *(Feb 11, 2026)*
+```
+✅ Android versionCode: 54 → 58 (aligned with iOS)
+✅ Audit: 76 files — checkout, orders, success, logic, templates
+✅ Haptics: emirate selection now works on Android (checkout.js)
+✅ Success page, order details, bag, cart logic: all cross-platform
+```
+
 ### **Development Server: RUNNING ✅**
 ```
 ✅ Expo server running on port 8085
 ✅ Hot reload enabled
 ✅ Metro bundler active
 ✅ Ready for development testing
+```
+
+### **Android Google Play Readiness Audit: PASS ✅** *(Feb 14, 2026)*
+```
+✅ Android export: 1972 modules, 0 errors, 0 warnings
+✅ Bundle size: 5.51 MB (HBC compiled)
+✅ Assets: 44 files included
+✅ versionCode: 58 (aligned with iOS build 58)
+✅ version: 1.4.0
+✅ 9 Android permissions: all justified and documented
+✅ 40 intent filter paths (20 genosys.ae + 20 www.genosys.ae)
+✅ 10 plugins configured (including FCM, camera, biometric)
+✅ Adaptive icon: foreground + background layers present
+✅ Splash screen configured
+✅ 1,391 translation keys synced across EN/AR/RU
+✅ Google Play Review Documentation updated to v1.4.0
+✅ Data Safety section documented
+✅ .gitignore updated for sensitive files
+```
+
+### **Android Code Fixes (Feb 14, 2026):**
+```
+✅ shop.js: Fixed syntax error (extra closing paren in category map)
+✅ product/[id].js: Added elevation:6 to inCartButton for Android shadows
+✅ product/[id].js: Added nestedScrollEnabled to gallery FlatList
+✅ product/[id].js: Translated hardcoded "Failed to update favorites"
+✅ checkout.js: Translated hardcoded "Login" button text
+✅ checkout.js: Added try/catch to getDefaultPaymentMethod
+✅ checkout.js: Added keyboardShouldPersistTaps="handled" to ScrollView
+✅ stripe.js: Guarded iOS-only WebBrowser presentation style
+✅ stripe.js: Added duplicate success alert prevention (useRef)
+✅ stripe.js: Added Platform import for Android/iOS branching
+✅ bag.js: Translated hardcoded "% OFF" and "Qty" strings
+✅ .gitignore: Added google-services.json and service account
+✅ i18n: Added bag.off, bag.qty, product.failedToUpdateFavorites (all 3 langs)
 ```
 
 ---
@@ -180,9 +223,11 @@ The Genosys UAE mobile app is now **live on the App Store** and available for do
 - Compatible with Expo Go and development builds
 
 ### **✅ Production Builds**
-- Ready for iOS App Store builds (Build 53, v1.3.0)
-- Ready for Android Play Store builds (versionCode 53, v1.3.0)
-- Android aligned with iOS (Feb 11, 2026): full feature parity, 9 permissions, 13 deep link paths, 10 plugins
+- Ready for iOS App Store builds (Build 60, v1.5.0)
+- Ready for Android Play Store builds (versionCode 60, v1.5.0)
+- Android aligned with iOS (Feb 17, 2026): full feature parity, 9 permissions, 40 deep link paths, 10 plugins
+- All Android-specific issues fixed (elevation, nested scroll, keyboard, haptics, Stripe)
+- Google Play Review Documentation updated and complete
 - Ready for standalone app builds
 
 ---
@@ -237,7 +282,9 @@ DEL  /mobile/user/wishlist/:id    - Remove from favorites
 |---------|-------|--------|--------------|--------------|
 | 1.0.0 | — | Released | Dec 2025 | Initial release |
 | 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
-| 1.3.0 | 53 | **Live** | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
+| 1.3.0 | 53 | Released | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
+| 1.4.0 | 58 | Released | Feb 14, 2026 | Pricing overhaul, checkout improvements, Android polish, Google Play ready |
+| 1.5.0 | 60 | **Current** | Feb 17, 2026 | All latest fixes, Android production build for Google Play submission |
 
 ---
 

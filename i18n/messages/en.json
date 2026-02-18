@@ -184,7 +184,9 @@
     "discount100": "100% OFF",
     "promotionTag": "Promotion",
     "emptyCartTitle": "Empty Cart",
-    "emptyCartMessage": "Please add some items to your cart before checkout."
+    "emptyCartMessage": "Please add some items to your cart before checkout.",
+    "off": "OFF",
+    "qty": "Qty"
   },
   "checkout": {
     "title": "Checkout",
@@ -315,6 +317,7 @@
     "error": "Error",
     "productNotFound": "Product not found",
     "failedToLoad": "Failed to load product",
+    "failedToUpdateFavorites": "Failed to update favorites",
     "share": "Share product",
     "shareError": "Could not open share sheet. Please try again.",
     "documentation": "Documentation",
