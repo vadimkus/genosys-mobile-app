@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
-**Version:** 1.4.0  
-**Build:** 58  
+**Version:** 1.5.0  
+**Build:** 65  
 **Platform:** iOS  
 
 ---
@@ -14,35 +14,66 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.4.0
+## What's New in Version 1.5.0
 
-### Pricing & Discount Logic Overhaul
+### Skin Concern Pages — Fully Native
+- **8 Skin Concern Categories** — Browse curated product collections for Sun Protection, Acne, Pigmentation, Scars, Hair Loss, Anti-Aging, Hydration, and Sensitivity — all rendered natively with fast, smooth scrolling.
+- **Complete Concern Detail Pages** — Each concern page features a hero section, expert "Why" highlights, step-by-step skincare routines with product recommendations, a product grid, FAQ accordion, downloadable professional protocol PDFs, and related concern cross-links.
+- **Tap-to-Add Routine Products** — Single tap on any product in the routine steps instantly adds it to your shopping bag with haptic feedback and an animated toast confirmation. Tap again to remove. Long press to view full product details.
+- **Routine Essentials** — Every concern page includes recommended daily essentials (cleanser, toner, SPF) for a complete skincare routine.
+- **Browse by Skin Concern** — New discovery entry points from the Shop category bar and AI Skin Analysis results, making it easy to find the right products for your skin.
+
+### 100% Native Experience
+- **Zero WebView Screens** — The entire app is now fully native. Training Materials (the last remaining WebView screen) has been converted to a native screen with tabs, cards, and fast loading.
+- **Native Concern Navigation** — Skin Concern cards screen and all concern detail pages are fully native with smooth transitions, pull-to-refresh, and loading skeletons.
+
+### Haptic Feedback
+- **App-Wide Haptics** — Consistent tactile feedback across all interactive elements: tab switches, cart actions, navigation, favorites, and more. Light taps for selections, medium impact for confirmations, success notifications for completed actions.
+
+### Product Enhancements
+- **PDRN Mask Product Video** — Added video demonstration for SKIN REBOOT PDRN MASK PACK.
+- **Microneedling Protocol Documents** — Added downloadable protocol PDFs for Power Solution and SRS products.
+- **API-First Documentation** — Product documentation (PDF guides) now loads dynamically from the server, keeping content up to date without app updates.
+
+### Bug Fixes & Stability
+- **Product Video Audio** — Fixed an issue where product demonstration videos were silent when the iOS silent switch was on.
+- **Category Badge Display** — "New" badges on category pills now appear correctly based on API data.
+- **Improved Product Lookup** — Fixed an issue where some routine products (cleanser, toner, serums, SPF) could not be added to the bag due to a product ID mapping mismatch.
+
+### Localization
+- **Full 3-Language Support** — All new Skin Concern screens, routine interactions, toast messages, and navigation elements are fully localized in English, Arabic (RTL), and Russian.
+
+---
+
+## What's New in Previous Versions
+
+### Version 1.4.0 (Build 58)
+
+#### Pricing & Discount Logic Overhaul
 - **Mutually Exclusive Discounts** — Bundle discounts and VIP discounts no longer stack. Bundle items receive only the bundle discount on retail price; regular items receive only the VIP discount on retail price.
 - **Consistent Cross-Platform Pricing** — All pricing calculations are now fully aligned between the website and native app across cart, checkout, order details, and email confirmations.
 - **Corrected Order History** — Order detail screens now display accurate per-item discounts (bundle items show only "Bundle Discount", VIP items show only their VIP percentage).
 
-### Checkout Improvements
+#### Checkout Improvements
 - **Auto-Populate Delivery Address** — Saved addresses are now automatically populated in the checkout form, eliminating the need to re-enter delivery details for returning customers.
 - **Checkout Footer Summary** — The checkout screen now displays a total summary in the footer, including item count, total price, and shipping information (e.g., "Free shipping" or "Incl. shipping 45 AED").
 
-### Localization & Translation
+#### Localization & Translation
 - **Fully Translated UI** — 26+ previously hardcoded English strings in the AI Skin Analysis camera and WebView screens are now translated into Arabic and Russian.
 - **New Translation Keys** — Added missing keys for checkout footer, shipping info, skin camera UI, and error messages.
 - **Complete 3-Language Coverage** — All 1,355+ translation keys verified across English, Arabic, and Russian with zero missing keys.
 
-### Bug Fixes
+#### Bug Fixes
 - **Bundle Item Pricing in Cart** — Fixed an issue where adding items from "Build Your Set" could show inflated retail prices due to variant size auto-selection.
 - **Product Price Refresh on Login** — The shop page now re-fetches products when a user logs in, ensuring VIP discounts appear immediately without requiring a manual refresh.
 - **Keyboard Behavior on Android** — Fixed `KeyboardAvoidingView` behavior for chat, address form, and blog comment screens on Android.
 - **Card Shadows on Android** — Added proper elevation values for cards that were missing shadows on Android.
 
-### Stability & Performance
+#### Stability & Performance
 - **Safe Import for Apple Authentication** — Apple Sign-In module now uses safe loading to prevent potential issues.
 - **Notification Badge Clearing** — App badge count now clears automatically when the app is opened or brought to foreground.
 
 ---
-
-## What's New in Previous Versions
 
 ### Version 1.3.0 (Build 53)
 
