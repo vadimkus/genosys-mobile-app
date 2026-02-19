@@ -107,6 +107,12 @@ export function handleDeepLink(url) {
       return true;
     }
 
+    // Skin concerns
+    if (cleanPath === 'skin-concerns' || cleanPath === 'products/concern') {
+      router.push('/skin-concerns');
+      return true;
+    }
+
     // Chat
     if (cleanPath === 'chat') {
       router.push('/chat');

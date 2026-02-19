@@ -119,6 +119,16 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
             </TouchableOpacity>
           </View>
 
+          <View style={[styles.highlightRow, isRTL && styles.gridRTL]}>
+            <TouchableOpacity
+              style={styles.highlightBtn}
+              onPress={() => navigateTo('/skin-concerns')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.highlightBtnText}>🌿 {t('categories.skinConcern') || 'Skin Concern'}</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* ─── Divider ─── */}
           <View style={styles.divider} />
 

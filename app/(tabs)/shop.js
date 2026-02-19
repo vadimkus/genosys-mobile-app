@@ -626,9 +626,7 @@ export default function ShopScreen() {
   const handleCategoryPress = (category) => {
     haptics.selectionTick();
     if (category === 'Skin Concern') {
-      const prefix = locale === 'en' ? '' : `/${locale}`;
-      const url = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${prefix}/products?categories=skin-concern`;
-      router.push({ pathname: '/webview', params: { url, title: t('categories.skinConcern') || 'Skin Concern' } });
+      router.push('/skin-concerns');
       return;
     }
     setSelectedCategory(category);
