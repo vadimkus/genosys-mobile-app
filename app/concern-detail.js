@@ -4,7 +4,7 @@
  * Receives `slug` param from skin-concerns.js or deep links.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,13 +39,16 @@ export default function ConcernDetailScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
 
-  const { addItem, isInCart } = useCart();
+  const { addItem, removeItem, isInCart } = useCart();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
   const [expandedFaq, setExpandedFaq] = useState({});
   const [justAddedIds, setJustAddedIds] = useState({});
   const lastTapRef = React.useRef({});
+  const [toastMessage, setToastMessage] = useState('');
+  const toastOpacity = useRef(new Animated.Value(0)).current;
+  const toastTimer = useRef(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -82,6 +86,15 @@ export default function ConcernDetailScreen() {
   const toggleFaq = (idx) => {
     setExpandedFaq(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
+
+  const showToast = useCallback((msg) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMessage(msg);
+    Animated.timing(toastOpacity, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+    toastTimer.current = setTimeout(() => {
+      Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }).start();
+    }, 1600);
+  }, [toastOpacity]);
 
   const handleProtocolDownload = () => {
     if (!data?.protocolPdf?.url) return;
@@ -121,7 +134,7 @@ export default function ConcernDetailScreen() {
     lastTapRef.current[productId] = now;
 
     if (now - last < 400) {
-      // Double tap — cancel pending navigation, add to cart
+      // Double tap — cancel pending navigation, toggle cart
       lastTapRef.current[productId] = 0;
       if (singleTapTimers.current[productId]) {
         clearTimeout(singleTapTimers.current[productId]);
@@ -130,9 +143,16 @@ export default function ConcernDetailScreen() {
       const fullProduct = productLookup[productId];
       if (fullProduct && !fullProduct.isPriceOnRequest) {
         haptics.lightTap();
-        addItem(fullProduct, 1, '', '');
-        setJustAddedIds((prev) => ({ ...prev, [productId]: true }));
-        setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [productId]: false })), 1200);
+        if (isInCart(productId)) {
+          removeItem(productId, '', '');
+          const name = fullProduct.name || '';
+          showToast(locale === 'ar' ? `تمت الإزالة من الحقيبة` : locale === 'ru' ? `Удалено из корзины` : `Removed from bag`);
+        } else {
+          addItem(fullProduct, 1, '', '');
+          setJustAddedIds((prev) => ({ ...prev, [productId]: true }));
+          setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [productId]: false })), 1200);
+          showToast(locale === 'ar' ? `تمت الإضافة إلى الحقيبة` : locale === 'ru' ? `Добавлено в корзину` : `Added to bag`);
+        }
       } else {
         router.push(`/product/${productId}`);
       }
@@ -147,7 +167,7 @@ export default function ConcernDetailScreen() {
         router.push(`/product/${productId}`);
       }, 400);
     }
-  }, [productLookup, addItem, router]);
+  }, [productLookup, addItem, removeItem, isInCart, router, showToast, locale]);
 
   // --- Loading skeleton ---
   if (loading) {
@@ -384,6 +404,14 @@ export default function ConcernDetailScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Toast */}
+      {toastMessage ? (
+        <Animated.View style={[styles.toast, { opacity: toastOpacity }]} pointerEvents="none">
+          <Ionicons name="bag-check-outline" size={16} color="#fff" />
+          <Text style={styles.toastText}>{toastMessage}</Text>
+        </Animated.View>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -489,6 +517,10 @@ const styles = StyleSheet.create({
 
   // Intro
   introText: { fontSize: 13, color: '#86868B', lineHeight: 20 },
+
+  // Toast
+  toast: { position: 'absolute', bottom: 48, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(0,0,0,0.82)', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24 },
+  toastText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 
   // RTL
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },
