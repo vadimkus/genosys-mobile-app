@@ -120,25 +120,29 @@ export default function ConcernDetailScreen() {
   const productLookup = React.useMemo(() => {
     if (!data?.products) return {};
     const map = {};
-    data.products.forEach((p) => { map[String(p.id)] = p; });
+    data.products.forEach((p) => {
+      map[String(p.id)] = p;
+      if (p.productNumber) map[String(p.productNumber)] = p;
+    });
     return map;
   }, [data?.products]);
 
-  const handleChipPress = useCallback((productId) => {
-    if (!productId) return;
-    const fullProduct = productLookup[productId];
+  const handleChipPress = useCallback((routeId) => {
+    if (!routeId) return;
+    const fullProduct = productLookup[routeId];
     if (!fullProduct || fullProduct.isPriceOnRequest) {
-      router.push(`/product/${productId}`);
+      router.push(`/product/${routeId}`);
       return;
     }
+    const cartId = String(fullProduct.id);
     haptics.lightTap();
-    if (isInCart(productId)) {
-      removeItem(productId, '', '');
+    if (isInCart(cartId)) {
+      removeItem(cartId, '', '');
       showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
     } else {
       addItem(fullProduct, 1, '', '');
-      setJustAddedIds((prev) => ({ ...prev, [productId]: true }));
-      setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [productId]: false })), 1200);
+      setJustAddedIds((prev) => ({ ...prev, [routeId]: true }));
+      setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [routeId]: false })), 1200);
       showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено в корзину' : 'Added to bag');
     }
   }, [productLookup, addItem, removeItem, isInCart, showToast, locale, router]);
@@ -268,7 +272,9 @@ export default function ConcernDetailScreen() {
                               {step.products.map((p, pi) => {
                                 const idMatch = p.url?.match(/\/products\/(\d+)/);
                                 const productId = idMatch ? idMatch[1] : null;
-                                const chipInCart = productId && (justAddedIds[productId] || isInCart(productId));
+                                const matchedProduct = productId ? productLookup[productId] : null;
+                                const cartId = matchedProduct ? String(matchedProduct.id) : null;
+                                const chipInCart = productId && (justAddedIds[productId] || (cartId && isInCart(cartId)));
                                 return (
                                   <TouchableOpacity
                                     key={pi}
