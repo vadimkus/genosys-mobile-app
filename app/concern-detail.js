@@ -112,14 +112,21 @@ export default function ConcernDetailScreen() {
     return map;
   }, [data?.products]);
 
+  const singleTapTimers = React.useRef({});
+
   const handleChipTap = useCallback((productId) => {
     if (!productId) return;
     const now = Date.now();
     const last = lastTapRef.current[productId] || 0;
     lastTapRef.current[productId] = now;
 
-    if (now - last < 350) {
+    if (now - last < 400) {
+      // Double tap — cancel pending navigation, add to cart
       lastTapRef.current[productId] = 0;
+      if (singleTapTimers.current[productId]) {
+        clearTimeout(singleTapTimers.current[productId]);
+        singleTapTimers.current[productId] = null;
+      }
       const fullProduct = productLookup[productId];
       if (fullProduct && !fullProduct.isPriceOnRequest) {
         haptics.lightTap();
@@ -130,8 +137,15 @@ export default function ConcernDetailScreen() {
         router.push(`/product/${productId}`);
       }
     } else {
-      haptics.lightTap();
-      router.push(`/product/${productId}`);
+      // First tap — delay navigation to allow double-tap
+      if (singleTapTimers.current[productId]) {
+        clearTimeout(singleTapTimers.current[productId]);
+      }
+      singleTapTimers.current[productId] = setTimeout(() => {
+        singleTapTimers.current[productId] = null;
+        haptics.lightTap();
+        router.push(`/product/${productId}`);
+      }, 400);
     }
   }, [productLookup, addItem, router]);
 
