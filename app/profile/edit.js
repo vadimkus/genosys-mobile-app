@@ -196,6 +196,7 @@ export default function EditProfileScreen() {
 
   // Profile Picture Functions
   const handleProfilePicturePress = () => {
+    haptics.lightTap();
     if (!isEditing) return;
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
@@ -260,6 +261,7 @@ export default function EditProfileScreen() {
 
   // Date Picker Functions
   const handleDateChange = (event, selectedDate) => {
+    haptics.selectionTick();
     const currentDate = selectedDate || new Date();
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
@@ -280,6 +282,7 @@ export default function EditProfileScreen() {
   const closeDatePicker = () => setShowDatePicker(false);
 
   const confirmDatePicker = () => {
+    haptics.selectionTick();
     setSelectedDate(tempDate);
     const formattedDate = tempDate.toISOString().split('T')[0];
     updateField('dateOfBirth', formattedDate);
@@ -306,6 +309,7 @@ export default function EditProfileScreen() {
   ];
 
   const handleGenderSelect = (selectedGenderValue) => {
+    haptics.selectionTick();
     updateField('gender', selectedGenderValue);
     setShowGenderModal(false);
   };
@@ -334,6 +338,7 @@ export default function EditProfileScreen() {
   }, [initialSnapshot]);
 
   const handleSave = async () => {
+    haptics.mediumTap();
     log.debug('Profile save started');
     
     // Validate form
@@ -381,6 +386,7 @@ export default function EditProfileScreen() {
       log.debug('Profile update result', { success: !!result?.success });
       
       if (result.success) {
+        haptics.success();
         // Mark form as "clean" so it no longer feels like you're mid-edit.
         setInitialSnapshot(getCurrentSnapshot());
         Keyboard.dismiss();
@@ -434,6 +440,7 @@ export default function EditProfileScreen() {
   };
 
   const handleDeleteAccount = () => {
+    haptics.heavyTap();
     Alert.alert(
       t('editProfile.deleteAccountTitle'),
       t('editProfile.deleteAccountMessage'),

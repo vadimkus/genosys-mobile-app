@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { createLogger } from '../utils/logger';
+import * as haptics from '../utils/haptics';
 
 const log = createLogger('WebView');
 
@@ -225,7 +226,7 @@ export default function WebViewScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
             <Ionicons name="arrow-back" size={24} color="#1F2937" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('webview.errorTitle')}</Text>
@@ -243,14 +244,14 @@ export default function WebViewScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+<TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
+        <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
           {pageTitle || 'Loading...'}
         </Text>
         <TouchableOpacity
-          onPress={() => webViewRef.current?.reload()}
+          onPress={() => { haptics.lightTap(); webViewRef.current?.reload(); }}
           style={styles.backBtn}
           activeOpacity={0.7}
         >
@@ -282,11 +283,11 @@ export default function WebViewScreen() {
               {httpError.url}
             </Text>
           ) : null}
-          <TouchableOpacity onPress={handleRetry} style={styles.retryButton} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => { haptics.lightTap(); handleRetry(); }} style={styles.retryButton} activeOpacity={0.7}>
             <Ionicons name="reload" size={18} color="#ffffff" />
             <Text style={styles.retryButtonText}>{t('webview.tryAgain')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backButton} activeOpacity={0.7}>
             <Text style={styles.backButtonText}>{t('webview.goBack')}</Text>
           </TouchableOpacity>
         </View>

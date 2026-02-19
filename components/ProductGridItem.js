@@ -16,6 +16,7 @@ import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDevice
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductSize, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
+import * as haptics from '../utils/haptics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -25,6 +26,7 @@ export default function ProductGridItem({ product }) {
   const { t, locale } = useLocalization();
   const isRTL = !!I18nManager.isRTL;
   const handlePress = () => {
+    haptics.lightTap();
     router.push(`/product/${product.id}`);
   };
 

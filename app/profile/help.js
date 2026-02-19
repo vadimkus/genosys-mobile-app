@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
+import * as haptics from '../../utils/haptics';
 
 export default function HelpSupportScreen() {
   const router = useRouter();
@@ -156,11 +157,12 @@ export default function HelpSupportScreen() {
   };
 
   const handleFaqPress = (faqId) => {
+    haptics.lightTap();
     setExpandedFaq(expandedFaq === faqId ? null : faqId);
   };
 
   const SupportOptionCard = ({ option }) => (
-    <TouchableOpacity style={[styles.supportCard, isRTL && styles.supportCardRTL, { backgroundColor: colors.card, borderColor: colors.borderSubtle }]} onPress={option.action}>
+    <TouchableOpacity style={[styles.supportCard, isRTL && styles.supportCardRTL, { backgroundColor: colors.card, borderColor: colors.borderSubtle }]} onPress={() => { haptics.lightTap(); option.action(); }}>
       <View style={[styles.supportIcon, isRTL && styles.supportIconRTL, { backgroundColor: colors.card2 }]}>
         <Ionicons name={option.icon} size={24} color={colors.primary} />
       </View>

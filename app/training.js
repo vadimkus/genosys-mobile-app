@@ -88,7 +88,7 @@ export default function TrainingScreen() {
 
   const openVideo = async (youtubeId) => {
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      haptics.mediumTap();
       // Try YouTube app first, fall back to browser
       const ytAppUrl = `youtube://watch?v=${youtubeId}`;
       const canOpen = await Linking.canOpenURL(ytAppUrl);

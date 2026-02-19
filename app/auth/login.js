@@ -22,6 +22,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
 import { createLogger } from '../../utils/logger';
+import * as haptics from '../../utils/haptics';
 import AUTH_CONFIG from '../../config/auth';
 import Constants from 'expo-constants';
 
@@ -86,8 +87,10 @@ export default function LoginScreen() {
   } = useAuth();
 
   const handleGoogleLogin = async () => {
+    haptics.lightTap();
     // Check privacy consent
     if (!privacyConsent) {
+      haptics.warning();
       Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
@@ -97,8 +100,10 @@ export default function LoginScreen() {
       const result = await loginWithGoogle();
       
       if (result.success) {
+        haptics.success();
         // Navigation will be handled by the auth context automatically
       } else {
+        haptics.warning();
         // Show helpful error message with alternative
         Alert.alert(
           t('authScreen.googleSignInIssueTitle'), 
@@ -113,6 +118,7 @@ export default function LoginScreen() {
         );
       }
     } catch (error) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.googleAuthFailed'));
     } finally {
       setLoading(false);
@@ -120,11 +126,14 @@ export default function LoginScreen() {
   };
 
   const handleAppleLogin = async () => {
+    haptics.lightTap();
     if (!privacyConsent) {
+      haptics.warning();
       Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
     if (!AppleAuthentication) {
+      haptics.warning();
       // Should never happen since the button is only shown on iOS, but guard anyway
       Alert.alert(t('authScreen.authFailedTitle'), 'Apple Sign-In is only available on iOS.');
       return;
@@ -134,6 +143,7 @@ export default function LoginScreen() {
       // Surface a clearer message when Apple Sign-In isn't available on the device.
       const isAvailable = await AppleAuthentication.isAvailableAsync().catch(() => false);
       if (!isAvailable) {
+        haptics.warning();
         Alert.alert(
           t('authScreen.authFailedTitle'),
           'Apple Sign‑In is not available on this device. Please ensure you are signed into iCloud and try again.'
@@ -153,13 +163,17 @@ export default function LoginScreen() {
         : '';
 
       if (!identityToken) {
+        haptics.warning();
         Alert.alert(t('authScreen.authFailedTitle'), t('authScreen.appleNoToken'));
         return;
       }
 
       const result = await loginWithApple({ identityToken, fullName });
       if (!result.success) {
+        haptics.warning();
         Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.appleAuthFailed'));
+      } else {
+        haptics.success();
       }
     } catch (error) {
       // User cancelled is common; don't show scary error.
@@ -184,6 +198,7 @@ export default function LoginScreen() {
         (codeUpper === 'ERR_UNKNOWN' && (msgLower.includes('authorization') || msgLower.includes('1000')));
 
       if (looksLikeSetupNotComplete || looksLikeNotHandled) {
+        haptics.warning();
         Alert.alert(
           t('authScreen.authFailedTitle'),
           t('authScreen.appleSetupNotComplete', { bundleId: bundleId || 'unknown' })
@@ -191,6 +206,7 @@ export default function LoginScreen() {
         return;
       }
       const detail = [code, msg].filter(Boolean).join(': ');
+      haptics.warning();
       Alert.alert(
         t('common.error'),
         detail
@@ -203,8 +219,10 @@ export default function LoginScreen() {
   };
 
   const handleBiometricLogin = async () => {
+    haptics.lightTap();
     // Check privacy consent
     if (!privacyConsent) {
+      haptics.warning();
       Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
@@ -214,12 +232,15 @@ export default function LoginScreen() {
       const result = await loginWithBiometrics();
       
       if (result.success) {
+        haptics.success();
         // Navigation will be handled by the auth context automatically
         log.debug('Biometric login successful');
       } else {
+        haptics.warning();
         Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.biometricLoginFailed'));
       }
     } catch (error) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.biometricAuthFailed'));
     } finally {
       setLoading(false);
@@ -227,7 +248,9 @@ export default function LoginScreen() {
   };
 
   const handleEmailAuth = async () => {
+    haptics.mediumTap();
     if (!email || !password || (!isLogin && !name)) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.fillAllFields'));
       return;
     }
@@ -235,31 +258,37 @@ export default function LoginScreen() {
     // Registration-specific validation
     if (!isLogin) {
       if (!phone.trim()) {
+        haptics.warning();
         Alert.alert(t('common.error'), t('authScreen.phoneRequired'));
         return;
       }
       if (!address.trim()) {
+        haptics.warning();
         Alert.alert(t('common.error'), t('authScreen.addressRequired'));
         return;
       }
       if (!emirate) {
+        haptics.warning();
         Alert.alert(t('common.error'), t('authScreen.emirateRequired'));
         return;
       }
     }
 
     if (!isValidEmail(email)) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.invalidEmail'));
       return;
     }
 
     if (password.length < 6) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.passwordMinLength'));
       return;
     }
 
     // Check privacy consent
     if (!privacyConsent) {
+      haptics.warning();
       Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
       return;
     }
@@ -280,15 +309,18 @@ export default function LoginScreen() {
       }
 
       if (result.success) {
+        haptics.success();
         // Show success alert only for registration, not login
         if (!isLogin) {
           Alert.alert(t('authScreen.accountCreatedTitle'), t('authScreen.accountCreatedMessage'));
         }
         // Navigation will be handled by the auth context automatically
       } else {
+        haptics.warning();
         Alert.alert(t('common.error'), result.error || (isLogin ? t('authScreen.loginFailed') : t('authScreen.registrationFailed')));
       }
     } catch (error) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.genericError'));
     } finally {
       setLoading(false);
@@ -301,6 +333,7 @@ export default function LoginScreen() {
   };
 
   const toggleMode = () => {
+    haptics.selectionTick();
     setIsLogin(!isLogin);
     setEmail('');
     setPassword('');
@@ -592,7 +625,7 @@ export default function LoginScreen() {
           <View style={[styles.privacySection, isRTL && styles.privacySectionRTL]}>
             <TouchableOpacity
               style={[styles.checkboxContainer, isRTL && styles.checkboxContainerRTL]}
-              onPress={() => setPrivacyConsent(!privacyConsent)}
+              onPress={() => { haptics.selectionTick(); setPrivacyConsent(!privacyConsent); }}
               activeOpacity={0.7}
             >
               <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked, isRTL && styles.checkboxRTL]}>

@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useLocalization } from '../contexts/LocalizationContext';
+import * as haptics from '../utils/haptics';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function AboutScreen() {
     <View style={[styles.infoRow, isRTL && styles.infoRowRTL]}>
       <Text style={[styles.infoLabel, isRTL && styles.infoLabelRTL]}>{label}</Text>
       {onPress ? (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); onPress(); }} activeOpacity={0.7}>
           <Text style={[styles.infoValue, styles.infoValueLink, isRTL && styles.infoValueRTL]}>{value}</Text>
         </TouchableOpacity>
       ) : (
@@ -54,7 +55,7 @@ export default function AboutScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header - generic back arrow */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
           <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>

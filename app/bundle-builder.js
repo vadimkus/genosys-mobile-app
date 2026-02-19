@@ -22,7 +22,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -116,11 +116,11 @@ export default function BundleBuilderScreen() {
       onPanResponderRelease: (_, g) => {
         if (g.dy < -30 || g.vy < -0.3) {
           // Swiped up → expand
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          haptics.lightTap();
           setFooterExpanded(true);
         } else if (g.dy > 30 || g.vy > 0.3) {
           // Swiped down → collapse
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          haptics.lightTap();
           setFooterExpanded(false);
         }
       },
@@ -170,7 +170,7 @@ export default function BundleBuilderScreen() {
   const totalSaved = discountAmount;
 
   const toggleProduct = (product, stepId) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setSelectedItems(prev => {
       const next = { ...prev };
       if (next[product.id]) {
@@ -189,7 +189,7 @@ export default function BundleBuilderScreen() {
   };
 
   const goToStep = (index) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setCurrentStep(index);
     // Scroll step indicator into view
     stepsScrollRef.current?.scrollToIndex?.({ index, animated: true, viewPosition: 0.5 });
@@ -204,7 +204,7 @@ export default function BundleBuilderScreen() {
       return;
     }
 
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptics.success();
 
     // Add each selected product to cart with bundle discount ONLY (no VIP stacking)
     selectedArray.forEach(({ product }) => {
@@ -474,7 +474,7 @@ export default function BundleBuilderScreen() {
         {/* Chevron toggle */}
         <TouchableOpacity
           style={styles.footerChevron}
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setFooterExpanded(v => !v); }}
+          onPress={() => { haptics.lightTap(); setFooterExpanded(v => !v); }}
           activeOpacity={0.7}
           hitSlop={{ top: 12, bottom: 12, left: 20, right: 20 }}
         >
@@ -638,7 +638,7 @@ export default function BundleBuilderScreen() {
             {/* Clear all */}
             <TouchableOpacity
               style={styles.clearAllBtn}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setSelectedItems({}); closeSummary(); }}
+              onPress={() => { haptics.mediumTap(); setSelectedItems({}); closeSummary(); }}
               activeOpacity={0.7}
             >
               <Ionicons name="trash-outline" size={16} color="#EF4444" />

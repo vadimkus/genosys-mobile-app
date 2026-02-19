@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
+import * as haptics from '../../utils/haptics';
 
 export default function ContactScreen() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function ContactScreen() {
   ];
 
   const ContactMethodCard = ({ method }) => (
-    <TouchableOpacity style={[styles.contactCard, isRTL && styles.contactCardRTL]} onPress={method.action}>
+    <TouchableOpacity style={[styles.contactCard, isRTL && styles.contactCardRTL]} onPress={() => { haptics.lightTap(); method.action(); }}>
       <View style={styles.contactIcon}>
         <Ionicons name={method.icon} size={24} color={method.icon === 'logo-whatsapp' ? '#25D366' : '#dc2626'} />
       </View>

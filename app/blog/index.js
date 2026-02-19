@@ -20,6 +20,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
 import { createLogger } from '../../utils/logger';
+import * as haptics from '../../utils/haptics';
 
 const log = createLogger('Blog');
 
@@ -80,7 +81,7 @@ export default function BlogScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
           <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
@@ -97,7 +98,7 @@ export default function BlogScreen() {
         <View style={styles.errorState}>
           <Ionicons name="cloud-offline" size={48} color="#D1D5DB" />
           <Text style={styles.errorTitle}>{l('Failed to load', 'فشل التحميل', 'Ошибка загрузки')}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={() => fetchPosts()} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => { haptics.lightTap(); fetchPosts(); }} activeOpacity={0.7}>
             <Text style={styles.retryBtnText}>{l('Retry', 'إعادة المحاولة', 'Повторить')}</Text>
           </TouchableOpacity>
         </View>
@@ -133,7 +134,7 @@ export default function BlogScreen() {
                 <TouchableOpacity
                   key={post.id}
                   style={styles.postCard}
-                  onPress={() => openPost(post.slug)}
+                  onPress={() => { haptics.lightTap(); openPost(post.slug); }}
                   activeOpacity={0.7}
                 >
                   {post.featuredImage ? (

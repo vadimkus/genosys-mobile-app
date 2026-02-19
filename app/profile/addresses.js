@@ -17,6 +17,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
+import * as haptics from '../../utils/haptics';
 
 const log = createLogger('Addresses');
 
@@ -91,10 +92,12 @@ export default function AddressesScreen() {
   };
 
   const handleAddAddress = () => {
+    haptics.lightTap();
     router.push('/profile/add-address');
   };
 
   const handleEditAddress = (address) => {
+    haptics.lightTap();
     router.push({
       pathname: '/profile/add-address',
       params: {
@@ -114,6 +117,7 @@ export default function AddressesScreen() {
           text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
+            haptics.heavyTap();
             const result = await removeAddress(addressId);
             if (result.success) {
               // Backend currently supports a single primary address; deleting clears it.
@@ -160,6 +164,7 @@ export default function AddressesScreen() {
           <TouchableOpacity
             style={styles.moreButton}
             onPress={() => {
+              haptics.lightTap();
               Alert.alert(
                 t('addresses.optionsTitle'),
                 '',

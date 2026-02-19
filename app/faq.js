@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('FAQ');
@@ -74,7 +74,7 @@ export default function FAQScreen() {
   }, [fetchFAQ]);
 
   const toggleItem = useCallback((id) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setExpandedId((prev) => (prev === id ? null : id));
   }, []);
 
@@ -238,7 +238,7 @@ export default function FAQScreen() {
           <View style={styles.ctaButtons}>
             <TouchableOpacity
               style={[styles.ctaBtn, styles.ctaBtnPrimary]}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); Linking.openURL('https://wa.me/971585487665'); }}
+              onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665'); }}
               activeOpacity={0.7}
             >
               <Ionicons name="logo-whatsapp" size={18} color="#ffffff" />
@@ -246,7 +246,7 @@ export default function FAQScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.ctaBtn, styles.ctaBtnSecondary]}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); Linking.openURL('mailto:sales@genosys.ae'); }}
+              onPress={() => { haptics.mediumTap(); Linking.openURL('mailto:sales@genosys.ae'); }}
               activeOpacity={0.7}
             >
               <Ionicons name="mail" size={18} color="#dc2626" />

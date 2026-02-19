@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { updateUserSettings } from '../../services/databaseService';
+import * as haptics from '../../utils/haptics';
 
 const LOCALES = ['en', 'ru', 'ar'];
 
@@ -27,6 +28,7 @@ export default function LanguageScreen() {
   }, [t]);
 
   const apply = async (next) => {
+    haptics.selectionTick();
     const nextLocale = String(next || '').toLowerCase();
     if (!LOCALES.includes(nextLocale)) return;
 

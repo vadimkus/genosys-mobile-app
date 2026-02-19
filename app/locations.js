@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 
 export default function LocationsScreen() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function LocationsScreen() {
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
 
   const handleSelectLocation = useCallback((slug) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setSelectedSlug((prev) => (prev === slug ? null : slug));
   }, []);
 

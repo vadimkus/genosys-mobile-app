@@ -22,7 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -101,7 +101,7 @@ export default function SkinAnalysisCameraScreen() {
   const handleCapture = async () => {
     if (!cameraRef.current || capturing) return;
     setCapturing(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.mediumTap();
 
     try {
       const photo = await cameraRef.current.takePictureAsync({
@@ -136,7 +136,7 @@ export default function SkinAnalysisCameraScreen() {
         const json = await res.json();
         if (json.success && json.data) {
           setAiResult(json.data);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          haptics.success();
           // Fetch product details (images, sizes, prices) in background
           fetchProductDetails(json.data.recommendations || []);
         } else {
@@ -181,7 +181,7 @@ export default function SkinAnalysisCameraScreen() {
       if (res.ok) {
         const product = await res.json();
         await addItem(product, 1, '', '');
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        haptics.success();
         setAddedProducts((prev) => new Set([...prev, productId]));
         setTimeout(() => {
           setAddedProducts((prev) => { const n = new Set(prev); n.delete(productId); return n; });

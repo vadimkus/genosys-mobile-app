@@ -14,6 +14,7 @@ import { isBeautyBoxProduct } from '../../../utils/productRules';
 import { parseBeautyBoxDescription } from '../../../utils/beautyBoxDescription';
 import { asText } from '../../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../../config/auth';
+import * as haptics from '../../../utils/haptics';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -290,6 +291,7 @@ export default function OrderDetailScreen() {
   }, [order]);
 
   const onPay = async () => {
+    haptics.mediumTap();
     if (!token || !order) return;
     setPaying(true);
     try {
@@ -333,6 +335,7 @@ export default function OrderDetailScreen() {
   };
 
   const onReorder = async () => {
+    haptics.mediumTap();
     if (!order || !user) return;
     
     const orderItems = Array.isArray(order?.items) ? order.items : [];
@@ -399,7 +402,7 @@ export default function OrderDetailScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/orders')} style={styles.backButton}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace('/(tabs)/orders') }} style={styles.backButton}>
           <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderDetails')}</Text>

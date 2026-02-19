@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { fetchPromo } from '../../services/api';
 import RenderHTML from 'react-native-render-html';
+import * as haptics from '../../utils/haptics';
 
 export default function PromoScreen() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function PromoScreen() {
       <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
         <TouchableOpacity
           style={[styles.backButton, isRTL && styles.backButtonRTL]}
-          onPress={() => router.replace('/profile')}
+          onPress={() => { haptics.lightTap(); router.replace('/profile'); }}
           activeOpacity={0.7}
         >
           <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>

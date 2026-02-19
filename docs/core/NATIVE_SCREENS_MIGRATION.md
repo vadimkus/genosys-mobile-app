@@ -25,6 +25,8 @@ We systematically replaced all 9 WebView screens with fully native React Native 
 | 7 | Blog | ✅ Native + API | `app/blog/index.js` + `[slug].js` | Full native reading & commenting |
 | 8 | Certificates | 🔵 Skipped | — | Low priority, rarely used |
 | 9 | Bundle Builder | ✅ Native + API | `app/bundle-builder.js` | 8-step routine, tiered discounts, cart integration via `/api/mobile/bundle-builder` |
+| 10 | Skin Concerns | ✅ Native | `app/skin-concerns.js` | 8 concern cards, 2-column grid |
+| 11 | Concern Detail | ✅ Native + API | `app/concern-detail.js` | Full concern page via `/api/mobile/concerns/[slug]` |
 
 ## Architecture Changes
 
@@ -491,6 +493,8 @@ Some screens have two versions — one for the hamburger menu (standalone with b
 | About | Hardcoded + translations | Code change |
 | Contact | Hardcoded + translations | Code change |
 | Bundle Builder | **API** (`/api/mobile/bundle-builder`) | Products in website DB |
+| Skin Concerns | Hardcoded in `app/skin-concerns.js` | Code change |
+| Concern Detail | **API** (`/api/mobile/concerns/[slug]`) | `lib/concernsData.ts` on website |
 
 ---
 
@@ -510,6 +514,8 @@ All 9 WebView screens have been successfully converted to native React Native im
 | 8 | About | Native (standalone + profile) |
 | 9 | Contact | Native (standalone + profile) |
 | 10 | Bundle Builder | Native + API |
+| 11 | Skin Concerns | Native (hardcoded) |
+| 12 | Concern Detail | Native + API |
 
 **The app is now 100% WebView-free for content screens.**
 
@@ -620,5 +626,74 @@ See: [Session Log 11 Feb 2026](./SESSION_LOG_2026_02_11.md) and [Google Play Rev
 
 ---
 
+---
+
+## Skin Concern Detail — Native Screen (February 2026)
+
+### Overview
+
+Skin concern detail pages (e.g., "Anti-Aging", "Pigmentation") were converted from WebView to a fully native screen with a dedicated API endpoint.
+
+### New Files
+
+| File | Description |
+|------|-------------|
+| `app/concern-detail.js` | Native concern detail screen — hero, why section, routine steps, products grid, FAQ, protocol PDF, related concerns |
+| `cosmetics-website/app/api/mobile/concerns/[slug]/route.ts` | API endpoint returning full localized concern page data |
+| `services/api.js` → `fetchConcernDetail()` | API client function |
+
+### Concern Detail API
+
+**Endpoint:** `GET /api/mobile/concerns/[slug]`
+
+**Headers:**
+- `x-api-key: <MOBILE_APP_KEY>` (required)
+- `x-locale: en|ar|ru` (optional, default: en)
+
+**Response includes:** `seo`, `why`, `protocolPdf`, `routine` (steps with products), `products[]`, `faq`, `relatedConcerns[]`, `routineEssentials`
+
+### Navigation
+
+| From | Method |
+|------|--------|
+| `app/skin-concerns.js` card tap | `router.push({ pathname: '/concern-detail', params: { slug } })` |
+| Deep link `products/concern/[slug]` | Routed via `utils/deepLinking.js` |
+
+### Screen Features
+
+- Animated gradient hero with localized h1 + description
+- "Why This Matters" expandable section
+- Protocol PDF download card (with file size badge)
+- Multi-step routine with expandable product chips
+- Product grid (reuses `ProductGridItem`)
+- Expandable FAQ accordion
+- Related concerns horizontal scroll
+- Routine essentials quick-add section
+- Full RTL + EN/AR/RU support
+- Skeleton loader, error state, pull-to-refresh
+
+---
+
+## App-Wide Haptic Standardization (February 18, 2026)
+
+All 40+ screen files now use the centralized `utils/haptics.js` utility exclusively. No direct `expo-haptics` imports exist outside the utility.
+
+**Coverage:** ~190 haptic feedback points across the entire app.
+
+**Strategy:**
+
+| Haptic | Used For |
+|--------|----------|
+| `lightTap()` | Navigation, toggles, card presses |
+| `mediumTap()` | Save, pay, add to cart, confirm |
+| `heavyTap()` | Destructive: delete, sign out |
+| `success()` | Login success, profile saved, order placed |
+| `warning()` | Validation errors, failed login |
+| `selectionTick()` | Pickers, switches, language/category selection |
+
+See: [Haptic Feedback Documentation](./HAPTIC_FEEDBACK.md) and [Session Log 18 Feb 2026](./SESSION_LOG_2026_02_18.md)
+
+---
+
 *Document created: February 10, 2026*  
-*Last updated: February 11, 2026 — Android aligned with iOS v1.3.0*
+*Last updated: February 18, 2026 — Concern detail native + app-wide haptic standardization*

@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 
 export default function DeliveryScreen() {
@@ -27,12 +27,12 @@ export default function DeliveryScreen() {
   const [selectedRate, setSelectedRate] = useState(null);
 
   const selectMethod = (index) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setSelectedMethod(selectedMethod === index ? null : index);
   };
 
   const selectRate = (index) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setSelectedRate(selectedRate === index ? null : index);
   };
 
@@ -191,7 +191,7 @@ export default function DeliveryScreen() {
           </Text>
           <TouchableOpacity
             style={[styles.helpBtn, isRTL && styles.helpBtnRTL]}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); Linking.openURL('https://wa.me/971585487665'); }}
+            onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665'); }}
             activeOpacity={0.7}
           >
             <Ionicons name="logo-whatsapp" size={20} color="#ffffff" />

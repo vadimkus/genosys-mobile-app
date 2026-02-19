@@ -17,6 +17,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
+import * as haptics from '../../utils/haptics';
 
 const log = createLogger('AddAddress');
 
@@ -69,6 +70,7 @@ export default function AddEditAddressScreen() {
   }, []);
 
   const handleSave = async () => {
+    haptics.mediumTap();
     // Validate form
     if (!formData.name.trim() || !formData.phone.trim() || !formData.address.trim()) {
       Alert.alert(t('common.error'), t('addAddress.validationMissingFields'));
@@ -109,6 +111,7 @@ export default function AddEditAddressScreen() {
       }
       
       if (result.success) {
+        haptics.success();
         // Mark current state as saved, so Cancel/Back won't ask to discard.
         initialFormRef.current = payload;
 
@@ -195,7 +198,7 @@ export default function AddEditAddressScreen() {
                     styles.typeButton,
                     formData.type === type && styles.activeTypeButton
                   ]}
-                  onPress={() => updateField('type', type)}
+                  onPress={() => { haptics.selectionTick(); updateField('type', type); }}
                 >
                   <Ionicons 
                     name={type === t('addAddress.typeHome') ? 'home' : type === t('addAddress.typeWork') ? 'business' : 'location'} 
@@ -312,7 +315,7 @@ export default function AddEditAddressScreen() {
                         isRTL && styles.emirateButtonRTL,
                         formData.emirate === emirate.value && styles.activeEmirateButton
                       ]}
-                      onPress={() => updateField('emirate', emirate.value)}
+                      onPress={() => { haptics.selectionTick(); updateField('emirate', emirate.value); }}
                     >
                       <Text style={[
                         styles.emirateButtonText,
@@ -355,7 +358,7 @@ export default function AddEditAddressScreen() {
               </View>
               <Switch
                 value={formData.isDefault}
-                onValueChange={(value) => updateField('isDefault', value)}
+                onValueChange={(value) => { haptics.selectionTick(); updateField('isDefault', value); }}
                 trackColor={{ false: '#E5E5EA', true: '#dc2626' }}
                 thumbColor="#ffffff"
                 ios_backgroundColor="#E5E5EA"

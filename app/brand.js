@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const VIDEO_WIDTH = SCREEN_WIDTH - 68; // 20 section padding + 14 card padding each side
@@ -80,7 +80,7 @@ export default function BrandScreen() {
   ];
 
   const openVideo = useCallback((youtubeId) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`);
   }, []);
 

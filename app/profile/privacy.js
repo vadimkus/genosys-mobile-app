@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyContent from '../../components/PrivacyPolicyContent';
+import * as haptics from '../../utils/haptics';
 
 export default function PrivacyPolicyScreen() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function PrivacyPolicyScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.replace('/profile')} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace('/profile'); }} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
           <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
             <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
             <Text style={[styles.backText, isRTL && styles.backTextRTL]} numberOfLines={1}>

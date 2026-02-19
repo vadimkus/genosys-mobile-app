@@ -21,6 +21,7 @@ import { fetchUserOrders } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
 import { createLogger } from '../utils/logger';
+import * as haptics from '../utils/haptics';
 
 const log = createLogger('Profile');
 
@@ -141,6 +142,7 @@ export default function ProfileScreen() {
   const displayEmail = String(user?.contactEmail || user?.email || '').trim();
 
   const handleSignOut = () => {
+    haptics.heavyTap();
     Alert.alert(
       t('profile.signOutTitle'),
       t('profile.signOutConfirm'),
@@ -172,18 +174,22 @@ export default function ProfileScreen() {
   };
 
   const handleEditProfile = () => {
+    haptics.lightTap();
     router.push('/profile/edit');
   };
 
   const handleContactSupport = () => {
+    haptics.lightTap();
     router.push('/profile/contact');
   };
 
   const handleAbout = () => {
+    haptics.lightTap();
     router.push('/profile/about');
   };
 
   const handleBiometricToggle = useCallback(async (value) => {
+    haptics.selectionTick();
     if (biometricLoading) return;
     
     setBiometricLoading(true);
@@ -236,6 +242,7 @@ export default function ProfileScreen() {
   }, [biometricLoading, biometricType, disableBiometric, enableBiometric, t, user?.email]);
 
   const handlePushToggle = async (value) => {
+    haptics.selectionTick();
     if (pushToggleLoading) return;
     // Only meaningful when logged in (we need user token to store token server-side)
     if (!user?.token) {
@@ -282,6 +289,7 @@ export default function ProfileScreen() {
   };
 
   const handleEmailNotifToggle = useCallback(async (value) => {
+    haptics.selectionTick();
     setEmailNotifications(!!value);
     await AsyncStorage.setItem(EMAIL_NOTIF_PREF_KEY, value ? '1' : '0').catch((e) => log.warn('Failed to save email notif pref', e?.message));
   }, []);
@@ -489,6 +497,7 @@ export default function ProfileScreen() {
               subtitle={ordersSubtitle}
               color="#dc2626"
               onPress={async () => {
+                haptics.lightTap();
                 // Ensure Orders header can route back to Account when opened from here.
                 await AsyncStorage.setItem('@genosys_nav_orders_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
                 router.push('/profile/orders');
@@ -500,6 +509,7 @@ export default function ProfileScreen() {
               subtitle={cartCount > 0 ? t('profile.itemsCount', { count: cartCount }) : t('profile.empty')}
               color="#27AE60"
               onPress={async () => {
+                haptics.lightTap();
                 // Ensure Bag header can route back to Account when opened from here.
                 await AsyncStorage.setItem('@genosys_nav_bag_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
                 router.push('/(tabs)/bag');
@@ -519,12 +529,12 @@ export default function ProfileScreen() {
             <ProfileItem
               icon="location-outline"
               title={t('profile.addresses')}
-              onPress={() => router.push('/profile/addresses')}
+              onPress={() => { haptics.lightTap(); router.push('/profile/addresses'); }}
             />
             <ProfileItem
               icon="card-outline"
               title={t('profile.paymentAndBilling')}
-              onPress={() => router.push('/profile/payment')}
+              onPress={() => { haptics.lightTap(); router.push('/profile/payment'); }}
             />
           </View>
         </ProfileSection>
@@ -573,12 +583,12 @@ export default function ProfileScreen() {
             <ProfileItem
               icon="shield-outline"
               title={t('profile.privacyPolicy')}
-              onPress={() => router.push('/profile/privacy')}
+              onPress={() => { haptics.lightTap(); router.push('/profile/privacy'); }}
             />
             <ProfileItem
               icon="document-text-outline"
               title={t('profile.termsAndConditions')}
-              onPress={() => router.push('/profile/terms')}
+              onPress={() => { haptics.lightTap(); router.push('/profile/terms'); }}
               isLast={true}
             />
           </View>
@@ -591,12 +601,12 @@ export default function ProfileScreen() {
               icon="language-outline"
               title={t('profile.language')}
               subtitle={locale === 'ru' ? t('profile.russian') : locale === 'ar' ? t('profile.arabic') : t('profile.english')}
-              onPress={() => router.push('/profile/language')}
+              onPress={() => { haptics.lightTap(); router.push('/profile/language'); }}
             />
             <ProfileItem
               icon="help-circle-outline"
               title={t('profile.helpAndSupport')}
-              onPress={() => router.push('/profile/help')}
+              onPress={() => { haptics.lightTap(); router.push('/profile/help'); }}
             />
             <ProfileItem
               icon="mail-outline"
@@ -606,7 +616,7 @@ export default function ProfileScreen() {
             <ProfileItem
               icon="download-outline"
               title={t('profile.trainingMaterials') || 'Training Materials'}
-              onPress={() => router.push('/training')}
+              onPress={() => { haptics.lightTap(); router.push('/training'); }}
             />
             <ProfileItem
               icon="information-circle-outline"

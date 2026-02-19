@@ -13,6 +13,7 @@ import { OrdersSkeleton } from '../../components/SkeletonLoader';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { createLogger } from '../../utils/logger';
+import * as haptics from '../../utils/haptics';
 
 const log = createLogger('Orders');
 
@@ -236,6 +237,7 @@ export default function OrdersScreen() {
   }, [orders]);
 
   const handlePay = async (order) => {
+    haptics.mediumTap();
     if (!token) return;
     const orderId = String(order?.id || order?.orderId || '');
     const orderNumber = String(order?.orderNumber || order?.order_number || order?.number || '');
@@ -311,6 +313,7 @@ export default function OrdersScreen() {
   };
 
   const handleDelete = (order) => {
+    haptics.heavyTap();
     const orderId = String(order?.id || order?.orderId || '').trim();
     const orderNumber = order?.orderNumber || order?.order_number || order?.number || order?.id || '';
     if (!orderId) {
@@ -347,6 +350,7 @@ export default function OrdersScreen() {
   };
 
   const toggleExpanded = (key) => {
+    haptics.lightTap();
     const k = String(key || '');
     setExpandedOrderKey((prev) => (prev === k ? '' : k));
   };
@@ -355,7 +359,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.replace(backTo)} style={styles.backButton}>
+          <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace(backTo); }} style={styles.backButton}>
             <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
               <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
               <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{backLabel}</Text>
@@ -375,7 +379,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.replace(backTo)} style={styles.backButton}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace(backTo); }} style={styles.backButton}>
           <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
             <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
             <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{backLabel}</Text>

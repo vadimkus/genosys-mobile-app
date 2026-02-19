@@ -20,6 +20,7 @@ import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDevice
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import { createLogger } from '../utils/logger';
+import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 
 const log = createLogger('FavoritesScreen');
@@ -36,6 +37,7 @@ export default function FavoritesScreen() {
   const [addingProducts, setAddingProducts] = useState(new Set());
 
   const handleProductPress = (product) => {
+    haptics.lightTap();
     router.push({
       pathname: '/product/[id]',
       params: { id: product.id }
@@ -43,6 +45,7 @@ export default function FavoritesScreen() {
   };
 
   const handleAddToCart = async (product) => {
+    haptics.mediumTap();
     if (product.isPriceOnRequest) return; // price-on-request products cannot be added to cart
     if (!user) {
       Alert.alert(
@@ -83,6 +86,7 @@ export default function FavoritesScreen() {
   };
 
   const handleRemoveFromFavorites = (product) => {
+    haptics.lightTap();
     toggleFavorite(product);
     log.debug('Removed from favorites', { productId: product?.id });
   };
@@ -93,7 +97,7 @@ export default function FavoritesScreen() {
         <View style={styles.header}>
           <TouchableOpacity 
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() => { haptics.lightTap(); router.back(); }}
             activeOpacity={0.7}
           >
             <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
@@ -115,7 +119,7 @@ export default function FavoritesScreen() {
             </Text>
             <TouchableOpacity 
               style={styles.browseButton}
-              onPress={() => router.back()}
+              onPress={() => { haptics.lightTap(); router.back(); }}
             >
               <Text style={styles.browseButtonText}>{t('favorites.browseProducts')}</Text>
             </TouchableOpacity>
@@ -130,7 +134,7 @@ export default function FavoritesScreen() {
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => { haptics.lightTap(); router.back(); }}
           activeOpacity={0.7}
         >
           <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />

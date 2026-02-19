@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Partners');
@@ -121,22 +121,22 @@ export default function PartnersScreen() {
   }, [fetchPartners]);
 
   const handleToggle = useCallback((id) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     setExpandedId((prev) => (prev === id ? null : id));
   }, []);
 
   const handleCall = useCallback((phone) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.mediumTap();
     Linking.openURL(`tel:${phone.replace(/\s/g, '')}`);
   }, []);
 
   const handleDirections = useCallback((url) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     Linking.openURL(url);
   }, []);
 
   const handleWebsite = useCallback((url) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.lightTap();
     Linking.openURL(url);
   }, []);
 

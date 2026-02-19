@@ -29,6 +29,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { handleDeepLink } from '../utils/deepLinking';
+import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
@@ -131,6 +132,7 @@ export default function ChatScreen() {
 
   /* ─── Chat API ─── */
   const handleSend = async (overrideText) => {
+    haptics.lightTap();
     const text = (overrideText || input).trim();
     if (!text || loading) return;
     Keyboard.dismiss();
@@ -182,6 +184,7 @@ export default function ChatScreen() {
   };
 
   const handleAddToBag = async (product) => {
+    haptics.mediumTap();
     if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
     try {
       await addItem(product, 1, '', '');
@@ -262,7 +265,7 @@ export default function ChatScreen() {
             )}
             <TouchableOpacity
               style={styles.viewProductBtn}
-              onPress={() => router.push({ pathname: '/product/[id]', params: { id: product.id } })}
+              onPress={() => { haptics.lightTap(); router.push({ pathname: '/product/[id]', params: { id: product.id } }); }}
               activeOpacity={0.8}
             >
               <Text style={styles.viewProductText}>{t('chat.viewProduct')}</Text>
@@ -432,7 +435,7 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* ─── Header (red, matches web) ─── */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
           <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#ffffff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>

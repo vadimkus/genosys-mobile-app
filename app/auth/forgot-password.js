@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import * as haptics from '../../utils/haptics';
 import { requestPasswordReset } from '../../services/authService';
 
 function isValidEmail(email) {
@@ -19,7 +20,9 @@ export default function ForgotPasswordScreen() {
   const canSubmit = useMemo(() => isValidEmail(email) && !loading, [email, loading]);
 
   const handleSend = async () => {
+    haptics.mediumTap();
     if (!isValidEmail(email)) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.invalidEmail'));
       return;
     }
@@ -29,10 +32,12 @@ export default function ForgotPasswordScreen() {
       const result = await requestPasswordReset(email.trim());
 
       if (!result.success) {
+        haptics.warning();
         Alert.alert(t('common.error'), result.error || t('authScreen.genericError'));
         return;
       }
 
+      haptics.success();
       Alert.alert(
         t('authScreen.resetEmailSentTitle'),
         t('authScreen.resetEmailSentMessage'),
@@ -44,6 +49,7 @@ export default function ForgotPasswordScreen() {
         ]
       );
     } catch (_e) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.genericError'));
     } finally {
       setLoading(false);
@@ -53,7 +59,7 @@ export default function ForgotPasswordScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.backButton} onPress={() => { haptics.lightTap(); router.back(); }} activeOpacity={0.7}>
           <Ionicons name="chevron-back" size={24} color="#111827" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('authScreen.forgotPasswordTitle')}</Text>

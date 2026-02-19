@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
+import * as haptics from '../utils/haptics';
 
 export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }) {
   const { user, logout } = useAuth();
@@ -60,7 +61,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
       statusBarTranslucent
     >
       {/* Backdrop */}
-      <Pressable style={styles.backdrop} onPress={onClose}>
+      <Pressable style={styles.backdrop} onPress={() => { haptics.lightTap(); onClose(); }}>
         <View />
       </Pressable>
 
@@ -74,26 +75,26 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
         >
           {/* ─── Primary Navigation (core app screens) ─── */}
           <View style={[styles.grid, isRTL && styles.gridRTL]}>
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/(tabs)/shop')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/(tabs)/shop'); }} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.products') || 'Products'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/(tabs)/orders')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/(tabs)/orders'); }} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.orders') || 'Orders'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/favorites')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/favorites'); }} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.favorites') || 'Favorites'}
                 {favCount > 0 ? <Text style={styles.badge}> {favCount}</Text> : null}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/profile')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/profile'); }} activeOpacity={0.7}>
               <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.profile') || 'Profile'}
               </Text>
@@ -104,7 +105,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
           <View style={[styles.highlightRow, isRTL && styles.gridRTL]}>
             <TouchableOpacity
               style={styles.highlightBtn}
-              onPress={() => navigateTo('/bundle-builder')}
+              onPress={() => { haptics.lightTap(); navigateTo('/bundle-builder'); }}
               activeOpacity={0.7}
             >
               <Text style={styles.highlightBtnText}>🎁 {t('navigation.bundleBuilder') || 'Bundle Builder'}</Text>
@@ -112,7 +113,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
 
             <TouchableOpacity
               style={styles.highlightBtn}
-              onPress={() => navigateTo('/skin-analysis')}
+              onPress={() => { haptics.lightTap(); navigateTo('/skin-analysis'); }}
               activeOpacity={0.7}
             >
               <Text style={styles.highlightBtnText}>✨ {t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}</Text>
@@ -122,7 +123,7 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
           <View style={[styles.highlightRow, isRTL && styles.gridRTL]}>
             <TouchableOpacity
               style={styles.highlightBtn}
-              onPress={() => navigateTo('/skin-concerns')}
+              onPress={() => { haptics.lightTap(); navigateTo('/skin-concerns'); }}
               activeOpacity={0.7}
             >
               <Text style={styles.highlightBtnText}>🌿 {t('categories.skinConcern') || 'Skin Concern'}</Text>
@@ -134,56 +135,56 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
 
           {/* ─── Info & Pages (2-column grid, even pairs) ─── */}
           <View style={[styles.grid, isRTL && styles.gridRTL]}>
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/about')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/about'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.about') || 'About'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/brand')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/brand'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.brand') || 'Brand'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/delivery')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/delivery'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.delivery') || 'Delivery'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/contact')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/contact'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.contact') || 'Contact'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/faq')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/faq'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.faq') || 'FAQ'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/locations')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/locations'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.locations') || 'Locations'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/blog')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/blog'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.blog') || 'Blog'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/partners')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/partners'); }} activeOpacity={0.7}>
               <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                 {t('navigation.partners') || 'Partners'}
               </Text>
             </TouchableOpacity>
 
             {user ? (
-              <TouchableOpacity style={styles.gridItem} onPress={() => navigateTo('/training')} activeOpacity={0.7}>
+              <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/training'); }} activeOpacity={0.7}>
                 <Text style={[styles.secondaryLink, isRTL && styles.textRTL]}>
                   {t('navigation.training') || 'Training'}
                 </Text>
@@ -196,14 +197,14 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
 
           {/* ─── Login / Logout ─── */}
           {user ? (
-            <TouchableOpacity style={styles.authButton} onPress={handleLogout} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.authButton} onPress={() => { haptics.lightTap(); handleLogout(); }} activeOpacity={0.7}>
               <View style={[styles.authRow, isRTL && styles.authRowRTL]}>
                 <Ionicons name="log-out-outline" size={18} color="#dc2626" />
                 <Text style={styles.logoutText}>{t('common.logout') || 'Sign Out'}</Text>
               </View>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.authButton} onPress={() => navigateTo('/auth/login')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.authButton} onPress={() => { haptics.lightTap(); navigateTo('/auth/login'); }} activeOpacity={0.7}>
               <View style={[styles.authRow, isRTL && styles.authRowRTL]}>
                 <Ionicons name="log-in-outline" size={18} color="#dc2626" />
                 <Text style={styles.logoutText}>{t('common.login') || 'Login'}</Text>

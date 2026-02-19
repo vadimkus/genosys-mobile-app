@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import * as haptics from '../../utils/haptics';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function AboutScreen() {
     <View style={[styles.infoRow, isRTL && styles.infoRowRTL]}>
       <Text style={[styles.infoLabel, isRTL && styles.infoLabelRTL]}>{label}</Text>
       {onPress ? (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); onPress(); }} activeOpacity={0.7}>
           <Text style={[styles.infoValue, styles.infoValueLink, isRTL && styles.infoValueRTL]}>{value}</Text>
         </TouchableOpacity>
       ) : (
@@ -50,7 +51,7 @@ export default function AboutScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.replace('/profile')} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace('/profile'); }} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
           <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
             <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
             <Text style={[styles.backText, isRTL && styles.backTextRTL]} numberOfLines={1}>

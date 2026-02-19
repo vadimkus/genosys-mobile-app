@@ -30,7 +30,7 @@ try {
 } catch {
   // Will fall back to plain text rendering
 }
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../../utils/haptics';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
@@ -172,7 +172,7 @@ export default function BlogPostScreen() {
         throw new Error(data.error || 'Failed to post comment');
       }
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.success();
       // Prepend new comment to list
       setComments((prev) => [data.comment, ...prev]);
       setCommentText('');

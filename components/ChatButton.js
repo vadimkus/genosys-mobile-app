@@ -31,6 +31,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { handleDeepLink } from '../utils/deepLinking';
+import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
@@ -171,6 +172,7 @@ export default function ChatButton({ visible = true }) {
 
   const handleAddToBag = async (product) => {
     if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
+    haptics.mediumTap();
     try {
       await addItem(product, 1, '', '');
       setAddedProducts((prev) => new Set([...prev, product.id]));
@@ -232,6 +234,7 @@ export default function ChatButton({ visible = true }) {
               <TouchableOpacity
                 style={s.requestQuoteBtn}
                 onPress={() => {
+                  haptics.mediumTap();
                   const msg = encodeURIComponent((t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name));
                   Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
                 }}
@@ -253,7 +256,7 @@ export default function ChatButton({ visible = true }) {
             )}
             <TouchableOpacity
               style={s.viewProductBtn}
-              onPress={() => { setIsOpen(false); router.push({ pathname: '/product/[id]', params: { id: product.id } }); }}
+              onPress={() => { haptics.mediumTap(); setIsOpen(false); router.push({ pathname: '/product/[id]', params: { id: product.id } }); }}
               activeOpacity={0.8}
             >
               <Text style={s.viewProductText}>{t('chat.viewProduct')}</Text>
@@ -297,7 +300,7 @@ export default function ChatButton({ visible = true }) {
     <TouchableOpacity
       key={index}
       style={[s.quickActionBtn, item.highlight && s.quickActionBtnHighlight]}
-      onPress={() => handleSend(item.query)}
+      onPress={() => { haptics.lightTap(); handleSend(item.query); }}
       activeOpacity={0.8}
     >
       {item.emoji ? <Text style={s.quickActionEmoji}>{item.emoji}</Text> : null}
@@ -348,7 +351,7 @@ export default function ChatButton({ visible = true }) {
         <View style={s.fabContainer} pointerEvents="auto">
           <TouchableOpacity
             style={s.fab}
-            onPress={() => setIsOpen(true)}
+            onPress={() => { haptics.lightTap(); setIsOpen(true); }}
             activeOpacity={0.85}
             accessibilityRole="button"
             accessibilityLabel="Open chat with Genie"
@@ -367,7 +370,7 @@ export default function ChatButton({ visible = true }) {
         onRequestClose={() => setIsOpen(false)}
       >
         {!isExpanded && (
-          <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
+          <TouchableWithoutFeedback onPress={() => { haptics.lightTap(); setIsOpen(false); }}>
             <View style={s.overlay} />
           </TouchableWithoutFeedback>
         )}
@@ -396,7 +399,7 @@ export default function ChatButton({ visible = true }) {
                 >
                   <Ionicons name={isExpanded ? 'contract-outline' : 'expand-outline'} size={18} color="#ffffff" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { setIsOpen(false); setIsExpanded(false); }} style={s.headerActionBtn} activeOpacity={0.7}>
+                <TouchableOpacity onPress={() => { haptics.lightTap(); setIsOpen(false); setIsExpanded(false); }} style={s.headerActionBtn} activeOpacity={0.7}>
                   <Ionicons name="close" size={20} color="#ffffff" />
                 </TouchableOpacity>
               </View>
@@ -443,7 +446,7 @@ export default function ChatButton({ visible = true }) {
               />
               <TouchableOpacity
                 style={[s.sendBtn, (!input.trim() || loading) && s.sendBtnDisabled]}
-                onPress={() => handleSend()}
+                onPress={() => { haptics.lightTap(); handleSend(); }}
                 disabled={!input.trim() || loading}
                 activeOpacity={0.8}
               >

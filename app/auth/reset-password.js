@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import * as haptics from '../../utils/haptics';
 import { resetPasswordWithToken } from '../../services/authService';
 
 export default function ResetPasswordScreen() {
@@ -25,15 +26,19 @@ export default function ResetPasswordScreen() {
   }, [token, newPassword, confirmPassword, loading]);
 
   const handleReset = async () => {
+    haptics.mediumTap();
     if (!newPassword || newPassword.length < 8) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.passwordTooShort8'));
       return;
     }
     if (newPassword !== confirmPassword) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.passwordsDontMatch'));
       return;
     }
     if (!token || token.trim().length < 10) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.resetTokenInvalid'));
       return;
     }
@@ -43,14 +48,17 @@ export default function ResetPasswordScreen() {
       const result = await resetPasswordWithToken(token.trim(), newPassword);
 
       if (!result.success) {
+        haptics.warning();
         Alert.alert(t('common.error'), result.error || t('authScreen.genericError'));
         return;
       }
 
+      haptics.success();
       Alert.alert(t('authScreen.passwordResetSuccessTitle'), t('authScreen.passwordResetSuccessMessage'), [
         { text: t('common.ok'), onPress: () => router.replace('/auth/login') },
       ]);
     } catch (_e) {
+      haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.genericError'));
     } finally {
       setLoading(false);
@@ -60,7 +68,7 @@ export default function ResetPasswordScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.backButton} onPress={() => { haptics.lightTap(); router.back(); }} activeOpacity={0.7}>
           <Ionicons name="chevron-back" size={24} color="#111827" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('authScreen.resetPasswordTitle')}</Text>
