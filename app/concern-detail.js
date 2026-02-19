@@ -247,17 +247,19 @@ export default function ConcernDetailScreen() {
                   const key = `${si}-${step.step}`;
                   const isExpanded = !!expandedRoutineSteps[key];
                   return (
-                    <Pressable key={step.step} onPress={() => toggleRoutineStep(si, step.step)} style={[styles.routineStep, isExpanded && styles.routineStepExpanded]}>
-                      <View style={[styles.routineStepHeader, isRTL && { flexDirection: 'row-reverse' }]}>
-                        <View style={[styles.stepNumber, isExpanded && styles.stepNumberActive]}>
-                          <Text style={[styles.stepNumberText, isExpanded && styles.stepNumberTextActive]}>{step.step}</Text>
+                    <View key={step.step} style={[styles.routineStep, isExpanded && styles.routineStepExpanded]}>
+                      <Pressable onPress={() => toggleRoutineStep(si, step.step)}>
+                        <View style={[styles.routineStepHeader, isRTL && { flexDirection: 'row-reverse' }]}>
+                          <View style={[styles.stepNumber, isExpanded && styles.stepNumberActive]}>
+                            <Text style={[styles.stepNumberText, isExpanded && styles.stepNumberTextActive]}>{step.step}</Text>
+                          </View>
+                          <View style={styles.stepTitleWrap}>
+                            <Text style={[styles.stepTitle, isRTL && styles.textRTL, isExpanded && styles.stepTitleActive]}>{step.title}</Text>
+                            <Text style={[styles.stepDuration, isRTL && styles.textRTL]}>({step.duration})</Text>
+                          </View>
+                          <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={isExpanded ? '#dc2626' : '#999'} />
                         </View>
-                        <View style={styles.stepTitleWrap}>
-                          <Text style={[styles.stepTitle, isRTL && styles.textRTL, isExpanded && styles.stepTitleActive]}>{step.title}</Text>
-                          <Text style={[styles.stepDuration, isRTL && styles.textRTL]}>({step.duration})</Text>
-                        </View>
-                        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={isExpanded ? '#dc2626' : '#999'} />
-                      </View>
+                      </Pressable>
                       {isExpanded ? (
                         <View style={styles.stepBody}>
                           <Text style={[styles.stepDetail, isRTL && styles.textRTL]}>{step.detail}</Text>
@@ -286,7 +288,7 @@ export default function ConcernDetailScreen() {
                           ) : null}
                         </View>
                       ) : null}
-                    </Pressable>
+                    </View>
                   );
                 })}
               </View>
