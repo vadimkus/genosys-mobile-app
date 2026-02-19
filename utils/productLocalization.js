@@ -49,6 +49,7 @@ const CATEGORY_CANONICAL_BY_KEY = {
   'beauty box': 'Beauty Boxes',
   'bio meso': 'Bio Meso',
   'bio-meso': 'Bio Meso',
+  'skin concern': 'Skin Concern',
 };
 
 export const normalizeCategoryCanonical = (rawCategory) => {
@@ -261,6 +262,8 @@ export const getCategoryTranslationKey = (category) => {
       return 'categories.beautyBoxes';
     case 'Bio Meso':
       return 'categories.bioMeso';
+    case 'Skin Concern':
+      return 'categories.skinConcern';
     default:
       return null;
   }

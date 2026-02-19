@@ -1110,7 +1110,8 @@
     "device": "Device",
     "holidayKits": "Holiday Kits",
     "beautyBoxes": "Beauty Boxes",
-    "bioMeso": "Bio Meso"
+    "bioMeso": "Bio Meso",
+    "skinConcern": "Skin Concern"
   },
   "support": {
     "whatsappOpenFailedTitle": "Could not open WhatsApp",

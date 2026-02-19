@@ -67,6 +67,7 @@ const GRID_CARD_WIDTH = Math.floor((SCREEN_WIDTH - GRID_SIDE_PADDING * 2 - GRID_
 // Allowed categories (order as desired in UI)
 const ALLOWED_CATEGORY_ORDER = [
   'All',
+  'Skin Concern',
   'Microneedling',
   'PRO Solution',
   'Cleanser',
@@ -89,6 +90,7 @@ const ALLOWED_CATEGORY_ORDER = [
 // (Matches desired lines: "Все товары + Уход за областью вокруг глаз", etc.)
 const RU_CATEGORY_PRIORITY_ORDER = [
   'All',
+  'Skin Concern',
   'Eye Care',
   'PRO Solution',
   'Sun',
@@ -98,11 +100,13 @@ const RU_CATEGORY_PRIORITY_ORDER = [
   'Mask',
 ];
 
+const VIRTUAL_CATEGORIES = ['Skin Concern'];
+
 const buildAllowedCategoryList = (foundCategories = []) => {
   const seen = new Set();
   const list = ['All'];
   ALLOWED_CATEGORY_ORDER.slice(1).forEach((allowed) => {
-    if (foundCategories.includes(allowed) && !seen.has(allowed)) {
+    if ((foundCategories.includes(allowed) || VIRTUAL_CATEGORIES.includes(allowed)) && !seen.has(allowed)) {
       seen.add(allowed);
       list.push(allowed);
     }
@@ -621,8 +625,13 @@ export default function ShopScreen() {
 
   const handleCategoryPress = (category) => {
     haptics.selectionTick();
+    if (category === 'Skin Concern') {
+      const prefix = locale === 'en' ? '' : `/${locale}`;
+      const url = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${prefix}/products?categories=skin-concern`;
+      router.push({ pathname: '/webview', params: { url, title: t('categories.skinConcern') || 'Skin Concern' } });
+      return;
+    }
     setSelectedCategory(category);
-    // Clear search when selecting a category for better UX
     if (searchQuery) {
       setSearchQuery('');
     }
@@ -941,7 +950,7 @@ export default function ShopScreen() {
 
                   return [...picked, ...rest];
                 })().map((category) => {
-                  const hasBadge = categoryBadges[category] === 'new';
+                  const hasBadge = categoryBadges[category] === 'new' || category === 'Skin Concern';
                   const isActive = selectedCategory === category;
                   return (
                   <View key={category} style={{ position: 'relative' }}>
