@@ -32,8 +32,11 @@
 | [Session Log 11 Feb 2026](./core/SESSION_LOG_2026_02_11.md) | Android alignment, v58, full audit (checkout/orders/success), haptics fix, badge fix, beauty box |
 | [Session Log 12 Feb 2026](./core/SESSION_LOG_2026_02_12.md) | v1.4.0 TestFlight, Apple Review doc update, App Store release notes |
 | [Session Log 13 Feb 2026](./core/SESSION_LOG_2026_02_13.md) | Product video sound fix, product documentation API-first fix |
-| [Session Log 14 Feb 2026](./core/SESSION_LOG_2026_02_14.md) | **NEW** Android app review, Google Play prep, 13 code fixes, full documentation |
-| [Native Screens Migration](./core/NATIVE_SCREENS_MIGRATION.md) | **NEW** WebView → Native: 8 screens migrated, API-driven FAQ & Partners |
+| [Session Log 19 Feb 2026 (Part 2)](./core/SESSION_LOG_2026_02_19_part2.md) | **NEW** Native concern-detail screen, training nativization, routine add-to-cart (tap toggle + long-press navigate), CUID vs productNumber fix, toast messages, TestFlight build 64 |
+| [Session Log 19 Feb 2026](./core/SESSION_LOG_2026_02_19.md) | Native Skin Concerns screen, Browse by Concern CTAs, PDRN video, Skin Concern category |
+| [Session Log 18 Feb 2026](./core/SESSION_LOG_2026_02_18.md) | Sun-protection enhancements, haptics standardization |
+| [Session Log 14 Feb 2026](./core/SESSION_LOG_2026_02_14.md) | Android app review, Google Play prep, 13 code fixes, full documentation |
+| [Native Screens Migration](./core/NATIVE_SCREENS_MIGRATION.md) | WebView → Native: 8 screens migrated, API-driven FAQ & Partners |
 | [Checkout Flow](./core/CHECKOUT_FLOW.md) | Delivery details, payment, order submission |
 | [Orders](./core/ORDERS_PAGES.md) | Orders list, order detail, reorder |
 | [Waterfall Pricing](./core/WATERFALL_PRICING.md) | Transparent discount breakdown (VIP, bundle) |
@@ -44,6 +47,21 @@
 | [Skeleton Loaders](./core/SKELETON_LOADING_SCREENS.md) | Shimmer placeholders for loading states |
 | [Haptic Feedback](./core/HAPTIC_FEEDBACK.md) | Tactile feedback on key actions |
 | [Animations](./core/ANIMATIONS.md) | Animation policy: what's kept vs removed |
+
+---
+
+## Skin Concerns & Routine Add-to-Cart
+
+| Feature | Details |
+|---------|---------|
+| **Skin Concerns List** | `app/skin-concerns.js` — Native 2-column card grid, 8 concerns, EN/AR/RU, RTL |
+| **Concern Detail** | `app/concern-detail.js` — Full native screen (hero, why, routine, products, FAQ, PDF, related) |
+| **Routine Tap-to-Cart** | Single tap = toggle add/remove from bag (toast + haptic); Long press = navigate to product page |
+| **API Endpoint** | `GET /api/mobile/concerns/:slug` — Returns localized concern data with all routine products |
+| **Product Lookup** | Dual-indexed by `id` (CUID) and `productNumber`; cart ops use real CUID |
+| **Training Materials** | `app/training.js` — Fully native (last WebView screen removed) |
+
+**App is now 100% native — zero WebView content screens.**
 
 ---
 
