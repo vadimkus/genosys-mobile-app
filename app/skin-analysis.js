@@ -312,6 +312,31 @@ export default function SkinAnalysisScreen() {
               })
             )}
 
+            {/* Browse by Skin Concern CTA */}
+            <TouchableOpacity
+              style={styles.concernCta}
+              onPress={() => router.push('/skin-concerns')}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.concernCtaIcon}>🌿</Text>
+              <Text style={[styles.concernCtaTitle, isRTL && styles.textRTL]}>
+                {locale === 'ar' ? 'استكشفي حسب مشكلة البشرة' : locale === 'ru' ? 'Подберите по проблеме кожи' : 'Browse by Skin Concern'}
+              </Text>
+              <Text style={[styles.concernCtaDesc, isRTL && styles.textRTL]}>
+                {locale === 'ar'
+                  ? 'منتجات مختارة وروتين يومي لكل مشكلة'
+                  : locale === 'ru'
+                  ? 'Подобранные продукты и ежедневный уход для каждой проблемы'
+                  : 'Curated products & daily routines for every concern'}
+              </Text>
+              <View style={[styles.concernCtaBtnRow, isRTL && { flexDirection: 'row-reverse' }]}>
+                <Text style={styles.concernCtaBtnText}>
+                  {locale === 'ar' ? 'اكتشفي' : locale === 'ru' ? 'Смотреть' : 'Explore'}
+                </Text>
+                <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color="#fff" />
+              </View>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.85}>
               <Ionicons name="refresh" size={18} color="#dc2626" />
               <Text style={styles.resetButtonText}>{t('skinAnalysis.tryAgain')}</Text>
@@ -718,6 +743,28 @@ const styles = StyleSheet.create({
   },
   retryBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
 
+  concernCta: {
+    marginTop: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    backgroundColor: '#FFF5F5',
+    padding: 20,
+    alignItems: 'center',
+  },
+  concernCtaIcon: { fontSize: 28, marginBottom: 8 },
+  concernCtaTitle: { fontSize: 17, fontWeight: '700', color: '#1D1D1F', marginBottom: 4, textAlign: 'center' },
+  concernCtaDesc: { fontSize: 13, color: '#86868B', textAlign: 'center', lineHeight: 18, marginBottom: 14 },
+  concernCtaBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  concernCtaBtnText: { fontSize: 14, fontWeight: '700', color: '#ffffff' },
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
