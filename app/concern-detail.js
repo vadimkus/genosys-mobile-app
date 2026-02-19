@@ -45,7 +45,6 @@ export default function ConcernDetailScreen() {
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
   const [expandedFaq, setExpandedFaq] = useState({});
   const [justAddedIds, setJustAddedIds] = useState({});
-  const lastTapRef = React.useRef({});
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const toastTimer = useRef(null);
@@ -125,49 +124,30 @@ export default function ConcernDetailScreen() {
     return map;
   }, [data?.products]);
 
-  const singleTapTimers = React.useRef({});
-
-  const handleChipTap = useCallback((productId) => {
+  const handleChipPress = useCallback((productId) => {
     if (!productId) return;
-    const now = Date.now();
-    const last = lastTapRef.current[productId] || 0;
-    lastTapRef.current[productId] = now;
-
-    if (now - last < 400) {
-      // Double tap — cancel pending navigation, toggle cart
-      lastTapRef.current[productId] = 0;
-      if (singleTapTimers.current[productId]) {
-        clearTimeout(singleTapTimers.current[productId]);
-        singleTapTimers.current[productId] = null;
-      }
-      const fullProduct = productLookup[productId];
-      if (fullProduct && !fullProduct.isPriceOnRequest) {
-        haptics.lightTap();
-        if (isInCart(productId)) {
-          removeItem(productId, '', '');
-          const name = fullProduct.name || '';
-          showToast(locale === 'ar' ? `تمت الإزالة من الحقيبة` : locale === 'ru' ? `Удалено из корзины` : `Removed from bag`);
-        } else {
-          addItem(fullProduct, 1, '', '');
-          setJustAddedIds((prev) => ({ ...prev, [productId]: true }));
-          setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [productId]: false })), 1200);
-          showToast(locale === 'ar' ? `تمت الإضافة إلى الحقيبة` : locale === 'ru' ? `Добавлено в корзину` : `Added to bag`);
-        }
-      } else {
-        router.push(`/product/${productId}`);
-      }
-    } else {
-      // First tap — delay navigation to allow double-tap
-      if (singleTapTimers.current[productId]) {
-        clearTimeout(singleTapTimers.current[productId]);
-      }
-      singleTapTimers.current[productId] = setTimeout(() => {
-        singleTapTimers.current[productId] = null;
-        haptics.lightTap();
-        router.push(`/product/${productId}`);
-      }, 400);
+    const fullProduct = productLookup[productId];
+    if (!fullProduct || fullProduct.isPriceOnRequest) {
+      router.push(`/product/${productId}`);
+      return;
     }
-  }, [productLookup, addItem, removeItem, isInCart, router, showToast, locale]);
+    haptics.lightTap();
+    if (isInCart(productId)) {
+      removeItem(productId, '', '');
+      showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
+    } else {
+      addItem(fullProduct, 1, '', '');
+      setJustAddedIds((prev) => ({ ...prev, [productId]: true }));
+      setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [productId]: false })), 1200);
+      showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено в корзину' : 'Added to bag');
+    }
+  }, [productLookup, addItem, removeItem, isInCart, showToast, locale, router]);
+
+  const handleChipLongPress = useCallback((productId) => {
+    if (!productId) return;
+    haptics.lightTap();
+    router.push(`/product/${productId}`);
+  }, [router]);
 
   // --- Loading skeleton ---
   if (loading) {
@@ -293,7 +273,9 @@ export default function ConcernDetailScreen() {
                                   <TouchableOpacity
                                     key={pi}
                                     style={[styles.stepProductChip, chipInCart && styles.stepProductChipInCart]}
-                                    onPress={() => handleChipTap(productId)}
+                                    onPress={() => handleChipPress(productId)}
+                                    onLongPress={() => handleChipLongPress(productId)}
+                                    delayLongPress={500}
                                     activeOpacity={0.7}
                                   >
                                     {chipInCart ? (
