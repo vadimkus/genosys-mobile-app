@@ -621,6 +621,37 @@ export const fetchConcernDetail = async (slug, options = {}) => {
   }
 };
 
+/**
+ * Fetches training materials (documents, product docs, videos).
+ * GET /api/mobile/training
+ * @param {Object} options - { locale: 'en'|'ar'|'ru' }
+ * @returns {Promise<Object>} { trainingDocuments, productDocuments, videos, stats, locale }
+ */
+export const fetchTraining = async (options = {}) => {
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+    };
+    if (options?.locale) headers['x-locale'] = String(options.locale);
+
+    const response = await fetch(`${API_BASE_URL}/training`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      const txt = await response.text().catch(() => '');
+      throw new Error(`Training request failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim());
+    }
+
+    return await response.json();
+  } catch (error) {
+    log.error('Failed to fetch training', error?.message || error);
+    throw error;
+  }
+};
+
 // Legacy compatibility exports
 export const fetchUserDiscountInfo = fetchUserProfile;
 
@@ -633,4 +664,5 @@ export default {
   fetchUserOrders,
   searchProducts,
   fetchConcernDetail,
+  fetchTraining,
 };

@@ -21,6 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { useCart } from '../contexts/CartContext';
 import { fetchConcernDetail } from '../services/api';
 import ProductGridItem from '../components/ProductGridItem';
 import * as haptics from '../utils/haptics';
@@ -37,10 +38,13 @@ export default function ConcernDetailScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
 
+  const { addItem, isInCart } = useCart();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
   const [expandedFaq, setExpandedFaq] = useState({});
+  const [justAddedIds, setJustAddedIds] = useState({});
+  const lastTapRef = React.useRef({});
 
   const loadData = useCallback(async () => {
     try {
@@ -100,6 +104,36 @@ export default function ConcernDetailScreen() {
     haptics.lightTap();
     router.push(`/product/${productId}`);
   };
+
+  const productLookup = React.useMemo(() => {
+    if (!data?.products) return {};
+    const map = {};
+    data.products.forEach((p) => { map[String(p.id)] = p; });
+    return map;
+  }, [data?.products]);
+
+  const handleChipTap = useCallback((productId) => {
+    if (!productId) return;
+    const now = Date.now();
+    const last = lastTapRef.current[productId] || 0;
+    lastTapRef.current[productId] = now;
+
+    if (now - last < 350) {
+      lastTapRef.current[productId] = 0;
+      const fullProduct = productLookup[productId];
+      if (fullProduct && !fullProduct.isPriceOnRequest) {
+        haptics.lightTap();
+        addItem(fullProduct, 1, '', '');
+        setJustAddedIds((prev) => ({ ...prev, [productId]: true }));
+        setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [productId]: false })), 1200);
+      } else {
+        router.push(`/product/${productId}`);
+      }
+    } else {
+      haptics.lightTap();
+      router.push(`/product/${productId}`);
+    }
+  }, [productLookup, addItem, router]);
 
   // --- Loading skeleton ---
   if (loading) {
@@ -218,15 +252,19 @@ export default function ConcernDetailScreen() {
                               {step.products.map((p, pi) => {
                                 const idMatch = p.url?.match(/\/products\/(\d+)/);
                                 const productId = idMatch ? idMatch[1] : null;
+                                const chipInCart = productId && (justAddedIds[productId] || isInCart(productId));
                                 return (
                                   <TouchableOpacity
                                     key={pi}
-                                    style={styles.stepProductChip}
-                                    onPress={() => productId && handleProductPress(productId)}
+                                    style={[styles.stepProductChip, chipInCart && styles.stepProductChipInCart]}
+                                    onPress={() => handleChipTap(productId)}
                                     activeOpacity={0.7}
                                   >
-                                    <Text style={styles.stepProductName}>{p.name}</Text>
-                                    <Text style={styles.stepProductPrice}>{p.price}</Text>
+                                    {chipInCart ? (
+                                      <Ionicons name="checkmark-circle" size={14} color="#16a34a" />
+                                    ) : null}
+                                    <Text style={[styles.stepProductName, chipInCart && styles.stepProductNameInCart]}>{p.name}</Text>
+                                    <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>{p.price}</Text>
                                   </TouchableOpacity>
                                 );
                               })}
@@ -399,8 +437,11 @@ const styles = StyleSheet.create({
   stepDetail: { fontSize: 13, color: '#555', lineHeight: 20, marginBottom: 10 },
   stepProducts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F9FAFB', borderWidth: 1, borderColor: '#E5E5EA', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
+  stepProductChipInCart: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
   stepProductName: { fontSize: 12, fontWeight: '600', color: '#1D1D1F' },
+  stepProductNameInCart: { color: '#15803D' },
   stepProductPrice: { fontSize: 12, color: '#86868B' },
+  stepProductPriceInCart: { color: '#16a34a' },
 
   // Products grid
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },

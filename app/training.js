@@ -21,10 +21,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import * as haptics from '../utils/haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
-import AUTH_CONFIG from '../config/auth';
+import { fetchTraining as fetchTrainingAPI } from '../services/api';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Training');
@@ -51,16 +51,7 @@ export default function TrainingScreen() {
       else setLoading(true);
       setError(null);
 
-      const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/mobile/training`, {
-        headers: {
-          'x-api-key': AUTH_CONFIG.API_KEY,
-          'x-locale': locale || 'en',
-        },
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const data = await fetchTrainingAPI({ locale: locale || 'en' });
 
       setTrainingDocs(data.trainingDocuments || []);
       setProductDocs(data.productDocuments || []);
@@ -85,7 +76,7 @@ export default function TrainingScreen() {
 
   const openDocument = async (url) => {
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      haptics.lightTap();
       await Linking.openURL(url);
     } catch {
       Alert.alert(

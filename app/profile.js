@@ -20,7 +20,6 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchUserOrders } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
-import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Profile');
@@ -607,16 +606,7 @@ export default function ProfileScreen() {
             <ProfileItem
               icon="download-outline"
               title={t('profile.trainingMaterials') || 'Training Materials'}
-              onPress={() => {
-                const url = buildAuthenticatedWebViewUrl('/training', locale, user);
-                router.push({
-                  pathname: '/webview',
-                  params: {
-                    url,
-                    title: t('profile.trainingMaterials') || 'Training Materials',
-                  },
-                });
-              }}
+              onPress={() => router.push('/training')}
             />
             <ProfileItem
               icon="information-circle-outline"
