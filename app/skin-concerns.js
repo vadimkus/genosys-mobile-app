@@ -1,6 +1,6 @@
 /**
  * Skin Concerns — native grid of concern cards.
- * Each card opens the concern detail page on the website in a WebView.
+ * Each card navigates to the native concern-detail screen.
  */
 
 import React from 'react';
@@ -17,7 +17,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
-import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_GAP = 12;
@@ -100,10 +99,7 @@ export default function SkinConcernsScreen() {
 
   const handleConcernPress = (concern) => {
     haptics.lightTap();
-    const prefix = locale === 'en' ? '' : `/${locale}`;
-    const url = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${prefix}/products/concern/${concern.slug}`;
-    const localeData = concern[locale] || concern.en;
-    router.push({ pathname: '/webview', params: { url, title: localeData.h1 } });
+    router.push({ pathname: '/concern-detail', params: { slug: concern.slug } });
   };
 
   return (

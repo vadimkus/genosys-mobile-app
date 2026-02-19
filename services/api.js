@@ -588,6 +588,39 @@ export const searchProducts = async (query, category = '', user = null) => {
   }
 };
 
+/**
+ * Fetches concern detail page data (localized).
+ * GET /api/mobile/concerns/:slug
+ * @param {string} slug - Concern slug (e.g. 'acne-treatment')
+ * @param {Object} options - { locale: 'en'|'ar'|'ru' }
+ * @returns {Promise<Object|null>} Concern data with products, routine, FAQ, etc.
+ */
+export const fetchConcernDetail = async (slug, options = {}) => {
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+    };
+    if (options?.locale) headers['x-locale'] = String(options.locale);
+
+    const response = await fetch(`${API_BASE_URL}/concerns/${encodeURIComponent(slug)}`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      const txt = await response.text().catch(() => '');
+      throw new Error(`Concern detail failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim());
+    }
+
+    const body = await response.json();
+    return body?.data ?? null;
+  } catch (error) {
+    log.error('Failed to fetch concern detail', error?.message || error);
+    throw error;
+  }
+};
+
 // Legacy compatibility exports
 export const fetchUserDiscountInfo = fetchUserProfile;
 
@@ -598,5 +631,6 @@ export default {
   fetchShippingRates,
   fetchUserProfile,
   fetchUserOrders,
-  searchProducts
+  searchProducts,
+  fetchConcernDetail,
 };
