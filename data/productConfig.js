@@ -39,6 +39,7 @@ export const PRODUCT_CONFIG = {
   },
   '52': {
     images: ['/images/PDRN.png', '/images/Second/pdrnnn.jpg'],
+    videoUrl: '/videos/pdrn.mp4',
   },
   '35': {
     images: ['/images/HYDR.jpg', '/images/Second/hmask_big.jpg'],
