@@ -39,7 +39,7 @@ export default function ConcernDetailScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
 
-  const { addItem, removeItem, isInCart } = useCart();
+  const { items: cartItems, addItem, removeItem } = useCart();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
@@ -127,6 +127,16 @@ export default function ConcernDetailScreen() {
     return map;
   }, [data?.products]);
 
+  const isProductInCart = useCallback((productId) => {
+    if (!productId) return false;
+    return cartItems.some(item => String(item.product?.id) === productId && !item.isPromotionItem);
+  }, [cartItems]);
+
+  const findCartItem = useCallback((productId) => {
+    if (!productId) return null;
+    return cartItems.find(item => String(item.product?.id) === productId && !item.isPromotionItem) || null;
+  }, [cartItems]);
+
   const handleChipPress = useCallback((routeId) => {
     if (!routeId) return;
     const fullProduct = productLookup[routeId];
@@ -136,16 +146,17 @@ export default function ConcernDetailScreen() {
     }
     const cartId = String(fullProduct.id);
     haptics.lightTap();
-    if (isInCart(cartId)) {
-      removeItem(cartId, '', '');
+    const existingCartItem = findCartItem(cartId);
+    if (existingCartItem) {
+      removeItem(cartId, existingCartItem.selectedColor || '', existingCartItem.selectedSize || '');
       showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
     } else {
       addItem(fullProduct, 1, '', '');
       setJustAddedIds((prev) => ({ ...prev, [routeId]: true }));
       setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [routeId]: false })), 1200);
-      showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено в корзину' : 'Added to bag');
+      showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено في корзину' : 'Added to bag');
     }
-  }, [productLookup, addItem, removeItem, isInCart, showToast, locale, router]);
+  }, [productLookup, addItem, removeItem, findCartItem, showToast, locale, router]);
 
   const handleChipLongPress = useCallback((productId) => {
     if (!productId) return;
@@ -274,7 +285,7 @@ export default function ConcernDetailScreen() {
                                 const productId = idMatch ? idMatch[1] : null;
                                 const matchedProduct = productId ? productLookup[productId] : null;
                                 const cartId = matchedProduct ? String(matchedProduct.id) : null;
-                                const chipInCart = productId && (justAddedIds[productId] || (cartId && isInCart(cartId)));
+                                const chipInCart = productId && (justAddedIds[productId] || (cartId && isProductInCart(cartId)));
                                 return (
                                   <TouchableOpacity
                                     key={pi}
