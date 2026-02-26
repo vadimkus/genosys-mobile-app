@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
@@ -636,7 +637,7 @@ export default function ProfileScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t('profile.appName')}</Text>
-          <Text style={styles.footerVersion}>{t('profile.version', { version: '1.0.0' })}</Text>
+          <Text style={styles.footerVersion}>{t('profile.version', { version: Constants.expoConfig?.version || '1.5.0' })}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
