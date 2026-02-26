@@ -29,6 +29,7 @@ import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
+import { CONCERNS } from './skin-concerns';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_GAP = 12;
@@ -413,23 +414,26 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* Related Concerns */}
-        {relatedConcerns && relatedConcerns.length > 0 ? (
+        {/* All Skin Concerns (horizontal scroll, excluding current) */}
+        {CONCERNS.filter(c => c.slug !== slug).length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-              {locale === 'ar' ? 'مشاكل بشرة مشابهة' : locale === 'ru' ? 'Похожие проблемы кожи' : 'Related Skin Concerns'}
+              {locale === 'ar' ? 'مشاكل بشرة أخرى' : locale === 'ru' ? 'Другие проблемы кожи' : 'Explore Other Skin Concerns'}
             </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.relatedScroll, isRTL && { flexDirection: 'row-reverse' }]}>
-              {relatedConcerns.map((rc) => (
-                <TouchableOpacity key={rc.slug} style={styles.relatedCard} onPress={() => handleRelatedPress(rc.slug)} activeOpacity={0.85}>
-                  <Text style={styles.relatedIcon}>{rc.icon}</Text>
-                  <Text style={[styles.relatedTitle, isRTL && styles.textRTL]} numberOfLines={2}>{rc.h1}</Text>
-                  <Text style={[styles.relatedDesc, isRTL && styles.textRTL]} numberOfLines={2}>{rc.heroShort}</Text>
-                </TouchableOpacity>
-              ))}
+              {CONCERNS.filter(c => c.slug !== slug).map((c) => {
+                const loc = c[locale] || c.en;
+                return (
+                  <TouchableOpacity key={c.slug} style={styles.relatedCard} onPress={() => handleRelatedPress(c.slug)} activeOpacity={0.85}>
+                    <Text style={styles.relatedIcon}>{c.icon}</Text>
+                    <Text style={[styles.relatedTitle, isRTL && styles.textRTL]} numberOfLines={2}>{loc.h1}</Text>
+                    <Text style={[styles.relatedDesc, isRTL && styles.textRTL]} numberOfLines={2}>{loc.heroShort}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
           </View>
-        ) : null}
+        )}
 
         {/* SEO intro text hidden — only relevant for web crawlers, not native app */}
 

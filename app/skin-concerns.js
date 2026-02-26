@@ -23,7 +23,7 @@ const CARD_GAP = 12;
 const SIDE_PADDING = 20;
 const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SIDE_PADDING * 2 - CARD_GAP) / 2);
 
-const CONCERNS = [
+export const CONCERNS = [
   {
     slug: 'sun-protection',
     icon: '☀️',
