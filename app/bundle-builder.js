@@ -27,6 +27,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import AUTH_CONFIG from '../config/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('BundleBuilder');
@@ -195,7 +196,7 @@ export default function BundleBuilderScreen() {
     stepsScrollRef.current?.scrollToIndex?.({ index, animated: true, viewPosition: 0.5 });
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (itemCount < 2) {
       Alert.alert(
         l('Minimum 2 Products', 'الحد الأدنى ٢ منتجات', 'Минимум 2 товара'),
@@ -235,6 +236,7 @@ export default function BundleBuilderScreen() {
     setSelectedItems({});
 
     // Navigate to bag
+    await AsyncStorage.setItem('@genosys_nav_bag_source', '/bundle-builder').catch(() => {});
     router.push('/(tabs)/bag');
   };
 

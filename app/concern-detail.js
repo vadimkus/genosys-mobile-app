@@ -26,6 +26,7 @@ import { useCart } from '../contexts/CartContext';
 import { fetchConcernDetail } from '../services/api';
 import ProductGridItem from '../components/ProductGridItem';
 import * as haptics from '../utils/haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -355,7 +356,7 @@ export default function ConcernDetailScreen() {
           <View style={[styles.ctaButtons, isRTL && { flexDirection: 'row-reverse' }]}>
             <TouchableOpacity
               style={[styles.ctaBtnPrimary, cartItems.length === 0 && styles.ctaBtnDisabled]}
-              onPress={() => { haptics.mediumTap(); router.push('/(tabs)/bag'); }}
+              onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', `/concern-detail?slug=${slug}`).catch(() => {}); router.push('/(tabs)/bag'); }}
               activeOpacity={0.85}
               disabled={cartItems.length === 0}
             >
@@ -434,7 +435,7 @@ export default function ConcernDetailScreen() {
                 : (locale === 'ar' ? 'منتجات' : locale === 'ru' ? 'товаров' : 'items')}
             </Text>
           </View>
-          <TouchableOpacity style={styles.stickyBtn} onPress={() => { haptics.mediumTap(); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', `/concern-detail?slug=${slug}`).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
             <Text style={styles.stickyBtnText}>
               {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
             </Text>

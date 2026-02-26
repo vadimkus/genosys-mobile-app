@@ -17,6 +17,7 @@ import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
@@ -330,7 +331,7 @@ export default function ProductDetailScreen() {
         message,
         [
           { text: t('product.continueShopping'), style: 'default' },
-          { text: t('product.viewBag'), style: 'default', onPress: () => router.push('/(tabs)/bag') }
+          { text: t('product.viewBag'), style: 'default', onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', `/product/${id}`).catch(() => {}); router.push('/(tabs)/bag'); } }
         ]
       );
     }

@@ -28,7 +28,7 @@ export default function BagScreen() {
   const { user } = useAuth();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const [openedFromAccount, setOpenedFromAccount] = useState(false);
+  const [navSource, setNavSource] = useState(null);
   const { 
     items, 
     getTotalItems, 
@@ -52,10 +52,8 @@ export default function BagScreen() {
     let cancelled = false;
     (async () => {
       try {
-        // One-time navigation source (set by Account page).
         const src = await AsyncStorage.getItem('@genosys_nav_bag_source');
-        if (!cancelled && src === 'profile') setOpenedFromAccount(true);
-        // Always clear so footer/tab entry behaves normally next time.
+        if (!cancelled && src) setNavSource(src);
         await AsyncStorage.removeItem('@genosys_nav_bag_source');
       } catch {
         // ignore
@@ -64,12 +62,11 @@ export default function BagScreen() {
     return () => { cancelled = true; };
   }, []);
 
-  const headerBackLabel = openedFromAccount ? t('profile.accountTitle') : t('tabs.home');
   const handleHeaderBack = () => {
     if (router.canGoBack()) {
       router.back();
-    } else if (openedFromAccount) {
-      router.replace('/profile');
+    } else if (navSource) {
+      router.replace(navSource);
     } else {
       router.replace('/(tabs)/shop');
     }

@@ -14,6 +14,7 @@ import { isBeautyBoxProduct } from '../../../utils/productRules';
 import { parseBeautyBoxDescription } from '../../../utils/beautyBoxDescription';
 import { asText } from '../../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../../config/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as haptics from '../../../utils/haptics';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
@@ -385,7 +386,7 @@ export default function OrderDetailScreen() {
             : t('ordersDetail.reorderSuccess', { count: addedCount }),
           [
             { text: t('common.continueShopping'), style: 'cancel' },
-            { text: t('ordersDetail.viewBag'), onPress: () => router.push('/(tabs)/bag') }
+            { text: t('ordersDetail.viewBag'), onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', `/profile/orders/${params.id}`).catch(() => {}); router.push('/(tabs)/bag'); } }
           ]
         );
       } else {
