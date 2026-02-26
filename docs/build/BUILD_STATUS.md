@@ -1,6 +1,23 @@
 # ✅ Mobile App Build Status: LIVE ON APP STORE / GOOGLE PLAY READY
 
-## 🎉 Version 1.5.0 (Build 60) — February 17, 2026
+## 🎉 Version 1.6.0 (Build 67) — February 26, 2026
+
+**Status:** Submitted to App Store Connect — awaiting Apple review  
+**Build ID:** `75456f05-355c-4765-b49a-d01142adf9ef`  
+**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/75456f05-355c-4765-b49a-d01142adf9ef  
+**Submission:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/submissions/0cf05309-2ebc-4389-a62d-dad96a7d4af0  
+**TestFlight:** https://appstoreconnect.apple.com/apps/6756648064/testflight/ios
+
+### What's New
+- Ramadan video splash screen (bundled `ramadan2.mp4`, 5.8MB)
+- Force update version gating (server-controlled)
+- Sticky bar UX: per-item remove, clear all, green discount color
+- Pricing fixes: concern page VIP pricing, cart price doubling fix
+- Payment simplification: removed "Generate Link", renamed to "Card Payment"
+
+---
+
+## Previous: Version 1.5.0 (Build 60) — February 17, 2026
 
 **App Store URL:** https://apps.apple.com/app/id6756648064
 
@@ -223,8 +240,8 @@ The Genosys UAE mobile app is **live on the App Store** and the Android build is
 - Compatible with Expo Go and development builds
 
 ### **✅ Production Builds**
-- Ready for iOS App Store builds (Build 60, v1.5.0)
-- Ready for Android Play Store builds (versionCode 60, v1.5.0)
+- iOS App Store build submitted (Build 67, v1.6.0)
+- Ready for Android Play Store builds (versionCode 64, v1.6.0)
 - Android aligned with iOS (Feb 17, 2026): full feature parity, 9 permissions, 40 deep link paths, 10 plugins
 - All Android-specific issues fixed (elevation, nested scroll, keyboard, haptics, Stripe)
 - Google Play Review Documentation updated and complete
@@ -284,7 +301,8 @@ DEL  /mobile/user/wishlist/:id    - Remove from favorites
 | 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
 | 1.3.0 | 53 | Released | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
 | 1.4.0 | 58 | Released | Feb 14, 2026 | Pricing overhaul, checkout improvements, Android polish, Google Play ready |
-| 1.5.0 | 60 | **Current** | Feb 17, 2026 | All latest fixes, Android production build for Google Play submission |
+| 1.6.0 | 67 | **Current** | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes, payment simplification |
+| 1.5.0 | 65 | Released | Feb 17, 2026 | Skin concern pages, 100% native, haptics, routine tap-to-add |
 
 ---
 

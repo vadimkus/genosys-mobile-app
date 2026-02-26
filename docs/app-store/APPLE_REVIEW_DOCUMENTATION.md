@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
-**Version:** 1.5.0  
-**Build:** 65  
+**Version:** 1.6.0  
+**Build:** 67  
 **Platform:** iOS  
 
 ---
@@ -14,38 +14,49 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.5.0
+## What's New in Version 1.6.0
 
-### Skin Concern Pages — Fully Native
-- **8 Skin Concern Categories** — Browse curated product collections for Sun Protection, Acne, Pigmentation, Scars, Hair Loss, Anti-Aging, Hydration, and Sensitivity — all rendered natively with fast, smooth scrolling.
-- **Complete Concern Detail Pages** — Each concern page features a hero section, expert "Why" highlights, step-by-step skincare routines with product recommendations, a product grid, FAQ accordion, downloadable professional protocol PDFs, and related concern cross-links.
-- **Tap-to-Add Routine Products** — Single tap on any product in the routine steps instantly adds it to your shopping bag with haptic feedback and an animated toast confirmation. Tap again to remove. Long press to view full product details.
-- **Routine Essentials** — Every concern page includes recommended daily essentials (cleanser, toner, SPF) for a complete skincare routine.
-- **Browse by Skin Concern** — New discovery entry points from the Shop category bar and AI Skin Analysis results, making it easy to find the right products for your skin.
+### Ramadan Video Splash Screen
+- **Dynamic Video Splash** — A beautiful Ramadan-themed video plays on app launch (5 seconds, tap to skip). The video is bundled locally for instant playback with no buffering.
+- **Remote Configuration** — Splash video can be swapped remotely via `/api/mobile/splash-config` without rebuilding the app. Supports video URL, duration, and caching settings.
 
-### 100% Native Experience
-- **Zero WebView Screens** — The entire app is now fully native. Training Materials (the last remaining WebView screen) has been converted to a native screen with tabs, cards, and fast loading.
-- **Native Concern Navigation** — Skin Concern cards screen and all concern detail pages are fully native with smooth transitions, pull-to-refresh, and loading skeletons.
+### Force Update Version Gating
+- **Automatic Update Prompts** — When a new app version is required, users see a blocking "Update Required" screen with localized messaging (EN/AR/RU) and a direct link to the App Store.
+- **Server-Controlled** — Minimum version, force update flag, and messaging are configured via `/api/mobile/app-version` API endpoint. No app rebuild needed to enforce updates.
 
-### Haptic Feedback
-- **App-Wide Haptics** — Consistent tactile feedback across all interactive elements: tab switches, cart actions, navigation, favorites, and more. Light taps for selections, medium impact for confirmations, success notifications for completed actions.
+### Sticky Bar UX Improvements
+- **Per-Item Remove** — Each item in the sticky cart bar now has an "x" button to remove it individually.
+- **Clear All** — When multiple items are in the bag, a "Clear all" link with a trash icon appears below the product list.
+- **Green Discount Color** — Discount amounts in the sticky bar now display in green for better visual clarity.
 
-### Product Enhancements
-- **PDRN Mask Product Video** — Added video demonstration for SKIN REBOOT PDRN MASK PACK.
-- **Microneedling Protocol Documents** — Added downloadable protocol PDFs for Power Solution and SRS products.
-- **API-First Documentation** — Product documentation (PDF guides) now loads dynamically from the server, keeping content up to date without app updates.
+### Pricing Bug Fixes
+- **Accurate Concern Page Pricing** — Products on Skin Concern pages now show correct personalized pricing for logged-in users with VIP discounts. Previously, concern pages could show retail prices even for VIP users.
+- **Fixed Price Doubling in Cart** — Resolved an issue where adding products from concern pages could display an inflated "original price" in the cart (e.g., showing 660 AED when retail was 330 AED).
+- **Cart Totals Discount Fallback** — Cart total calculations now correctly apply user discounts even when the server returns products without an explicit `originalPrice` field.
 
-### Bug Fixes & Stability
-- **Product Video Audio** — Fixed an issue where product demonstration videos were silent when the iOS silent switch was on.
-- **Category Badge Display** — "New" badges on category pills now appear correctly based on API data.
-- **Improved Product Lookup** — Fixed an issue where some routine products (cleanser, toner, serums, SPF) could not be added to the bag due to a product ID mapping mismatch.
+### Payment Method Simplification
+- **Removed "Generate Link for Payment"** — The payment link option has been removed from checkout. Only "Cash on Delivery" and "Card Payment" are now available.
+- **Renamed "Stripe Checkout"** — Now displayed as "Card Payment" across all languages.
 
 ### Localization
-- **Full 3-Language Support** — All new Skin Concern screens, routine interactions, toast messages, and navigation elements are fully localized in English, Arabic (RTL), and Russian.
+- **Full 3-Language Support** — All new features (force update screen, sticky bar actions, payment labels) are fully localized in English, Arabic (RTL), and Russian.
 
 ---
 
 ## What's New in Previous Versions
+
+### Version 1.5.0 (Build 65)
+
+#### Skin Concern Pages — Fully Native
+- **8 Skin Concern Categories** — Browse curated product collections for Sun Protection, Acne, Pigmentation, Scars, Hair Loss, Anti-Aging, Hydration, and Sensitivity — all rendered natively with fast, smooth scrolling.
+- **Complete Concern Detail Pages** — Each concern page features a hero section, expert "Why" highlights, step-by-step skincare routines with product recommendations, a product grid, FAQ accordion, downloadable professional protocol PDFs, and related concern cross-links.
+- **Tap-to-Add Routine Products** — Single tap on any product in the routine steps instantly adds it to your shopping bag with haptic feedback and an animated toast confirmation. Tap again to remove. Long press to view full product details.
+
+#### 100% Native Experience
+- **Zero WebView Screens** — The entire app is now fully native.
+
+#### Haptic Feedback
+- **App-Wide Haptics** — Consistent tactile feedback across all interactive elements.
 
 ### Version 1.4.0 (Build 58)
 
@@ -346,6 +357,8 @@ This account is pre-created and ready to use. No email verification required.
 
 | Version | Build | Key Changes |
 |---------|-------|-------------|
+| 1.6.0 | 67 | Ramadan video splash, force update gating, sticky bar UX, pricing fixes, payment simplification |
+| 1.5.0 | 65 | 8 Skin Concern pages, 100% native, app-wide haptics, routine tap-to-add |
 | 1.4.0 | 58 | Mutually exclusive discounts, auto-populate address, checkout footer, full translation coverage, bundle pricing fixes |
 | 1.3.1 | 56 | Bundle discount alignment, Stripe/Apple Pay bundle processing |
 | 1.3.0 | 53 | AI Skin Analysis, Build Your Set, Native Blog, Push Notifications |
@@ -378,6 +391,23 @@ This account is pre-created and ready to use. No email verification required.
 - [x] AI Skin Analysis camera screen fully translated (AR/RU)
 - [x] WebView screens fully translated (AR/RU)
 - [x] Product prices refresh when user logs in
+
+### v1.6.0 Features
+- [x] Ramadan video splash plays on app launch (5 seconds, tap to skip)
+- [x] Force update screen blocks old versions with localized message
+- [x] Sticky bar shows per-item remove buttons
+- [x] Sticky bar shows "Clear all" link for multiple items
+- [x] Sticky bar discount amounts display in green
+- [x] Concern page products show correct VIP pricing
+- [x] Cart displays correct original prices (no doubling)
+- [x] Only "Cash on Delivery" and "Card Payment" at checkout
+- [x] "Card Payment" label replaces "Stripe Checkout"
+
+### v1.5.0 Features
+- [x] 8 Skin Concern pages accessible from Shop category
+- [x] Concern detail pages with routines, products, FAQ
+- [x] Tap-to-add routine products with haptic feedback
+- [x] 100% native — zero WebView screens
 
 ### v1.3.0 Features
 - [x] AI Camera Analysis completes with results
