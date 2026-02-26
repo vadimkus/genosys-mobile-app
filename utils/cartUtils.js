@@ -124,8 +124,16 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
             return variantPrice;
           }
 
-          if (!excludedFromUserDiscount && hasUserDiscount && Number.isFinite(productOriginal) && productOriginal > 0) {
-            return productOriginal * (1 - discountPct / 100);
+          if (!excludedFromUserDiscount && hasUserDiscount) {
+            if (Number.isFinite(productOriginal) && productOriginal > 0) {
+              return productOriginal * (1 - discountPct / 100);
+            }
+            // Fallback: use product.price (retail) as base for discount when originalPrice is absent
+            // (e.g. product fetched without user context — displayPrice equals retail)
+            const retailBase = Number(item.product?.price);
+            if (Number.isFinite(retailBase) && retailBase > 0) {
+              return retailBase * (1 - discountPct / 100);
+            }
           }
 
           return Number(rawDisplay);

@@ -45,7 +45,7 @@ export default function ConcernDetailScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
 
-  const { items: cartItems, addItem, removeItem, getCartSummary } = useCart();
+  const { items: cartItems, addItem, removeItem, clearCart, getCartSummary } = useCart();
   const { user } = useAuth();
   const discountPct = Number(user?.discountPercentage);
   const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
@@ -65,7 +65,7 @@ export default function ConcernDetailScreen() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await fetchConcernDetail(slug, { locale });
+      const result = await fetchConcernDetail(slug, { locale, user });
       if (result) {
         setData(result);
       } else {
@@ -84,11 +84,11 @@ export default function ConcernDetailScreen() {
     } finally {
       setLoading(false);
     }
-  }, [slug, locale]);
+  }, [slug, locale, user?.id]);
 
   useEffect(() => {
     if (slug) loadData();
-  }, [slug, locale]);
+  }, [slug, locale, user?.id]);
 
   const toggleRoutineStep = (sectionIdx, stepIdx) => {
     const key = `${sectionIdx}-${stepIdx}`;
@@ -520,7 +520,8 @@ export default function ConcernDetailScreen() {
             {stickyExpanded && (() => {
               let retailTotal = 0;
               let discountedTotal = 0;
-              const rows = cartItems.filter(i => !i.isPromotionItem).map((item, idx) => {
+              const nonPromoItems = cartItems.filter(i => !i.isPromotionItem);
+              const rows = nonPromoItems.map((item, idx) => {
                 const name = getLocalizedProductName(item.product, locale) || item.product?.name || '';
                 const qty = item.quantity || 1;
                 const forceCanonical = hasFixedPriceOverride(item.product) || isHydroCoolMask(item.product) || isDeviceProduct(item.product);
@@ -537,8 +538,16 @@ export default function ConcernDetailScreen() {
                 retailTotal += retailUnit * qty;
                 discountedTotal += finalUnit * qty;
                 const showStrike = retailUnit > finalUnit + 0.01;
+                const pid = String(item.product?.id);
                 return (
-                  <View key={`${item.product?.id}-${idx}`} style={[styles.stickyItemRow, isRTL && styles.stickyItemRowRTL]}>
+                  <View key={`${pid}-${idx}`} style={[styles.stickyItemRow, isRTL && styles.stickyItemRowRTL]}>
+                    <TouchableOpacity
+                      onPress={() => { haptics.lightTap(); removeItem(pid, item.selectedColor || '', item.selectedSize || ''); showToast(locale === 'ar' ? 'تمت الإزالة' : locale === 'ru' ? 'Удалено' : 'Removed'); }}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      style={styles.stickyRemoveBtn}
+                    >
+                      <Ionicons name="close-circle" size={16} color="#D1D5DB" />
+                    </TouchableOpacity>
                     <Text style={[styles.stickyItemName, isRTL && styles.textRTL]} numberOfLines={1}>{name}{qty > 1 ? ` ×${qty}` : ''}</Text>
                     <View style={{ alignItems: 'flex-end' }}>
                       {showStrike && (
@@ -554,6 +563,18 @@ export default function ConcernDetailScreen() {
               return (
                 <View style={styles.stickyDetails}>
                   {rows}
+                  {nonPromoItems.length > 1 && (
+                    <TouchableOpacity
+                      onPress={() => { haptics.lightTap(); clearCart(); showToast(locale === 'ar' ? 'تم مسح الحقيبة' : locale === 'ru' ? 'Корзина очищена' : 'Bag cleared'); }}
+                      style={[styles.stickyClearAll, isRTL && { alignSelf: 'flex-end' }]}
+                      hitSlop={{ top: 6, bottom: 6, left: 10, right: 10 }}
+                    >
+                      <Ionicons name="trash-outline" size={13} color="#9CA3AF" />
+                      <Text style={styles.stickyClearAllText}>
+                        {locale === 'ar' ? 'مسح الكل' : locale === 'ru' ? 'Очистить' : 'Clear all'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                   <View style={styles.stickyDivider} />
                   {showDiscountRow && (
                     <>
@@ -564,10 +585,10 @@ export default function ConcernDetailScreen() {
                         <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{retailTotal.toFixed(0)} AED</Text>
                       </View>
                       <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
-                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#dc2626', fontWeight: '600' }]}>
+                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#16a34a', fontWeight: '600' }]}>
                           {locale === 'ar' ? `خصم ${discountPct}%` : locale === 'ru' ? `Скидка ${discountPct}%` : `${discountPct}% Discount`}
                         </Text>
-                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#dc2626' }}>-{discountAmount.toFixed(0)} AED</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#16a34a' }}>-{discountAmount.toFixed(0)} AED</Text>
                       </View>
                     </>
                   )}
@@ -800,6 +821,9 @@ const styles = StyleSheet.create({
   stickyChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 2 },
   stickyHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 2 },
   stickyDetails: { paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 6 },
+  stickyClearAll: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 4, paddingVertical: 2, marginTop: 4 },
+  stickyClearAllText: { fontSize: 12, color: '#9CA3AF', fontWeight: '500' },
+  stickyRemoveBtn: { marginRight: 8 },
   stickyItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
   stickyItemRowRTL: { flexDirection: 'row-reverse' },
   stickyItemName: { ...T.caption, color: '#374151', flex: 1, marginRight: 12 },

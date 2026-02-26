@@ -12,6 +12,7 @@ import { NotificationProvider } from '../contexts/NotificationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
 import ForceUpdateScreen from '../components/ForceUpdateScreen';
+import VideoLaunchScreen from '../components/VideoLaunchScreen';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { setupDeepLinkListener } from '../utils/deepLinking';
 import AUTH_CONFIG from '../config/auth';
@@ -34,9 +35,15 @@ function compareVersions(current, minimum) {
   return 0;
 }
 
+// Local video asset for Expo Go preview — remove or set to null for production (API-driven)
+const LOCAL_SPLASH_VIDEO = require('../images/video/ramadan2.mp4');
+
 export default function RootLayout() {
   const [showLaunch, setShowLaunch] = useState(true);
   const [forceUpdate, setForceUpdate] = useState(null); // null = checking, false = ok, object = needs update
+  const [splashVideo, setSplashVideo] = useState(
+    LOCAL_SPLASH_VIDEO ? { local: true, duration: 5000 } : null
+  );
 
   // Initialize deep link listener
   useEffect(() => {
@@ -44,7 +51,7 @@ export default function RootLayout() {
     return cleanup;
   }, []);
 
-  // Check minimum app version on cold start
+  // Check minimum app version + splash config on cold start
   useEffect(() => {
     let cancelled = false;
 
@@ -68,12 +75,31 @@ export default function RootLayout() {
           setForceUpdate(false);
         }
       } catch {
-        // Network error or server down — fail open, let the user through
         if (!cancelled) setForceUpdate(false);
       }
     }
 
+    async function checkSplash() {
+      try {
+        const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/splash-config`, {
+          headers: { 'Cache-Control': 'no-cache' },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (cancelled) return;
+
+        if (data.enabled && data.type === 'video' && data.videoUrl) {
+          setSplashVideo(data);
+        } else {
+          setSplashVideo(false);
+        }
+      } catch {
+        if (!cancelled) setSplashVideo(false);
+      }
+    }
+
     checkVersion();
+    if (!LOCAL_SPLASH_VIDEO) checkSplash();
     return () => { cancelled = true; };
   }, []);
 
@@ -82,7 +108,7 @@ export default function RootLayout() {
   // For EAS dev builds / TestFlight, rely on the native splash (`app.json`).
   const isExpoGo = Constants.appOwnership === 'expo';
 
-  if (isExpoGo && showLaunch) {
+  if (isExpoGo && showLaunch && !LOCAL_SPLASH_VIDEO) {
     return <BrandedLaunchScreen onDone={() => setShowLaunch(false)} />;
   }
 
@@ -103,6 +129,18 @@ export default function RootLayout() {
                   <ErrorBoundary screenName="AppRoot">
                     <AuthWrapper />
                   </ErrorBoundary>
+
+                  {/* Video splash overlay — renders on top while app loads underneath */}
+                  {splashVideo && typeof splashVideo === 'object' && (
+                    <VideoLaunchScreen
+                      localSource={splashVideo.local ? LOCAL_SPLASH_VIDEO : undefined}
+                      videoUrl={splashVideo.videoUrl}
+                      posterUrl={splashVideo.posterUrl}
+                      duration={splashVideo.duration || 3000}
+                      cacheTTL={splashVideo.cacheTTL || 86400}
+                      onDone={() => setSplashVideo(false)}
+                    />
+                  )}
                 </OrdersProvider>
               </CartProvider>
             </FavoritesProvider>

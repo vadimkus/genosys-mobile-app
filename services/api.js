@@ -592,7 +592,7 @@ export const searchProducts = async (query, category = '', user = null) => {
  * Fetches concern detail page data (localized).
  * GET /api/mobile/concerns/:slug
  * @param {string} slug - Concern slug (e.g. 'acne-treatment')
- * @param {Object} options - { locale: 'en'|'ar'|'ru' }
+ * @param {Object} options - { locale: 'en'|'ar'|'ru', user: { id } }
  * @returns {Promise<Object|null>} Concern data with products, routine, FAQ, etc.
  */
 export const fetchConcernDetail = async (slug, options = {}) => {
@@ -602,6 +602,7 @@ export const fetchConcernDetail = async (slug, options = {}) => {
       'x-api-key': API_KEY,
     };
     if (options?.locale) headers['x-locale'] = String(options.locale);
+    if (options?.user?.id) headers[API_CONFIG.HEADERS.USER_ID] = options.user.id;
 
     const response = await fetch(`${API_BASE_URL}/concerns/${encodeURIComponent(slug)}`, {
       method: 'GET',

@@ -342,18 +342,16 @@ export default function BagScreen() {
                   return <Text style={[styles.itemPrice, isRTL && styles.itemPriceRTL]}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
                 }
 
-                // Prefer the variant's originalPrice if present; otherwise use the cart item's originalPrice (which we may infer on add).
-                // If neither exists but the user has a % discount, infer original from the displayed (already-discounted) base price,
-                // so the UI can show "145 → 72.5" instead of only "72.5".
+                // Use server-provided originalPrice or the product's base price (retail) for strikethrough display.
+                // Never reverse-engineer original by dividing displayPrice — that wrongly inflates when the
+                // server returned undiscounted pricing (e.g. concern-detail API with no user context).
                 const storedOriginal = Number(item.product?.originalPrice);
+                const productBasePrice = Number(item.product?.price);
                 const originalForDisplay = (() => {
                   const fromVariant = Number(original);
                   if (Number.isFinite(fromVariant) && fromVariant > base) return fromVariant;
-                  if (hasUserDiscount && Number.isFinite(base) && base > 0) {
-                    const inferred = base / (1 - pct / 100);
-                    if (Number.isFinite(inferred) && inferred > base) return inferred;
-                  }
                   if (Number.isFinite(storedOriginal) && storedOriginal > base) return storedOriginal;
+                  if (hasUserDiscount && Number.isFinite(productBasePrice) && productBasePrice > base + 0.01) return productBasePrice;
                   return null;
                 })();
 

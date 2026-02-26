@@ -73,3 +73,44 @@ The "New" badge now shows consistently across shop, favorites, and concern detai
 - No custom font files were loaded — the system standardizes values for the platform defaults (San Francisco on iOS, Roboto on Android)
 - The `T.mono` token uses `Platform.select()` for cross-platform monospace (`Menlo` on iOS, `monospace` on Android)
 - Decorative/emoji font sizes were intentionally left untouched
+
+---
+
+## Session 2: Concern-Detail Pricing Fix + Sticky Bar UX
+
+### Bug Fix: Double-Inflated Prices for Discount Users
+
+**Problem**: Users with a personal discount (e.g. 50%) saw doubled prices when adding products from Skin Concern pages. SNOW O₂ CLEANSER (retail 330 AED) showed ~~660~~ 330 instead of ~~330~~ 165.
+
+**Root cause**: Two-part failure:
+1. The concern-detail API returned guest pricing (`user = null`), so `displayPrice = retail` and `originalPrice = undefined`.
+2. `CartContext.addItem()` auto-picked the default variant (180ml, 330 AED) and `inferOriginalFromUserDiscount()` wrongly reverse-calculated `330 / 0.5 = 660` as the "original," assuming the price was already discounted.
+
+**Fix** (4 files):
+
+| File | Change |
+|------|--------|
+| `services/api.js` | `fetchConcernDetail` now accepts `user` in options and sends `x-user-id` header |
+| `app/concern-detail.js` | Pass `user` to `fetchConcernDetail`; `user?.id` added to dependency arrays |
+| `contexts/CartContext.js` | `inferOriginalFromUserDiscount` now gated by `serverConfirmedDiscount` — only infers when `originalPrice` or `variant.originalPrice` exists (both `addItem` and `loadCartFromStorage` paths) |
+| `utils/cartUtils.js` | Added `product.price` (retail) fallback for user discount in `calculateCartTotals` |
+| `app/(tabs)/bag.js` | Removed dangerous `base / (1 - pct)` reverse-calculation; uses only server `originalPrice` or `product.price` |
+
+Server-side fix (cosmetics-website):
+- `app/api/mobile/concerns/[slug]/route.ts` — Added `x-user-id` header support, user lookup, pass to pricing engine
+
+### UX: Sticky Bar Improvements
+
+| Feature | Detail |
+|---------|--------|
+| **Discount color** | Changed from red (`#dc2626`) to green (`#16a34a`) |
+| **Per-item remove** | Gray `×` circle icon on each item row (haptic + toast on tap) |
+| **Clear all** | "Clear all" link + trash icon below item list when 2+ items (haptic + toast) |
+
+All changes in `app/concern-detail.js` — new styles: `stickyClearAll`, `stickyClearAllText`, `stickyRemoveBtn`.
+
+### Build Verification (Session 2)
+
+- `npx expo export --platform ios` — **Success**
+- `npx next build` (cosmetics-website) — **Success**
+- No linter errors

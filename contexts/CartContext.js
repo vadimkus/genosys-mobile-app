@@ -219,10 +219,15 @@ export const CartProvider = ({ children }) => {
             const v = product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize);
             const vp = Number(v?.price);
             if (Number.isFinite(vp) && vp > 0) {
-              const discountPct = Number(user?.discountPercentage);
-              const inferredOriginal = inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct });
               const variantOriginal = Number(v?.originalPrice);
               const productOriginal = Number(product?.originalPrice);
+              const serverConfirmedDiscount =
+                (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
+                (Number.isFinite(productOriginal) && productOriginal > 0);
+              const discountPct = Number(user?.discountPercentage);
+              const inferredOriginal = serverConfirmedDiscount
+                ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
+                : null;
               const keptOriginal =
                 (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
                 inferredOriginal ||
@@ -370,13 +375,20 @@ export const CartProvider = ({ children }) => {
         const v = product.variants.find((vv) => String(vv?.size || '').trim() === String(normalizedSize).trim());
         const vp = Number(v?.price);
         if (Number.isFinite(vp) && vp > 0) {
-          const discountPct = Number(user?.discountPercentage);
-          const inferredOriginal = inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct });
           const variantOriginal = Number(v?.originalPrice);
           const productOriginal = Number(product?.originalPrice);
+          // Only infer original from user discount when the server confirmed a discount
+          // (originalPrice exists). Without it, the variant price IS the retail price and
+          // inferring would wrongly inflate it (e.g. 330/0.5 = 660 when retail is 330).
+          const serverConfirmedDiscount =
+            (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
+            (Number.isFinite(productOriginal) && productOriginal > 0);
+          const discountPct = Number(user?.discountPercentage);
+          const inferredOriginal = serverConfirmedDiscount
+            ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
+            : null;
           const keptOriginal =
             (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            // Prefer inferred original from user discount over base product originalPrice for size variants.
             inferredOriginal ||
             (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
             null;
@@ -384,8 +396,6 @@ export const CartProvider = ({ children }) => {
             ...product,
             price: vp,
             displayPrice: vp,
-            // Prefer variant originalPrice; otherwise keep product originalPrice if it still makes sense for this size.
-            // If neither exists but user has a discount, infer original so Bag doesn't "double-discount" the already-discounted price.
             originalPrice: keptOriginal,
           };
         }
