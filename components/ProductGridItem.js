@@ -12,8 +12,9 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct, isUserDiscountExcludedProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { useAuth } from '../contexts/AuthContext';
 import { getLocalizedProductName, getLocalizedProductSize, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
@@ -21,10 +22,15 @@ import * as haptics from '../utils/haptics';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
 
-export default function ProductGridItem({ product }) {
+export default function ProductGridItem({ product, onAddToCart, inCart, justAdded }) {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t, locale } = useLocalization();
+  const { user } = useAuth();
   const isRTL = !!I18nManager.isRTL;
+
+  const discountPct = Number(user?.discountPercentage);
+  const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+
   const handlePress = () => {
     haptics.lightTap();
     router.push(`/product/${product.id}`);
@@ -169,11 +175,6 @@ export default function ProductGridItem({ product }) {
                     : t('product.sizeLine', { size: getLocalizedProductSize(product, locale) })}
               </Text>
             </View>
-            {(product.stock || product.inStock) && (
-              <View style={styles.stockBadge}>
-                <Text style={[styles.stockBadgeText, isRTL && styles.textRTL]}>{t('stock.inStock')}</Text>
-              </View>
-            )}
           </View>
         )}
         
@@ -202,28 +203,57 @@ export default function ProductGridItem({ product }) {
             <Text style={[styles.price, isRTL && styles.valueRTL]}>
               {getCanonicalUnitPrice(product).toFixed(2)} AED
             </Text>
-          ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
-            <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
-              <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
-                {product.originalPrice.toFixed(2)} AED
+          ) : (() => {
+            const displayP = Number(product.displayPrice || product.price || 0);
+            const serverOriginal = Number(product.originalPrice);
+            const hasServerOriginal = Number.isFinite(serverOriginal) && serverOriginal > 0;
+            const excluded = isUserDiscountExcludedProduct(product);
+            const retailPrice = (hasServerOriginal && serverOriginal > displayP) ? serverOriginal : displayP;
+            const serverAlreadyDiscounted = hasServerOriginal && serverOriginal > displayP;
+            const canApplyUserDiscount = hasUserDiscount && !excluded && !serverAlreadyDiscounted;
+            const finalPrice = canApplyUserDiscount ? retailPrice * (1 - discountPct / 100) : displayP;
+            const hasDiscount = retailPrice > finalPrice + 0.01;
+            const label = serverAlreadyDiscounted ? product.discountLabel : (canApplyUserDiscount ? `${discountPct}% OFF` : null);
+
+            return hasDiscount ? (
+              <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
+                <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
+                  {retailPrice.toFixed(2)} AED
+                </Text>
+                <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
+                  {finalPrice.toFixed(2)} AED
+                </Text>
+                {label ? (
+                  <View style={styles.savingsContainer}>
+                    <Text style={styles.savings}>{label}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : (
+              <Text style={[styles.price, isRTL && styles.valueRTL]}>
+                {finalPrice.toFixed(2)} AED
               </Text>
-              <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
-                {(product.displayPrice || product.price).toFixed(2)} AED
-              </Text>
-              {product.discountLabel && (
-                <View style={styles.savingsContainer}>
-                  <Text style={styles.savings}>
-                    {product.discountLabel}
-                  </Text>
-                </View>
-              )}
-            </View>
-          ) : (
-            <Text style={[styles.price, isRTL && styles.valueRTL]}>
-              {(product.displayPrice || product.price).toFixed(2)} AED
-            </Text>
-          )}
+            );
+          })()}
         </View>
+        {onAddToCart && !isOutOfStock && (
+          <TouchableOpacity
+            style={[styles.addToCartBtn, inCart && styles.addToCartBtnInCart]}
+            onPress={(e) => { e.stopPropagation?.(); onAddToCart(); }}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name={inCart ? 'checkmark-circle' : justAdded ? 'checkmark-circle' : 'bag-add-outline'}
+              size={14}
+              color={inCart ? '#15803D' : '#fff'}
+            />
+            <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
+              {inCart
+                ? (locale === 'ar' ? 'في الحقيبة ✓' : locale === 'ru' ? 'В корзине ✓' : 'In Bag ✓')
+                : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -432,16 +462,27 @@ const styles = StyleSheet.create({
     color: '#666666',
     fontWeight: '500',
   },
-  stockBadge: {
-    backgroundColor: '#34C759',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
+  addToCartBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    backgroundColor: '#dc2626',
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    marginTop: 8,
   },
-  stockBadgeText: {
-    fontSize: 9,
-    color: '#ffffff',
-    fontWeight: '600',
+  addToCartBtnInCart: {
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  addToCartBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  addToCartBtnTextInCart: {
+    color: '#15803D',
   },
 });

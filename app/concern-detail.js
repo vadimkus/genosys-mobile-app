@@ -28,6 +28,8 @@ import ProductGridItem from '../components/ProductGridItem';
 import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalizedProductName } from '../utils/productLocalization';
+import { isUserDiscountExcludedProduct, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
+import { useAuth } from '../contexts/AuthContext';
 import AUTH_CONFIG from '../config/auth';
 import { CONCERNS } from './skin-concerns';
 
@@ -43,6 +45,9 @@ export default function ConcernDetailScreen() {
   const isRTL = dir === 'rtl';
 
   const { items: cartItems, addItem, removeItem, getCartSummary } = useCart();
+  const { user } = useAuth();
+  const discountPct = Number(user?.discountPercentage);
+  const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
@@ -222,7 +227,7 @@ export default function ConcernDetailScreen() {
               onPress={() => { haptics.lightTap(); setWhyExpanded(prev => !prev); }}
               activeOpacity={0.7}
             >
-              <Text style={[styles.sectionTitle, { marginBottom: 0 }, isRTL && styles.textRTL]}>{why.title}</Text>
+              <Text style={[styles.sectionTitle, { marginBottom: 0, flex: 1, marginRight: 8 }, isRTL && styles.textRTL]}>{why.title}</Text>
               <Ionicons name={whyExpanded ? 'chevron-up' : 'chevron-down'} size={22} color="#1D1D1F" />
             </TouchableOpacity>
             {whyExpanded && (
@@ -296,6 +301,13 @@ export default function ConcernDetailScreen() {
                                 const matchedProduct = productId ? productLookup[productId] : null;
                                 const cartId = matchedProduct ? String(matchedProduct.id) : null;
                                 const chipInCart = productId && (justAddedIds[productId] || (cartId && isProductInCart(cartId)));
+                                const excluded = matchedProduct ? isUserDiscountExcludedProduct(matchedProduct) : false;
+                                const forceCanonical = matchedProduct && (hasFixedPriceOverride(matchedProduct) || isHydroCoolMask(matchedProduct) || isDeviceProduct(matchedProduct));
+                                const rawNum = parseFloat(String(p.price).replace(/[^0-9.]/g, ''));
+                                const retailUnit = Number.isFinite(rawNum) ? rawNum : 0;
+                                const canDiscount = hasUserDiscount && !excluded && !forceCanonical && retailUnit > 0;
+                                const finalUnit = canDiscount ? Math.round(retailUnit * (1 - discountPct / 100) * 100) / 100 : retailUnit;
+                                const hasDisc = canDiscount && retailUnit > finalUnit + 0.01;
                                 return (
                                   <TouchableOpacity
                                     key={pi}
@@ -309,7 +321,14 @@ export default function ConcernDetailScreen() {
                                       <Ionicons name="checkmark-circle" size={14} color="#16a34a" />
                                     ) : null}
                                     <Text style={[styles.stepProductName, chipInCart && styles.stepProductNameInCart]}>{p.name}</Text>
-                                    <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>{p.price}</Text>
+                                    {hasDisc ? (
+                                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                        <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: '#9CA3AF' }]}>{retailUnit.toFixed(0)}</Text>
+                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: '#dc2626' }]}>{finalUnit.toFixed(0)} AED</Text>
+                                      </View>
+                                    ) : (
+                                      <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>{p.price}</Text>
+                                    )}
                                   </TouchableOpacity>
                                 );
                               })}
@@ -333,7 +352,7 @@ export default function ConcernDetailScreen() {
               onPress={() => { haptics.lightTap(); setProductsExpanded(prev => !prev); }}
               activeOpacity={0.7}
             >
-              <Text style={[styles.sectionTitle, { marginBottom: 0 }, isRTL && styles.textRTL]}>
+              <Text style={[styles.sectionTitle, { marginBottom: 0, flex: 1, marginRight: 8 }, isRTL && styles.textRTL]}>
                 {locale === 'ar' ? `المنتجات الموصى بها (${products.length})` : locale === 'ru' ? `Рекомендуемые продукты (${products.length})` : `Recommended Products (${products.length})`}
               </Text>
               <Ionicons
@@ -344,11 +363,34 @@ export default function ConcernDetailScreen() {
             </TouchableOpacity>
             {productsExpanded && (
               <View style={[styles.productsGrid, isRTL && { flexDirection: 'row-reverse' }]}>
-                {products.map((product) => (
-                  <View key={product.id} style={{ width: PRODUCT_CARD_WIDTH, marginBottom: GRID_GAP }}>
-                    <ProductGridItem product={product} />
-                  </View>
-                ))}
+                {products.map((product) => {
+                  const pid = String(product.id);
+                  const inCart = isProductInCart(pid);
+                  const justAdded = justAddedIds[pid];
+                  const isOnRequest = product.isPriceOnRequest;
+                  return (
+                    <View key={product.id} style={{ width: PRODUCT_CARD_WIDTH, marginBottom: GRID_GAP }}>
+                      <ProductGridItem
+                        product={product}
+                        inCart={inCart}
+                        justAdded={justAdded}
+                        onAddToCart={isOnRequest ? undefined : () => {
+                          haptics.lightTap();
+                          if (inCart) {
+                            const ci = findCartItem(pid);
+                            if (ci) removeItem(pid, ci.selectedColor || '', ci.selectedSize || '');
+                            showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
+                          } else {
+                            addItem(product, 1, '', '');
+                            setJustAddedIds(prev => ({ ...prev, [pid]: true }));
+                            setTimeout(() => setJustAddedIds(prev => ({ ...prev, [pid]: false })), 1200);
+                            showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено в корзину' : 'Added to bag');
+                          }
+                        }}
+                      />
+                    </View>
+                  );
+                })}
               </View>
             )}
           </View>
@@ -457,42 +499,83 @@ export default function ConcernDetailScreen() {
             </TouchableOpacity>
 
             {/* Expanded: item list + pricing */}
-            {stickyExpanded && (
-              <View style={styles.stickyDetails}>
-                {cartItems.filter(i => !i.isPromotionItem).map((item, idx) => {
-                  const name = getLocalizedProductName(item.product, locale) || item.product?.name || '';
-                  const price = Number(item.product?.price) || 0;
-                  const qty = item.quantity || 1;
-                  return (
-                    <View key={`${item.product?.id}-${idx}`} style={[styles.stickyItemRow, isRTL && styles.stickyItemRowRTL]}>
-                      <Text style={[styles.stickyItemName, isRTL && styles.textRTL]} numberOfLines={1}>{name}{qty > 1 ? ` ×${qty}` : ''}</Text>
-                      <Text style={styles.stickyItemPrice}>{(price * qty).toFixed(0)} AED</Text>
+            {stickyExpanded && (() => {
+              let retailTotal = 0;
+              let discountedTotal = 0;
+              const rows = cartItems.filter(i => !i.isPromotionItem).map((item, idx) => {
+                const name = getLocalizedProductName(item.product, locale) || item.product?.name || '';
+                const qty = item.quantity || 1;
+                const forceCanonical = hasFixedPriceOverride(item.product) || isHydroCoolMask(item.product) || isDeviceProduct(item.product);
+                const excluded = isUserDiscountExcludedProduct(item.product);
+                const displayP = forceCanonical
+                  ? getCanonicalUnitPrice(item.product)
+                  : Number(item.product?.displayPrice ?? item.product?.price ?? 0);
+                const origPrice = Number(item.product?.originalPrice);
+                const hasServerOriginal = Number.isFinite(origPrice) && origPrice > 0;
+                const retailUnit = (hasServerOriginal && origPrice > displayP) ? origPrice : displayP;
+                const serverAlreadyDiscounted = hasServerOriginal && origPrice > displayP;
+                const canApplyUserDiscount = hasUserDiscount && !excluded && !forceCanonical && !serverAlreadyDiscounted;
+                const finalUnit = canApplyUserDiscount ? retailUnit * (1 - discountPct / 100) : displayP;
+                retailTotal += retailUnit * qty;
+                discountedTotal += finalUnit * qty;
+                const showStrike = retailUnit > finalUnit + 0.01;
+                return (
+                  <View key={`${item.product?.id}-${idx}`} style={[styles.stickyItemRow, isRTL && styles.stickyItemRowRTL]}>
+                    <Text style={[styles.stickyItemName, isRTL && styles.textRTL]} numberOfLines={1}>{name}{qty > 1 ? ` ×${qty}` : ''}</Text>
+                    <View style={{ alignItems: 'flex-end' }}>
+                      {showStrike && (
+                        <Text style={styles.stickyItemOriginalPrice}>{(retailUnit * qty).toFixed(0)} AED</Text>
+                      )}
+                      <Text style={[styles.stickyItemPrice, showStrike && { color: '#dc2626' }]}>{(finalUnit * qty).toFixed(0)} AED</Text>
                     </View>
-                  );
-                })}
-                <View style={styles.stickyDivider} />
-                <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
-                  <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL]}>
-                    {locale === 'ar' ? 'المجموع الفرعي' : locale === 'ru' ? 'Промежуточный итог' : 'Subtotal'}
-                  </Text>
-                  <Text style={styles.stickyPricingValue}>{Number(summary.subtotal).toFixed(0)} AED</Text>
+                  </View>
+                );
+              });
+              const discountAmount = retailTotal - discountedTotal;
+              const showDiscountRow = hasUserDiscount && discountAmount > 0.5;
+              return (
+                <View style={styles.stickyDetails}>
+                  {rows}
+                  <View style={styles.stickyDivider} />
+                  {showDiscountRow && (
+                    <>
+                      <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
+                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#86868B', fontWeight: '500' }]}>
+                          {locale === 'ar' ? 'السعر الأصلي' : locale === 'ru' ? 'Полная цена' : 'Retail Price'}
+                        </Text>
+                        <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{retailTotal.toFixed(0)} AED</Text>
+                      </View>
+                      <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
+                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#dc2626', fontWeight: '600' }]}>
+                          {locale === 'ar' ? `خصم ${discountPct}%` : locale === 'ru' ? `Скидка ${discountPct}%` : `${discountPct}% Discount`}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#dc2626' }}>-{discountAmount.toFixed(0)} AED</Text>
+                      </View>
+                    </>
+                  )}
+                  <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
+                    <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL]}>
+                      {locale === 'ar' ? 'المجموع الفرعي' : locale === 'ru' ? 'Промежуточный итог' : 'Subtotal'}
+                    </Text>
+                    <Text style={styles.stickyPricingValue}>{discountedTotal.toFixed(0)} AED</Text>
+                  </View>
+                  {summary.amountForFreeShipping > 0 && (
+                    <Text style={[styles.stickyFreeShipping, isRTL && styles.textRTL]}>
+                      {locale === 'ar'
+                        ? `أضف ${summary.amountForFreeShipping.toFixed(0)} د.إ للشحن المجاني`
+                        : locale === 'ru'
+                          ? `Ещё ${summary.amountForFreeShipping.toFixed(0)} AED до бесплатной доставки`
+                          : `Add ${summary.amountForFreeShipping.toFixed(0)} AED for free shipping`}
+                    </Text>
+                  )}
+                  {summary.hasFreeShipping && (
+                    <Text style={[styles.stickyFreeShippingDone, isRTL && styles.textRTL]}>
+                      {locale === 'ar' ? '✓ شحن مجاني' : locale === 'ru' ? '✓ Бесплатная доставка' : '✓ Free shipping'}
+                    </Text>
+                  )}
                 </View>
-                {summary.amountForFreeShipping > 0 && (
-                  <Text style={[styles.stickyFreeShipping, isRTL && styles.textRTL]}>
-                    {locale === 'ar'
-                      ? `أضف ${summary.amountForFreeShipping.toFixed(0)} د.إ للشحن المجاني`
-                      : locale === 'ru'
-                        ? `Ещё ${summary.amountForFreeShipping.toFixed(0)} AED до бесплатной доставки`
-                        : `Add ${summary.amountForFreeShipping.toFixed(0)} AED for free shipping`}
-                  </Text>
-                )}
-                {summary.hasFreeShipping && (
-                  <Text style={[styles.stickyFreeShippingDone, isRTL && styles.textRTL]}>
-                    {locale === 'ar' ? '✓ شحن مجاني' : locale === 'ru' ? '✓ Бесплатная доставка' : '✓ Free shipping'}
-                  </Text>
-                )}
-              </View>
-            )}
+              );
+            })()}
 
             {/* Collapsed summary row + View Bag button */}
             <View style={[styles.stickyRow, isRTL && styles.stickyRowRTL]}>
@@ -706,6 +789,7 @@ const styles = StyleSheet.create({
   stickyItemRowRTL: { flexDirection: 'row-reverse' },
   stickyItemName: { flex: 1, fontSize: 13, color: '#374151', marginRight: 12 },
   stickyItemPrice: { fontSize: 13, fontWeight: '600', color: '#1D1D1F' },
+  stickyItemOriginalPrice: { fontSize: 11, color: '#86868B', textDecorationLine: 'line-through' },
   stickyDivider: { height: StyleSheet.hairlineWidth, backgroundColor: '#E5E7EB', marginVertical: 6 },
   stickyPricingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 },
   stickyPricingRowRTL: { flexDirection: 'row-reverse' },

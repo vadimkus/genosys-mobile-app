@@ -33,7 +33,7 @@ export const CONCERNS = [
   },
   {
     slug: 'acne-treatment',
-    icon: '🔬',
+    icon: '💆',
     en: { h1: 'Acne & Blemish Treatment', heroShort: 'Clinically proven toner, serum & cream that control breakouts without damaging your skin barrier.' },
     ar: { h1: 'علاج حب الشباب والبثور', heroShort: 'تونر وسيروم وكريم مثبتون سريرياً يتحكمون في البثور دون الإضرار بحاجز البشرة.' },
     ru: { h1: 'Лечение акне и высыпаний', heroShort: 'Клинически доказанные тоник, сыворотка и крем — контролируют высыпания, не повреждая барьер кожи.' },
@@ -47,7 +47,7 @@ export const CONCERNS = [
   },
   {
     slug: 'scars-treatment',
-    icon: '🩹',
+    icon: '🧬',
     en: { h1: 'Scar Treatment & Skin Repair', heroShort: 'EGF repair creams & microneedling serums — rebuild collagen and smooth scar tissue.' },
     ar: { h1: 'علاج الندبات وإصلاح البشرة', heroShort: 'كريمات إصلاح EGF وسيرومات الوخز بالإبر — إعادة بناء الكولاجين وتنعيم أنسجة الندبات.' },
     ru: { h1: 'Лечение рубцов и восстановление', heroShort: 'Кремы с EGF и сыворотки для микронидлинга — восстановление коллагена и разглаживание рубцов.' },
