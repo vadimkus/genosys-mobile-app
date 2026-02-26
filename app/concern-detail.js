@@ -429,7 +429,7 @@ export default function ConcernDetailScreen() {
           <View style={[styles.ctaButtons, isRTL && { flexDirection: 'row-reverse' }]}>
             <TouchableOpacity
               style={[styles.ctaBtnPrimary, cartItems.length === 0 && styles.ctaBtnDisabled]}
-              onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', `/concern-detail?slug=${slug}`).catch(() => {}); router.push('/(tabs)/bag'); }}
+              onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/concern-detail', params: { slug } })).catch(() => {}); router.push('/(tabs)/bag'); }}
               activeOpacity={0.85}
               disabled={cartItems.length === 0}
             >
@@ -627,7 +627,7 @@ export default function ConcernDetailScreen() {
                   {' · '}{Number(summary.subtotal).toFixed(0)} AED
                 </Text>
               </View>
-              <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', `/concern-detail?slug=${slug}`).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
+              <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/concern-detail', params: { slug } })).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
                 <Text style={styles.stickyBtnText}>
                   {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Корзина' : 'View Bag'}
                 </Text>

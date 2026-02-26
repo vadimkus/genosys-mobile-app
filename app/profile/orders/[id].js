@@ -387,7 +387,7 @@ export default function OrderDetailScreen() {
             : t('ordersDetail.reorderSuccess', { count: addedCount }),
           [
             { text: t('common.continueShopping'), style: 'cancel' },
-            { text: t('ordersDetail.viewBag'), onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', `/profile/orders/${params.id}`).catch(() => {}); router.push('/(tabs)/bag'); } }
+            { text: t('ordersDetail.viewBag'), onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/profile/orders/[id]', params: { id: params.id } })).catch(() => {}); router.push('/(tabs)/bag'); } }
           ]
         );
       } else {

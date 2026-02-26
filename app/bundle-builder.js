@@ -237,7 +237,7 @@ export default function BundleBuilderScreen() {
     setSelectedItems({});
 
     // Navigate to bag
-    await AsyncStorage.setItem('@genosys_nav_bag_source', '/bundle-builder').catch(() => {});
+    await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/bundle-builder' })).catch(() => {});
     router.push('/(tabs)/bag');
   };
 

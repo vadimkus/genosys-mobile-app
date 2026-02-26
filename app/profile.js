@@ -504,7 +504,7 @@ export default function ProfileScreen() {
               onPress={async () => {
                 haptics.lightTap();
                 // Ensure Bag header can route back to Account when opened from here.
-                await AsyncStorage.setItem('@genosys_nav_bag_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
+                await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/profile' })).catch((e) => log.warn('Failed to save nav source', e?.message));
                 router.push('/(tabs)/bag');
               }}
             />

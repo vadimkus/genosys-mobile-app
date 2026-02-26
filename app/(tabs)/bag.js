@@ -66,10 +66,16 @@ export default function BagScreen() {
 
   const handleHeaderBack = useCallback(() => {
     AsyncStorage.removeItem('@genosys_nav_bag_source').catch(() => {});
-    if (router.canGoBack()) {
+    if (navSource) {
+      try {
+        const parsed = JSON.parse(navSource);
+        router.push(parsed);
+      } catch {
+        router.push(navSource);
+      }
+      setNavSource(null);
+    } else if (router.canGoBack()) {
       router.back();
-    } else if (navSource) {
-      router.push(navSource);
     } else {
       router.push('/(tabs)/shop');
     }

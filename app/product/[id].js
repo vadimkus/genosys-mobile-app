@@ -330,7 +330,7 @@ export default function ProductDetailScreen() {
         message,
         [
           { text: t('product.continueShopping'), style: 'default' },
-          { text: t('product.viewBag'), style: 'default', onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', `/product/${id}`).catch(() => {}); router.push('/(tabs)/bag'); } }
+          { text: t('product.viewBag'), style: 'default', onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/product/[id]', params: { id } })).catch(() => {}); router.push('/(tabs)/bag'); } }
         ]
       );
     }
