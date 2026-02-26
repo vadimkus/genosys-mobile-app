@@ -27,6 +27,7 @@ import { fetchConcernDetail } from '../services/api';
 import ProductGridItem from '../components/ProductGridItem';
 import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -40,13 +41,14 @@ export default function ConcernDetailScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
 
-  const { items: cartItems, addItem, removeItem } = useCart();
+  const { items: cartItems, addItem, removeItem, getCartSummary } = useCart();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
   const [expandedFaq, setExpandedFaq] = useState({});
   const [justAddedIds, setJustAddedIds] = useState({});
   const [productsExpanded, setProductsExpanded] = useState(false);
+  const [stickyExpanded, setStickyExpanded] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const toastTimer = useRef(null);
@@ -424,25 +426,81 @@ export default function ConcernDetailScreen() {
         <View style={{ height: cartItems.length > 0 ? 90 : 40 }} />
       </ScrollView>
 
-      {/* Sticky Bottom Bar — visible when cart has items */}
-      {cartItems.length > 0 && (
-        <View style={styles.stickyBar}>
-          <View style={styles.stickyInfo}>
-            <Ionicons name="bag-handle" size={20} color="#dc2626" />
-            <Text style={styles.stickyCount}>
-              {cartItems.length} {cartItems.length === 1
-                ? (locale === 'ar' ? 'منتج' : locale === 'ru' ? 'товар' : 'item')
-                : (locale === 'ar' ? 'منتجات' : locale === 'ru' ? 'товаров' : 'items')}
-            </Text>
+      {/* Sticky Bottom Bar — expandable, visible when cart has items */}
+      {cartItems.length > 0 && (() => {
+        const summary = getCartSummary();
+        return (
+          <View style={styles.stickyBar}>
+            {/* Chevron handle */}
+            <TouchableOpacity
+              style={styles.stickyChevron}
+              onPress={() => { haptics.lightTap(); setStickyExpanded(v => !v); }}
+              activeOpacity={0.7}
+              hitSlop={{ top: 12, bottom: 12, left: 20, right: 20 }}
+            >
+              <View style={styles.stickyHandle} />
+              <Ionicons name={stickyExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            {/* Expanded: item list + pricing */}
+            {stickyExpanded && (
+              <View style={styles.stickyDetails}>
+                {cartItems.filter(i => !i.isPromotionItem).map((item, idx) => {
+                  const name = getLocalizedProductName(item.product, locale) || item.product?.name || '';
+                  const price = Number(item.product?.price) || 0;
+                  const qty = item.quantity || 1;
+                  return (
+                    <View key={`${item.product?.id}-${idx}`} style={[styles.stickyItemRow, isRTL && styles.stickyItemRowRTL]}>
+                      <Text style={[styles.stickyItemName, isRTL && styles.textRTL]} numberOfLines={1}>{name}{qty > 1 ? ` ×${qty}` : ''}</Text>
+                      <Text style={styles.stickyItemPrice}>{(price * qty).toFixed(0)} AED</Text>
+                    </View>
+                  );
+                })}
+                <View style={styles.stickyDivider} />
+                <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
+                  <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL]}>
+                    {locale === 'ar' ? 'المجموع الفرعي' : locale === 'ru' ? 'Промежуточный итог' : 'Subtotal'}
+                  </Text>
+                  <Text style={styles.stickyPricingValue}>{Number(summary.subtotal).toFixed(0)} AED</Text>
+                </View>
+                {summary.amountForFreeShipping > 0 && (
+                  <Text style={[styles.stickyFreeShipping, isRTL && styles.textRTL]}>
+                    {locale === 'ar'
+                      ? `أضف ${summary.amountForFreeShipping.toFixed(0)} د.إ للشحن المجاني`
+                      : locale === 'ru'
+                        ? `Ещё ${summary.amountForFreeShipping.toFixed(0)} AED до бесплатной доставки`
+                        : `Add ${summary.amountForFreeShipping.toFixed(0)} AED for free shipping`}
+                  </Text>
+                )}
+                {summary.hasFreeShipping && (
+                  <Text style={[styles.stickyFreeShippingDone, isRTL && styles.textRTL]}>
+                    {locale === 'ar' ? '✓ شحن مجاني' : locale === 'ru' ? '✓ Бесплатная доставка' : '✓ Free shipping'}
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {/* Collapsed summary row + View Bag button */}
+            <View style={[styles.stickyRow, isRTL && styles.stickyRowRTL]}>
+              <View style={[styles.stickyInfo, isRTL && styles.stickyInfoRTL]}>
+                <Ionicons name="bag-handle" size={20} color="#dc2626" />
+                <Text style={styles.stickyCount}>
+                  {cartItems.length} {cartItems.length === 1
+                    ? (locale === 'ar' ? 'منتج' : locale === 'ru' ? 'товар' : 'item')
+                    : (locale === 'ar' ? 'منتجات' : locale === 'ru' ? 'товаров' : 'items')}
+                  {' · '}{Number(summary.subtotal).toFixed(0)} AED
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', `/concern-detail?slug=${slug}`).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
+                <Text style={styles.stickyBtnText}>
+                  {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Корзина' : 'View Bag'}
+                </Text>
+                <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', `/concern-detail?slug=${slug}`).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
-            <Text style={styles.stickyBtnText}>
-              {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
-            </Text>
-            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      )}
+        );
+      })()}
 
       {/* Toast */}
       {toastMessage ? (
@@ -610,51 +668,52 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
   },
 
-  // Sticky Bottom Bar
+  // Sticky Bottom Bar (expandable)
   stickyBar: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    paddingBottom: 28,
+    paddingHorizontal: 16,
+    paddingBottom: 34,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 10,
   },
-  stickyInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stickyCount: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1D1D1F',
-  },
+  stickyChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 2 },
+  stickyHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 2 },
+  stickyDetails: { paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 6 },
+  stickyItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
+  stickyItemRowRTL: { flexDirection: 'row-reverse' },
+  stickyItemName: { flex: 1, fontSize: 13, color: '#374151', marginRight: 12 },
+  stickyItemPrice: { fontSize: 13, fontWeight: '600', color: '#1D1D1F' },
+  stickyDivider: { height: StyleSheet.hairlineWidth, backgroundColor: '#E5E7EB', marginVertical: 6 },
+  stickyPricingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 },
+  stickyPricingRowRTL: { flexDirection: 'row-reverse' },
+  stickyPricingLabel: { fontSize: 14, fontWeight: '600', color: '#1D1D1F' },
+  stickyPricingValue: { fontSize: 14, fontWeight: '700', color: '#1D1D1F' },
+  stickyFreeShipping: { fontSize: 12, color: '#D97706', marginTop: 4 },
+  stickyFreeShippingDone: { fontSize: 12, color: '#059669', fontWeight: '600', marginTop: 4 },
+  stickyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 },
+  stickyRowRTL: { flexDirection: 'row-reverse' },
+  stickyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  stickyInfoRTL: { flexDirection: 'row-reverse' },
+  stickyCount: { fontSize: 14, fontWeight: '600', color: '#1D1D1F' },
   stickyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#dc2626',
     borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
   },
-  stickyBtnText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#fff',
-  },
+  stickyBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
 
   // Toast
   toast: { position: 'absolute', bottom: 48, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(0,0,0,0.82)', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24 },
