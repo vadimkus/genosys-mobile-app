@@ -56,6 +56,7 @@ export default function ConcernDetailScreen() {
   const [productsExpanded, setProductsExpanded] = useState(false);
   const [stickyExpanded, setStickyExpanded] = useState(false);
   const [whyExpanded, setWhyExpanded] = useState(false);
+  const [docsExpanded, setDocsExpanded] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const toastTimer = useRef(null);
@@ -193,7 +194,9 @@ export default function ConcernDetailScreen() {
 
   if (!data) return null;
 
-  const { seo, why, protocolPdf, routine, products, faq, relatedConcerns, icon } = data;
+  const { seo, why, protocolPdf, routine, products, faq, relatedConcerns, icon: apiIcon } = data;
+  const localConcern = CONCERNS.find(c => c.slug === slug);
+  const icon = localConcern?.icon || apiIcon;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -244,26 +247,40 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* Protocol PDF */}
+        {/* Documentation — collapsible */}
         {protocolPdf ? (
-          <TouchableOpacity style={styles.pdfCard} onPress={handleProtocolDownload} activeOpacity={0.85}>
-            <View style={[styles.pdfRow, isRTL && { flexDirection: 'row-reverse' }]}>
-              <View style={styles.pdfIconBox}>
-                <Ionicons name="document-text-outline" size={22} color="#92400E" />
-              </View>
-              <View style={styles.pdfContent}>
-                <View style={[styles.pdfTitleRow, isRTL && { flexDirection: 'row-reverse' }]}>
-                  <Text style={[styles.pdfTitle, isRTL && styles.textRTL]} numberOfLines={1}>{protocolPdf.title}</Text>
-                  <View style={styles.pdfBadge}><Text style={styles.pdfBadgeText}>PDF</Text></View>
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={[styles.collapsibleHeader, isRTL && styles.collapsibleHeaderRTL]}
+              onPress={() => { haptics.lightTap(); setDocsExpanded(prev => !prev); }}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.sectionTitle, { marginBottom: 0, flex: 1, marginRight: 8 }, isRTL && styles.textRTL]}>
+                {locale === 'ar' ? 'الوثائق' : locale === 'ru' ? 'Документация' : 'Documentation'}
+              </Text>
+              <Ionicons name={docsExpanded ? 'chevron-up' : 'chevron-down'} size={22} color="#1D1D1F" />
+            </TouchableOpacity>
+            {docsExpanded && (
+              <TouchableOpacity style={styles.pdfCard} onPress={handleProtocolDownload} activeOpacity={0.85}>
+                <View style={[styles.pdfRow, isRTL && { flexDirection: 'row-reverse' }]}>
+                  <View style={styles.pdfIconBox}>
+                    <Ionicons name="document-text-outline" size={22} color="#92400E" />
+                  </View>
+                  <View style={styles.pdfContent}>
+                    <View style={[styles.pdfTitleRow, isRTL && { flexDirection: 'row-reverse' }]}>
+                      <Text style={[styles.pdfTitle, isRTL && styles.textRTL]} numberOfLines={1}>{protocolPdf.title}</Text>
+                      <View style={styles.pdfBadge}><Text style={styles.pdfBadgeText}>PDF</Text></View>
+                    </View>
+                    <Text style={[styles.pdfDesc, isRTL && styles.textRTL]} numberOfLines={2}>{protocolPdf.description}</Text>
+                  </View>
+                  <View style={styles.pdfDownload}>
+                    <Text style={styles.pdfSize}>{protocolPdf.fileSize}</Text>
+                    <Ionicons name="download-outline" size={18} color="#92400E" />
+                  </View>
                 </View>
-                <Text style={[styles.pdfDesc, isRTL && styles.textRTL]} numberOfLines={2}>{protocolPdf.description}</Text>
-              </View>
-              <View style={styles.pdfDownload}>
-                <Text style={styles.pdfSize}>{protocolPdf.fileSize}</Text>
-                <Ionicons name="download-outline" size={18} color="#92400E" />
-              </View>
-            </View>
-          </TouchableOpacity>
+              </TouchableOpacity>
+            )}
+          </View>
         ) : null}
 
         {/* Routine */}

@@ -244,6 +244,7 @@ const styles = StyleSheet.create({
     borderColor: '#F0F0F0',
     padding: 16,
     marginBottom: CARD_GAP,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -260,12 +261,14 @@ const styles = StyleSheet.create({
     color: '#1D1D1F',
     lineHeight: 20,
     marginBottom: 6,
+    textAlign: 'center',
   },
   cardDescription: {
     fontSize: 12,
     color: '#86868B',
     lineHeight: 17,
     marginBottom: 10,
+    textAlign: 'center',
   },
   exploreRow: {
     flexDirection: 'row',

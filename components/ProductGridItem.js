@@ -15,7 +15,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct, isUserDiscountExcludedProduct } from '../utils/productRules';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
-import { getLocalizedProductName, getLocalizedProductSize, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
+import { getLocalizedProductName, getLocalizedProductSize, getLocalizedProductDescription, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
 
@@ -162,6 +162,13 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
             return key ? t(key) : canon;
           })()}
         </Text>
+        {(() => {
+          const desc = getLocalizedProductDescription(product, locale) || product.description || '';
+          const plain = String(desc).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+          return plain ? (
+            <Text style={[styles.productDescription, isRTL && styles.textRTL]} numberOfLines={2}>{plain}</Text>
+          ) : null;
+        })()}
         
         {/* Enhanced Size Information from Server */}
         {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
@@ -364,8 +371,14 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 12,
     color: '#86868B',
-    marginBottom: 6,
+    marginBottom: 4,
     textTransform: 'capitalize',
+  },
+  productDescription: {
+    fontSize: 11,
+    color: '#999',
+    lineHeight: 15,
+    marginBottom: 6,
   },
   priceContainer: {
     alignItems: 'flex-start',
@@ -394,7 +407,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   savingsContainer: {
-    backgroundColor: '#dc2626',
+    backgroundColor: '#16a34a',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
