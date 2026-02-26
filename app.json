@@ -55,7 +55,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 67,
+      "versionCode": 68,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
