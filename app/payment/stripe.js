@@ -31,7 +31,8 @@ export default function StripePaymentScreen() {
   const { user } = useAuth();
   const { clearCart } = useCart();
   const token = user?.token || user?.accessToken || '';
-  const { t } = useLocalization();
+  const { t, dir } = useLocalization();
+  const isRTL = dir === 'rtl';
 
   const params = useLocalSearchParams();
   const paymentUrl = String(params.paymentUrl || '');
@@ -182,8 +183,8 @@ export default function StripePaymentScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#dc2626" />
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/bag')} style={styles.backButton}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.headerSpacer} />

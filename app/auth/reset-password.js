@@ -69,7 +69,7 @@ export default function ResetPasswordScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => { haptics.lightTap(); router.back(); }} activeOpacity={0.7}>
-          <Ionicons name="chevron-back" size={24} color="#111827" />
+          <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('authScreen.resetPasswordTitle')}</Text>
         <View style={styles.backButton} />

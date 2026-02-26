@@ -58,16 +58,11 @@ export default function PromoScreen() {
     <SafeAreaView style={styles.container}>
       <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
         <TouchableOpacity
-          style={[styles.backButton, isRTL && styles.backButtonRTL]}
-          onPress={() => { haptics.lightTap(); router.replace('/profile'); }}
+          style={styles.backButton}
+          onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); }}
           activeOpacity={0.7}
         >
-          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
-            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#dc2626" />
-            <Text style={[styles.backText, isRTL && styles.backTextRTL]} numberOfLines={1}>
-              {t('profile.accountTitle')}
-            </Text>
-          </View>
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={[styles.navTitle, isRTL && styles.navTitleRTL]}>{t('promo.title')}</Text>
         <View style={styles.headerSpacer} />

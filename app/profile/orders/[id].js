@@ -402,8 +402,8 @@ export default function OrderDetailScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace('/(tabs)/orders') }} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/orders'); }} style={styles.backButton}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('ordersDetail.orderDetails')}</Text>
         <TouchableOpacity onPress={load} style={styles.refreshButton}>

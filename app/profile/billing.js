@@ -70,8 +70,8 @@ export default function BillingScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/profile')} style={styles.backButton}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('billing.title')}</Text>
         <View style={styles.headerSpacer} />

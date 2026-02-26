@@ -111,7 +111,7 @@ export default function ContactScreen() {
       {/* Header - standard arrow back (same as Partners, Delivery, etc.) */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
           {t('contact.title')}

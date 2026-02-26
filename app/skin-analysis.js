@@ -150,7 +150,7 @@ export default function SkinAnalysisScreen() {
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('skinAnalysis.title')}</Text>
           <View style={styles.backBtn} />
@@ -195,7 +195,7 @@ export default function SkinAnalysisScreen() {
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <TouchableOpacity onPress={handleReset} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('skinAnalysis.yourResults')}</Text>
           <View style={styles.backBtn} />
@@ -361,7 +361,7 @@ export default function SkinAnalysisScreen() {
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={handleBack} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {t('skinAnalysis.step', { current: step, total: TOTAL_STEPS })}

@@ -224,7 +224,7 @@ export default function BlogPostScreen() {
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>{l('Article', 'مقال', 'Статья')}</Text>
           <View style={styles.backBtn} />
@@ -243,7 +243,7 @@ export default function BlogPostScreen() {
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>{l('Article', 'مقال', 'Статья')}</Text>
           <View style={styles.backBtn} />
@@ -266,7 +266,7 @@ export default function BlogPostScreen() {
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#1F2937" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
           {l('Blog', 'المدونة', 'Блог')}

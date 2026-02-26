@@ -88,10 +88,16 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/favorites'); }} activeOpacity={0.7}>
-              <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
-                {t('navigation.favorites') || 'Favorites'}
-                {favCount > 0 ? <Text style={styles.badge}> {favCount}</Text> : null}
-              </Text>
+              <View style={styles.badgeRow}>
+                <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
+                  {t('navigation.favorites') || 'Favorites'}
+                </Text>
+                {favCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{favCount}</Text>
+                  </View>
+                )}
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/profile'); }} activeOpacity={0.7}>
@@ -299,15 +305,25 @@ const styles = StyleSheet.create({
     letterSpacing: -0.1,
   },
   /* ── Badge ── */
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   badge: {
-    fontSize: 12,
+    backgroundColor: '#dc2626',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+  },
+  badgeText: {
+    fontSize: 11,
     fontWeight: '700',
     color: '#ffffff',
-    backgroundColor: '#dc2626',
-    borderRadius: 8,
-    overflow: 'hidden',
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    lineHeight: 14,
   },
   /* ── Dividers ── */
   divider: {

@@ -359,11 +359,8 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace(backTo); }} style={styles.backButton}>
-            <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
-              <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-              <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{backLabel}</Text>
-            </View>
+          <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace(backTo); }} style={styles.backButton}>
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
           <View style={styles.headerSpacer} />
@@ -379,11 +376,8 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace(backTo); }} style={styles.backButton}>
-          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
-            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-            <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{backLabel}</Text>
-          </View>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace(backTo); }} style={styles.backButton}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
         <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>

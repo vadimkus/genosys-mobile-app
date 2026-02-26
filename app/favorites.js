@@ -100,7 +100,7 @@ export default function FavoritesScreen() {
             onPress={() => { haptics.lightTap(); router.back(); }}
             activeOpacity={0.7}
           >
-            <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
           </TouchableOpacity>
           
           <View style={styles.headerCenter}>
@@ -137,7 +137,7 @@ export default function FavoritesScreen() {
           onPress={() => { haptics.lightTap(); router.back(); }}
           activeOpacity={0.7}
         >
-          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>

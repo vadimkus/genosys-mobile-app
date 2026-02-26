@@ -408,20 +408,11 @@ export default function ProfileScreen() {
       {/* Navigation Header */}
       <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
         <TouchableOpacity 
-          style={[styles.backButton, isRTL && styles.backButtonRTL]}
-          onPress={() => router.replace('/(tabs)/shop')}
+          style={styles.backButton}
+          onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/shop')}
           activeOpacity={0.7}
         >
-          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
-            <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
-            <Text
-              style={[styles.backText, isRTL && styles.backTextRTL]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {t('tabs.home')}
-            </Text>
-          </View>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         
         <Text style={[styles.navTitle, isRTL && styles.navTitleRTL]}>{t('profile.accountTitle')}</Text>

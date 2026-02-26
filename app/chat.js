@@ -436,7 +436,7 @@ export default function ChatScreen() {
       {/* ─── Header (red, matches web) ─── */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color="#ffffff" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#ffffff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <View style={styles.headerTitleRow}>

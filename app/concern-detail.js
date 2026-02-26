@@ -112,11 +112,6 @@ export default function ConcernDetailScreen() {
     router.push({ pathname: '/concern-detail', params: { slug: relatedSlug } });
   };
 
-  const handleEssentialPress = (productId) => {
-    haptics.lightTap();
-    router.push(`/product/${productId}`);
-  };
-
   const productLookup = React.useMemo(() => {
     if (!data?.products) return {};
     const map = {};
@@ -187,7 +182,7 @@ export default function ConcernDetailScreen() {
 
   if (!data) return null;
 
-  const { seo, why, protocolPdf, routine, products, faq, relatedConcerns, routineEssentials, icon } = data;
+  const { seo, why, protocolPdf, routine, products, faq, relatedConcerns, icon } = data;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -331,27 +326,42 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* Complete Your Routine */}
-        {routineEssentials && routineEssentials.length > 0 ? (
-          <View style={styles.essentialsSection}>
-            <Text style={[styles.sectionTitle, isRTL && styles.textRTL, { textAlign: 'center' }]}>
-              {locale === 'ar' ? 'أكملي روتينك' : locale === 'ru' ? 'Дополните ваш уход' : 'Complete Your Routine'}
-            </Text>
-            <Text style={[styles.essentialsSubtitle, isRTL && styles.textRTL]}>
-              {locale === 'ar' ? 'كل روتين فعّال يبدأ بقاعدة نظيفة وينتهي بحماية من الشمس' : locale === 'ru' ? 'Каждый уход начинается с очищения и заканчивается SPF-защитой' : 'Every effective routine starts with a clean base and ends with sun protection'}
-            </Text>
-            {routineEssentials.map((item, i) => (
-              <TouchableOpacity key={i} style={[styles.essentialCard, isRTL && { flexDirection: 'row-reverse' }]} onPress={() => handleEssentialPress(item.productId)} activeOpacity={0.85}>
-                <Text style={styles.essentialIcon}>{item.icon}</Text>
-                <View style={styles.essentialContent}>
-                  <Text style={[styles.essentialName, isRTL && styles.textRTL]}>{item.name}</Text>
-                  <Text style={[styles.essentialDesc, isRTL && styles.textRTL]}>{item.description}</Text>
-                  <Text style={[styles.essentialPrice, isRTL && styles.textRTL]}>{item.price} →</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+        {/* Start Your Routine CTA */}
+        <View style={styles.ctaBlock}>
+          <Text style={[styles.ctaTitle, isRTL && styles.textRTL]}>
+            {locale === 'ar' ? 'ابدأي روتينك اليوم' : locale === 'ru' ? 'Начните уход сегодня' : 'Start Your Routine Today'}
+          </Text>
+          <Text style={[styles.ctaSubtitle, isRTL && styles.textRTL]}>
+            {locale === 'ar'
+              ? 'اضغطي على المنتجات في الروتين أعلاه لإضافتها إلى حقيبتك'
+              : locale === 'ru'
+                ? 'Нажимайте на продукты в рутине выше, чтобы добавить их в корзину'
+                : 'Tap products in the routine above to add them to your bag'}
+          </Text>
+          <View style={[styles.ctaButtons, isRTL && { flexDirection: 'row-reverse' }]}>
+            <TouchableOpacity
+              style={[styles.ctaBtnPrimary, cartItems.length === 0 && styles.ctaBtnDisabled]}
+              onPress={() => { haptics.mediumTap(); router.push('/(tabs)/bag'); }}
+              activeOpacity={0.85}
+              disabled={cartItems.length === 0}
+            >
+              <Ionicons name="bag-handle-outline" size={18} color="#fff" />
+              <Text style={styles.ctaBtnPrimaryText}>
+                {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
+                {cartItems.length > 0 ? ` (${cartItems.length})` : ''}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.ctaBtnSecondary}
+              onPress={() => { haptics.lightTap(); router.push('/skin-analysis'); }}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.ctaBtnSecondaryText}>
+                {locale === 'ar' ? '✨ تحليل البشرة بالذكاء الاصطناعي' : locale === 'ru' ? '✨ AI-анализ кожи' : '✨ AI Skin Analysis'}
+              </Text>
+            </TouchableOpacity>
           </View>
-        ) : null}
+        </View>
 
         {/* FAQ */}
         {faq && faq.length > 0 ? (
@@ -394,15 +404,30 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* SEO Intro text */}
-        {seo?.intro ? (
-          <View style={styles.section}>
-            <Text style={[styles.introText, isRTL && styles.textRTL]}>{seo.intro}</Text>
-          </View>
-        ) : null}
+        {/* SEO intro text hidden — only relevant for web crawlers, not native app */}
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: cartItems.length > 0 ? 90 : 40 }} />
       </ScrollView>
+
+      {/* Sticky Bottom Bar — visible when cart has items */}
+      {cartItems.length > 0 && (
+        <View style={styles.stickyBar}>
+          <View style={styles.stickyInfo}>
+            <Ionicons name="bag-handle" size={20} color="#dc2626" />
+            <Text style={styles.stickyCount}>
+              {cartItems.length} {cartItems.length === 1
+                ? (locale === 'ar' ? 'منتج' : locale === 'ru' ? 'товар' : 'item')
+                : (locale === 'ar' ? 'منتجات' : locale === 'ru' ? 'товаров' : 'items')}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.stickyBtn} onPress={() => { haptics.mediumTap(); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
+            <Text style={styles.stickyBtnText}>
+              {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
+            </Text>
+            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Toast */}
       {toastMessage ? (
@@ -489,16 +514,6 @@ const styles = StyleSheet.create({
   // Products grid
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
 
-  // Essentials
-  essentialsSection: { marginTop: 24, marginBottom: 8, backgroundColor: '#F9FAFB', borderRadius: 16, padding: 16, marginHorizontal: -SIDE_PADDING, paddingHorizontal: SIDE_PADDING },
-  essentialsSubtitle: { fontSize: 13, color: '#86868B', textAlign: 'center', marginBottom: 16 },
-  essentialCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#F0F0F0', padding: 14, marginBottom: 10 },
-  essentialIcon: { fontSize: 26 },
-  essentialContent: { flex: 1 },
-  essentialName: { fontSize: 14, fontWeight: '600', color: '#1D1D1F', marginBottom: 3 },
-  essentialDesc: { fontSize: 12, color: '#86868B', lineHeight: 17, marginBottom: 4 },
-  essentialPrice: { fontSize: 12, fontWeight: '600', color: '#dc2626' },
-
   // FAQ
   faqSection: { marginTop: 24, marginBottom: 8, backgroundColor: '#F9FAFB', borderRadius: 16, padding: 16, marginHorizontal: -SIDE_PADDING, paddingHorizontal: SIDE_PADDING },
   faqItem: { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#E5E5EA', marginBottom: 8, overflow: 'hidden' },
@@ -514,8 +529,115 @@ const styles = StyleSheet.create({
   relatedTitle: { fontSize: 14, fontWeight: '600', color: '#1D1D1F', marginBottom: 4, lineHeight: 19 },
   relatedDesc: { fontSize: 11, color: '#86868B', lineHeight: 16 },
 
-  // Intro
-  introText: { fontSize: 13, color: '#86868B', lineHeight: 20 },
+  // Bottom CTA Block
+  ctaBlock: {
+    marginTop: 28,
+    marginBottom: 8,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 20,
+    padding: 24,
+    marginHorizontal: -SIDE_PADDING,
+    paddingHorizontal: SIDE_PADDING + 4,
+    alignItems: 'center',
+  },
+  ctaTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  ctaSubtitle: {
+    fontSize: 13,
+    color: '#86868B',
+    textAlign: 'center',
+    lineHeight: 19,
+    marginBottom: 20,
+  },
+  ctaButtons: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+  },
+  ctaBtnPrimary: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#dc2626',
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  ctaBtnDisabled: {
+    backgroundColor: '#D1D5DB',
+  },
+  ctaBtnPrimaryText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  ctaBtnSecondary: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    paddingVertical: 14,
+    borderWidth: 1.5,
+    borderColor: '#E5E5EA',
+  },
+  ctaBtnSecondaryText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1D1D1F',
+  },
+
+  // Sticky Bottom Bar
+  stickyBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingBottom: 28,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  stickyInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  stickyCount: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1D1D1F',
+  },
+  stickyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#dc2626',
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  stickyBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+  },
 
   // Toast
   toast: { position: 'absolute', bottom: 48, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(0,0,0,0.82)', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24 },

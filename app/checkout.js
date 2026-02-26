@@ -551,7 +551,7 @@ export default function CheckoutScreen() {
       {/* Header with Step Indicator */}
       <CheckoutSteps
         activeStep={activeStep}
-        onBack={() => router.back()}
+        onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/bag')}
         styles={styles}
       />
 

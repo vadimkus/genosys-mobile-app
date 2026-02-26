@@ -142,13 +142,8 @@ export default function TermsScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.replace('/profile'); }} style={[styles.backButton, isRTL && styles.backButtonRTL]}>
-          <View style={[styles.backButtonContent, isRTL && styles.backButtonContentRTL]}>
-            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-            <Text style={[styles.backText, isRTL && styles.backTextRTL]} numberOfLines={1}>
-              {t('profile.accountTitle')}
-            </Text>
-          </View>
+        <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); }} style={styles.backButton}>
+          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('terms.title')}</Text>
         <View style={styles.headerSpacer} />

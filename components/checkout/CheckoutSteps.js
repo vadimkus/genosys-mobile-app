@@ -33,7 +33,7 @@ export default function CheckoutSteps({
         onPress={onBack}
         activeOpacity={0.7}
       >
-        <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color="#dc2626" />
+        <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
       </TouchableOpacity>
 
       <View style={styles.headerCenter}>

@@ -66,7 +66,9 @@ export default function BagScreen() {
 
   const headerBackLabel = openedFromAccount ? t('profile.accountTitle') : t('tabs.home');
   const handleHeaderBack = () => {
-    if (openedFromAccount) {
+    if (router.canGoBack()) {
+      router.back();
+    } else if (openedFromAccount) {
       router.replace('/profile');
     } else {
       router.replace('/(tabs)/shop');
@@ -433,8 +435,7 @@ export default function BagScreen() {
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
                 onPress={handleHeaderBack}
               >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{headerBackLabel}</Text>
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
@@ -463,8 +464,7 @@ export default function BagScreen() {
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
                 onPress={handleHeaderBack}
               >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{headerBackLabel}</Text>
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
               </TouchableOpacity>
               
               <View style={styles.headerCenter}>
@@ -513,8 +513,7 @@ export default function BagScreen() {
                 style={[styles.backButton, isRTL && styles.backButtonRTL]}
                 onPress={handleHeaderBack}
               >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#dc2626" />
-                <Text style={[styles.backText, isRTL && styles.backTextRTL]}>{headerBackLabel}</Text>
+                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
               </TouchableOpacity>
 
               <View pointerEvents="none" style={styles.headerCenterAbsolute}>

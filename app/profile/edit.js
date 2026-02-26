@@ -23,6 +23,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getAddressLine, parseGenosysAddress } from '../../utils/addressUtils';
 import { createLogger } from '../../utils/logger';
+import * as haptics from '../../utils/haptics';
 
 const log = createLogger('EditProfile');
 
@@ -222,40 +223,50 @@ export default function EditProfileScreen() {
   };
 
   const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.cameraPermission'));
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.cameraPermission'));
+        return;
+      }
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
 
-    if (!result.canceled) {
-      updateField('profilePicture', result.assets[0].uri);
+      if (!result.canceled && result.assets?.length > 0 && result.assets[0]?.uri) {
+        updateField('profilePicture', result.assets[0].uri);
+      }
+    } catch (err) {
+      log.error('takePhoto failed:', err);
+      Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not take photo. Please try again.');
     }
   };
 
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.libraryPermission'));
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.libraryPermission'));
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
 
-    if (!result.canceled) {
-      updateField('profilePicture', result.assets[0].uri);
+      if (!result.canceled && result.assets?.length > 0 && result.assets[0]?.uri) {
+        updateField('profilePicture', result.assets[0].uri);
+      }
+    } catch (err) {
+      log.error('pickImage failed:', err);
+      Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not select photo. Please try again.');
     }
   };
 
@@ -484,10 +495,9 @@ export default function EditProfileScreen() {
         ) : (
           <TouchableOpacity
             onPress={handleBack}
-            style={[styles.headerButton, styles.headerBackButton, isRTL && styles.rowRTL]}
+            style={[styles.headerButton, styles.headerBackButton]}
           >
-            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={18} color="#dc2626" />
-            <Text style={[styles.backText, isRTL && styles.textRTL]}>{t('common.back')}</Text>
+            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
           </TouchableOpacity>
         )}
         <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('editProfile.headerTitle')}</Text>
