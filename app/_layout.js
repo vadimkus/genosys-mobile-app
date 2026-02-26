@@ -11,8 +11,10 @@ import { AnimationProvider } from '../contexts/AnimationContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
+import ForceUpdateScreen from '../components/ForceUpdateScreen';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { setupDeepLinkListener } from '../utils/deepLinking';
+import AUTH_CONFIG from '../config/auth';
 
 // Suppress known warnings that don't affect functionality
 // Push notifications on Android require Firebase (google-services.json) for production
@@ -22,13 +24,57 @@ LogBox.ignoreLogs([
   'expo-notifications',
 ]);
 
+function compareVersions(current, minimum) {
+  const c = current.split('.').map(Number);
+  const m = minimum.split('.').map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((c[i] || 0) < (m[i] || 0)) return -1;
+    if ((c[i] || 0) > (m[i] || 0)) return 1;
+  }
+  return 0;
+}
+
 export default function RootLayout() {
   const [showLaunch, setShowLaunch] = useState(true);
+  const [forceUpdate, setForceUpdate] = useState(null); // null = checking, false = ok, object = needs update
 
   // Initialize deep link listener
   useEffect(() => {
     const cleanup = setupDeepLinkListener();
     return cleanup;
+  }, []);
+
+  // Check minimum app version on cold start
+  useEffect(() => {
+    let cancelled = false;
+
+    async function checkVersion() {
+      try {
+        const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/app-version`, {
+          headers: { 'Cache-Control': 'no-cache' },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (cancelled) return;
+
+        const currentVersion = Constants.expoConfig?.version || '0.0.0';
+
+        if (data.forceUpdate && data.minimumVersion && compareVersions(currentVersion, data.minimumVersion) < 0) {
+          const locale = Constants.expoConfig?.extra?.locale || 'en';
+          const message = data.message?.[locale] || data.message?.en || data.message;
+          setForceUpdate({ updateUrl: data.updateUrl, message });
+        } else {
+          setForceUpdate(false);
+        }
+      } catch {
+        // Network error or server down — fail open, let the user through
+        if (!cancelled) setForceUpdate(false);
+      }
+    }
+
+    checkVersion();
+    return () => { cancelled = true; };
   }, []);
 
   // Expo Go always shows its own native loading screen first (app name text).
@@ -38,6 +84,11 @@ export default function RootLayout() {
 
   if (isExpoGo && showLaunch) {
     return <BrandedLaunchScreen onDone={() => setShowLaunch(false)} />;
+  }
+
+  // Block the entire app if a force update is required
+  if (forceUpdate && typeof forceUpdate === 'object') {
+    return <ForceUpdateScreen updateUrl={forceUpdate.updateUrl} message={forceUpdate.message} />;
   }
 
   return (
