@@ -27,6 +27,8 @@ const CHAT_HIDDEN_ROUTES = [
   '/faq',                  // FAQ page
   '/delivery',             // delivery page
   '/about',                // about page
+  '/skin-concerns',        // skin concerns listing
+  '/concern-detail',       // skin concern detail pages
 ];
 
 export default function AuthWrapper() {
