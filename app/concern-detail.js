@@ -49,6 +49,7 @@ export default function ConcernDetailScreen() {
   const [justAddedIds, setJustAddedIds] = useState({});
   const [productsExpanded, setProductsExpanded] = useState(false);
   const [stickyExpanded, setStickyExpanded] = useState(false);
+  const [whyExpanded, setWhyExpanded] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const toastTimer = useRef(null);
@@ -212,19 +213,28 @@ export default function ConcernDetailScreen() {
           ) : null}
         </View>
 
-        {/* Why Section */}
+        {/* Why Section — collapsible */}
         {why && why.items?.length > 0 ? (
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{why.title}</Text>
-            <View style={[styles.whyGrid, isRTL && { flexDirection: 'row-reverse' }]}>
-              {why.items.map((item, i) => (
-                <View key={i} style={styles.whyCard}>
-                  <Text style={styles.whyIcon}>{item.icon}</Text>
-                  <Text style={[styles.whyLabel, isRTL && styles.textRTL]}>{item.label}</Text>
-                  <Text style={[styles.whyDetail, isRTL && styles.textRTL]}>{item.detail}</Text>
-                </View>
-              ))}
-            </View>
+            <TouchableOpacity
+              style={[styles.collapsibleHeader, isRTL && styles.collapsibleHeaderRTL]}
+              onPress={() => { haptics.lightTap(); setWhyExpanded(prev => !prev); }}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.sectionTitle, { marginBottom: 0 }, isRTL && styles.textRTL]}>{why.title}</Text>
+              <Ionicons name={whyExpanded ? 'chevron-up' : 'chevron-down'} size={22} color="#1D1D1F" />
+            </TouchableOpacity>
+            {whyExpanded && (
+              <View style={[styles.whyGrid, isRTL && { flexDirection: 'row-reverse' }]}>
+                {why.items.map((item, i) => (
+                  <View key={i} style={styles.whyCard}>
+                    <Text style={styles.whyIcon}>{item.icon}</Text>
+                    <Text style={[styles.whyLabel, isRTL && styles.textRTL]}>{item.label}</Text>
+                    <Text style={[styles.whyDetail, isRTL && styles.textRTL]}>{item.detail}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         ) : null}
 
