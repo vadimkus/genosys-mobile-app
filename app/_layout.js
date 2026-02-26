@@ -35,7 +35,7 @@ function compareVersions(current, minimum) {
   return 0;
 }
 
-// Local video asset for Expo Go preview — remove or set to null for production (API-driven)
+// Bundled splash video — set to null to use API-driven remote video instead
 const LOCAL_SPLASH_VIDEO = require('../images/video/ramadan2.mp4');
 
 export default function RootLayout() {
