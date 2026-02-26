@@ -433,7 +433,7 @@ export default function ConcernDetailScreen() {
 
         {/* SEO intro text hidden — only relevant for web crawlers, not native app */}
 
-        <View style={{ height: cartItems.length > 0 ? 90 : 40 }} />
+        <View style={{ height: cartItems.length > 0 ? 120 : 40 }} />
       </ScrollView>
 
       {/* Sticky Bottom Bar — expandable, visible when cart has items */}
