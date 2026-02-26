@@ -45,6 +45,7 @@ export default function ConcernDetailScreen() {
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
   const [expandedFaq, setExpandedFaq] = useState({});
   const [justAddedIds, setJustAddedIds] = useState({});
+  const [productsExpanded, setProductsExpanded] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const toastTimer = useRef(null);
@@ -310,19 +311,32 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* Products Grid */}
+        {/* Products Grid — collapsible */}
         {products && products.length > 0 ? (
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-              {locale === 'ar' ? `المنتجات الموصى بها (${products.length})` : locale === 'ru' ? `Рекомендуемые продукты (${products.length})` : `Recommended Products (${products.length})`}
-            </Text>
-            <View style={[styles.productsGrid, isRTL && { flexDirection: 'row-reverse' }]}>
-              {products.map((product) => (
-                <View key={product.id} style={{ width: PRODUCT_CARD_WIDTH, marginBottom: GRID_GAP }}>
-                  <ProductGridItem product={product} />
-                </View>
-              ))}
-            </View>
+            <TouchableOpacity
+              style={[styles.collapsibleHeader, isRTL && styles.collapsibleHeaderRTL]}
+              onPress={() => { haptics.lightTap(); setProductsExpanded(prev => !prev); }}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.sectionTitle, { marginBottom: 0 }, isRTL && styles.textRTL]}>
+                {locale === 'ar' ? `المنتجات الموصى بها (${products.length})` : locale === 'ru' ? `Рекомендуемые продукты (${products.length})` : `Recommended Products (${products.length})`}
+              </Text>
+              <Ionicons
+                name={productsExpanded ? 'chevron-up' : 'chevron-down'}
+                size={22}
+                color="#1D1D1F"
+              />
+            </TouchableOpacity>
+            {productsExpanded && (
+              <View style={[styles.productsGrid, isRTL && { flexDirection: 'row-reverse' }]}>
+                {products.map((product) => (
+                  <View key={product.id} style={{ width: PRODUCT_CARD_WIDTH, marginBottom: GRID_GAP }}>
+                    <ProductGridItem product={product} />
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         ) : null}
 
@@ -466,6 +480,8 @@ const styles = StyleSheet.create({
   // Sections
   section: { marginTop: 20, marginBottom: 8 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1D1D1F', marginBottom: 12 },
+  collapsibleHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4, marginBottom: 8 },
+  collapsibleHeaderRTL: { flexDirection: 'row-reverse' },
 
   // Why
   whyGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
