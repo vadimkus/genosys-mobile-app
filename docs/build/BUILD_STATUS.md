@@ -1,11 +1,11 @@
 # ✅ Mobile App Build Status: LIVE ON APP STORE / GOOGLE PLAY READY
 
-## 🎉 Version 1.6.0 (Build 67) — February 26, 2026
+## 🎉 Version 1.6.0 (Build 68) — February 26, 2026
 
-**Status:** Submitted to App Store Connect — awaiting Apple review  
-**Build ID:** `75456f05-355c-4765-b49a-d01142adf9ef`  
-**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/75456f05-355c-4765-b49a-d01142adf9ef  
-**Submission:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/submissions/0cf05309-2ebc-4389-a62d-dad96a7d4af0  
+**Status:** Submitted to App Store Connect via TestFlight  
+**Build ID:** `c893776b-9035-46a7-80ce-39d705b54fb6`  
+**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/c893776b-9035-46a7-80ce-39d705b54fb6  
+**Submission:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/submissions/0bbc6d7b-8e54-4264-ba40-a061b2367684  
 **TestFlight:** https://appstoreconnect.apple.com/apps/6756648064/testflight/ios
 
 ### What's New
@@ -14,6 +14,7 @@
 - Sticky bar UX: per-item remove, clear all, green discount color
 - Pricing fixes: concern page VIP pricing, cart price doubling fix
 - Payment simplification: removed "Generate Link", renamed to "Card Payment"
+- Bag back chevron fix: correctly returns to the previous page
 
 ---
 
@@ -301,7 +302,7 @@ DEL  /mobile/user/wishlist/:id    - Remove from favorites
 | 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
 | 1.3.0 | 53 | Released | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
 | 1.4.0 | 58 | Released | Feb 14, 2026 | Pricing overhaul, checkout improvements, Android polish, Google Play ready |
-| 1.6.0 | 67 | **Current** | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes, payment simplification |
+| 1.6.0 | 68 | **Current** | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes, payment simplification, bag back nav fix |
 | 1.5.0 | 65 | Released | Feb 17, 2026 | Skin concern pages, 100% native, haptics, routine tap-to-add |
 
 ---

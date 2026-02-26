@@ -1,4 +1,4 @@
-# Release Notes — Version 1.6.0 (Build 67)
+# Release Notes — Version 1.6.0 (Build 68)
 
 ## App Store "What's New" Text
 
@@ -24,6 +24,9 @@ Simplified Checkout
 - Only two payment methods: Card Payment (Visa, Mastercard, Apple Pay, Google Pay) and Cash on Delivery
 - Clearer payment labels across all languages
 
+Navigation Fix
+- Back button in the shopping bag now correctly returns to the page you came from
+
 Full English, Arabic (RTL), and Russian support for all new features.
 ```
 
@@ -32,7 +35,7 @@ Full English, Arabic (RTL), and Russian support for all new features.
 | Field | Value |
 |-------|-------|
 | Version | 1.6.0 |
-| Build | 67 |
+| Build | 68 |
 | Copyright | © 2026 Genosys Middle East FZ-LLC |
 | Category | Shopping |
 | Content Rating | 4+ |
@@ -47,8 +50,9 @@ Key areas to review:
 1. App launch → Ramadan video plays for 5 seconds (tap anywhere to skip)
 2. Skin Concern pages → Add products to bag → Verify correct pricing in sticky bar and bag
 3. Sticky cart bar → Per-item remove (x button) and "Clear all" link
-4. Checkout → Only "Cash on Delivery" and "Card Payment" options available
-5. Profile → Language → Switch to Arabic/Russian → Verify all new labels are translated
+4. Bag screen → Tap back chevron → Should return to the page you navigated from
+5. Checkout → Only "Cash on Delivery" and "Card Payment" options available
+6. Profile → Language → Switch to Arabic/Russian → Verify all new labels are translated
 
 Test account credentials are unchanged from previous submissions.
 ```
@@ -72,8 +76,12 @@ Ramadan Kareem! Enjoy a festive launch experience, smarter updates, and an impro
 
 ### Modified Files
 - `app/_layout.js` — Version check, splash config fetch, video overlay integration
-- `app/concern-detail.js` — User context for personalized pricing, sticky bar UX improvements
-- `app/(tabs)/bag.js` — Fixed originalForDisplay price inference
+- `app/concern-detail.js` — User context for personalized pricing, sticky bar UX improvements, JSON navSource for bag back navigation
+- `app/(tabs)/bag.js` — Fixed originalForDisplay price inference; back chevron fix using `useFocusEffect` + JSON navSource
+- `app/product/[id].js` — JSON navSource for bag back navigation
+- `app/bundle-builder.js` — JSON navSource for bag back navigation
+- `app/profile/orders/[id].js` — JSON navSource for bag back navigation
+- `app/profile.js` — JSON navSource for bag back navigation
 - `contexts/CartContext.js` — Conditional originalPrice inference to prevent doubling
 - `services/api.js` — Sends x-user-id header for concern detail API
 - `utils/cartUtils.js` — Discount fallback for missing originalPrice

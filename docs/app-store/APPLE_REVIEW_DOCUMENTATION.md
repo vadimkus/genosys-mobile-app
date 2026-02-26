@@ -3,7 +3,7 @@
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
 **Version:** 1.6.0  
-**Build:** 67  
+**Build:** 68  
 **Platform:** iOS  
 
 ---
@@ -357,7 +357,7 @@ This account is pre-created and ready to use. No email verification required.
 
 | Version | Build | Key Changes |
 |---------|-------|-------------|
-| 1.6.0 | 67 | Ramadan video splash, force update gating, sticky bar UX, pricing fixes, payment simplification |
+| 1.6.0 | 68 | Ramadan video splash, force update gating, sticky bar UX, pricing fixes, payment simplification, bag back nav fix |
 | 1.5.0 | 65 | 8 Skin Concern pages, 100% native, app-wide haptics, routine tap-to-add |
 | 1.4.0 | 58 | Mutually exclusive discounts, auto-populate address, checkout footer, full translation coverage, bundle pricing fixes |
 | 1.3.1 | 56 | Bundle discount alignment, Stripe/Apple Pay bundle processing |
