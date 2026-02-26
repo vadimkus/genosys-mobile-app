@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function TermsScreen() {
   const router = useRouter();
@@ -216,11 +217,10 @@ const styles = StyleSheet.create({
   backButtonRTL: { alignItems: 'flex-end' },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   headerSpacer: { width: 130 },
@@ -237,7 +237,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5EA',
   },
   updateText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     textAlign: 'center',
     fontStyle: 'italic',
@@ -254,16 +255,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F2F2F7',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 12,
-    letterSpacing: -0.4,
   },
   paragraph: {
-    fontSize: 16,
-    color: '#1D1D1F',
-    lineHeight: 24,
+    ...T.body,
     marginBottom: 12,
   },
 
@@ -273,9 +270,7 @@ const styles = StyleSheet.create({
     marginStart: 12,
   },
   bulletPoint: {
-    fontSize: 16,
-    color: '#1D1D1F',
-    lineHeight: 24,
+    ...T.body,
     marginBottom: 4,
   },
 
@@ -287,7 +282,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   contactItem: {
-    fontSize: 16,
+    ...T.body,
     color: '#dc2626',
     marginBottom: 4,
   },

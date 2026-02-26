@@ -33,6 +33,7 @@ import { getLocalizedProductName } from '../utils/productLocalization';
 import { handleDeepLink } from '../utils/deepLinking';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
+import T from '../utils/typography';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -532,8 +533,8 @@ const s = StyleSheet.create({
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   headerActionBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16 },
-  panelHeaderTitle: { fontSize: 14, fontWeight: '700', color: '#ffffff' },
-  panelHeaderSubtitle: { fontSize: 10, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
+  panelHeaderTitle: { ...T.label, fontWeight: '700', color: '#ffffff' },
+  panelHeaderSubtitle: { ...T.badge, fontWeight: '400', color: 'rgba(255,255,255,0.8)', marginTop: 1 },
 
   /* ─── Messages ─── */
   messageList: { flex: 1 },
@@ -559,14 +560,14 @@ const s = StyleSheet.create({
     }),
   },
 
-  messageText: { fontSize: 14, lineHeight: 20 },
+  messageText: { ...T.label, fontWeight: '400', lineHeight: 20, color: undefined },
   userText: { color: '#ffffff' },
   assistantText: { color: '#1F2937' },
-  linkText: { color: '#2563EB', textDecorationLine: 'underline', fontWeight: '600' },
+  linkText: { ...T.link, color: '#2563EB', textDecorationLine: 'underline' },
   textRTL: { textAlign: 'right' },
 
   typingRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  typingText: { fontSize: 12, color: '#6B7280', fontStyle: 'italic' },
+  typingText: { ...T.captionSmall, color: '#6B7280', fontStyle: 'italic' },
 
   /* ─── Quick-action buttons ─── */
   quickActionsContainer: { marginStart: 30, marginTop: 4, marginBottom: 6, gap: 6 },
@@ -579,7 +580,7 @@ const s = StyleSheet.create({
   },
   quickActionBtnHighlight: { backgroundColor: '#dc2626', borderColor: '#dc2626' },
   quickActionEmoji: { fontSize: 11 },
-  quickActionLabel: { fontSize: 11, fontWeight: '600', color: '#374151' },
+  quickActionLabel: { ...T.captionTiny, fontWeight: '600', color: '#374151' },
   quickActionLabelHighlight: { color: '#ffffff' },
 
   /* ─── Product card ─── */
@@ -591,16 +592,16 @@ const s = StyleSheet.create({
   productImage: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#F3F4F6' },
   productImagePlaceholder: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
   productInfo: { flex: 1, marginStart: 8 },
-  productName: { fontSize: 12, fontWeight: '600', color: '#1F2937', lineHeight: 16 },
-  productPrice: { fontSize: 12, fontWeight: '800', color: '#dc2626', marginTop: 2 },
-  productPriceOnRequest: { fontSize: 12, fontWeight: '700', color: '#25D366', marginTop: 2 },
+  productName: { ...T.captionSmall, fontWeight: '600', color: '#1F2937', lineHeight: 16 },
+  productPrice: { ...T.captionSmall, fontWeight: '800', color: '#dc2626', marginTop: 2 },
+  productPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 6, marginTop: 4 },
   addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#dc2626', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
   addToBagBtnAdded: { backgroundColor: '#16A34A' },
   requestQuoteBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#25D366', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
-  addToBagText: { fontSize: 10, fontWeight: '700', color: '#ffffff' },
+  addToBagText: { ...T.badge, color: '#ffffff' },
   viewProductBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, borderWidth: 1, borderColor: '#D1D5DB' },
-  viewProductText: { fontSize: 10, fontWeight: '600', color: '#374151' },
+  viewProductText: { ...T.badge, fontWeight: '600', color: '#374151' },
 
   /* ─── Input bar ─── */
   inputBar: {
@@ -610,7 +611,8 @@ const s = StyleSheet.create({
   },
   inputBarRTL: { flexDirection: 'row-reverse' },
   input: {
-    flex: 1, fontSize: 14, color: '#1F2937', backgroundColor: '#F3F4F6',
+    ...T.label, fontWeight: '400', color: '#1F2937',
+    flex: 1, backgroundColor: '#F3F4F6',
     borderRadius: 18, paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 8 : 6,
     maxHeight: 80, marginEnd: 8, borderWidth: 1, borderColor: '#E5E7EB',

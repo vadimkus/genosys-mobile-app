@@ -18,6 +18,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 const log = createLogger('AddAddress');
 
@@ -405,18 +406,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   cancelText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
+    fontWeight: '400',
   },
   saveText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
-    fontWeight: '600',
   },
   headerButtonDisabled: {
     opacity: 0.5,
@@ -438,12 +438,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#C6C6C8',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
     marginHorizontal: 20,
-    letterSpacing: -0.4,
   },
   formContent: {
     backgroundColor: '#F2F2F7',
@@ -478,7 +476,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
   },
   typeButtonText: {
-    fontSize: 16,
+    ...T.button,
     fontWeight: '500',
     color: '#dc2626',
   },
@@ -495,7 +493,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#C6C6C8',
   },
   fieldLabel: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '500',
     color: '#000000',
     marginBottom: 8,
@@ -506,7 +504,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   textInput: {
-    fontSize: 16,
+    ...T.body,
     color: '#000000',
     backgroundColor: '#ffffff',
     borderRadius: 8,
@@ -554,7 +552,7 @@ const styles = StyleSheet.create({
     borderColor: '#dc2626',
   },
   emirateButtonText: {
-    fontSize: 14,
+    ...T.label,
     color: '#3C3C43',
     fontWeight: '500',
   },
@@ -583,7 +581,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   switchSubtext: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     marginTop: 2,
   },
@@ -602,7 +601,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   deliveryNoteText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     lineHeight: 18,
     flex: 1,

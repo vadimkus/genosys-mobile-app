@@ -21,6 +21,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 const log = createLogger('Blog');
 
@@ -188,13 +189,13 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 24, backgroundColor: '#FAFAFA' },
-  heroTitle: { fontSize: 24, fontWeight: '700', color: '#000', marginBottom: 6, letterSpacing: -0.4 },
-  heroSubtitle: { fontSize: 14, color: '#6B7280', lineHeight: 20 },
+  heroTitle: { ...T.pageTitle, color: '#000', marginBottom: 6 },
+  heroSubtitle: { ...T.caption, color: '#6B7280', lineHeight: 20, fontSize: 14 },
 
   // Posts
   postsSection: { paddingHorizontal: 20, paddingVertical: 16 },
@@ -202,23 +203,23 @@ const styles = StyleSheet.create({
   postImage: { width: '100%', height: 180, backgroundColor: '#F3F4F6' },
   postImagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
   postContent: { padding: 14 },
-  postTitle: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 6, lineHeight: 22 },
-  postExcerpt: { fontSize: 14, color: '#6B7280', lineHeight: 20, marginBottom: 8 },
+  postTitle: { ...T.sectionTitleSmall, fontSize: 17, color: '#111827', marginBottom: 6, lineHeight: 22 },
+  postExcerpt: { ...T.caption, color: '#6B7280', lineHeight: 20, marginBottom: 8, fontSize: 14 },
   postMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   postMetaRTL: { flexDirection: 'row-reverse' },
-  postDate: { fontSize: 12, color: '#9CA3AF' },
+  postDate: { ...T.captionSmall, color: '#9CA3AF' },
   viewsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   viewsRowRTL: { flexDirection: 'row-reverse' },
-  viewsText: { fontSize: 12, color: '#9CA3AF' },
+  viewsText: { ...T.captionSmall, color: '#9CA3AF' },
 
   // States
   loadingState: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   errorState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 },
-  errorTitle: { fontSize: 16, fontWeight: '600', color: '#6B7280' },
+  errorTitle: { ...T.label, fontSize: 16, color: '#6B7280' },
   retryBtn: { backgroundColor: '#1F2937', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  retryBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  retryBtnText: { ...T.buttonSmall, color: '#fff' },
   emptyState: { alignItems: 'center', paddingVertical: 48, gap: 12 },
-  emptyText: { fontSize: 16, color: '#9CA3AF' },
+  emptyText: { ...T.body, color: '#9CA3AF' },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

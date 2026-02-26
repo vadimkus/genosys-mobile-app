@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const VIDEO_WIDTH = SCREEN_WIDTH - 68; // 20 section padding + 14 card padding each side
@@ -220,36 +221,36 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#FAFAFA' },
   logo: { width: 240, height: 72, marginBottom: 16 },
-  heroTitle: { fontSize: 20, fontWeight: '700', color: '#000', textAlign: 'center', marginBottom: 16, letterSpacing: -0.3 },
+  heroTitle: { ...T.sectionTitle, color: '#000', textAlign: 'center', marginBottom: 16 },
   badgeRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
   badge: { backgroundColor: '#FEF2F2', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#FECACA' },
-  badgeText: { fontSize: 13, fontWeight: '600', color: '#dc2626' },
+  badgeText: { ...T.caption, fontWeight: '600', color: '#dc2626' },
   badgeGreen: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
   badgeGreenText: { color: '#16a34a' },
 
   // Sections
   section: { paddingHorizontal: 20, paddingVertical: 24 },
   sectionAlt: { backgroundColor: '#FAFAFA' },
-  sectionTitle: { fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 14, letterSpacing: -0.4 },
-  paragraph: { fontSize: 16, color: '#374151', lineHeight: 24 },
+  sectionTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', marginBottom: 14, letterSpacing: -0.4 },
+  paragraph: { ...T.body, color: '#374151' },
 
   // Technology Cards
   techCard: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16, backgroundColor: '#F9FAFB', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#F3F4F6' },
   techCardRTL: { flexDirection: 'row-reverse' },
   techIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FEF2F2', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   techContent: { flex: 1 },
-  techTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  techDesc: { fontSize: 14, color: '#6B7280', lineHeight: 20 },
+  techTitle: { ...T.label, fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
+  techDesc: { ...T.caption, color: '#6B7280', lineHeight: 20 },
 
   // Videos
   videoCard: { marginBottom: 20, backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#E5E7EB' },
-  videoTitle: { fontSize: 16, fontWeight: '600', color: '#111827', padding: 14, paddingBottom: 0 },
+  videoTitle: { ...T.label, fontSize: 16, color: '#111827', padding: 14, paddingBottom: 0 },
   videoWrapper: { height: VIDEO_HEIGHT, margin: 14, borderRadius: 10, overflow: 'hidden', backgroundColor: '#000', position: 'relative' },
   videoThumbnail: { width: '100%', height: '100%' },
   playOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' },
@@ -258,14 +259,14 @@ const styles = StyleSheet.create({
   // Product Showcase
   productImageCard: { backgroundColor: '#F9FAFB', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#F3F4F6' },
   productImage: { width: '100%', height: SCREEN_WIDTH * 0.65, backgroundColor: '#ffffff' },
-  productCaption: { fontSize: 13, color: '#6B7280', textAlign: 'center', paddingHorizontal: 16, paddingVertical: 12, lineHeight: 18 },
+  productCaption: { ...T.caption, color: '#6B7280', textAlign: 'center', paddingHorizontal: 16, paddingVertical: 12, lineHeight: 18 },
 
   // Footer
   footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
-  footerText: { fontSize: 15, fontWeight: '600', color: '#6B7280' },
-  footerSub: { fontSize: 13, color: '#9CA3AF', marginTop: 4 },
-  footerLink: { fontSize: 14, color: '#dc2626', fontWeight: '600' },
-  footerCopyright: { fontSize: 12, color: '#C7C7CC', marginTop: 12 },
+  footerText: { ...T.bodySmall, fontWeight: '600', color: '#6B7280', lineHeight: undefined },
+  footerSub: { ...T.caption, color: '#9CA3AF', marginTop: 4 },
+  footerLink: { ...T.link, color: '#dc2626' },
+  footerCopyright: { ...T.captionSmall, color: '#C7C7CC', marginTop: 12 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

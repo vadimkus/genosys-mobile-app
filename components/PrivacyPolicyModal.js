@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import PrivacyPolicyContent from './PrivacyPolicyContent';
+import T from '../utils/typography';
 
 export default function PrivacyPolicyModal({ visible, onClose, showCloseButton = true }) {
   const { t, dir } = useLocalization();
@@ -53,8 +54,7 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
     flex: 1,
     textAlign: 'center',

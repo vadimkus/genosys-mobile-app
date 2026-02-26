@@ -52,6 +52,7 @@ import {
   deriveDiscountFromBadges,
 } from '../../utils/productDetailUtils';
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
+import T from '../../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Product detail hero image height
@@ -182,11 +183,9 @@ const videoStyles = StyleSheet.create({
     marginBottom: 32,
   },
   title: {
-    fontSize: 20,
+    ...T.sectionTitle,
     fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 16,
-    letterSpacing: -0.3,
   },
   container: {
     borderRadius: 12,
@@ -1116,8 +1115,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   loadingText: {
+    ...T.body,
     marginTop: 16,
-    fontSize: 16,
     color: '#86868B',
     fontWeight: '500',
   },
@@ -1219,25 +1218,19 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   category: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
+    letterSpacing: 0.5,
     color: '#dc2626',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
     marginBottom: 8,
   },
   productName: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.pageTitleLarge,
     lineHeight: 34,
     marginBottom: 12,
-    letterSpacing: -0.5,
   },
   price: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.priceLarge,
     marginBottom: 8,
   },
   priceBlock: {
@@ -1261,9 +1254,8 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   discountBadgeText: {
+    ...T.badgeMedium,
     color: '#27AE60',
-    fontSize: 12,
-    fontWeight: '700',
     letterSpacing: 0.2,
   },
   size: {
@@ -1275,11 +1267,9 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 20,
+    ...T.sectionTitle,
     fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 16,
-    letterSpacing: -0.3,
   },
   beautyBoxPriceLineWrap: {
     marginTop: 12,
@@ -1350,8 +1340,7 @@ const styles = StyleSheet.create({
     borderColor: '#BBF7D0',
   },
   description: {
-    fontSize: 16,
-    lineHeight: 24,
+    ...T.body,
     color: '#1D1D1F',
   },
   noteText: {
@@ -1406,10 +1395,9 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   listText: {
+    ...T.bodySmall,
     flex: 1,
-    fontSize: 15,
     color: '#1D1D1F',
-    lineHeight: 22,
   },
   specList: {
     backgroundColor: '#F8F9FA',
@@ -1432,10 +1420,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   specLabel: {
+    ...T.label,
     width: 124,
-    fontSize: 14,
     color: '#6E6E73',
-    fontWeight: '600',
     lineHeight: 20,
   },
   specLabelRTL: {
@@ -1450,9 +1437,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   specValueText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#1D1D1F',
-    lineHeight: 22,
   },
   specValueTextRTL: {
     textAlign: 'right',
@@ -1718,9 +1704,7 @@ const styles = StyleSheet.create({
     marginStart: 8,
   },
   addToBagText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#ffffff',
+    ...T.buttonLarge,
   },
   sizeInfoContainer: {
     flexDirection: 'row',
@@ -1733,15 +1717,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   sizeInfo: {
-    fontSize: 14,
-    color: '#1D1D1F',
+    ...T.label,
+    fontWeight: '400',
     backgroundColor: '#F2F2F7',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   stockInfo: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#34C759',
     fontWeight: '600',
     backgroundColor: '#F0F9FF',
@@ -1750,14 +1734,11 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   originalPrice: {
-    fontSize: 14,
-    color: '#86868B',
-    textDecorationLine: 'line-through',
+    ...T.priceStrikethrough,
   },
   discountedPrice: {
+    ...T.priceDiscount,
     fontSize: 20,
-    fontWeight: '700',
-    color: '#dc2626',
   },
   // Beauty Boxes detail page pricing styles
   beautyBoxDetailPricing: {
@@ -1829,7 +1810,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   docsSectionTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#1D1D1F',
     marginBottom: 10,

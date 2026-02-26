@@ -15,6 +15,7 @@ import {
   getLocalizedProductDescription,
   getCategoryTranslationKey,
 } from '../utils/productLocalization';
+import T from '../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.8;
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   category: {
-    fontSize: 12,
+    ...T.productCategory,
     fontWeight: '600',
     color: '#dc2626',
     textTransform: 'uppercase',
@@ -134,14 +135,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   name: {
+    ...T.sectionTitle,
     fontSize: 22,
     fontWeight: '600',
-    color: '#1D1D1F',
+    letterSpacing: 0,
     marginBottom: 8,
     lineHeight: 28,
   },
   description: {
-    fontSize: 16,
+    ...T.body,
     color: '#6E6E73',
     lineHeight: 22,
     marginBottom: 16,
@@ -161,9 +163,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   price: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitleSmall,
+    letterSpacing: 0,
   },
   inStockBadge: {
     backgroundColor: '#34C759',
@@ -172,9 +173,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   inStockText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
+    ...T.badgeMedium,
     textTransform: 'uppercase',
   },
   orderBadge: {
@@ -184,9 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   orderText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
+    ...T.badgeMedium,
     textTransform: 'uppercase',
   },
 });

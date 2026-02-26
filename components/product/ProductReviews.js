@@ -19,6 +19,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
 import { createLogger } from '../../utils/logger';
+import T from '../../utils/typography';
 
 const log = createLogger('ProductReviews');
 
@@ -340,11 +341,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   sectionTitle: {
-    fontSize: 20,
+    ...T.sectionTitle,
     fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 6,
-    letterSpacing: -0.3,
   },
   ratingRow: {
     flexDirection: 'row',
@@ -366,12 +365,12 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   avgRatingText: {
-    fontSize: 16,
+    ...T.price,
     fontWeight: '600',
-    color: '#1D1D1F',
   },
   reviewCountText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#6B7280',
   },
   writeButton: {
@@ -384,9 +383,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   writeButtonText: {
+    ...T.labelSmall,
     color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
   },
   // Form
   formContainer: {
@@ -396,45 +394,42 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   formTitle: {
-    fontSize: 16,
+    ...T.price,
     fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 12,
   },
   formLabel: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '500',
     color: '#374151',
     marginTop: 12,
     marginBottom: 6,
   },
   input: {
+    ...T.input,
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#D1D5DB',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 15,
-    color: '#1D1D1F',
   },
   inputRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
   },
   textarea: {
+    ...T.input,
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#D1D5DB',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 15,
-    color: '#1D1D1F',
     minHeight: 100,
   },
   charCount: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#9CA3AF',
     marginTop: 4,
   },
@@ -457,9 +452,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitButtonText: {
-    color: '#ffffff',
+    ...T.buttonSmall,
     fontSize: 15,
-    fontWeight: '600',
   },
   cancelButton: {
     flex: 1,
@@ -469,9 +463,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#374151',
+    ...T.buttonSmall,
     fontSize: 15,
-    fontWeight: '600',
+    color: '#374151',
   },
   // Reviews list
   reviewsList: {
@@ -502,18 +496,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   reviewerName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.label,
   },
   reviewTitleText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '500',
-    color: '#1D1D1F',
     marginTop: 2,
   },
   reviewDate: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#9CA3AF',
     marginTop: 2,
   },
@@ -528,9 +519,10 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   reviewComment: {
-    fontSize: 14,
-    lineHeight: 20,
+    ...T.label,
+    fontWeight: '400',
     color: '#374151',
+    lineHeight: 20,
   },
   // Empty & loading
   loadingContainer: {
@@ -541,7 +533,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   loadingText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#6B7280',
   },
   emptyContainer: {
@@ -550,7 +543,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptyText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#9CA3AF',
     textAlign: 'center',
   },

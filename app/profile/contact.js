@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function ContactScreen() {
   const router = useRouter();
@@ -201,11 +202,10 @@ const styles = StyleSheet.create({
   backButtonRTL: { alignItems: 'flex-end' },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   headerSpacer: { width: 130 },
@@ -230,15 +230,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+    ...T.pageTitle,
     color: '#000000',
     textAlign: 'center',
     marginBottom: 8,
-    letterSpacing: -0.4,
   },
   heroSubtitle: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
     textAlign: 'center',
     lineHeight: 22,
@@ -262,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   countryText: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
   },
 
@@ -272,11 +270,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
-    letterSpacing: -0.4,
   },
 
   // Contact Cards
@@ -307,19 +303,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   contactTitle: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#000000',
     marginBottom: 2,
   },
   contactValue: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#dc2626',
     fontWeight: '500',
     marginBottom: 2,
   },
   contactDescription: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
   },
 
@@ -334,7 +330,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   distributorText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#000000',
     marginStart: 10,
     flex: 1,
@@ -362,12 +358,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   fieldLabel: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '500',
     color: '#000000',
     marginBottom: 8,
   },
   textInput: {
+    ...T.input,
     backgroundColor: '#ffffff',
     borderRadius: 8,
     padding: 12,
@@ -388,8 +385,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sendButtonText: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#ffffff',
   },
 
@@ -411,8 +407,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   officeTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   mapButton: {
@@ -422,8 +417,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   mapButtonText: {
-    fontSize: 14,
-    color: '#ffffff',
+    ...T.buttonSmall,
     fontWeight: '500',
   },
   officeDetails: {
@@ -434,7 +428,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   officeText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     marginStart: 8,
     flex: 1,
@@ -466,13 +460,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   faqTitle: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#000000',
     marginBottom: 2,
   },
   faqSubtitle: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
   },
 
@@ -483,7 +476,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   responseText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     textAlign: 'center',
     lineHeight: 20,

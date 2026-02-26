@@ -21,6 +21,7 @@ import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   headerSpacer: { width: 40 },
 
   scrollView: { flex: 1 },
@@ -156,31 +157,31 @@ const styles = StyleSheet.create({
   // Hero Section
   heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#ffffff' },
   logo: { width: 240, height: 72, marginBottom: 14 },
-  heroTitle: { fontSize: 24, fontWeight: '700', color: '#000000', textAlign: 'center', marginBottom: 8, letterSpacing: -0.4 },
+  heroTitle: { ...T.pageTitle, color: '#000000', textAlign: 'center', marginBottom: 8 },
   countryRow: { marginTop: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   countryRowRtl: { flexDirection: 'row-reverse' },
   flagText: { fontSize: 14 },
-  countryText: { fontSize: 16, color: '#8E8E93' },
+  countryText: { ...T.body, color: '#8E8E93', lineHeight: undefined },
 
   // Sections
   section: { paddingHorizontal: 20, paddingVertical: 24 },
-  sectionTitle: { fontSize: 22, fontWeight: '700', color: '#000000', marginBottom: 16, letterSpacing: -0.4 },
-  paragraph: { fontSize: 16, color: '#1D1D1F', lineHeight: 24, marginBottom: 12 },
+  sectionTitle: { ...T.sectionTitle, fontSize: 22, color: '#000000', marginBottom: 16, letterSpacing: -0.4 },
+  paragraph: { ...T.body, color: '#1D1D1F', marginBottom: 12 },
 
   card: { backgroundColor: '#F2F2F7', borderRadius: 14, padding: 16, marginBottom: 14 },
-  cardTitle: { fontSize: 16, fontWeight: '800', color: '#111827', marginBottom: 12 },
+  cardTitle: { ...T.label, fontSize: 16, fontWeight: '800', color: '#111827', marginBottom: 12 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#E5E5EA' },
-  infoLabel: { fontSize: 13, fontWeight: '700', color: '#6B7280', width: '38%', paddingEnd: 8 },
-  infoValue: { fontSize: 14, fontWeight: '700', color: '#111827', width: '62%', textAlign: 'right' },
+  infoLabel: { ...T.caption, fontWeight: '700', color: '#6B7280', width: '38%', paddingEnd: 8 },
+  infoValue: { ...T.label, fontWeight: '700', color: '#111827', width: '62%', textAlign: 'right' },
   infoValueLink: { color: '#2563eb' },
 
   // Footer
   footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
-  footerText: { fontSize: 15, fontWeight: '600', color: '#6B7280' },
-  footerSub: { fontSize: 13, color: '#9CA3AF', marginTop: 4 },
-  footerLink: { fontSize: 14, color: '#dc2626', fontWeight: '600' },
-  footerCopyright: { fontSize: 12, color: '#C7C7CC', marginTop: 12 },
-  footerVersion: { fontSize: 12, color: '#C7C7CC', marginTop: 6 },
+  footerText: { ...T.bodySmall, fontWeight: '600', color: '#6B7280', lineHeight: undefined },
+  footerSub: { ...T.caption, color: '#9CA3AF', marginTop: 4 },
+  footerLink: { ...T.link, color: '#dc2626' },
+  footerCopyright: { ...T.captionSmall, color: '#C7C7CC', marginTop: 12 },
+  footerVersion: { ...T.captionSmall, color: '#C7C7CC', marginTop: 6 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

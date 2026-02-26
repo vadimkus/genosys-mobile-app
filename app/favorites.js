@@ -21,6 +21,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 import AUTH_CONFIG from '../config/auth';
 
 const log = createLogger('FavoritesScreen');
@@ -201,17 +202,15 @@ export default function FavoritesScreen() {
                     const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
                     const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
                     const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
+                    const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
                     const isBeautyBox = isBeautyBoxProduct(product);
 
                     const baseBadges = (product.badges || []).filter((badge) => {
                       const text = (badge.text || '').toLowerCase().trim();
                       if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
-                      // Remove "Bundle Offer" badge from Beauty Boxes
                       if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
-                      // Remove "Professional" badge from specific products
                       if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
-                      // Keep "New" only for PDRN mask
-                      if (text === 'new' && !(isPdrnMask || isBioFermentMask)) return false;
+                      if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
                       return true;
                     });
 
@@ -224,9 +223,8 @@ export default function FavoritesScreen() {
                       }
                     }
 
-                    // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
                     const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
-                    if (isBioFermentMask && !hasNewBadge) {
+                    if ((isBioFermentMask || isRevitaGlow) && !hasNewBadge) {
                       computedBadges.push({ text: t('common.new'), color: '#007AFF', priority: 1 });
                     }
 
@@ -380,8 +378,8 @@ const styles = StyleSheet.create({
     width: 40,
   },
   title: {
+    ...T.navTitle,
     fontSize: 18,
-    fontWeight: '600',
     color: '#000000',
   },
   headerRight: {
@@ -390,8 +388,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   countText: {
-    fontSize: 16,
-    fontWeight: '600',
+    ...T.button,
     color: '#dc2626',
   },
   scrollView: {
@@ -415,15 +412,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+    ...T.pageTitle,
     color: '#000000',
     marginTop: 20,
     marginBottom: 12,
     textAlign: 'center',
   },
   emptySubtitle: {
-    fontSize: 16,
+    ...T.body,
     color: '#86868B',
     textAlign: 'center',
     lineHeight: 22,
@@ -441,9 +437,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   browseButtonText: {
+    ...T.buttonLarge,
     fontSize: 17,
-    fontWeight: '600',
-    color: '#ffffff',
   },
   
   // Grid
@@ -521,24 +516,19 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   badgeText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: '700',
+    ...T.badge,
     textTransform: 'uppercase',
   },
   gridContent: {
     padding: 12,
   },
   gridName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.productName,
     marginBottom: 4,
     lineHeight: 18,
   },
   gridCategory: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.productCategory,
     marginBottom: 8,
     textTransform: 'capitalize',
   },
@@ -560,27 +550,22 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   gridPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.price,
     marginBottom: 4,
   },
   originalPrice: {
+    ...T.priceStrikethrough,
     fontSize: 12,
     color: '#86868B',
-    textDecorationLine: 'line-through',
     marginBottom: 2,
   },
   discountedPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#dc2626',
+    ...T.priceDiscount,
     marginBottom: 2,
   },
   savings: {
-    fontSize: 10,
+    ...T.badge,
     color: '#27AE60',
-    fontWeight: '600',
     marginBottom: 2,
   },
   vatText: {
@@ -617,7 +602,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   priceOnRequestText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#25D366',
   },
@@ -625,9 +610,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   addToCartText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#ffffff',
+    ...T.buttonSmall,
   },
   
   footer: {

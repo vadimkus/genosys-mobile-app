@@ -16,6 +16,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling } from '../../services/databaseService';
 import { mediumTap } from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -208,8 +209,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   addButton: {
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5EA',
   },
   infoText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     textAlign: 'center',
   },
@@ -239,11 +239,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
-    letterSpacing: -0.4,
   },
 
   methodRow: {
@@ -271,13 +269,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   methodTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#000000',
     marginBottom: 2,
   },
   methodSubtitle: {
-    fontSize: 13,
+    ...T.caption,
     color: '#8E8E93',
   },
 
@@ -294,8 +292,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   noteText: {
+    ...T.caption,
     flex: 1,
-    fontSize: 13,
     color: '#6B7280',
     lineHeight: 18,
   },
@@ -313,17 +311,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   billingLabel: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '500',
     color: '#000000',
   },
   billingLink: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#dc2626',
     fontWeight: '500',
   },
   billingAddress: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
   },
 
@@ -334,11 +332,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   securityTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
-    letterSpacing: -0.4,
   },
   securityCard: {
     backgroundColor: '#ffffff',
@@ -363,13 +359,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   securityItemTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#000000',
     marginBottom: 4,
   },
   securityItemText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     lineHeight: 18,
   },

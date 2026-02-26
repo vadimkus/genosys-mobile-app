@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'r
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
+import T from '../utils/typography';
 
 export default function PrivacyPolicyContent({ showLastUpdated = true }) {
   const { t, dir } = useLocalization();
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E7',
   },
-  updateText: { fontSize: 14, color: '#666', fontStyle: 'italic' },
+  updateText: { ...T.label, fontWeight: '400', color: '#666', fontStyle: 'italic' },
   highlightSection: {
     backgroundColor: '#FFF3F3',
     marginHorizontal: 20,
@@ -184,20 +185,20 @@ const styles = StyleSheet.create({
     borderRightWidth: 4,
     borderRightColor: '#dc2626',
   },
-  highlightTitle: { fontSize: 18, fontWeight: '700', color: '#dc2626', marginBottom: 8 },
-  highlightText: { fontSize: 16, lineHeight: 24, color: '#333' },
+  highlightTitle: { ...T.sectionTitleSmall, color: '#dc2626', marginBottom: 8 },
+  highlightText: { ...T.body, color: '#333' },
   section: { paddingHorizontal: 20, paddingVertical: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: '600', color: '#1D1D1F', marginBottom: 12 },
-  paragraph: { fontSize: 16, lineHeight: 24, color: '#333', marginBottom: 16 },
+  sectionTitle: { ...T.sectionTitleSmall, fontWeight: '600', marginBottom: 12 },
+  paragraph: { ...T.body, color: '#333', marginBottom: 16 },
   listContainer: { marginVertical: 8 },
   listItem: { marginBottom: 12, paddingStart: 16 },
   listItemRTL: { paddingStart: 16 },
-  listItemLabel: { fontSize: 16, fontWeight: '600', color: '#1D1D1F', marginBottom: 4 },
-  listItemText: { fontSize: 16, lineHeight: 22, color: '#333' },
+  listItemLabel: { ...T.button, color: '#1D1D1F', marginBottom: 4 },
+  listItemText: { ...T.body, color: '#333', lineHeight: 22 },
   subSection: { marginBottom: 16, paddingStart: 16 },
   subSectionRTL: { paddingStart: 16 },
-  subSectionLabel: { fontSize: 16, fontWeight: '600', color: '#1D1D1F', marginBottom: 4 },
-  subSectionText: { fontSize: 16, lineHeight: 22, color: '#333' },
+  subSectionLabel: { ...T.button, color: '#1D1D1F', marginBottom: 4 },
+  subSectionText: { ...T.body, color: '#333', lineHeight: 22 },
   contactInfo: {
     marginTop: 16,
     padding: 16,
@@ -206,13 +207,14 @@ const styles = StyleSheet.create({
   },
   contactItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, paddingStart: 4 },
   contactLink: {
-    fontSize: 16,
+    ...T.body,
     color: '#dc2626',
+    lineHeight: undefined,
     textDecorationLine: 'underline',
     marginStart: 8,
   },
-  contactText: { fontSize: 16, color: '#333', marginStart: 8, flex: 1, lineHeight: 22 },
-  link: { color: '#dc2626', textDecorationLine: 'underline' },
+  contactText: { ...T.body, color: '#333', lineHeight: 22, marginStart: 8, flex: 1 },
+  link: { ...T.link, color: '#dc2626', textDecorationLine: 'underline' },
   rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },

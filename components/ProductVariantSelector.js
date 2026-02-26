@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { isCushionBB } from '../utils/productRules';
+import T from '../utils/typography';
 
 const parseMaybeJSON = (value) => {
   if (value === null || value === undefined) return null;
@@ -161,9 +162,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 16,
+    ...T.price,
     fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 12,
   },
   optionsScroll: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderColor: '#dc2626',
   },
   colorLabel: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '500',
     color: '#666666',
     textAlign: 'center',
@@ -240,9 +240,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   sizeLabel: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '500',
-    color: '#1D1D1F',
     textAlign: 'center',
     marginBottom: 2,
   },
@@ -251,7 +250,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sizePrice: {
-    fontSize: 11,
+    ...T.captionTiny,
     color: '#666666',
     textAlign: 'center',
   },
@@ -276,9 +275,9 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
   unavailableText: {
-    fontSize: 10,
-    color: '#EF4444',
+    ...T.badge,
     fontWeight: '500',
+    color: '#EF4444',
     marginTop: 2,
   },
 });

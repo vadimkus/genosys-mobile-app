@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_GAP = 12;
@@ -194,9 +195,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
+    ...T.navTitle,
     flex: 1,
-    fontSize: 17,
-    fontWeight: '600',
     color: '#1D1D1F',
     textAlign: 'center',
   },
@@ -215,13 +215,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pageTitle: {
+    ...T.pageTitle,
     fontSize: 22,
-    fontWeight: '700',
+    letterSpacing: -0.3,
     color: '#1D1D1F',
     textAlign: 'center',
-    letterSpacing: -0.3,
   },
   pageSubtitle: {
+    ...T.caption,
     fontSize: 14,
     color: '#86868B',
     textAlign: 'center',
@@ -256,16 +257,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardTitle: {
+    ...T.label,
     fontSize: 15,
-    fontWeight: '600',
     color: '#1D1D1F',
     lineHeight: 20,
     marginBottom: 6,
     textAlign: 'center',
   },
   cardDescription: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.captionSmall,
     lineHeight: 17,
     marginBottom: 10,
     textAlign: 'center',
@@ -280,8 +280,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   exploreText: {
-    fontSize: 13,
-    fontWeight: '600',
+    ...T.labelSmall,
     color: '#dc2626',
   },
   textRTL: {

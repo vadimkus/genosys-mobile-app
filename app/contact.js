@@ -20,6 +20,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 export default function ContactScreen() {
   const router = useRouter();
@@ -206,6 +207,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
+    ...T.navTitle,
     flex: 1,
     textAlign: 'center',
     fontSize: 18,
@@ -226,12 +228,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+    ...T.pageTitle,
     color: '#000000',
     textAlign: 'center',
     marginBottom: 8,
-    letterSpacing: -0.4,
   },
   logo: {
     width: 240,
@@ -252,8 +252,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   countryText: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
+    lineHeight: undefined,
   },
 
   // Sections
@@ -262,8 +263,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
     letterSpacing: -0.4,
@@ -297,20 +297,21 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   contactTitle: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#000000',
     marginBottom: 2,
   },
   contactValue: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#dc2626',
     fontWeight: '500',
     marginBottom: 2,
+    lineHeight: undefined,
   },
   contactDescription: {
-    fontSize: 14,
+    ...T.caption,
     color: '#8E8E93',
+    fontSize: 14,
   },
 
   distributorCard: {
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   distributorText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#000000',
     marginStart: 10,
     flex: 1,

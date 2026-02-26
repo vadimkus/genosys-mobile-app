@@ -31,6 +31,7 @@ import { getLocalizedProductName } from '../utils/productLocalization';
 import { handleDeepLink } from '../utils/deepLinking';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
+import T from '../utils/typography';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -523,8 +524,8 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerCenter: { flex: 1, alignItems: 'center' },
   headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  headerTitle: { fontSize: 15, fontWeight: '700', color: '#ffffff' },
-  headerSubtitle: { fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
+  headerTitle: { ...T.bodySmall, fontWeight: '700', color: '#ffffff', lineHeight: undefined },
+  headerSubtitle: { ...T.captionTiny, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
 
   /* ─── Messages ─── */
   messageList: { flex: 1 },
@@ -568,14 +569,14 @@ const styles = StyleSheet.create({
     }),
   },
 
-  messageText: { fontSize: 15, lineHeight: 22 },
+  messageText: { ...T.bodySmall, color: undefined },
   userText: { color: '#ffffff' },
   assistantText: { color: '#1F2937' },
-  linkText: { color: '#2563EB', textDecorationLine: 'underline', fontWeight: '600' },
+  linkText: { ...T.link, color: '#2563EB', textDecorationLine: 'underline' },
   textRTL: { textAlign: 'right' },
 
   typingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  typingText: { fontSize: 13, color: '#6B7280', fontStyle: 'italic' },
+  typingText: { ...T.caption, color: '#6B7280', fontStyle: 'italic' },
 
   /* ─── Quick-action buttons ─── */
   quickActionsContainer: {
@@ -611,7 +612,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   quickActionLabel: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
     color: '#374151',
   },
@@ -650,8 +651,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   productInfo: { flex: 1, marginStart: 10 },
-  productName: { fontSize: 13, fontWeight: '600', color: '#1F2937', lineHeight: 18 },
-  productPrice: { fontSize: 13, fontWeight: '800', color: '#dc2626', marginTop: 2 },
+  productName: { ...T.labelSmall, color: '#1F2937', lineHeight: 18 },
+  productPrice: { ...T.labelSmall, fontWeight: '800', color: '#dc2626', marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 8, marginTop: 6 },
   addToBagBtn: {
     flexDirection: 'row',
@@ -672,8 +673,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 6,
   },
-  productPriceOnRequest: { fontSize: 13, fontWeight: '700', color: '#25D366', marginTop: 2 },
-  addToBagText: { fontSize: 11, fontWeight: '700', color: '#ffffff' },
+  productPriceOnRequest: { ...T.labelSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
+  addToBagText: { ...T.captionTiny, fontWeight: '700', color: '#ffffff' },
   viewProductBtn: {
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -681,7 +682,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D1D5DB',
   },
-  viewProductText: { fontSize: 11, fontWeight: '600', color: '#374151' },
+  viewProductText: { ...T.captionTiny, fontWeight: '600', color: '#374151' },
 
   /* ─── Input bar ─── */
   inputBar: {
@@ -696,8 +697,8 @@ const styles = StyleSheet.create({
   },
   inputBarRTL: { flexDirection: 'row-reverse' },
   input: {
+    ...T.input,
     flex: 1,
-    fontSize: 15,
     color: '#1F2937',
     backgroundColor: '#F3F4F6',
     borderRadius: 20,

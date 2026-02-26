@@ -7,6 +7,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { updateUserSettings } from '../../services/databaseService';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 const LOCALES = ['en', 'ru', 'ar'];
 
@@ -105,9 +106,9 @@ const styles = StyleSheet.create({
   backButtonRTL: { alignItems: 'flex-end' },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  headerTitle: { fontSize: 16, fontWeight: '700', color: '#1D1D1F' },
+  headerTitle: { ...T.body, fontWeight: '700', color: '#1D1D1F' },
   headerSpacer: { width: 130 },
   card: {
     margin: 16,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5EA',
   },
-  subtitle: { fontSize: 14, fontWeight: '700', color: '#1D1D1F', marginBottom: 12 },
+  subtitle: { ...T.label, fontWeight: '700', color: '#1D1D1F', marginBottom: 12 },
   row: {
     paddingVertical: 14,
     paddingHorizontal: 14,
@@ -139,9 +140,9 @@ const styles = StyleSheet.create({
     borderColor: '#27AE60',
     backgroundColor: '#F0FFF4',
   },
-  rowText: { fontSize: 15, fontWeight: '600', color: '#1D1D1F' },
+  rowText: { ...T.bodySmall, fontWeight: '600', color: '#1D1D1F' },
   rowTextActive: { color: '#14532D' },
-  note: { marginTop: 8, fontSize: 12, color: '#8E8E93', lineHeight: 18 },
+  note: { ...T.captionSmall, marginTop: 8, color: '#8E8E93', lineHeight: 18 },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });
 

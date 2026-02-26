@@ -14,6 +14,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 const log = createLogger('Orders');
 
@@ -743,9 +744,9 @@ const styles = StyleSheet.create({
   backButton: { padding: 4 },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { fontSize: 14, color: '#dc2626', fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  headerTitle: { fontSize: 18, fontWeight: '600', color: '#000000' },
+  headerTitle: { ...T.sectionTitleSmall, color: '#000000' },
   headerSpacer: { width: 28 },
   refreshButton: { padding: 4 },
   scrollView: { flex: 1 },
@@ -754,8 +755,8 @@ const styles = StyleSheet.create({
   emptyUniImage: { width: 240, height: 240, marginBottom: 24 },
   centerRTL: { alignItems: 'flex-end' },
   loadingText: { marginTop: 12, color: '#8E8E93' },
-  emptyTitle: { fontSize: 18, fontWeight: '600', color: '#1D1D1F', marginBottom: 6, textAlign: 'center' },
-  emptyText: { fontSize: 14, color: '#8E8E93', textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { ...T.sectionTitleSmall, marginBottom: 6, textAlign: 'center' },
+  emptyText: { ...T.label, fontWeight: '400', color: '#8E8E93', textAlign: 'center', lineHeight: 20 },
   shopButton: {
     marginTop: 18,
     backgroundColor: '#dc2626',
@@ -766,9 +767,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   shopButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...T.button,
   },
   shopButtonTextRTL: {
     writingDirection: 'rtl',
@@ -808,7 +807,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F2F7',
   },
   detailsPillRTL: { flexDirection: 'row-reverse' },
-  detailsPillText: { fontSize: 12, fontWeight: '700', color: '#1D1D1F' },
+  detailsPillText: { ...T.captionSmall, fontWeight: '700', color: '#1D1D1F' },
   deletePill: {
     width: 36,
     height: 32,
@@ -822,9 +821,9 @@ const styles = StyleSheet.create({
   },
   statusRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
   statusRowRTL: { justifyContent: 'flex-end' },
-  orderNumber: { fontSize: 15, fontWeight: '700', color: '#1D1D1F' },
+  orderNumber: { ...T.bodySmall, fontWeight: '700', color: '#1D1D1F' },
   statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  statusText: { fontSize: 12, fontWeight: '700' },
+  statusText: { ...T.badgeMedium },
   metaRow: {
     marginTop: 6,
     flexDirection: 'row',
@@ -840,14 +839,14 @@ const styles = StyleSheet.create({
   },
   metaRightRTL: { flexDirection: 'row-reverse' },
   appleLogo: { marginEnd: 4 },
-  metaText: { marginTop: 6, fontSize: 12, color: '#8E8E93' },
+  metaText: { ...T.captionSmall, marginTop: 6, color: '#8E8E93' },
   cardBottom: { marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   cardBottomRTL: { flexDirection: 'row-reverse' },
-  totalText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
-  itemsText: { fontSize: 12, color: '#8E8E93' },
+  totalText: { ...T.priceSmall, color: '#dc2626' },
+  itemsText: { ...T.captionSmall, color: '#8E8E93' },
   breakdownRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
   breakdownRowRTL: { justifyContent: 'flex-end' },
-  breakdownText: { fontSize: 12, color: '#8E8E93' },
+  breakdownText: { ...T.captionSmall, color: '#8E8E93' },
   orderSummaryBody: {
     marginTop: 12,
     backgroundColor: '#F2F2F7',
@@ -856,10 +855,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5EA',
   },
-  orderSummaryTitle: { fontSize: 13, fontWeight: '800', color: '#1D1D1F', marginBottom: 8 },
-  orderSummaryLine: { fontSize: 12, color: '#3C3C43', lineHeight: 18, marginBottom: 4 },
+  orderSummaryTitle: { ...T.labelSmall, fontWeight: '800', color: '#1D1D1F', marginBottom: 8 },
+  orderSummaryLine: { ...T.captionSmall, color: '#3C3C43', lineHeight: 18, marginBottom: 4 },
   orderSummaryItemRow: { marginBottom: 6 },
-  orderSummaryLineMuted: { fontSize: 12, color: '#6B7280', lineHeight: 18 },
+  orderSummaryLineMuted: { ...T.captionSmall, color: '#6B7280', lineHeight: 18 },
   orderSummaryPriceStrike: { textDecorationLine: 'line-through', color: '#9CA3AF', fontWeight: '700' },
   orderSummaryPriceFinal: { color: '#dc2626', fontWeight: '800' },
   orderSummaryDivider: { height: 1, backgroundColor: '#E5E5EA', marginTop: 10, marginBottom: 6 },
@@ -921,7 +920,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   payButtonDisabled: { opacity: 0.6 },
-  payButtonText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
+  payButtonText: { ...T.buttonSmall, fontWeight: '700' },
   supportButton: {
     marginTop: 10,
     flexDirection: 'row',
@@ -932,7 +931,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
   },
-  supportButtonText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
+  supportButtonText: { ...T.buttonSmall, fontWeight: '700' },
   buttonRTL: { flexDirection: 'row-reverse' },
   // Keep prices readable in RTL contexts.
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },

@@ -18,6 +18,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 const log = createLogger('Addresses');
 
@@ -304,8 +305,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   addButton: {
@@ -323,13 +323,14 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   emptyTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#000000',
     marginBottom: 6,
   },
   emptySubtitle: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#6B7280',
     lineHeight: 20,
   },
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5EA',
   },
   infoText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     textAlign: 'center',
   },
@@ -376,8 +377,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   addressType: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#000000',
     marginStart: 8,
   },
@@ -393,8 +393,7 @@ const styles = StyleSheet.create({
     marginEnd: 8,
   },
   defaultText: {
-    fontSize: 12,
-    color: '#ffffff',
+    ...T.badgeMedium,
     fontWeight: '600',
   },
   moreButton: {
@@ -409,18 +408,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   addressName: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '500',
     color: '#000000',
     marginBottom: 4,
   },
   addressText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     marginBottom: 2,
   },
   addressPhone: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     marginTop: 4,
   },
@@ -459,7 +458,7 @@ const styles = StyleSheet.create({
     marginStart: 0,
   },
   addNewText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
     fontWeight: '500',
     flexShrink: 1,
@@ -474,8 +473,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   tipsTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
     marginBottom: 12,
   },
@@ -487,7 +485,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   tipText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     marginStart: 8,
     flex: 1,
@@ -510,7 +508,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   loadingText: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
     marginTop: 12,
   },

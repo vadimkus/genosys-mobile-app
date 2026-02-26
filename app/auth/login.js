@@ -25,6 +25,7 @@ import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import AUTH_CONFIG from '../../config/auth';
 import Constants from 'expo-constants';
+import T from '../../utils/typography';
 
 // expo-apple-authentication is iOS-only; safe-load to prevent Android build/runtime issues
 let AppleAuthentication = null;
@@ -799,7 +800,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   langButtonText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '800',
     color: '#16A34A',
   },
@@ -834,9 +835,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
   },
   langMenuItemText: {
-    fontSize: 14,
+    ...T.label,
     color: '#111827',
-    fontWeight: '600',
   },
   langMenuItemTextRtl: {
     textAlign: 'right',
@@ -855,9 +855,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '400',
-    color: '#1D1D1F',
     marginBottom: 0,
     textAlign: 'center',
   },
@@ -877,7 +876,7 @@ const styles = StyleSheet.create({
     marginTop: -1,
   },
   subtitle: {
-    fontSize: 16,
+    ...T.body,
     color: '#86868B',
     textAlign: 'center',
     lineHeight: 22,
@@ -919,14 +918,15 @@ const styles = StyleSheet.create({
     marginLeft: 0,
   },
   googleIconText: {
-    color: '#ffffff',
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '700',
+    color: '#ffffff',
   },
   googleButtonText: {
-    fontSize: 15,
+    ...T.bodySmall,
     fontWeight: '700',
     color: '#1D1D1F',
+    lineHeight: undefined,
   },
   googleButtonDisabled: {
     opacity: 0.5,
@@ -952,9 +952,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   appleButtonText: {
-    fontSize: 15,
+    ...T.bodySmall,
     fontWeight: '700',
     color: '#ffffff',
+    lineHeight: undefined,
   },
   appleButtonDisabled: {
     opacity: 0.5,
@@ -977,9 +978,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   biometricButtonText: {
-    fontSize: 15,
+    ...T.bodySmall,
     fontWeight: '700',
     color: '#ffffff',
+    lineHeight: undefined,
     marginLeft: 12,
   },
   socialRow: {
@@ -1004,10 +1006,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E5EA',
   },
   dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
-    color: '#86868B',
+    ...T.label,
     fontWeight: '500',
+    color: '#86868B',
+    marginHorizontal: 16,
   },
   form: {
     marginBottom: 24,
@@ -1016,20 +1018,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
+    ...T.button,
     color: '#1D1D1F',
     marginBottom: 8,
   },
   textInput: {
+    ...T.body,
+    color: '#1D1D1F',
+    lineHeight: undefined,
+    fontWeight: undefined,
     backgroundColor: '#F2F2F7',
     borderWidth: 1,
     borderColor: '#E5E5EA',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#1D1D1F',
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -1040,11 +1043,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   passwordInput: {
+    ...T.body,
+    color: '#1D1D1F',
+    lineHeight: undefined,
+    fontWeight: undefined,
     flex: 1,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#1D1D1F',
   },
   passwordToggle: {
     paddingHorizontal: 16,
@@ -1066,8 +1071,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   authButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
+    ...T.button,
     fontWeight: '700',
   },
   forgotPassword: {
@@ -1075,16 +1079,17 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   forgotPasswordText: {
-    fontSize: 14,
-    color: '#dc2626',
+    ...T.label,
     fontWeight: '500',
+    color: '#dc2626',
   },
   switchMode: {
     alignItems: 'center',
     marginTop: 20,
   },
   switchModeText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#86868B',
     textAlign: 'center',
   },
@@ -1092,9 +1097,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   switchModeButton: {
-    fontSize: 15,
-    color: '#dc2626',
+    ...T.bodySmall,
     fontWeight: '700',
+    color: '#dc2626',
+    lineHeight: undefined,
   },
 
   // Required field star
@@ -1118,8 +1124,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   selectButtonText: {
-    fontSize: 16,
+    ...T.body,
     color: '#1D1D1F',
+    lineHeight: undefined,
+    fontWeight: undefined,
   },
   selectButtonTextRTL: {
     textAlign: 'right',
@@ -1129,7 +1137,7 @@ const styles = StyleSheet.create({
   },
   // Birthday hint
   birthdayHint: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#86868B',
     marginTop: 6,
   },
@@ -1154,8 +1162,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   emirateMenuTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    ...T.price,
     color: '#1D1D1F',
     textAlign: 'center',
     paddingVertical: 14,
@@ -1175,9 +1182,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
   },
   emirateMenuItemText: {
-    fontSize: 16,
+    ...T.body,
     color: '#1D1D1F',
     fontWeight: '500',
+    lineHeight: undefined,
   },
   emirateMenuItemTextRtl: {
     textAlign: 'right',
@@ -1213,14 +1221,14 @@ const styles = StyleSheet.create({
     borderColor: '#dc2626',
   },
   privacyText: {
-    flex: 1,
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#3C3C43',
     lineHeight: 20,
+    flex: 1,
   },
   privacyLink: {
-    color: '#007AFF',
-    fontWeight: '600',
+    ...T.link,
     textDecorationLine: 'underline',
   },
   
@@ -1235,10 +1243,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   privacyNoticeText: {
-    fontSize: 13,
+    ...T.caption,
+    fontWeight: '500',
     color: '#856404',
     textAlign: 'center',
-    fontWeight: '500',
   },
 
   // RTL-specific styles for Arabic

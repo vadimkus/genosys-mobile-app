@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, I18nManager } from 'react-native';
 import ProgressBar from './ProgressBar';
+import T from '../utils/typography';
 
 /**
  * Generic progress card used for promo/free-shipping progress UIs.
@@ -77,17 +78,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   leftText: {
+    ...T.price,
     flex: 1,
     minWidth: 0,
     flexShrink: 1,
-    fontSize: 16,
-    color: '#1D1D1F',
-    fontWeight: '700',
   },
   rightText: {
-    fontSize: 14,
-    color: '#6B7280',
+    ...T.label,
     fontWeight: '700',
+    color: '#6B7280',
   },
   rightTextMet: {
     color: '#34C759',

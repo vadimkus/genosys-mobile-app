@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
 
 export default function DeliveryScreen() {
@@ -216,13 +217,13 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Sections
   section: { paddingHorizontal: 20, paddingVertical: 24 },
   sectionAlt: { backgroundColor: '#F9FAFB' },
-  sectionTitle: { fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 16, letterSpacing: -0.4 },
+  sectionTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', marginBottom: 16, letterSpacing: -0.4 },
 
   // Delivery Methods
   methodCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, backgroundColor: '#F9FAFB', borderRadius: 14, padding: 16, borderWidth: 2, borderColor: '#F3F4F6' },
@@ -230,14 +231,14 @@ const styles = StyleSheet.create({
   methodCardSelected: { borderColor: '#dc2626', backgroundColor: '#FFF5F5' },
   methodIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   methodContent: { flex: 1 },
-  methodTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  methodDesc: { fontSize: 15, fontWeight: '600', color: '#dc2626', marginBottom: 2 },
-  methodPartner: { fontSize: 13, color: '#6B7280' },
+  methodTitle: { ...T.label, fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
+  methodDesc: { ...T.bodySmall, fontWeight: '600', color: '#dc2626', marginBottom: 2, lineHeight: undefined },
+  methodPartner: { ...T.caption, color: '#6B7280' },
 
   // Free Shipping
   freeShippingBanner: { marginHorizontal: 20, backgroundColor: '#F0FDF4', borderRadius: 16, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: '#BBF7D0' },
-  freeShippingTitle: { fontSize: 20, fontWeight: '700', color: '#16a34a', marginTop: 8 },
-  freeShippingDesc: { fontSize: 15, color: '#4B5563', marginTop: 4 },
+  freeShippingTitle: { ...T.sectionTitle, color: '#16a34a', marginTop: 8 },
+  freeShippingDesc: { ...T.bodySmall, color: '#4B5563', marginTop: 4, lineHeight: undefined },
 
   // Shipping Rates
   ratesCard: { backgroundColor: '#F9FAFB', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F3F4F6' },
@@ -245,9 +246,9 @@ const styles = StyleSheet.create({
   rateRowRTL: { flexDirection: 'row-reverse' },
   rateRowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
   rateRowSelected: { backgroundColor: '#FEF2F2' },
-  rateEmirate: { flex: 1, fontSize: 15, fontWeight: '500', color: '#374151' },
+  rateEmirate: { ...T.bodySmall, flex: 1, fontWeight: '500', color: '#374151', lineHeight: undefined },
   rateEmirateSelected: { fontWeight: '700', color: '#111827' },
-  rateAmount: { fontSize: 15, fontWeight: '700', color: '#111827' },
+  rateAmount: { ...T.bodySmall, fontWeight: '700', color: '#111827', lineHeight: undefined },
   rateAmountSelected: { color: '#dc2626' },
 
   // Return Policy
@@ -256,14 +257,14 @@ const styles = StyleSheet.create({
   policyItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
   policyItemRTL: { flexDirection: 'row-reverse' },
   policyIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  policyText: { flex: 1, fontSize: 14, color: '#374151', lineHeight: 20 },
+  policyText: { ...T.faqAnswer, flex: 1, color: '#374151', lineHeight: 20 },
 
   // Help
   helpSection: { paddingHorizontal: 20, paddingVertical: 24, alignItems: 'center' },
-  helpTitle: { fontSize: 18, fontWeight: '700', color: '#000', marginBottom: 14 },
+  helpTitle: { ...T.sectionTitleSmall, color: '#000', marginBottom: 14 },
   helpBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#25D366', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 14 },
   helpBtnRTL: { flexDirection: 'row-reverse' },
-  helpBtnText: { color: '#ffffff', fontSize: 16, fontWeight: '600' },
+  helpBtnText: { ...T.button, color: '#ffffff' },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

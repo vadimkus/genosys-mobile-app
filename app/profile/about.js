@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -142,11 +143,10 @@ const styles = StyleSheet.create({
   },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   headerSpacer: { width: 130 },
@@ -167,12 +167,10 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+    ...T.pageTitle,
     color: '#000000',
     textAlign: 'center',
     marginBottom: 8,
-    letterSpacing: -0.4,
   },
   countryRow: {
     marginTop: 2,
@@ -188,11 +186,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   countryText: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
   },
   versionText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#C7C7CC',
   },
 
@@ -202,17 +201,14 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   sectionTitle: {
+    ...T.sectionTitle,
     fontSize: 22,
-    fontWeight: '700',
     color: '#000000',
     marginBottom: 16,
-    letterSpacing: -0.4,
   },
 
   paragraph: {
-    fontSize: 16,
-    color: '#1D1D1F',
-    lineHeight: 24,
+    ...T.body,
     marginBottom: 12,
   },
 
@@ -223,7 +219,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   cardTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '800',
     color: '#111827',
     marginBottom: 12,
@@ -237,14 +233,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5EA',
   },
   infoLabel: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '700',
     color: '#6B7280',
     width: '38%',
     paddingEnd: 8,
   },
   infoValue: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#111827',
     width: '62%',
@@ -262,12 +258,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   footerText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     textAlign: 'center',
   },
   footerSubtext: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#C7C7CC',
     textAlign: 'center',
     marginTop: 8,

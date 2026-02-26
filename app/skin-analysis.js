@@ -27,6 +27,7 @@ import { useCart } from '../contexts/CartContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import T from '../utils/typography';
 
 const log = createLogger('SkinAnalysis');
 
@@ -506,7 +507,7 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 16, fontWeight: '700', color: '#1F2937' },
+  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700', color: '#1F2937', flex: 1, textAlign: 'center' },
 
   // Progress bar
   progressBar: {
@@ -535,14 +536,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   landingTitle: {
-    fontSize: 24,
+    ...T.pageTitle,
     fontWeight: '800',
     color: '#1F2937',
     marginBottom: 8,
     textAlign: 'center',
   },
   landingSubtitle: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 40,
@@ -560,7 +561,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
   },
-  startButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  startButtonText: { ...T.button, fontWeight: '700' },
   cameraButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -574,11 +575,11 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
   },
-  cameraButtonText: { fontSize: 16, fontWeight: '700', color: '#dc2626' },
+  cameraButtonText: { ...T.button, fontWeight: '700', color: '#dc2626' },
 
   // Quiz steps
   stepContent: { padding: 24 },
-  stepTitle: { fontSize: 20, fontWeight: '700', color: '#1F2937', marginBottom: 24 },
+  stepTitle: { ...T.sectionTitle, color: '#1F2937', marginBottom: 24 },
   textCenter: { textAlign: 'center' },
   textRTL: { textAlign: 'right' },
 
@@ -601,8 +602,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF2F2',
   },
   optionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
     color: '#374151',
     marginTop: 8,
     textAlign: 'center',
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
     borderColor: '#dc2626',
   },
-  chipText: { fontSize: 14, fontWeight: '600', color: '#374151' },
+  chipText: { ...T.label, color: '#374151' },
   chipTextSelected: { color: '#ffffff' },
 
   // Footer
@@ -648,11 +648,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   nextButtonDisabled: { backgroundColor: '#D1D5DB' },
-  nextButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  nextButtonText: { ...T.button, fontWeight: '700' },
 
   // Loading
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  loadingText: { fontSize: 15, color: '#6B7280' },
+  loadingText: { ...T.bodySmall, color: '#6B7280', lineHeight: undefined },
 
   // Results
   resultsContent: { padding: 16, paddingBottom: 40 },
@@ -667,10 +667,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 6,
   },
-  profileLabel: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
-  profileValue: { fontSize: 13, fontWeight: '700', color: '#1F2937', maxWidth: '60%', textAlign: 'right' },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#1F2937', marginBottom: 16 },
-  noResults: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginTop: 20 },
+  profileLabel: { ...T.labelSmall, color: '#6B7280' },
+  profileValue: { ...T.labelSmall, fontWeight: '700', color: '#1F2937', maxWidth: '60%', textAlign: 'right' },
+  sectionTitle: { ...T.sectionTitleSmall, fontWeight: '800', color: '#1F2937', marginBottom: 16 },
+  noResults: { ...T.label, fontWeight: '400', color: '#6B7280', textAlign: 'center', marginTop: 20 },
 
   // Recommendation card
   recCard: {
@@ -689,8 +689,8 @@ const styles = StyleSheet.create({
   recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#F3F4F6' },
   recImagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
   recInfo: { flex: 1, marginStart: 12 },
-  recName: { fontSize: 14, fontWeight: '600', color: '#1F2937', lineHeight: 20 },
-  recPrice: { fontSize: 14, fontWeight: '800', color: '#dc2626', marginTop: 4 },
+  recName: { ...T.label, color: '#1F2937', lineHeight: 20 },
+  recPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {
     flexDirection: 'row',
@@ -711,8 +711,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 6,
   },
-  recPriceOnRequest: { fontSize: 13, fontWeight: '700', color: '#25D366', marginTop: 2 },
-  recAddText: { fontSize: 12, fontWeight: '700', color: '#fff' },
+  recPriceOnRequest: { ...T.labelSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
+  recAddText: { ...T.captionSmall, fontWeight: '700', color: '#fff' },
   recViewBtn: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D1D5DB',
   },
-  recViewText: { fontSize: 12, fontWeight: '600', color: '#374151' },
+  recViewText: { ...T.captionSmall, fontWeight: '600', color: '#374151' },
 
   errorBox: {
     backgroundColor: '#FEF2F2',
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 16,
   },
-  errorText: { fontSize: 14, color: '#991B1B', textAlign: 'center', lineHeight: 20 },
+  errorText: { ...T.label, fontWeight: '400', color: '#991B1B', textAlign: 'center', lineHeight: 20 },
   retryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 4,
   },
-  retryBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  retryBtnText: { ...T.buttonSmall, fontWeight: '700' },
 
   concernCta: {
     marginTop: 24,
@@ -753,8 +753,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   concernCtaIcon: { fontSize: 28, marginBottom: 8 },
-  concernCtaTitle: { fontSize: 17, fontWeight: '700', color: '#1D1D1F', marginBottom: 4, textAlign: 'center' },
-  concernCtaDesc: { fontSize: 13, color: '#86868B', textAlign: 'center', lineHeight: 18, marginBottom: 14 },
+  concernCtaTitle: { ...T.navTitle, fontWeight: '700', marginBottom: 4, textAlign: 'center' },
+  concernCtaDesc: { ...T.caption, textAlign: 'center', lineHeight: 18, marginBottom: 14 },
   concernCtaBtnRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
   },
-  concernCtaBtnText: { fontSize: 14, fontWeight: '700', color: '#ffffff' },
+  concernCtaBtnText: { ...T.buttonSmall, fontWeight: '700' },
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -776,5 +776,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#dc2626',
   },
-  resetButtonText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
+  resetButtonText: { ...T.bodySmall, fontWeight: '700', color: '#dc2626', lineHeight: undefined },
 });

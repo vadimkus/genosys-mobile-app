@@ -55,6 +55,7 @@ import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import NavigationDrawer from '../../components/NavigationDrawer';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
+import T from '../../utils/typography';
 
 
 const log = createLogger('Shop');
@@ -250,17 +251,15 @@ export default function ShopScreen() {
             const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
             const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
             const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
+            const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
             const isBeautyBox = isBeautyBoxProduct(product);
 
             const baseBadges = (product.badges || []).filter((badge) => {
               const text = (badge.text || '').toLowerCase().trim();
               if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
-              // Remove "Bundle Offer" badge from Beauty Boxes
               if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
-              // Remove "Professional" badge from specific products
               if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
-              // Keep "New" only for PDRN mask
-              if (text === 'new' && !(isPdrnMask || isBioFermentMask)) return false;
+              if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
               return true;
             });
 
@@ -273,9 +272,8 @@ export default function ShopScreen() {
               }
             }
 
-            // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
             const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
-            if (isBioFermentMask && !hasNewBadge) {
+            if ((isBioFermentMask || isRevitaGlow) && !hasNewBadge) {
               computedBadges.push({ text: t('common.new'), color: '#007AFF', priority: 1 });
             }
 
@@ -1100,10 +1098,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
+    ...T.body,
     color: '#86868B',
-    fontWeight: '500',
+    marginTop: 16,
   },
   scrollView: {
     flex: 1,
@@ -1171,16 +1168,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 10,
+    marginStart: 6,
   },
   langButtonText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '800',
     color: '#16A34A', // matches website (green)
   },
   hamburgerBtn: {
     padding: 6,
     borderRadius: 8,
-    marginStart: 2,
+    marginStart: -4,
   },
   aiLinkBtn: {
     paddingHorizontal: 6,
@@ -1189,10 +1187,10 @@ const styles = StyleSheet.create({
     marginStart: 2,
   },
   aiLinkText: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '900',
-    color: '#dc2626',
     letterSpacing: 0.5,
+    color: '#dc2626',
   },
   langOverlay: {
     flex: 1,
@@ -1220,9 +1218,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2', // primary-50
   },
   langMenuItemText: {
-    fontSize: 14,
+    ...T.label,
     color: '#111827',
-    fontWeight: '600',
   },
   langMenuItemTextRtl: {
     textAlign: 'right',
@@ -1236,11 +1233,11 @@ const styles = StyleSheet.create({
     height: 36,
   },
   subtitle: {
-    fontSize: 12,
-    color: '#8E8E93',
+    ...T.captionSmall,
     fontWeight: '500',
-    textAlign: 'center',
     letterSpacing: 0.2,
+    color: '#8E8E93',
+    textAlign: 'center',
   },
   subtitleWrap: {
     position: 'relative',
@@ -1278,7 +1275,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   favoritesBadgeText: {
-    fontSize: 10,
+    ...T.badge,
     fontWeight: '600',
     color: '#ffffff',
     textAlign: 'center',
@@ -1307,8 +1304,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   userInitials: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
     color: '#ffffff',
   },
   onlineDot: {
@@ -1333,9 +1329,9 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   productCount: {
-    fontSize: 13,
-    color: '#dc2626',
+    ...T.caption,
     fontWeight: '500',
+    color: '#dc2626',
     marginTop: 8,
     textAlign: 'left',
   },
@@ -1343,12 +1339,10 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
+    ...T.sectionTitle,
     fontSize: 22,
-    fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 16,
     paddingHorizontal: 20,
-    letterSpacing: -0.3,
   },
   gridContainer: {
     flexDirection: 'row',
@@ -1399,9 +1393,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   gridName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.productName,
     marginBottom: 4,
     lineHeight: 18,
   },
@@ -1410,8 +1402,7 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
   gridCategory: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.productCategory,
     marginBottom: 4,
   },
   gridCategoryRTL: {
@@ -1419,8 +1410,7 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
   gridDescription: {
-    fontSize: 11,
-    color: '#86868B',
+    ...T.productDescription,
     lineHeight: 14,
     marginBottom: 6,
   },
@@ -1429,9 +1419,7 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
   gridPrice: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.priceSmall,
   },
 
   // Search Styles
@@ -1455,9 +1443,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   searchInput: {
+    ...T.body,
+    lineHeight: undefined,
     flex: 1,
-    fontSize: 16,
-    color: '#1D1D1F',
     paddingVertical: 0,
   },
   clearButton: {
@@ -1523,22 +1511,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   voiceTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitleSmall,
     marginBottom: 8,
   },
   voicePartialText: {
-    fontSize: 15,
-    color: '#dc2626',
+    ...T.bodySmall,
     fontWeight: '500',
+    color: '#dc2626',
     textAlign: 'center',
     marginBottom: 16,
     minHeight: 20,
   },
   voiceHintText: {
+    ...T.caption,
     fontSize: 14,
-    color: '#86868B',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -1551,9 +1537,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   voiceStopText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.label,
   },
 
   // No Results Styles
@@ -1563,16 +1547,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   noResultsTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.sectionTitle,
     marginBottom: 8,
   },
   noResultsText: {
-    fontSize: 16,
+    ...T.body,
     color: '#86868B',
     textAlign: 'center',
-    lineHeight: 22,
     marginBottom: 20,
   },
   clearButtonsContainer: {
@@ -1595,9 +1576,7 @@ const styles = StyleSheet.create({
     maxWidth: 220,
   },
   clearSearchText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...T.button,
     textAlign: 'center',
   },
 
@@ -1666,9 +1645,8 @@ const styles = StyleSheet.create({
     color: '#dc2626',
   },
   categoryButtonText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '500',
-    color: '#1D1D1F',
   },
   ruCategoryButtonText: {
     fontSize: 13,
@@ -1703,9 +1681,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   badgeText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: '700',
+    ...T.badge,
     textTransform: 'uppercase',
   },
   
@@ -1738,9 +1714,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stockOverlayText: {
-    color: '#ffffff',
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#ffffff',
   },
   
   
@@ -1754,14 +1730,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   originalPrice: {
+    ...T.priceStrikethrough,
     fontSize: 12,
-    color: '#86868B',
-    textDecorationLine: 'line-through',
   },
   discountedPrice: {
+    ...T.priceDiscount,
     fontSize: 15,
-    fontWeight: '700',
-    color: '#dc2626',
   },
   savings: {
     fontSize: 10,
@@ -1810,10 +1784,9 @@ const styles = StyleSheet.create({
     minHeight: 36,
   },
   priceOnRequestText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#dc2626',
+    ...T.label,
     letterSpacing: 0.3,
+    color: '#dc2626',
   },
   addToCartButtonDisabled: {
     backgroundColor: '#95A5A6',
@@ -1827,8 +1800,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   addToCartText: {
-    color: '#ffffff',
-    fontSize: 12,
+    ...T.buttonTiny,
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -1904,13 +1876,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buildSetTitle: {
-    fontSize: 15,
+    ...T.label,
     fontWeight: '700',
-    color: '#1D1D1F',
+    fontSize: 15,
     marginBottom: 2,
   },
   buildSetSubtitle: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#6B7280',
     lineHeight: 16,
   },

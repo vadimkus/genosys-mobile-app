@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling, updateUserBilling } from '../../services/databaseService';
+import T from '../../utils/typography';
 
 export default function BillingScreen() {
   const router = useRouter();
@@ -126,17 +127,17 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backButton: { padding: 4 },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: '600', color: '#000' },
+  headerTitle: { ...T.sectionTitleSmall, flex: 1, textAlign: 'center', color: '#000' },
   headerSpacer: { width: 32 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scroll: { flex: 1 },
   content: { padding: 20, paddingBottom: 32 },
-  label: { fontSize: 14, fontWeight: '700', color: '#111827', marginBottom: 8 },
+  label: { ...T.label, fontWeight: '700', color: '#111827', marginBottom: 8 },
   input: {
+    ...T.input,
     backgroundColor: '#F2F2F7',
     borderRadius: 12,
     padding: 14,
-    fontSize: 15,
     color: '#111827',
   },
   textarea: { minHeight: 96, textAlignVertical: 'top' },
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveBtnDisabled: { opacity: 0.7 },
-  saveText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  saveText: { ...T.button, fontWeight: '700' },
 });
 
 

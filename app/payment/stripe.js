@@ -10,6 +10,7 @@ import { fetchUserOrderById, fetchUserOrders } from '../../services/api';
 import AUTH_CONFIG from '../../config/auth';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
+import T from '../../utils/typography';
 
 const log = createLogger('StripePayment');
 
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   backButton: { padding: 4 },
-  headerTitle: { fontSize: 16, fontWeight: '700', color: '#1D1D1F' },
+  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700' },
   headerSpacer: { width: 28 },
   content: { flex: 1, padding: 20, gap: 12 },
   card: {
@@ -259,9 +260,9 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#ffffff',
   },
-  title: { fontSize: 18, fontWeight: '700', color: '#1D1D1F' },
-  subtitle: { marginTop: 6, fontSize: 14, color: '#8E8E93', lineHeight: 20 },
-  status: { marginTop: 10, fontSize: 14, color: '#1D1D1F', fontWeight: '600' },
+  title: { ...T.sectionTitleSmall },
+  subtitle: { ...T.label, fontWeight: '400', color: '#8E8E93', lineHeight: 20, marginTop: 6 },
+  status: { ...T.label, color: '#1D1D1F', marginTop: 10 },
   primaryButton: {
     marginTop: 14,
     flexDirection: 'row',
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
   },
-  primaryButtonText: { color: '#ffffff', fontSize: 15, fontWeight: '700' },
+  primaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
   secondaryButton: {
     marginTop: 10,
     flexDirection: 'row',
@@ -285,11 +286,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#FFF5F5',
   },
-  secondaryButtonText: { color: '#dc2626', fontSize: 15, fontWeight: '700' },
+  secondaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700', color: '#dc2626' },
   linkButton: { alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 12 },
-  linkText: { color: '#007AFF', fontSize: 14, fontWeight: '600' },
+  linkText: { ...T.link },
   buttonDisabled: { opacity: 0.6 },
-  note: { marginTop: 12, fontSize: 12, color: '#8E8E93', lineHeight: 18 },
+  note: { ...T.captionSmall, color: '#8E8E93', lineHeight: 18, marginTop: 12 },
 });
 
 

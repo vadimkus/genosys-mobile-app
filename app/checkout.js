@@ -38,6 +38,7 @@ import {
   getDeliveryEtaInfo,
   computeSavingsAED,
 } from '../utils/checkoutFormUtils';
+import T from '../utils/typography';
 
 export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
@@ -789,8 +790,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
     textAlign: 'center',
   },
@@ -801,10 +801,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   headerSteps: {
-    marginTop: 2,
-    fontSize: 12,
-    color: '#6B7280',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#6B7280',
+    marginTop: 2,
   },
   stepsRow: {
     marginTop: 4,
@@ -820,9 +820,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepText: {
-    fontSize: 12,
-    color: '#9CA3AF',
+    ...T.captionSmall,
     fontWeight: '700',
+    color: '#9CA3AF',
   },
   stepTextActive: {
     color: '#111827',
@@ -878,14 +878,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   orderNumber: {
-    fontSize: 18,
-    fontWeight: '700',
+    ...T.mono,
     color: '#ffffff',
-    fontFamily: 'monospace',
   },
   itemCount: {
-    fontSize: 14,
+    ...T.label,
     color: '#ffffff',
+    fontWeight: '400',
     opacity: 0.9,
   },
   orderSummaryBody: {
@@ -896,19 +895,17 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   orderSummaryTitle: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '800',
-    color: '#1D1D1F',
     marginBottom: 8,
   },
   orderSummarySection: {
-    marginTop: 10,
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '800',
-    color: '#1D1D1F',
+    marginTop: 10,
   },
   orderSummaryLine: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#3C3C43',
     lineHeight: 18,
     marginBottom: 4,
@@ -929,23 +926,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   orderTotalsLabel: {
-    fontSize: 12,
-    color: '#3C3C43',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#3C3C43',
   },
   orderTotalsValue: {
-    fontSize: 12,
-    color: '#1D1D1F',
+    ...T.captionSmall,
     fontWeight: '700',
+    color: '#1D1D1F',
   },
   orderTotalsLabelStrong: {
-    fontSize: 13,
-    color: '#1D1D1F',
+    ...T.labelSmall,
     fontWeight: '800',
   },
   orderTotalsValueStrong: {
-    fontSize: 13,
-    color: '#1D1D1F',
+    ...T.labelSmall,
     fontWeight: '900',
   },
 
@@ -968,9 +963,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   sectionTitle: {
-    fontSize: 17,
+    ...T.navTitle,
     fontWeight: '700',
-    color: '#1D1D1F',
   },
 
   // Form
@@ -989,7 +983,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
     color: '#6B7280',
     marginBottom: 6,
@@ -1001,13 +995,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
+    ...T.input,
     borderWidth: 1,
     borderColor: '#D1D1D6',
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 15,
-    color: '#1D1D1F',
     backgroundColor: '#ffffff',
   },
   selectInput: {
@@ -1026,9 +1019,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   selectText: {
+    ...T.input,
     flex: 1,
-    fontSize: 15,
-    color: '#1D1D1F',
   },
   selectPlaceholder: {
     color: '#9CA3AF',
@@ -1051,9 +1043,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   phonePrefixText: {
-    fontSize: 15,
+    ...T.input,
     fontWeight: '500',
-    color: '#1D1D1F',
     letterSpacing: 0.2,
   },
   inputWrap: {
@@ -1075,10 +1066,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   helperError: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#dc2626',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#dc2626',
+    marginTop: 6,
   },
   helperErrorRTL: {
     textAlign: 'right',
@@ -1128,8 +1119,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    ...T.price,
     color: '#111827',
   },
   modalCloseButton: {
@@ -1140,7 +1130,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   modalOptionText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#dc2626',
   },
@@ -1169,26 +1159,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   modalAddressType: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '800',
     color: '#111827',
     marginBottom: 4,
   },
   modalAddressName: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '700',
     color: '#111827',
     marginBottom: 2,
   },
   modalAddressLine: {
-    fontSize: 13,
+    ...T.caption,
     color: '#374151',
   },
   modalAddressMeta: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#6B7280',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#6B7280',
+    marginTop: 4,
   },
   pinButton: {
     flexDirection: 'row',
@@ -1217,12 +1207,12 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   pinButtonText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
     color: '#007AFF',
   },
   pinRowButtonText: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '700',
     color: '#007AFF',
   },
@@ -1270,7 +1260,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   emirateText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '500',
     color: '#3C3C43',
     flexShrink: 1,
@@ -1286,9 +1276,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   emirateShipping: {
-    fontSize: 12,
-    color: '#8E8E93',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#8E8E93',
   },
   freeBadge: {
     paddingHorizontal: 10,
@@ -1299,16 +1289,16 @@ const styles = StyleSheet.create({
     borderColor: '#DCFCE7',
   },
   freeBadgeText: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '800',
     color: '#16A34A',
   },
   deliveryEtaHint: {
+    ...T.captionSmall,
+    fontWeight: '600',
+    color: '#6B7280',
     marginTop: 2,
     marginBottom: 8,
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '600',
   },
 
   // Payment
@@ -1336,12 +1326,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   paymentTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    ...T.button,
     color: '#1D1D1F',
   },
   paymentDescription: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     marginLeft: 32,
   },
@@ -1352,9 +1342,9 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
   paymentHint: {
-    fontSize: 12,
-    color: '#6B7280',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#6B7280',
     marginTop: -6,
     marginBottom: 10,
   },
@@ -1369,15 +1359,15 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   trustText: {
-    fontSize: 12,
-    color: '#6B7280',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#6B7280',
   },
   trustTextSecondary: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#9CA3AF',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#9CA3AF',
+    marginTop: 6,
     marginLeft: 22,
   },
   trustTextSecondaryRTL: {
@@ -1398,13 +1388,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   summaryLabel: {
-    fontSize: 14,
+    ...T.summaryLabel,
     color: '#3C3C43',
   },
   summaryValue: {
-    fontSize: 14,
+    ...T.summaryValue,
     fontWeight: '500',
-    color: '#1D1D1F',
   },
   summaryValueRTL: {
     textAlign: 'left',
@@ -1419,9 +1408,9 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   freeShippingText: {
-    fontSize: 12,
-    color: '#27AE60',
+    ...T.captionSmall,
     fontWeight: '500',
+    color: '#27AE60',
   },
   totalRow: {
     flexDirection: 'row',
@@ -1433,17 +1422,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   totalLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.totalLabel,
   },
   totalValue: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.totalValue,
     color: '#dc2626',
   },
   vatNote: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#8E8E93',
     textAlign: 'center',
     marginTop: 8,
@@ -1456,31 +1442,27 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
   summaryLabelDiscount: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#7C3AED',
   },
   summaryValueDiscount: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#7C3AED',
   },
   summaryLabelIntermediate: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#9CA3AF',
   },
   summaryValueIntermediate: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#9CA3AF',
   },
   summaryLabelBundle: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#16A34A',
   },
   summaryValueBundle: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#16A34A',
   },
   summaryDividerLight: {
@@ -1489,21 +1471,19 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   summaryLabelBold: {
-    fontSize: 14,
+    ...T.summaryValue,
     fontWeight: '700',
-    color: '#1D1D1F',
   },
   summaryValueBold: {
-    fontSize: 14,
+    ...T.summaryValue,
     fontWeight: '700',
-    color: '#1D1D1F',
   },
   summaryValueFree: {
     color: '#16A34A',
     fontWeight: '600',
   },
   vatNoteRed: {
-    fontSize: 11,
+    ...T.captionTiny,
     color: '#dc2626',
     paddingVertical: 2,
   },
@@ -1518,7 +1498,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   youSavedText: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '700',
     color: '#15803D',
   },
@@ -1574,17 +1554,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   footerTotalLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
     color: '#374151',
   },
   footerTotalValue: {
-    fontSize: 18,
+    ...T.sectionTitleSmall,
     fontWeight: '800',
     color: '#111827',
+    letterSpacing: 0,
   },
   footerShippingNote: {
-    fontSize: 11,
+    ...T.captionTiny,
     color: '#9CA3AF',
     textAlign: 'center',
     marginBottom: 8,
@@ -1596,9 +1576,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   reviewText: {
-    fontSize: 12,
-    color: '#6B7280',
+    ...T.captionSmall,
     fontWeight: '700',
+    color: '#6B7280',
     lineHeight: 16,
   },
   stickySummaryRow: {
@@ -1624,7 +1604,7 @@ const styles = StyleSheet.create({
     borderColor: '#DCFCE7',
   },
   savingsPillText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '800',
     color: '#16A34A',
   },
@@ -1641,7 +1621,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   etaPillText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '700',
     color: '#6B7280',
     textAlign: 'right',
@@ -1667,9 +1647,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   placeOrderButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#ffffff',
+    ...T.buttonLarge,
   },
   // RTL support (footer)
   footerDetailsRTL: {

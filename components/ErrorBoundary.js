@@ -13,6 +13,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { createLogger } from '../utils/logger';
+import T from '../utils/typography';
 
 const log = createLogger('ErrorBoundary');
 
@@ -121,17 +122,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#1a1a1a',
     marginBottom: 8,
     textAlign: 'center',
   },
   message: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#666',
     textAlign: 'center',
-    lineHeight: 22,
     marginBottom: 24,
   },
   retryButton: {
@@ -143,9 +142,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...T.button,
   },
   debugContainer: {
     backgroundColor: '#f5f5f5',
@@ -156,9 +153,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   debugText: {
+    ...T.mono,
     fontSize: 11,
     color: '#666',
-    fontFamily: 'monospace',
   },
 });
 

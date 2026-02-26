@@ -21,6 +21,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('FAQ');
@@ -270,20 +271,20 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Loading / Error
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-  loadingText: { marginTop: 12, fontSize: 15, color: '#6B7280' },
-  errorText: { marginTop: 12, fontSize: 15, color: '#6B7280', textAlign: 'center' },
+  loadingText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', lineHeight: undefined },
+  errorText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', textAlign: 'center', lineHeight: undefined },
   retryBtn: { marginTop: 16, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  retryBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
 
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#FAFAFA' },
-  heroTitle: { fontSize: 24, fontWeight: '700', color: '#000', textAlign: 'center', marginBottom: 8, letterSpacing: -0.4 },
-  heroSubtitle: { fontSize: 15, color: '#6B7280', textAlign: 'center', lineHeight: 22 },
+  heroTitle: { ...T.pageTitle, color: '#000', textAlign: 'center', marginBottom: 8 },
+  heroSubtitle: { ...T.subtitle, textAlign: 'center', lineHeight: 22 },
 
   // Section
   section: { paddingHorizontal: 20, paddingVertical: 20 },
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
   faqItemBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
   faqQuestion: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 16 },
   faqQuestionRTL: { flexDirection: 'row-reverse' },
-  faqQuestionText: { fontSize: 15, fontWeight: '500', color: '#1F2937', flex: 1, paddingEnd: 12 },
+  faqQuestionText: { ...T.faqQuestion, color: '#1F2937', flex: 1, paddingEnd: 12 },
   faqQuestionTextActive: { color: '#dc2626', fontWeight: '600' },
   faqAnswer: { paddingHorizontal: 16, paddingBottom: 16, backgroundColor: '#F9FAFB' },
 
@@ -303,18 +304,18 @@ const styles = StyleSheet.create({
   answerRowRTL: { flexDirection: 'row-reverse' },
   bullet: { fontSize: 16, lineHeight: 22, color: '#dc2626', fontWeight: '800' },
   numBullet: { fontSize: 14, lineHeight: 22, color: '#dc2626', fontWeight: '800', minWidth: 22, textAlign: 'right' },
-  answerText: { flex: 1, fontSize: 14, lineHeight: 22, color: '#4B5563', fontWeight: '400' },
-  answerParagraph: { fontSize: 14, lineHeight: 22, color: '#4B5563', marginBottom: 6 },
+  answerText: { ...T.faqAnswer, flex: 1, color: '#4B5563' },
+  answerParagraph: { ...T.faqAnswer, color: '#4B5563', marginBottom: 6 },
 
   // CTA
   ctaSection: { paddingHorizontal: 20, paddingVertical: 24, alignItems: 'center', backgroundColor: '#F9FAFB' },
-  ctaTitle: { fontSize: 18, fontWeight: '700', color: '#000', marginBottom: 16 },
+  ctaTitle: { ...T.sectionTitleSmall, color: '#000', marginBottom: 16 },
   ctaButtons: { flexDirection: 'row', gap: 12 },
   ctaBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingVertical: 14, borderRadius: 14 },
   ctaBtnPrimary: { backgroundColor: '#25D366' },
-  ctaBtnPrimaryText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  ctaBtnPrimaryText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
   ctaBtnSecondary: { backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FECACA' },
-  ctaBtnSecondaryText: { color: '#dc2626', fontSize: 15, fontWeight: '600' },
+  ctaBtnSecondaryText: { ...T.buttonSmall, color: '#dc2626', fontSize: 15 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

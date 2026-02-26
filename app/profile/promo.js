@@ -7,6 +7,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { fetchPromo } from '../../services/api';
 import RenderHTML from 'react-native-render-html';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function PromoScreen() {
   const router = useRouter();
@@ -154,9 +155,9 @@ const styles = StyleSheet.create({
   backButtonRTL: { alignItems: 'flex-end' },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  navTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: '600', color: '#000' },
+  navTitle: { ...T.sectionTitleSmall, flex: 1, textAlign: 'center', color: '#000' },
   navTitleRTL: { writingDirection: 'rtl' },
   headerSpacer: { width: 130 },
 
@@ -187,14 +188,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleWrap: { flex: 1, minWidth: 0 },
-  title: { fontSize: 16, fontWeight: '800', color: '#111827' },
-  subtitle: { marginTop: 2, fontSize: 13, color: '#6B7280' },
+  title: { ...T.body, fontWeight: '800', color: '#111827' },
+  subtitle: { ...T.caption, marginTop: 2, color: '#6B7280' },
 
   loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  loadingText: { fontSize: 14, color: '#6B7280' },
-  date: { fontSize: 12, color: '#6B7280', marginBottom: 10, writingDirection: 'ltr', textAlign: 'left' },
+  loadingText: { ...T.label, fontWeight: '400', color: '#6B7280' },
+  date: { ...T.captionSmall, color: '#6B7280', marginBottom: 10, writingDirection: 'ltr', textAlign: 'left' },
   dateRTL: { textAlign: 'right' },
-  empty: { fontSize: 14, color: '#6B7280' },
+  empty: { ...T.label, fontWeight: '400', color: '#6B7280' },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });

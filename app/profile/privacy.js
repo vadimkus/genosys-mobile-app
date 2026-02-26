@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyContent from '../../components/PrivacyPolicyContent';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function PrivacyPolicyScreen() {
   const router = useRouter();
@@ -65,18 +66,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   backText: {
+    ...T.link,
     color: '#dc2626',
-    fontSize: 14,
-    fontWeight: '600',
   },
   backTextRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
   },
   headerTitle: {
-    fontSize: 20,
+    ...T.sectionTitle,
     fontWeight: '600',
-    color: '#1D1D1F',
   },
   headerSpacer: { width: 130 },
   textRTL: { writingDirection: 'rtl', textAlign: 'center' },

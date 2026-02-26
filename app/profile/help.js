@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function HelpSupportScreen() {
   const router = useRouter();
@@ -381,11 +382,10 @@ const styles = StyleSheet.create({
   backButtonRTL: { alignItems: 'flex-end' },
   backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { color: '#dc2626', fontSize: 14, fontWeight: '600' },
+  backText: { ...T.link, color: '#dc2626' },
   backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
   },
   headerSpacer: { width: 130 },
   scrollView: {
@@ -400,15 +400,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+    ...T.pageTitle,
     color: '#000000',
     textAlign: 'center',
     marginBottom: 8,
-    letterSpacing: -0.4,
   },
   heroSubtitle: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
     textAlign: 'center',
     lineHeight: 22,
@@ -420,11 +418,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
-    letterSpacing: -0.4,
   },
 
   // Support Cards
@@ -463,13 +459,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   supportTitle: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#000000',
     marginBottom: 2,
   },
   supportSubtitle: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     marginBottom: 4,
   },
@@ -478,7 +473,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   supportDescription: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#dc2626',
     fontWeight: '500',
   },
@@ -506,8 +501,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   faqQuestionText: {
-    fontSize: 16,
-    fontWeight: '500',
+    ...T.faqQuestion,
     flex: 1,
     paddingEnd: 16,
   },
@@ -550,15 +544,13 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   answerText: {
+    ...T.faqAnswer,
     flex: 1,
-    fontSize: 15,
-    lineHeight: 22,
     color: '#3C3C43',
     fontWeight: '500',
   },
   answerParagraph: {
-    fontSize: 15,
-    lineHeight: 22,
+    ...T.faqAnswer,
     color: '#3C3C43',
     fontWeight: '500',
     marginBottom: 8,
@@ -598,13 +590,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   quickActionTitle: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#000000',
     textAlign: 'center',
   },
   returnChecklistTitle: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#000000',
     marginBottom: 8,
@@ -626,8 +618,8 @@ const styles = StyleSheet.create({
     color: '#007AFF',
   },
   returnChecklistText: {
+    ...T.faqAnswer,
     flex: 1,
-    fontSize: 14,
     lineHeight: 20,
     color: '#3C3C43',
     fontWeight: '500',
@@ -647,8 +639,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   returnEmailButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
+    ...T.buttonSmall,
     fontWeight: '700',
   },
 
@@ -684,7 +675,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   returnModalTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '800',
     color: '#1D1D1F',
   },
@@ -707,7 +698,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   modalSecondaryBtnText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#1D1D1F',
   },
@@ -719,11 +710,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   businessHoursTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
     marginBottom: 16,
-    letterSpacing: -0.4,
   },
   businessHoursCard: {
     backgroundColor: '#ffffff',
@@ -740,16 +729,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   dayText: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '500',
     color: '#000000',
   },
   hoursText: {
-    fontSize: 16,
+    ...T.body,
     color: '#8E8E93',
   },
   timezoneText: {
-    fontSize: 13,
+    ...T.caption,
     color: '#C7C7CC',
     textAlign: 'center',
     marginTop: 12,

@@ -18,6 +18,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getLocalizedProductName, getLocalizedProductSize, getLocalizedProductDescription, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -48,6 +49,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
   const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
   const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
   const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
+  const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
   const isBeautyBox = isBeautyBoxProduct(product);
 
   const baseBadges = (product.badges || []).filter((b) => {
@@ -57,8 +59,8 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
     if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
     // Remove "Professional" badge from specific products
     if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
-    // Keep "New" only for PDRN mask
-    if (text === 'new' && !(isPdrnMask || isBioFermentMask)) return false;
+    // Keep "New" only for specific products
+    if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
     return true;
   });
 
@@ -84,9 +86,8 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
     }
   }
 
-  // Add "New" badge to Bio Ferment Mask even if backend doesn't send it
   const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
-  if (isBioFermentMask && !hasNewBadge) {
+  if ((isBioFermentMask || isRevitaGlow) && !hasNewBadge) {
     computedBadges.push({
       type: 'new',
       text: t('common.new'),
@@ -323,9 +324,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stockOverlayText: {
-    color: '#ffffff',
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#ffffff',
   },
   badgesContainer: {
     position: 'absolute',
@@ -352,9 +353,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   badgeText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: '700',
+    ...T.badgeMedium,
     textTransform: 'uppercase',
     textAlign: 'center',
   },
@@ -362,22 +361,17 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   name: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.productName,
     marginBottom: 4,
     lineHeight: 18,
   },
   category: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.productCategory,
     marginBottom: 4,
     textTransform: 'capitalize',
   },
   productDescription: {
-    fontSize: 11,
-    color: '#999',
-    lineHeight: 15,
+    ...T.productDescription,
     marginBottom: 6,
   },
   priceContainer: {
@@ -387,23 +381,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   price: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.price,
   },
   discountPricing: {
     alignItems: 'flex-start',
   },
   originalPrice: {
+    ...T.priceStrikethrough,
     fontSize: 12,
-    color: '#86868B',
-    textDecorationLine: 'line-through',
     marginBottom: 2,
   },
   discountedPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#dc2626',
+    ...T.priceDiscount,
     marginBottom: 2,
   },
   savingsContainer: {
@@ -413,9 +402,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   savings: {
-    fontSize: 10,
-    color: '#ffffff',
-    fontWeight: '600',
+    ...T.badge,
+    color: '#FFFFFF',
   },
   // Beauty Boxes specific pricing styles
   beautyBoxPricing: {
@@ -426,9 +414,9 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   beautyBoxFullPrice: {
-    fontSize: 12,
-    color: '#2C3E50',
+    ...T.captionSmall,
     fontWeight: '500',
+    color: '#2C3E50',
     marginBottom: 4,
   },
   beautyBoxDiscountContainer: {
@@ -437,18 +425,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   beautyBoxDiscount: {
-    fontSize: 11,
-    color: '#dc2626',
+    ...T.captionTiny,
     fontWeight: 'bold',
+    color: '#dc2626',
     backgroundColor: '#FFE5E5',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
   },
   beautyBoxFinalPrice: {
-    fontSize: 13,
-    color: '#27AE60',
+    ...T.labelSmall,
     fontWeight: 'bold',
+    color: '#27AE60',
   },
   rowRTL: { flexDirection: 'row-reverse' },
   alignEndRTL: { alignItems: 'flex-end' },
@@ -471,9 +459,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   sizeBadgeText: {
+    ...T.badge,
     fontSize: 9,
-    color: '#666666',
     fontWeight: '500',
+    color: '#666666',
   },
   addToCartBtn: {
     flexDirection: 'row',
@@ -491,9 +480,7 @@ const styles = StyleSheet.create({
     borderColor: '#BBF7D0',
   },
   addToCartBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#fff',
+    ...T.buttonTiny,
   },
   addToCartBtnTextInCart: {
     color: '#15803D',

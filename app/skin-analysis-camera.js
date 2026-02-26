@@ -31,6 +31,7 @@ import SkinAnalysisResults from '../components/SkinAnalysisResults';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import T from '../utils/typography';
 
 const log = createLogger('SkinAnalysisCamera');
 
@@ -529,9 +530,9 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 16, fontWeight: '700', color: '#1F2937' },
+  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700', color: '#1F2937', flex: 1, textAlign: 'center' },
 
-  permissionText: { fontSize: 15, color: '#6B7280', textAlign: 'center', marginTop: 8 },
+  permissionText: { ...T.bodySmall, color: '#6B7280', lineHeight: undefined, textAlign: 'center', marginTop: 8 },
   permissionBtn: {
     backgroundColor: '#dc2626',
     paddingHorizontal: 24,
@@ -539,7 +540,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 16,
   },
-  permissionBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
+  permissionBtnText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
 
   cameraFlex: { flex: 1 },
   camera: { flex: 1 },
@@ -564,9 +565,8 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   guideText: {
+    ...T.label,
     color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
     marginTop: 20,
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -598,9 +598,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   captureLabel: {
+    ...T.labelSmall,
     color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
     marginTop: 8,
   },
   analyzingBox: {
@@ -609,9 +608,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   analyzingText: {
+    ...T.label,
     color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
   },
 
   // AI Results
@@ -632,8 +630,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   aiScoreNum: { fontSize: 32, fontWeight: '900' },
-  aiScoreMax: { fontSize: 13, color: '#9CA3AF', fontWeight: '600', marginTop: -4 },
-  aiScoreLabel: { fontSize: 14, fontWeight: '700', color: '#374151', marginBottom: 8 },
+  aiScoreMax: { ...T.labelSmall, color: '#9CA3AF', marginTop: -4 },
+  aiScoreLabel: { ...T.label, fontWeight: '700', color: '#374151', marginBottom: 8 },
   aiSkinTypeBadge: {
     backgroundColor: '#FEF2F2',
     paddingHorizontal: 16,
@@ -642,7 +640,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FECACA',
   },
-  aiSkinTypeText: { fontSize: 13, fontWeight: '700', color: '#dc2626' },
+  aiSkinTypeText: { ...T.labelSmall, fontWeight: '700', color: '#dc2626' },
 
   aiSection: {
     backgroundColor: '#F9FAFB',
@@ -656,8 +654,8 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
-  aiSectionTitle: { fontSize: 16, fontWeight: '800', color: '#1F2937' },
-  aiAnalysisText: { fontSize: 14, color: '#374151', lineHeight: 22 },
+  aiSectionTitle: { ...T.price, fontWeight: '800', color: '#1F2937' },
+  aiAnalysisText: { ...T.label, fontWeight: '400', color: '#374151', lineHeight: 22 },
 
   // Concerns
   concernChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -672,7 +670,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FECACA',
   },
-  concernChipText: { fontSize: 13, fontWeight: '600', color: '#991B1B' },
+  concernChipText: { ...T.labelSmall, color: '#991B1B' },
 
   // AI Recommendations
   aiRecCard: {
@@ -705,16 +703,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   aiRecSize: {
-    fontSize: 10,
+    ...T.badge,
     fontWeight: '600',
     color: '#9CA3AF',
     marginTop: 3,
   },
   aiRecBody: { flex: 1 },
-  aiRecName: { fontSize: 14, fontWeight: '700', color: '#1F2937', marginBottom: 2 },
-  aiRecPrice: { fontSize: 14, fontWeight: '800', color: '#dc2626', marginBottom: 4 },
-  aiRecPriceOnRequest: { fontSize: 12, fontWeight: '700', color: '#25D366', marginBottom: 4 },
-  aiRecReason: { fontSize: 12, color: '#6B7280', lineHeight: 17, marginBottom: 8 },
+  aiRecName: { ...T.label, fontWeight: '700', color: '#1F2937', marginBottom: 2 },
+  aiRecPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginBottom: 4 },
+  aiRecPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginBottom: 4 },
+  aiRecReason: { ...T.captionSmall, color: '#6B7280', lineHeight: 17, marginBottom: 8 },
   aiRecActions: { flexDirection: 'row', gap: 8 },
   aiRecAddBtn: {
     flexDirection: 'row',
@@ -726,7 +724,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   aiRecAddBtnAdded: { backgroundColor: '#16A34A' },
-  aiRecAddText: { fontSize: 12, fontWeight: '700', color: '#fff' },
+  aiRecAddText: { ...T.captionSmall, fontWeight: '700', color: '#fff' },
   aiRecViewBtn: {
     paddingHorizontal: 14,
     paddingVertical: 7,
@@ -734,7 +732,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D1D5DB',
   },
-  aiRecViewText: { fontSize: 12, fontWeight: '600', color: '#374151' },
+  aiRecViewText: { ...T.captionSmall, fontWeight: '600', color: '#374151' },
 
   // Routine
   routineBlock: { marginBottom: 14 },
@@ -744,7 +742,7 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 8,
   },
-  routineLabel: { fontSize: 14, fontWeight: '700', color: '#374151' },
+  routineLabel: { ...T.label, fontWeight: '700', color: '#374151' },
   routineStep: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -752,18 +750,18 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   routineStepNum: {
+    ...T.captionSmall,
+    fontWeight: '700',
     width: 22,
     height: 22,
     borderRadius: 11,
     backgroundColor: '#dc2626',
     color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
     textAlign: 'center',
     lineHeight: 22,
     overflow: 'hidden',
   },
-  routineStepText: { flex: 1, fontSize: 13, color: '#374151', lineHeight: 20 },
+  routineStepText: { ...T.caption, color: '#374151', lineHeight: 20, flex: 1 },
 
   // Tips
   tipRow: {
@@ -772,7 +770,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  tipText: { flex: 1, fontSize: 13, color: '#374151', lineHeight: 20 },
+  tipText: { ...T.caption, color: '#374151', lineHeight: 20, flex: 1 },
 
   // Bottom actions
   aiActionsRow: {
@@ -791,7 +789,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#dc2626',
   },
-  retakeBtnText: { fontSize: 14, fontWeight: '700', color: '#dc2626' },
+  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: '#dc2626' },
   quizBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -803,5 +801,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#D1D5DB',
   },
-  quizBtnText: { fontSize: 14, fontWeight: '700', color: '#374151' },
+  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: '#374151' },
 });

@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
 import { requestPasswordReset } from '../../services/authService';
+import T from '../../utils/typography';
 
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,8 +122,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
+    ...T.navTitle,
     fontSize: 16,
-    fontWeight: '600',
     color: '#111827',
   },
   content: {
@@ -131,7 +132,8 @@ const styles = StyleSheet.create({
     paddingTop: 18,
   },
   subtitle: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#6B7280',
     lineHeight: 20,
     marginBottom: 18,
@@ -140,19 +142,20 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 12,
+    ...T.captionSmall,
+    fontWeight: '600',
     color: '#111827',
     marginBottom: 8,
-    fontWeight: '600',
   },
   input: {
+    ...T.label,
+    fontWeight: '400',
+    color: '#111827',
     height: 48,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
     paddingHorizontal: 14,
-    fontSize: 14,
-    color: '#111827',
     backgroundColor: '#ffffff',
   },
   button: {
@@ -167,8 +170,7 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 14,
+    ...T.buttonSmall,
     fontWeight: '700',
   },
 });

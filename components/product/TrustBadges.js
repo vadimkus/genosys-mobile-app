@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import T from '../../utils/typography';
 
 const BADGES = [
   { key: 'certified', icon: 'shield-checkmark', color: '#16A34A' },
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
     color: '#374151',
     flex: 1,

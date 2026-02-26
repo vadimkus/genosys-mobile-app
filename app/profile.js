@@ -23,6 +23,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 const log = createLogger('Profile');
 
@@ -681,9 +682,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   backText: {
-    fontSize: 14,
+    ...T.label,
     color: '#dc2626',
-    fontWeight: '600',
     flexShrink: 1,
   },
   backTextRTL: {
@@ -691,10 +691,9 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   navTitle: {
-    flex: 1,
-    fontSize: 18,
+    ...T.sectionTitleSmall,
     fontWeight: '600',
-    color: '#000000',
+    flex: 1,
     textAlign: 'center',
   },
   headerSpacer: {
@@ -759,14 +758,14 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   userName: {
+    ...T.pageTitle,
     fontSize: 22,
-    fontWeight: '700',
     color: '#000000',
     marginBottom: 2,
-    letterSpacing: -0.4,
   },
   userEmail: {
-    fontSize: 16,
+    ...T.body,
+    lineHeight: undefined,
     color: '#8E8E93',
     marginBottom: 4,
     flexShrink: 1,
@@ -782,16 +781,14 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
   },
   discountBadgeText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
+    ...T.badgeMedium,
     flexShrink: 1,
     minWidth: 0,
     writingDirection: 'ltr',
     textAlign: 'left',
   },
   userPhone: {
-    fontSize: 14,
+    ...T.caption,
     color: '#999999',
     marginBottom: 12,
     flexShrink: 1,
@@ -800,9 +797,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   editButtonText: {
-    fontSize: 17,
-    color: '#007AFF',
+    ...T.navTitle,
     fontWeight: '400',
+    color: '#007AFF',
   },
 
   // Quick Actions
@@ -852,14 +849,14 @@ const styles = StyleSheet.create({
     left: 12,
   },
   quickActionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...T.navTitle,
     color: '#000000',
     marginBottom: 2,
     textAlign: 'center',
   },
   quickActionSubtitle: {
-    fontSize: 15,
+    ...T.bodySmall,
+    lineHeight: undefined,
     color: '#8E8E93',
     textAlign: 'center',
   },
@@ -869,12 +866,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   sectionTitle: {
+    ...T.pageTitle,
     fontSize: 22,
-    fontWeight: '700',
-    color: '#000000',
     marginBottom: 8,
     marginHorizontal: 20,
-    letterSpacing: -0.4,
   },
   sectionContent: {
     marginHorizontal: 20,
@@ -915,13 +910,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileItemTitle: {
-    fontSize: 17,
+    ...T.navTitle,
     fontWeight: '400',
     color: '#000000',
     marginBottom: 1,
   },
   profileItemSubtitle: {
-    fontSize: 15,
+    ...T.bodySmall,
+    lineHeight: undefined,
     color: '#8E8E93',
   },
   profileItemRight: {
@@ -941,7 +937,7 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   signOutText: {
-    fontSize: 17,
+    ...T.navTitle,
     fontWeight: '400',
     color: '#dc2626',
   },
@@ -949,8 +945,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   unavailableText: {
-    fontSize: 14,
-    color: '#86868B',
+    ...T.caption,
     fontStyle: 'italic',
   },
 
@@ -961,12 +956,12 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for tab bar
   },
   footerText: {
-    fontSize: 15,
+    ...T.bodySmall,
+    lineHeight: undefined,
     color: '#8E8E93',
-    fontWeight: '400',
   },
   footerVersion: {
-    fontSize: 13,
+    ...T.caption,
     color: '#C7C7CC',
     marginTop: 4,
   },

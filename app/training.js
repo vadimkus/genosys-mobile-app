@@ -22,6 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchTraining as fetchTrainingAPI } from '../services/api';
@@ -359,20 +360,20 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Loading
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
-  loadingText: { marginTop: 12, fontSize: 15, color: '#6B7280' },
+  loadingText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', lineHeight: undefined },
 
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FAFAFA' },
-  heroTitle: { fontSize: 22, fontWeight: '700', color: '#000', textAlign: 'center', marginTop: 12, marginBottom: 8 },
-  heroSubtitle: { fontSize: 14, color: '#6B7280', textAlign: 'center' },
+  heroTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', textAlign: 'center', marginTop: 12, marginBottom: 8 },
+  heroSubtitle: { ...T.caption, color: '#6B7280', textAlign: 'center', fontSize: 14 },
   statsRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   statBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#fff', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#F3F4F6' },
-  statText: { fontSize: 12, fontWeight: '600', color: '#374151' },
+  statText: { ...T.captionSmall, fontWeight: '600', color: '#374151' },
 
   // Sections
   section: { paddingHorizontal: 16, paddingVertical: 20 },
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 10 },
   sectionHeaderRTL: { flexDirection: 'row-reverse' },
   sectionIconBg: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  sectionTitle: { fontSize: 20, fontWeight: '700', color: '#000', letterSpacing: -0.3 },
+  sectionTitle: { ...T.sectionTitle },
 
   // Training Document Cards
   docCard: {
@@ -393,13 +394,13 @@ const styles = StyleSheet.create({
   docIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   docTextWrap: { flex: 1, marginLeft: 12 },
   docTextWrapRTL: { marginLeft: 0, marginRight: 12 },
-  docTitle: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 2 },
-  docSize: { fontSize: 11, color: '#9CA3AF' },
+  docTitle: { ...T.label, color: '#374151', marginBottom: 2 },
+  docSize: { ...T.captionTiny, color: '#9CA3AF' },
   downloadBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     backgroundColor: '#F0FDF4', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
   },
-  downloadText: { fontSize: 11, fontWeight: '700', color: '#16a34a' },
+  downloadText: { ...T.captionTiny, fontWeight: '700', color: '#16a34a' },
 
   // Product Document Cards
   productDocCard: {
@@ -414,7 +415,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB', borderWidth: 1, borderColor: '#F3F4F6',
   },
   productImage: { width: '100%', height: '100%' },
-  productDocTitle: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 2 },
+  productDocTitle: { ...T.labelSmall, color: '#374151', marginBottom: 2 },
 
   // Video Grid
   videoGrid: { gap: 12 },
@@ -438,30 +439,30 @@ const styles = StyleSheet.create({
     position: 'absolute', bottom: 8, right: 8,
     backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
   },
-  durationText: { fontSize: 11, color: '#fff', fontWeight: '600' },
+  durationText: { ...T.captionTiny, color: '#fff', fontWeight: '600' },
   videoInfo: { padding: 14 },
-  videoTitle: { fontSize: 15, fontWeight: '700', color: '#1F2937', marginBottom: 8 },
+  videoTitle: { ...T.bodySmall, fontWeight: '700', color: '#1F2937', marginBottom: 8 },
   videoMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   videoMetaRTL: { flexDirection: 'row-reverse' },
   levelBadge: { backgroundColor: '#F5F3FF', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  levelText: { fontSize: 11, fontWeight: '600', color: '#7c3aed' },
-  videoCategory: { fontSize: 12, color: '#9CA3AF' },
+  levelText: { ...T.captionTiny, fontWeight: '600', color: '#7c3aed' },
+  videoCategory: { ...T.captionSmall, color: '#9CA3AF' },
 
   // Footer
   footer: { alignItems: 'center', paddingVertical: 24, paddingHorizontal: 20, borderTopWidth: 1, borderTopColor: '#F3F4F6', marginTop: 12 },
-  footerText: { fontSize: 14, fontWeight: '600', color: '#374151' },
-  footerSub: { fontSize: 12, color: '#9CA3AF', marginTop: 4 },
-  footerLink: { fontSize: 14, color: '#dc2626', fontWeight: '600', textDecorationLine: 'underline' },
-  footerCopyright: { fontSize: 11, color: '#D1D5DB', marginTop: 8 },
+  footerText: { ...T.label, color: '#374151' },
+  footerSub: { ...T.captionSmall, color: '#9CA3AF', marginTop: 4 },
+  footerLink: { ...T.link, color: '#dc2626', textDecorationLine: 'underline' },
+  footerCopyright: { ...T.captionTiny, color: '#D1D5DB', marginTop: 8 },
 
   // Empty State / Error
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', color: '#374151', marginTop: 16, marginBottom: 8, textAlign: 'center' },
-  emptyDesc: { fontSize: 15, color: '#6B7280', textAlign: 'center', marginBottom: 20, lineHeight: 22 },
+  emptyTitle: { ...T.sectionTitle, color: '#374151', marginTop: 16, marginBottom: 8, textAlign: 'center' },
+  emptyDesc: { ...T.subtitle, textAlign: 'center', marginBottom: 20, lineHeight: 22 },
   loginBtn: { backgroundColor: '#dc2626', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 14 },
-  loginBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  loginBtnText: { ...T.button, color: '#fff' },
   retryBtn: { backgroundColor: '#16a34a', paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 8 },
-  retryBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

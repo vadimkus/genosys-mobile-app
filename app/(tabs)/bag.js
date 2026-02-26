@@ -23,6 +23,7 @@ import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCa
 import AUTH_CONFIG from '../../config/auth';
 import { computeWaterfallBreakdown } from '../../utils/cartUtils';
 import { mediumTap } from '../../utils/haptics';
+import T from '../../utils/typography';
 
 export default function BagScreen() {
   const { user } = useAuth();
@@ -810,9 +811,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backText: {
-    fontSize: 14,
+    ...T.label,
     color: '#dc2626',
-    fontWeight: '600',
     marginLeft: 4,
   },
   headerCenter: {
@@ -827,10 +827,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   titleInline: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1D1D1F',
-    letterSpacing: -0.4,
+    ...T.sectionTitle,
     textAlign: 'center',
   },
   headerRight: {
@@ -842,17 +839,13 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitle,
     marginBottom: 2,
-    letterSpacing: -0.4,
     textAlign: 'center',
   },
   subtitle: {
+    ...T.caption,
     fontSize: 14,
-    color: '#86868B',
-    fontWeight: '400',
     textAlign: 'center',
   },
   promoHeaderBlock: {
@@ -869,26 +862,24 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   promoTitle: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
-    color: '#1D1D1F',
     marginBottom: 6,
   },
   promoLine: {
-    flex: 1,
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#3C3C43',
+    flex: 1,
   },
   promoApplied: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#27AE60',
+    ...T.captionSmall,
     fontWeight: '700',
+    color: '#27AE60',
+    marginTop: 8,
   },
   clearText: {
-    fontSize: 16,
+    ...T.button,
     color: '#dc2626',
-    fontWeight: '600',
   },
   // Layout Sections
   itemsList: {
@@ -923,14 +914,12 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitleSmall,
   },
   sectionSubtle: {
-    fontSize: 12,
-    color: '#dc2626',
+    ...T.captionSmall,
     fontWeight: '700',
+    color: '#dc2626',
     flexShrink: 1,
     maxWidth: '48%',
     textAlign: 'right',
@@ -944,9 +933,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   progressRightText: {
-    fontSize: 14,
-    color: '#6B7280',
+    ...T.label,
     fontWeight: '700',
+    color: '#6B7280',
   },
   progressRightTextMet: {
     color: '#34C759',
@@ -979,18 +968,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   rewardText: {
+    ...T.body,
+    fontWeight: '600',
+    color: '#1D1D1F',
+    lineHeight: undefined,
     flex: 1,
     minWidth: 0,
     flexShrink: 1,
-    fontSize: 16,
-    color: '#1D1D1F',
-    fontWeight: '600',
   },
   deliveryHintText: {
-    marginTop: 2,
-    fontSize: 14,
+    ...T.label,
     color: '#6B7280',
-    fontWeight: '600',
+    marginTop: 2,
   },
   
   // Emirates Selection
@@ -1011,24 +1000,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deliveryInfoLine: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#86868B',
+    ...T.captionSmall,
     fontWeight: '600',
+    marginTop: 4,
   },
   deliveryCostValue: {
     color: '#1D1D1F',
     fontWeight: '800',
   },
   emirateLabel: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.captionSmall,
     marginBottom: 2,
   },
   emirateValue: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#1D1D1F',
+    lineHeight: undefined,
   },
   
   // Free Shipping Banner (legacy/cart top)
@@ -1042,9 +1030,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   freeShippingText: {
-    color: '#1D1D1F',
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
   },
   // Free Shipping Banner (green, inside waterfall)
   freeShippingBannerGreen: {
@@ -1057,12 +1043,12 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   freeShippingTextGreen: {
-    fontSize: 12,
-    color: '#27AE60',
+    ...T.captionSmall,
     fontWeight: '600',
+    color: '#27AE60',
   },
   vatNoteRed: {
-    fontSize: 11,
+    ...T.captionTiny,
     color: '#dc2626',
     paddingVertical: 2,
   },
@@ -1093,10 +1079,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   itemImageSize: {
-    marginTop: 6,
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
     color: '#1D1D1F',
+    marginTop: 6,
     textAlign: 'center',
   },
   itemImagePlaceholder: {
@@ -1122,47 +1108,44 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   itemName: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#1D1D1F',
-    marginBottom: 4,
     lineHeight: 20,
+    marginBottom: 4,
   },
   itemCategory: {
+    ...T.caption,
     fontSize: 14,
-    color: '#86868B',
     marginBottom: 4,
   },
   itemSize: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.captionSmall,
     marginBottom: 8,
   },
   itemPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.price,
     marginBottom: 12,
   },
   promoItemPrice: {
-    fontSize: 16,
+    ...T.price,
     fontWeight: '800',
     color: '#27AE60',
     marginBottom: 12,
   },
   promoItemPriceRight: {
-    fontSize: 16,
+    ...T.price,
     fontWeight: '900',
     color: '#27AE60',
   },
   promoQtyRight: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '700',
     color: '#000000',
     marginBottom: 6,
   },
   promoTag: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '800',
     color: '#27AE60',
     marginTop: 2,
@@ -1173,8 +1156,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   variantText: {
-    fontSize: 12,
-    color: '#86868B',
+    ...T.captionSmall,
     marginBottom: 2,
   },
   
@@ -1183,25 +1165,21 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   itemOriginalPrice: {
-    fontSize: 14,
-    color: '#86868B',
-    textDecorationLine: 'line-through',
+    ...T.priceStrikethrough,
     marginBottom: 2,
   },
   itemDiscountedPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#dc2626',
+    ...T.priceDiscount,
   },
   itemBundleLabel: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '700',
     color: '#27AE60',
     marginTop: 2,
     marginBottom: 2,
   },
   itemDiscountLabel: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '700',
     color: '#27AE60',
     marginTop: 2,
@@ -1224,9 +1202,10 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   quantityText: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#1D1D1F',
+    lineHeight: undefined,
     minWidth: 20,
     textAlign: 'center',
   },
@@ -1251,17 +1230,15 @@ const styles = StyleSheet.create({
     height: 240,
   },
   emptyTitle: {
+    ...T.sectionTitle,
     fontSize: 22,
-    fontWeight: '600',
-    color: '#1D1D1F',
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyText: {
-    fontSize: 16,
+    ...T.body,
     color: '#86868B',
     textAlign: 'center',
-    lineHeight: 22,
     marginBottom: 32,
   },
   shopButton: {
@@ -1271,9 +1248,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   shopButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
+    ...T.button,
   },
   checkoutFooter: {
     position: 'absolute',
@@ -1313,14 +1288,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   summaryLabel: {
-    fontSize: 14,
+    ...T.summaryLabel,
     color: '#86868B',
-    fontWeight: '500',
   },
   summaryValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1D1D1F',
+    ...T.summaryValue,
   },
   summaryOriginalValue: {
     textDecorationLine: 'line-through',
@@ -1328,7 +1300,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   summaryDiscountValue: {
-    fontSize: 14,
+    ...T.summaryValue,
     fontWeight: '700',
     color: '#dc2626',
   },
@@ -1342,31 +1314,27 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
   summaryLabelDiscount: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#7C3AED',
   },
   summaryValueDiscountPurple: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#7C3AED',
   },
   summaryLabelIntermediate: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#9CA3AF',
   },
   summaryValueIntermediate: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#9CA3AF',
   },
   summaryLabelBundle: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#16A34A',
   },
   summaryValueBundle: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.summaryValue,
     color: '#16A34A',
   },
   waterfallDivider: {
@@ -1375,14 +1343,12 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   summaryLabelBold: {
-    fontSize: 14,
+    ...T.summaryValue,
     fontWeight: '700',
-    color: '#1D1D1F',
   },
   summaryValueBold: {
-    fontSize: 14,
+    ...T.summaryValue,
     fontWeight: '700',
-    color: '#1D1D1F',
   },
   youSavedBanner: {
     backgroundColor: '#F0FDF4',
@@ -1395,7 +1361,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   youSavedText: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '700',
     color: '#15803D',
   },
@@ -1414,14 +1380,13 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   totalLabel: {
+    ...T.totalLabel,
     fontSize: 16,
     color: '#86868B',
     fontWeight: '500',
   },
   totalAmount: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.totalValue,
   },
   checkoutButton: {
     backgroundColor: '#dc2626',
@@ -1430,9 +1395,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkoutButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
+    ...T.button,
   },
   
   // Emirates Selection Modal
@@ -1450,9 +1413,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F2F2F7',
   },
   modalTitle: {
-    fontSize: 18,
+    ...T.sectionTitleSmall,
     fontWeight: '600',
-    color: '#1D1D1F',
   },
   modalCloseButton: {
     padding: 4,
@@ -1472,17 +1434,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   emirateOptionName: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '600',
     color: '#1D1D1F',
+    lineHeight: undefined,
     marginBottom: 2,
   },
   selectedEmirateText: {
     color: '#dc2626',
   },
   emirateShippingCost: {
+    ...T.caption,
     fontSize: 14,
-    color: '#86868B',
   },
 
   // RTL Support Styles

@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -663,10 +664,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '700', color: '#1F2937', textAlign: 'center' },
+  headerTitle: { ...T.navTitle, flex: 1, fontWeight: '700', color: '#1F2937', textAlign: 'center' },
   cartBadgeBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: '#dc2626', borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
-  cartBadgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
+  cartBadgeText: { ...T.badge, color: '#fff' },
 
   // Progress bar
   progressSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FAFAFA', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
@@ -676,11 +677,11 @@ const styles = StyleSheet.create({
   tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#E5E7EB', borderWidth: 2, borderColor: '#fff' },
   tierDotActive: { backgroundColor: '#16a34a' },
   progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 },
-  progressLabel: { fontSize: 10, color: '#9CA3AF', fontWeight: '600' },
+  progressLabel: { ...T.badge, color: '#9CA3AF' },
   progressLabelActive: { color: '#16a34a', fontWeight: '700' },
-  nextTierHint: { fontSize: 12, color: '#dc2626', fontWeight: '600', textAlign: 'center', marginTop: 6 },
+  nextTierHint: { ...T.captionSmall, color: '#dc2626', fontWeight: '600', textAlign: 'center', marginTop: 6 },
   discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: '#F0FDF4', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
-  discountActiveText: { fontSize: 12, fontWeight: '700', color: '#16a34a' },
+  discountActiveText: { ...T.badgeMedium, color: '#16a34a' },
 
   // Step indicator
   stepIndicator: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', height: 52 },
@@ -688,20 +689,20 @@ const styles = StyleSheet.create({
   stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6', height: 32 },
   stepPillActive: { backgroundColor: '#FEF2F2', borderColor: '#dc2626' },
   stepEmoji: { fontSize: 14 },
-  stepPillText: { fontSize: 11, fontWeight: '600', color: '#6B7280' },
+  stepPillText: { ...T.captionTiny, fontWeight: '600', color: '#6B7280' },
   stepPillTextActive: { color: '#dc2626' },
   requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#dc2626' },
   stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
-  stepCountText: { fontSize: 10, fontWeight: '700', color: '#fff' },
+  stepCountText: { ...T.badge, color: '#fff' },
 
   // Step header
   stepHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6' },
   stepHeaderEmoji: { fontSize: 28 },
   stepHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  stepHeaderTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  stepHeaderDesc: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+  stepHeaderTitle: { ...T.sectionTitleSmall, color: '#111827' },
+  stepHeaderDesc: { ...T.caption, color: '#6B7280', marginTop: 2 },
   requiredBadge: { backgroundColor: '#FEF2F2', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  requiredBadgeText: { fontSize: 11, fontWeight: '600', color: '#dc2626' },
+  requiredBadgeText: { ...T.captionTiny, fontWeight: '600', color: '#dc2626' },
 
   // Product grid
   productGrid: { paddingHorizontal: 12, paddingVertical: 12, paddingBottom: 200 },
@@ -720,18 +721,18 @@ const styles = StyleSheet.create({
   productImageWrap: { height: 130, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FAFAFA', padding: 8 },
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
-  productName: { fontSize: 12, fontWeight: '600', color: '#374151', lineHeight: 16, minHeight: 32 },
-  productDesc: { fontSize: 10, color: '#6B7280', lineHeight: 14, marginTop: 2 },
-  productSize: { fontSize: 11, color: '#9CA3AF', marginTop: 2 },
+  productName: { ...T.captionSmall, fontWeight: '600', color: '#374151', lineHeight: 16, minHeight: 32 },
+  productDesc: { ...T.badge, fontWeight: '400', color: '#6B7280', lineHeight: 14, marginTop: 2 },
+  productSize: { ...T.captionTiny, color: '#9CA3AF', marginTop: 2 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  priceOriginal: { fontSize: 11, color: '#9CA3AF', textDecorationLine: 'line-through' },
-  priceMain: { fontSize: 14, fontWeight: '700', color: '#111827' },
+  priceOriginal: { ...T.captionTiny, color: '#9CA3AF', textDecorationLine: 'line-through' },
+  priceMain: { ...T.label, fontWeight: '700', color: '#111827' },
   priceDiscounted: { color: '#16a34a' },
-  loginToSee: { fontSize: 11, color: '#9CA3AF', marginTop: 4, fontStyle: 'italic' },
+  loginToSee: { ...T.captionTiny, color: '#9CA3AF', marginTop: 4, fontStyle: 'italic' },
 
   addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: '#dc2626' },
   addBtnSelected: { backgroundColor: '#dc2626', borderColor: '#dc2626' },
-  addBtnText: { fontSize: 13, fontWeight: '600', color: '#dc2626' },
+  addBtnText: { ...T.caption, fontWeight: '600', color: '#dc2626' },
   addBtnTextSelected: { color: '#fff' },
 
   // Bottom bar
@@ -742,15 +743,15 @@ const styles = StyleSheet.create({
   navRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   navBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 4, minWidth: 80 },
   navBtnDisabled: { opacity: 0.4 },
-  navBtnText: { fontSize: 14, fontWeight: '600', color: '#374151' },
+  navBtnText: { ...T.buttonSmall, color: '#374151' },
   navBtnTextDisabled: { color: '#D1D5DB' },
   navCenter: { alignItems: 'center' },
-  navDiscount: { fontSize: 11, fontWeight: '700', color: '#16a34a' },
-  navTotal: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  navItems: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
+  navDiscount: { ...T.captionTiny, fontWeight: '700', color: '#16a34a' },
+  navTotal: { ...T.price, color: '#111827' },
+  navItems: { ...T.caption, fontWeight: '600', color: '#6B7280' },
 
   addToCartBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#dc2626', paddingVertical: 14, borderRadius: 14, marginTop: 8 },
-  addToCartText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  addToCartText: { ...T.button, fontWeight: '700', color: '#fff' },
 
   // Summary overlay
   summaryOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 },
@@ -758,41 +759,41 @@ const styles = StyleSheet.create({
   summarySheet: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: 34 },
   summaryHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 10 },
   summaryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
-  summaryTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  summaryTitle: { ...T.sectionTitleSmall, color: '#111827' },
   summaryScroll: { paddingHorizontal: 20, maxHeight: 280 },
   summaryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6' },
   summaryImageWrap: { alignItems: 'center' },
   summaryItemImage: { width: 44, height: 44, borderRadius: 8, backgroundColor: '#F9FAFB' },
-  summaryImageSize: { fontSize: 9, color: '#9CA3AF', marginTop: 2, fontWeight: '500' },
-  summaryItemName: { fontSize: 13, fontWeight: '600', color: '#374151' },
-  summaryItemStep: { fontSize: 11, color: '#9CA3AF', marginTop: 2 },
-  summaryItemPrice: { fontSize: 14, fontWeight: '700', color: '#111827' },
+  summaryImageSize: { ...T.badge, fontWeight: '500', color: '#9CA3AF', marginTop: 2, fontSize: 9 },
+  summaryItemName: { ...T.labelSmall, color: '#374151' },
+  summaryItemStep: { ...T.captionTiny, color: '#9CA3AF', marginTop: 2 },
+  summaryItemPrice: { ...T.label, fontWeight: '700', color: '#111827' },
   summaryRemoveBtn: { padding: 4 },
 
   // Pricing
   summaryPricing: { paddingHorizontal: 20, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
   pricingRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  pricingLabel: { fontSize: 14, color: '#6B7280' },
-  pricingValue: { fontSize: 14, fontWeight: '600', color: '#374151' },
-  pricingLabelPurple: { fontSize: 14, color: '#7c3aed', fontWeight: '600' },
-  pricingValuePurple: { fontSize: 14, fontWeight: '700', color: '#7c3aed' },
-  pricingLabelGreen: { fontSize: 14, color: '#16a34a', fontWeight: '600' },
-  pricingValueGreen: { fontSize: 14, fontWeight: '700', color: '#16a34a' },
+  pricingLabel: { ...T.summaryLabel, color: '#6B7280' },
+  pricingValue: { ...T.summaryValue, color: '#374151' },
+  pricingLabelPurple: { ...T.summaryLabel, color: '#7c3aed', fontWeight: '600' },
+  pricingValuePurple: { ...T.summaryValue, fontWeight: '700', color: '#7c3aed' },
+  pricingLabelGreen: { ...T.summaryLabel, color: '#16a34a', fontWeight: '600' },
+  pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: '#16a34a' },
   pricingRowTotal: { borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 8, marginTop: 4 },
-  pricingTotalLabel: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  pricingTotalValue: { fontSize: 18, fontWeight: '800', color: '#dc2626' },
+  pricingTotalLabel: { ...T.totalLabel, color: '#111827', fontSize: 16 },
+  pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: '#dc2626', fontSize: 18 },
 
   clearAllBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12 },
-  clearAllText: { fontSize: 14, fontWeight: '600', color: '#EF4444' },
+  clearAllText: { ...T.buttonSmall, color: '#EF4444' },
 
   // Empty & loading
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
-  loadingText: { marginTop: 12, fontSize: 15, color: '#6B7280' },
-  errorText: { fontSize: 16, fontWeight: '600', color: '#374151', marginTop: 12, textAlign: 'center' },
+  loadingText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', lineHeight: undefined },
+  errorText: { ...T.label, fontSize: 16, color: '#374151', marginTop: 12, textAlign: 'center' },
   retryBtn: { backgroundColor: '#dc2626', paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
-  retryBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
   emptyStep: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyStepText: { fontSize: 14, color: '#9CA3AF', marginTop: 8 },
+  emptyStepText: { ...T.caption, color: '#9CA3AF', marginTop: 8, fontSize: 14 },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });

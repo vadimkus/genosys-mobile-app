@@ -22,6 +22,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }) {
   const { user, logout } = useAuth();
@@ -272,14 +273,15 @@ const styles = StyleSheet.create({
   },
   /* ── Primary links (bold) ── */
   primaryLink: {
-    fontSize: 15,
+    ...T.bodySmall,
     fontWeight: '700',
     color: '#1F2937',
     letterSpacing: -0.1,
+    lineHeight: undefined,
   },
   /* ── Secondary links (regular) ── */
   secondaryLink: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '400',
     color: '#4B5563',
   },
@@ -299,7 +301,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   highlightBtnText: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '700',
     color: '#dc2626',
     letterSpacing: -0.1,
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   badgeText: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '700',
     color: '#ffffff',
     lineHeight: 14,
@@ -344,8 +346,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   logoutText: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
     color: '#dc2626',
   },
   textRTL: {

@@ -21,6 +21,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Partners');
@@ -332,19 +333,19 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Loading / Error states
   centerState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
-  stateText: { fontSize: 15, color: '#6B7280', marginTop: 12, textAlign: 'center' },
+  stateText: { ...T.bodySmall, color: '#6B7280', marginTop: 12, textAlign: 'center', lineHeight: undefined },
   retryBtn: { marginTop: 16, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 },
-  retryBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
 
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FAFAFA' },
-  heroTitle: { fontSize: 24, fontWeight: '700', color: '#000', textAlign: 'center', marginTop: 12, marginBottom: 8, letterSpacing: -0.4 },
-  heroSubtitle: { fontSize: 15, color: '#6B7280', textAlign: 'center', lineHeight: 22 },
+  heroTitle: { ...T.pageTitle, color: '#000', textAlign: 'center', marginTop: 12, marginBottom: 8 },
+  heroSubtitle: { ...T.subtitle, textAlign: 'center', lineHeight: 22 },
 
   // Section
   section: { paddingHorizontal: 16, paddingVertical: 16 },
@@ -362,30 +363,30 @@ const styles = StyleSheet.create({
   partnerRowRTL: { flexDirection: 'row-reverse' },
   partnerIcon: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   partnerContent: { flex: 1 },
-  partnerName: { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 1 },
-  partnerBranch: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 2 },
-  partnerType: { fontSize: 12, color: '#9CA3AF' },
+  partnerName: { ...T.bodySmall, fontWeight: '700', color: '#111827', marginBottom: 1, lineHeight: undefined },
+  partnerBranch: { ...T.caption, fontWeight: '600', color: '#374151', marginBottom: 2 },
+  partnerType: { ...T.captionSmall, color: '#9CA3AF' },
 
   // Expanded
   expandedSection: { marginTop: 12, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB' },
-  descriptionText: { fontSize: 13, color: '#4B5563', lineHeight: 19, marginBottom: 10 },
+  descriptionText: { ...T.caption, color: '#4B5563', lineHeight: 19, marginBottom: 10 },
   detailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, gap: 8 },
   detailRowRTL: { flexDirection: 'row-reverse' },
-  detailText: { flex: 1, fontSize: 13, color: '#4B5563', lineHeight: 18 },
+  detailText: { ...T.caption, flex: 1, color: '#4B5563', lineHeight: 18 },
 
   // Action buttons
   actionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   actionRowRTL: { flexDirection: 'row-reverse' },
   actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10 },
-  actionBtnText: { fontSize: 13, fontWeight: '600' },
+  actionBtnText: { ...T.caption, fontWeight: '600' },
 
   // CTA
   ctaSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FEF2F2', marginHorizontal: 16, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: '#FECACA' },
-  ctaTitle: { fontSize: 18, fontWeight: '700', color: '#dc2626', marginBottom: 8, textAlign: 'center' },
-  ctaDesc: { fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 20, marginBottom: 16 },
+  ctaTitle: { ...T.sectionTitleSmall, color: '#dc2626', marginBottom: 8, textAlign: 'center' },
+  ctaDesc: { ...T.caption, color: '#6B7280', textAlign: 'center', lineHeight: 20, marginBottom: 16, fontSize: 14 },
   ctaBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 14 },
   ctaBtnRTL: { flexDirection: 'row-reverse' },
-  ctaBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  ctaBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

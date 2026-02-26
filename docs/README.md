@@ -32,7 +32,8 @@
 | [Session Log 11 Feb 2026](./core/SESSION_LOG_2026_02_11.md) | Android alignment, v58, full audit (checkout/orders/success), haptics fix, badge fix, beauty box |
 | [Session Log 12 Feb 2026](./core/SESSION_LOG_2026_02_12.md) | v1.4.0 TestFlight, Apple Review doc update, App Store release notes |
 | [Session Log 13 Feb 2026](./core/SESSION_LOG_2026_02_13.md) | Product video sound fix, product documentation API-first fix |
-| [Session Log 20 Feb 2026](./core/SESSION_LOG_2026_02_20.md) | **NEW** Fix routine chip cart state for products with size variants (9 products across 7 concern pages) |
+| [Session Log 26 Feb 2026](./core/SESSION_LOG_2026_02_26.md) | **NEW** Centralized typography system (54 files), Revita Glow "New" badge fix |
+| [Session Log 20 Feb 2026](./core/SESSION_LOG_2026_02_20.md) | Fix routine chip cart state for products with size variants (9 products across 7 concern pages) |
 | [Session Log 19 Feb 2026 (Part 2)](./core/SESSION_LOG_2026_02_19_part2.md) | Native concern-detail screen, training nativization, routine add-to-cart (tap toggle + long-press navigate), CUID vs productNumber fix, toast messages, TestFlight build 64 |
 | [Session Log 19 Feb 2026](./core/SESSION_LOG_2026_02_19.md) | Native Skin Concerns screen, Browse by Concern CTAs, PDRN video, Skin Concern category |
 | [Session Log 18 Feb 2026](./core/SESSION_LOG_2026_02_18.md) | Sun-protection enhancements, haptics standardization |
@@ -92,6 +93,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [Typography System](./ui/TYPOGRAPHY_SYSTEM.md) | **NEW** Centralized type scale (`utils/typography.js`) — 30+ tokens, 54 files |
 | [Size Variants](./ui/SIZE_VARIANTS_IMPLEMENTATION.md) | Product size variant selector |
 | [Footer Icons](./ui/FOOTER_ICON_ENHANCEMENTS.md) | Tab bar improvements |
 | [Bag Icon](./ui/BAG_ICON_COLOR_CHANGE.md) | Cart icon styling |

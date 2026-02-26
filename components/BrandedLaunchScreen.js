@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { Image } from 'expo-image';
+import T from '../utils/typography';
 
 export default function BrandedLaunchScreen({ onDone, minimumMs = 650 }) {
   // IMPORTANT: This screen is rendered before `LocalizationProvider` (Expo Go only),
@@ -62,10 +63,9 @@ const styles = StyleSheet.create({
     height: 90,
   },
   companyText: {
-    marginTop: 18,
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#dc2626',
+    marginTop: 18,
     textAlign: 'center',
   },
 });

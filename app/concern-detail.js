@@ -28,6 +28,7 @@ import ProductGridItem from '../components/ProductGridItem';
 import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalizedProductName } from '../utils/productLocalization';
+import T from '../utils/typography';
 import { isUserDiscountExcludedProduct, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
 import { useAuth } from '../contexts/AuthContext';
 import AUTH_CONFIG from '../config/auth';
@@ -634,11 +635,11 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#E5E5EA' },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1D1D1F', textAlign: 'center' },
+  headerTitle: { ...T.navTitle, flex: 1, textAlign: 'center' },
 
   // Loading
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 12, fontSize: 15, color: '#86868B' },
+  loadingText: { ...T.subtitle, marginTop: 12 },
 
   // Scroll
   scroll: { flex: 1 },
@@ -647,12 +648,12 @@ const styles = StyleSheet.create({
   // Hero
   hero: { paddingTop: 24, paddingBottom: 20, alignItems: 'center' },
   heroIcon: { fontSize: 40, marginBottom: 12 },
-  heroTitle: { fontSize: 24, fontWeight: '700', color: '#1D1D1F', textAlign: 'center', letterSpacing: -0.3, lineHeight: 30 },
-  heroSubtitle: { fontSize: 15, color: '#86868B', textAlign: 'center', marginTop: 8, lineHeight: 22, paddingHorizontal: 8 },
+  heroTitle: { ...T.pageTitle, letterSpacing: -0.3, textAlign: 'center', lineHeight: 30 },
+  heroSubtitle: { ...T.subtitle, textAlign: 'center', marginTop: 8, lineHeight: 22, paddingHorizontal: 8 },
 
   // Sections
   section: { marginTop: 20, marginBottom: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1D1D1F', marginBottom: 12 },
+  sectionTitle: { ...T.sectionTitleSmall, marginBottom: 12 },
   collapsibleHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4, marginBottom: 8 },
   collapsibleHeaderRTL: { flexDirection: 'row-reverse' },
 
@@ -660,8 +661,8 @@ const styles = StyleSheet.create({
   whyGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   whyCard: { width: (SCREEN_WIDTH - SIDE_PADDING * 2 - 10) / 2, backgroundColor: '#F9FAFB', borderRadius: 14, borderWidth: 1, borderColor: '#F0F0F0', padding: 14, marginBottom: 10, alignItems: 'center' },
   whyIcon: { fontSize: 26, marginBottom: 8 },
-  whyLabel: { fontSize: 13, fontWeight: '600', color: '#1D1D1F', textAlign: 'center', marginBottom: 4 },
-  whyDetail: { fontSize: 11, color: '#86868B', textAlign: 'center', lineHeight: 16 },
+  whyLabel: { ...T.labelSmall, textAlign: 'center', marginBottom: 4 },
+  whyDetail: { ...T.captionTiny, textAlign: 'center', lineHeight: 16 },
 
   // Protocol PDF
   pdfCard: { marginTop: 16, marginBottom: 8, backgroundColor: '#FFFBEB', borderRadius: 16, borderWidth: 1, borderColor: '#FDE68A', padding: 16 },
@@ -669,35 +670,35 @@ const styles = StyleSheet.create({
   pdfIconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FEF3C7', justifyContent: 'center', alignItems: 'center' },
   pdfContent: { flex: 1 },
   pdfTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  pdfTitle: { fontSize: 14, fontWeight: '600', color: '#1D1D1F', flex: 1 },
+  pdfTitle: { ...T.label, flex: 1 },
   pdfBadge: { backgroundColor: '#FEF3C7', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
-  pdfBadgeText: { fontSize: 10, fontWeight: '600', color: '#92400E' },
-  pdfDesc: { fontSize: 12, color: '#86868B', lineHeight: 17 },
+  pdfBadgeText: { ...T.badge, fontWeight: '600', color: '#92400E' },
+  pdfDesc: { ...T.captionSmall, lineHeight: 17 },
   pdfDownload: { alignItems: 'center', gap: 4 },
-  pdfSize: { fontSize: 10, color: '#92400E' },
+  pdfSize: { ...T.badge, fontWeight: '400', color: '#92400E' },
 
   // Routine
-  routineSectionTitle: { fontSize: 20, fontWeight: '700', color: '#1D1D1F', marginBottom: 4 },
-  routineSubtitle: { fontSize: 13, color: '#86868B', marginBottom: 12 },
+  routineSectionTitle: { ...T.sectionTitle, marginBottom: 4 },
+  routineSubtitle: { ...T.caption, marginBottom: 12 },
   routineStep: { backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#E5E5EA', marginBottom: 8, overflow: 'hidden' },
   routineStepExpanded: { borderColor: '#FECACA' },
   routineStepHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 10 },
   stepNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#1D1D1F', justifyContent: 'center', alignItems: 'center' },
   stepNumberActive: { backgroundColor: '#dc2626' },
-  stepNumberText: { fontSize: 12, fontWeight: '700', color: '#fff' },
+  stepNumberText: { ...T.badgeMedium },
   stepNumberTextActive: { color: '#fff' },
   stepTitleWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  stepTitle: { fontSize: 15, fontWeight: '600', color: '#1D1D1F' },
+  stepTitle: { ...T.label, fontSize: 15 },
   stepTitleActive: { color: '#dc2626' },
-  stepDuration: { fontSize: 13, color: '#86868B' },
+  stepDuration: { ...T.caption },
   stepBody: { paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
-  stepDetail: { fontSize: 13, color: '#555', lineHeight: 20, marginBottom: 10 },
+  stepDetail: { ...T.caption, color: '#555', lineHeight: 20, marginBottom: 10 },
   stepProducts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F9FAFB', borderWidth: 1, borderColor: '#E5E5EA', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
   stepProductChipInCart: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
-  stepProductName: { fontSize: 12, fontWeight: '600', color: '#1D1D1F' },
+  stepProductName: { ...T.captionSmall, fontWeight: '600', color: '#1D1D1F' },
   stepProductNameInCart: { color: '#15803D' },
-  stepProductPrice: { fontSize: 12, color: '#86868B' },
+  stepProductPrice: { ...T.captionSmall },
   stepProductPriceInCart: { color: '#16a34a' },
 
   // Products grid
@@ -708,15 +709,15 @@ const styles = StyleSheet.create({
   faqItem: { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#E5E5EA', marginBottom: 8, overflow: 'hidden' },
   faqItemOpen: { borderColor: '#FECACA' },
   faqHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 8 },
-  faqQuestion: { fontSize: 14, fontWeight: '600', color: '#1D1D1F', lineHeight: 20 },
-  faqAnswer: { paddingHorizontal: 14, paddingBottom: 14, fontSize: 13, color: '#555', lineHeight: 20, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
+  faqQuestion: { ...T.faqQuestion, fontWeight: '600', lineHeight: 20 },
+  faqAnswer: { ...T.faqAnswer, fontSize: 13, paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
 
   // Related concerns
   relatedScroll: { gap: 10, paddingRight: 16 },
   relatedCard: { width: 180, backgroundColor: '#F9FAFB', borderRadius: 14, borderWidth: 1, borderColor: '#F0F0F0', padding: 14 },
   relatedIcon: { fontSize: 28, marginBottom: 8 },
-  relatedTitle: { fontSize: 14, fontWeight: '600', color: '#1D1D1F', marginBottom: 4, lineHeight: 19 },
-  relatedDesc: { fontSize: 11, color: '#86868B', lineHeight: 16 },
+  relatedTitle: { ...T.label, marginBottom: 4, lineHeight: 19 },
+  relatedDesc: { ...T.captionTiny, lineHeight: 16 },
 
   // Bottom CTA Block
   ctaBlock: {
@@ -730,15 +731,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ctaTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitle,
     textAlign: 'center',
     marginBottom: 8,
   },
   ctaSubtitle: {
-    fontSize: 13,
-    color: '#86868B',
+    ...T.caption,
     textAlign: 'center',
     lineHeight: 19,
     marginBottom: 20,
@@ -762,9 +760,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1D5DB',
   },
   ctaBtnPrimaryText: {
-    fontSize: 15,
+    ...T.buttonSmall,
     fontWeight: '700',
-    color: '#fff',
+    fontSize: 15,
   },
   ctaBtnSecondary: {
     flex: 1,
@@ -804,21 +802,21 @@ const styles = StyleSheet.create({
   stickyDetails: { paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 6 },
   stickyItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
   stickyItemRowRTL: { flexDirection: 'row-reverse' },
-  stickyItemName: { flex: 1, fontSize: 13, color: '#374151', marginRight: 12 },
-  stickyItemPrice: { fontSize: 13, fontWeight: '600', color: '#1D1D1F' },
-  stickyItemOriginalPrice: { fontSize: 11, color: '#86868B', textDecorationLine: 'line-through' },
+  stickyItemName: { ...T.caption, color: '#374151', flex: 1, marginRight: 12 },
+  stickyItemPrice: { ...T.labelSmall },
+  stickyItemOriginalPrice: { ...T.priceStrikethrough, fontSize: 11 },
   stickyDivider: { height: StyleSheet.hairlineWidth, backgroundColor: '#E5E7EB', marginVertical: 6 },
   stickyPricingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 },
   stickyPricingRowRTL: { flexDirection: 'row-reverse' },
-  stickyPricingLabel: { fontSize: 14, fontWeight: '600', color: '#1D1D1F' },
-  stickyPricingValue: { fontSize: 14, fontWeight: '700', color: '#1D1D1F' },
-  stickyFreeShipping: { fontSize: 12, color: '#D97706', marginTop: 4 },
-  stickyFreeShippingDone: { fontSize: 12, color: '#059669', fontWeight: '600', marginTop: 4 },
+  stickyPricingLabel: { ...T.label },
+  stickyPricingValue: { ...T.summaryValue, fontWeight: '700' },
+  stickyFreeShipping: { ...T.captionSmall, color: '#D97706', marginTop: 4 },
+  stickyFreeShippingDone: { ...T.captionSmall, fontWeight: '600', color: '#059669', marginTop: 4 },
   stickyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 },
   stickyRowRTL: { flexDirection: 'row-reverse' },
   stickyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
   stickyInfoRTL: { flexDirection: 'row-reverse' },
-  stickyCount: { fontSize: 14, fontWeight: '600', color: '#1D1D1F' },
+  stickyCount: { ...T.label },
   stickyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -828,11 +826,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 10,
   },
-  stickyBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  stickyBtnText: { ...T.buttonSmall },
 
   // Toast
   toast: { position: 'absolute', bottom: 48, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(0,0,0,0.82)', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24 },
-  toastText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  toastText: { ...T.label, color: '#fff' },
 
   // RTL
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },

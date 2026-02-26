@@ -31,6 +31,7 @@ try {
   // Will fall back to plain text rendering
 }
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
@@ -463,7 +464,7 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Featured image
@@ -471,20 +472,20 @@ const styles = StyleSheet.create({
 
   // Article meta
   articleMeta: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
-  articleTitle: { fontSize: 24, fontWeight: '800', color: '#111827', lineHeight: 32, letterSpacing: -0.5, marginBottom: 12 },
+  articleTitle: { ...T.pageTitleLarge, fontWeight: '800', color: '#111827', lineHeight: 32, fontSize: 24, marginBottom: 12 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, marginBottom: 12 },
   metaRowRTL: { flexDirection: 'row-reverse' },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaItemRTL: { flexDirection: 'row-reverse' },
-  metaText: { fontSize: 13, color: '#6B7280' },
+  metaText: { ...T.caption, color: '#6B7280' },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
   tagsRowRTL: { flexDirection: 'row-reverse' },
   tag: { backgroundColor: '#F3F4F6', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  tagText: { fontSize: 12, color: '#6B7280', fontWeight: '500' },
+  tagText: { ...T.captionSmall, color: '#6B7280', fontWeight: '500' },
 
   // Content
   contentContainer: { paddingHorizontal: 20, paddingBottom: 20 },
-  noContent: { fontSize: 15, color: '#9CA3AF', textAlign: 'center', paddingVertical: 40 },
+  noContent: { ...T.bodySmall, color: '#9CA3AF', textAlign: 'center', paddingVertical: 40 },
 
   // Divider
   divider: { height: 8, backgroundColor: '#F3F4F6', marginVertical: 8 },
@@ -493,16 +494,16 @@ const styles = StyleSheet.create({
   commentsSection: { paddingHorizontal: 20, paddingTop: 16 },
   commentsSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
   commentsSectionHeaderRTL: { flexDirection: 'row-reverse' },
-  commentsTitle: { fontSize: 20, fontWeight: '700', color: '#111827' },
+  commentsTitle: { ...T.sectionTitle, color: '#111827' },
   commentCountBadge: { backgroundColor: '#dc2626', borderRadius: 10, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  commentCountText: { fontSize: 12, fontWeight: '700', color: '#fff' },
+  commentCountText: { ...T.badgeMedium, color: '#fff' },
 
   // Comment input
   commentInputContainer: { marginBottom: 20 },
   commentInputRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   commentInputRowRTL: { flexDirection: 'row-reverse' },
   commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center', marginTop: 2 },
-  commentAvatarText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  commentAvatarText: { ...T.button, fontWeight: '700', color: '#fff' },
   commentInput: {
     flex: 1, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: '#374151',
@@ -515,17 +516,17 @@ const styles = StyleSheet.create({
     borderRadius: 10, marginTop: 10, alignSelf: 'flex-end',
   },
   submitBtnDisabled: { opacity: 0.6 },
-  submitBtnText: { fontSize: 14, fontWeight: '600', color: '#fff' },
+  submitBtnText: { ...T.buttonSmall, color: '#fff' },
 
   loginToComment: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     backgroundColor: '#FEF2F2', paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: '#FECACA',
   },
-  loginToCommentText: { fontSize: 14, fontWeight: '600', color: '#dc2626' },
+  loginToCommentText: { ...T.buttonSmall, color: '#dc2626' },
 
   // Comments list
   noComments: { alignItems: 'center', paddingVertical: 32, gap: 8 },
-  noCommentsText: { fontSize: 14, color: '#9CA3AF' },
+  noCommentsText: { ...T.caption, color: '#9CA3AF', fontSize: 14 },
   commentCard: {
     backgroundColor: '#F9FAFB', borderRadius: 12, padding: 14, marginBottom: 12,
     borderWidth: 1, borderColor: '#F3F4F6',
@@ -533,18 +534,18 @@ const styles = StyleSheet.create({
   commentHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   commentHeaderRTL: { flexDirection: 'row-reverse' },
   commentAvatarSmall: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#E5E7EB', alignItems: 'center', justifyContent: 'center' },
-  commentAvatarSmallText: { fontSize: 13, fontWeight: '700', color: '#6B7280' },
-  commentUserName: { fontSize: 14, fontWeight: '600', color: '#374151' },
-  commentTime: { fontSize: 11, color: '#9CA3AF' },
-  commentContent: { fontSize: 14, color: '#4B5563', lineHeight: 20 },
+  commentAvatarSmallText: { ...T.caption, fontWeight: '700', color: '#6B7280' },
+  commentUserName: { ...T.label, color: '#374151' },
+  commentTime: { ...T.captionTiny, color: '#9CA3AF' },
+  commentContent: { ...T.faqAnswer, color: '#4B5563', lineHeight: 20 },
 
   // States
   loadingState: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loadingText: { fontSize: 15, color: '#6B7280' },
+  loadingText: { ...T.bodySmall, color: '#6B7280', lineHeight: undefined },
   errorState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 },
-  errorTitle: { fontSize: 16, fontWeight: '600', color: '#6B7280', textAlign: 'center' },
+  errorTitle: { ...T.label, fontSize: 16, color: '#6B7280', textAlign: 'center' },
   retryBtn: { backgroundColor: '#1F2937', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  retryBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  retryBtnText: { ...T.buttonSmall, color: '#fff' },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

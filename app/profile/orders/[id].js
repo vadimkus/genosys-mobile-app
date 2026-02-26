@@ -16,6 +16,7 @@ import { asText } from '../../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../../config/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as haptics from '../../../utils/haptics';
+import T from '../../../utils/typography';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -1013,9 +1014,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitleSmall,
   },
   refreshButton: {
     padding: 4,
@@ -1030,20 +1029,20 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   loadingText: {
+    ...T.label,
+    fontWeight: '400',
     marginTop: 12,
-    fontSize: 14,
     color: '#8E8E93',
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.sectionTitleSmall,
     marginTop: 16,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#8E8E93',
     textAlign: 'center',
     lineHeight: 20,
@@ -1073,16 +1072,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   orderNumberLabel: {
-    fontSize: 12,
+    ...T.captionSmall,
     fontWeight: '600',
     color: '#8E8E93',
     marginBottom: 2,
   },
   orderNumber: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1D1D1F',
-    fontFamily: 'monospace',
+    ...T.mono,
   },
   dateTimeRow: {
     flexDirection: 'row',
@@ -1094,9 +1090,9 @@ const styles = StyleSheet.create({
     borderTopColor: '#F2F2F7',
   },
   dateTimeText: {
-    fontSize: 13,
-    color: '#8E8E93',
+    ...T.caption,
     fontWeight: '500',
+    color: '#8E8E93',
   },
   
   // Section
@@ -1116,7 +1112,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 16,
+    ...T.body,
     fontWeight: '700',
     color: '#1D1D1F',
   },
@@ -1146,9 +1142,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8E8E93',
   },
   statusBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#ffffff',
+    ...T.badgeMedium,
     textTransform: 'uppercase',
   },
   // RTL helpers
@@ -1180,13 +1174,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   notesText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#1D1D1F',
-    lineHeight: 22,
   },
   paymentMethodText: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...T.label,
     color: '#1D1D1F',
   },
   paymentMethodRow: {
@@ -1195,7 +1187,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   paymentMethodPaidHint: {
-    fontSize: 13,
+    ...T.labelSmall,
     fontWeight: '700',
     color: '#16A34A',
   },
@@ -1250,8 +1242,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   itemName: {
+    ...T.label,
     flex: 1,
-    fontSize: 14,
     fontWeight: '700',
     color: '#1D1D1F',
     lineHeight: 18,
@@ -1265,12 +1257,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   discountPillText: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '900',
     color: '#16A34A',
   },
   itemPrice: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '800',
     color: '#dc2626',
   },
@@ -1280,7 +1272,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   itemDetailText: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#8E8E93',
     fontWeight: '500',
   },
@@ -1354,7 +1346,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   promoHeaderText: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#16A34A',
   },
@@ -1389,14 +1381,13 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   promoItemName: {
+    ...T.labelSmall,
     flex: 1,
-    fontSize: 13,
-    fontWeight: '600',
     color: '#16A34A',
     lineHeight: 18,
   },
   promoItemQty: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#16A34A',
     fontWeight: '500',
     marginTop: 4,
@@ -1410,7 +1401,7 @@ const styles = StyleSheet.create({
     borderColor: '#DCFCE7',
   },
   freeBadgeText: {
-    fontSize: 11,
+    ...T.captionTiny,
     fontWeight: '800',
     color: '#16A34A',
     textTransform: 'uppercase',
@@ -1427,14 +1418,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   detailLabel: {
-    fontSize: 13,
-    fontWeight: '600',
+    ...T.labelSmall,
     color: '#8E8E93',
     width: 80,
   },
   detailValue: {
+    ...T.labelSmall,
     flex: 1,
-    fontSize: 13,
     fontWeight: '500',
     color: '#1D1D1F',
     lineHeight: 18,
@@ -1454,14 +1444,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   summaryLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    ...T.summaryLabel,
     color: '#3C3C43',
   },
   summaryValue: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.summaryValue,
   },
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
@@ -1508,9 +1495,9 @@ const styles = StyleSheet.create({
     borderColor: '#BBF7D0',
   },
   youSavedText: {
-    fontSize: 13,
-    color: '#16A34A',
+    ...T.labelSmall,
     fontWeight: '800',
+    color: '#16A34A',
   },
   summaryLabelBold: {
     fontSize: 14,
@@ -1536,12 +1523,12 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   freeShippingText: {
-    fontSize: 12,
+    ...T.captionSmall,
     color: '#27AE60',
     fontWeight: '600',
   },
   vatNoteRed: {
-    fontSize: 11,
+    ...T.captionTiny,
     color: '#dc2626',
     paddingVertical: 2,
   },
@@ -1562,12 +1549,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   totalLabel: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1D1D1F',
+    ...T.totalLabel,
   },
   totalValue: {
-    fontSize: 20,
+    ...T.totalValue,
     fontWeight: '900',
     color: '#dc2626',
   },
@@ -1593,9 +1578,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   reorderButtonText: {
-    fontSize: 16,
+    ...T.button,
     fontWeight: '700',
-    color: '#ffffff',
   },
   payButton: {
     flexDirection: 'row',
@@ -1612,9 +1596,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   payButtonText: {
-    fontSize: 16,
+    ...T.button,
     fontWeight: '700',
-    color: '#ffffff',
   },
   supportButton: {
     flexDirection: 'row',
@@ -1631,9 +1614,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   supportButtonText: {
-    fontSize: 16,
+    ...T.button,
     fontWeight: '700',
-    color: '#ffffff',
   },
   buttonDisabled: {
     opacity: 0.6,

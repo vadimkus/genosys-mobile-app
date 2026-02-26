@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 export default function LocationsScreen() {
   const router = useRouter();
@@ -207,18 +208,18 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
   // Hero
   heroSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FAFAFA' },
   heroEmoji: { fontSize: 40, marginBottom: 8 },
-  heroTitle: { fontSize: 22, fontWeight: '700', color: '#000', textAlign: 'center', marginBottom: 8, letterSpacing: -0.3 },
-  heroSubtitle: { fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 20 },
+  heroTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', textAlign: 'center', marginBottom: 8 },
+  heroSubtitle: { ...T.caption, color: '#6B7280', textAlign: 'center', lineHeight: 20, fontSize: 14 },
 
   // Free Ship Banner
   freeShipBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginHorizontal: 20, marginTop: 16, backgroundColor: '#F0FDF4', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#BBF7D0' },
-  freeShipText: { fontSize: 13, fontWeight: '600', color: '#16a34a' },
+  freeShipText: { ...T.caption, fontWeight: '600', color: '#16a34a' },
 
   // Section
   section: { paddingHorizontal: 20, paddingVertical: 20 },
@@ -229,23 +230,23 @@ const styles = StyleSheet.create({
   locationHeaderRTL: { flexDirection: 'row-reverse' },
   locationIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   locationInfo: { flex: 1 },
-  locationName: { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  locationDesc: { fontSize: 13, color: '#6B7280', lineHeight: 18 },
+  locationName: { ...T.navTitle, fontWeight: '700', color: '#111827', marginBottom: 4 },
+  locationDesc: { ...T.caption, color: '#6B7280', lineHeight: 18 },
   locationMeta: { flexDirection: 'row', gap: 20, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB' },
   locationMetaRTL: { flexDirection: 'row-reverse' },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   metaItemRTL: { flexDirection: 'row-reverse' },
-  metaText: { fontSize: 13, fontWeight: '600', color: '#4B5563' },
+  metaText: { ...T.caption, fontWeight: '600', color: '#4B5563' },
 
   // Office
   officeSection: { paddingHorizontal: 20, paddingVertical: 20, backgroundColor: '#F9FAFB' },
-  officeTitle: { fontSize: 20, fontWeight: '700', color: '#000', marginBottom: 14 },
+  officeTitle: { ...T.sectionTitle, color: '#000', marginBottom: 14 },
   officeCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' },
   officeCardRTL: { flexDirection: 'row-reverse' },
   officeIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FEF2F2', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   officeInfo: { flex: 1 },
-  officeAddress: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  officeCity: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+  officeAddress: { ...T.bodySmall, fontWeight: '600', color: '#111827', lineHeight: undefined },
+  officeCity: { ...T.caption, color: '#6B7280', marginTop: 2 },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

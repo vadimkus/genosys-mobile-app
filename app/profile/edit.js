@@ -24,6 +24,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { getAddressLine, parseGenosysAddress } from '../../utils/addressUtils';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
+import T from '../../utils/typography';
 
 const log = createLogger('EditProfile');
 
@@ -843,18 +844,18 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   backText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
     fontWeight: '400',
   },
   cancelText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
+    fontWeight: '400',
   },
   headerButtonDisabled: {
     opacity: 0.5,
@@ -863,9 +864,8 @@ const styles = StyleSheet.create({
     color: '#999999',
   },
   saveText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
-    fontWeight: '600',
   },
   readOnlyBlock: {
     opacity: 0.75,
@@ -894,8 +894,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   avatarText: {
+    ...T.pageTitleLarge,
     fontSize: 36,
-    fontWeight: '600',
     color: '#ffffff',
   },
   changePhotoButton: {
@@ -903,7 +903,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   changePhotoText: {
-    fontSize: 17,
+    ...T.navTitle,
     color: '#dc2626',
     fontWeight: '400',
   },
@@ -935,10 +935,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...T.sectionTitle,
     color: '#000000',
-    letterSpacing: -0.4,
   },
   textRTL: {
     textAlign: 'right',
@@ -972,7 +970,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#C6C6C8',
   },
   fieldLabel: {
-    fontSize: 17,
+    ...T.navTitle,
     fontWeight: '400',
     color: '#000000',
     marginBottom: 6,
@@ -987,7 +985,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   textInput: {
-    fontSize: 17,
+    ...T.navTitle,
+    fontWeight: '400',
     color: '#000000',
     paddingVertical: 8,
     paddingHorizontal: 0,
@@ -1007,8 +1006,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   infoBoxText: {
+    ...T.captionSmall,
     flex: 1,
-    fontSize: 12,
     color: '#1D4ED8',
     lineHeight: 16,
     fontWeight: '600',
@@ -1025,8 +1024,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   warningBoxText: {
+    ...T.captionSmall,
     flex: 1,
-    fontSize: 12,
     color: '#92400E',
     lineHeight: 16,
     fontWeight: '600',
@@ -1041,7 +1040,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   selectFieldText: {
-    fontSize: 17,
+    ...T.navTitle,
+    fontWeight: '400',
     color: '#000000',
   },
 
@@ -1060,7 +1060,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   switchSubtext: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     marginTop: 2,
   },
@@ -1076,7 +1076,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   privacyText: {
-    fontSize: 15,
+    ...T.bodySmall,
     color: '#8E8E93',
     lineHeight: 20,
     textAlign: 'center',
@@ -1091,7 +1091,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#C6C6C8',
   },
   dangerTitle: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
     color: '#8E8E93',
     marginBottom: 12,
@@ -1109,7 +1109,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   deleteAccountText: {
-    fontSize: 15,
+    ...T.bodySmall,
     fontWeight: '700',
     color: '#ffffff',
   },
@@ -1151,7 +1151,7 @@ const styles = StyleSheet.create({
     borderColor: '#ffffff',
   },
   profilePictureText: {
-    fontSize: 16,
+    ...T.body,
     color: '#dc2626',
     fontWeight: '500',
   },
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   iosDateHeaderText: {
-    fontSize: 16,
+    ...T.button,
     color: '#007AFF',
     fontWeight: '500',
   },
@@ -1222,8 +1222,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F2F2F7',
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#000000',
   },
   modalContent: {
@@ -1242,7 +1241,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   genderOptionText: {
-    fontSize: 16,
+    ...T.body,
     color: '#000000',
   },
   selectedGenderOptionText: {
@@ -1252,8 +1251,7 @@ const styles = StyleSheet.create({
 
   // Required field indicator
   requiredMark: {
+    ...T.button,
     color: '#dc2626',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });

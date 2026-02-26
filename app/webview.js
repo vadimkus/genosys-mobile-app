@@ -13,6 +13,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
+import T from '../utils/typography';
 
 const log = createLogger('WebView');
 
@@ -366,10 +367,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   headerTitle: {
-    flex: 1,
+    ...T.navTitle,
     fontSize: 16,
-    fontWeight: '600',
     color: '#1F2937',
+    flex: 1,
     textAlign: 'center',
     marginHorizontal: 8,
   },
@@ -390,24 +391,26 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   errorText: {
-    fontSize: 16,
+    ...T.body,
     color: '#6B7280',
+    lineHeight: undefined,
   },
   errorTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
     color: '#1F2937',
     marginTop: 8,
   },
   errorDescription: {
-    fontSize: 14,
+    ...T.label,
+    fontWeight: '400',
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 8,
   },
   errorUrl: {
-    fontSize: 10,
+    ...T.badge,
+    fontWeight: '400',
     color: '#9CA3AF',
     textAlign: 'center',
     marginBottom: 16,
@@ -426,17 +429,16 @@ const styles = StyleSheet.create({
     maxWidth: 260,
   },
   retryButtonText: {
-    color: '#ffffff',
+    ...T.buttonSmall,
     fontSize: 15,
-    fontWeight: '600',
   },
   backButton: {
     paddingHorizontal: 24,
     paddingVertical: 10,
   },
   backButtonText: {
-    color: '#6B7280',
-    fontSize: 14,
+    ...T.label,
     fontWeight: '500',
+    color: '#6B7280',
   },
 });
