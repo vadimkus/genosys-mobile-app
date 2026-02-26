@@ -114,3 +114,71 @@ All changes in `app/concern-detail.js` — new styles: `stickyClearAll`, `sticky
 - `npx expo export --platform ios` — **Success**
 - `npx next build` (cosmetics-website) — **Success**
 - No linter errors
+
+---
+
+## Session 3: Ramadan Video Splash + Force Update + Bag Back Navigation Fix
+
+### Feature: Ramadan Video Splash Screen
+
+**Implementation**: Dynamic video splash that plays on app launch (5 seconds, tap to skip).
+
+| File | Change |
+|------|--------|
+| `components/VideoLaunchScreen.js` | New component — full-screen video player with local asset support, remote URL caching (`expo-file-system`), fade-out animation, tap-to-skip |
+| `app/_layout.js` | Bundled `ramadan2.mp4` via `require()`; splash renders as overlay on top of main app; skips `BrandedLaunchScreen` when local video is active |
+| `images/video/ramadan2.mp4` | Bundled Ramadan video asset (5.8MB) |
+
+**Remote configuration** (cosmetics-website):
+- `app/api/mobile/splash-config/route.ts` — New API endpoint returning `{ enabled, type, videoUrl, duration, cacheTTL }`
+- `public/videos/ramadan2.mp4` — Hosted copy for remote delivery to existing app versions
+
+### Feature: Force Update Version Gating
+
+| File | Change |
+|------|--------|
+| `components/ForceUpdateScreen.js` | New component — blocking "Update Required" screen with localized messaging and App Store link |
+| `app/_layout.js` | `compareVersions()` utility; fetches `/api/mobile/app-version` on cold start; blocks app if `currentVersion < minimumVersion` |
+
+**Server-side** (cosmetics-website):
+- `app/api/mobile/app-version/route.ts` — Returns `minimumVersion`, `latestVersion`, `forceUpdate` flag, localized messages
+
+### Feature: Payment Simplification
+
+| File | Change |
+|------|--------|
+| `components/checkout/PaymentMethodSelector.tsx` | Removed "Generate Link for Payment" option; renamed "Stripe Checkout" to "Card Payment" |
+| `app/checkout/CheckoutClient.tsx` | Commented out `support-link` payment handling |
+| `messages/en.json`, `ar.json`, `ru.json` | Updated payment descriptions, FAQ answers, added `cardPayment` key |
+
+### Bug Fix: Bag Back Chevron Not Returning to Previous Page
+
+**Problem**: Tapping the back chevron in the bag screen did nothing or navigated to the wrong place. The bag is a tab screen (stays mounted), so:
+1. `useEffect([])` only ran once on first mount — subsequent visits never re-read `navSource`
+2. `navSource` was stored as a plain URL string (`/concern-detail?slug=acne`) but expo-router needs `{ pathname, params }` object form
+3. `router.canGoBack()` was checked first but returns unreliable results for tab screens
+
+**Fix** (6 files):
+
+| File | Change |
+|------|--------|
+| `app/(tabs)/bag.js` | `useEffect` → `useFocusEffect` to re-read navSource on every focus; JSON.parse navSource; check navSource BEFORE `router.canGoBack()`; clear only on back press |
+| `app/concern-detail.js` | Store navSource as JSON `{ pathname: '/concern-detail', params: { slug } }` |
+| `app/product/[id].js` | Store navSource as JSON `{ pathname: '/product/[id]', params: { id } }` |
+| `app/bundle-builder.js` | Store navSource as JSON `{ pathname: '/bundle-builder' }` |
+| `app/profile/orders/[id].js` | Store navSource as JSON `{ pathname: '/profile/orders/[id]', params: { id } }` |
+| `app/profile.js` | Store navSource as JSON `{ pathname: '/profile' }` |
+
+### Version Bump & Build
+
+- Version: **1.5.0 → 1.6.0**
+- iOS buildNumber: **65 → 67** (EAS auto-bumped 66 → 67)
+- Android versionCode: **63 → 64**
+- EAS Build ID: `75456f05-355c-4765-b49a-d01142adf9ef`
+- Submitted to App Store Connect via `--auto-submit`
+
+### Documentation Updated
+
+- `docs/app-store/APPLE_REVIEW_DOCUMENTATION.md` — Updated to v1.6.0
+- `docs/app-store/RELEASE_NOTES_1.6.0.md` — New file with App Store "What's New" text
+- `docs/build/BUILD_STATUS.md` — Added v1.6.0 build section
