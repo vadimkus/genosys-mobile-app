@@ -14,7 +14,7 @@ import CollapsibleFooter from '../../components/CollapsibleFooter';
 import ProgressCard from '../../components/ProgressCard';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isBeautyBoxProduct, isHydroCoolMask, isUserDiscountExcludedProduct, getCanonicalUnitPrice, hasFixedPriceOverride, isDeviceProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
@@ -49,29 +49,31 @@ export default function BagScreen() {
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const src = await AsyncStorage.getItem('@genosys_nav_bag_source');
-        if (!cancelled && src) setNavSource(src);
-        await AsyncStorage.removeItem('@genosys_nav_bag_source');
-      } catch {
-        // ignore
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const src = await AsyncStorage.getItem('@genosys_nav_bag_source');
+          if (!cancelled && src) setNavSource(src);
+        } catch {
+          // ignore
+        }
+      })();
+      return () => { cancelled = true; };
+    }, [])
+  );
 
-  const handleHeaderBack = () => {
+  const handleHeaderBack = useCallback(() => {
+    AsyncStorage.removeItem('@genosys_nav_bag_source').catch(() => {});
     if (router.canGoBack()) {
       router.back();
     } else if (navSource) {
-      router.replace(navSource);
+      router.push(navSource);
     } else {
-      router.replace('/(tabs)/shop');
+      router.push('/(tabs)/shop');
     }
-  };
+  }, [navSource]);
 
   const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
 
