@@ -23,7 +23,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { fetchProductById } from '../../services/api';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../../utils/productRules';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isUserDiscountExcludedProduct } from '../../utils/productRules';
 import { isBeautyBoxProduct } from '../../utils/productRules';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedProductSize } from '../../utils/productLocalization';
@@ -871,7 +871,7 @@ export default function ProductDetailScreen() {
                 <View style={styles.priceBlock}>
                   {(() => {
                     // Canonical-price / no-user-discount products: show canonical/base price only.
-                    if (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) {
+                    if (isUserDiscountExcludedProduct(product) || hasFixedPriceOverride(product)) {
                       return <Text style={styles.price}>{`${formatPrice(getCanonicalUnitPrice(product))} AED`}</Text>;
                     }
 
