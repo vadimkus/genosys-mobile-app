@@ -573,7 +573,7 @@ export default function OrderDetailScreen() {
                           <View style={[styles.discountPill, isBundleItem && { backgroundColor: '#F0FDF4' }]}>
                             <Text style={[styles.discountPillText, isBundleItem && { color: '#16a34a' }]}>
                               {isBundleItem
-                                ? `${Math.round(orderBundleDiscPct)}% Bundle`
+                                ? `${Math.round(discountPct)}% Bundle`
                                 : `${Math.round(discountPct)}%`}
                             </Text>
                           </View>
