@@ -509,36 +509,33 @@ export default function OrderDetailScreen() {
               const color = it?.color || it?.selectedColor || '';
               const itemTotal = qty * price;
 
-              // Prefer the discount% stored with the order (captures the rate at time of purchase),
-              // falling back to the user's current discount% for older orders that lack this field.
               const orderDiscountPct = Number(order?.discountPercentage);
               const orderBundleDiscPct = Number(order?.bundleDiscountPercentage);
               const orderBundleDiscAmt = Number(order?.bundleDiscountAmount);
               const hasBundleOnOrder = Number.isFinite(orderBundleDiscPct) && orderBundleDiscPct > 0 && Number.isFinite(orderBundleDiscAmt) && orderBundleDiscAmt > 0;
 
-              // Check if this item is a bundle item (from "Build Your Set")
-              // Bundle items: item has fromBundle flag, or order has bundle discount and item is not excluded
-              const itemFromBundle = it?.fromBundle === true;
+              // Per-item bundleDiscount (from DB) takes priority over order-level inference
+              const itemBundlePct = Number(it?.bundleDiscount);
+              const hasPerItemBundleDiscount = Number.isFinite(itemBundlePct) && itemBundlePct > 0;
+              const itemFromBundle = hasPerItemBundleDiscount || it?.fromBundle === true;
               const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
 
-              // If order has bundle discount but no VIP discount, individual items are likely bundle items
-              // (unless they are beauty boxes / devices / hydro cool mask)
-              const isBundleItem = itemFromBundle || (hasBundleOnOrder && !excludedFromUserDiscount);
+              // Item is a bundle item if it has per-item bundleDiscount, or (legacy) order-level bundle + not excluded
+              const isBundleItem = hasPerItemBundleDiscount
+                || itemFromBundle
+                || (hasBundleOnOrder && it?.bundleDiscount === undefined && !excludedFromUserDiscount);
 
               let discountPct;
               let inferredOriginalUnit;
               let canShowDiscountBreakdown;
 
-              if (isBundleItem && hasBundleOnOrder) {
-                // Bundle item: ONLY bundle discount on retail price (no VIP stacking)
-                // Stored price = retail × (1 - bundlePct/100)
-                // Reverse to get retail: price / (1 - bundlePct/100)
-                const bundleFactor = 1 - orderBundleDiscPct / 100;
+              if (isBundleItem && (hasPerItemBundleDiscount || hasBundleOnOrder)) {
+                const bundlePctToUse = hasPerItemBundleDiscount ? itemBundlePct : orderBundleDiscPct;
+                const bundleFactor = 1 - bundlePctToUse / 100;
                 inferredOriginalUnit = bundleFactor > 0 ? Math.round(price / bundleFactor * 100) / 100 : null;
-                discountPct = orderBundleDiscPct;
+                discountPct = bundlePctToUse;
                 canShowDiscountBreakdown = !isPromoItem(it) && inferredOriginalUnit != null;
               } else {
-                // Regular item: use VIP discount
                 discountPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0)
                   ? orderDiscountPct
                   : Number(user?.discountPercentage);
