@@ -564,17 +564,32 @@ export const CartProvider = ({ children }) => {
       }
 
       // Update size and recalculate price from the new variant
+      // Must mirror addItem's originalPrice inference so discount display stays correct.
       const variants = itemToUpdate.product?.variants;
       let updatedProduct = itemToUpdate.product;
       if (Array.isArray(variants)) {
         const newVariant = variants.find(v => String(v?.size || '').trim() === normalizedNewSize);
         const vp = Number(newVariant?.price);
         if (Number.isFinite(vp) && vp > 0) {
+          const variantOriginal = Number(newVariant?.originalPrice);
+          const productOriginal = Number(itemToUpdate.product?.originalPrice);
+          const serverConfirmedDiscount =
+            (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
+            (Number.isFinite(productOriginal) && productOriginal > 0);
+          const discountPct = Number(user?.discountPercentage);
+          const inferredOriginal = serverConfirmedDiscount
+            ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
+            : null;
+          const keptOriginal =
+            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
+            inferredOriginal ||
+            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
+            null;
           updatedProduct = {
             ...updatedProduct,
             price: vp,
             displayPrice: vp,
-            originalPrice: Number(newVariant?.originalPrice) || null,
+            originalPrice: keptOriginal,
           };
         }
       }
