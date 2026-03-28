@@ -183,14 +183,14 @@ export default function BagScreen() {
     reloadShippingRates?.();
   }, []);
 
-  const handleQuantityChange = (item, change) => {
+  const handleQuantityChange = useCallback((item, change) => {
     const newQuantity = item.quantity + change;
     updateQuantity(item.product.id, newQuantity, item.selectedColor, item.selectedSize);
-  };
+  }, [updateQuantity]);
 
-  const handleRemoveItem = (item) => {
+  const handleRemoveItem = useCallback((item) => {
     removeItem(item.product.id, item.selectedColor, item.selectedSize);
-  };
+  }, [removeItem]);
 
   const handleCheckout = () => {
     mediumTap();
@@ -492,7 +492,7 @@ export default function BagScreen() {
         </View>
       );
     },
-    [getCategoryTranslationKey, handleQuantityChange, handleRemoveItem, isPromoItem, locale, t, user]
+    [handleQuantityChange, handleRemoveItem, updateColor, updateSize, locale, t, user, isRTL]
   );
 
   if (isLoading) {

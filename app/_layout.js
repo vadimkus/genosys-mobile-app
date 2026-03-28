@@ -131,7 +131,7 @@ export default function RootLayout() {
 
   const isExpoGo = Constants.appOwnership === 'expo';
 
-  if (isExpoGo && showLaunch && !splashVideo) {
+  if (isExpoGo && showLaunch && splashVideo === false) {
     return <BrandedLaunchScreen onDone={() => setShowLaunch(false)} />;
   }
 

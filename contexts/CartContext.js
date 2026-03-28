@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
@@ -77,6 +77,8 @@ export const CartProvider = ({ children }) => {
   const [shippingRates, setShippingRates] = useState(null);
   const [emirates, setEmirates] = useState(UAE_EMIRATES);
   const shippingRatesFetchRef = useRef({ inFlight: null, lastAt: 0 });
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   // Load cart and emirate from storage on mount
   useEffect(() => {
@@ -103,28 +105,34 @@ export const CartProvider = ({ children }) => {
   }, [selectedEmirate, isLoading]);
 
   // Auto-apply Free Mask Promotion based on cart subtotal (excludes existing promo items).
-  // This keeps promo items visible in Bag + included in checkout payload, while not affecting pricing totals.
+  // Uses itemsRef to read current items without listing `items` as a dep (which would
+  // cause a re-trigger every time setItems runs, risking an infinite loop).
+  // Instead, the effect re-runs when external factors change (user, emirate, rates).
+  // Cart mutations (add/remove/qty) also trigger it via a lightweight counter.
+  const promoTickRef = useRef(0);
+  const [promoTick, setPromoTick] = useState(0);
+  const bumpPromoTick = useCallback(() => setPromoTick((n) => n + 1), []);
+
   useEffect(() => {
     if (isLoading) return;
-
-    const nonPromoItems = items.filter((it) => !isPromotionItem(it));
-    const totals = calculateCartTotals(nonPromoItems, user, selectedEmirate, {
-      emirates,
-      freeShippingThreshold: shippingRates?.freeShippingThreshold,
-      vatRate: shippingRates?.vatRate,
-    });
-    const subtotal = Number(totals?.subtotal) || 0;
-
-    const desiredKeys = [];
-    if (subtotal >= PROMO_THRESHOLDS.twoMasks) {
-      desiredKeys.push('collagen', 'seaAlgae');
-    } else if (subtotal >= PROMO_THRESHOLDS.collagen) {
-      desiredKeys.push('collagen');
-    }
 
     setItems((prev) => {
       const prevNonPromo = prev.filter((it) => !isPromotionItem(it));
       const prevPromo = prev.filter((it) => isPromotionItem(it));
+
+      const totals = calculateCartTotals(prevNonPromo, user, selectedEmirate, {
+        emirates,
+        freeShippingThreshold: shippingRates?.freeShippingThreshold,
+        vatRate: shippingRates?.vatRate,
+      });
+      const subtotal = Number(totals?.subtotal) || 0;
+
+      const desiredKeys = [];
+      if (subtotal >= PROMO_THRESHOLDS.twoMasks) {
+        desiredKeys.push('collagen', 'seaAlgae');
+      } else if (subtotal >= PROMO_THRESHOLDS.collagen) {
+        desiredKeys.push('collagen');
+      }
 
       const currentKeys = new Set(
         prevPromo
@@ -134,13 +142,11 @@ export const CartProvider = ({ children }) => {
 
       const wantKeys = new Set(desiredKeys);
 
-      // Remove promos that should no longer exist
       const keptPromo = prevPromo.filter((it) => {
         const k = String(it?.promotionKey || '').trim();
         return k && wantKeys.has(k);
       });
 
-      // Add missing promos
       const toAdd = [];
       for (const key of desiredKeys) {
         if (currentKeys.has(key)) continue;
@@ -167,31 +173,11 @@ export const CartProvider = ({ children }) => {
         });
       }
 
-      const next = [...prevNonPromo, ...keptPromo, ...toAdd];
+      if (toAdd.length === 0 && keptPromo.length === prevPromo.length) return prev;
 
-      // Avoid state churn if nothing changed
-      if (next.length === prev.length) {
-        let same = true;
-        for (let i = 0; i < next.length; i++) {
-          const a = next[i];
-          const b = prev[i];
-          if (
-            a?.product?.id !== b?.product?.id ||
-            a?.quantity !== b?.quantity ||
-            a?.selectedSize !== b?.selectedSize ||
-            a?.selectedColor !== b?.selectedColor ||
-            a?.isPromotionItem !== b?.isPromotionItem
-          ) {
-            same = false;
-            break;
-          }
-        }
-        if (same) return prev;
-      }
-
-      return next;
+      return [...prevNonPromo, ...keptPromo, ...toAdd];
     });
-  }, [items, user, selectedEmirate, emirates, shippingRates, isLoading]);
+  }, [promoTick, user, selectedEmirate, emirates, shippingRates, isLoading]);
 
   const loadCartFromStorage = async () => {
     try {
@@ -438,6 +424,7 @@ export const CartProvider = ({ children }) => {
       return [...prev, newItem];
     });
 
+    bumpPromoTick();
     log.debug('Added to cart', { productId: normalizedProduct?.id, quantity });
   };
 
@@ -458,6 +445,7 @@ export const CartProvider = ({ children }) => {
       );
     }));
 
+    bumpPromoTick();
     log.debug('Removed from cart', { productId });
   };
 
@@ -481,6 +469,7 @@ export const CartProvider = ({ children }) => {
         : item
     ));
 
+    bumpPromoTick();
     log.debug('Updated quantity', { productId, quantity });
   };
 
@@ -525,6 +514,7 @@ export const CartProvider = ({ children }) => {
       );
     });
 
+    bumpPromoTick();
     log.debug('Updated color', { productId, oldColor, newColor });
   };
 
@@ -563,8 +553,11 @@ export const CartProvider = ({ children }) => {
           .filter(item => item !== itemToUpdate);
       }
 
-      // Update size and recalculate price from the new variant
-      // Must mirror addItem's originalPrice inference so discount display stays correct.
+      // Update size and recalculate price from the new variant.
+      // IMPORTANT: Do NOT use itemToUpdate.product.originalPrice for the "server confirmed
+      // discount" check — after a prior size switch it may be an inferred value, not the
+      // server's raw original. Instead, check the variant's own originalPrice or whether
+      // ANY variant in the array carries a server-set originalPrice.
       const variants = itemToUpdate.product?.variants;
       let updatedProduct = itemToUpdate.product;
       if (Array.isArray(variants)) {
@@ -572,10 +565,13 @@ export const CartProvider = ({ children }) => {
         const vp = Number(newVariant?.price);
         if (Number.isFinite(vp) && vp > 0) {
           const variantOriginal = Number(newVariant?.originalPrice);
-          const productOriginal = Number(itemToUpdate.product?.originalPrice);
+          const anyVariantHasOriginal = variants.some((v) => {
+            const vo = Number(v?.originalPrice);
+            return Number.isFinite(vo) && vo > Number(v?.price);
+          });
           const serverConfirmedDiscount =
             (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
-            (Number.isFinite(productOriginal) && productOriginal > 0);
+            anyVariantHasOriginal;
           const discountPct = Number(user?.discountPercentage);
           const inferredOriginal = serverConfirmedDiscount
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
@@ -583,7 +579,6 @@ export const CartProvider = ({ children }) => {
           const keptOriginal =
             (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
             inferredOriginal ||
-            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
             null;
           updatedProduct = {
             ...updatedProduct,
@@ -601,6 +596,7 @@ export const CartProvider = ({ children }) => {
       );
     });
 
+    bumpPromoTick();
     log.debug('Updated size', { productId, oldSize, newSize });
   };
 
@@ -609,6 +605,7 @@ export const CartProvider = ({ children }) => {
    */
   const clearCart = () => {
     setItems([]);
+    bumpPromoTick();
     log.debug('Cart cleared');
   };
 

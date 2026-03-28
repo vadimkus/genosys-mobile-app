@@ -43,7 +43,7 @@ import T from '../utils/typography';
 export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
   const { user, getAddresses } = useAuth();
-  const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates } = useCart();
+  const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const scrollRef = useRef(null);
@@ -89,7 +89,11 @@ export default function CheckoutScreen() {
 
   // Calculate totals
   const cartSummary = getCartSummary();
-  const totals = calculateCartTotals(items, user, selectedEmirate, getAvailableEmirates());
+  const totals = calculateCartTotals(items, user, selectedEmirate, {
+    emirates: getAvailableEmirates(),
+    freeShippingThreshold: shippingRates?.freeShippingThreshold,
+    vatRate: shippingRates?.vatRate,
+  });
   const safeSubtotal = Number(totals.subtotal) || 0;
   const safeShipping = Number(totals.shipping) || 0;
   const safeVat = Number(totals.vatAmount) || 0;

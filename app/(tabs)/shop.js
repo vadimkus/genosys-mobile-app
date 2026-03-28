@@ -349,7 +349,9 @@ export default function ShopScreen() {
             return isBeautyBox;
           })() ? (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.originalPrice}>{Number(product.originalPrice || ((Number(product.displayPrice) || Number(product.price) || 0) / 0.85)).toFixed(2)} AED</Text>
+              {Number(product.originalPrice) > Number(product.displayPrice || product.price || 0) && (
+                <Text style={styles.originalPrice}>{Number(product.originalPrice).toFixed(2)} AED</Text>
+              )}
               <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
               <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
@@ -544,9 +546,9 @@ export default function ShopScreen() {
   const initialLoadDone = useRef(false);
 
   useEffect(() => {
-    loadProducts();
-    loadCategories();
-    initialLoadDone.current = true;
+    Promise.all([loadProducts(), loadCategories()]).then(() => {
+      initialLoadDone.current = true;
+    });
   }, []);
 
   // Re-fetch products when user becomes available (login) to get personalized pricing.
@@ -610,7 +612,7 @@ export default function ShopScreen() {
     }
 
     setFilteredProducts(filtered);
-  }, [searchQuery, selectedCategory, products]);
+  }, [searchQuery, selectedCategory, products, locale, t]);
 
   const handleProductPress = (product) => {
     router.push({
@@ -673,14 +675,18 @@ export default function ShopScreen() {
     }
   };
 
-  const handleToggleFavorite = (product) => {
+  const handleToggleFavorite = async (product) => {
     haptics.lightTap();
-    const result = toggleFavorite(product);
-    log.debug(
-      result === 'added'
-        ? `favorite_added:${String(product?.id || '')}`
-        : `favorite_removed:${String(product?.id || '')}`
-    );
+    try {
+      const result = await toggleFavorite(product);
+      log.debug(
+        result === 'added'
+          ? `favorite_added:${String(product?.id || '')}`
+          : `favorite_removed:${String(product?.id || '')}`
+      );
+    } catch (err) {
+      log.warn('toggleFavorite failed', err?.message || err);
+    }
   };
 
 

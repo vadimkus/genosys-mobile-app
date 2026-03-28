@@ -171,26 +171,32 @@ export const FavoritesProvider = ({ children }) => {
   const addToFavorites = async (product) => {
     try {
       log.debug('Adding to favorites', { productId: product?.id });
-      
-      const newFavorite = {
-        id: product.id,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-        addedAt: new Date().toISOString(),
-      };
-      
+
+      // Check current state synchronously via ref-style read before mutating.
+      // Using a flag set inside the updater to know what actually happened.
+      let alreadyExists = false;
       let updatedFavorites;
       setFavorites(prev => {
         if (prev.some(fav => fav.id === product.id)) {
-          updatedFavorites = prev;
+          alreadyExists = true;
           return prev;
         }
+        const newFavorite = {
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          addedAt: new Date().toISOString(),
+        };
         updatedFavorites = [...prev, newFavorite];
         return updatedFavorites;
       });
 
-      if (!updatedFavorites || updatedFavorites === favorites) {
+      // React 18 batches — updater runs synchronously during setState in event handlers,
+      // but may defer in async contexts. Use a microtask yield to guarantee flags are set.
+      await Promise.resolve();
+
+      if (alreadyExists || !updatedFavorites) {
         log.debug('Product already in favorites');
         return { success: false, error: 'Product already in favorites' };
       }
@@ -242,6 +248,8 @@ export const FavoritesProvider = ({ children }) => {
         updatedFavorites = prev.filter(fav => fav.id !== productId);
         return updatedFavorites;
       });
+      await Promise.resolve();
+      if (!updatedFavorites) updatedFavorites = [];
       await saveFavorites(updatedFavorites);
       
       // Sync with database if user is logged in

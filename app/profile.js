@@ -35,6 +35,8 @@ const SWITCH_TRACK_BIOMETRIC = { false: '#E5E5EA', true: '#27AE60' };
 const SWITCH_TRACK_EMAIL = { false: '#E5E5EA', true: '#dc2626' };
 const SWITCH_THUMB = '#ffffff';
 const SWITCH_IOS_BG = '#E5E5EA';
+const PUSH_PREF_KEY = '@genosys_push_enabled';
+const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -59,8 +61,6 @@ export default function ProfileScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
-  const PUSH_PREF_KEY = '@genosys_push_enabled';
-  const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
 
   useEffect(() => {
     let cancelled = false;
@@ -682,11 +682,6 @@ export default function ProfileScreen() {
               icon="people-outline"
               title={t('navigation.partners') || 'Partners'}
               onPress={() => { haptics.lightTap(); router.push('/partners'); }}
-            />
-            <ProfileItem
-              icon="ribbon-outline"
-              title={t('navigation.about') || 'About'}
-              onPress={() => { haptics.lightTap(); router.push('/about'); }}
               isLast={true}
             />
           </View>
