@@ -74,40 +74,6 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* ─── Primary Navigation (core app screens) ─── */}
-          <View style={[styles.grid, isRTL && styles.gridRTL]}>
-            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/(tabs)/shop'); }} activeOpacity={0.7}>
-              <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
-                {t('navigation.products') || 'Products'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/(tabs)/orders'); }} activeOpacity={0.7}>
-              <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
-                {t('navigation.orders') || 'Orders'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/favorites'); }} activeOpacity={0.7}>
-              <View style={styles.badgeRow}>
-                <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
-                  {t('navigation.favorites') || 'Favorites'}
-                </Text>
-                {favCount > 0 && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{favCount}</Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.gridItem} onPress={() => { haptics.lightTap(); navigateTo('/profile'); }} activeOpacity={0.7}>
-              <Text style={[styles.primaryLink, isRTL && styles.textRTL]}>
-                {t('navigation.profile') || 'Profile'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
           {/* ─── Highlight actions (full-width, prominent) ─── */}
           <View style={[styles.highlightRow, isRTL && styles.gridRTL]}>
             <TouchableOpacity
