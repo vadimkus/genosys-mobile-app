@@ -379,13 +379,14 @@ export default function BagScreen() {
 
                 // "Build Your Set" bundle items: bundle discount ONLY (no VIP)
                 if (isBundleItem && bundlePct > 0 && Number.isFinite(base) && base > 0) {
-                  // Retail price = originalPrice stored when adding to cart
                   const retailPrice = (Number.isFinite(original) && original > base) ? original : base / (1 - bundlePct / 100);
                   const discountLabel = `${bundlePct}%`;
                   return (
                     <View style={styles.itemPriceContainer}>
-                      <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>
-                      <Text style={styles.itemBundleLabel}>{discountLabel} {t('bag.bundleOff') || 'OFF'}</Text>
+                      <View style={styles.itemPriceRow}>
+                        <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>
+                        <Text style={styles.itemBundleLabel}>{discountLabel} {t('bag.bundleOff') || 'OFF'}</Text>
+                      </View>
                       <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
                     </View>
                   );
@@ -395,12 +396,14 @@ export default function BagScreen() {
                 if (isBeautyBox && Number.isFinite(base) && base > 0) {
                   const fullPrice = (Number.isFinite(original) && original > base)
                     ? original
-                    : (base / 0.85); // bundle is 15% off
+                    : (base / 0.85);
 
                   return (
                     <View style={styles.itemPriceContainer}>
-                      <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
-                      <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
+                      <View style={styles.itemPriceRow}>
+                        <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
+                        <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
+                      </View>
                       <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
                     </View>
                   );
@@ -444,8 +447,10 @@ export default function BagScreen() {
                   const pctLabel = Math.round(pct);
                   return (
                     <View style={styles.itemPriceContainer}>
-                      <Text style={styles.itemOriginalPrice}>{originalForDisplay.toFixed(2)} AED</Text>
-                      {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% {t('bag.off')}</Text> : null}
+                      <View style={styles.itemPriceRow}>
+                        <Text style={styles.itemOriginalPrice}>{originalForDisplay.toFixed(2)} AED</Text>
+                        {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% {t('bag.off')}</Text> : null}
+                      </View>
                       <Text style={styles.itemDiscountedPrice}>{discountedForDisplay.toFixed(2)} AED</Text>
                     </View>
                   );
@@ -1176,9 +1181,10 @@ const styles = StyleSheet.create({
   },
   itemName: {
     ...T.body,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1D1D1F',
-    lineHeight: 20,
+    lineHeight: 18,
     marginBottom: 4,
   },
   itemCategory: {
@@ -1274,9 +1280,14 @@ const styles = StyleSheet.create({
   itemPriceContainer: {
     marginBottom: 12,
   },
+  itemPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
   itemOriginalPrice: {
     ...T.priceStrikethrough,
-    marginBottom: 2,
   },
   itemDiscountedPrice: {
     ...T.priceDiscount,
@@ -1285,15 +1296,11 @@ const styles = StyleSheet.create({
     ...T.captionTiny,
     fontWeight: '700',
     color: '#27AE60',
-    marginTop: 2,
-    marginBottom: 2,
   },
   itemDiscountLabel: {
     ...T.captionTiny,
     fontWeight: '700',
     color: '#27AE60',
-    marginTop: 2,
-    marginBottom: 2,
   },
   quantityContainer: {
     flexDirection: 'row',
