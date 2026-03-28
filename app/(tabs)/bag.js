@@ -35,6 +35,8 @@ export default function BagScreen() {
     getTotalItems, 
     updateQuantity, 
     removeItem, 
+    updateColor,
+    updateSize,
     clearCart, 
     getCartSummary,
     selectedEmirate,
@@ -275,14 +277,73 @@ export default function BagScreen() {
               })()}
             </Text>
 
-            {/* Variants Display - only show color here (size is shown below image) */}
-            {!promo && item.selectedColor && (
-              <View style={[styles.variantsContainer, isRTL && styles.variantsContainerRTL]}>
-                <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
-                  {t('common.color')}: {item.selectedColor}
-                </Text>
-              </View>
-            )}
+            {/* Color Selector */}
+            {!promo && (() => {
+              const cv = item.product?.colorVariants || [];
+              if (cv.length <= 0) {
+                if (item.selectedColor) {
+                  return (
+                    <View style={[styles.variantsContainer, isRTL && styles.variantsContainerRTL]}>
+                      <Text style={[styles.variantText, isRTL && styles.variantTextRTL]}>
+                        {t('common.color')}: {item.selectedColor}
+                      </Text>
+                    </View>
+                  );
+                }
+                return null;
+              }
+              return (
+                <View style={styles.variantSelectorWrap}>
+                  <Text style={[styles.variantSelectorLabel, isRTL && styles.variantTextRTL]}>{t('common.color')}:</Text>
+                  <View style={[styles.variantChipsRow, isRTL && { flexDirection: 'row-reverse' }]}>
+                    {cv.map((c) => {
+                      const sel = (item.selectedColor || '') === c.value;
+                      return (
+                        <TouchableOpacity
+                          key={c.value}
+                          style={[styles.variantChip, sel && styles.variantChipSelected]}
+                          onPress={() => { mediumTap(); updateColor(item.product.id, c.value, item.selectedColor, item.selectedSize); }}
+                        >
+                          <Text style={[styles.variantChipText, sel && styles.variantChipTextSelected]}>{c.label || c.value}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              );
+            })()}
+
+            {/* Size Selector */}
+            {!promo && (() => {
+              const variants = item.product?.variants;
+              if (!Array.isArray(variants)) return null;
+              const sizes = variants.filter(v => v?.size && v.size !== 'default' && v.available !== false);
+              const uniqueSizes = sizes.reduce((acc, v) => {
+                if (!acc.find(s => s.size === v.size)) acc.push(v);
+                return acc;
+              }, []);
+              if (uniqueSizes.length <= 1) return null;
+              const currentSize = item.selectedSize || '';
+              return (
+                <View style={styles.variantSelectorWrap}>
+                  <Text style={[styles.variantSelectorLabel, isRTL && styles.variantTextRTL]}>{t('product.size') || 'Size'}:</Text>
+                  <View style={[styles.variantChipsRow, isRTL && { flexDirection: 'row-reverse' }]}>
+                    {uniqueSizes.map((v) => {
+                      const sel = currentSize === v.size;
+                      return (
+                        <TouchableOpacity
+                          key={v.size}
+                          style={[styles.variantChip, sel && styles.variantChipSizeSelected]}
+                          onPress={() => { mediumTap(); updateSize(item.product.id, v.size, item.selectedSize, item.selectedColor); }}
+                        >
+                          <Text style={[styles.variantChipText, sel && styles.variantChipTextSizeSelected]}>{v.size}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              );
+            })()}
 
             {/* Price with Discount Display */}
             {promo ? (
@@ -1164,6 +1225,49 @@ const styles = StyleSheet.create({
   variantText: {
     ...T.captionSmall,
     marginBottom: 2,
+  },
+  variantSelectorWrap: {
+    marginBottom: 8,
+  },
+  variantSelectorLabel: {
+    ...T.captionSmall,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  variantChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  variantChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#D1D1D6',
+    backgroundColor: '#ffffff',
+  },
+  variantChipSelected: {
+    borderColor: '#dc2626',
+    backgroundColor: '#FFF5F5',
+  },
+  variantChipSizeSelected: {
+    borderColor: '#2563EB',
+    backgroundColor: '#EFF6FF',
+  },
+  variantChipText: {
+    ...T.captionSmall,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  variantChipTextSelected: {
+    color: '#dc2626',
+    fontWeight: '700',
+  },
+  variantChipTextSizeSelected: {
+    color: '#2563EB',
+    fontWeight: '700',
   },
   
   // Enhanced Price Display

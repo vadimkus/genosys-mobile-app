@@ -271,7 +271,14 @@
     "item": "منتج",
     "freeMasks": "هدايا مجانية",
     "inclShipping": "شامل التوصيل",
-    "freeShipping": "توصيل مجاني"
+    "freeShipping": "توصيل مجاني",
+    "colorRequiredTitle": "يجب اختيار اللون",
+    "colorRequiredMessage": "يرجى اختيار لون لـ: {products}. انتقل إلى السلة واضغط على المنتج لاختيار الدرجة.",
+    "sizeRequiredTitle": "يجب اختيار الحجم",
+    "sizeRequiredMessage": "يرجى اختيار حجم لـ: {products}. انتقل إلى السلة واختر الحجم الصحيح.",
+    "variantRequiredTitle": "يجب الاختيار",
+    "variantRequiredMessage": "يرجى اختيار اللون/الحجم لـ: {products}. انتقل إلى السلة للاختيار.",
+    "goToBag": "الذهاب للسلة"
   },
   "applePay": {
     "applePay": "Apple Pay",

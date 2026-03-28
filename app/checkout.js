@@ -82,6 +82,7 @@ export default function CheckoutScreen() {
   
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
+  const submittingRef = useRef(false);
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
@@ -350,6 +351,8 @@ export default function CheckoutScreen() {
   }, [user]);
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     haptics.mediumTap();
     setSubmitAttempted(true);
     setTouched({
@@ -360,6 +363,46 @@ export default function CheckoutScreen() {
       address: true,
     });
 
+    // Block checkout if any paid item has color variants but no color selected
+    const itemsMissingColor = paidItems.filter(item => {
+      const cv = item?.product?.colorVariants;
+      return Array.isArray(cv) && cv.length > 0 && !item.selectedColor;
+    });
+    // Block checkout if any paid item has multiple size variants but no size selected
+    const itemsMissingSize = paidItems.filter(item => {
+      const variants = item?.product?.variants;
+      if (!Array.isArray(variants)) return false;
+      const sizes = variants.filter(v => v?.size && v.size !== 'default' && v.available !== false);
+      const uniqueSizes = [...new Set(sizes.map(v => v.size))];
+      return uniqueSizes.length > 1 && !item.selectedSize;
+    });
+    if (itemsMissingColor.length > 0 || itemsMissingSize.length > 0) {
+      submittingRef.current = false;
+      haptics.warning();
+      const allMissing = [...itemsMissingColor, ...itemsMissingSize];
+      const uniqueNames = [...new Set(allMissing.map(i => i?.product?.name || i?.product?.title || 'Unknown'))];
+      const names = uniqueNames.join(', ');
+      const title = itemsMissingColor.length > 0 && itemsMissingSize.length > 0
+        ? t('checkout.variantRequiredTitle')
+        : itemsMissingColor.length > 0
+          ? t('checkout.colorRequiredTitle')
+          : t('checkout.sizeRequiredTitle');
+      const message = itemsMissingColor.length > 0 && itemsMissingSize.length > 0
+        ? t('checkout.variantRequiredMessage', { products: names })
+        : itemsMissingColor.length > 0
+          ? t('checkout.colorRequiredMessage', { products: names })
+          : t('checkout.sizeRequiredMessage', { products: names });
+      Alert.alert(
+        title,
+        message,
+        [
+          { text: t('checkout.goToBag'), onPress: () => router.replace('/(tabs)/bag') },
+          { text: t('common.cancel'), style: 'cancel' },
+        ]
+      );
+      return;
+    }
+
     const hasErrors =
       !firstName.trim() ||
       !lastName.trim() ||
@@ -368,6 +411,7 @@ export default function CheckoutScreen() {
       !address.trim();
 
     if (hasErrors) {
+      submittingRef.current = false;
       haptics.warning();
       await focusFirstInvalidField();
       return;
@@ -535,6 +579,7 @@ export default function CheckoutScreen() {
         ]
       );
     } finally {
+      submittingRef.current = false;
       setIsProcessing(false);
     }
   };

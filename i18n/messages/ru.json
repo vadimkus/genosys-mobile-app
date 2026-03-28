@@ -271,7 +271,14 @@
     "item": "товар",
     "freeMasks": "бесплатных масок",
     "inclShipping": "Вкл. доставку",
-    "freeShipping": "Бесплатная доставка"
+    "freeShipping": "Бесплатная доставка",
+    "colorRequiredTitle": "Необходимо выбрать цвет",
+    "colorRequiredMessage": "Пожалуйста, выберите цвет для: {products}. Перейдите в корзину и нажмите на товар, чтобы выбрать оттенок.",
+    "sizeRequiredTitle": "Необходимо выбрать размер",
+    "sizeRequiredMessage": "Пожалуйста, выберите размер для: {products}. Перейдите в корзину и выберите правильный размер.",
+    "variantRequiredTitle": "Необходимо сделать выбор",
+    "variantRequiredMessage": "Пожалуйста, выберите цвет/размер для: {products}. Перейдите в корзину для выбора.",
+    "goToBag": "В корзину"
   },
   "applePay": {
     "applePay": "Apple Pay",

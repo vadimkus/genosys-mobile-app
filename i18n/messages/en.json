@@ -271,7 +271,14 @@
     "item": "item",
     "freeMasks": "free masks",
     "inclShipping": "Incl. shipping",
-    "freeShipping": "Free shipping"
+    "freeShipping": "Free shipping",
+    "colorRequiredTitle": "Color Selection Required",
+    "colorRequiredMessage": "Please select a color for: {products}. Go to your bag and tap the item to choose a shade.",
+    "sizeRequiredTitle": "Size Selection Required",
+    "sizeRequiredMessage": "Please select a size for: {products}. Go to your bag and choose the correct size.",
+    "variantRequiredTitle": "Selection Required",
+    "variantRequiredMessage": "Please select color/size for: {products}. Go to your bag to choose.",
+    "goToBag": "Go to Bag"
   },
   "applePay": {
     "applePay": "Apple Pay",

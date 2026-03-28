@@ -414,31 +414,29 @@ export const CartProvider = ({ children }) => {
       };
     })();
     
-    const existingItemIndex = items.findIndex(item => 
-      item.product.id === normalizedProduct.id && 
-      item.selectedColor === normalizedColor && 
-      item.selectedSize === normalizedSize &&
-      !isPromotionItem(item)
-    );
+    const newItem = {
+      product: normalizedProduct,
+      quantity,
+      selectedColor: normalizedColor,
+      selectedSize: normalizedSize,
+      addedAt: new Date().toISOString(),
+      ...(itemMeta?.fromBundle ? { fromBundle: true, bundleDiscountPercent: itemMeta.bundleDiscountPercent || 0 } : {}),
+    };
 
-    if (existingItemIndex >= 0) {
-      // Update existing item quantity
-      const newItems = [...items];
-      newItems[existingItemIndex].quantity += quantity;
-      setItems(newItems);
-    } else {
-      // Add new item
-      const newItem = {
-        product: normalizedProduct,
-        quantity,
-        selectedColor: normalizedColor,
-        selectedSize: normalizedSize,
-        addedAt: new Date().toISOString(),
-        // Preserve bundle metadata at the item level (used by waterfall pricing)
-        ...(itemMeta?.fromBundle ? { fromBundle: true, bundleDiscountPercent: itemMeta.bundleDiscountPercent || 0 } : {}),
-      };
-      setItems(prev => [...prev, newItem]);
-    }
+    setItems(prev => {
+      const existingIdx = prev.findIndex(item =>
+        item.product.id === normalizedProduct.id &&
+        item.selectedColor === normalizedColor &&
+        item.selectedSize === normalizedSize &&
+        !isPromotionItem(item)
+      );
+      if (existingIdx >= 0) {
+        return prev.map((item, i) =>
+          i === existingIdx ? { ...item, quantity: item.quantity + quantity } : item
+        );
+      }
+      return [...prev, newItem];
+    });
 
     log.debug('Added to cart', { productId: normalizedProduct?.id, quantity });
   };
@@ -493,48 +491,102 @@ export const CartProvider = ({ children }) => {
     const normalizedOldColor = oldColor || '';
     const normalizedSize = selectedSize || '';
     const normalizedNewColor = newColor || '';
-    
-    // Find the item to update
-    const itemToUpdate = items.find(item =>
-      item.product.id === productId && 
-      item.selectedColor === normalizedOldColor && 
-      item.selectedSize === normalizedSize
-    );
-    
-    if (itemToUpdate) {
-      // Check if an item with the new color already exists
-      const existingItemWithNewColor = items.find(item =>
-        item.product.id === productId && 
-        item.selectedColor === normalizedNewColor && 
+
+    setItems(prev => {
+      const matchOld = (item) =>
+        item.product.id === productId &&
+        item.selectedColor === normalizedOldColor &&
+        item.selectedSize === normalizedSize;
+
+      const itemToUpdate = prev.find(matchOld);
+      if (!itemToUpdate) return prev;
+
+      const matchNew = (item) =>
+        item.product.id === productId &&
+        item.selectedColor === normalizedNewColor &&
         item.selectedSize === normalizedSize &&
-        item !== itemToUpdate
-      );
-      
-      if (existingItemWithNewColor) {
-        // Merge quantities and remove the old item
-        const updatedItems = items
+        item !== itemToUpdate;
+
+      const existingWithNewColor = prev.find(matchNew);
+
+      if (existingWithNewColor) {
+        return prev
           .map(item =>
-            item.product.id === productId && 
-            item.selectedColor === normalizedNewColor && 
-            item.selectedSize === normalizedSize &&
-            item !== itemToUpdate
+            matchNew(item)
               ? { ...item, quantity: item.quantity + itemToUpdate.quantity }
               : item
           )
           .filter(item => item !== itemToUpdate);
-        
-        setItems(updatedItems);
-      } else {
-        // Just update the color
-        setItems(prev => prev.map(item =>
-          item === itemToUpdate
-            ? { ...item, selectedColor: normalizedNewColor }
-            : item
-        ));
       }
-    }
+      return prev.map(item =>
+        item === itemToUpdate
+          ? { ...item, selectedColor: normalizedNewColor }
+          : item
+      );
+    });
 
     log.debug('Updated color', { productId, oldColor, newColor });
+  };
+
+  /**
+   * Update item size variant
+   */
+  const updateSize = (productId, newSize, oldSize = '', selectedColor = '') => {
+    const normalizedOldSize = oldSize || '';
+    const normalizedColor = selectedColor || '';
+    const normalizedNewSize = newSize || '';
+
+    setItems(prev => {
+      const matchOld = (item) =>
+        item.product.id === productId &&
+        item.selectedSize === normalizedOldSize &&
+        item.selectedColor === normalizedColor;
+
+      const itemToUpdate = prev.find(matchOld);
+      if (!itemToUpdate) return prev;
+
+      const matchNew = (item) =>
+        item.product.id === productId &&
+        item.selectedSize === normalizedNewSize &&
+        item.selectedColor === normalizedColor &&
+        item !== itemToUpdate;
+
+      const existingWithNewSize = prev.find(matchNew);
+
+      if (existingWithNewSize) {
+        return prev
+          .map(item =>
+            matchNew(item)
+              ? { ...item, quantity: item.quantity + itemToUpdate.quantity }
+              : item
+          )
+          .filter(item => item !== itemToUpdate);
+      }
+
+      // Update size and recalculate price from the new variant
+      const variants = itemToUpdate.product?.variants;
+      let updatedProduct = itemToUpdate.product;
+      if (Array.isArray(variants)) {
+        const newVariant = variants.find(v => String(v?.size || '').trim() === normalizedNewSize);
+        const vp = Number(newVariant?.price);
+        if (Number.isFinite(vp) && vp > 0) {
+          updatedProduct = {
+            ...updatedProduct,
+            price: vp,
+            displayPrice: vp,
+            originalPrice: Number(newVariant?.originalPrice) || null,
+          };
+        }
+      }
+
+      return prev.map(item =>
+        item === itemToUpdate
+          ? { ...item, selectedSize: normalizedNewSize, product: updatedProduct }
+          : item
+      );
+    });
+
+    log.debug('Updated size', { productId, oldSize, newSize });
   };
 
   /**
@@ -714,6 +766,7 @@ export const CartProvider = ({ children }) => {
     removeItem,
     updateQuantity,
     updateColor,
+    updateSize,
     clearCart,
     setSelectedEmirate,
     saveOrderToDatabase,
