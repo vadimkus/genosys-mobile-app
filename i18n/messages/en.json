@@ -20,7 +20,9 @@
     "aiSkinAnalysis": "AI Skin Analysis",
     "training": "Training",
     "partners": "Partners",
-    "certificates": "Gift Certificates"
+    "certificates": "Gift Certificates",
+    "explore": "Explore",
+    "information": "Information"
   },
   "chat": {
     "title": "Genie ✨ Your Beauty Genie",
@@ -646,6 +648,9 @@
     "contactUs": "Contact Us",
     "aboutGenosys": "About Genosys",
     "trainingMaterials": "Training Materials",
+    "buildYourSet": "Build your skincare set",
+    "aiSkinSubtitle": "Camera or quiz analysis",
+    "skinConcernSubtitle": "Browse by concern",
     "notAvailable": "Not Available",
     "signOut": "Sign Out",
     "signOutTitle": "Sign Out",

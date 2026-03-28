@@ -20,7 +20,9 @@
     "aiSkinAnalysis": "تحليل البشرة بالذكاء الاصطناعي",
     "training": "التدريب",
     "partners": "الشركاء",
-    "certificates": "شهادات الهدايا"
+    "certificates": "شهادات الهدايا",
+    "explore": "استكشف",
+    "information": "معلومات"
   },
   "chat": {
     "title": "جيني ✨ مساعدة الجمال",
@@ -646,6 +648,9 @@
     "contactUs": "اتصل بنا",
     "aboutGenosys": "حول Genosys",
     "trainingMaterials": "مواد التدريب",
+    "buildYourSet": "ابنِ مجموعة العناية بالبشرة",
+    "aiSkinSubtitle": "تحليل بالكاميرا أو اختبار",
+    "skinConcernSubtitle": "تصفح حسب المشكلة",
     "notAvailable": "غير متوفر",
     "signOut": "تسجيل الخروج",
     "signOutTitle": "تسجيل الخروج",

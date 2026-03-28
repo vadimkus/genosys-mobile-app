@@ -20,7 +20,9 @@
     "aiSkinAnalysis": "AI Анализ кожи",
     "training": "Обучение",
     "partners": "Партнёры",
-    "certificates": "Подарочные сертификаты"
+    "certificates": "Подарочные сертификаты",
+    "explore": "Обзор",
+    "information": "Информация"
   },
   "chat": {
     "title": "Джинни ✨ Ваш Бьюти-Джинн",
@@ -646,6 +648,9 @@
     "contactUs": "Связаться с нами",
     "aboutGenosys": "О Genosys",
     "trainingMaterials": "Учебные материалы",
+    "buildYourSet": "Соберите свой набор",
+    "aiSkinSubtitle": "Анализ камерой или тест",
+    "skinConcernSubtitle": "Подбор по проблеме",
     "notAvailable": "Недоступно",
     "signOut": "Выйти",
     "signOutTitle": "Выйти",
