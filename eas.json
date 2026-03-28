@@ -28,10 +28,12 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production"
     },
     "production:android": {
       "autoIncrement": true,
+      "channel": "production",
       "prebuildCommand": "npx expo prebuild --no-install",
       "android": {
         "buildType": "app-bundle"

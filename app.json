@@ -3,7 +3,7 @@
     "name": "Genosys UAE",
     "owner": "vadimkus",
     "slug": "genosys-mobile-app",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "72",
+      "buildNumber": "73",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
@@ -341,6 +341,9 @@
     "sdkVersion": "54.0.0",
     "runtimeVersion": "1.0.0",
     "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 5000,
       "url": "https://u.expo.dev/b874a5c1-c47e-4c4e-9286-42e431978d51"
     }
   }

@@ -18,6 +18,7 @@ import UpdateBanner from '../components/UpdateBanner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { setupDeepLinkListener } from '../utils/deepLinking';
 import AUTH_CONFIG from '../config/auth';
+import { checkForUpdates } from '../config/updates';
 
 const UPDATE_DISMISSED_KEY = '@update_dismissed_version';
 
@@ -119,6 +120,12 @@ export default function RootLayout() {
 
     checkVersion();
     checkSplash();
+
+    // OTA: download update in background; applies on next cold start
+    if (!__DEV__) {
+      checkForUpdates();
+    }
+
     return () => { cancelled = true; };
   }, []);
 
