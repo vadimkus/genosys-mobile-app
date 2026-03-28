@@ -11,6 +11,7 @@
     "development:android": {
       "developmentClient": true,
       "distribution": "internal",
+      "prebuildCommand": "npx expo prebuild --no-install",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleDebug"
@@ -21,6 +22,7 @@
     },
     "preview:android": {
       "distribution": "internal",
+      "prebuildCommand": "npx expo prebuild --no-install",
       "android": {
         "buildType": "apk"
       }
@@ -30,6 +32,7 @@
     },
     "production:android": {
       "autoIncrement": true,
+      "prebuildCommand": "npx expo prebuild --no-install",
       "android": {
         "buildType": "app-bundle"
       }

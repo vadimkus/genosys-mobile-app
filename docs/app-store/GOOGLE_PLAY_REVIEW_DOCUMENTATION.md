@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Package Name:** ae.genosys.app  
-**Version:** 1.4.0  
-**Version Code:** 58  
+**Version:** 1.7.0  
+**Version Code:** 71  
 **Platform:** Android  
 
 ---
@@ -14,37 +14,74 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.4.0
+## What's New in Version 1.7.0
 
-### Pricing & Discount Logic Overhaul
+### Remote Splash Screen
+- **API-Driven Splash Video** — Launch video is now delivered over-the-air, updatable without app rebuild. Seasonal splash videos (Ramadan, Eid, holidays) can be swapped instantly server-side.
+- **5.6MB Binary Reduction** — Removed bundled video from app binary. App downloads faster and takes less storage.
+- **Instant Cached Playback** — Splash config and video file are cached locally for instant display on repeat launches.
+
+### Soft Update Banner
+- **Non-Blocking Update Notification** — When a newer version is available, a dismissible dark banner slides in at the top with "A new version is available on Google Play" and an "Update" button.
+- **Persistent Dismissal** — Dismissing the banner persists via AsyncStorage so the user isn't nagged again for the same version.
+
+### Platform-Aware Update URLs
+- **Correct Store Redirect** — Force update and soft update banners now direct Android users to Google Play and iOS users to the App Store.
+
+### Under the Hood
+- Splash screen configuration cached locally for instant display on repeat launches
+- Improved cold start performance
+- Android versionCode aligned with iOS buildNumber (71)
+
+---
+
+## What's New in Previous Versions
+
+### Version 1.6.0 (Build 68) — February 26, 2026
+- Ramadan video splash screen (bundled)
+- Force update version gating (server-controlled)
+- Sticky bar UX: per-item remove, clear all, green discount color
+- Pricing fixes: concern page VIP pricing, cart price doubling fix
+- Payment simplification: removed "Generate Link", renamed to "Card Payment"
+- Bag back chevron fix
+
+### Version 1.5.0 (Build 65) — February 17, 2026
+- Native skin concern detail pages
+- Tap-to-add from routine chips
+- 100% native (zero WebView content screens)
+- App-wide haptic feedback (38 files, ~190 touch points)
+
+### Version 1.4.0 (Build 58) — February 14, 2026
+
+#### Pricing & Discount Logic Overhaul
 - **Mutually Exclusive Discounts** — Bundle discounts and VIP discounts no longer stack. Bundle items receive only the bundle discount on retail price; regular items receive only the VIP discount on retail price.
 - **Consistent Cross-Platform Pricing** — All pricing calculations are now fully aligned between the website and native app across cart, checkout, order details, and email confirmations.
 - **Corrected Order History** — Order detail screens now display accurate per-item discounts (bundle items show only "Bundle Discount", VIP items show only their VIP percentage).
 
-### Checkout Improvements
+#### Checkout Improvements
 - **Auto-Populate Delivery Address** — Saved addresses are now automatically populated in the checkout form, eliminating the need to re-enter delivery details for returning customers.
 - **Checkout Footer Summary** — The checkout screen now displays a total summary in the footer, including item count, total price, and shipping information.
 - **Improved Keyboard Handling** — ScrollView now persists taps on Android, preventing accidental input dismissal.
 
-### Localization & Translation
+#### Localization & Translation
 - **Fully Translated UI** — 26+ previously hardcoded English strings in the AI Skin Analysis camera and WebView screens are now translated into Arabic and Russian.
 - **Complete 3-Language Coverage** — All 1,390+ translation keys verified across English, Arabic, and Russian with zero missing keys.
 
-### Bug Fixes
+#### Bug Fixes
 - **Bundle Item Pricing in Cart** — Fixed issue where adding items from "Build Your Set" could show inflated retail prices.
 - **Product Price Refresh on Login** — Shop page now re-fetches products when a user logs in.
 - **Product Video Sound** — Videos now play with audio even when the iOS/Android silent mode is on.
 - **Product Documentation** — PDF guides now load from API first (future-proof), with local fallback.
 - **Stripe Payment Stability** — Prevented duplicate success alerts on payment completion; iOS-only presentation styles now properly guarded.
 
-### Android-Specific Fixes
+#### Android-Specific Fixes
 - **Keyboard Behavior** — Fixed `KeyboardAvoidingView` behavior for chat, address form, and blog comment screens.
 - **Card Shadows** — Added proper elevation values for cards that were missing shadows on Android.
 - **Nested Scroll** — Gallery FlatList inside product detail now uses `nestedScrollEnabled` for smooth scrolling on Android.
 - **Haptic Feedback** — All haptic feedback now works cross-platform (previously some were iOS-only).
 - **Chrome Custom Tabs** — Stripe payment opens cleanly in Chrome Custom Tabs without iOS-only presentation styles.
 
-### Stability & Performance
+#### Stability & Performance
 - **Safe Import for Apple Authentication** — Apple Sign-In module uses safe loading to prevent crashes on Android.
 - **Notification Badge Clearing** — App badge count clears automatically when the app is opened.
 - **Error Recovery** — Added fallback for payment method preferences loading.
@@ -380,7 +417,24 @@ This account is pre-created and ready to use. No email verification required.
 - [x] User profile management works
 - [x] Order history displays with correct pricing
 
-### New v1.4.0 Features
+### v1.7.0 Features
+- [x] Remote splash screen plays on launch (API-driven video)
+- [x] Splash video caches locally for instant repeat playback
+- [x] Soft update banner appears when newer version exists
+- [x] "Update" button links to Google Play (not App Store)
+- [x] Dismiss banner → persists, doesn't reappear for same version
+- [x] Force update screen links to Google Play
+
+### v1.6.0 Features
+- [x] Force update version gating works (blocks app if below minimum)
+- [x] Sticky bar UX with per-item remove and clear all
+
+### v1.5.0 Features
+- [x] Skin concern detail pages render natively
+- [x] Tap-to-add from routine chips works
+- [x] Haptic feedback works on Android
+
+### v1.4.0 Features
 - [x] Bundle and VIP discounts mutually exclusive (no stacking)
 - [x] Checkout auto-populates saved delivery address
 - [x] Checkout footer shows total summary with shipping info
@@ -428,7 +482,10 @@ This account is pre-created and ready to use. No email verification required.
 | 1.0.0 | — | Released | Dec 2025 | Initial release |
 | 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
 | 1.3.0 | 53 | Released | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
-| 1.4.0 | 58 | **Current** | Feb 14, 2026 | Pricing overhaul, checkout improvements, full translation, Android polish |
+| 1.4.0 | 58 | Released | Feb 14, 2026 | Pricing overhaul, checkout improvements, full translation, Android polish |
+| 1.5.0 | 65 | Released | Feb 17, 2026 | Skin concern pages, 100% native, haptics, routine tap-to-add |
+| 1.6.0 | 68 | Released | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes |
+| 1.7.0 | 71 | **Current** | Mar 21, 2026 | Remote splash screen, soft update banner, 5.6MB binary reduction, platform-aware updates |
 
 ---
 

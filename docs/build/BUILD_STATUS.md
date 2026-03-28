@@ -1,12 +1,47 @@
 # ✅ Mobile App Build Status: LIVE ON APP STORE / GOOGLE PLAY READY
 
-## 🎉 Version 1.6.0 (Build 68) — February 26, 2026
+## 🎉 Version 1.7.0 (Build 71) — March 21, 2026 — LIVE ON APP STORE / ANDROID ALIGNED
 
-**Status:** Submitted to App Store Connect via TestFlight  
-**Build ID:** `c893776b-9035-46a7-80ce-39d705b54fb6`  
-**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/c893776b-9035-46a7-80ce-39d705b54fb6  
-**Submission:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/submissions/0bbc6d7b-8e54-4264-ba40-a061b2367684  
+**Status:** Live on App Store | Android build ready (versionCode 71)  
+**iOS Build ID:** `8faaf570-32e3-4458-8f43-de01d6d81005`  
+**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/8faaf570-32e3-4458-8f43-de01d6d81005  
+**App Store:** https://apps.apple.com/app/id6756648064  
+**Google Play:** https://play.google.com/store/apps/details?id=ae.genosys.app  
 **TestFlight:** https://appstoreconnect.apple.com/apps/6756648064/testflight/ios
+
+### What's New
+- Remote splash screen: video is now API-driven, updatable without app rebuild
+- Removed bundled video from binary (5.6MB savings)
+- AsyncStorage caching for instant splash display on repeat launches
+- Soft update banner: dismissible "new version available" notification on launch
+- Platform-aware update URLs: Android → Google Play, iOS → App Store
+- Android versionCode aligned with iOS buildNumber (69 → 71)
+- Android native directory generated locally (expo prebuild)
+- See [Remote Splash Screen](../core/REMOTE_SPLASH_SCREEN.md) for full technical documentation
+
+### OTA Splash Updates (no app rebuild)
+
+| Date | Video | Commit | Notes |
+|------|-------|--------|-------|
+| Mar 19, 2026 | `ramadan2.mp4` (5.6MB) | Initial release | Ramadan campaign |
+| Mar 20, 2026 | `Splash.mp4` (4.4MB) | `815b8c8` | New branded splash, Ramadan over |
+
+### Android Alignment (Mar 21, 2026)
+
+| Change | Before | After |
+|--------|--------|-------|
+| `android.versionCode` in `app.json` | 69 | 71 |
+| `android/` directory | Not present (cloud-only) | Generated locally via `expo prebuild` |
+| App-version API (`/api/mobile/app-version`) | iOS App Store URL only | Platform-aware: `?platform=android` → Google Play URL |
+| ForceUpdateScreen button text | "Update Now" | "Update on Google Play" |
+| UpdateBanner text | "A new version is available" | "A new version is available on Google Play" |
+| Google Play Review Documentation | v1.4.0 / versionCode 58 | v1.7.0 / versionCode 71 |
+
+---
+
+## Previous: Version 1.6.0 (Build 68) — February 26, 2026
+
+**Build ID:** `c893776b-9035-46a7-80ce-39d705b54fb6`
 
 ### What's New
 - Ramadan video splash screen (bundled `ramadan2.mp4`, 5.8MB)
@@ -241,12 +276,13 @@ The Genosys UAE mobile app is **live on the App Store** and the Android build is
 - Compatible with Expo Go and development builds
 
 ### **✅ Production Builds**
-- iOS App Store build submitted (Build 67, v1.6.0)
-- Ready for Android Play Store builds (versionCode 64, v1.6.0)
-- Android aligned with iOS (Feb 17, 2026): full feature parity, 9 permissions, 40 deep link paths, 10 plugins
+- iOS App Store build submitted (Build 71, v1.7.0) — LIVE
+- Android aligned with iOS (Mar 21, 2026): versionCode 71, full feature parity
+- Platform-aware update URLs (App Store / Google Play)
+- Android native directory generated locally (`android/`)
 - All Android-specific issues fixed (elevation, nested scroll, keyboard, haptics, Stripe)
-- Google Play Review Documentation updated and complete
-- Ready for standalone app builds
+- Google Play Review Documentation updated to v1.7.0
+- Ready for `npm run build:android:production` and `npm run submit:android`
 
 ---
 
@@ -302,8 +338,9 @@ DEL  /mobile/user/wishlist/:id    - Remove from favorites
 | 1.1.0 | 34 | Released | Jan 2026 | AI features, image gallery, videos, hamburger menu |
 | 1.3.0 | 53 | Released | Feb 11, 2026 | AI Skin Analysis, Bundle Builder, Native Blog, Push Notifications |
 | 1.4.0 | 58 | Released | Feb 14, 2026 | Pricing overhaul, checkout improvements, Android polish, Google Play ready |
-| 1.6.0 | 68 | **Current** | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes, payment simplification, bag back nav fix |
 | 1.5.0 | 65 | Released | Feb 17, 2026 | Skin concern pages, 100% native, haptics, routine tap-to-add |
+| 1.6.0 | 68 | Released | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes, payment simplification, bag back nav fix |
+| 1.7.0 | 71 | **Live** | Mar 19, 2026 | Remote splash screen (API-driven), soft update banner, 5.6MB binary reduction, Android aligned (Mar 21) |
 
 ---
 

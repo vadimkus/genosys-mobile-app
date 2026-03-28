@@ -3,7 +3,7 @@
     "name": "Genosys UAE",
     "owner": "vadimkus",
     "slug": "genosys-mobile-app",
-    "version": "1.6.0",
+    "version": "1.7.1",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "68",
+      "buildNumber": "72",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
@@ -55,7 +55,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 68,
+      "versionCode": 75,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -66,11 +66,14 @@
         "VIBRATE",
         "RECORD_AUDIO",
         "CAMERA",
-        "READ_MEDIA_IMAGES",
         "POST_NOTIFICATIONS",
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
         "ACCESS_NETWORK_STATE"
+      ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
       ],
       "intentFilters": [
         {

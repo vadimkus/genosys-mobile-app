@@ -172,12 +172,6 @@ export const FavoritesProvider = ({ children }) => {
     try {
       log.debug('Adding to favorites', { productId: product?.id });
       
-      // Check if already in favorites
-      if (favorites.some(fav => fav.id === product.id)) {
-        log.debug('Product already in favorites');
-        return { success: false, error: 'Product already in favorites' };
-      }
-      
       const newFavorite = {
         id: product.id,
         name: product.name,
@@ -186,9 +180,21 @@ export const FavoritesProvider = ({ children }) => {
         addedAt: new Date().toISOString(),
       };
       
-      // Update local state
-      const updatedFavorites = [...favorites, newFavorite];
-      setFavorites(updatedFavorites);
+      let updatedFavorites;
+      setFavorites(prev => {
+        if (prev.some(fav => fav.id === product.id)) {
+          updatedFavorites = prev;
+          return prev;
+        }
+        updatedFavorites = [...prev, newFavorite];
+        return updatedFavorites;
+      });
+
+      if (!updatedFavorites || updatedFavorites === favorites) {
+        log.debug('Product already in favorites');
+        return { success: false, error: 'Product already in favorites' };
+      }
+
       await saveFavorites(updatedFavorites);
       
       // Sync with database if user is logged in
@@ -231,9 +237,11 @@ export const FavoritesProvider = ({ children }) => {
     try {
       log.debug('Removing from favorites', { productId });
       
-      // Update local state
-      const updatedFavorites = favorites.filter(fav => fav.id !== productId);
-      setFavorites(updatedFavorites);
+      let updatedFavorites;
+      setFavorites(prev => {
+        updatedFavorites = prev.filter(fav => fav.id !== productId);
+        return updatedFavorites;
+      });
       await saveFavorites(updatedFavorites);
       
       // Sync with database if user is logged in

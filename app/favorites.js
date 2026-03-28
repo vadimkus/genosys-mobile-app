@@ -268,13 +268,13 @@ export default function FavoritesScreen() {
                     </View>
                   ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
                     <View style={styles.priceContainer}>
-                      <Text style={styles.gridPrice}>{getCanonicalUnitPrice(product).toFixed(2)} AED</Text>
+                      <Text style={styles.gridPrice}>{Number(getCanonicalUnitPrice(product) || 0).toFixed(2)} AED</Text>
                       <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                     </View>
                   ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
                     <View style={styles.priceContainer}>
                       <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
-                      <Text style={styles.discountedPrice}>{(product.displayPrice || product.price).toFixed(2)} AED</Text>
+                      <Text style={styles.discountedPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
                       {product.discountLabel && (
                         <Text style={styles.savings}>{product.discountLabel}</Text>
                       )}
@@ -282,7 +282,7 @@ export default function FavoritesScreen() {
                     </View>
                   ) : (
                     <View style={styles.priceContainer}>
-                      <Text style={styles.gridPrice}>{(product.displayPrice || product.price).toFixed(2)} AED</Text>
+                      <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
                       <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                     </View>
                   )}

@@ -32,7 +32,10 @@
 | [Session Log 11 Feb 2026](./core/SESSION_LOG_2026_02_11.md) | Android alignment, v58, full audit (checkout/orders/success), haptics fix, badge fix, beauty box |
 | [Session Log 12 Feb 2026](./core/SESSION_LOG_2026_02_12.md) | v1.4.0 TestFlight, Apple Review doc update, App Store release notes |
 | [Session Log 13 Feb 2026](./core/SESSION_LOG_2026_02_13.md) | Product video sound fix, product documentation API-first fix |
-| [Session Log 26 Feb 2026](./core/SESSION_LOG_2026_02_26.md) | **NEW** Centralized typography system (54 files), Revita Glow "New" badge fix |
+| [Bug Audit 23 Mar 2026](./core/BUG_AUDIT_2026_03_23.md) | **NEW** Full code audit: 11 bugs fixed (crash, security, race conditions, checkout) |
+| [Session Log 19–20 Mar 2026](./core/SESSION_LOG_2026_03_19.md) | Remote splash screen, soft update banner, v1.7.0 live, first OTA splash swap |
+| [Remote Splash Screen](./core/REMOTE_SPLASH_SCREEN.md) | How to update/disable splash video without app rebuild (with change history) |
+| [Session Log 26 Feb 2026](./core/SESSION_LOG_2026_02_26.md) | Centralized typography system (54 files), Revita Glow "New" badge fix |
 | [Session Log 20 Feb 2026](./core/SESSION_LOG_2026_02_20.md) | Fix routine chip cart state for products with size variants (9 products across 7 concern pages) |
 | [Session Log 19 Feb 2026 (Part 2)](./core/SESSION_LOG_2026_02_19_part2.md) | Native concern-detail screen, training nativization, routine add-to-cart (tap toggle + long-press navigate), CUID vs productNumber fix, toast messages, TestFlight build 64 |
 | [Session Log 19 Feb 2026](./core/SESSION_LOG_2026_02_19.md) | Native Skin Concerns screen, Browse by Concern CTAs, PDRN video, Skin Concern category |
@@ -133,6 +136,7 @@
 | Doc | Description |
 |-----|-------------|
 | [App Store Assets](./app-store/APP_STORE_ASSETS.md) | Assets for App Store listing |
+| [Release Notes 1.7.0](./app-store/RELEASE_NOTES_1.7.0.md) | **NEW** v1.7.0 release notes, review notes, technical changes |
 | [Apple Review](./app-store/APPLE_REVIEW_DOCUMENTATION.md) | Apple App Store review preparation |
 | [Google Play Review](./app-store/GOOGLE_PLAY_REVIEW_DOCUMENTATION.md) | Google Play Store review documentation |
 | [Google Play Console Setup](./app-store/GOOGLE_PLAY_CONSOLE_SETUP.md) | **NEW** Developer account setup, build, submit, release details (Feb 2026) |

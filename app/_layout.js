@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { LogBox } from 'react-native';
+import { LogBox, Platform } from 'react-native';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
@@ -13,13 +14,13 @@ import AuthWrapper from './AuthWrapper';
 import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
 import ForceUpdateScreen from '../components/ForceUpdateScreen';
 import VideoLaunchScreen from '../components/VideoLaunchScreen';
+import UpdateBanner from '../components/UpdateBanner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { setupDeepLinkListener } from '../utils/deepLinking';
 import AUTH_CONFIG from '../config/auth';
 
-// Suppress known warnings that don't affect functionality
-// Push notifications on Android require Firebase (google-services.json) for production
-// In Expo Go / dev builds without Firebase, this warning is expected and can be ignored
+const UPDATE_DISMISSED_KEY = '@update_dismissed_version';
+
 LogBox.ignoreLogs([
   'expo-notifications: Android Push notifications',
   'expo-notifications',
@@ -35,29 +36,25 @@ function compareVersions(current, minimum) {
   return 0;
 }
 
-// Bundled splash video — set to null to use API-driven remote video instead
-const LOCAL_SPLASH_VIDEO = require('../images/video/ramadan2.mp4');
+const SPLASH_CACHE_KEY = '@splash_config';
 
 export default function RootLayout() {
   const [showLaunch, setShowLaunch] = useState(true);
-  const [forceUpdate, setForceUpdate] = useState(null); // null = checking, false = ok, object = needs update
-  const [splashVideo, setSplashVideo] = useState(
-    LOCAL_SPLASH_VIDEO ? { local: true, duration: 5000 } : null
-  );
+  const [forceUpdate, setForceUpdate] = useState(null);
+  const [softUpdate, setSoftUpdate] = useState(null);
+  const [splashVideo, setSplashVideo] = useState(null);
 
-  // Initialize deep link listener
   useEffect(() => {
     const cleanup = setupDeepLinkListener();
     return cleanup;
   }, []);
 
-  // Check minimum app version + splash config on cold start
   useEffect(() => {
     let cancelled = false;
 
     async function checkVersion() {
       try {
-        const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/app-version`, {
+        const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/app-version?platform=${Platform.OS}`, {
           headers: { 'Cache-Control': 'no-cache' },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -73,6 +70,13 @@ export default function RootLayout() {
           setForceUpdate({ updateUrl: data.updateUrl, message });
         } else {
           setForceUpdate(false);
+
+          if (data.latestVersion && compareVersions(currentVersion, data.latestVersion) < 0) {
+            const dismissed = await AsyncStorage.getItem(UPDATE_DISMISSED_KEY).catch(() => null);
+            if (dismissed !== data.latestVersion) {
+              setSoftUpdate({ latestVersion: data.latestVersion, updateUrl: data.updateUrl });
+            }
+          }
         }
       } catch {
         if (!cancelled) setForceUpdate(false);
@@ -80,12 +84,27 @@ export default function RootLayout() {
     }
 
     async function checkSplash() {
+      // 1. Instantly apply cached config so returning users see splash without delay
+      try {
+        const cached = await AsyncStorage.getItem(SPLASH_CACHE_KEY);
+        if (cached && !cancelled) {
+          const config = JSON.parse(cached);
+          if (config.enabled && config.type === 'video' && config.videoUrl) {
+            setSplashVideo(config);
+          }
+        }
+      } catch {}
+
+      // 2. Fetch fresh config from API and persist for next cold start
       try {
         const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/splash-config`, {
           headers: { 'Cache-Control': 'no-cache' },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+
+        await AsyncStorage.setItem(SPLASH_CACHE_KEY, JSON.stringify(data)).catch(() => {});
+
         if (cancelled) return;
 
         if (data.enabled && data.type === 'video' && data.videoUrl) {
@@ -94,21 +113,18 @@ export default function RootLayout() {
           setSplashVideo(false);
         }
       } catch {
-        if (!cancelled) setSplashVideo(false);
+        if (!cancelled) setSplashVideo((prev) => prev || false);
       }
     }
 
     checkVersion();
-    if (!LOCAL_SPLASH_VIDEO) checkSplash();
+    checkSplash();
     return () => { cancelled = true; };
   }, []);
 
-  // Expo Go always shows its own native loading screen first (app name text).
-  // We only show an in-app branded launch screen in Expo Go to make it look nicer.
-  // For EAS dev builds / TestFlight, rely on the native splash (`app.json`).
   const isExpoGo = Constants.appOwnership === 'expo';
 
-  if (isExpoGo && showLaunch && !LOCAL_SPLASH_VIDEO) {
+  if (isExpoGo && showLaunch && !splashVideo) {
     return <BrandedLaunchScreen onDone={() => setShowLaunch(false)} />;
   }
 
@@ -130,15 +146,23 @@ export default function RootLayout() {
                     <AuthWrapper />
                   </ErrorBoundary>
 
-                  {/* Video splash overlay — renders on top while app loads underneath */}
                   {splashVideo && typeof splashVideo === 'object' && (
                     <VideoLaunchScreen
-                      localSource={splashVideo.local ? LOCAL_SPLASH_VIDEO : undefined}
                       videoUrl={splashVideo.videoUrl}
                       posterUrl={splashVideo.posterUrl}
-                      duration={splashVideo.duration || 3000}
+                      duration={splashVideo.duration || 5000}
                       cacheTTL={splashVideo.cacheTTL || 86400}
                       onDone={() => setSplashVideo(false)}
+                    />
+                  )}
+
+                  {softUpdate && !splashVideo && (
+                    <UpdateBanner
+                      updateUrl={softUpdate.updateUrl}
+                      onDismiss={() => {
+                        AsyncStorage.setItem(UPDATE_DISMISSED_KEY, softUpdate.latestVersion).catch(() => {});
+                        setSoftUpdate(null);
+                      }}
                     />
                   )}
                 </OrdersProvider>

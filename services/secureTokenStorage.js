@@ -37,16 +37,18 @@ export async function storeUserSession(userData) {
     // Store non-sensitive user data in AsyncStorage
     await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(profileData));
     
-    // Also write to legacy key for backward compatibility during transition
-    await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(userData));
+    // Also write to legacy key for backward compatibility (without token)
+    await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(profileData));
     
     log.debug('User session stored securely');
   } catch (error) {
     log.error('Failed to store user session', error?.message || error);
-    // Fallback: store everything in AsyncStorage if SecureStore fails
+    // Fallback: store profile data (without token) in AsyncStorage if SecureStore fails
     try {
-      await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(userData));
-      log.warn('Fell back to AsyncStorage for full session');
+      const fallbackData = { ...userData };
+      delete fallbackData.token;
+      await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(fallbackData));
+      log.warn('Fell back to AsyncStorage for profile data (token not persisted)');
     } catch (fallbackError) {
       log.error('Fallback storage also failed', fallbackError?.message);
     }
@@ -139,11 +141,11 @@ export async function updateSecureToken(newToken) {
   try {
     await SecureStore.setItemAsync(SECURE_TOKEN_KEY, newToken);
     
-    // Also update legacy key for backward compatibility
+    // Ensure legacy key doesn't contain the token
     const legacyRaw = await AsyncStorage.getItem(LEGACY_KEY);
     if (legacyRaw) {
       const data = JSON.parse(legacyRaw);
-      data.token = newToken;
+      delete data.token;
       await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(data));
     }
     

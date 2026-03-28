@@ -41,7 +41,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
           onPress={handleUpdate}
         >
           <Text style={styles.buttonText}>
-            {Platform.OS === 'ios' ? 'Update on App Store' : 'Update Now'}
+            {Platform.OS === 'ios' ? 'Update on App Store' : 'Update on Google Play'}
           </Text>
         </Pressable>
       </View>

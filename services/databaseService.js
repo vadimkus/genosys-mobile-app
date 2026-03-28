@@ -376,8 +376,11 @@ export const deleteAddress = async (token, addressId) => {
   log.debug('Deleting address');
 
   const id = String(addressId || '').trim();
+  if (!id) {
+    log.warn('deleteAddress called without an address ID');
+    return { success: false, error: 'Address ID is required' };
+  }
   if (id === 'legacy' || id === 'primary') {
-    // Legacy address is stored in User.address; backend supports clearing via DELETE /user/addresses.
     return await apiRequest('/user/addresses', {
       method: 'DELETE',
       headers: {
@@ -385,8 +388,7 @@ export const deleteAddress = async (token, addressId) => {
       },
     });
   }
-  const endpoint = id ? `/user/addresses/${encodeURIComponent(id)}` : '/user/addresses';
-  return await apiRequest(endpoint, {
+  return await apiRequest(`/user/addresses/${encodeURIComponent(id)}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,

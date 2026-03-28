@@ -116,11 +116,13 @@ export const registerUser = async (name, email, password, extra = {}) => {
         }
       };
     } else {
-      const error = await response.json();
-      log.warn('Registration failed', error);
+      const errorText = await response.text();
+      let errorData = {};
+      try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
+      log.warn('Registration failed', errorData || errorText);
       return { 
         success: false, 
-        error: error.error || 'Registration failed' 
+        error: errorData.error || errorData.message || 'Registration failed' 
       };
     }
   } catch (error) {

@@ -161,14 +161,11 @@ export const fetchProducts = async (user = null, options = {}) => {
       headers['x-locale'] = String(options.locale);
     }
     
-    // Add user ID for personalized pricing (enhanced API format)
+    if (user?.token) {
+      headers['Authorization'] = `Bearer ${user.token}`;
+    }
     if (user?.id) {
       headers[API_CONFIG.HEADERS.USER_ID] = user.id;
-      log.debug('Including user ID for personalized pricing');
-    } else if (user?.token) {
-      // Fallback: use Authorization header if user ID not available
-      headers['Authorization'] = `Bearer ${user.token}`;
-      log.debug('Using token-based auth fallback');
     }
     
     const response = await fetch(`${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.PRODUCTS}`, {

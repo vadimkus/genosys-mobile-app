@@ -351,26 +351,26 @@ export default function ShopScreen() {
             return isBeautyBox;
           })() ? (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.originalPrice}>{(product.originalPrice || ((product.displayPrice || product.price || 0) / 0.85)).toFixed(2)} AED</Text>
+              <Text style={styles.originalPrice}>{Number(product.originalPrice || ((Number(product.displayPrice) || Number(product.price) || 0) / 0.85)).toFixed(2)} AED</Text>
               <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
-              <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
+              <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
             </View>
           ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.gridPrice}>{getCanonicalUnitPrice(product).toFixed(2)} AED</Text>
+              <Text style={styles.gridPrice}>{Number(getCanonicalUnitPrice(product) || 0).toFixed(2)} AED</Text>
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
             </View>
           ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
               <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
-              <Text style={styles.discountedPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
+              <Text style={styles.discountedPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
               {product.discountLabel && <Text style={styles.userDiscount}>{product.discountLabel}</Text>}
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
             </View>
           ) : (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.gridPrice}>{(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
+              <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
             </View>
           )}

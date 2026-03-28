@@ -246,13 +246,19 @@ export async function submitCardOrder(orderData) {
     // Mobile Stripe checkout endpoint (no CSRF): requires Authorization token
     const orderPayload = {
       orderNumber: orderData.orderNumber,
+      customerName: orderData.customerName,
+      customerEmail: orderData.customerEmail,
+      customerPhone: orderData.customerPhone,
+      customerAddress: orderData.customerAddress,
       customer: {
         name: orderData.customerName,
         email: orderData.customerEmail,
         phone: orderData.customerPhone,
         address: orderData.customerAddress,
+        emirate: orderData.emirate,
       },
       emirate: orderData.emirate,
+      paymentMethod: 'card',
       items: orderData.items.map(item => {
         const isBundleItem = item.fromBundle === true || item.product?.fromBundle === true;
         return {
