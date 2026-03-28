@@ -2,8 +2,8 @@
 
 **App Name:** Genosys UAE  
 **Bundle ID:** ae.genosys.app  
-**Version:** 1.6.0  
-**Build:** 68  
+**Version:** 1.8.0  
+**Build:** 74  
 **Platform:** iOS  
 
 ---
@@ -14,36 +14,42 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 
 ---
 
-## What's New in Version 1.6.0
+## What's New in Version 1.8.0
 
-### Ramadan Video Splash Screen
-- **Dynamic Video Splash** — A beautiful Ramadan-themed video plays on app launch (5 seconds, tap to skip). The video is bundled locally for instant playback with no buffering.
-- **Remote Configuration** — Splash video can be swapped remotely via `/api/mobile/splash-config` without rebuilding the app. Supports video URL, duration, and caching settings.
+### In-Bag Size & Color Selection
+- **Size Selector** — Products with multiple sizes (e.g. 50g / 210g) display a dropdown directly in the bag. Price updates automatically when the customer changes size.
+- **Color Selector** — Products with color variants (e.g. Natural Beige / Light) display a color dropdown in the bag.
 
-### Force Update Version Gating
-- **Automatic Update Prompts** — When a new app version is required, users see a blocking "Update Required" screen with localized messaging (EN/AR/RU) and a direct link to the App Store.
-- **Server-Controlled** — Minimum version, force update flag, and messaging are configured via `/api/mobile/app-version` API endpoint. No app rebuild needed to enforce updates.
+### Checkout Variant Validation
+- **Required Selection Gate** — Orders cannot be placed without selecting required product variants. If a product requires a size or color choice, the customer is prompted with specific product names before proceeding.
 
-### Sticky Bar UX Improvements
-- **Per-Item Remove** — Each item in the sticky cart bar now has an "x" button to remove it individually.
-- **Clear All** — When multiple items are in the bag, a "Clear all" link with a trash icon appears below the product list.
-- **Green Discount Color** — Discount amounts in the sticky bar now display in green for better visual clarity.
+### Over-the-Air Update Support
+- **Silent Background Updates** — The app checks for JavaScript bundle updates on every cold start and downloads them silently. Updates apply on the next app launch. No user-facing UI.
 
-### Pricing Bug Fixes
-- **Accurate Concern Page Pricing** — Products on Skin Concern pages now show correct personalized pricing for logged-in users with VIP discounts. Previously, concern pages could show retail prices even for VIP users.
-- **Fixed Price Doubling in Cart** — Resolved an issue where adding products from concern pages could display an inflated "original price" in the cart (e.g., showing 660 AED when retail was 330 AED).
-- **Cart Totals Discount Fallback** — Cart total calculations now correctly apply user discounts even when the server returns products without an explicit `originalPrice` field.
+### Navigation Cleanup
+- **Streamlined Side Menu** — Removed redundant "Products", "Orders", "Favorites", and "Profile" links from the hamburger menu. These destinations are always accessible via the bottom tab bar.
 
-### Payment Method Simplification
-- **Removed "Generate Link for Payment"** — The payment link option has been removed from checkout. Only "Cash on Delivery" and "Card Payment" are now available.
-- **Renamed "Stripe Checkout"** — Now displayed as "Card Payment" across all languages.
-
-### Localization
-- **Full 3-Language Support** — All new features (force update screen, sticky bar actions, payment labels) are fully localized in English, Arabic (RTL), and Russian.
+### Bug Fixes
+- Fixed per-item discount percentage display on bundle badges
+- Fixed per-item bundle discount in order detail screen
+- Fixed pricing for products excluded from user discounts
 
 ---
 
 ## What's New in Previous Versions
+
+### Version 1.7.0 (Build 71)
+- Remote splash screen: video is now API-driven, updatable without app rebuild
+- Removed bundled video from binary (5.6MB savings)
+- Soft update banner: dismissible "new version available" notification on launch
+
+### Version 1.6.0 (Build 68)
+- Ramadan video splash screen with remote configuration
+- Force update version gating (server-controlled)
+- Sticky bar UX improvements (per-item remove, clear all, green discounts)
+- Pricing fixes (VIP on concern pages, cart price doubling)
+- Payment simplification (removed "Generate Link", renamed to "Card Payment")
+- Full 3-language support for all new features
 
 ### Version 1.5.0 (Build 65)
 
@@ -131,17 +137,44 @@ This account is pre-created and ready to use. No email verification required.
 ### Quick Test Flow (10-12 minutes)
 
 #### 1. Login
-- Open app > Tap "Sign In"
+- Open app → Tap "Sign In"
 - Enter email: `appreview@genosys.ae`
 - Enter password: `GenosysReview2026!`
 - Tap "Sign In"
 
-#### 2. Verify VIP Pricing (New in 1.4.0)
-- After login, browse the Shop tab
+#### 2. Size Selection in Bag (New in 1.8.0)
+- Shop tab → Find a product with multiple sizes (e.g. "Intensive Hydro Soothing Cream" — 50g/250g)
+- Tap "Add to Bag" from the product card or detail page
+- Go to Bag tab
+- **Verify:** A size dropdown appears showing "50g" / "250g"
+- Change the size
+- **Verify:** The price updates immediately
+
+#### 3. Color Selection in Bag (New in 1.8.0)
+- Shop tab → Find "Skin Caring Blemish Balm Cushion" (BB Cushion)
+- Add to bag
+- Go to Bag tab
+- **Verify:** A color dropdown appears (Beige / Ivory / Camel)
+- Select a color
+
+#### 4. Checkout Validation (New in 1.8.0)
+- Add the BB Cushion to the bag WITHOUT selecting a color (quick-add from shop grid)
+- Tap "Proceed to Checkout" → fill details → tap "Place Order"
+- **Verify:** An alert appears saying color selection is required
+- Tap "Go to Bag" → select a color → proceed to checkout again
+- **Verify:** Checkout proceeds normally
+
+#### 5. Navigation Menu (Updated in 1.8.0)
+- Tap the hamburger menu (top-left)
+- **Verify:** Menu no longer shows "Products", "Orders", "Favorites", or "Profile" links
+- These are accessible via the bottom tab bar
+
+#### 6. Verify VIP Pricing
+- Browse the Shop tab
 - Products should display discounted prices with the VIP discount applied
 - Discount badges should appear on product cards (e.g., "-50%")
 
-#### 3. Build Your Set (Updated in 1.4.0)
+#### 7. Build Your Set
 - Open hamburger menu (top-left) > Tap "Build Your Set"
 - Select products for each skincare step (swipe through steps at top)
 - **Note:** Products display at retail price (no VIP discount in bundle builder)
@@ -357,7 +390,9 @@ This account is pre-created and ready to use. No email verification required.
 
 | Version | Build | Key Changes |
 |---------|-------|-------------|
-| 1.6.0 | 68 | Ramadan video splash, force update gating, sticky bar UX, pricing fixes, payment simplification, bag back nav fix |
+| 1.8.0 | 74 | In-bag size/color selectors, checkout validation, OTA updates, nav cleanup, pricing fixes |
+| 1.7.0 | 71 | Remote splash screen, soft update banner, 5.6MB binary reduction |
+| 1.6.0 | 68 | Ramadan video splash, force update gating, sticky bar UX, pricing fixes, payment simplification |
 | 1.5.0 | 65 | 8 Skin Concern pages, 100% native, app-wide haptics, routine tap-to-add |
 | 1.4.0 | 58 | Mutually exclusive discounts, auto-populate address, checkout footer, full translation coverage, bundle pricing fixes |
 | 1.3.1 | 56 | Bundle discount alignment, Stripe/Apple Pay bundle processing |
@@ -392,8 +427,22 @@ This account is pre-created and ready to use. No email verification required.
 - [x] WebView screens fully translated (AR/RU)
 - [x] Product prices refresh when user logs in
 
+### v1.8.0 Features
+- [ ] Size dropdown appears in bag for multi-size products
+- [ ] Changing size updates the price immediately
+- [ ] Color dropdown appears in bag for multi-color products
+- [ ] Checkout blocks submission when required variant is missing
+- [ ] Alert shows specific product names and "Go to Bag" action
+- [ ] After selecting variants, checkout proceeds normally
+- [ ] Hamburger menu no longer shows Products/Orders/Favorites/Profile
+- [ ] Bottom tab bar provides access to all main sections
+- [ ] App launches normally (OTA check is invisible)
+
+### v1.7.0 Features
+- [x] Remote splash video plays on app launch (tap to skip)
+- [x] Soft update banner appears when newer version exists
+
 ### v1.6.0 Features
-- [x] Ramadan video splash plays on app launch (5 seconds, tap to skip)
 - [x] Force update screen blocks old versions with localized message
 - [x] Sticky bar shows per-item remove buttons
 - [x] Sticky bar shows "Clear all" link for multiple items
