@@ -1,13 +1,46 @@
-# ✅ Mobile App Build Status: LIVE ON APP STORE / GOOGLE PLAY READY
+# ✅ Mobile App Build Status: BUILDING v1.8.0
 
-## 🎉 Version 1.7.0 (Build 71) — March 21, 2026 — LIVE ON APP STORE / ANDROID ALIGNED
+## 🚀 Version 1.8.0 (Build 74) — March 28, 2026 — BUILDING (pending App Store submission)
+
+**Status:** iOS build submitted to EAS — awaiting completion  
+**iOS Build ID:** `e7391e82-ecd6-4850-8fd4-3440018d9ca1`  
+**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/e7391e82-ecd6-4850-8fd4-3440018d9ca1  
+**App Store:** https://apps.apple.com/app/id6756648064  
+**Google Play:** https://play.google.com/store/apps/details?id=ae.genosys.app  
+**TestFlight:** https://appstoreconnect.apple.com/apps/6756648064/testflight/ios  
+**Release Notes:** [v1.8.0 Release Notes](../app-store/RELEASE_NOTES_1.8.0.md)
+
+### What's New
+- **In-bag variant selection**: Size and color dropdowns in the bag screen with live price updates
+- **Checkout validation**: Orders blocked if required size/color not selected — user prompted to complete selections
+- **OTA updates wired**: `expo-updates` integrated into app launch; future JS-only fixes ship without App Store review
+- **Navigation cleanup**: Removed redundant Products/Orders/Favorites/Profile links from hamburger menu (bottom tabs suffice)
+- **Bug fixes**: Per-item discount display, bundle badge accuracy, discount-excluded product pricing
+
+### OTA Update Configuration
+
+| Setting | Value |
+|---------|-------|
+| `updates.enabled` | `true` |
+| `updates.checkAutomatically` | `ON_LOAD` |
+| `updates.fallbackToCacheTimeout` | `5000` |
+| `eas.json` channel | `production` |
+| `runtimeVersion` | `1.0.0` |
+| Update URL | `https://u.expo.dev/b874a5c1-c47e-4c4e-9286-42e431978d51` |
+
+### Next Steps After Build Completes
+1. `eas submit --platform ios` → submit to App Store Connect
+2. TestFlight testing → verify variant selectors, checkout validation, OTA check
+3. Release to App Store
+4. Future JS changes: `eas update --branch production --message "description"`
+
+---
+
+## Previous: Version 1.7.0 (Build 71) — March 21, 2026 — LIVE ON APP STORE
 
 **Status:** Live on App Store | Android build ready (versionCode 71)  
 **iOS Build ID:** `8faaf570-32e3-4458-8f43-de01d6d81005`  
-**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/8faaf570-32e3-4458-8f43-de01d6d81005  
-**App Store:** https://apps.apple.com/app/id6756648064  
-**Google Play:** https://play.google.com/store/apps/details?id=ae.genosys.app  
-**TestFlight:** https://appstoreconnect.apple.com/apps/6756648064/testflight/ios
+**EAS Build:** https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/8faaf570-32e3-4458-8f43-de01d6d81005
 
 ### What's New
 - Remote splash screen: video is now API-driven, updatable without app rebuild
@@ -16,26 +49,7 @@
 - Soft update banner: dismissible "new version available" notification on launch
 - Platform-aware update URLs: Android → Google Play, iOS → App Store
 - Android versionCode aligned with iOS buildNumber (69 → 71)
-- Android native directory generated locally (expo prebuild)
 - See [Remote Splash Screen](../core/REMOTE_SPLASH_SCREEN.md) for full technical documentation
-
-### OTA Splash Updates (no app rebuild)
-
-| Date | Video | Commit | Notes |
-|------|-------|--------|-------|
-| Mar 19, 2026 | `ramadan2.mp4` (5.6MB) | Initial release | Ramadan campaign |
-| Mar 20, 2026 | `Splash.mp4` (4.4MB) | `815b8c8` | New branded splash, Ramadan over |
-
-### Android Alignment (Mar 21, 2026)
-
-| Change | Before | After |
-|--------|--------|-------|
-| `android.versionCode` in `app.json` | 69 | 71 |
-| `android/` directory | Not present (cloud-only) | Generated locally via `expo prebuild` |
-| App-version API (`/api/mobile/app-version`) | iOS App Store URL only | Platform-aware: `?platform=android` → Google Play URL |
-| ForceUpdateScreen button text | "Update Now" | "Update on Google Play" |
-| UpdateBanner text | "A new version is available" | "A new version is available on Google Play" |
-| Google Play Review Documentation | v1.4.0 / versionCode 58 | v1.7.0 / versionCode 71 |
 
 ---
 
@@ -276,12 +290,11 @@ The Genosys UAE mobile app is **live on the App Store** and the Android build is
 - Compatible with Expo Go and development builds
 
 ### **✅ Production Builds**
-- iOS App Store build submitted (Build 71, v1.7.0) — LIVE
+- iOS App Store build submitted (Build 74, v1.8.0) — awaiting completion
+- Previous: Build 71, v1.7.0 — LIVE on App Store
 - Android aligned with iOS (Mar 21, 2026): versionCode 71, full feature parity
-- Platform-aware update URLs (App Store / Google Play)
-- Android native directory generated locally (`android/`)
+- OTA updates wired: `expo-updates` + `channel: "production"` in eas.json
 - All Android-specific issues fixed (elevation, nested scroll, keyboard, haptics, Stripe)
-- Google Play Review Documentation updated to v1.7.0
 - Ready for `npm run build:android:production` and `npm run submit:android`
 
 ---
@@ -340,7 +353,8 @@ DEL  /mobile/user/wishlist/:id    - Remove from favorites
 | 1.4.0 | 58 | Released | Feb 14, 2026 | Pricing overhaul, checkout improvements, Android polish, Google Play ready |
 | 1.5.0 | 65 | Released | Feb 17, 2026 | Skin concern pages, 100% native, haptics, routine tap-to-add |
 | 1.6.0 | 68 | Released | Feb 26, 2026 | Ramadan splash, force update, sticky bar UX, pricing fixes, payment simplification, bag back nav fix |
-| 1.7.0 | 71 | **Live** | Mar 19, 2026 | Remote splash screen (API-driven), soft update banner, 5.6MB binary reduction, Android aligned (Mar 21) |
+| 1.7.0 | 71 | Live | Mar 19, 2026 | Remote splash screen (API-driven), soft update banner, 5.6MB binary reduction, Android aligned (Mar 21) |
+| 1.8.0 | 74 | **Building** | Mar 28, 2026 | In-bag size/color selectors, checkout validation, OTA updates wired, hamburger menu cleanup |
 
 ---
 

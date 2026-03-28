@@ -136,7 +136,8 @@
 | Doc | Description |
 |-----|-------------|
 | [App Store Assets](./app-store/APP_STORE_ASSETS.md) | Assets for App Store listing |
-| [Release Notes 1.7.0](./app-store/RELEASE_NOTES_1.7.0.md) | **NEW** v1.7.0 release notes, review notes, technical changes |
+| [Release Notes 1.8.0](./app-store/RELEASE_NOTES_1.8.0.md) | **NEW** v1.8.0: variant selectors, checkout validation, OTA updates, nav cleanup |
+| [Release Notes 1.7.0](./app-store/RELEASE_NOTES_1.7.0.md) | v1.7.0 release notes, review notes, technical changes |
 | [Apple Review](./app-store/APPLE_REVIEW_DOCUMENTATION.md) | Apple App Store review preparation |
 | [Google Play Review](./app-store/GOOGLE_PLAY_REVIEW_DOCUMENTATION.md) | Google Play Store review documentation |
 | [Google Play Console Setup](./app-store/GOOGLE_PLAY_CONSOLE_SETUP.md) | **NEW** Developer account setup, build, submit, release details (Feb 2026) |
