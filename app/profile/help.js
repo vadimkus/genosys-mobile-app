@@ -173,8 +173,11 @@ export default function HelpSupportScreen() {
         <Text
           style={[
             styles.supportDescription,
-            // Keep emails/phone numbers LTR so digits don't get visually inverted in Arabic UI.
-            isRTL && (option.id === 'phone' || option.id === 'whatsapp' || option.id === 'email') ? styles.valueLTRRight : styles.textRTL,
+            isRTL
+              ? (option.id === 'phone' || option.id === 'whatsapp' || option.id === 'email'
+                  ? styles.valueLTRRight
+                  : styles.textRTL)
+              : null,
             { color: colors.primary },
           ]}
         >
