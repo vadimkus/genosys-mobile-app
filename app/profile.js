@@ -511,6 +511,36 @@ export default function ProfileScreen() {
           </View>
         </ProfileSection>
 
+        {/* Explore */}
+        <ProfileSection title={t('navigation.explore') || 'Explore'}>
+          <View style={styles.sectionContent}>
+            <ProfileItem
+              icon="gift-outline"
+              title={t('navigation.bundleBuilder') || 'Bundle Builder'}
+              subtitle={t('profile.buildYourSet') || 'Build your skincare set'}
+              onPress={() => { haptics.lightTap(); router.push('/bundle-builder'); }}
+            />
+            <ProfileItem
+              icon="sparkles-outline"
+              title={t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}
+              subtitle={t('profile.aiSkinSubtitle') || 'Camera or quiz analysis'}
+              onPress={() => { haptics.lightTap(); router.push('/skin-analysis'); }}
+            />
+            <ProfileItem
+              icon="leaf-outline"
+              title={t('categories.skinConcern') || 'Skin Concern'}
+              subtitle={t('profile.skinConcernSubtitle') || 'Browse by concern'}
+              onPress={() => { haptics.lightTap(); router.push('/skin-concerns'); }}
+            />
+            <ProfileItem
+              icon="newspaper-outline"
+              title={t('navigation.blog') || 'Blog'}
+              onPress={() => { haptics.lightTap(); router.push('/blog'); }}
+              isLast={true}
+            />
+          </View>
+        </ProfileSection>
+
         {/* Account & Settings */}
         <ProfileSection title={t('profile.accountSection')}>
           <View style={styles.sectionContent}>
@@ -615,6 +645,48 @@ export default function ProfileScreen() {
               icon="information-circle-outline"
               title={t('profile.aboutGenosys')}
               onPress={handleAbout}
+              isLast={true}
+            />
+          </View>
+        </ProfileSection>
+
+        {/* Information */}
+        <ProfileSection title={t('navigation.information') || 'Information'}>
+          <View style={styles.sectionContent}>
+            <ProfileItem
+              icon="business-outline"
+              title={t('navigation.brand') || 'Brand'}
+              onPress={() => { haptics.lightTap(); router.push('/brand'); }}
+            />
+            <ProfileItem
+              icon="car-outline"
+              title={t('navigation.delivery') || 'Delivery'}
+              onPress={() => { haptics.lightTap(); router.push('/delivery'); }}
+            />
+            <ProfileItem
+              icon="navigate-outline"
+              title={t('navigation.locations') || 'Locations'}
+              onPress={() => { haptics.lightTap(); router.push('/locations'); }}
+            />
+            <ProfileItem
+              icon="chatbubble-ellipses-outline"
+              title={t('navigation.contact') || 'Contact'}
+              onPress={() => { haptics.lightTap(); router.push('/contact'); }}
+            />
+            <ProfileItem
+              icon="help-buoy-outline"
+              title={t('navigation.faq') || 'FAQ'}
+              onPress={() => { haptics.lightTap(); router.push('/faq'); }}
+            />
+            <ProfileItem
+              icon="people-outline"
+              title={t('navigation.partners') || 'Partners'}
+              onPress={() => { haptics.lightTap(); router.push('/partners'); }}
+            />
+            <ProfileItem
+              icon="ribbon-outline"
+              title={t('navigation.about') || 'About'}
+              onPress={() => { haptics.lightTap(); router.push('/about'); }}
               isLast={true}
             />
           </View>

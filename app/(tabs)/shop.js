@@ -53,7 +53,6 @@ import {
 } from '../../utils/productLocalization';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
-import NavigationDrawer from '../../components/NavigationDrawer';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
 
@@ -134,7 +133,6 @@ export default function ShopScreen() {
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
   const isRTL = dir === 'rtl';
 
   // ─── Voice Search (only when native module is available) ───
@@ -706,18 +704,8 @@ export default function ShopScreen() {
           if (typeof h === 'number' && Number.isFinite(h) && h > 0) setHeaderHeight(h);
         }}
       >
-        {/* Left: Hamburger, then Language selector */}
+        {/* Left: Language selector */}
         <View style={[styles.headerLeft, isRTL && styles.headerLeftRtl]}>
-          <TouchableOpacity
-            onPress={() => setMenuOpen((v) => !v)}
-            activeOpacity={0.85}
-            style={styles.hamburgerBtn}
-            accessibilityRole="button"
-            accessibilityLabel={menuOpen ? 'Close menu' : 'Open menu'}
-          >
-            <Ionicons name={menuOpen ? 'close' : 'menu'} size={22} color={menuOpen ? '#16A34A' : '#374151'} />
-          </TouchableOpacity>
-
           <TouchableOpacity
             onPress={() => setLangOpen((v) => !v)}
             disabled={langSwitching}
@@ -1076,12 +1064,6 @@ export default function ShopScreen() {
         </View>
       </ScrollView>
 
-      {/* Navigation Drawer (hamburger menu) */}
-      <NavigationDrawer
-        visible={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        headerHeight={(insets?.top || 0) + (headerHeight || 56)}
-      />
     </SafeAreaView>
   );
 }
@@ -1174,11 +1156,6 @@ const styles = StyleSheet.create({
     ...T.captionSmall,
     fontWeight: '800',
     color: '#16A34A', // matches website (green)
-  },
-  hamburgerBtn: {
-    padding: 6,
-    borderRadius: 8,
-    marginStart: -4,
   },
   aiLinkBtn: {
     paddingHorizontal: 6,
