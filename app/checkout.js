@@ -609,7 +609,7 @@ export default function CheckoutScreen() {
             <TouchableOpacity
               style={styles.successPrimaryBtn}
               activeOpacity={0.85}
-              onPress={() => { setSuccessOrder(null); router.replace('/(tabs)/orders'); }}
+              onPress={() => router.replace('/(tabs)/orders')}
             >
               <Ionicons name="receipt-outline" size={18} color="#fff" style={{ marginEnd: 6 }} />
               <Text style={styles.successPrimaryText}>{t('checkout.viewOrder')}</Text>
@@ -618,7 +618,7 @@ export default function CheckoutScreen() {
             <TouchableOpacity
               style={styles.successSecondaryBtn}
               activeOpacity={0.7}
-              onPress={() => { setSuccessOrder(null); router.replace('/(tabs)/shop'); }}
+              onPress={() => router.replace('/(tabs)/shop')}
             >
               <Text style={styles.successSecondaryText}>{t('checkout.continueShopping')}</Text>
             </TouchableOpacity>
