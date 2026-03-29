@@ -32,7 +32,8 @@
 | [Session Log 11 Feb 2026](./core/SESSION_LOG_2026_02_11.md) | Android alignment, v58, full audit (checkout/orders/success), haptics fix, badge fix, beauty box |
 | [Session Log 12 Feb 2026](./core/SESSION_LOG_2026_02_12.md) | v1.4.0 TestFlight, Apple Review doc update, App Store release notes |
 | [Session Log 13 Feb 2026](./core/SESSION_LOG_2026_02_13.md) | Product video sound fix, product documentation API-first fix |
-| [Bug Audit 28 Mar 2026](./core/BUG_AUDIT_2026_03_28.md) | **NEW** Full code audit: 13 bugs + 1 regression fix (perf, race conditions, pricing, size variant discount) |
+| [Bug Audit 29 Mar 2026](./core/BUG_AUDIT_2026_03_29.md) | **NEW** Comprehensive audit: 50 issues fixed across 14 files (pricing, RTL, performance, security, error handling) |
+| [Bug Audit 28 Mar 2026](./core/BUG_AUDIT_2026_03_28.md) | Full code audit: 13 bugs + 1 regression fix (perf, race conditions, pricing, size variant discount) |
 | [Bug Audit 23 Mar 2026](./core/BUG_AUDIT_2026_03_23.md) | Full code audit: 11 bugs fixed (crash, security, race conditions, checkout) |
 | [Session Log 19–20 Mar 2026](./core/SESSION_LOG_2026_03_19.md) | Remote splash screen, soft update banner, v1.7.0 live, first OTA splash swap |
 | [Remote Splash Screen](./core/REMOTE_SPLASH_SCREEN.md) | How to update/disable splash video without app rebuild (with change history) |
