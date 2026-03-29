@@ -143,7 +143,7 @@ export default function ProfileScreen() {
 
   const displayEmail = String(user?.contactEmail || user?.email || '').trim();
 
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     haptics.heavyTap();
     Alert.alert(
       t('profile.signOutTitle'),
@@ -173,7 +173,7 @@ export default function ProfileScreen() {
         }
       ]
     );
-  };
+  }, [t, clearCart, logout]);
 
   const handleEditProfile = () => {
     haptics.lightTap();
@@ -241,7 +241,7 @@ export default function ProfileScreen() {
     } finally {
       setBiometricLoading(false);
     }
-  }, [biometricLoading, biometricType, disableBiometric, enableBiometric, t, user?.email]);
+  }, [biometricLoading, biometricType, disableBiometric, enableBiometric, handleSignOut, t, user?.email]);
 
   const handlePushToggle = async (value) => {
     haptics.selectionTick();
@@ -307,18 +307,19 @@ export default function ProfileScreen() {
       trackColor,
       disabled,
       isLast,
+      rtl,
     }) {
       return (
-        <View style={[styles.profileItem, isLast && styles.profileItemLast]}>
-          <View style={styles.profileItemLeft}>
+        <View style={[styles.profileItem, rtl && styles.profileItemRTL, isLast && styles.profileItemLast]}>
+          <View style={[styles.profileItemLeft, rtl && styles.profileItemLeftRTL]}>
             {icon && (
               <View style={styles.iconContainer}>
                 <Ionicons name={icon} size={22} color="#dc2626" />
               </View>
             )}
-            <View style={styles.profileItemText}>
-              <Text style={styles.profileItemTitle}>{title}</Text>
-              {subtitle ? <Text style={styles.profileItemSubtitle}>{subtitle}</Text> : null}
+            <View style={[styles.profileItemText, rtl && styles.profileItemTextRTL]}>
+              <Text style={[styles.profileItemTitle, rtl && styles.profileItemTitleRTL]}>{title}</Text>
+              {subtitle ? <Text style={[styles.profileItemSubtitle, rtl && styles.profileItemSubtitleRTL]}>{subtitle}</Text> : null}
             </View>
           </View>
           <View style={styles.profileItemRight}>
@@ -573,6 +574,7 @@ export default function ProfileScreen() {
                 onValueChange={handleBiometricToggle}
                 trackColor={SWITCH_TRACK_BIOMETRIC}
                 disabled={biometricLoading}
+                rtl={isRTL}
               />
             ) : (
               <ProfileItem
@@ -594,12 +596,14 @@ export default function ProfileScreen() {
               onValueChange={handleEmailNotifToggle}
               trackColor={SWITCH_TRACK_EMAIL}
               disabled={!user?.token}
+              rtl={isRTL}
             />
             <ProfileSwitchItem
               icon="notifications-outline"
               title={t('profile.pushNotifications')}
               value={notificationsEnabled}
               onValueChange={handlePushToggle}
+              rtl={isRTL}
               trackColor={SWITCH_TRACK_PUSH}
               disabled={pushToggleLoading}
             />
@@ -971,7 +975,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginEnd: 12,
   },
   profileItemText: {
     flex: 1,

@@ -279,12 +279,11 @@ export const validateSession = async (token) => {
       }
 
       log.warn('Session validation failed', { status: response.status });
-      return { success: false, error: 'Session expired' };
+      return { success: false, valid: false, error: 'Session expired' };
     }
   } catch (error) {
     log.error('Session validation error', error?.message || error);
-    // Network errors: keep stored session; the app can recover on next request.
-    return { success: true, valid: true, user: null, skipped: true, error: 'Network error' };
+    return { success: false, valid: false, user: null, error: 'Network error' };
   }
 };
 
@@ -384,9 +383,10 @@ export const updateUserProfile = async (token, profileData) => {
       log.debug('Profile update successful');
       return { success: true, user: result.user, message: 'Profile updated successfully' };
     } else {
-      const error = await response.json();
-      log.warn('Profile update failed', error);
-      return { success: false, error: error.error || 'Failed to update profile' };
+      let errorData;
+      try { errorData = await response.json(); } catch { errorData = { message: await response.text().catch(() => '') }; }
+      log.warn('Profile update failed', errorData);
+      return { success: false, error: errorData.error || errorData.message || 'Failed to update profile' };
     }
   } catch (error) {
     log.error('Profile update error', error?.message || error);

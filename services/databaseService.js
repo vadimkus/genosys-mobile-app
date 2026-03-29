@@ -156,16 +156,14 @@ export const uploadProfilePicture = async (token, imageUri) => {
       name: 'profile.jpg',
     });
 
-    const response = await fetch(`${API_BASE_URL}/user/profile-picture`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/user/profile-picture`, {
       method: 'POST',
       headers: {
-        // NOTE: Do NOT set Content-Type for FormData in React Native fetch.
-        // fetch will set the correct boundary automatically; manually setting it can break uploads.
         'x-api-key': API_KEY,
         'Authorization': `Bearer ${token}`,
       },
       body: formData,
-    });
+    }, token);
 
     const contentType = response.headers.get('content-type') || '';
     const rawText = await response.text().catch(() => '');
@@ -462,7 +460,7 @@ export const addToWishlist = async (token, productData) => {
 export const removeFromWishlist = async (token, productId) => {
   log.debug('Removing from wishlist', { productId: String(productId) });
   
-  return await apiRequest(`/user/wishlist/${productId}`, {
+  return await apiRequest(`/user/wishlist/${encodeURIComponent(productId)}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -511,7 +509,7 @@ export const getUserOrders = async (token) => {
  * @returns {Promise<Object>} Order details
  */
 export const getOrderDetails = async (token, orderId) => {
-  return await apiRequest(`/user/orders/${orderId}`, {
+  return await apiRequest(`/user/orders/${encodeURIComponent(orderId)}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,

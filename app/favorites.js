@@ -16,7 +16,8 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct } from '../utils/productRules';
+import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../utils/productRules';
+import { computeProductBadges } from '../utils/badges';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import { createLogger } from '../utils/logger';
@@ -132,7 +133,7 @@ export default function FavoritesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.headerRTL]}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => { haptics.lightTap(); router.back(); }}
@@ -195,42 +196,11 @@ export default function FavoritesScreen() {
                   
                   {/* Badges */}
                   {(() => {
-                    const nameLower = (product?.name || '').trim().toLowerCase();
-                    const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
-                    const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
-                    const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
-                    const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
-                    const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
-                    const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
-                    const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
-                    const isBeautyBox = isBeautyBoxProduct(product);
-
-                    const baseBadges = (product.badges || []).filter((badge) => {
-                      const text = (badge.text || '').toLowerCase().trim();
-                      if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
-                      if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
-                      if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
-                      if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
-                      return true;
+                    const badges = computeProductBadges(product, {
+                      order: t('common.order'),
+                      inStock: t('stock.inStock'),
+                      new: t('common.new'),
                     });
-
-                    const computedBadges = [];
-                    if (!isOutOfStock) {
-                      if (isMesopeciaKit) {
-                        computedBadges.push({ text: t('common.order'), color: '#FF9500', priority: 0 });
-                      } else if (!isHolidayKit) {
-                        computedBadges.push({ text: t('stock.inStock'), color: '#34C759', priority: 0 });
-                      }
-                    }
-
-                    const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
-                    if ((isBioFermentMask || isRevitaGlow) && !hasNewBadge) {
-                      computedBadges.push({ text: t('common.new'), color: '#007AFF', priority: 1 });
-                    }
-
-                    const badges = [...computedBadges, ...baseBadges]
-                      .sort((a, b) => (a.priority || 10) - (b.priority || 10))
-                      .slice(0, 2);
 
                     if (!badges.length) return null;
 
@@ -250,10 +220,10 @@ export default function FavoritesScreen() {
                 </View>
                 
                 <View style={styles.gridContent}>
-                  <Text style={styles.gridName} numberOfLines={2}>
+                  <Text style={[styles.gridName, isRTL && styles.textRTL]} numberOfLines={2}>
                     {getLocalizedProductName(product, locale) || product.name}
                   </Text>
-                  <Text style={styles.gridCategory}>
+                  <Text style={[styles.gridCategory, isRTL && styles.textRTL]}>
                     {(() => {
                       const canon = normalizeCategoryCanonical(product.category) || product.category;
                       const key = getCategoryTranslationKey(canon);
@@ -271,9 +241,9 @@ export default function FavoritesScreen() {
                       <Text style={styles.gridPrice}>{Number(getCanonicalUnitPrice(product) || 0).toFixed(2)} AED</Text>
                       <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                     </View>
-                  ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
+                  ) : product.originalPrice && Number(product.originalPrice) > Number(product.displayPrice || product.price || 0) ? (
                     <View style={styles.priceContainer}>
-                      <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
+                      <Text style={styles.originalPrice}>{Number(product.originalPrice).toFixed(2)} AED</Text>
                       <Text style={styles.discountedPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
                       {product.discountLabel && (
                         <Text style={styles.savings}>{product.discountLabel}</Text>
@@ -298,7 +268,7 @@ export default function FavoritesScreen() {
                     const msg = encodeURIComponent(
                       (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
                     );
-                    Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                    Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
                   }}
                   activeOpacity={0.7}
                 >
@@ -460,10 +430,10 @@ const styles = StyleSheet.create({
     width: (SCREEN_WIDTH - 40) / 2,
   },
   gridCardLeft: {
-    marginRight: 8,
+    marginEnd: 8,
   },
   gridCardRight: {
-    marginLeft: 8,
+    marginStart: 8,
   },
   gridImageContainer: {
     position: 'relative',
@@ -490,7 +460,7 @@ const styles = StyleSheet.create({
   favoriteHeart: {
     position: 'absolute',
     top: 8,
-    right: 8,
+    end: 8,
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -506,7 +476,7 @@ const styles = StyleSheet.create({
   badgeContainer: {
     position: 'absolute',
     top: 8,
-    left: 8,
+    start: 8,
     gap: 4,
   },
   badge: {
@@ -607,7 +577,7 @@ const styles = StyleSheet.create({
     color: '#25D366',
   },
   addToCartIcon: {
-    marginRight: 4,
+    marginEnd: 4,
   },
   addToCartText: {
     ...T.buttonSmall,
@@ -615,5 +585,12 @@ const styles = StyleSheet.create({
   
   footer: {
     height: 100,
+  },
+  headerRTL: {
+    flexDirection: 'row-reverse',
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
 });

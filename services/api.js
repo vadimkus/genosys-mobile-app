@@ -176,7 +176,7 @@ export const fetchProducts = async (user = null, options = {}) => {
     log.debug('Products response status', { status: response.status });
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = await response.text().catch(() => '');
       log.error('Products API error', { status: response.status, body: String(errorText || '').slice(0, 300) });
       
       if (response.status === 401) {
@@ -251,17 +251,18 @@ export const fetchProductCategories = async () => {
     
     // Attach badge metadata if available from API
     // categoriesWithBadges: [{ name: "Cream", badge: "new" }, { name: "Serum", badge: null }, ...]
+    let badgeMap = null;
     if (Array.isArray(data?.categoriesWithBadges)) {
-      categories._badgeMap = {};
+      badgeMap = new Map();
       data.categoriesWithBadges.forEach((item) => {
         if (item?.name && item?.badge) {
-          categories._badgeMap[item.name] = item.badge;
+          badgeMap.set(item.name, item.badge);
         }
       });
     }
 
     log.debug('Categories received', { count: categories.length });
-    return categories;
+    return { categories, badgeMap };
     
   } catch (error) {
     log.error('Failed to fetch categories', error?.message || error);
@@ -412,7 +413,9 @@ export const fetchUserOrders = async (token, params = {}) => {
     }
 
     const body = await response.json();
-    log.debug('Orders response body:', body);
+    log.debug('Orders response received', {
+      orderCount: Array.isArray(body) ? body.length : (body?.data?.length || body?.orders?.length || 'unknown'),
+    });
     
     const data = Array.isArray(body) ? body : (body.data || body.orders || []);
     const result = Array.isArray(data) ? data : [];

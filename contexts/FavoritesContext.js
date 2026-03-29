@@ -3,7 +3,7 @@
  * Manages wishlist/favorites with database persistence
  */
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
   getUserWishlist, 
@@ -23,6 +23,8 @@ export const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
+  const favoritesRef = useRef(favorites);
+  favoritesRef.current = favorites;
 
   const extractWishlistArray = (payload) => {
     if (!payload) return [];
@@ -168,42 +170,31 @@ export const FavoritesProvider = ({ children }) => {
   /**
    * Add product to favorites
    */
-  const addToFavorites = async (product) => {
+  const addToFavorites = useCallback(async (product) => {
     try {
       log.debug('Adding to favorites', { productId: product?.id });
 
-      // Check current state synchronously via ref-style read before mutating.
-      // Using a flag set inside the updater to know what actually happened.
-      let alreadyExists = false;
-      let updatedFavorites;
-      setFavorites(prev => {
-        if (prev.some(fav => fav.id === product.id)) {
-          alreadyExists = true;
-          return prev;
-        }
-        const newFavorite = {
-          id: product.id,
-          name: product.name,
-          image: product.image,
-          price: product.price,
-          addedAt: new Date().toISOString(),
-        };
-        updatedFavorites = [...prev, newFavorite];
-        return updatedFavorites;
-      });
-
-      // React 18 batches — updater runs synchronously during setState in event handlers,
-      // but may defer in async contexts. Use a microtask yield to guarantee flags are set.
-      await Promise.resolve();
-
-      if (alreadyExists || !updatedFavorites) {
+      if (favoritesRef.current.some(fav => fav.id === product.id)) {
         log.debug('Product already in favorites');
         return { success: false, error: 'Product already in favorites' };
       }
 
+      const newFavorite = {
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+        displayPrice: product.displayPrice ?? product.price,
+        originalPrice: product.originalPrice ?? null,
+        category: product.category ?? null,
+        discountLabel: product.discountLabel ?? null,
+        variants: product.variants ?? null,
+        addedAt: new Date().toISOString(),
+      };
+      const updatedFavorites = [...favoritesRef.current, newFavorite];
+      setFavorites(updatedFavorites);
       await saveFavorites(updatedFavorites);
-      
-      // Sync with database if user is logged in
+
       if (user?.token) {
         try {
           const dbResult = await addToWishlist(user.token, {
@@ -212,7 +203,6 @@ export const FavoritesProvider = ({ children }) => {
             productImage: product.image,
             productPrice: product.price,
           });
-          
           if (!dbResult.success) {
             if (dbResult.error?.includes('404') || dbResult.error?.includes('not found')) {
               log.debug('Wishlist API not available - favorite saved locally only');
@@ -226,37 +216,29 @@ export const FavoritesProvider = ({ children }) => {
           log.warn('Network error adding to favorites (saved locally)', error?.message || error);
         }
       }
-      
+
       log.debug('Added to favorites successfully');
       return { success: true, favorites: updatedFavorites };
-      
     } catch (error) {
       log.error('Add to favorites error', error?.message || error);
       return { success: false, error: 'Failed to add to favorites' };
     }
-  };
+  }, [user?.token]);
 
   /**
    * Remove product from favorites
    */
-  const removeFromFavorites = async (productId) => {
+  const removeFromFavorites = useCallback(async (productId) => {
     try {
       log.debug('Removing from favorites', { productId });
-      
-      let updatedFavorites;
-      setFavorites(prev => {
-        updatedFavorites = prev.filter(fav => fav.id !== productId);
-        return updatedFavorites;
-      });
-      await Promise.resolve();
-      if (!updatedFavorites) updatedFavorites = [];
+
+      const updatedFavorites = favoritesRef.current.filter(fav => fav.id !== productId);
+      setFavorites(updatedFavorites);
       await saveFavorites(updatedFavorites);
-      
-      // Sync with database if user is logged in
+
       if (user?.token) {
         try {
           const dbResult = await removeFromWishlist(user.token, productId);
-          
           if (!dbResult.success) {
             if (dbResult.error?.includes('404') || dbResult.error?.includes('not found')) {
               log.debug('Wishlist API not available - favorite removed locally only');
@@ -270,28 +252,26 @@ export const FavoritesProvider = ({ children }) => {
           log.warn('Network error removing favorite (removed locally)', error?.message || error);
         }
       }
-      
+
       log.debug('Removed from favorites successfully');
       return { success: true, favorites: updatedFavorites };
-      
     } catch (error) {
       log.error('Remove from favorites error', error?.message || error);
       return { success: false, error: 'Failed to remove from favorites' };
     }
-  };
+  }, [user?.token]);
 
   /**
    * Toggle favorite status
    */
-  const toggleFavorite = async (product) => {
-    const isCurrentlyFavorite = favorites.some(fav => fav.id === product.id);
-    
+  const toggleFavorite = useCallback(async (product) => {
+    const isCurrentlyFavorite = favoritesRef.current.some(fav => fav.id === product.id);
     if (isCurrentlyFavorite) {
       return await removeFromFavorites(product.id);
     } else {
       return await addToFavorites(product);
     }
-  };
+  }, [addToFavorites, removeFromFavorites]);
 
   /**
    * Check if product is in favorites

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
@@ -58,6 +58,16 @@ const normalizeSizeKey = (product, selectedSize) => {
   return pickDefaultVariantSize(product) || '';
 };
 
+const hasServerDiscount = (variantOriginal, variantPrice, variants, product) => {
+  if (Number.isFinite(variantOriginal) && variantOriginal > variantPrice) return true;
+  if (Array.isArray(variants) && variants.some(v => {
+    const vo = Number(v?.originalPrice);
+    return Number.isFinite(vo) && vo > Number(v?.price);
+  })) return true;
+  if (product?.discountLabel) return true;
+  return false;
+};
+
 const inferOriginalFromUserDiscount = ({ discountedPrice, discountPct }) => {
   const pct = Number(discountPct);
   const base = Number(discountedPrice);
@@ -77,8 +87,6 @@ export const CartProvider = ({ children }) => {
   const [shippingRates, setShippingRates] = useState(null);
   const [emirates, setEmirates] = useState(UAE_EMIRATES);
   const shippingRatesFetchRef = useRef({ inFlight: null, lastAt: 0 });
-  const itemsRef = useRef(items);
-  itemsRef.current = items;
 
   // Load cart and emirate from storage on mount
   useEffect(() => {
@@ -104,12 +112,40 @@ export const CartProvider = ({ children }) => {
     }
   }, [selectedEmirate, isLoading]);
 
+  // Re-normalize cart pricing when user context changes (e.g., login provides discountPercentage)
+  const userIdRef = useRef(user?.id);
+  useEffect(() => {
+    if (isLoading || !user?.id || user.id === userIdRef.current) return;
+    userIdRef.current = user.id;
+    setItems(prev => prev.map(it => {
+      if (!it?.product || isPromotionItem(it)) return it;
+      const product = it.product;
+      const selectedSize = String(it?.selectedSize || '').trim();
+      if (!selectedSize || !Array.isArray(product?.variants)) return it;
+      const v = product.variants.find(vv => String(vv?.size || '').trim() === selectedSize);
+      const vp = Number(v?.price);
+      if (!Number.isFinite(vp) || vp <= 0) return it;
+      const variantOriginal = Number(v?.originalPrice);
+      const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
+      const discountPct = Number(user?.discountPercentage);
+      const inferredOriginal = serverConfirmed
+        ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
+        : null;
+      const keptOriginal =
+        (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
+        inferredOriginal ||
+        null;
+      return { ...it, product: { ...product, price: vp, displayPrice: vp, originalPrice: keptOriginal } };
+    }));
+    bumpPromoTick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isLoading]);
+
   // Auto-apply Free Mask Promotion based on cart subtotal (excludes existing promo items).
   // Uses itemsRef to read current items without listing `items` as a dep (which would
   // cause a re-trigger every time setItems runs, risking an infinite loop).
   // Instead, the effect re-runs when external factors change (user, emirate, rates).
   // Cart mutations (add/remove/qty) also trigger it via a lightweight counter.
-  const promoTickRef = useRef(0);
   const [promoTick, setPromoTick] = useState(0);
   const bumpPromoTick = useCallback(() => setPromoTick((n) => n + 1), []);
 
@@ -177,7 +213,8 @@ export const CartProvider = ({ children }) => {
 
       return [...prevNonPromo, ...keptPromo, ...toAdd];
     });
-  }, [promoTick, user, selectedEmirate, emirates, shippingRates, isLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promoTick, user, selectedEmirate, emirates, isLoading]);
 
   const loadCartFromStorage = async () => {
     try {
@@ -206,18 +243,14 @@ export const CartProvider = ({ children }) => {
             const vp = Number(v?.price);
             if (Number.isFinite(vp) && vp > 0) {
               const variantOriginal = Number(v?.originalPrice);
-              const productOriginal = Number(product?.originalPrice);
-              const serverConfirmedDiscount =
-                (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
-                (Number.isFinite(productOriginal) && productOriginal > 0);
+              const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
               const discountPct = Number(user?.discountPercentage);
-              const inferredOriginal = serverConfirmedDiscount
+              const inferredOriginal = serverConfirmed
                 ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
                 : null;
               const keptOriginal =
                 (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
                 inferredOriginal ||
-                (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
                 null;
               return {
                 ...it,
@@ -363,20 +396,14 @@ export const CartProvider = ({ children }) => {
         if (Number.isFinite(vp) && vp > 0) {
           const variantOriginal = Number(v?.originalPrice);
           const productOriginal = Number(product?.originalPrice);
-          // Only infer original from user discount when the server confirmed a discount
-          // (originalPrice exists). Without it, the variant price IS the retail price and
-          // inferring would wrongly inflate it (e.g. 330/0.5 = 660 when retail is 330).
-          const serverConfirmedDiscount =
-            (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
-            (Number.isFinite(productOriginal) && productOriginal > 0);
+          const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
           const discountPct = Number(user?.discountPercentage);
-          const inferredOriginal = serverConfirmedDiscount
+          const inferredOriginal = serverConfirmed
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
             : null;
           const keptOriginal =
             (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
             inferredOriginal ||
-            (Number.isFinite(productOriginal) && productOriginal > vp ? productOriginal : null) ||
             null;
           return {
             ...product,
@@ -507,9 +534,30 @@ export const CartProvider = ({ children }) => {
           )
           .filter(item => item !== itemToUpdate);
       }
+
+      let updatedProduct = itemToUpdate.product;
+      const variants = updatedProduct?.variants;
+      if (Array.isArray(variants) && normalizedSize) {
+        const v = variants.find(vv => String(vv?.size || '').trim() === normalizedSize);
+        const vp = Number(v?.price);
+        if (Number.isFinite(vp) && vp > 0) {
+          const variantOriginal = Number(v?.originalPrice);
+          const serverConfirmed = hasServerDiscount(variantOriginal, vp, variants, updatedProduct);
+          const discountPct = Number(user?.discountPercentage);
+          const inferredOriginal = serverConfirmed
+            ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
+            : null;
+          const keptOriginal =
+            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
+            inferredOriginal ||
+            null;
+          updatedProduct = { ...updatedProduct, price: vp, displayPrice: vp, originalPrice: keptOriginal };
+        }
+      }
+
       return prev.map(item =>
         item === itemToUpdate
-          ? { ...item, selectedColor: normalizedNewColor }
+          ? { ...item, selectedColor: normalizedNewColor, product: updatedProduct }
           : item
       );
     });
@@ -566,17 +614,9 @@ export const CartProvider = ({ children }) => {
         const vp = Number(newVariant?.price);
         if (Number.isFinite(vp) && vp > 0) {
           const variantOriginal = Number(newVariant?.originalPrice);
-          const anyVariantHasOriginal = variants.some((v) => {
-            const vo = Number(v?.originalPrice);
-            return Number.isFinite(vo) && vo > Number(v?.price);
-          });
-          const hasDiscountLabel = !!itemToUpdate.product?.discountLabel;
-          const serverConfirmedDiscount =
-            (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
-            anyVariantHasOriginal ||
-            hasDiscountLabel;
+          const serverConfirmed = hasServerDiscount(variantOriginal, vp, variants, itemToUpdate.product);
           const discountPct = Number(user?.discountPercentage);
-          const inferredOriginal = serverConfirmedDiscount
+          const inferredOriginal = serverConfirmed
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
             : null;
           const keptOriginal =
@@ -677,45 +717,32 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Get total number of items in cart
-   */
-  const getTotalItems = () => {
-    // Do not count promotion items towards the "Bag: X items" header.
-    return items.filter((it) => !isPromotionItem(it)).reduce((total, item) => total + item.quantity, 0);
-  };
+  const getTotalItems = useCallback(() => {
+    return items.filter((it) => !isPromotionItem(it)).reduce((total, item) => total + (Number(item.quantity) || 0), 0);
+  }, [items]);
 
-  /**
-   * Check if a specific product is in cart
-   */
-  const isInCart = (productId, selectedColor = '', selectedSize = '') => {
+  const isInCart = useCallback((productId, selectedColor = '', selectedSize = '') => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
-    
     return items.some(item => 
       !isPromotionItem(item) &&
       item.product.id === productId && 
       item.selectedColor === normalizedColor && 
       item.selectedSize === normalizedSize
     );
-  };
+  }, [items]);
 
-  /**
-   * Get quantity of a specific item in cart
-   */
-  const getItemQuantity = (productId, selectedColor = '', selectedSize = '') => {
+  const getItemQuantity = useCallback((productId, selectedColor = '', selectedSize = '') => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
-    
-    const item = items.find(item => 
-      !isPromotionItem(item) &&
-      item.product.id === productId && 
-      item.selectedColor === normalizedColor && 
-      item.selectedSize === normalizedSize
+    const item = items.find(it => 
+      !isPromotionItem(it) &&
+      it.product.id === productId && 
+      it.selectedColor === normalizedColor && 
+      it.selectedSize === normalizedSize
     );
-    
     return item ? item.quantity : 0;
-  };
+  }, [items]);
 
   /**
    * Set selected emirate
@@ -733,24 +760,17 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Get cart totals with VAT, shipping, and discounts
-   */
-  const getCartTotals = () => {
+  const getCartTotals = useCallback(() => {
     return calculateCartTotals(items, user, selectedEmirate, {
       emirates,
       freeShippingThreshold: shippingRates?.freeShippingThreshold,
       vatRate: shippingRates?.vatRate,
     });
-  };
+  }, [items, user, selectedEmirate, emirates, shippingRates]);
 
-  /**
-   * Get cart summary for display
-   */
-  const getCartSummary = () => {
+  const getCartSummary = useCallback(() => {
     const totals = getCartTotals();
     const itemCount = getTotalItems();
-    
     return {
       itemCount,
       subtotal: totals.subtotal,
@@ -761,22 +781,16 @@ export const CartProvider = ({ children }) => {
       amountForFreeShipping: totals.amountForFreeShipping,
       hasFreeShipping: (totals.shippingCost ?? totals.shipping ?? 0) === 0
     };
-  };
+  }, [getCartTotals, getTotalItems]);
 
-  /**
-   * Get available emirates for shipping
-   */
-  const getAvailableEmirates = () => {
+  const getAvailableEmirates = useCallback(() => {
     return emirates?.length ? emirates : UAE_EMIRATES;
-  };
+  }, [emirates]);
 
-  const value = {
-    // State
+  const value = useMemo(() => ({
     items,
     selectedEmirate,
     isLoading,
-    
-    // Actions
     addItem,
     removeItem,
     updateQuantity,
@@ -785,19 +799,16 @@ export const CartProvider = ({ children }) => {
     clearCart,
     setSelectedEmirate,
     saveOrderToDatabase,
-    
-    // Getters
     getTotalItems,
     isInCart,
     getItemQuantity,
     getCartTotals,
     getCartSummary,
     getAvailableEmirates,
-
-    // Shipping rates (DB-driven)
     shippingRates,
     reloadShippingRates: loadShippingRates,
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [items, selectedEmirate, isLoading, shippingRates, getTotalItems, isInCart, getItemQuantity, getCartTotals, getCartSummary, getAvailableEmirates]);
 
   return (
     <CartContext.Provider value={value}>

@@ -3,7 +3,7 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  ScrollView, 
+  FlatList, 
   TouchableOpacity, 
   ActivityIndicator,
   RefreshControl,
@@ -42,7 +42,8 @@ import * as haptics from '../../utils/haptics';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
-import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice, isBeautyBoxProduct } from '../../utils/productRules';
+import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../../utils/productRules';
+import { computeProductBadges } from '../../utils/badges';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import {
   getLocalizedProductName,
@@ -242,42 +243,11 @@ export default function ShopScreen() {
 
           {/* Badges */}
           {(() => {
-            const nameLower = (product?.name || '').trim().toLowerCase();
-            const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
-            const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
-            const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
-            const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
-            const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
-            const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
-            const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
-            const isBeautyBox = isBeautyBoxProduct(product);
-
-            const baseBadges = (product.badges || []).filter((badge) => {
-              const text = (badge.text || '').toLowerCase().trim();
-              if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
-              if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
-              if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
-              if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
-              return true;
+            const badges = computeProductBadges(product, {
+              order: t('common.order'),
+              inStock: t('stock.inStock'),
+              new: t('common.new'),
             });
-
-            const computedBadges = [];
-            if (!isOutOfStock) {
-              if (isMesopeciaKit) {
-                computedBadges.push({ text: t('common.order'), color: '#FF9500', priority: 0 });
-              } else if (!isHolidayKit) {
-                computedBadges.push({ text: t('stock.inStock'), color: '#34C759', priority: 0 });
-              }
-            }
-
-            const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
-            if ((isBioFermentMask || isRevitaGlow) && !hasNewBadge) {
-              computedBadges.push({ text: t('common.new'), color: '#007AFF', priority: 1 });
-            }
-
-            const badges = [...computedBadges, ...baseBadges]
-              .sort((a, b) => (a.priority || 10) - (b.priority || 10))
-              .slice(0, 2);
 
             if (!badges.length) return null;
 
@@ -361,9 +331,9 @@ export default function ShopScreen() {
               <Text style={styles.gridPrice}>{Number(getCanonicalUnitPrice(product) || 0).toFixed(2)} AED</Text>
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
             </View>
-          ) : product.originalPrice && product.originalPrice !== (product.displayPrice || product.price) ? (
+          ) : product.originalPrice && Number(product.originalPrice) > Number(product.displayPrice || product.price || 0) ? (
             <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.originalPrice}>{product.originalPrice} AED</Text>
+              <Text style={styles.originalPrice}>{Number(product.originalPrice).toFixed(2)} AED</Text>
               <Text style={styles.discountedPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
               {product.discountLabel && <Text style={styles.userDiscount}>{product.discountLabel}</Text>}
               <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
@@ -384,7 +354,7 @@ export default function ShopScreen() {
                 const message = encodeURIComponent(
                   (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
                 );
-                Linking.openURL(`https://wa.me/971585487665?text=${message}`);
+                Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
               }}
               activeOpacity={0.7}
             >
@@ -504,16 +474,17 @@ export default function ShopScreen() {
   const loadCategories = async () => {
     try {
       log.debug('Loading categories from API...');
-      const categoryData = await fetchProductCategories();
+      const categoryResult = await fetchProductCategories();
+      const categoryData = categoryResult?.categories || categoryResult;
+      const badgeMap = categoryResult?.badgeMap;
       log.debug('Categories received', { hasData: !!categoryData });
       
-      // Extract badge metadata from API response (e.g. { "Cream": "new", "Beauty Boxes": "new" })
-      if (categoryData?._badgeMap && typeof categoryData._badgeMap === 'object') {
-        setCategoryBadges(categoryData._badgeMap);
+      if (badgeMap && badgeMap instanceof Map) {
+        setCategoryBadges(Object.fromEntries(badgeMap));
       }
 
       // Add "All" as the first option
-      const allCategories = ['All', ...categoryData];
+      const allCategories = ['All', ...(Array.isArray(categoryData) ? categoryData : [])];
       setCategories(prev => {
         const normalized = [];
         const seen = new Set();
@@ -567,7 +538,8 @@ export default function ShopScreen() {
         log.warn('Re-fetch for user pricing failed', err?.message);
       }
     })();
-  }, [user?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, locale]);
 
   // Combined search and category filter effect
   useEffect(() => {
@@ -833,191 +805,196 @@ export default function ShopScreen() {
         </Pressable>
       </Modal>
       
-      <ScrollView 
+      <FlatList
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor="#dc2626"
-          />
-        }
-      >
-        <View style={styles.contentContainer}>
-          {/* Search Field */}
-          <View style={styles.searchContainer}>
-            <View style={[styles.searchInputContainer, isRTL && styles.searchInputContainerRTL]}>
-              <View style={[styles.searchIcon, isRTL && styles.searchIconRTL]}>
-                <Ionicons name="search" size={18} color="#86868B" />
-              </View>
-              <TextInput
-                style={[styles.searchInput, isRTL && styles.searchInputRTL]}
-                placeholder={t('shop.searchPlaceholder')}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                placeholderTextColor="#86868B"
-                autoCapitalize="none"
-                autoCorrect={false}
-                textAlign={isRTL ? 'right' : 'left'}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity 
-                  style={[styles.searchClearIconButton, isRTL && styles.searchClearIconButtonRTL]}
-                  onPress={() => setSearchQuery('')}
-                >
-                  <Ionicons name="close" size={14} color="#ffffff" />
-                </TouchableOpacity>
-              )}
-
-              {/* Voice Search Mic Button – only shown when native module is available */}
-              {speechAvailable && (
-                <TouchableOpacity
-                  style={[styles.micButton, isRTL && styles.micButtonRTL]}
-                  onPress={isListening ? stopVoiceSearch : startVoiceSearch}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('voiceSearch.label') || 'Voice search'}
-                >
-                  <RNAnimated.View style={isListening ? { transform: [{ scale: pulseAnim }] } : undefined}>
-                    <Ionicons
-                      name={isListening ? 'mic' : 'mic-outline'}
-                      size={20}
-                      color={isListening ? '#dc2626' : '#86868B'}
-                    />
-                  </RNAnimated.View>
-                </TouchableOpacity>
-              )}
-            </View>
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        data={filteredProducts}
+        numColumns={2}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        columnWrapperStyle={styles.gridRow}
+        renderItem={({ item: product }) => (
+          <View style={styles.gridCard}>
+            <TouchableOpacity
+              style={{ flex: 1 }}
+              onPress={() => handleProductPress(product)}
+              activeOpacity={0.95}
+            >
+              {renderProductCardInner(product)}
+            </TouchableOpacity>
           </View>
-
-          {/* Voice Search Listening Overlay – only rendered when native module is available */}
-          {speechAvailable && (
-            <Modal visible={isListening} transparent animationType="fade" onRequestClose={stopVoiceSearch}>
-              <Pressable style={styles.voiceOverlay} onPress={stopVoiceSearch}>
-                <View style={styles.voiceModal}>
-                  <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
-                    <Ionicons name="mic" size={40} color="#ffffff" />
-                  </RNAnimated.View>
-                  <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
-                  {voicePartial ? (
-                    <Text style={styles.voicePartialText} numberOfLines={2}>{voicePartial}</Text>
-                  ) : (
-                    <Text style={styles.voiceHintText}>{t('voiceSearch.hint') || 'Say a product name'}</Text>
-                  )}
-                  <TouchableOpacity style={styles.voiceStopBtn} onPress={stopVoiceSearch} activeOpacity={0.8}>
-                    <Text style={styles.voiceStopText}>{t('voiceSearch.stop') || 'Stop'}</Text>
-                  </TouchableOpacity>
+        )}
+        ListHeaderComponent={
+          <View style={styles.contentContainer}>
+            {/* Search Field */}
+            <View style={styles.searchContainer}>
+              <View style={[styles.searchInputContainer, isRTL && styles.searchInputContainerRTL]}>
+                <View style={[styles.searchIcon, isRTL && styles.searchIconRTL]}>
+                  <Ionicons name="search" size={18} color="#86868B" />
                 </View>
-              </Pressable>
-            </Modal>
-          )}
+                <TextInput
+                  style={[styles.searchInput, isRTL && styles.searchInputRTL]}
+                  placeholder={t('shop.searchPlaceholder')}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholderTextColor="#86868B"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  textAlign={isRTL ? 'right' : 'left'}
+                />
+                {searchQuery.length > 0 && (
+                  <TouchableOpacity 
+                    style={[styles.searchClearIconButton, isRTL && styles.searchClearIconButtonRTL]}
+                    onPress={() => setSearchQuery('')}
+                  >
+                    <Ionicons name="close" size={14} color="#ffffff" />
+                  </TouchableOpacity>
+                )}
 
-          {/* Categories Filter */}
-          {categories.length > 0 && (
-            <View style={styles.categoriesContainer}>
-              <View style={[styles.categoriesGrid, isRTL && styles.categoriesGridRTL]}>
-                {(() => {
-                  const list = Array.isArray(categories) ? [...categories] : [];
-                  if (locale !== 'ru') return list;
+                {/* Voice Search Mic Button */}
+                {speechAvailable && (
+                  <TouchableOpacity
+                    style={[styles.micButton, isRTL && styles.micButtonRTL]}
+                    onPress={isListening ? stopVoiceSearch : startVoiceSearch}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('voiceSearch.label') || 'Voice search'}
+                  >
+                    <RNAnimated.View style={isListening ? { transform: [{ scale: pulseAnim }] } : undefined}>
+                      <Ionicons
+                        name={isListening ? 'mic' : 'mic-outline'}
+                        size={20}
+                        color={isListening ? '#dc2626' : '#86868B'}
+                      />
+                    </RNAnimated.View>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
 
-                  // 1) Put preferred RU categories first in the exact order.
-                  const picked = [];
-                  const remaining = new Set(list);
-                  RU_CATEGORY_PRIORITY_ORDER.forEach((cat) => {
-                    if (remaining.has(cat)) {
-                      picked.push(cat);
-                      remaining.delete(cat);
-                    }
-                  });
-
-                  // 2) Append whatever else exists, sorted by translated label length (short -> long).
-                  const getLabel = (cat) =>
-                    getCategoryTranslationKey(cat) ? t(getCategoryTranslationKey(cat)) : cat;
-                  const rest = Array.from(remaining);
-                  rest.sort((a, b) => String(getLabel(a)).length - String(getLabel(b)).length);
-
-                  return [...picked, ...rest];
-                })().map((category) => {
-                  const hasBadge = categoryBadges[category] === 'new' || category === 'Skin Concern';
-                  const isActive = selectedCategory === category;
-                  return (
-                  <View key={category} style={{ position: 'relative' }}>
-                    {hasBadge && (
-                      <View style={[
-                        styles.categoryNewBadge,
-                        isActive && styles.categoryNewBadgeActive
-                      ]}>
-                        <Text style={[
-                          styles.categoryNewBadgeText,
-                          isActive && styles.categoryNewBadgeTextActive
-                        ]}>{t('common.new')}</Text>
-                      </View>
+            {/* Voice Search Listening Overlay */}
+            {speechAvailable && (
+              <Modal visible={isListening} transparent animationType="fade" onRequestClose={stopVoiceSearch}>
+                <Pressable style={styles.voiceOverlay} onPress={stopVoiceSearch}>
+                  <View style={styles.voiceModal}>
+                    <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
+                      <Ionicons name="mic" size={40} color="#ffffff" />
+                    </RNAnimated.View>
+                    <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
+                    {voicePartial ? (
+                      <Text style={styles.voicePartialText} numberOfLines={2}>{voicePartial}</Text>
+                    ) : (
+                      <Text style={styles.voiceHintText}>{t('voiceSearch.hint') || 'Say a product name'}</Text>
                     )}
-                    <TouchableOpacity
-                      style={[
-                        styles.categoryButton,
-                        isRTL && styles.categoryButtonRTL,
-                        locale === 'ru' && styles.ruCategoryButton,
-                        isActive && styles.activeCategoryButton
-                      ]}
-                      onPress={() => handleCategoryPress(category)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={[
-                        styles.categoryButtonText,
-                        isRTL && styles.categoryButtonTextRTL,
-                        locale === 'ru' && styles.ruCategoryButtonText,
-                        isActive && styles.activeCategoryButtonText
-                      ]}>
-                        {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
-                      </Text>
+                    <TouchableOpacity style={styles.voiceStopBtn} onPress={stopVoiceSearch} activeOpacity={0.8}>
+                      <Text style={styles.voiceStopText}>{t('voiceSearch.stop') || 'Stop'}</Text>
                     </TouchableOpacity>
                   </View>
-                  );
-                })}
-              </View>
-              
-              {/* Product Count under Categories */}
-              <Text style={[styles.productCount, isRTL && styles.productCountRTL]}>
-                {filteredProducts.length} {t(filteredProducts.length === 1 ? 'shop.product' : 'shop.products')}
-                {selectedCategory !== 'All' && ` ${t('shop.in')} ${(getCategoryTranslationKey(selectedCategory) ? t(getCategoryTranslationKey(selectedCategory)) : selectedCategory)}`}
-                {searchQuery && ` ${t('shop.foundFor', { query: searchQuery })}`}
-              </Text>
-            </View>
-          )}
+                </Pressable>
+              </Modal>
+            )}
 
-          {/* Build Your Set Banner — only under Beauty Boxes category */}
-          {selectedCategory === 'Beauty Boxes' && !searchQuery && (
-            <TouchableOpacity
-              style={styles.buildSetBanner}
-              activeOpacity={0.85}
-              onPress={() => {
-                router.push('/bundle-builder');
-              }}
-            >
-              <View style={[styles.buildSetContent, isRTL && styles.buildSetContentRTL]}>
-                <View style={styles.buildSetTextArea}>
-                  <Text style={[styles.buildSetTitle, isRTL && styles.textRTL]}>
-                    🎁 {t('shop.buildYourSet') || 'Build Your Set'}
-                  </Text>
-                  <Text style={[styles.buildSetSubtitle, isRTL && styles.textRTL]}>
-                    {t('shop.buildYourSetDesc') || 'Mix & match products and save up to 20%'}
-                  </Text>
-                </View>
-                <View style={styles.buildSetBadge}>
-                  <Text style={styles.buildSetBadgeText}>{t('shop.upTo20Off') || 'Up to 20% OFF'}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
+            {/* Categories Filter */}
+            {categories.length > 0 && (
+              <View style={styles.categoriesContainer}>
+                <View style={[styles.categoriesGrid, isRTL && styles.categoriesGridRTL]}>
+                  {(() => {
+                    const list = Array.isArray(categories) ? [...categories] : [];
+                    if (locale !== 'ru') return list;
 
-          {/* Products Grid */}
-          <View style={styles.section}>
-          
-          {filteredProducts.length === 0 && (searchQuery || selectedCategory !== 'All') ? (
-            /* No Search/Filter Results */
+                    const picked = [];
+                    const remaining = new Set(list);
+                    RU_CATEGORY_PRIORITY_ORDER.forEach((cat) => {
+                      if (remaining.has(cat)) {
+                        picked.push(cat);
+                        remaining.delete(cat);
+                      }
+                    });
+
+                    const getLabel = (cat) =>
+                      getCategoryTranslationKey(cat) ? t(getCategoryTranslationKey(cat)) : cat;
+                    const rest = Array.from(remaining);
+                    rest.sort((a, b) => String(getLabel(a)).length - String(getLabel(b)).length);
+
+                    return [...picked, ...rest];
+                  })().map((category) => {
+                    const hasBadge = categoryBadges[category] === 'new' || category === 'Skin Concern';
+                    const isActive = selectedCategory === category;
+                    return (
+                    <View key={category} style={{ position: 'relative' }}>
+                      {hasBadge && (
+                        <View style={[
+                          styles.categoryNewBadge,
+                          isActive && styles.categoryNewBadgeActive
+                        ]}>
+                          <Text style={[
+                            styles.categoryNewBadgeText,
+                            isActive && styles.categoryNewBadgeTextActive
+                          ]}>{t('common.new')}</Text>
+                        </View>
+                      )}
+                      <TouchableOpacity
+                        style={[
+                          styles.categoryButton,
+                          isRTL && styles.categoryButtonRTL,
+                          locale === 'ru' && styles.ruCategoryButton,
+                          isActive && styles.activeCategoryButton
+                        ]}
+                        onPress={() => handleCategoryPress(category)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.categoryButtonText,
+                          isRTL && styles.categoryButtonTextRTL,
+                          locale === 'ru' && styles.ruCategoryButtonText,
+                          isActive && styles.activeCategoryButtonText
+                        ]}>
+                          {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    );
+                  })}
+                </View>
+                
+                <Text style={[styles.productCount, isRTL && styles.productCountRTL]}>
+                  {filteredProducts.length} {t(filteredProducts.length === 1 ? 'shop.product' : 'shop.products')}
+                  {selectedCategory !== 'All' && ` ${t('shop.in')} ${(getCategoryTranslationKey(selectedCategory) ? t(getCategoryTranslationKey(selectedCategory)) : selectedCategory)}`}
+                  {searchQuery && ` ${t('shop.foundFor', { query: searchQuery })}`}
+                </Text>
+              </View>
+            )}
+
+            {/* Build Your Set Banner */}
+            {selectedCategory === 'Beauty Boxes' && !searchQuery && (
+              <TouchableOpacity
+                style={styles.buildSetBanner}
+                activeOpacity={0.85}
+                onPress={() => {
+                  router.push('/bundle-builder');
+                }}
+              >
+                <View style={[styles.buildSetContent, isRTL && styles.buildSetContentRTL]}>
+                  <View style={styles.buildSetTextArea}>
+                    <Text style={[styles.buildSetTitle, isRTL && styles.textRTL]}>
+                      🎁 {t('shop.buildYourSet') || 'Build Your Set'}
+                    </Text>
+                    <Text style={[styles.buildSetSubtitle, isRTL && styles.textRTL]}>
+                      {t('shop.buildYourSetDesc') || 'Mix & match products and save up to 20%'}
+                    </Text>
+                  </View>
+                  <View style={styles.buildSetBadge}>
+                    <Text style={styles.buildSetBadgeText}>{t('shop.upTo20Off') || 'Up to 20% OFF'}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+        }
+        ListEmptyComponent={
+          (searchQuery || selectedCategory !== 'All') ? (
             <View style={styles.noResultsContainer}>
               <Text style={[styles.noResultsTitle, isRTL && styles.noResultsTitleRTL]}>{t('shop.noResults')}</Text>
               <Text style={[styles.noResultsText, isRTL && styles.noResultsTextRTL]}>
@@ -1051,24 +1028,9 @@ export default function ShopScreen() {
                 )}
               </View>
             </View>
-          ) : (
-            <View style={styles.gridContainer}>
-              {filteredProducts.map((product, index) => (
-                <View key={`${product.id}-${index}`} style={styles.gridCard}>
-                  <TouchableOpacity
-                    style={{ flex: 1 }}
-                    onPress={() => handleProductPress(product)}
-                    activeOpacity={0.95}
-                  >
-                    {renderProductCardInner(product)}
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-        </View>
-      </ScrollView>
+          ) : null
+        }
+      />
 
     </SafeAreaView>
   );
@@ -1330,6 +1292,10 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingHorizontal: GRID_SIDE_PADDING,
+    justifyContent: 'space-between',
+  },
+  gridRow: {
     paddingHorizontal: GRID_SIDE_PADDING,
     justifyContent: 'space-between',
   },

@@ -43,7 +43,7 @@ import T from '../utils/typography';
 export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
   const { user, getAddresses } = useAuth();
-  const { items, getTotalItems, getCartSummary, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
+  const { items, getTotalItems, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const scrollRef = useRef(null);
@@ -87,13 +87,11 @@ export default function CheckoutScreen() {
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
 
-  // Calculate totals
-  const cartSummary = getCartSummary();
-  const totals = calculateCartTotals(items, user, selectedEmirate, {
+  const totals = useMemo(() => calculateCartTotals(items, user, selectedEmirate, {
     emirates: getAvailableEmirates(),
     freeShippingThreshold: shippingRates?.freeShippingThreshold,
     vatRate: shippingRates?.vatRate,
-  });
+  }), [items, user, selectedEmirate, getAvailableEmirates, shippingRates]);
   const safeSubtotal = Number(totals.subtotal) || 0;
   const safeShipping = Number(totals.shipping) || 0;
   const safeVat = Number(totals.vatAmount) || 0;
@@ -226,6 +224,38 @@ export default function CheckoutScreen() {
     }, [loadSavedAddresses])
   );
 
+  const applySavedAddress = useCallback((addr) => {
+    if (!addr) return;
+    userPickedSavedAddressRef.current = true;
+    setSelectedSavedAddressId(String(addr.id || ''));
+
+    const name = String(addr.name || '').trim();
+    const parts = name ? name.split(' ') : [];
+    if (parts.length) {
+      setFirstName(parts[0] || '');
+      setLastName(parts.slice(1).join(' ') || '');
+    }
+
+    const national = normalizeUaeToNationalDigits(String(addr.phone || '').trim());
+    if (national) setPhoneNational(formatUaeNationalForInput(national));
+
+    setAddressDetails(addr);
+
+    const streetLine = String(addr.address || '').trim();
+    const cityPart = String(addr.city || '').trim();
+    const emiratePart = String(addr.emirate || '').trim();
+    const fullAddress = [streetLine, cityPart, emiratePart].filter(Boolean).join(', ');
+    setAddress(fullAddress || streetLine);
+
+    if (addr?.landmark) {
+      setLandmark(String(addr.landmark).trim());
+    }
+
+    if (addr?.emirate && typeof setSelectedEmirate === 'function') {
+      setSelectedEmirate(String(addr.emirate).trim());
+    }
+  }, [setSelectedEmirate]);
+
   // Auto-populate the default saved address (or the only saved address) into the form
   useEffect(() => {
     if (userPickedSavedAddressRef.current) return;          // user already picked manually
@@ -244,39 +274,6 @@ export default function CheckoutScreen() {
     if (k === 'other') return t('addAddress.typeOther');
     return t('addAddress.typeHome');
   }, [t]);
-
-  const applySavedAddress = useCallback((addr) => {
-    if (!addr) return;
-    userPickedSavedAddressRef.current = true;
-    setSelectedSavedAddressId(String(addr.id || ''));
-
-    const name = String(addr.name || '').trim();
-    const parts = name ? name.split(' ') : [];
-    if (parts.length) {
-      setFirstName(parts[0] || '');
-      setLastName(parts.slice(1).join(' ') || '');
-    }
-
-    const national = normalizeUaeToNationalDigits(String(addr.phone || '').trim());
-    if (national) setPhoneNational(formatUaeNationalForInput(national));
-
-    setAddressDetails(addr);
-
-    // Build full delivery address from saved address fields (street, city, emirate)
-    const streetLine = String(addr.address || '').trim();
-    const cityPart = String(addr.city || '').trim();
-    const emiratePart = String(addr.emirate || '').trim();
-    const fullAddress = [streetLine, cityPart, emiratePart].filter(Boolean).join(', ');
-    setAddress(fullAddress || streetLine);
-
-    if (addr?.landmark) {
-      setLandmark(String(addr.landmark).trim());
-    }
-
-    if (addr?.emirate && typeof setSelectedEmirate === 'function') {
-      setSelectedEmirate(String(addr.emirate).trim());
-    }
-  }, [setSelectedEmirate]);
 
   const clearSavedAddressSelection = useCallback(() => {
     setSelectedSavedAddressId(null);
@@ -771,7 +768,7 @@ export default function CheckoutScreen() {
             {/* Order total summary above Place Order button */}
             <View style={[styles.footerTotalRow, isRTL && { flexDirection: 'row-reverse' }]}>
               <Text style={styles.footerTotalLabel}>
-                {t('checkout.total') || 'Total'} ({items.filter(i => !(i?.isPromotionItem || String(i?.selectedSize || '').trim() === '__PROMO__')).reduce((s, i) => s + (i.quantity || 1), 0)} {items.length === 1 ? (t('checkout.item') || 'item') : (t('checkout.items') || 'items')})
+                {(() => { const c = paidItems.reduce((s, i) => s + (Number(i.quantity) || 1), 0); return `${t('checkout.total') || 'Total'} (${c} ${c === 1 ? (t('checkout.item') || 'item') : (t('checkout.items') || 'items')})`; })()}
               </Text>
               <Text style={styles.footerTotalValue}>{safeTotal.toFixed(2)} AED</Text>
             </View>

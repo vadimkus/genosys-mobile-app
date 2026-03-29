@@ -171,7 +171,7 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
   const totalWithVat = (Number.isFinite(subtotal) ? subtotal : 0) + shipping;
   const vatAmount = Number.isFinite(totalWithVat) ? (totalWithVat * vatRate) / (1 + vatRate) : 0;
 
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const itemCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
   const totals = {
     subtotal,
@@ -195,7 +195,8 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
  * @returns {number} Shipping cost
  */
 export function getShippingCost(emirateName) {
-  const emirate = UAE_EMIRATES.find(e => e.name === emirateName);
+  const key = String(emirateName || '').trim().toLowerCase();
+  const emirate = UAE_EMIRATES.find(e => String(e.name || '').trim().toLowerCase() === key);
   return emirate ? emirate.shippingCost : 0;
 }
 

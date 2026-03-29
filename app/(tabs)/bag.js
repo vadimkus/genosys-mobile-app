@@ -40,7 +40,6 @@ export default function BagScreen() {
     clearCart, 
     getCartSummary,
     selectedEmirate,
-    getAvailableEmirates,
     reloadShippingRates,
     isLoading
   } = useCart();
@@ -86,20 +85,15 @@ export default function BagScreen() {
   const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
 
   const cartSummary = getCartSummary();
-  const emirates = getAvailableEmirates();
   const paidItemCount = getTotalItems();
 
   const isPromoItem = (item) => item?.isPromotionItem === true || item?.selectedSize === '__PROMO__';
   const promoSubtotal = Number(cartSummary.subtotal) || 0;
-  const promoTier =
-    promoSubtotal >= 700 ? 'twoMasks'
-      : promoSubtotal >= 500 ? 'collagen'
-        : 'none';
   const promo500Met = promoSubtotal >= 500;
   const promo700Met = promoSubtotal >= 700;
 
   const headerTranslateY = useMemo(() => {
-    const h = Math.max(1, headerHeight);
+    const h = headerHeight || 100;
     return scrollY.interpolate({
       inputRange: [0, h],
       outputRange: [0, -h],
@@ -116,12 +110,6 @@ export default function BagScreen() {
   const safeVat = Number(cartSummary.vatAmount) || 0;
   const safeTotal = Number(cartSummary.total) || 0;
 
-  const deliveryEtaText =
-    String(selectedEmirate || '').trim().toLowerCase() === 'dubai'
-      ? t('checkout.deliveryEtaDubai')
-      : t('checkout.deliveryEtaOther');
-  const deliveryCostText = cartSummary.hasFreeShipping ? t('common.free') : `${safeShipping.toFixed(2)} AED`;
-
   // Progress bars (UI only)
   const promo500Remaining = Math.max(0, 500 - promoSubtotal);
   const promo700Remaining = Math.max(0, 700 - promoSubtotal);
@@ -133,47 +121,6 @@ export default function BagScreen() {
 
   const promoCollagenImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/in.png`;
   const promoSeaAlgaeImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/SEA.jpg`;
-
-  const originalSubtotal = (() => {
-    if (!Number.isFinite(discountPct) || discountPct <= 0 || discountPct >= 100) return null;
-    const multiplier = 1 - discountPct / 100;
-    if (multiplier <= 0) return null;
-    const sum = items.reduce((acc, item) => {
-      // Never include promo items in "before discount" math.
-      if (isPromoItem(item)) return acc;
-
-      const qty = Number(item.quantity) || 0;
-      const explicitOriginal = Number(item.product?.originalPrice);
-      const base = Number(item.product?.displayPrice ?? item.product?.price ?? 0) || 0;
-      const selectedSize = String(item?.selectedSize || '').trim();
-      const selectedVariant = selectedSize && Array.isArray(item?.product?.variants)
-        ? item.product.variants.find((v) => String(v?.size || '').trim() === selectedSize)
-        : null;
-      const variantPrice = Number(selectedVariant?.price);
-      const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
-      // Discount-excluded products (Beauty Boxes, Hydro Cool Mask): ignore user discount
-      if (isUserDiscountExcludedProduct(item.product)) {
-        // Canonical-price products should always use canonical/base price (e.g. Hydro Cool, Devices)
-        if (isHydroCoolMask(item.product) || isDeviceProduct(item.product) || hasFixedPriceOverride(item.product)) {
-          return acc + getCanonicalUnitPrice(item.product) * qty;
-        }
-        return acc + base * qty;
-      }
-      // Prefer the larger of explicit original vs inferred original from discount,
-      // because explicit original may be for a different size (e.g. cleanser 500ml).
-      const inferred = base > 0 ? (base / multiplier) : 0;
-      const orig = Math.max(
-        (Number.isFinite(explicitOriginal) && explicitOriginal > 0 ? explicitOriginal : 0),
-        (Number.isFinite(inferred) && inferred > 0 ? inferred : 0)
-      );
-      return acc + (Number.isFinite(orig) ? orig : base) * qty;
-    }, 0);
-    return Number.isFinite(sum) ? sum : null;
-  })();
-
-  const discountAmount = originalSubtotal && originalSubtotal > safeSubtotal
-    ? Math.max(0, originalSubtotal - safeSubtotal)
-    : 0;
 
   // Waterfall breakdown for order summary
   const waterfall = computeWaterfallBreakdown(items, user);
@@ -383,7 +330,7 @@ export default function BagScreen() {
                   const retailPrice = (Number.isFinite(original) && original > base) ? original : base / (1 - bundlePct / 100);
                   const discountLabel = `${bundlePct}%`;
                   return (
-                    <View style={styles.itemPriceContainer}>
+                    <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
                       <View style={styles.itemPriceRow}>
                         <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>
                         <Text style={styles.itemBundleLabel}>{discountLabel} {t('bag.bundleOff') || 'OFF'}</Text>
@@ -400,7 +347,7 @@ export default function BagScreen() {
                     : (base / 0.85);
 
                   return (
-                    <View style={styles.itemPriceContainer}>
+                    <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
                       <View style={styles.itemPriceRow}>
                         <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
                         <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
@@ -447,7 +394,7 @@ export default function BagScreen() {
                 ) {
                   const pctLabel = Math.round(pct);
                   return (
-                    <View style={styles.itemPriceContainer}>
+                    <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
                       <View style={styles.itemPriceRow}>
                         <Text style={styles.itemOriginalPrice}>{originalForDisplay.toFixed(2)} AED</Text>
                         {pctLabel ? <Text style={styles.itemDiscountLabel}>{pctLabel}% {t('bag.off')}</Text> : null}
@@ -884,11 +831,6 @@ const styles = StyleSheet.create({
     paddingRight: 8,
     flex: 1,
   },
-  backText: {
-    ...T.label,
-    color: '#dc2626',
-    marginLeft: 4,
-  },
   headerCenter: {
     flex: 2,
     alignItems: 'center',
@@ -921,35 +863,6 @@ const styles = StyleSheet.create({
     ...T.caption,
     fontSize: 14,
     textAlign: 'center',
-  },
-  promoHeaderBlock: {
-    marginTop: 12,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 12,
-  },
-  promoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    marginBottom: 2,
-  },
-  promoTitle: {
-    ...T.label,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  promoLine: {
-    ...T.captionSmall,
-    color: '#3C3C43',
-    flex: 1,
-  },
-  promoApplied: {
-    ...T.captionSmall,
-    fontWeight: '700',
-    color: '#27AE60',
-    marginTop: 8,
   },
   clearText: {
     ...T.button,
@@ -989,14 +902,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...T.sectionTitleSmall,
-  },
-  sectionSubtle: {
-    ...T.captionSmall,
-    fontWeight: '700',
-    color: '#dc2626',
-    flexShrink: 1,
-    maxWidth: '48%',
-    textAlign: 'right',
   },
   progressCard: {
     marginBottom: 12,
@@ -1056,56 +961,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   
-  // Emirates Selection
-  emirateSelector: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  emirateSelectorContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  emirateIcon: {
-    marginRight: 12,
-  },
-  emirateInfo: {
-    flex: 1,
-  },
-  deliveryInfoLine: {
-    ...T.captionSmall,
-    fontWeight: '600',
-    marginTop: 4,
-  },
-  deliveryCostValue: {
-    color: '#1D1D1F',
-    fontWeight: '800',
-  },
-  emirateLabel: {
-    ...T.captionSmall,
-    marginBottom: 2,
-  },
-  emirateValue: {
-    ...T.body,
-    fontWeight: '600',
-    color: '#1D1D1F',
-    lineHeight: undefined,
-  },
   
-  // Free Shipping Banner (legacy/cart top)
-  freeShippingBanner: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-  },
-  freeShippingText: {
-    ...T.label,
-  },
   // Free Shipping Banner (green, inside waterfall)
   freeShippingBannerGreen: {
     flexDirection: 'row',
@@ -1194,18 +1050,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 4,
   },
-  itemSize: {
-    ...T.captionSmall,
-    marginBottom: 8,
-  },
   itemPrice: {
     ...T.price,
-    marginBottom: 12,
-  },
-  promoItemPrice: {
-    ...T.price,
-    fontWeight: '800',
-    color: '#27AE60',
     marginBottom: 12,
   },
   promoItemPriceRight: {
@@ -1419,15 +1265,6 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     fontWeight: '500',
   },
-  summaryDiscountValue: {
-    ...T.summaryValue,
-    fontWeight: '700',
-    color: '#dc2626',
-  },
-  discountPctGreen: {
-    color: '#27AE60',
-    fontWeight: '700',
-  },
   // Waterfall discount breakdown styles
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
@@ -1518,55 +1355,6 @@ const styles = StyleSheet.create({
     ...T.button,
   },
   
-  // Emirates Selection Modal
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
-  },
-  modalTitle: {
-    ...T.sectionTitleSmall,
-    fontWeight: '600',
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  emirateOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
-  },
-  selectedEmirateOption: {
-    backgroundColor: '#dc262610',
-  },
-  emirateOptionContent: {
-    flex: 1,
-  },
-  emirateOptionName: {
-    ...T.body,
-    fontWeight: '600',
-    color: '#1D1D1F',
-    lineHeight: undefined,
-    marginBottom: 2,
-  },
-  selectedEmirateText: {
-    color: '#dc2626',
-  },
-  emirateShippingCost: {
-    ...T.caption,
-    fontSize: 14,
-  },
 
   // RTL Support Styles
   itemDetailsRTL: {
@@ -1629,11 +1417,6 @@ const styles = StyleSheet.create({
   backButtonRTL: {
     flexDirection: 'row-reverse',
   },
-  backTextRTL: {
-    textAlign: 'right',
-    marginLeft: 0,
-    marginRight: 8,
-  },
   titleInlineRTL: {
     textAlign: 'center',
     writingDirection: 'rtl',
@@ -1659,9 +1442,6 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
     marginLeft: 0,
     marginRight: 8,
-  },
-  sectionSubtleRTL: {
-    textAlign: 'left',
   },
   // Empty state RTL
   emptyTitleRTL: {

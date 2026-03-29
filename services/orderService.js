@@ -116,6 +116,10 @@ export async function getPaymentUrlForExistingOrder({ token, orderId, orderNumbe
  * @returns {Promise<Object>} Order submission result
  */
 export async function submitCODOrder(orderData) {
+  if (!Array.isArray(orderData?.items) || orderData.items.length === 0) {
+    return { success: false, error: 'Order must contain at least one item' };
+  }
+
   log.debug('Submitting COD order', { orderNumber: orderData?.orderNumber });
   
   try {
@@ -240,6 +244,10 @@ export async function submitCODOrder(orderData) {
  * @returns {Promise<Object>} Order submission result
  */
 export async function submitCardOrder(orderData) {
+  if (!Array.isArray(orderData?.items) || orderData.items.length === 0) {
+    return { success: false, error: 'Order must contain at least one item' };
+  }
+
   log.debug('Submitting Card order', { orderNumber: orderData?.orderNumber });
   
   try {
@@ -264,23 +272,22 @@ export async function submitCardOrder(orderData) {
         return {
           id: item.product?.id || item.id,
           name: item.product?.name || item.name,
-          price: item.product?.displayPrice || item.product?.price || item.price,
-          quantity: item.quantity,
+          price: Number(item.product?.displayPrice || item.product?.price || item.price) || 0,
+          quantity: Number(item.quantity) || 0,
           image: item.product?.image_url || item.product?.image || item.image,
           size: item.isPromotionItem === true ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
           color: item.selectedColor || item.color,
           isPromotionItem: item.isPromotionItem === true,
           promotionKey: item.promotionKey || null,
-          // Bundle metadata (Build Your Set) — server needs per-item flags
           fromBundle: isBundleItem,
           bundleDiscountPercent: isBundleItem ? (Number(item.bundleDiscountPercent || item.product?.bundleDiscountPercent) || 0) : 0,
           originalPrice: isBundleItem ? (Number(item.product?.originalPrice) || 0) : 0,
         };
       }),
-      shippingCost: orderData.shippingCost,
-      vatAmount: orderData.vatAmount,
-      subtotal: orderData.subtotal,
-      total: orderData.total,
+      shippingCost: Number(orderData.shippingCost) || 0,
+      vatAmount: Number(orderData.vatAmount) || 0,
+      subtotal: Number(orderData.subtotal) || 0,
+      total: Number(orderData.total) || 0,
       orderNotes: orderData.orderNotes || '',
       locale: orderData.locale || 'en',
       // Discount fields for email templates and order records
@@ -288,6 +295,9 @@ export async function submitCardOrder(orderData) {
       discountAmount: orderData.discountAmount || 0,
       bundleDiscountPercentage: orderData.bundleDiscountPercentage || 0,
       bundleDiscountAmount: orderData.bundleDiscountAmount || 0,
+      sendEmails: true,
+      notifyAdmin: true,
+      source: 'mobile_app',
     };
 
     const response = await fetch(`${API_BASE_URL}/checkout/stripe`, {
@@ -340,8 +350,9 @@ export function generateOrderNumber() {
   const year = now.getFullYear().toString().slice(-2);
   const month = (now.getMonth() + 1).toString().padStart(2, '0');
   const day = now.getDate().toString().padStart(2, '0');
-  const sequence = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-  return `GEN${year}${month}${day}${sequence}`;
+  const seq = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const entropy = Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+  return `GEN${year}${month}${day}${seq}${entropy}`;
 }
 
 // Note: Apple Pay was removed due to Apple's high in-app payment fees (15-30%)

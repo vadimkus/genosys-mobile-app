@@ -27,31 +27,23 @@ export async function storeUserSession(userData) {
     
     const token = userData.token;
     const profileData = { ...userData };
-    delete profileData.token; // Don't store token in AsyncStorage
+    delete profileData.token;
     
-    // Store token in SecureStore (encrypted)
     if (token) {
-      await SecureStore.setItemAsync(SECURE_TOKEN_KEY, token);
+      try {
+        await SecureStore.setItemAsync(SECURE_TOKEN_KEY, token);
+      } catch (secureErr) {
+        log.error('SecureStore write failed, aborting session store', secureErr?.message || secureErr);
+        return;
+      }
     }
     
-    // Store non-sensitive user data in AsyncStorage
     await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(profileData));
-    
-    // Also write to legacy key for backward compatibility (without token)
     await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(profileData));
     
     log.debug('User session stored securely');
   } catch (error) {
     log.error('Failed to store user session', error?.message || error);
-    // Fallback: store profile data (without token) in AsyncStorage if SecureStore fails
-    try {
-      const fallbackData = { ...userData };
-      delete fallbackData.token;
-      await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(fallbackData));
-      log.warn('Fell back to AsyncStorage for profile data (token not persisted)');
-    } catch (fallbackError) {
-      log.error('Fallback storage also failed', fallbackError?.message);
-    }
   }
 }
 
@@ -76,6 +68,7 @@ export async function getUserSession() {
       if (legacyData && legacyData.token) {
         log.info('Migrating legacy session to secure storage');
         await storeUserSession(legacyData);
+        await AsyncStorage.removeItem(LEGACY_KEY).catch(() => {});
         return legacyData;
       }
       return legacyData;
