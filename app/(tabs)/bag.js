@@ -269,13 +269,15 @@ export default function BagScreen() {
                 {getLocalizedProductName(item.product, locale) || item.product.name}
               </Text>
             </TouchableOpacity>
-            <Text style={[styles.itemCategory, isRTL && styles.itemCategoryRTL]}>
-              {(() => {
-                const canon = normalizeCategoryCanonical(item.product.category) || item.product.category;
-                const key = getCategoryTranslationKey(canon);
-                return key ? t(key) : canon;
-              })()}
-            </Text>
+            {!promo && (
+              <Text style={[styles.itemCategory, isRTL && styles.itemCategoryRTL]}>
+                {(() => {
+                  const canon = normalizeCategoryCanonical(item.product.category) || item.product.category;
+                  const key = getCategoryTranslationKey(canon);
+                  return key ? t(key) : canon;
+                })()}
+              </Text>
+            )}
 
             {/* Color Selector */}
             {!promo && (() => {
@@ -350,7 +352,6 @@ export default function BagScreen() {
               <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
                 <Text style={[styles.itemOriginalPrice, isRTL && styles.itemOriginalPriceRTL]}>{(Number(item.product?.originalPrice) || 0).toFixed(2)} AED</Text>
                 <Text style={[styles.itemDiscountLabel, isRTL && styles.itemDiscountLabelRTL]}>{t('bag.discount100')}</Text>
-                <Text style={[styles.promoTag, isRTL && styles.promoTagRTL]}>{t('bag.promotionTag')}</Text>
               </View>
             ) : (
               (() => {
@@ -465,6 +466,7 @@ export default function BagScreen() {
             <View style={[styles.itemRightActions, isRTL && styles.itemRightActionsRTL]}>
               <Text style={[styles.promoQtyRight, isRTL && styles.promoQtyRightRTL]}>{t('bag.qty')} {item.quantity || 1}</Text>
               <Text style={[styles.promoItemPriceRight, isRTL && styles.promoItemPriceRightRTL]}>{t('common.free')}</Text>
+              <Text style={[styles.promoTag, isRTL && styles.promoTagRTL]}>{t('bag.promotionTag')}</Text>
             </View>
           ) : (
             <View style={[styles.itemRightActions, isRTL && styles.itemRightActionsRTL]}>
@@ -1221,7 +1223,8 @@ const styles = StyleSheet.create({
     ...T.captionTiny,
     fontWeight: '800',
     color: '#27AE60',
-    marginTop: 2,
+    marginTop: 4,
+    textAlign: 'right',
   },
   
   // Variants Display
