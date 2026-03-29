@@ -554,10 +554,11 @@ export const CartProvider = ({ children }) => {
       }
 
       // Update size and recalculate price from the new variant.
-      // IMPORTANT: Do NOT use itemToUpdate.product.originalPrice for the "server confirmed
-      // discount" check — after a prior size switch it may be an inferred value, not the
-      // server's raw original. Instead, check the variant's own originalPrice or whether
-      // ANY variant in the array carries a server-set originalPrice.
+      // Do NOT use itemToUpdate.product.originalPrice for the "server confirmed discount"
+      // check — after a prior size switch it may be an inferred value. Instead use:
+      //   1. The new variant's own originalPrice (if server set it)
+      //   2. Any variant carrying a server-set originalPrice
+      //   3. The product's discountLabel (set by API, never overwritten by cart mutations)
       const variants = itemToUpdate.product?.variants;
       let updatedProduct = itemToUpdate.product;
       if (Array.isArray(variants)) {
@@ -569,9 +570,11 @@ export const CartProvider = ({ children }) => {
             const vo = Number(v?.originalPrice);
             return Number.isFinite(vo) && vo > Number(v?.price);
           });
+          const hasDiscountLabel = !!itemToUpdate.product?.discountLabel;
           const serverConfirmedDiscount =
             (Number.isFinite(variantOriginal) && variantOriginal > vp) ||
-            anyVariantHasOriginal;
+            anyVariantHasOriginal ||
+            hasDiscountLabel;
           const discountPct = Number(user?.discountPercentage);
           const inferredOriginal = serverConfirmedDiscount
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
