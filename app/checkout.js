@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Modal,
+  Animated,
   ActivityIndicator,
   Linking,
   Platform,
@@ -86,6 +88,9 @@ export default function CheckoutScreen() {
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
+  const [successOrder, setSuccessOrder] = useState(null);
+  const successScale = useRef(new Animated.Value(0.8)).current;
+  const successOpacity = useRef(new Animated.Value(0)).current;
 
   const totals = useMemo(() => calculateCartTotals(items, user, selectedEmirate, {
     emirates: getAvailableEmirates(),
@@ -488,22 +493,11 @@ export default function CheckoutScreen() {
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
           haptics.success();
           clearCart();
-          Alert.alert(
-            t('checkout.orderSubmittedTitle'),
-            t('checkout.orderSubmittedMessageCOD', { orderNumber: finalOrderNumber }),
-            [
-              { 
-                text: t('checkout.viewOrder'), 
-                onPress: () => router.replace('/(tabs)/orders'),
-                style: 'default'
-              },
-              { 
-                text: t('checkout.continueShopping'), 
-                onPress: () => router.replace('/(tabs)/shop'),
-                style: 'cancel'
-              }
-            ]
-          );
+          setSuccessOrder(finalOrderNumber);
+          Animated.parallel([
+            Animated.spring(successScale, { toValue: 1, tension: 60, friction: 8, useNativeDriver: true }),
+            Animated.timing(successOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+          ]).start();
           return;
         }
 
@@ -595,6 +589,43 @@ export default function CheckoutScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+
+      {/* COD Order Success Modal */}
+      <Modal visible={!!successOrder} transparent animationType="none">
+        <View style={styles.successOverlay}>
+          <Animated.View style={[styles.successCard, { opacity: successOpacity, transform: [{ scale: successScale }] }]}>
+            <View style={styles.successIconCircle}>
+              <Ionicons name="checkmark" size={40} color="#ffffff" />
+            </View>
+
+            <Text style={[styles.successTitle, isRTL && { textAlign: 'right' }]}>
+              {t('checkout.orderSubmittedTitle')}
+            </Text>
+
+            <Text style={[styles.successBody, isRTL && { textAlign: 'right' }]}>
+              {t('checkout.orderSubmittedMessageCOD', { orderNumber: successOrder || '' })}
+            </Text>
+
+            <TouchableOpacity
+              style={styles.successPrimaryBtn}
+              activeOpacity={0.85}
+              onPress={() => { setSuccessOrder(null); router.replace('/(tabs)/orders'); }}
+            >
+              <Ionicons name="receipt-outline" size={18} color="#fff" style={{ marginEnd: 6 }} />
+              <Text style={styles.successPrimaryText}>{t('checkout.viewOrder')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.successSecondaryBtn}
+              activeOpacity={0.7}
+              onPress={() => { setSuccessOrder(null); router.replace('/(tabs)/shop'); }}
+            >
+              <Text style={styles.successSecondaryText}>{t('checkout.continueShopping')}</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
+
       {/* Header with Step Indicator */}
       <CheckoutSteps
         activeStep={activeStep}
@@ -1712,5 +1743,86 @@ const styles = StyleSheet.create({
   placeOrderButtonTextRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
+  },
+
+  // Success Modal
+  successOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 28,
+  },
+  successCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    paddingTop: 32,
+    paddingBottom: 24,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 340,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  successIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#22c55e',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  successTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    letterSpacing: -0.3,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  successBody: {
+    fontSize: 15,
+    fontWeight: '400',
+    lineHeight: 22,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 28,
+  },
+  successPrimaryBtn: {
+    flexDirection: 'row',
+    backgroundColor: '#dc2626',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 14,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  successPrimaryText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+  },
+  successSecondaryBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 14,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  successSecondaryText: {
+    color: '#374151',
+    fontSize: 15,
+    fontWeight: '500',
   },
 });
