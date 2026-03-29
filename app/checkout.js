@@ -335,12 +335,12 @@ export default function CheckoutScreen() {
     haptics.lightTap();
   };
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (but not when showing success modal)
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !successOrder) {
       router.replace('/(tabs)/bag');
     }
-  }, [items.length]);
+  }, [items.length, successOrder]);
 
   // Redirect if user is not logged in
   useEffect(() => {
@@ -579,7 +579,7 @@ export default function CheckoutScreen() {
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !successOrder) {
     return null; // Will redirect via useEffect
   }
 
