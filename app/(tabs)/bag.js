@@ -1082,22 +1082,22 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   variantSelectorWrap: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
   variantSelectorLabel: {
-    ...T.captionSmall,
+    fontSize: 10,
     fontWeight: '600',
     color: '#6B7280',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   variantChipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
+    gap: 3,
   },
   variantChip: {
-    paddingHorizontal: 7,
-    paddingVertical: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#D1D1D6',
@@ -1112,7 +1112,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EFF6FF',
   },
   variantChipText: {
-    ...T.captionSmall,
+    fontSize: 10,
     fontWeight: '600',
     color: '#374151',
   },
