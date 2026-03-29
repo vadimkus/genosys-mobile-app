@@ -1096,7 +1096,7 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   variantChip: {
-    paddingHorizontal: 6,
+    paddingHorizontal: 5,
     paddingVertical: 3,
     borderRadius: 5,
     borderWidth: 1,
