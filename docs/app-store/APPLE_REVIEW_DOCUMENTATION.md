@@ -5,6 +5,7 @@
 **Version:** 1.8.0  
 **Build:** 74  
 **Platform:** iOS  
+**Last OTA Update:** March 29, 2026  
 
 ---
 
@@ -17,22 +18,54 @@ Genosys UAE is an e-commerce mobile application for purchasing professional Kore
 ## What's New in Version 1.8.0
 
 ### In-Bag Size & Color Selection
-- **Size Selector** — Products with multiple sizes (e.g. 50g / 210g) display a dropdown directly in the bag. Price updates automatically when the customer changes size.
-- **Color Selector** — Products with color variants (e.g. Natural Beige / Light) display a color dropdown in the bag.
+- **Size Chips** — Products with multiple sizes (e.g. 0.25mm / 0.5mm, or 50g / 210g) display compact tappable chips directly in the bag. Price updates automatically when the customer changes size.
+- **Color Chips** — Products with color variants (e.g. #01 Bright / #02 Natural, or Beige / Ivory / Camel) display tappable chips in the bag. Selected variant is highlighted.
 
 ### Checkout Variant Validation
 - **Required Selection Gate** — Orders cannot be placed without selecting required product variants. If a product requires a size or color choice, the customer is prompted with specific product names before proceeding.
 
 ### Over-the-Air Update Support
 - **Silent Background Updates** — The app checks for JavaScript bundle updates on every cold start and downloads them silently. Updates apply on the next app launch. No user-facing UI.
+- **Force Update Screen** — When a critical update is released, users on very old versions see a blocking screen directing them to the App Store.
+- **Soft Update Banner** — When a newer version is available but not required, a dismissible banner slides in from the top suggesting the user update.
 
 ### Navigation Cleanup
 - **Streamlined Side Menu** — Removed redundant "Products", "Orders", "Favorites", and "Profile" links from the hamburger menu. These destinations are always accessible via the bottom tab bar.
+
+### Performance & Stability (OTA — March 29, 2026)
+- **Virtualized Product Grid** — Shop page now uses FlatList instead of ScrollView for smooth scrolling with 50+ products
+- **Memoized Cart Context** — Cart provider value and getter functions are memoized to prevent unnecessary re-renders
+- **Type-Safe Price Comparisons** — All price comparisons use explicit Number() coercion to prevent string/number mismatches
+- **Race Condition Fixes** — Favorites context uses ref-based state reads to prevent stale closures in async operations
+- **Unified Discount Logic** — Server-confirmed discount detection consolidated into a single helper function
+- **Shared Badge Utility** — Product badge computation extracted into a reusable utility module
+
+### RTL & Localization Improvements (OTA — March 29, 2026)
+- **Favorites Grid RTL** — Full right-to-left support for favorites page (heart icon, badges, card layout, text alignment)
+- **Bag Price RTL** — Bundle, beauty box, and VIP discount price containers now mirror correctly in Arabic
+- **Profile Switch Items RTL** — Biometric and notification toggle rows correctly mirror in Arabic
+- **Logical Layout Properties** — Replaced hardcoded left/right with start/end throughout for proper RTL support
+
+### Error Handling & Security (OTA — March 29, 2026)
+- **Safe API Error Parsing** — response.json() and response.text() calls wrapped with fallbacks to prevent crashes
+- **Authenticated Uploads** — Profile picture uploads now use authenticated requests
+- **URL Encoding** — Dynamic URL path segments properly encoded to prevent injection
+- **PII Redaction** — Order response logs no longer contain customer data
+- **Empty Order Guard** — Order submission blocked at client level if items array is empty
+- **Enhanced Order IDs** — Order numbers now include additional entropy to prevent collisions
+- **Secure Token Cleanup** — Legacy plaintext auth tokens removed after migration to SecureStore
 
 ### Bug Fixes
 - Fixed per-item discount percentage display on bundle badges
 - Fixed per-item bundle discount in order detail screen
 - Fixed pricing for products excluded from user discounts
+- Fixed cart quantity coercion (prevents string concatenation from AsyncStorage)
+- Fixed case-sensitive emirate name lookup in shipping cost calculation
+- Fixed checkout singular/plural item count label
+- Fixed checkout function declaration order issue
+- Fixed session validation returning undefined on API failures
+- Fixed Linking.openURL unhandled promise rejections
+- Removed ~15 dead style definitions and unused variables from bag screen
 
 ---
 
@@ -143,19 +176,20 @@ This account is pre-created and ready to use. No email verification required.
 - Tap "Sign In"
 
 #### 2. Size Selection in Bag (New in 1.8.0)
-- Shop tab → Find a product with multiple sizes (e.g. "Intensive Hydro Soothing Cream" — 50g/250g)
+- Shop tab → Find "Microneedle Roller" (has 5 size variants)
 - Tap "Add to Bag" from the product card or detail page
 - Go to Bag tab
-- **Verify:** A size dropdown appears showing "50g" / "250g"
-- Change the size
-- **Verify:** The price updates immediately
+- **Verify:** Compact size chips appear (0.25mm, 0.1mm, 0.5mm, 0.15mm, 0.2mm) with the selected size highlighted in blue
+- Tap a different size chip
+- **Verify:** The price updates immediately and the chip highlight moves
 
 #### 3. Color Selection in Bag (New in 1.8.0)
 - Shop tab → Find "Skin Caring Blemish Balm Cushion" (BB Cushion)
 - Add to bag
 - Go to Bag tab
-- **Verify:** A color dropdown appears (Beige / Ivory / Camel)
-- Select a color
+- **Verify:** Color chips appear (Beige / Ivory / Camel) all on one row, selected chip highlighted in red
+- Tap a different color chip
+- **Verify:** Selection updates
 
 #### 4. Checkout Validation (New in 1.8.0)
 - Add the BB Cushion to the bag WITHOUT selecting a color (quick-add from shop grid)
@@ -168,6 +202,12 @@ This account is pre-created and ready to use. No email verification required.
 - Tap the hamburger menu (top-left)
 - **Verify:** Menu no longer shows "Products", "Orders", "Favorites", or "Profile" links
 - These are accessible via the bottom tab bar
+
+#### 6. RTL Layout (Improved in 1.8.0 OTA)
+- Profile tab > Language > Arabic
+- Navigate to Shop, Bag, Favorites, Profile
+- **Verify:** All text is right-aligned, layouts mirror correctly, variant chips reverse order
+- Switch back to English
 
 #### 6. Verify VIP Pricing
 - Browse the Shop tab
@@ -390,7 +430,7 @@ This account is pre-created and ready to use. No email verification required.
 
 | Version | Build | Key Changes |
 |---------|-------|-------------|
-| 1.8.0 | 74 | In-bag size/color selectors, checkout validation, OTA updates, nav cleanup, pricing fixes |
+| 1.8.0 | 74 | In-bag size/color chip selectors, checkout validation, OTA updates, nav cleanup, pricing fixes, 50-issue audit (perf, RTL, security, error handling), compact variant chips |
 | 1.7.0 | 71 | Remote splash screen, soft update banner, 5.6MB binary reduction |
 | 1.6.0 | 68 | Ramadan video splash, force update gating, sticky bar UX, pricing fixes, payment simplification |
 | 1.5.0 | 65 | 8 Skin Concern pages, 100% native, app-wide haptics, routine tap-to-add |
@@ -428,15 +468,25 @@ This account is pre-created and ready to use. No email verification required.
 - [x] Product prices refresh when user logs in
 
 ### v1.8.0 Features
-- [ ] Size dropdown appears in bag for multi-size products
-- [ ] Changing size updates the price immediately
-- [ ] Color dropdown appears in bag for multi-color products
+- [ ] Compact size chips appear in bag for multi-size products (e.g. Microneedle Roller)
+- [ ] Changing size chip updates the price immediately
+- [ ] Compact color chips appear in bag for multi-color products (e.g. BB Cushion)
+- [ ] All color chips fit on one row (Beige/Ivory/Camel, or #01 Bright/#02 Natural)
 - [ ] Checkout blocks submission when required variant is missing
 - [ ] Alert shows specific product names and "Go to Bag" action
 - [ ] After selecting variants, checkout proceeds normally
 - [ ] Hamburger menu no longer shows Products/Orders/Favorites/Profile
 - [ ] Bottom tab bar provides access to all main sections
 - [ ] App launches normally (OTA check is invisible)
+
+### v1.8.0 OTA Improvements (March 29, 2026)
+- [ ] Shop page scrolls smoothly with 50+ products (FlatList virtualization)
+- [ ] Favorites page supports RTL layout (Arabic)
+- [ ] Bag price containers support RTL layout (Arabic)
+- [ ] Profile switch items support RTL layout (Arabic)
+- [ ] Discount badges display correctly on product cards
+- [ ] Price strikethrough works on favorites page
+- [ ] No crashes on API error responses
 
 ### v1.7.0 Features
 - [x] Remote splash video plays on app launch (tap to skip)
