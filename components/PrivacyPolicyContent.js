@@ -1,36 +1,163 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
-import AUTH_CONFIG from '../config/auth';
+import { AUTH_CONFIG } from '../config/auth';
 import T from '../utils/typography';
 
 export default function PrivacyPolicyContent({ showLastUpdated = true }) {
-  const { t, dir } = useLocalization();
+  const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const [policy, setPolicy] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const lastUpdated = t('privacy.lastUpdatedDate');
-  const email = t('contact.emailValue') || 'sales@genosys.ae';
-  const phoneDisplay = t('contact.phoneDisplay') || '+971 58 548 76 65';
-  const location = t('contact.locationValue') || 'Dubai, UAE';
-  const genosysPrivacyUrl = AUTH_CONFIG?.PRIVACY_POLICY_URL || 'https://genosys.ae/privacy-policy';
-  const googlePrivacyUrl = 'https://policies.google.com/privacy';
-  const applePrivacyUrl = 'https://www.apple.com/legal/privacy/';
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchPolicy() {
+      try {
+        setLoading(true);
+        setError(false);
+        const res = await fetch(`${AUTH_CONFIG.API_BASE_URL}/privacy-policy`, {
+          headers: {
+            'x-api-key': AUTH_CONFIG.API_KEY,
+            'x-locale': locale || 'en',
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!cancelled) setPolicy(data);
+      } catch (e) {
+        console.warn('Failed to fetch privacy policy from API:', e.message);
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchPolicy();
+    return () => { cancelled = true; };
+  }, [locale]);
 
-  const handleEmailPress = () => {
-    Linking.openURL(`mailto:${email}`);
-  };
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#dc2626" />
+      </View>
+    );
+  }
 
-  const handleGooglePrivacyPress = () => {
-    Linking.openURL(googlePrivacyUrl);
-  };
+  if (error || !policy) {
+    const fallbackUrl = `https://genosys.ae/${locale === 'en' ? '' : locale + '/'}privacy-policy`;
+    return (
+      <View style={styles.centered}>
+        <Ionicons name="shield-outline" size={48} color="#ccc" />
+        <Text style={[styles.errorText, isRTL && styles.textRTL]}>
+          {locale === 'ar' ? 'لم نتمكن من تحميل سياسة الخصوصية.' : locale === 'ru' ? 'Не удалось загрузить политику конфиденциальности.' : 'Could not load privacy policy.'}
+        </Text>
+        <TouchableOpacity style={styles.fallbackButton} onPress={() => Linking.openURL(fallbackUrl)}>
+          <Text style={styles.fallbackButtonText}>
+            {locale === 'ar' ? 'عرض على الموقع' : locale === 'ru' ? 'Открыть на сайте' : 'View on Website'}
+          </Text>
+          <Ionicons name="open-outline" size={16} color="#dc2626" />
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
-  const handleApplePrivacyPress = () => {
-    Linking.openURL(applePrivacyUrl);
-  };
+  const renderSection = (section) => {
+    switch (section.type) {
+      case 'highlight':
+        return (
+          <View key={section.id} style={[styles.highlightSection, isRTL && styles.highlightSectionRTL]}>
+            <Text style={[styles.highlightTitle, isRTL && styles.textRTL]}>{section.title}</Text>
+            <Text style={[styles.highlightText, isRTL && styles.textRTL]}>{section.content}</Text>
+          </View>
+        );
 
-  const handlePrivacyPolicyPress = () => {
-    Linking.openURL(genosysPrivacyUrl);
+      case 'list':
+        return (
+          <View key={section.id} style={styles.section}>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+              {section.number ? `${section.number}. ` : ''}{section.title}
+            </Text>
+            {section.content && (
+              <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
+            )}
+            <View style={styles.listContainer}>
+              {section.items?.map((item, i) => (
+                <View key={i} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+                  <Text style={[styles.listItemLabel, isRTL && styles.textRTL]}>{item.label}</Text>
+                  <Text style={[styles.listItemText, isRTL && styles.textRTL]}>{item.text}</Text>
+                </View>
+              ))}
+            </View>
+            {section.links?.map((link, i) => (
+              <TouchableOpacity key={i} onPress={() => Linking.openURL(link.url)} style={[styles.linkRow, isRTL && styles.linkRowRTL]}>
+                <Ionicons name="open-outline" size={14} color="#dc2626" />
+                <Text style={styles.link}>{link.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        );
+
+      case 'bullets':
+        return (
+          <View key={section.id} style={styles.section}>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+              {section.number ? `${section.number}. ` : ''}{section.title}
+            </Text>
+            {section.content && (
+              <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
+            )}
+            <View style={styles.listContainer}>
+              {section.items?.map((item, i) => (
+                <View key={i} style={[styles.bulletItem, isRTL && styles.bulletItemRTL]}>
+                  <Text style={styles.bullet}>{isRTL ? '◂' : '▸'}</Text>
+                  <Text style={[styles.bulletText, isRTL && styles.textRTL]}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        );
+
+      case 'text':
+        return (
+          <View key={section.id} style={styles.section}>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+              {section.number ? `${section.number}. ` : ''}{section.title}
+            </Text>
+            <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
+          </View>
+        );
+
+      case 'contact':
+        return (
+          <View key={section.id} style={styles.section}>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+              {section.number ? `${section.number}. ` : ''}{section.title}
+            </Text>
+            <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
+            <View style={styles.contactInfo}>
+              <Text style={styles.contactCompany}>{section.contact.company}</Text>
+              <TouchableOpacity onPress={() => Linking.openURL(`mailto:${section.contact.email}`)} style={[styles.contactItem, isRTL && styles.rowRTL]}>
+                <Ionicons name="mail-outline" size={16} color="#dc2626" />
+                <Text style={styles.contactLink}>{section.contact.email}</Text>
+              </TouchableOpacity>
+              <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
+                <Ionicons name="call-outline" size={16} color="#dc2626" />
+                <Text style={styles.contactText}>{section.contact.phone}</Text>
+              </View>
+              <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
+                <Ionicons name="location-outline" size={16} color="#dc2626" />
+                <Text style={[styles.contactText, isRTL && styles.textRTL]}>{section.contact.address}</Text>
+              </View>
+            </View>
+          </View>
+        );
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -41,120 +168,14 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
     >
       {showLastUpdated && (
         <View style={styles.updateInfo}>
-          <Text style={[styles.updateText, isRTL && styles.textRTL]}>{t('privacy.lastUpdated', { date: lastUpdated })}</Text>
+          <Text style={[styles.updateText, isRTL && styles.textRTL]}>
+            {t('privacy.lastUpdated', { date: policy.lastUpdated })}
+          </Text>
         </View>
       )}
 
-      {/* Privacy Rights Section */}
-      <View style={[styles.highlightSection, isRTL && styles.highlightSectionRTL]}>
-        <Text style={[styles.highlightTitle, isRTL && styles.textRTL]}>{t('privacy.rightsTitle')}</Text>
-        <Text style={[styles.highlightText, isRTL && styles.textRTL]}>{t('privacy.rightsText')}</Text>
-      </View>
+      {policy.sections.map(renderSection)}
 
-      {/* Personal Information We Collect */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.title')}</Text>
-        <View style={styles.listContainer}>
-          <View style={[styles.listItem, isRTL && styles.listItemRTL]}>
-            <Text style={[styles.listItemLabel, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.accountLabel')}</Text>
-            <Text style={[styles.listItemText, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.accountText')}</Text>
-          </View>
-          <View style={[styles.listItem, isRTL && styles.listItemRTL]}>
-            <Text style={[styles.listItemLabel, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.profileLabel')}</Text>
-            <Text style={[styles.listItemText, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.profileText')}</Text>
-          </View>
-          <View style={[styles.listItem, isRTL && styles.listItemRTL]}>
-            <Text style={[styles.listItemLabel, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.orderLabel')}</Text>
-            <Text style={[styles.listItemText, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.orderText')}</Text>
-          </View>
-          <View style={[styles.listItem, isRTL && styles.listItemRTL]}>
-            <Text style={[styles.listItemLabel, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.usageLabel')}</Text>
-            <Text style={[styles.listItemText, isRTL && styles.textRTL]}>{t('privacy.sections.personalInfo.usageText')}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Google Authentication */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('privacy.sections.google.title')}</Text>
-
-        <View style={[styles.subSection, isRTL && styles.subSectionRTL]}>
-          <Text style={[styles.subSectionLabel, isRTL && styles.textRTL]}>{t('privacy.sections.google.signInLabel')}</Text>
-          <Text style={[styles.subSectionText, isRTL && styles.textRTL]}>{t('privacy.sections.google.signInText')}</Text>
-        </View>
-        <View style={[styles.subSection, isRTL && styles.subSectionRTL]}>
-          <Text style={[styles.subSectionLabel, isRTL && styles.textRTL]}>{t('privacy.sections.google.sharedLabel')}</Text>
-          <Text style={[styles.subSectionText, isRTL && styles.textRTL]}>{t('privacy.sections.google.sharedText')}</Text>
-        </View>
-        <View style={[styles.subSection, isRTL && styles.subSectionRTL]}>
-          <Text style={[styles.subSectionLabel, isRTL && styles.textRTL]}>{t('privacy.sections.google.privacyLabel')}</Text>
-          <Text style={[styles.subSectionText, isRTL && styles.textRTL]}>
-            {t('privacy.sections.google.privacyPrefix')}{' '}
-            <Text style={styles.link} onPress={handleGooglePrivacyPress}>
-              {googlePrivacyUrl}
-            </Text>
-          </Text>
-        </View>
-      </View>
-
-      {/* Apple Authentication */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('privacy.sections.apple.title')}</Text>
-
-        <View style={[styles.subSection, isRTL && styles.subSectionRTL]}>
-          <Text style={[styles.subSectionLabel, isRTL && styles.textRTL]}>{t('privacy.sections.apple.signInLabel')}</Text>
-          <Text style={[styles.subSectionText, isRTL && styles.textRTL]}>{t('privacy.sections.apple.signInText')}</Text>
-        </View>
-        <View style={[styles.subSection, isRTL && styles.subSectionRTL]}>
-          <Text style={[styles.subSectionLabel, isRTL && styles.textRTL]}>{t('privacy.sections.apple.sharedLabel')}</Text>
-          <Text style={[styles.subSectionText, isRTL && styles.textRTL]}>{t('privacy.sections.apple.sharedText')}</Text>
-        </View>
-        <View style={[styles.subSection, isRTL && styles.subSectionRTL]}>
-          <Text style={[styles.subSectionLabel, isRTL && styles.textRTL]}>{t('privacy.sections.apple.privacyLabel')}</Text>
-          <Text style={[styles.subSectionText, isRTL && styles.textRTL]}>
-            {t('privacy.sections.apple.privacyPrefix')}{' '}
-            <Text style={styles.link} onPress={handleApplePrivacyPress}>
-              {applePrivacyUrl}
-            </Text>
-          </Text>
-        </View>
-      </View>
-
-      {/* Genosys Privacy Policy */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('privacy.sections.genosys.title')}</Text>
-        <Text style={[styles.paragraph, isRTL && styles.textRTL]}>
-          {t('privacy.sections.genosys.prefix')}{' '}
-          <Text style={styles.link} onPress={handlePrivacyPolicyPress}>
-            {genosysPrivacyUrl}
-          </Text>
-        </Text>
-      </View>
-
-      {/* Contact Us */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('privacy.sections.contact.title')}</Text>
-        <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{t('privacy.sections.contact.text')}</Text>
-
-        <View style={styles.contactInfo}>
-          <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
-            <Ionicons name="mail-outline" size={16} color="#dc2626" />
-            <TouchableOpacity onPress={handleEmailPress}>
-              <Text style={[styles.contactLink, isRTL && styles.valueLTR]}>{email}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
-            <Ionicons name="call-outline" size={16} color="#dc2626" />
-            <Text style={[styles.contactText, isRTL && styles.valueLTR]}>{phoneDisplay}</Text>
-          </View>
-          <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
-            <Ionicons name="location-outline" size={16} color="#dc2626" />
-            <Text style={[styles.contactText, isRTL && styles.textRTL]}>{location}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Footer Space */}
       <View style={styles.footerSpace} />
     </ScrollView>
   );
@@ -163,6 +184,10 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
 const styles = StyleSheet.create({
   scrollView: { flex: 1 },
   contentContainer: { paddingBottom: 40 },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40, minHeight: 300 },
+  errorText: { ...T.body, color: '#666', marginTop: 16, textAlign: 'center' },
+  fallbackButton: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 16, padding: 12 },
+  fallbackButtonText: { ...T.button, color: '#dc2626' },
   updateInfo: {
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -187,25 +212,28 @@ const styles = StyleSheet.create({
   },
   highlightTitle: { ...T.sectionTitleSmall, color: '#dc2626', marginBottom: 8 },
   highlightText: { ...T.body, color: '#333' },
-  section: { paddingHorizontal: 20, paddingVertical: 20 },
+  section: { paddingHorizontal: 20, paddingVertical: 16 },
   sectionTitle: { ...T.sectionTitleSmall, fontWeight: '600', marginBottom: 12 },
-  paragraph: { ...T.body, color: '#333', marginBottom: 16 },
-  listContainer: { marginVertical: 8 },
+  paragraph: { ...T.body, color: '#333', marginBottom: 12, lineHeight: 22 },
+  listContainer: { marginVertical: 4 },
   listItem: { marginBottom: 12, paddingStart: 16 },
   listItemRTL: { paddingStart: 16 },
   listItemLabel: { ...T.button, color: '#1D1D1F', marginBottom: 4 },
   listItemText: { ...T.body, color: '#333', lineHeight: 22 },
-  subSection: { marginBottom: 16, paddingStart: 16 },
-  subSectionRTL: { paddingStart: 16 },
-  subSectionLabel: { ...T.button, color: '#1D1D1F', marginBottom: 4 },
-  subSectionText: { ...T.body, color: '#333', lineHeight: 22 },
+  bulletItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, paddingStart: 8 },
+  bulletItemRTL: { flexDirection: 'row-reverse', paddingStart: 0, paddingEnd: 8 },
+  bullet: { color: '#dc2626', fontSize: 12, marginTop: 4, marginEnd: 8, width: 14 },
+  bulletText: { ...T.body, color: '#333', lineHeight: 22, flex: 1 },
+  linkRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingStart: 16, marginTop: 8 },
+  linkRowRTL: { flexDirection: 'row-reverse', paddingStart: 0, paddingEnd: 16 },
   contactInfo: {
-    marginTop: 16,
+    marginTop: 12,
     padding: 16,
     backgroundColor: '#F8F9FA',
     borderRadius: 8,
   },
-  contactItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, paddingStart: 4 },
+  contactCompany: { ...T.button, color: '#1D1D1F', marginBottom: 12 },
+  contactItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, paddingStart: 4 },
   contactLink: {
     ...T.body,
     color: '#dc2626',
@@ -217,8 +245,5 @@ const styles = StyleSheet.create({
   link: { ...T.link, color: '#dc2626', textDecorationLine: 'underline' },
   rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
   footerSpace: { height: 40 },
 });
-
-
