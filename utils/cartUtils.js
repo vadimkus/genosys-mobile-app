@@ -169,7 +169,7 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
       ? Number(vatRateRaw)
       : 0.05;
   const totalWithVat = (Number.isFinite(subtotal) ? subtotal : 0) + shipping;
-  const vatAmount = Number.isFinite(totalWithVat) ? (totalWithVat * vatRate) / (1 + vatRate) : 0;
+  const vatAmount = Number.isFinite(totalWithVat) ? Math.round(((totalWithVat * vatRate) / (1 + vatRate)) * 100) / 100 : 0;
 
   const itemCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
