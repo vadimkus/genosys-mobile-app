@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  iOS Expo Updates config.
+
+  KEEP IN SYNC with ../../../app.json ("updates" block + "runtimeVersion").
+  iOS production builds in eas.json do not run `expo prebuild`, so this
+  file is the runtime source of truth for iOS OTA. Android is generated
+  from app.json on each prebuild.
+
+  See docs/OTA_UPDATES.md for release workflow.
+-->
 <plist version="1.0">
   <dict>
     <key>EXUpdatesCheckOnLaunch</key>
