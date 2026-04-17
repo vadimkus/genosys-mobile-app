@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,24 +8,30 @@ import {
   Alert,
   Linking,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
+import AUTH_CONFIG from '../../config/auth';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('Help');
 
 export default function HelpSupportScreen() {
   const router = useRouter();
-  const { t, dir } = useLocalization();
+  const { t, dir, locale: localeFromHook } = useLocalization();
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [returnModalVisible, setReturnModalVisible] = useState(false);
+  const [faqData, setFaqData] = useState([]);
+  const [faqLoading, setFaqLoading] = useState(true);
 
-  // Local palette (Help screen previously referenced an undefined `colors` object, causing a crash).
   const colors = {
     primary: '#dc2626',
     text: '#000000',
@@ -35,6 +41,37 @@ export default function HelpSupportScreen() {
     card2: '#ffffff',
     borderSubtle: '#E5E5EA',
   };
+
+  const locale = localeFromHook;
+
+  const fetchFAQ = useCallback(async () => {
+    try {
+      setFaqLoading(true);
+      const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
+      const res = await fetch(`${baseUrl}/api/mobile/faq`, {
+        headers: {
+          'x-api-key': AUTH_CONFIG.API_KEY,
+          'x-locale': locale || 'en',
+        },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setFaqData((data.items || []).map((item, i) => ({
+        id: item.id ?? i + 1,
+        question: item.question,
+        answer: item.answer,
+      })));
+    } catch (err) {
+      log.warn('Help: failed to fetch FAQ:', err.message);
+      setFaqData([]);
+    } finally {
+      setFaqLoading(false);
+    }
+  }, [locale]);
+
+  useEffect(() => {
+    fetchFAQ();
+  }, [fetchFAQ]);
 
   const handleReturnItem = async () => {
     const name = String(user?.name || '').trim();
@@ -50,26 +87,6 @@ export default function HelpSupportScreen() {
     }
     await Linking.openURL(url);
   };
-
-  const faqData = [
-    { id: 1, question: t('help.faqItems.q1'), answer: t('help.faqItems.a1') },
-    { id: 2, question: t('help.faqItems.q2'), answer: t('help.faqItems.a2') },
-    { id: 3, question: t('help.faqItems.q3'), answer: t('help.faqItems.a3') },
-    { id: 4, question: t('help.faqItems.q4'), answer: t('help.faqItems.a4') },
-    { id: 5, question: t('help.faqItems.q5'), answer: t('help.faqItems.a5') },
-    { id: 6, question: t('help.faqItems.q6'), answer: t('help.faqItems.a6') },
-    { id: 7, question: t('help.faqItems.q7'), answer: t('help.faqItems.a7') },
-    { id: 8, question: t('help.faqItems.q8'), answer: t('help.faqItems.a8') },
-    { id: 9, question: t('help.faqItems.q9'), answer: t('help.faqItems.a9') },
-    { id: 10, question: t('help.faqItems.q10'), answer: t('help.faqItems.a10') },
-    { id: 11, question: t('help.faqItems.q11'), answer: t('help.faqItems.a11') },
-    { id: 12, question: t('help.faqItems.q12'), answer: t('help.faqItems.a12') },
-    { id: 13, question: t('help.faqItems.q13'), answer: t('help.faqItems.a13') },
-    { id: 14, question: t('help.faqItems.q14'), answer: t('help.faqItems.a14') },
-    { id: 15, question: t('help.faqItems.q15'), answer: t('help.faqItems.a15') },
-    { id: 16, question: t('help.faqItems.q16'), answer: t('help.faqItems.a16') },
-    { id: 17, question: t('help.faqItems.q17'), answer: t('help.faqItems.a17') },
-  ];
 
   const supportOptions = [
     {
@@ -99,7 +116,7 @@ export default function HelpSupportScreen() {
   ];
 
   const renderFormattedAnswer = (answer) => {
-    const raw = String(answer || '');
+    const raw = String(answer || '').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
     const lines = raw.replace(/\r\n/g, '\n').split('\n');
     const rows = [];
 
@@ -238,14 +255,30 @@ export default function HelpSupportScreen() {
           ))}
         </View>
 
-        {/* FAQ Section */}
+        {/* FAQ Section (API-driven) */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.faqTitle')}</Text>
-          <View style={styles.faqContainer}>
-            {faqData.map((faq, index) => (
-              <FaqItem key={`${faq.id}-${index}`} faq={faq} />
-            ))}
-          </View>
+          {faqLoading ? (
+            <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+              <ActivityIndicator size="small" color="#dc2626" />
+            </View>
+          ) : faqData.length > 0 ? (
+            <View style={styles.faqContainer}>
+              {faqData.map((faq, index) => (
+                <FaqItem key={`${faq.id}-${index}`} faq={faq} />
+              ))}
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={{ paddingVertical: 16, alignItems: 'center' }}
+              onPress={fetchFAQ}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.faqQuestionText, { color: colors.textSecondary, textAlign: 'center' }]}>
+                {t('common.tryAgain') || 'Tap to retry'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Quick Actions */}

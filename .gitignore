@@ -11,6 +11,13 @@ web-build/
 *.key
 *.mobileprovision
 
+# Native build outputs (Expo managed workflow — regenerate via `expo prebuild` / EAS)
+android/
+build/
+*.aab
+*.apk
+*.ipa
+
 # Metro
 .metro-health-check*
 

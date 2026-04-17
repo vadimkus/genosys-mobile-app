@@ -1,10 +1,10 @@
 /**
  * FAQ Screen - Native (fetches from API)
  * Data is loaded dynamically from /api/mobile/faq on the website.
- * When FAQ content is updated on the website, it appears here automatically.
+ * Grouped by category with section headers.
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
   Linking,
   ActivityIndicator,
   RefreshControl,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +27,17 @@ import { createLogger } from '../utils/logger';
 
 const log = createLogger('FAQ');
 
+const CATEGORY_ORDER = ['general', 'products', 'orders', 'shipping', 'app', 'account'];
+
+const CATEGORY_LABELS = {
+  general:  { en: 'About GENOSYS',     ar: 'عن GENOSYS',       ru: 'О GENOSYS',           icon: 'storefront-outline' },
+  products: { en: 'Products',          ar: 'المنتجات',         ru: 'Продукты',            icon: 'sparkles-outline' },
+  orders:   { en: 'Orders & Payment',  ar: 'الطلبات والدفع',   ru: 'Заказы и оплата',     icon: 'card-outline' },
+  shipping: { en: 'Shipping',          ar: 'الشحن',            ru: 'Доставка',            icon: 'car-outline' },
+  app:      { en: 'Mobile App',        ar: 'التطبيق',          ru: 'Приложение',          icon: 'phone-portrait-outline' },
+  account:  { en: 'Account & Support', ar: 'الحساب والدعم',    ru: 'Аккаунт и поддержка', icon: 'person-outline' },
+};
+
 export default function FAQScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
@@ -34,12 +46,19 @@ export default function FAQScreen() {
   const [faqData, setFaqData] = useState([]);
   const [subtitle, setSubtitle] = useState('');
   const [description, setDescription] = useState('');
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedIds, setExpandedIds] = useState({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
+
+  const getCategoryLabel = (cat) => {
+    const meta = CATEGORY_LABELS[cat];
+    if (!meta) return cat;
+    return locale === 'ar' ? meta.ar : locale === 'ru' ? meta.ru : meta.en;
+  };
 
   const fetchFAQ = useCallback(async (isRefresh = false) => {
     try {
@@ -74,14 +93,36 @@ export default function FAQScreen() {
     fetchFAQ();
   }, [fetchFAQ]);
 
+  const filteredData = useMemo(() => {
+    if (!searchQuery.trim()) return faqData;
+    const q = searchQuery.toLowerCase();
+    return faqData.filter(
+      (item) => item.question.toLowerCase().includes(q) || item.answer.toLowerCase().includes(q)
+    );
+  }, [faqData, searchQuery]);
+
+  const groupedFaqs = useMemo(() => {
+    const groups = [];
+    for (const cat of CATEGORY_ORDER) {
+      const items = filteredData.filter((f) => (f.category || 'general') === cat);
+      if (items.length > 0) groups.push({ category: cat, items });
+    }
+    const uncategorized = filteredData.filter(
+      (f) => f.category && !CATEGORY_ORDER.includes(f.category)
+    );
+    if (uncategorized.length > 0) groups.push({ category: 'general', items: uncategorized });
+    return groups;
+  }, [filteredData]);
+
   const toggleItem = useCallback((id) => {
     haptics.lightTap();
-    setExpandedId((prev) => (prev === id ? null : id));
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
   const renderFormattedAnswer = (answer) => {
     const raw = String(answer || '');
-    const lines = raw.replace(/\r\n/g, '\n').split('\n');
+    const cleaned = raw.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+    const lines = cleaned.replace(/\r\n/g, '\n').split('\n');
     const rows = [];
 
     for (let i = 0; i < lines.length; i++) {
@@ -123,19 +164,22 @@ export default function FAQScreen() {
     );
   };
 
-  // Loading state
+  const renderHeader = () => (
+    <View style={[styles.header, isRTL && styles.headerRTL]}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle} numberOfLines={1}>
+        {t('navigation.faq') || 'FAQ'}
+      </Text>
+      <View style={styles.backBtn} />
+    </View>
+  );
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {t('navigation.faq') || 'FAQ'}
-          </Text>
-          <View style={styles.backBtn} />
-        </View>
+        {renderHeader()}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#dc2626" />
           <Text style={styles.loadingText}>
@@ -146,19 +190,10 @@ export default function FAQScreen() {
     );
   }
 
-  // Error state
   if (error && faqData.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {t('navigation.faq') || 'FAQ'}
-          </Text>
-          <View style={styles.backBtn} />
-        </View>
+        {renderHeader()}
         <View style={styles.centered}>
           <Ionicons name="cloud-offline" size={48} color="#9CA3AF" />
           <Text style={styles.errorText}>{error}</Text>
@@ -172,16 +207,7 @@ export default function FAQScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {t('navigation.faq') || 'FAQ'}
-        </Text>
-        <View style={styles.backBtn} />
-      </View>
+      {renderHeader()}
 
       <ScrollView
         style={styles.scrollView}
@@ -202,39 +228,94 @@ export default function FAQScreen() {
           ) : null}
         </View>
 
-        {/* FAQ List */}
-        <View style={styles.section}>
-          <View style={styles.faqContainer}>
-            {faqData.map((faq, index) => (
-              <View key={faq.id} style={[styles.faqItem, index < faqData.length - 1 && styles.faqItemBorder]}>
-                <TouchableOpacity
-                  style={[styles.faqQuestion, isRTL && styles.faqQuestionRTL]}
-                  onPress={() => toggleItem(faq.id)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.faqQuestionText, isRTL && styles.textRTL, expandedId === faq.id && styles.faqQuestionTextActive]}>
-                    {faq.question}
-                  </Text>
-                  <Ionicons
-                    name={expandedId === faq.id ? 'chevron-up' : 'chevron-down'}
-                    size={20}
-                    color={expandedId === faq.id ? '#dc2626' : '#9CA3AF'}
-                  />
-                </TouchableOpacity>
-                {expandedId === faq.id && (
-                  <View style={styles.faqAnswer}>
-                    {renderFormattedAnswer(faq.answer)}
-                  </View>
-                )}
-              </View>
-            ))}
+        {/* Search */}
+        <View style={styles.searchContainer}>
+          <View style={[styles.searchBar, isRTL && styles.searchBarRTL]}>
+            <Ionicons name="search" size={18} color="#9CA3AF" />
+            <TextInput
+              style={[styles.searchInput, isRTL && styles.textRTL]}
+              placeholder={l('Search FAQ...', 'ابحث في الأسئلة...', 'Поиск по FAQ...')}
+              placeholderTextColor="#9CA3AF"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              clearButtonMode="while-editing"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              </TouchableOpacity>
+            )}
           </View>
+        </View>
+
+        {/* Grouped FAQ Sections */}
+        <View style={styles.section}>
+          {groupedFaqs.length === 0 && (
+            <View style={styles.emptyState}>
+              <Ionicons name="search" size={40} color="#D1D5DB" />
+              <Text style={[styles.emptyText, isRTL && styles.textRTL]}>
+                {l('No results found', 'لم يتم العثور على نتائج', 'Ничего не найдено')}
+              </Text>
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Text style={styles.clearSearchLink}>
+                  {l('Clear search', 'مسح البحث', 'Очистить')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {groupedFaqs.map(({ category, items }) => {
+            const meta = CATEGORY_LABELS[category] || CATEGORY_LABELS.general;
+            return (
+              <View key={category} style={styles.categoryGroup}>
+                {/* Category header */}
+                <View style={[styles.categoryHeader, isRTL && styles.categoryHeaderRTL]}>
+                  <Ionicons name={meta.icon} size={18} color="#dc2626" />
+                  <Text style={[styles.categoryTitle, isRTL && styles.textRTL]}>
+                    {getCategoryLabel(category)}
+                  </Text>
+                  <View style={styles.categoryDivider} />
+                </View>
+
+                {/* FAQ items */}
+                <View style={styles.faqContainer}>
+                  {items.map((faq, index) => {
+                    const isExpanded = !!expandedIds[faq.id];
+                    return (
+                      <View key={faq.id} style={[styles.faqItem, index < items.length - 1 && styles.faqItemBorder]}>
+                        <TouchableOpacity
+                          style={[styles.faqQuestion, isRTL && styles.faqQuestionRTL]}
+                          onPress={() => toggleItem(faq.id)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[styles.faqQuestionText, isRTL && styles.textRTL, isExpanded && styles.faqQuestionTextActive]}>
+                            {faq.question}
+                          </Text>
+                          <Ionicons
+                            name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                            size={20}
+                            color={isExpanded ? '#dc2626' : '#9CA3AF'}
+                          />
+                        </TouchableOpacity>
+                        {isExpanded && (
+                          <View style={styles.faqAnswer}>
+                            {renderFormattedAnswer(faq.answer)}
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            );
+          })}
         </View>
 
         {/* Still have questions? */}
         <View style={styles.ctaSection}>
           <Text style={[styles.ctaTitle, isRTL && styles.textRTL]}>
-            {l("Still have questions?", "لا تزال لديك أسئلة؟", "Остались вопросы?")}
+            {l('Still have questions?', 'لا تزال لديك أسئلة؟', 'Остались вопросы?')}
           </Text>
           <View style={styles.ctaButtons}>
             <TouchableOpacity
@@ -274,22 +355,32 @@ const styles = StyleSheet.create({
   headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
   scrollView: { flex: 1 },
 
-  // Loading / Error
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
   loadingText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', lineHeight: undefined },
   errorText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', textAlign: 'center', lineHeight: undefined },
   retryBtn: { marginTop: 16, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
   retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
 
-  // Hero
-  heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#FAFAFA' },
+  heroSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FAFAFA' },
   heroTitle: { ...T.pageTitle, color: '#000', textAlign: 'center', marginBottom: 8 },
   heroSubtitle: { ...T.subtitle, textAlign: 'center', lineHeight: 22 },
 
-  // Section
-  section: { paddingHorizontal: 20, paddingVertical: 20 },
+  searchContainer: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 },
+  searchBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#F3F4F6', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10,
+  },
+  searchBarRTL: { flexDirection: 'row-reverse' },
+  searchInput: { flex: 1, fontSize: 15, color: '#1F2937', padding: 0 },
 
-  // FAQ
+  section: { paddingHorizontal: 20, paddingVertical: 12 },
+
+  categoryGroup: { marginBottom: 20 },
+  categoryHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  categoryHeaderRTL: { flexDirection: 'row-reverse' },
+  categoryTitle: { ...T.faqQuestion, color: '#1F2937', fontWeight: '700', fontSize: 15 },
+  categoryDivider: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: '#E5E7EB' },
+
   faqContainer: { borderRadius: 16, overflow: 'hidden', backgroundColor: '#fff', borderWidth: 1, borderColor: '#E5E7EB' },
   faqItem: {},
   faqItemBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
@@ -299,7 +390,6 @@ const styles = StyleSheet.create({
   faqQuestionTextActive: { color: '#dc2626', fontWeight: '600' },
   faqAnswer: { paddingHorizontal: 16, paddingBottom: 16, backgroundColor: '#F9FAFB' },
 
-  // Answer formatting
   answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6 },
   answerRowRTL: { flexDirection: 'row-reverse' },
   bullet: { fontSize: 16, lineHeight: 22, color: '#dc2626', fontWeight: '800' },
@@ -307,7 +397,10 @@ const styles = StyleSheet.create({
   answerText: { ...T.faqAnswer, flex: 1, color: '#4B5563' },
   answerParagraph: { ...T.faqAnswer, color: '#4B5563', marginBottom: 6 },
 
-  // CTA
+  emptyState: { alignItems: 'center', paddingVertical: 40, gap: 8 },
+  emptyText: { ...T.bodySmall, color: '#9CA3AF', lineHeight: undefined },
+  clearSearchLink: { ...T.bodySmall, color: '#dc2626', fontWeight: '600', marginTop: 4, lineHeight: undefined },
+
   ctaSection: { paddingHorizontal: 20, paddingVertical: 24, alignItems: 'center', backgroundColor: '#F9FAFB' },
   ctaTitle: { ...T.sectionTitleSmall, color: '#000', marginBottom: 16 },
   ctaButtons: { flexDirection: 'row', gap: 12 },
@@ -317,6 +410,5 @@ const styles = StyleSheet.create({
   ctaBtnSecondary: { backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FECACA' },
   ctaBtnSecondaryText: { ...T.buttonSmall, color: '#dc2626', fontSize: 15 },
 
-  // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });
