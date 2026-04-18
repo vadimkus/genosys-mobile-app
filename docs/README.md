@@ -2,7 +2,7 @@
 
 > **iOS and Android** app for GENOSYS Professional Korean Dermacosmetics (genosys.ae)
 >
-> Tech: React Native (Expo), TypeScript, expo-router, expo-image, expo-av
+> Tech: React Native (Expo), TypeScript, expo-router, expo-image, expo-video, expo-audio
 
 ---
 
@@ -35,6 +35,7 @@
 | [Bug Audit 29 Mar 2026](./core/BUG_AUDIT_2026_03_29.md) | **NEW** Comprehensive audit: 50 issues fixed across 14 files (pricing, RTL, performance, security, error handling) |
 | [Bug Audit 28 Mar 2026](./core/BUG_AUDIT_2026_03_28.md) | Full code audit: 13 bugs + 1 regression fix (perf, race conditions, pricing, size variant discount) |
 | [Bug Audit 23 Mar 2026](./core/BUG_AUDIT_2026_03_23.md) | Full code audit: 11 bugs fixed (crash, security, race conditions, checkout) |
+| [Session Log 18 Apr 2026](./core/SESSION_LOG_2026_04_18.md) | **NEW** `expo-av` → `expo-video` + `expo-audio` migration (SDK 55 ready). `VideoLaunchScreen.js` and `ProductVideo` both moved to the new imperative `useVideoPlayer` API; iOS silent-mode override now uses `setAudioModeAsync({ playsInSilentMode: true })`. TypeScript clean, bundle exports cleanly, `expo-av` fully removed. Requires a native rebuild (EAS) to ship. |
 | [Session Log 19–20 Mar 2026](./core/SESSION_LOG_2026_03_19.md) | Remote splash screen, soft update banner, v1.7.0 live, first OTA splash swap |
 | [Remote Splash Screen](./core/REMOTE_SPLASH_SCREEN.md) | How to update/disable splash video without app rebuild (with change history) |
 | [Session Log 26 Feb 2026](./core/SESSION_LOG_2026_02_26.md) | Centralized typography system (54 files), Revita Glow "New" badge fix |

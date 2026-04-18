@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, StatusBar, Animated, Pressable } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import { Image } from 'expo-image';
 import * as FileSystem from 'expo-file-system';
 
@@ -54,7 +54,6 @@ async function downloadAndCache(remoteUrl, cacheTTL) {
  *   onDone      — called when the screen should be dismissed
  */
 export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onDone }) {
-  const videoRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const [videoSource, setVideoSource] = useState(localSource || null);
   const dismissed = useRef(false);
@@ -70,7 +69,6 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   }, [fadeAnim, onDone]);
 
   useEffect(() => {
-    // If a local bundled asset was provided, skip remote fetch entirely
     if (localSource) return;
 
     let cancelled = false;
@@ -93,14 +91,45 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   }, [localSource, videoUrl, cacheTTL]);
 
   useEffect(() => {
-    // Safety timeout — always dismiss after duration even if video stalls
     timeoutRef.current = setTimeout(dismiss, duration + 500);
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, [duration, dismiss]);
 
-  const handlePlaybackStatusUpdate = useCallback((status) => {
-    if (status.didJustFinish) dismiss();
-  }, [dismiss]);
+  // expo-video replaces expo-av's declarative `<Video shouldPlay isMuted … />`
+  // with an imperative `useVideoPlayer` instance. The initial source is passed
+  // once at creation; any later source change goes through `player.replace()`.
+  const player = useVideoPlayer(videoSource ?? null, (p) => {
+    p.loop = false;
+    p.muted = true;
+    p.play();
+  });
+
+  // Remote source resolves asynchronously — swap it into the player when ready.
+  useEffect(() => {
+    if (!player || !videoSource) return;
+    try {
+      player.replace(videoSource);
+      player.play();
+    } catch (e) {
+      dismiss();
+    }
+  }, [player, videoSource, dismiss]);
+
+  // `playToEnd` replaces `onPlaybackStatusUpdate({ didJustFinish })`.
+  // `statusChange` catches load errors (the old `onError` path).
+  useEffect(() => {
+    if (!player) return undefined;
+    const onEnd = () => dismiss();
+    const onStatus = ({ status }) => {
+      if (status === 'error') dismiss();
+    };
+    const endSub = player.addListener('playToEnd', onEnd);
+    const statusSub = player.addListener('statusChange', onStatus);
+    return () => {
+      endSub.remove();
+      statusSub.remove();
+    };
+  }, [player, dismiss]);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
@@ -112,16 +141,11 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
 
       {videoSource && (
         <Pressable style={StyleSheet.absoluteFill} onPress={dismiss}>
-          <Video
-            ref={videoRef}
-            source={videoSource}
+          <VideoView
+            player={player}
             style={StyleSheet.absoluteFill}
-            resizeMode={ResizeMode.COVER}
-            shouldPlay
-            isMuted
-            isLooping={false}
-            onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-            onError={dismiss}
+            contentFit="cover"
+            nativeControls={false}
           />
         </Pressable>
       )}

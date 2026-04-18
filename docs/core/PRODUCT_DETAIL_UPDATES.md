@@ -30,19 +30,21 @@ Major improvements to the product detail screen (`app/product/[id].js`) covering
 
 ### 3. Video Player — Thumbnail + Play Button
 
-**Problem:** The original `expo-av` Video component showed a black screen on load with no visible controls. Videos played when tapped but the UX was confusing.
+**Problem:** The original Video component showed a black screen on load with no visible controls. Videos played when tapped but the UX was confusing.
 
 **Fix:**
 - Created a dedicated `ProductVideo` component inside `app/product/[id].js`
 - Shows the product image as a thumbnail with a red play button overlay
-- On tap, replaces the thumbnail with the actual `expo-av` Video player with `shouldPlay={true}` and `useNativeControls`
-- Error handling: if video fails, the section is hidden gracefully
+- On tap, replaces the thumbnail with a `VideoView` (expo-video) + `nativeControls`, and calls `player.play()`
+- Error handling: if video fails (`statusChange → 'error'`), the section is hidden gracefully
 - Uses 16:9 aspect ratio calculated from screen width
 - Added `product.video` translation key to EN, AR, RU (later removed the title text since "Video" label was unnecessary)
 
 **Files changed:**
 - `app/product/[id].js` (ProductVideo component + videoStyles)
 - `i18n/messages/en.json`, `ar.json`, `ru.json`
+
+**Migration note (Apr 2026):** Originally built on `expo-av`'s `<Video>` component with `shouldPlay`, `useNativeControls`, `ResizeMode.CONTAIN`, and `videoRef.current.playAsync()`. Migrated to `expo-video`'s `useVideoPlayer` + `VideoView` (`contentFit="contain"`, `nativeControls`) ahead of SDK 55, where `expo-av` is removed. See "Video Sound Fix" below for the paired `expo-av.Audio` → `expo-audio` migration.
 
 ### 4. Second Image for Hydro Cool Mask (Product 35)
 
@@ -56,18 +58,19 @@ Added `hmask_big.jpg` as a second gallery image for the Hydro Cool Modeling Mask
 
 **Problem:** Product videos played without sound in the native app, while web/mobile web had audio. Users reported no sound when playing product videos on product cards.
 
-**Root cause:** On iOS, `expo-av`'s `<Video>` component defaults to `playsInSilentModeIOS: false` — it respects the device's physical mute switch. When the iPhone silent switch is on (which is very common), videos play muted. The web `<video>` element does not have this limitation.
+**Root cause:** On iOS, the video player defaults to respecting the device's physical silent switch. When the iPhone silent switch is on (which is very common), videos play muted. The web `<video>` element does not have this limitation.
 
-**Fix:** Call `Audio.setAudioModeAsync({ playsInSilentModeIOS: true })` before playing the video in `ProductVideo`'s `handlePlay`. This enables audio playback even when the iOS silent switch is on.
+**Fix:** Call `setAudioModeAsync({ playsInSilentMode: true })` before playing the video in `ProductVideo`'s `handlePlay`. This configures the iOS audio session so audio plays even when the silent switch is on.
 
 **Files changed:** `app/product/[id].js`
 
 **Rebuild required:** Yes — this is a client-side change. Rebuild and submit to TestFlight for the fix to take effect.
 
 **Technical details:**
-- Import `Audio` from `expo-av` alongside `Video` and `ResizeMode`
-- In `handlePlay`, call `Audio.setAudioModeAsync({ playsInSilentModeIOS: true })` before `setIsPlaying(true)`
-- Wrapped in try/catch with logging; failure does not block video playback
+- Import `setAudioModeAsync` from `expo-audio` (originally `Audio.setAudioModeAsync` from `expo-av` before the Apr 2026 migration).
+- The key name changed from `playsInSilentModeIOS` (expo-av) to `playsInSilentMode` (expo-audio).
+- In `handlePlay`, call `setAudioModeAsync({ playsInSilentMode: true })` before `setIsPlaying(true)`.
+- Wrapped in try/catch with logging; failure does not block video playback.
 
 ## Products with Video
 

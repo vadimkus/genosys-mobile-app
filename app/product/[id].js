@@ -12,7 +12,8 @@ import {
   FlatList,
   Linking,
 } from 'react-native';
-import { Audio, Video, ResizeMode } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { setAudioModeAsync } from 'expo-audio';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -99,36 +100,56 @@ const log = createLogger('ProductDetail');
 
 /**
  * ProductVideo – shows a thumbnail with play button; loads video on tap.
+ *
+ * Migrated from expo-av → expo-video. Differences:
+ *   • useVideoPlayer must be called unconditionally (Rules of Hooks), so
+ *     the player is created upfront with the remote URL and paused until
+ *     the user taps play.
+ *   • iOS silent-switch override now uses expo-audio's setAudioModeAsync
+ *     with the renamed `playsInSilentMode` key.
+ *   • onError → statusChange event listener (`status === 'error'`).
  */
 function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
-  const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
+  const player = useVideoPlayer({ uri: videoUrl }, (p) => {
+    p.loop = false;
+    p.muted = false;
+  });
+
+  useEffect(() => {
+    if (!player) return undefined;
+    const sub = player.addListener('statusChange', ({ status, error }) => {
+      if (status === 'error') {
+        log.error('Video playback error', error?.message || 'unknown');
+        setVideoError(true);
+      }
+    });
+    return () => sub.remove();
+  }, [player]);
+
   const handlePlay = async () => {
-    // Enable audio playback even when the iOS silent switch is on
     try {
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
+      // expo-audio's setAudioModeAsync: `playsInSilentModeIOS` (expo-av) →
+      // `playsInSilentMode` (expo-audio). Needed so product video audio plays
+      // even when the iOS silent switch is on.
+      await setAudioModeAsync({
+        playsInSilentMode: true,
       });
     } catch (e) {
       log.warn('Audio mode set failed', e?.message || e);
     }
     setIsPlaying(true);
-    // Small delay so the Video component mounts before we call play
-    setTimeout(async () => {
-      try {
-        if (videoRef.current) {
-          await videoRef.current.playAsync();
-        }
-      } catch (e) {
-        log.error('Video play error', e?.message || e);
-      }
-    }, 300);
+    try {
+      player.play();
+    } catch (e) {
+      log.error('Video play error', e?.message || e);
+    }
   };
 
   if (videoError) {
-    return null; // Hide section if video fails to load
+    return null;
   }
 
   return (
@@ -157,18 +178,11 @@ function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
             </View>
           </TouchableOpacity>
         ) : (
-          <Video
-            ref={videoRef}
-            source={{ uri: videoUrl }}
+          <VideoView
+            player={player}
             style={videoStyles.player}
-            useNativeControls
-            resizeMode={ResizeMode.CONTAIN}
-            shouldPlay={true}
-            isLooping={false}
-            onError={(error) => {
-              log.error('Video playback error', error);
-              setVideoError(true);
-            }}
+            contentFit="contain"
+            nativeControls
           />
         )}
       </View>

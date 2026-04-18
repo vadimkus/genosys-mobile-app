@@ -159,7 +159,7 @@ The Android app has **full feature parity** with iOS (aligned February 11, 2026)
 | **Native Blog + Comments** | ✅ | ✅ | API-driven, react-native-render-html |
 | **Push Notifications** | ✅ (APNs) | ✅ (FCM) | Expo push tokens |
 | **AI Chatbot** | ✅ | ✅ | SSE streaming |
-| **Product Videos** | ✅ | ✅ | expo-av |
+| **Product Videos** | ✅ | ✅ | expo-video + expo-audio |
 | **PDF Downloads** | ✅ | ✅ | WebView |
 | **Offline Cache** | ✅ | ✅ | AsyncStorage |
 | **Training (API)** | ✅ | ✅ | Auth-gated |

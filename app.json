@@ -324,7 +324,10 @@
           "photosPermission": "Genosys uses your photo library to let you choose a profile photo or skin analysis image."
         }
       ],
-      "expo-local-authentication"
+      "expo-local-authentication",
+      "expo-video",
+      "expo-audio",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
