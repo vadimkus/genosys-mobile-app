@@ -11,6 +11,7 @@ import {
   Share,
   FlatList,
   Linking,
+  findNodeHandle,
 } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { setAudioModeAsync } from 'expo-audio';
@@ -31,7 +32,8 @@ import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedPr
 import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
 import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
 import ProductReviews from '../../components/product/ProductReviews';
-// TrustBadges removed from product pages
+import TrustBadges from '../../components/product/TrustBadges';
+import CollapsibleSection from '../../components/product/CollapsibleSection';
 import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
 import * as haptics from '../../utils/haptics';
 import { createLogger } from '../../utils/logger';
@@ -252,14 +254,60 @@ export default function ProductDetailScreen() {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [reviewAggregate, setReviewAggregate] = useState(null); // { averageRating, reviewCount }
   const { addItem, isInCart, getItemQuantity } = useCart();
   const scrollY = useRef(new Animated.Value(0)).current;
   const galleryRef = useRef(null);
+  const scrollRef = useRef(null);
+  const reviewsWrapperRef = useRef(null);
 
   useEffect(() => {
     loadProduct();
   }, [id]);
 
+  // Lightweight review aggregate fetch for the summary shown under product name.
+  // The ProductReviews component renders its own full list further down — we keep
+  // the summary call separate so the "Be the first to review" link can appear
+  // instantly alongside the product header, without waiting for the full list.
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    const base = AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae';
+    fetch(`${base}/api/products/${id}/reviews`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setReviewAggregate({
+          averageRating: data.averageRating ?? null,
+          reviewCount: data.reviewCount ?? 0,
+        });
+      })
+      .catch(() => {
+        // Non-critical; reviews are optional
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const scrollToReviews = useCallback(() => {
+    const scrollable = scrollRef.current;
+    const target = reviewsWrapperRef.current;
+    if (!scrollable || !target) return;
+    // Animated.ScrollView proxies scrollTo. For measureLayout we need the native node handle
+    // of the underlying ScrollView's inner view. `getScrollableNode()` returns it.
+    const innerNode =
+      (scrollable.getScrollableNode && scrollable.getScrollableNode()) ||
+      findNodeHandle(scrollable);
+    if (!innerNode || !target.measureLayout) return;
+    target.measureLayout(
+      innerNode,
+      (_x, y) => {
+        scrollable.scrollTo({ y: Math.max(0, y - 16), animated: true });
+      },
+      () => {}
+    );
+  }, []);
 
   const loadProduct = async () => {
     try {
@@ -450,12 +498,28 @@ export default function ProductDetailScreen() {
     if (!text || text.trim().length === 0) return null;
     const variant = options?.variant;
     const isNote = variant === 'note';
+    const body = (
+      <View style={[styles.descriptionContainer, isNote && styles.noteContainer]}>
+        <Text style={[styles.description, isNote && styles.noteText, isRTL && styles.textRTL]}>{text}</Text>
+      </View>
+    );
+    if (options?.collapsible) {
+      return (
+        <CollapsibleSection
+          title={title}
+          icon={options.icon}
+          iconColor={options.iconColor}
+          defaultOpen={!!options.defaultOpen}
+          isRTL={isRTL}
+        >
+          {body}
+        </CollapsibleSection>
+      );
+    }
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-        <View style={[styles.descriptionContainer, isNote && styles.noteContainer]}>
-          <Text style={[styles.description, isNote && styles.noteText, isRTL && styles.textRTL]}>{text}</Text>
-        </View>
+        {body}
       </View>
     );
   };
@@ -621,19 +685,35 @@ export default function ProductDetailScreen() {
     );
   };
 
-  const renderListSection = (title, items) => {
+  const renderListSection = (title, items, options = {}) => {
     if (!items || items.length === 0) return null;
+    const body = (
+      <View style={styles.listContainer}>
+        {items.map((item, idx) => (
+          <View key={idx} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+            <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
+            <Text style={[styles.listText, isRTL && styles.textRTL]}>{asText(item)}</Text>
+          </View>
+        ))}
+      </View>
+    );
+    if (options?.collapsible) {
+      return (
+        <CollapsibleSection
+          title={title}
+          icon={options.icon}
+          iconColor={options.iconColor}
+          defaultOpen={!!options.defaultOpen}
+          isRTL={isRTL}
+        >
+          {body}
+        </CollapsibleSection>
+      );
+    }
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-        <View style={styles.listContainer}>
-          {items.map((item, idx) => (
-            <View key={idx} style={[styles.listItem, isRTL && styles.listItemRTL]}>
-              <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
-              <Text style={[styles.listText, isRTL && styles.textRTL]}>{asText(item)}</Text>
-            </View>
-          ))}
-        </View>
+        {body}
       </View>
     );
   };
@@ -657,42 +737,74 @@ export default function ProductDetailScreen() {
     );
   };
 
-  const renderStepsSection = (title, steps) => {
+  const renderStepsSection = (title, steps, options = {}) => {
     if (!steps || steps.length === 0) return null;
+    const body = (
+      <View style={styles.listContainer}>
+        {steps.map((s, idx) => (
+          <View key={`${idx}-${s.title}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+            <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>{idx + 1}.</Text>
+            <Text style={[styles.listText, isRTL && styles.textRTL]}>
+              {s.title ? `${s.title}: ` : ''}
+              {s.body}
+            </Text>
+          </View>
+        ))}
+      </View>
+    );
+    if (options?.collapsible) {
+      return (
+        <CollapsibleSection
+          title={title}
+          icon={options.icon}
+          iconColor={options.iconColor}
+          defaultOpen={!!options.defaultOpen}
+          isRTL={isRTL}
+        >
+          {body}
+        </CollapsibleSection>
+      );
+    }
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-        <View style={styles.listContainer}>
-          {steps.map((s, idx) => (
-            <View key={`${idx}-${s.title}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
-              <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>{idx + 1}.</Text>
-              <Text style={[styles.listText, isRTL && styles.textRTL]}>
-                {s.title ? `${s.title}: ` : ''}
-                {s.body}
-              </Text>
-            </View>
-          ))}
-        </View>
+        {body}
       </View>
     );
   };
 
-  const renderIngredientsSection = (title, items) => {
+  const renderIngredientsSection = (title, items, options = {}) => {
     if (!items || items.length === 0) return null;
+    const body = (
+      <View style={styles.listContainer}>
+        {items.map((it, idx) => (
+          <View key={`${idx}-${it.name}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+            <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
+            <Text style={[styles.listText, isRTL && styles.textRTL]}>
+              <Text style={{ fontWeight: '700', color: '#1D1D1F' }}>{it.name}</Text>
+              {it.description ? ` — ${it.description}` : ''}
+            </Text>
+          </View>
+        ))}
+      </View>
+    );
+    if (options?.collapsible) {
+      return (
+        <CollapsibleSection
+          title={title}
+          icon={options.icon}
+          iconColor={options.iconColor}
+          defaultOpen={!!options.defaultOpen}
+          isRTL={isRTL}
+        >
+          {body}
+        </CollapsibleSection>
+      );
+    }
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-        <View style={styles.listContainer}>
-          {items.map((it, idx) => (
-            <View key={`${idx}-${it.name}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
-              <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
-              <Text style={[styles.listText, isRTL && styles.textRTL]}>
-                <Text style={{ fontWeight: '700', color: '#1D1D1F' }}>{it.name}</Text>
-                {it.description ? ` — ${it.description}` : ''}
-              </Text>
-            </View>
-          ))}
-        </View>
+        {body}
       </View>
     );
   };
@@ -748,6 +860,7 @@ export default function ProductDetailScreen() {
 
       {/* Product Content */}
       <Animated.ScrollView
+        ref={scrollRef}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
@@ -846,7 +959,59 @@ export default function ProductDetailScreen() {
               })()}
             </Text>
             <Text style={[styles.productName, isRTL && styles.textRTL]}>{asText(getLocalizedProductName(product, locale) || product.name)}</Text>
-            
+
+            {/* Review summary: honest stars+count when real reviews exist,
+                otherwise a subtle "Be the first to review" link. */}
+            {(() => {
+              if (!reviewAggregate) return null;
+              const { averageRating, reviewCount } = reviewAggregate;
+              if (reviewCount > 0 && averageRating != null) {
+                const rounded = Math.round(averageRating);
+                return (
+                  <TouchableOpacity
+                    onPress={scrollToReviews}
+                    activeOpacity={0.6}
+                    style={[styles.reviewSummary, isRTL && styles.reviewSummaryRTL]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${averageRating.toFixed(1)} out of 5, ${reviewCount} reviews`}
+                  >
+                    <View style={[styles.reviewStarsRow, isRTL && styles.reviewStarsRowRTL]}>
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Ionicons
+                          key={i}
+                          name={i <= rounded ? 'star' : 'star-outline'}
+                          size={14}
+                          color={i <= rounded ? '#FBBF24' : '#D1D5DB'}
+                          style={styles.reviewStarIcon}
+                        />
+                      ))}
+                    </View>
+                    <Text style={[styles.reviewSummaryText, isRTL && styles.textRTL]}>
+                      {averageRating.toFixed(1)} ({reviewCount})
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+              return (
+                <TouchableOpacity
+                  onPress={scrollToReviews}
+                  activeOpacity={0.6}
+                  style={[styles.reviewSummary, isRTL && styles.reviewSummaryRTL]}
+                  accessibilityRole="button"
+                >
+                  <Text style={[styles.reviewSummaryLink, isRTL && styles.textRTL]}>
+                    {t('product.beTheFirstToReview') || 'Be the first to review'}
+                  </Text>
+                  <Ionicons
+                    name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                    size={14}
+                    color="#dc2626"
+                    style={{ marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }}
+                  />
+                </TouchableOpacity>
+              );
+            })()}
+
             {/* Enhanced Size and Stock Info from Server */}
             {(product.size || product.hasVariants || (product.variants && product.variants.length > 0)) && (
               <View style={[styles.sizeInfoContainer, isRTL && styles.sizeInfoContainerRTL]}>
@@ -1029,28 +1194,34 @@ export default function ProductDetailScreen() {
                   })(),
                 ]);
                 const filteredBenefits = filterListForLocale(benefits, locale);
+                const benefitsOpts = { collapsible: true, defaultOpen: true, icon: 'sparkles-outline', iconColor: '#dc2626' };
 
                 if (filteredBenefits.length === 1 && filteredBenefits[0].length > 200 && !filteredBenefits[0].includes(' — ')) {
-                  return renderInfoSection(t('product.benefits'), filteredBenefits[0]);
+                  return renderInfoSection(t('product.benefits'), filteredBenefits[0], benefitsOpts);
                 }
-                return renderListSection(t('product.benefits'), filteredBenefits);
+                return renderListSection(t('product.benefits'), filteredBenefits, benefitsOpts);
               })()}
 
               {(() => {
                 const steps = toHowToSteps(product?.howToUse);
                 const howToText = pickField(product, ['howToUse', 'how_to_use', 'application', 'usage']);
                 const fallbackDirections = pickField(product, ['directions']);
+                const directionsOpts = { collapsible: true, defaultOpen: false, icon: 'list-outline', iconColor: '#2563EB' };
 
                 // If we have explicit how-to content, we keep it under "Directions"
                 // and treat `product.directions` as an extra "Note" (matches website behavior for many products).
-                if (steps.length) return renderStepsSection(t('product.directions'), steps);
-                if (howToText) return renderInfoSection(t('product.directions'), howToText);
+                if (steps.length) return renderStepsSection(t('product.directions'), steps, directionsOpts);
+                if (howToText) return renderInfoSection(t('product.directions'), howToText, directionsOpts);
 
                 // If no how-to content exists, fall back to `directions` as actual directions.
-                return renderInfoSection(t('product.directions'), fallbackDirections);
+                return renderInfoSection(t('product.directions'), fallbackDirections, directionsOpts);
               })()}
 
-              {renderIngredientsSection(t('product.keyIngredients'), toIngredients(product?.ingredients || product?.keyIngredients))}
+              {renderIngredientsSection(
+                t('product.keyIngredients'),
+                toIngredients(product?.ingredients || product?.keyIngredients),
+                { collapsible: true, defaultOpen: false, icon: 'leaf-outline', iconColor: '#16A34A' }
+              )}
 
               {(() => {
                 // Prefer backend-driven `product.note` (added to mobile API),
@@ -1058,13 +1229,26 @@ export default function ProductDetailScreen() {
                 const noteBody =
                   pickField(product, ['note']) ||
                   pickField(product, ['notes', 'warning', 'caution']);
-                return noteBody ? renderInfoSection(t('product.note'), noteBody, { variant: 'note' }) : null;
+                return noteBody
+                  ? renderInfoSection(t('product.note'), noteBody, {
+                      variant: 'note',
+                      collapsible: true,
+                      defaultOpen: false,
+                      icon: 'information-circle-outline',
+                      iconColor: '#86868B',
+                    })
+                  : null;
               })()}
             </>
           )}
 
+          {/* Trust Badges - between content and reviews (mirrors web PDP placement) */}
+          <TrustBadges />
+
           {/* Customer Reviews */}
-          <ProductReviews productId={product.id} />
+          <View ref={reviewsWrapperRef} collapsable={false}>
+            <ProductReviews productId={product.id} />
+          </View>
         </View>
       </Animated.ScrollView>
 
@@ -1242,6 +1426,39 @@ const styles = StyleSheet.create({
     ...T.pageTitleLarge,
     lineHeight: 34,
     marginBottom: 12,
+  },
+  reviewSummary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+    paddingVertical: 4,
+  },
+  reviewSummaryRTL: {
+    flexDirection: 'row-reverse',
+    alignSelf: 'flex-end',
+  },
+  reviewStarsRow: {
+    flexDirection: 'row',
+    marginRight: 6,
+  },
+  reviewStarsRowRTL: {
+    flexDirection: 'row-reverse',
+    marginRight: 0,
+    marginLeft: 6,
+  },
+  reviewStarIcon: {
+    marginRight: 1,
+  },
+  reviewSummaryText: {
+    ...T.captionSmall,
+    color: '#374151',
+    fontWeight: '600',
+  },
+  reviewSummaryLink: {
+    ...T.captionSmall,
+    color: '#dc2626',
+    fontWeight: '600',
   },
   price: {
     ...T.priceLarge,

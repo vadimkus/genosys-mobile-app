@@ -1,6 +1,12 @@
 /**
- * TrustBadges - Credibility signals on product detail pages
- * Shows UAE certification, secure payments, free shipping, and professional grade badges.
+ * TrustBadges - Credibility signals on product detail pages.
+ *
+ * Three specific, honest trust signals (free shipping threshold, authentic
+ * Korean origin, VAT inclusive pricing). Stacked vertically so all three lines
+ * are always visible on the narrow mobile canvas.
+ *
+ * Copy is inlined here (EN/AR/RU) to mirror the web implementation exactly,
+ * and to avoid any i18n chunk-loading surprises.
  */
 
 import React from 'react';
@@ -9,72 +15,93 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import T from '../../utils/typography';
 
+const COPY = {
+  en: {
+    shipping: 'Free shipping over AED 1,000',
+    authentic: 'Authentic Korean dermacosmetics',
+    vat: 'All prices VAT inclusive',
+  },
+  ar: {
+    shipping: 'شحن مجاني للطلبات فوق 1,000 درهم',
+    authentic: 'مستحضرات تجميل كورية أصلية',
+    vat: 'جميع الأسعار شاملة ضريبة القيمة المضافة',
+  },
+  ru: {
+    shipping: 'Бесплатная доставка от 1,000 AED',
+    authentic: 'Оригинальная корейская космецевтика',
+    vat: 'Все цены с учётом НДС',
+  },
+};
+
 const BADGES = [
-  { key: 'certified', icon: 'shield-checkmark', color: '#16A34A' },
-  { key: 'secure', icon: 'lock-closed', color: '#2563EB' },
-  { key: 'shipping', icon: 'car', color: '#D97706' },
-  { key: 'professional', icon: 'ribbon', color: '#7C3AED' },
+  { key: 'shipping', icon: 'car-outline', color: '#D97706' },
+  { key: 'authentic', icon: 'shield-checkmark-outline', color: '#16A34A' },
+  { key: 'vat', icon: 'card-outline', color: '#2563EB' },
 ];
 
 export default function TrustBadges() {
-  const { t, dir } = useLocalization();
+  const { locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const copy = COPY[locale] || COPY.en;
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.grid, isRTL && styles.gridRTL]}>
-        {BADGES.map((badge) => (
-          <View key={badge.key} style={styles.badgeItem}>
-            <View style={[styles.iconCircle, { backgroundColor: badge.color + '15' }]}>
-              <Ionicons name={badge.icon} size={18} color={badge.color} />
-            </View>
-            <Text style={[styles.badgeText, isRTL && styles.textRTL]} numberOfLines={2}>
-              {t(`trustBadges.${badge.key}`) || defaultLabels[badge.key]}
-            </Text>
+    <View style={styles.container} accessibilityRole="summary">
+      {BADGES.map((badge) => (
+        <View
+          key={badge.key}
+          style={[styles.row, isRTL && styles.rowRTL]}
+        >
+          <View
+            style={[
+              styles.iconWrap,
+              { backgroundColor: badge.color + '15' },
+              isRTL ? styles.iconWrapRTL : null,
+            ]}
+          >
+            <Ionicons name={badge.icon} size={16} color={badge.color} />
           </View>
-        ))}
-      </View>
+          <Text
+            style={[styles.text, isRTL && styles.textRTL]}
+            numberOfLines={2}
+          >
+            {copy[badge.key]}
+          </Text>
+        </View>
+      ))}
     </View>
   );
 }
 
-const defaultLabels = {
-  certified: 'UAE Certified',
-  secure: 'Secure Payment',
-  shipping: 'Fast Delivery',
-  professional: 'Professional Grade',
-};
-
 const styles = StyleSheet.create({
   container: {
+    marginTop: 12,
     marginBottom: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    gap: 10,
   },
-  grid: {
+  row: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
   },
-  gridRTL: {
+  rowRTL: {
     flexDirection: 'row-reverse',
   },
-  badgeItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    width: '48%',
-  },
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  iconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 10,
   },
-  badgeText: {
+  iconWrapRTL: {
+    marginRight: 0,
+    marginLeft: 10,
+  },
+  text: {
     ...T.captionSmall,
     fontWeight: '600',
     color: '#374151',
