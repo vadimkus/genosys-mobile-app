@@ -255,11 +255,13 @@ export default function ProductDetailScreen() {
   const [selectedColor, setSelectedColor] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [reviewAggregate, setReviewAggregate] = useState(null); // { averageRating, reviewCount }
+  const [condensedHeader, setCondensedHeader] = useState(false);
   const { addItem, isInCart, getItemQuantity } = useCart();
   const scrollY = useRef(new Animated.Value(0)).current;
   const galleryRef = useRef(null);
   const scrollRef = useRef(null);
   const reviewsWrapperRef = useRef(null);
+  const condensedHeaderRef = useRef(false);
 
   useEffect(() => {
     loadProduct();
@@ -291,6 +293,7 @@ export default function ProductDetailScreen() {
   }, [id]);
 
   const scrollToReviews = useCallback(() => {
+    haptics.lightTap();
     const scrollable = scrollRef.current;
     const target = reviewsWrapperRef.current;
     if (!scrollable || !target) return;
@@ -399,6 +402,7 @@ export default function ProductDetailScreen() {
   };
 
   const handleSizeChange = (size) => {
+    haptics.selectionTick();
     setSelectedSize(size);
     log.debug('Size changed', { size });
     
@@ -423,6 +427,7 @@ export default function ProductDetailScreen() {
   };
 
   const handleColorChange = (color) => {
+    haptics.selectionTick();
     setSelectedColor(color);
     log.debug('Color changed', { color });
   };
@@ -446,6 +451,7 @@ export default function ProductDetailScreen() {
 
   const handleShare = async () => {
     if (!product) return;
+    haptics.lightTap();
     const url = `${AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}/products/${product.id}`;
     const message = `${asText(getLocalizedProductName(product, locale) || product.name)}\n${formatPrice(product.displayPrice || product.price)} AED\n${url}`;
     try {
@@ -838,7 +844,13 @@ export default function ProductDetailScreen() {
       {/* Fixed header bar (not overlapping image) */}
       <View style={styles.headerBar}>
         <View style={[styles.headerButtons, isRTL && styles.headerButtonsRTL]}>
-          <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => {
+              haptics.lightTap();
+              router.back();
+            }}
+          >
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color="#1D1D1F" />
           </TouchableOpacity>
 
@@ -856,6 +868,80 @@ export default function ProductDetailScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Sticky mini header – fades in once the hero image scrolls out of view.
+            Shows the product name, selected-unit price and a compact bag button so
+            the user can add to bag without scrolling back up. */}
+        <Animated.View
+          pointerEvents={condensedHeader ? 'auto' : 'none'}
+          style={[
+            styles.miniHeaderOverlay,
+            {
+              opacity: scrollY.interpolate({
+                inputRange: [200, 280],
+                outputRange: [0, 1],
+                extrapolate: 'clamp',
+              }),
+              transform: [
+                {
+                  translateY: scrollY.interpolate({
+                    inputRange: [200, 280],
+                    outputRange: [-8, 0],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View style={[styles.miniHeaderRow, isRTL && styles.miniHeaderRowRTL]}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => {
+                haptics.lightTap();
+                router.back();
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Back"
+            >
+              <Ionicons
+                name={isRTL ? 'chevron-forward' : 'chevron-back'}
+                size={20}
+                color="#1D1D1F"
+              />
+            </TouchableOpacity>
+            <View style={styles.miniHeaderTextWrap}>
+              <Text
+                style={[styles.miniHeaderName, isRTL && styles.textRTL]}
+                numberOfLines={1}
+              >
+                {asText(getLocalizedProductName(product, locale) || product.name)}
+              </Text>
+              {(() => {
+                const unit = getSelectedUnitPrice();
+                if (!unit) return null;
+                return (
+                  <Text style={[styles.miniHeaderPrice, isRTL && styles.textRTL]} numberOfLines={1}>
+                    {formatPrice(unit)} AED
+                  </Text>
+                );
+              })()}
+            </View>
+            <TouchableOpacity
+              onPress={handleAddToBag}
+              style={styles.miniHeaderBagButton}
+              accessibilityRole="button"
+              accessibilityLabel={t('product.addToBag') || 'Add to bag'}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name={isInCart(product.id, selectedColor, selectedSize) ? 'checkmark' : 'bag'}
+                size={16}
+                color="#ffffff"
+              />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
       </View>
 
       {/* Product Content */}
@@ -866,7 +952,17 @@ export default function ProductDetailScreen() {
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
+          {
+            useNativeDriver: true,
+            listener: (e) => {
+              const y = e.nativeEvent.contentOffset.y;
+              const shouldCondense = y > 240;
+              if (shouldCondense !== condensedHeaderRef.current) {
+                condensedHeaderRef.current = shouldCondense;
+                setCondensedHeader(shouldCondense);
+              }
+            },
+          }
         )}
       >
         {/* Image Gallery */}
@@ -1347,6 +1443,46 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
+  },
+  miniHeaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    justifyContent: 'center',
+  },
+  miniHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  miniHeaderRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  miniHeaderTextWrap: {
+    flex: 1,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+  },
+  miniHeaderName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    letterSpacing: -0.1,
+  },
+  miniHeaderPrice: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#86868B',
+    marginTop: 1,
+  },
+  miniHeaderBagButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#1D1D1F',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerButtons: {
     flexDirection: 'row',
