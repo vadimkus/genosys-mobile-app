@@ -555,10 +555,12 @@ export default function EditProfileScreen() {
         {/* Personal Information */}
         <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline">
           <View style={styles.formContent}>
+            {/* Required asterisks dropped: at 5/7 fields, they carried no
+                information (redundant noise). Optional fields are marked
+                "(optional)" below — same pattern as the web app. */}
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.firstName')}
-                <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={[styles.textInput, isRTL && styles.inputRTL]}
@@ -574,11 +576,10 @@ export default function EditProfileScreen() {
                 editable={isEditing}
               />
             </View>
-            
+
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.lastName')}
-                <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={[styles.textInput, isRTL && styles.inputRTL]}
@@ -594,14 +595,19 @@ export default function EditProfileScreen() {
                 editable={isEditing}
               />
             </View>
-            
+
+            {/* Email (read-only) — lock icon in label + universal "Used to
+                sign in" hint below clarifies the two-email UX. Apple Relay
+                users also get the relay-specific info box beneath. */}
             <View style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
-                {t('editProfile.emailAddress')}
-                <Text style={styles.requiredMark}> *</Text>
-              </Text>
+              <View style={[styles.labelRow, isRTL && styles.rowRTL]}>
+                <Ionicons name="lock-closed-outline" size={12} color="#6B7280" />
+                <Text style={[styles.fieldLabel, styles.fieldLabelMuted, isRTL && styles.textRTL, { marginBottom: 0 }]}>
+                  {t('editProfile.emailAddress')}
+                </Text>
+              </View>
               <TextInput
-                style={[styles.textInput, isRTL && styles.inputValueLTR]}
+                style={[styles.textInput, styles.textInputReadOnly, isRTL && styles.inputValueLTR]}
                 value={formData.email}
                 placeholder={t('editProfile.enterEmail')}
                 keyboardType="email-address"
@@ -613,6 +619,9 @@ export default function EditProfileScreen() {
                 placeholderTextColor="#C7C7CC"
                 editable={false}
               />
+              <Text style={[styles.hintText, isRTL && styles.textRTL]}>
+                {t('editProfile.emailHint')}
+              </Text>
               {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
                 <View style={[styles.infoBox, isRTL && styles.rowRTL]}>
                   <Ionicons name="shield-checkmark" size={16} color="#2563EB" />
@@ -624,7 +633,6 @@ export default function EditProfileScreen() {
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.contactEmail')}
-                <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={[styles.textInput, isRTL && styles.inputValueLTR]}
@@ -640,18 +648,19 @@ export default function EditProfileScreen() {
                 placeholderTextColor="#C7C7CC"
                 editable={isEditing}
               />
-              <View style={[styles.infoBox, isRTL && styles.rowRTL, { marginTop: 10, backgroundColor: '#FFFBEB', borderColor: '#FDE68A' }]}>
-                <Ionicons name="mail-outline" size={16} color="#B45309" />
-                <Text style={[styles.infoBoxText, isRTL && styles.textRTL, { color: '#92400E' }]}>
+              {/* Softened from amber warning banner to neutral gray hint —
+                  this is helpful info, not a warning. */}
+              <View style={[styles.hintRow, isRTL && styles.rowRTL]}>
+                <Ionicons name="mail-outline" size={12} color="#6B7280" />
+                <Text style={[styles.hintText, styles.hintTextInline, isRTL && styles.textRTL]}>
                   {t('editProfile.contactEmailHint')}
                 </Text>
               </View>
             </View>
-            
+
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.phoneNumber')}
-                <Text style={styles.requiredMark}> *</Text>
               </Text>
               <TextInput
                 style={[styles.textInput, isRTL && styles.inputValueLTR]}
@@ -674,7 +683,9 @@ export default function EditProfileScreen() {
         <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline">
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('editProfile.dateOfBirth')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                {t('editProfile.dateOfBirth')} <Text style={styles.optionalMark}>{t('editProfile.optional')}</Text>
+              </Text>
               <TouchableOpacity
                 style={[styles.selectField, isRTL && styles.selectFieldRTL, !isEditing && styles.readOnlyBlock]}
                 onPress={showDatePickerModal}
@@ -687,7 +698,9 @@ export default function EditProfileScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('editProfile.gender')}</Text>
+              <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                {t('editProfile.gender')} <Text style={styles.optionalMark}>{t('editProfile.optional')}</Text>
+              </Text>
               <TouchableOpacity
                 style={[styles.selectField, isRTL && styles.selectFieldRTL, !isEditing && styles.readOnlyBlock]}
                 onPress={showGenderSelector}
@@ -975,6 +988,15 @@ const styles = StyleSheet.create({
     color: '#000000',
     marginBottom: 6,
   },
+  fieldLabelMuted: {
+    color: '#6B7280',
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
   requiredMark: {
     color: '#dc2626',
     fontSize: 17,
@@ -993,6 +1015,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     minHeight: 40,
     textAlignVertical: 'top',
+  },
+  textInputReadOnly: {
+    color: '#6B7280',
+  },
+  hintRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+  },
+  hintText: {
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
+    marginTop: 4,
+  },
+  hintTextInline: {
+    marginTop: 0,
+    flex: 1,
   },
   infoBox: {
     marginTop: 8,

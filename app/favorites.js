@@ -114,17 +114,39 @@ export default function FavoritesScreen() {
         
         <View style={styles.emptyContainer}>
           <View style={styles.emptyContent}>
-            <Image source={EMPTY_UNI_IMAGE} style={styles.emptyUniImage} contentFit="contain" />
+            <Image
+              source={EMPTY_UNI_IMAGE}
+              style={styles.emptyUniImage}
+              contentFit="contain"
+              accessibilityRole="image"
+              accessible={false}
+            />
             <Text style={styles.emptyTitle}>{t('favorites.emptyTitle')}</Text>
             <Text style={styles.emptySubtitle}>
               {t('favorites.emptySubtitle')}
             </Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.browseButton}
               onPress={() => { haptics.lightTap(); router.back(); }}
             >
               <Text style={styles.browseButtonText}>{t('favorites.browseProducts')}</Text>
             </TouchableOpacity>
+            {/* Login nudge for signed-out guests — favorites are stored
+                per-device, so cross-device sync is a real incentive to
+                sign in. Hidden once the user has an auth session. */}
+            {!user ? (
+              <View style={styles.loginNudge}>
+                <Text style={styles.loginNudgeText}>{t('favorites.signInToSync')}</Text>
+                <TouchableOpacity
+                  onPress={() => { haptics.lightTap(); router.push('/auth/login'); }}
+                  style={styles.loginNudgeButton}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="log-in-outline" size={16} color="#dc2626" />
+                  <Text style={styles.loginNudgeButtonText}>{t('favorites.signIn')}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
         </View>
       </SafeAreaView>
@@ -410,7 +432,29 @@ const styles = StyleSheet.create({
     ...T.buttonLarge,
     fontSize: 17,
   },
-  
+  loginNudge: {
+    alignItems: 'center',
+    marginTop: 24,
+    gap: 8,
+  },
+  loginNudgeText: {
+    ...T.bodySmall,
+    color: '#8E8E93',
+    textAlign: 'center',
+  },
+  loginNudgeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  loginNudgeButtonText: {
+    ...T.buttonLarge,
+    color: '#dc2626',
+    fontSize: 15,
+  },
+
   // Grid
   grid: {
     flexDirection: 'row',
