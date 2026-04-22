@@ -39,6 +39,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  // Header matches the standard profile-stack convention
+  // (addresses.js, edit.js, terms.js, contact.js, etc.).
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -46,38 +48,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#C6C6C8',
   },
   headerRTL: { flexDirection: 'row-reverse' },
-  backButton: {
-    padding: 4,
-    width: 130,
-  },
-  backButtonRTL: {
-    alignItems: 'flex-end',
-  },
-  backButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  backButtonContentRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backText: {
-    ...T.link,
-    color: '#dc2626',
-  },
-  backTextRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
+  backButton: { padding: 4 },
   headerTitle: {
-    ...T.sectionTitle,
-    fontWeight: '600',
+    ...T.sectionTitleSmall,
+    color: '#000000',
   },
-  headerSpacer: { width: 130 },
+  headerSpacer: { width: 32 },
   textRTL: { writingDirection: 'rtl', textAlign: 'center' },
   // Body styles moved to `components/PrivacyPolicyContent`
 });

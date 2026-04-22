@@ -83,9 +83,17 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
             {section.content && (
               <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
             )}
-            <View style={styles.listContainer}>
+            {/* Grouped card with hairline dividers between rows — matches the
+                web divided-list style shipped in d25b1e16 for scannability. */}
+            <View style={styles.listCard}>
               {section.items?.map((item, i) => (
-                <View key={i} style={[styles.listItem, isRTL && styles.listItemRTL]}>
+                <View
+                  key={i}
+                  style={[
+                    styles.listRow,
+                    i > 0 && styles.listRowDivider,
+                  ]}
+                >
                   <Text style={[styles.listItemLabel, isRTL && styles.textRTL]}>{item.label}</Text>
                   <Text style={[styles.listItemText, isRTL && styles.textRTL]}>{item.text}</Text>
                 </View>
@@ -167,10 +175,11 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
       contentContainerStyle={styles.contentContainer}
     >
       {showLastUpdated && (
-        <View style={styles.updateInfo}>
-          <Text style={[styles.updateText, isRTL && styles.textRTL]}>
-            {t('privacy.lastUpdated', { date: policy.lastUpdated })}
-          </Text>
+        <View style={[styles.updateInfo, isRTL && styles.updateInfoRTL]}>
+          <View style={styles.updatePill}>
+            <Ionicons name="time-outline" size={14} color="#6B7280" />
+            <Text style={styles.updatePillText}>{policy.lastUpdated}</Text>
+          </View>
         </View>
       )}
 
@@ -188,14 +197,25 @@ const styles = StyleSheet.create({
   errorText: { ...T.body, color: '#666', marginTop: 16, textAlign: 'center' },
   fallbackButton: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 16, padding: 12 },
   fallbackButtonText: { ...T.button, color: '#dc2626' },
+  // Tight pill badge replaces the full-width italic banner — matches
+  // the web Privacy Policy "Last Updated" treatment shipped in 6f9e4f04.
   updateInfo: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: '#F8F9FA',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E7',
+    paddingTop: 16,
+    paddingBottom: 4,
+    alignItems: 'flex-start',
   },
-  updateText: { ...T.label, fontWeight: '400', color: '#666', fontStyle: 'italic' },
+  updateInfoRTL: { alignItems: 'flex-end' },
+  updatePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  updatePillText: { ...T.captionSmall, color: '#4B5563', fontWeight: '500' },
   highlightSection: {
     backgroundColor: '#FFF3F3',
     marginHorizontal: 20,
@@ -216,8 +236,23 @@ const styles = StyleSheet.create({
   sectionTitle: { ...T.sectionTitleSmall, fontWeight: '600', marginBottom: 12 },
   paragraph: { ...T.body, color: '#333', marginBottom: 12, lineHeight: 22 },
   listContainer: { marginVertical: 4 },
+  // Legacy styles — still referenced elsewhere, kept for safety
   listItem: { marginBottom: 12, paddingStart: 16 },
   listItemRTL: { paddingStart: 16 },
+  // New grouped-card + divided-row layout (matches web d25b1e16)
+  listCard: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 4,
+  },
+  listRow: { paddingVertical: 4 },
+  listRowDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E5E5EA',
+    marginTop: 12,
+    paddingTop: 12,
+  },
   listItemLabel: { ...T.button, color: '#1D1D1F', marginBottom: 4 },
   listItemText: { ...T.body, color: '#333', lineHeight: 22 },
   bulletItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, paddingStart: 8 },

@@ -91,6 +91,8 @@ export default function LanguageScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F2F7' },
+  // Header matches standard profile-stack convention
+  // (addresses.js, edit.js, terms.js, contact.js, etc.).
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -98,18 +100,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: '#C6C6C8',
     backgroundColor: '#ffffff',
   },
   headerRTL: { flexDirection: 'row-reverse' },
-  backButton: { padding: 4, width: 130 },
-  backButtonRTL: { alignItems: 'flex-end' },
-  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { ...T.link, color: '#dc2626' },
-  backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  headerTitle: { ...T.body, fontWeight: '700', color: '#1D1D1F' },
-  headerSpacer: { width: 130 },
+  backButton: { padding: 4 },
+  headerTitle: { ...T.sectionTitleSmall, color: '#000000' },
+  headerSpacer: { width: 32 },
   card: {
     margin: 16,
     backgroundColor: '#ffffff',
