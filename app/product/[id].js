@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -34,6 +34,8 @@ import PerfectCombinationCard from '../../components/product/PerfectCombinationC
 import ProductReviews from '../../components/product/ProductReviews';
 import TrustBadges from '../../components/product/TrustBadges';
 import CollapsibleSection from '../../components/product/CollapsibleSection';
+import ImageLightbox from '../../components/product/ImageLightbox';
+import Toast from '../../components/Toast';
 import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
 import * as haptics from '../../utils/haptics';
 import { createLogger } from '../../utils/logger';
@@ -242,6 +244,45 @@ const videoStyles = StyleSheet.create({
   },
 });
 
+// PDP Batch C — inlined copy for strings that power the new UI surfaces
+// (quantity stepper, toast, read-more control, VAT line, OOS messaging).
+// Kept inline (mirrors TrustStrip/TrustBadges pattern) so translations
+// ship with the JS bundle and are not subject to runtime i18n cache misses.
+const PDP_COPY_MAP = {
+  en: {
+    addedToBag: 'added to bag',
+    viewBag: 'View Bag',
+    readMore: 'Read more',
+    showLess: 'Show less',
+    vatIncluded: 'VAT included',
+    outOfStock: 'Out of stock',
+    quantity: 'Quantity',
+  },
+  ar: {
+    addedToBag: 'أُضيف إلى الحقيبة',
+    viewBag: 'عرض الحقيبة',
+    readMore: 'اقرأ المزيد',
+    showLess: 'عرض أقل',
+    vatIncluded: 'شامل ضريبة القيمة المضافة',
+    outOfStock: 'غير متوفر',
+    quantity: 'الكمية',
+  },
+  ru: {
+    addedToBag: 'добавлен в корзину',
+    viewBag: 'В корзину',
+    readMore: 'Читать далее',
+    showLess: 'Свернуть',
+    vatIncluded: 'Цены включают НДС',
+    outOfStock: 'Нет в наличии',
+    quantity: 'Количество',
+  },
+};
+
+const getPdpCopy = (locale) => {
+  const lang = String(locale || '').toLowerCase().split('-')[0];
+  return PDP_COPY_MAP[lang] || PDP_COPY_MAP.en;
+};
+
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
@@ -256,6 +297,30 @@ export default function ProductDetailScreen() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [reviewAggregate, setReviewAggregate] = useState(null); // { averageRating, reviewCount }
   const [condensedHeader, setCondensedHeader] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const PDP_COPY = getPdpCopy(locale);
+
+  // Conservative OOS detection: only treat as out-of-stock when an explicit
+  // signal exists. Missing/undefined stock info should not block checkout.
+  const isOutOfStock = !!product && (
+    product.status === 'out_of_stock'
+    || product.outOfStock === true
+    || product.available === false
+    || product.stock === 0
+  );
+
+  // Hoisted so the inline gallery and the full-screen Lightbox share the same
+  // image array (avoids re-computing or getting out of sync).
+  const galleryImages = useMemo(() => {
+    if (!product) return [];
+    const productId = String(product.productNumber || product.id || id);
+    return getProductImages(productId, product) || [];
+  }, [product, id]);
   const { addItem, isInCart, getItemQuantity } = useCart();
   const scrollY = useRef(new Animated.Value(0)).current;
   const galleryRef = useRef(null);
@@ -360,45 +425,71 @@ export default function ProductDetailScreen() {
   };
 
   const handleAddToBag = () => {
-    if (product && !product.isPriceOnRequest) {
-      // Ensure selected size variant pricing is respected in bag/checkout
-      const unitPrice = (() => {
-        if (selectedSize && Array.isArray(product.variants) && product.variants.length > 0) {
-          const v = product.variants.find((vv) => String(vv.size) === String(selectedSize));
-          const vp = Number(v?.price);
-          if (Number.isFinite(vp) && vp > 0) return vp;
-        }
-        const base = Number(product.displayPrice ?? product.price ?? 0);
-        return Number.isFinite(base) ? base : 0;
-      })();
+    if (!product || product.isPriceOnRequest) return;
 
-      const productForCart = {
-        ...product,
-        displayPrice: unitPrice,
-        price: unitPrice,
-      };
-
-      addItem(productForCart, 1, selectedColor, selectedSize);
-      haptics.success();
-      
-      const safeName = getLocalizedProductName(product, locale) || product.name;
-      let message = t('product.addedToBagMessage', { name: safeName });
-      if (selectedSize) {
-        message += `\n${t('common.size')}: ${selectedSize}`;
-      }
-      if (selectedColor) {
-        message += `\n${t('common.color')}: ${selectedColor}`;
-      }
-      
-      Alert.alert(
-        t('product.addedToBagTitle'),
-        message,
-        [
-          { text: t('product.continueShopping'), style: 'default' },
-          { text: t('product.viewBag'), style: 'default', onPress: async () => { await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/product/[id]', params: { id } })).catch(() => {}); router.push('/(tabs)/bag'); } }
-        ]
-      );
+    // OOS guard — no-op if product is out of stock (defensive, UI also disables the button).
+    if (isOutOfStock) {
+      haptics.lightTap();
+      setToastMessage(PDP_COPY.outOfStock);
+      setToastVisible(true);
+      return;
     }
+
+    // Ensure selected size variant pricing is respected in bag/checkout
+    const unitPrice = (() => {
+      if (selectedSize && Array.isArray(product.variants) && product.variants.length > 0) {
+        const v = product.variants.find((vv) => String(vv.size) === String(selectedSize));
+        const vp = Number(v?.price);
+        if (Number.isFinite(vp) && vp > 0) return vp;
+      }
+      const base = Number(product.displayPrice ?? product.price ?? 0);
+      return Number.isFinite(base) ? base : 0;
+    })();
+
+    const productForCart = {
+      ...product,
+      displayPrice: unitPrice,
+      price: unitPrice,
+    };
+
+    const qty = Math.max(1, Number(quantity) || 1);
+    addItem(productForCart, qty, selectedColor, selectedSize);
+    haptics.success();
+
+    const safeName = getLocalizedProductName(product, locale) || product.name;
+    const msg = qty > 1
+      ? `${safeName} × ${qty} ${PDP_COPY.addedToBag.toLowerCase()}`
+      : `${safeName} ${PDP_COPY.addedToBag.toLowerCase()}`;
+    setToastMessage(msg);
+    setToastVisible(true);
+  };
+
+  const handleViewBagFromToast = async () => {
+    try {
+      await AsyncStorage.setItem(
+        '@genosys_nav_bag_source',
+        JSON.stringify({ pathname: '/product/[id]', params: { id } })
+      );
+    } catch {
+      // non-fatal
+    }
+    router.push('/(tabs)/bag');
+  };
+
+  const incrementQty = () => {
+    haptics.selectionTick();
+    setQuantity((q) => Math.min(99, (Number(q) || 1) + 1));
+  };
+
+  const decrementQty = () => {
+    haptics.selectionTick();
+    setQuantity((q) => Math.max(1, (Number(q) || 1) - 1));
+  };
+
+  const openLightbox = (idx = 0) => {
+    haptics.lightTap();
+    setLightboxIndex(idx);
+    setLightboxOpen(true);
   };
 
   const handleSizeChange = (size) => {
@@ -967,8 +1058,6 @@ export default function ProductDetailScreen() {
       >
         {/* Image Gallery */}
         {(() => {
-          const productId = String(product.productNumber || product.id || id);
-          const galleryImages = getProductImages(productId, product);
           const hasMultipleImages = galleryImages.length > 1;
           const isBox = isBeautyBoxProduct(product);
           // Use "contain" for all products so images fit within the container without cropping
@@ -989,13 +1078,21 @@ export default function ProductDetailScreen() {
           if (!hasMultipleImages) {
             return (
               <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
-                <Image
-                  source={galleryImages[0]}
-                  style={styles.heroImage}
-                  contentFit={imageFit}
-                  transition={300}
-                  cachePolicy="memory-disk"
-                />
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => openLightbox(0)}
+                  accessibilityRole="imagebutton"
+                  accessibilityLabel="Open image viewer"
+                  style={{ flex: 1 }}
+                >
+                  <Image
+                    source={galleryImages[0]}
+                    style={styles.heroImage}
+                    contentFit={imageFit}
+                    transition={300}
+                    cachePolicy="memory-disk"
+                  />
+                </TouchableOpacity>
               </View>
             );
           }
@@ -1015,14 +1112,21 @@ export default function ProductDetailScreen() {
                     const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
                     setActiveImageIndex(newIndex);
                   }}
-                  renderItem={({ item }) => (
-                    <Image
-                      source={item}
-                      style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: '#ffffff' }}
-                      contentFit={imageFit}
-                      transition={300}
-                      cachePolicy="memory-disk"
-                    />
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={() => openLightbox(index)}
+                      accessibilityRole="imagebutton"
+                      accessibilityLabel={`Open image ${index + 1} of ${galleryImages.length}`}
+                    >
+                      <Image
+                        source={item}
+                        style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: '#ffffff' }}
+                        contentFit={imageFit}
+                        transition={300}
+                        cachePolicy="memory-disk"
+                      />
+                    </TouchableOpacity>
                   )}
                 />
               </View>
@@ -1200,6 +1304,15 @@ export default function ProductDetailScreen() {
                   })()}
                 </View>
               )}
+
+            {/* VAT-inclusive disclosure — matches web PDP. Hidden for
+                price-on-request and beauty-box bundles which render
+                their own pricing treatment above. */}
+            {!product.isPriceOnRequest && !(product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box'))) && (
+              <Text style={[styles.vatNote, isRTL && styles.textRTL]}>
+                {PDP_COPY.vatIncluded}
+              </Text>
+            )}
           </View>
 
             {/* Enhanced Product Variant Selector */}
@@ -1264,7 +1377,43 @@ export default function ProductDetailScreen() {
             <BeautyBoxDetails product={product} styles={styles} />
           ) : (
             <>
-              {renderInfoSection(t('product.about'), getDisplayDescription())}
+              {(() => {
+                const fullText = asText(
+                  formatDescription(asText(getLocalizedProductDescription(product, locale) || product.description))
+                );
+                if (!fullText || !fullText.trim()) return null;
+                const isLong = fullText.length > 500;
+                const visible = isLong && !showFullDescription
+                  ? fullText.substring(0, 500).trimEnd() + '…'
+                  : fullText;
+                return (
+                  <View style={styles.section}>
+                    <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+                      {t('product.about')}
+                    </Text>
+                    <View style={styles.descriptionContainer}>
+                      <Text style={[styles.description, isRTL && styles.textRTL]}>
+                        {visible}
+                      </Text>
+                      {isLong && (
+                        <TouchableOpacity
+                          style={[styles.readMoreButton, isRTL && { alignSelf: 'flex-end' }]}
+                          onPress={() => {
+                            haptics.lightTap();
+                            setShowFullDescription((v) => !v);
+                          }}
+                          activeOpacity={0.7}
+                          accessibilityRole="button"
+                        >
+                          <Text style={styles.readMoreText}>
+                            {showFullDescription ? PDP_COPY.showLess : PDP_COPY.readMore}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                );
+              })()}
 
               {/* Required website-like sections (deduped + formatted) */}
               {renderSpecs()}
@@ -1375,24 +1524,94 @@ export default function ProductDetailScreen() {
         ) : (() => {
           const inBagForSelection = isInCart(product.id, selectedColor, selectedSize);
           const qtyForSelection = getItemQuantity(product.id, selectedColor, selectedSize);
+          const disabled = isOutOfStock;
+          const buttonLabel = disabled
+            ? PDP_COPY.outOfStock
+            : inBagForSelection
+              ? t('product.inBag', { count: qtyForSelection })
+              : t('product.addToBag');
           return (
-            <TouchableOpacity
-              style={[styles.addToBagButton, isRTL && styles.addToBagButtonRTL, inBagForSelection && styles.inCartButton]}
-              onPress={handleAddToBag}
-            >
-          <Ionicons 
-                name={inBagForSelection ? "checkmark" : "bag"} 
-            size={20} 
-            color="#ffffff" 
-            style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
-          />
-            <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
-                {inBagForSelection ? t('product.inBag', { count: qtyForSelection }) : t('product.addToBag')}
-            </Text>
-          </TouchableOpacity>
+            <View style={[styles.bottomRow, isRTL && styles.bottomRowRTL]}>
+              {/* Quantity stepper — web PDP parity. Hidden when OOS. */}
+              {!disabled && (
+                <View
+                  style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
+                  accessibilityLabel={PDP_COPY.quantity}
+                >
+                  <TouchableOpacity
+                    style={[styles.qtyBtn, quantity <= 1 && styles.qtyBtnDisabled]}
+                    onPress={decrementQty}
+                    disabled={quantity <= 1}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Decrease quantity"
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  >
+                    <Ionicons name="remove" size={18} color={quantity <= 1 ? '#C7C7CC' : '#1D1D1F'} />
+                  </TouchableOpacity>
+                  <Text style={styles.qtyValue}>{quantity}</Text>
+                  <TouchableOpacity
+                    style={styles.qtyBtn}
+                    onPress={incrementQty}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Increase quantity"
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  >
+                    <Ionicons name="add" size={18} color="#1D1D1F" />
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              <TouchableOpacity
+                style={[
+                  styles.addToBagButton,
+                  styles.addToBagButtonFlex,
+                  isRTL && styles.addToBagButtonRTL,
+                  inBagForSelection && !disabled && styles.inCartButton,
+                  disabled && styles.addToBagButtonDisabled,
+                ]}
+                onPress={handleAddToBag}
+                disabled={disabled}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityState={{ disabled }}
+              >
+                <Ionicons
+                  name={disabled ? 'alert-circle' : inBagForSelection ? 'checkmark' : 'bag'}
+                  size={20}
+                  color="#ffffff"
+                  style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
+                />
+                <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
+                  {buttonLabel}
+                </Text>
+              </TouchableOpacity>
+            </View>
           );
         })()}
         </View>
+
+        {/* Toast — non-blocking add-to-bag (and OOS) feedback */}
+        <Toast
+          visible={toastVisible}
+          message={toastMessage}
+          actionLabel={!isOutOfStock ? PDP_COPY.viewBag : null}
+          onAction={!isOutOfStock ? handleViewBagFromToast : null}
+          onHide={() => setToastVisible(false)}
+          bottomOffset={110}
+          isRTL={isRTL}
+          icon={isOutOfStock ? 'alert-circle' : 'checkmark-circle'}
+          iconColor={isOutOfStock ? '#F59E0B' : '#22C55E'}
+        />
+
+        {/* Full-screen image gallery (Lightbox) */}
+        <ImageLightbox
+          visible={lightboxOpen}
+          images={galleryImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
       </SafeAreaView>
   );
 }
@@ -1602,6 +1821,13 @@ const styles = StyleSheet.create({
   },
   priceBlock: {
     marginBottom: 8,
+  },
+  vatNote: {
+    ...T.captionSmall,
+    color: '#86868B',
+    marginTop: 2,
+    marginBottom: 4,
+    fontWeight: '500',
   },
   discountRow: {
     flexDirection: 'row',
@@ -2027,6 +2253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 16,
+    paddingHorizontal: 18,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -2035,6 +2262,63 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
+  },
+  addToBagButtonFlex: {
+    flex: 1,
+    minHeight: 52,
+  },
+  addToBagButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+    shadowColor: '#9CA3AF',
+    shadowOpacity: 0.15,
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  bottomRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  qtyStepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F2F7',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+    minHeight: 52,
+  },
+  qtyStepperRTL: {
+    flexDirection: 'row-reverse',
+  },
+  qtyBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  qtyBtnDisabled: {
+    backgroundColor: '#F9FAFB',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  qtyValue: {
+    minWidth: 28,
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    marginHorizontal: 4,
   },
   requestQuoteBottomButton: {
     backgroundColor: '#25D366',
