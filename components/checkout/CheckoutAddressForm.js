@@ -142,6 +142,8 @@ export default function CheckoutAddressForm({
               }}
               placeholder={t('checkout.enterFirstName')}
               autoCapitalize="words"
+              autoComplete="given-name"
+              textContentType="givenName"
               onBlur={() => setTouched((p) => ({ ...p, firstName: true }))}
               ref={firstNameRef}
               returnKeyType="next"
@@ -160,6 +162,8 @@ export default function CheckoutAddressForm({
               }}
               placeholder={t('checkout.enterLastName')}
               autoCapitalize="words"
+              autoComplete="family-name"
+              textContentType="familyName"
               onBlur={() => setTouched((p) => ({ ...p, lastName: true }))}
               ref={lastNameRef}
               returnKeyType="next"
@@ -186,6 +190,9 @@ export default function CheckoutAddressForm({
               placeholder={t('checkout.enterEmail')}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="emailAddress"
               onBlur={() => setTouched((p) => ({ ...p, email: true }))}
               ref={emailRef}
               returnKeyType="next"
@@ -223,6 +230,8 @@ export default function CheckoutAddressForm({
                 }}
                 placeholder={t('checkout.enterPhone')}
                 keyboardType="phone-pad"
+                autoComplete="tel-national"
+                textContentType="telephoneNumber"
                 onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
                 ref={phoneRef}
                 returnKeyType="next"
@@ -252,6 +261,8 @@ export default function CheckoutAddressForm({
             multiline
             numberOfLines={3}
             textAlignVertical="top"
+            autoComplete="street-address"
+            textContentType="fullStreetAddress"
             onBlur={() => setTouched((p) => ({ ...p, address: true }))}
             ref={addressRef}
           />

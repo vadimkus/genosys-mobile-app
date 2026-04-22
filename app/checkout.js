@@ -70,7 +70,9 @@ export default function CheckoutScreen() {
   const [savedAddressPickerOpen, setSavedAddressPickerOpen] = useState(false);
   const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(null);
   const [orderNotes, setOrderNotes] = useState('');
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
+  // Default to CARD on first render (matches web checkout). If the user has
+  // explicitly saved a preference (including 'cod'), the effect below restores it.
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHODS.CARD);
 
   const [touched, setTouched] = useState({
     firstName: false,
@@ -147,19 +149,20 @@ export default function CheckoutScreen() {
     reloadShippingRates?.();
   }, []);
 
-  // Load default payment method preference
+  // Load default payment method preference. First-time users default to CARD
+  // to match the web checkout; existing users keep whatever they last selected.
   useEffect(() => {
     (async () => {
       try {
         const saved = await getDefaultPaymentMethod();
-        // If user had Apple Pay saved, fall back to COD (Apple Pay removed)
+        // Legacy value cleanup (Apple Pay was removed) — fall back to CARD.
         if (saved === 'apple_pay') {
-          setSelectedPaymentMethod(PAYMENT_METHODS.COD);
+          setSelectedPaymentMethod(PAYMENT_METHODS.CARD);
         } else {
-          setSelectedPaymentMethod(saved || PAYMENT_METHODS.COD);
+          setSelectedPaymentMethod(saved || PAYMENT_METHODS.CARD);
         }
       } catch {
-        setSelectedPaymentMethod(PAYMENT_METHODS.COD);
+        setSelectedPaymentMethod(PAYMENT_METHODS.CARD);
       }
     })();
   }, []);
@@ -938,31 +941,56 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   orderHeader: {
-    backgroundColor: '#dc2626',
-    padding: 16,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
   orderHeaderRTL: {
     flexDirection: 'row-reverse',
   },
+  orderHeaderIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  orderHeaderIconWrapRTL: {
+    // no transform — icon is symmetric
+  },
   orderHeaderLeft: {
     flex: 1,
-    paddingEnd: 12,
+    paddingEnd: 8,
   },
   orderHeaderLeftRTL: {
     alignItems: 'flex-end',
   },
+  orderEyebrow: {
+    ...T.captionTiny,
+    color: '#9CA3AF',
+    fontWeight: '600',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  orderHeaderTotal: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1D1D1F',
+    marginTop: 2,
+    letterSpacing: -0.2,
+  },
   orderNumber: {
     ...T.mono,
-    color: '#ffffff',
+    color: '#1D1D1F',
   },
   itemCount: {
-    ...T.label,
-    color: '#ffffff',
-    fontWeight: '400',
-    opacity: 0.9,
+    ...T.captionSmall,
+    color: '#6B7280',
+    marginTop: 1,
   },
   orderSummaryBody: {
     backgroundColor: '#F2F2F7',

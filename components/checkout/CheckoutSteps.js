@@ -32,6 +32,9 @@ export default function CheckoutSteps({
         style={[styles.backButton, isRTL && styles.backButtonRTL]}
         onPress={onBack}
         activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={t('common.back') || 'Back'}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
       </TouchableOpacity>

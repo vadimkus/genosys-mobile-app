@@ -13,13 +13,14 @@ export async function getDefaultPaymentMethod() {
   try {
     const value = await AsyncStorage.getItem(DEFAULT_PAYMENT_METHOD_KEY);
     // Backward/forward compatibility: accept known values only.
-    // If user had apple_pay saved, fall back to COD
+    // Users who previously saved a preference (including 'cod') keep that choice.
     if (value === PAYMENT_METHODS.CARD || value === PAYMENT_METHODS.COD) {
       return value;
     }
-    return PAYMENT_METHODS.COD;
+    // First-time users default to CARD (matches web checkout).
+    return PAYMENT_METHODS.CARD;
   } catch {
-    return PAYMENT_METHODS.COD;
+    return PAYMENT_METHODS.CARD;
   }
 }
 

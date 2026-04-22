@@ -34,6 +34,7 @@ export default function OrderSummaryCard({
         multiline
         numberOfLines={2}
         textAlignVertical="top"
+        maxLength={500}
       />
     </View>
   );

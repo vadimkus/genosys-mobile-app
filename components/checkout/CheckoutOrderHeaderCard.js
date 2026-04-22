@@ -32,9 +32,20 @@ export default function CheckoutOrderHeaderCard({
         style={[styles.orderHeader, isRTL && styles.orderHeaderRTL]}
         onPress={onToggle}
         activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: !!orderSummaryExpanded }}
+        accessibilityLabel={t('checkout.orderSummary')}
       >
+        <View style={[styles.orderHeaderIconWrap, isRTL && styles.orderHeaderIconWrapRTL]}>
+          <Ionicons name="bag-handle" size={18} color="#dc2626" />
+        </View>
         <View style={[styles.orderHeaderLeft, isRTL && styles.orderHeaderLeftRTL]}>
-          <Text style={[styles.orderNumber, isRTL && styles.textRTL]}>{t('checkout.orderNumberLine', { orderNumber })}</Text>
+          <Text style={[styles.orderEyebrow, isRTL && styles.textRTL]}>
+            {t('checkout.orderNumberLine', { orderNumber })}
+          </Text>
+          <Text style={[styles.orderHeaderTotal, isRTL && styles.textRTL]}>
+            AED {Number(safeTotal || 0).toFixed(2)}
+          </Text>
           <Text style={[styles.itemCount, isRTL && styles.textRTL]}>
             {t('bag.header', {
               count: itemCount,
@@ -45,7 +56,7 @@ export default function CheckoutOrderHeaderCard({
         <Ionicons
           name={orderSummaryExpanded ? 'chevron-up' : 'chevron-down'}
           size={20}
-          color="#ffffff"
+          color="#6B7280"
         />
       </TouchableOpacity>
 
