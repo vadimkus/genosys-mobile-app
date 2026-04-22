@@ -42,7 +42,9 @@ const ITEMS = [
 export default function TrustStrip() {
   const { locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const copy = COPY[locale] || COPY.en;
+  // Robust lookup: locale could be 'en', 'en-US', 'ru-RU', etc.
+  const lang = String(locale || '').toLowerCase().split('-')[0];
+  const copy = COPY[lang] || COPY.en;
 
   return (
     <View style={styles.wrapper} accessibilityRole="summary">

@@ -887,16 +887,25 @@ export default function ShopScreen() {
             {/* Trust strip — brand promise, one horizontal row (matches web mobile) */}
             <TrustStrip />
 
-            {/* Categories Filter — single horizontal scrollable row (no wrapping) */}
-            {categories.length > 0 && (
+            {/* Categories Filter — single horizontal scrollable row (no wrapping).
+                Ordering: "All" first, then NEW-flagged categories, then the rest. */}
+            {categories.length > 0 && (() => {
+              const isNewCategory = (c) =>
+                c === 'Skin Concern' || categoryBadges[c] === 'new';
+              const head = categories.slice(0, 1); // "All"
+              const tail = categories.slice(1);
+              const newFirst = tail.filter(isNewCategory);
+              const rest = tail.filter((c) => !isNewCategory(c));
+              const ordered = [...head, ...newFirst, ...rest];
+              return (
               <View style={styles.categoriesContainer}>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={[styles.categoriesScroll, isRTL && styles.categoriesScrollRTL]}
                 >
-                  {categories.map((category) => {
-                    const hasBadge = categoryBadges[category] === 'new' || category === 'Skin Concern';
+                  {ordered.map((category) => {
+                    const hasBadge = isNewCategory(category);
                     const isActive = selectedCategory === category;
                     return (
                       <View key={category} style={styles.categoryItem}>
@@ -942,7 +951,8 @@ export default function ShopScreen() {
                   {searchQuery && ` ${t('shop.foundFor', { query: searchQuery })}`}
                 </Text>
               </View>
-            )}
+              );
+            })()}
 
             {/* Build Your Set Banner */}
             {selectedCategory === 'Beauty Boxes' && !searchQuery && (
@@ -1516,7 +1526,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 10, // headroom for the -4 top "NEW" badge
+    paddingTop: 14, // headroom so the floating "NEW" badge sits clearly above the pill
     paddingBottom: 4,
   },
   categoriesScrollRTL: {
@@ -1549,24 +1559,33 @@ const styles = StyleSheet.create({
   },
   categoryNewBadge: {
     position: 'absolute',
-    top: -6,
+    top: -10,
     alignSelf: 'center',
     left: '50%',
-    transform: [{ translateX: -12 }],
+    transform: [{ translateX: -14 }],
     backgroundColor: '#22C55E',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#ffffff',
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    elevation: 3,
   },
   categoryNewBadgeActive: {
     backgroundColor: '#ffffff',
   },
   categoryNewBadgeText: {
-    fontSize: 8,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '800',
     color: '#ffffff',
     textTransform: 'uppercase',
+    letterSpacing: 0.2,
+    includeFontPadding: false,
   },
   categoryNewBadgeTextActive: {
     color: '#dc2626',
