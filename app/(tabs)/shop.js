@@ -4,6 +4,7 @@ import {
   Text, 
   StyleSheet, 
   FlatList, 
+  ScrollView,
   TouchableOpacity, 
   ActivityIndicator,
   RefreshControl,
@@ -56,6 +57,7 @@ import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
+import TrustStrip from '../../components/TrustStrip';
 
 
 const log = createLogger('Shop');
@@ -85,20 +87,6 @@ const ALLOWED_CATEGORY_ORDER = [
   'Bio Meso',
   'Holiday Kits',
   'Beauty Boxes',
-];
-
-// RU: preferred visual grouping/order so long labels wrap nicely.
-// (Matches desired lines: "Все товары + Уход за областью вокруг глаз", etc.)
-const RU_CATEGORY_PRIORITY_ORDER = [
-  'All',
-  'Skin Concern',
-  'Eye Care',
-  'PRO Solution',
-  'Sun',
-  'Peeling',
-  'Scalp/Hair',
-  'Cream',
-  'Mask',
 ];
 
 const VIRTUAL_CATEGORIES = ['Skin Concern'];
@@ -896,69 +884,58 @@ export default function ShopScreen() {
               </Modal>
             )}
 
-            {/* Categories Filter */}
+            {/* Trust strip — brand promise, one horizontal row (matches web mobile) */}
+            <TrustStrip />
+
+            {/* Categories Filter — single horizontal scrollable row (no wrapping) */}
             {categories.length > 0 && (
               <View style={styles.categoriesContainer}>
-                <View style={[styles.categoriesGrid, isRTL && styles.categoriesGridRTL]}>
-                  {(() => {
-                    const list = Array.isArray(categories) ? [...categories] : [];
-                    if (locale !== 'ru') return list;
-
-                    const picked = [];
-                    const remaining = new Set(list);
-                    RU_CATEGORY_PRIORITY_ORDER.forEach((cat) => {
-                      if (remaining.has(cat)) {
-                        picked.push(cat);
-                        remaining.delete(cat);
-                      }
-                    });
-
-                    const getLabel = (cat) =>
-                      getCategoryTranslationKey(cat) ? t(getCategoryTranslationKey(cat)) : cat;
-                    const rest = Array.from(remaining);
-                    rest.sort((a, b) => String(getLabel(a)).length - String(getLabel(b)).length);
-
-                    return [...picked, ...rest];
-                  })().map((category) => {
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={[styles.categoriesScroll, isRTL && styles.categoriesScrollRTL]}
+                >
+                  {categories.map((category) => {
                     const hasBadge = categoryBadges[category] === 'new' || category === 'Skin Concern';
                     const isActive = selectedCategory === category;
                     return (
-                    <View key={category} style={{ position: 'relative' }}>
-                      {hasBadge && (
-                        <View style={[
-                          styles.categoryNewBadge,
-                          isActive && styles.categoryNewBadgeActive
-                        ]}>
-                          <Text style={[
-                            styles.categoryNewBadgeText,
-                            isActive && styles.categoryNewBadgeTextActive
-                          ]}>{t('common.new')}</Text>
-                        </View>
-                      )}
-                      <TouchableOpacity
-                        style={[
-                          styles.categoryButton,
-                          isRTL && styles.categoryButtonRTL,
-                          locale === 'ru' && styles.ruCategoryButton,
-                          isActive && styles.activeCategoryButton
-                        ]}
-                        onPress={() => handleCategoryPress(category)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={[
-                          styles.categoryButtonText,
-                          isRTL && styles.categoryButtonTextRTL,
-                          locale === 'ru' && styles.ruCategoryButtonText,
-                          isActive && styles.activeCategoryButtonText
-                        ]}>
-                          {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                      <View key={category} style={styles.categoryItem}>
+                        {hasBadge && (
+                          <View style={[
+                            styles.categoryNewBadge,
+                            isActive && styles.categoryNewBadgeActive
+                          ]}>
+                            <Text style={[
+                              styles.categoryNewBadgeText,
+                              isActive && styles.categoryNewBadgeTextActive
+                            ]}>{t('common.new')}</Text>
+                          </View>
+                        )}
+                        <TouchableOpacity
+                          style={[
+                            styles.categoryButton,
+                            isRTL && styles.categoryButtonRTL,
+                            isActive && styles.activeCategoryButton,
+                          ]}
+                          onPress={() => handleCategoryPress(category)}
+                          activeOpacity={0.7}
+                        >
+                          <Text
+                            style={[
+                              styles.categoryButtonText,
+                              isRTL && styles.categoryButtonTextRTL,
+                              isActive && styles.activeCategoryButtonText,
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {getCategoryTranslationKey(category) ? t(getCategoryTranslationKey(category)) : category}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     );
                   })}
-                </View>
-                
+                </ScrollView>
+
                 <Text style={[styles.productCount, isRTL && styles.productCountRTL]}>
                   {filteredProducts.length} {t(filteredProducts.length === 1 ? 'shop.product' : 'shop.products')}
                   {selectedCategory !== 'All' && ` ${t('shop.in')} ${(getCategoryTranslationKey(selectedCategory) ? t(getCategoryTranslationKey(selectedCategory)) : selectedCategory)}`}
@@ -1278,6 +1255,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#dc2626',
     marginTop: 8,
+    paddingHorizontal: 20,
     textAlign: 'left',
   },
   section: {
@@ -1529,41 +1507,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Categories Styles
+  // Categories Styles — single horizontal scroll row (matches web mobile)
   categoriesContainer: {
-    paddingHorizontal: 20,
     paddingBottom: 12,
     backgroundColor: '#ffffff',
   },
-  categoriesGrid: {
+  categoriesScroll: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -4,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 10, // headroom for the -4 top "NEW" badge
+    paddingBottom: 4,
   },
-  categoriesGridRTL: {
+  categoriesScrollRTL: {
     flexDirection: 'row-reverse',
-    justifyContent: 'flex-end',
+  },
+  categoryItem: {
+    position: 'relative',
+    marginRight: 8,
   },
   categoryButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 16,
+    borderRadius: 18,
     backgroundColor: '#F2F2F7',
     borderWidth: 1,
     borderColor: '#E5E5EA',
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 36,
+    minWidth: 56,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
-    minWidth: 60,
-    margin: 4,
-  },
-  ruCategoryButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    minWidth: 0,
   },
   activeCategoryButton: {
     backgroundColor: '#dc2626',
@@ -1571,7 +1549,7 @@ const styles = StyleSheet.create({
   },
   categoryNewBadge: {
     position: 'absolute',
-    top: -4,
+    top: -6,
     alignSelf: 'center',
     left: '50%',
     transform: [{ translateX: -12 }],
@@ -1596,8 +1574,6 @@ const styles = StyleSheet.create({
   categoryButtonText: {
     ...T.label,
     fontWeight: '500',
-  },
-  ruCategoryButtonText: {
     fontSize: 13,
   },
   activeCategoryButtonText: {
