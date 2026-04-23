@@ -66,6 +66,43 @@ Fix:
   4. Switch locale to Russian → "Новинка" centres above each pill, never
      wraps, never touches the next pill.
 
+## OTA publish
+
+Pushing to `main` alone does **not** ship an OTA update — `eas update` has
+to be run explicitly. Both platforms were published from commit
+`5a55e8c8c4d263f5250c0c8f34ddbc08fabbe347`:
+
+- iOS update group `5fefb644-4e42-4df3-8741-3d818ecfc4f9` (update ID
+  `019dba08-82c8-7d1e-8643-9b653c1d3a1f`) — runtime `1.0.0`, branch
+  `production`.
+- Android update group `628e3ff8-c27e-422c-8488-9384de3a8c66` (update ID
+  `019dba09-2829-747e-a196-e67c35b116dd`) — runtime `1.0.0`, branch
+  `production`.
+
+### Regression fixed
+
+The previous four OTAs shipped to Android only (iOS was skipped for: checkout
+parity, profile headers, favorites, and one of the Batch C updates). Always
+publish **both** platforms:
+
+```bash
+CI=1 eas update --branch production --platform ios     --message "..."
+CI=1 eas update --branch production --platform android --message "..."
+```
+
+`--platform all` currently fails in this repo because the Expo export
+attempts a web bundle and `react-native-web` isn't installed. Until we
+either install `react-native-web` or restrict `platforms` in app config,
+run the two commands explicitly.
+
+### What users see
+
+With `updates.checkAutomatically: ON_LOAD` and
+`fallbackToCacheTimeout: 5000`, a user must fully quit the app (swipe up
+from the app switcher) and reopen once. On a good connection the new
+bundle downloads within the 5-second window and the first relaunch shows
+the fix; otherwise the second relaunch shows it.
+
 ## Related
 
 - Web side of the same change: `cosmetics-website/docs/CART_UX_FIXES_2026-04-23.md`
