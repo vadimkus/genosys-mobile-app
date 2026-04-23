@@ -82,18 +82,27 @@ to be run explicitly. Both platforms were published from commit
 ### Regression fixed
 
 The previous four OTAs shipped to Android only (iOS was skipped for: checkout
-parity, profile headers, favorites, and one of the Batch C updates). Always
-publish **both** platforms:
+parity, profile headers, favorites, and one of the Batch C updates). The
+fix is to always publish with `--platform all`:
 
 ```bash
-CI=1 eas update --branch production --platform ios     --message "..."
-CI=1 eas update --branch production --platform android --message "..."
+CI=1 eas update --branch production --platform all --message "..."
 ```
 
-`--platform all` currently fails in this repo because the Expo export
-attempts a web bundle and `react-native-web` isn't installed. Until we
-either install `react-native-web` or restrict `platforms` in app config,
-run the two commands explicitly.
+This produces a single update group with both `iOS update ID` and
+`Android update ID`, so it is impossible to forget one platform.
+
+`react-native-web` is now installed (SDK 54 compatible `^0.21.0`) so the
+Expo exporter can produce a web bundle alongside the native ones. The
+web bundle is a side-effect of the export — no code imports it, nothing
+in the app uses `react-native-web` at runtime, and the published update
+still only drives the native clients. If we ever want to trim the web
+bundle out, we can either set `platforms: ["ios", "android"]` in
+`app.json` or pass `--platform ios` / `--platform android` explicitly,
+but there is no current downside to leaving it enabled.
+
+First publish confirming `--platform all` works end-to-end: update group
+`8ea49b9d-abb1-4bf1-9b42-c687bbb13e2c`.
 
 ### What users see
 
