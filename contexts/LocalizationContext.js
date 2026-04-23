@@ -90,14 +90,19 @@ export function LocalizationProvider({ children }) {
   const setLocale = useCallback(async (nextLocale) => {
     const next = String(nextLocale || '').toLowerCase();
     const safe = SUPPORTED.includes(next) ? next : 'en';
-    // If RTL changes, force + reload before updating state (so app restarts in correct direction).
-    await applyRTLIfNeeded(safe);
-    setLocaleState(safe);
+    // IMPORTANT: Persist to storage BEFORE any RTL toggle + reload.
+    // applyRTLIfNeeded calls Updates.reloadAsync() which tears down the JS
+    // runtime; any code after it (including setItem) never runs. That caused
+    // AR <-> non-AR switches to silently fail (store stayed on the old locale,
+    // and after the reload the app rehydrated the previous language).
     try {
       await AsyncStorage.setItem(STORAGE_KEY, safe);
     } catch {
       // ignore
     }
+    setLocaleState(safe);
+    // If RTL changes, force + reload (app restarts and picks up stored locale).
+    await applyRTLIfNeeded(safe);
   }, [applyRTLIfNeeded]);
 
   // On first hydration, ensure RTL matches stored locale.
