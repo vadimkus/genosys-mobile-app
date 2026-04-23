@@ -1097,6 +1097,8 @@
     "added": "تمت الإضافة!",
     "addToBag": "أضف إلى السلة",
     "inBag": "في الحقيبة",
+    "decreaseQuantity": "تقليل الكمية",
+    "increaseQuantity": "زيادة الكمية",
     "loginToBuy": "سجّل الدخول للشراء",
     "requestQuote": "طلب عرض سعر",
     "priceOnRequest": "السعر عند الطلب",

@@ -107,7 +107,7 @@ export default function ShopScreen() {
   const { user } = useAuth();
   const { t, locale, setLocale, dir } = useLocalization();
   // Animations disabled (kept only for header in bag.js)
-  const { addItem, getItemQuantity } = useCart();
+  const { addItem, getProductTotalQuantity, decrementProductFromCart } = useCart();
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
   const [products, setProducts] = useState([]);
@@ -359,14 +359,74 @@ export default function ShopScreen() {
           ) : (() => {
             const isAdding = addingProducts.has(product.id);
             const outOfStock = product.status === 'out_of_stock' || product.stock === false;
-            const qtyInBag = user ? (getItemQuantity?.(product?.id, '', '') || 0) : 0;
+            // Sum across ALL variants of this product so multi-size items
+            // (e.g. Snow O2 Cleanser 180ml / 500ml) also reflect the real
+            // in-bag count — the previous `getItemQuantity(id, '', '')`
+            // only matched the empty-size line and always returned 0 for
+            // variant products, leaving the button red.
+            const qtyInBag = user ? (getProductTotalQuantity?.(product?.id) || 0) : 0;
             const isInBag = qtyInBag > 0 && !outOfStock;
+
+            // In-bag state: show a [-] [N in Bag] [+] stepper so the user
+            // can adjust quantity from the grid without opening the bag.
+            if (isInBag) {
+              const decLabel = t('shop.decreaseQuantity') || 'Decrease quantity';
+              const incLabel = t('shop.increaseQuantity') || 'Increase quantity';
+              return (
+                <View
+                  style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
+                  accessibilityRole="adjustable"
+                  accessibilityLabel={`${t('shop.inBag')} (${qtyInBag}) — ${product?.name || ''}`}
+                >
+                  <TouchableOpacity
+                    style={styles.qtyStepperBtn}
+                    onPress={() => {
+                      haptics.lightTap();
+                      decrementProductFromCart?.(product.id);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={decLabel}
+                    disabled={isAdding}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="remove" size={18} color="#ffffff" />
+                  </TouchableOpacity>
+
+                  <View style={styles.qtyStepperLabelWrap} pointerEvents="none">
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={14}
+                      color="#ffffff"
+                      style={styles.qtyStepperCheck}
+                    />
+                    <Text
+                      style={styles.qtyStepperLabel}
+                      numberOfLines={1}
+                      allowFontScaling={false}
+                    >
+                      {`${t('shop.inBag')} (${qtyInBag})`}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.qtyStepperBtn}
+                    onPress={() => handleAddToCart(product)}
+                    accessibilityRole="button"
+                    accessibilityLabel={incLabel}
+                    disabled={isAdding}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="add" size={18} color="#ffffff" />
+                  </TouchableOpacity>
+                </View>
+              );
+            }
+
             return (
               <TouchableOpacity
                 style={[
                   styles.addToCartButton,
                   isRTL && styles.addToCartButtonRTL,
-                  isInBag && styles.addToCartButtonInBag,
                   (outOfStock || isAdding) && styles.addToCartButtonDisabled,
                 ]}
                 onPress={() => handleAddToCart(product)}
@@ -374,25 +434,19 @@ export default function ShopScreen() {
                 activeOpacity={0.7}
               >
                 <Ionicons
-                  name={isAdding ? 'checkmark' : (isInBag ? 'checkmark-circle' : 'bag-add')}
+                  name={isAdding ? 'checkmark' : 'bag-add'}
                   size={16}
-                  color={isInBag ? '#15803D' : '#ffffff'}
+                  color="#ffffff"
                   style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
                 />
-                <Text style={[
-                  styles.addToCartText,
-                  isRTL && styles.addToCartTextRTL,
-                  isInBag && styles.addToCartTextInBag,
-                ]}>
+                <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
                   {isAdding
                     ? t('shop.added')
                     : outOfStock
                       ? t('stock.outOfStock')
                       : !user
                         ? t('shop.loginToBuy')
-                        : isInBag
-                          ? `${t('shop.inBag')} (${qtyInBag})`
-                          : t('shop.addToBag')}
+                        : t('shop.addToBag')}
                 </Text>
               </TouchableOpacity>
             );
@@ -1771,14 +1825,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#95A5A6',
     opacity: 0.6,
   },
-  addToCartButtonInBag: {
-    backgroundColor: '#F0FDF4',
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-  },
-  addToCartTextInBag: {
-    color: '#15803D',
-  },
   addToCartIcon: {
     marginRight: 6,
   },
@@ -1790,9 +1836,51 @@ const styles = StyleSheet.create({
     ...T.buttonTiny,
     fontWeight: '600',
     textAlign: 'center',
+    color: '#ffffff',
   },
   addToCartTextRTL: {
     writingDirection: 'rtl',
+  },
+
+  // In-bag quantity stepper (replaces the flat "In Bag (N)" button once
+  // the product has been added). Keeps the same 44px height as the
+  // original button so the card's vertical rhythm is preserved.
+  qtyStepper: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    justifyContent: 'space-between',
+    backgroundColor: '#16A34A',
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    minHeight: 44,
+    overflow: 'hidden',
+  },
+  qtyStepperRTL: {
+    flexDirection: 'row-reverse',
+  },
+  qtyStepperBtn: {
+    width: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  qtyStepperLabelWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  qtyStepperCheck: {
+    marginRight: 6,
+  },
+  qtyStepperLabel: {
+    ...T.buttonTiny,
+    fontWeight: '700',
+    color: '#ffffff',
+    textAlign: 'center',
   },
 
   // RTL Support Styles

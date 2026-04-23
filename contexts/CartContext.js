@@ -491,6 +491,42 @@ export const CartProvider = ({ children }) => {
   };
 
   /**
+   * Decrement a single unit of a product in the cart, regardless of which
+   * size/colour variant was added. Used by the "-" button in the products
+   * grid stepper so users can undo a tap without opening the bag.
+   *
+   * Behaviour:
+   *   - Picks the most recently added non-promo line that matches productId.
+   *   - If quantity > 1 → decrements by 1.
+   *   - If quantity === 1 → removes the line entirely.
+   *   - Never touches promotion/free items (they are auto-managed by the
+   *     free-mask reconciliation effect).
+   */
+  const decrementProductFromCart = (productId) => {
+    if (!productId) return;
+    setItems((prev) => {
+      let targetIdx = -1;
+      for (let i = prev.length - 1; i >= 0; i -= 1) {
+        const it = prev[i];
+        if (it?.product?.id === productId && !isPromotionItem(it)) {
+          targetIdx = i;
+          break;
+        }
+      }
+      if (targetIdx < 0) return prev;
+      const target = prev[targetIdx];
+      const nextQty = (Number(target?.quantity) || 0) - 1;
+      if (nextQty <= 0) {
+        return prev.filter((_, i) => i !== targetIdx);
+      }
+      return prev.map((it, i) => (i === targetIdx ? { ...it, quantity: nextQty } : it));
+    });
+
+    bumpPromoTick();
+    log.debug('Decremented from cart', { productId });
+  };
+
+  /**
    * Update item quantity
    */
   const updateQuantity = (productId, quantity, selectedColor = '', selectedSize = '') => {
@@ -759,6 +795,21 @@ export const CartProvider = ({ children }) => {
   }, [items]);
 
   /**
+   * Sum the total quantity of a product across all variants (all
+   * colour/size combinations) in the cart. Use this on the products grid
+   * where we don't know which variant the user is looking at; for the
+   * cart detail view use `getItemQuantity` with the exact variant.
+   */
+  const getProductTotalQuantity = useCallback((productId) => {
+    if (!productId) return 0;
+    return items.reduce((sum, it) => {
+      if (isPromotionItem(it)) return sum;
+      if (it?.product?.id !== productId) return sum;
+      return sum + (Number(it.quantity) || 0);
+    }, 0);
+  }, [items]);
+
+  /**
    * Set selected emirate
    */
   const setSelectedEmirate = (emirate) => {
@@ -807,6 +858,7 @@ export const CartProvider = ({ children }) => {
     isLoading,
     addItem,
     removeItem,
+    decrementProductFromCart,
     updateQuantity,
     updateColor,
     updateSize,
@@ -816,13 +868,14 @@ export const CartProvider = ({ children }) => {
     getTotalItems,
     isInCart,
     getItemQuantity,
+    getProductTotalQuantity,
     getCartTotals,
     getCartSummary,
     getAvailableEmirates,
     shippingRates,
     reloadShippingRates: loadShippingRates,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [items, selectedEmirate, isLoading, shippingRates, getTotalItems, isInCart, getItemQuantity, getCartTotals, getCartSummary, getAvailableEmirates]);
+  }), [items, selectedEmirate, isLoading, shippingRates, getTotalItems, isInCart, getItemQuantity, getProductTotalQuantity, getCartTotals, getCartSummary, getAvailableEmirates]);
 
   return (
     <CartContext.Provider value={value}>

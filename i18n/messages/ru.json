@@ -1097,6 +1097,8 @@
     "added": "Добавлено!",
     "addToBag": "В корзину",
     "inBag": "В корзине",
+    "decreaseQuantity": "Уменьшить количество",
+    "increaseQuantity": "Увеличить количество",
     "loginToBuy": "Войти для покупки",
     "requestQuote": "Запросить цену",
     "priceOnRequest": "Цена по запросу",

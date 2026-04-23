@@ -1097,6 +1097,8 @@
     "added": "Added!",
     "addToBag": "Add to Bag",
     "inBag": "In Bag",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
     "loginToBuy": "Login to Buy",
     "requestQuote": "Request Quote",
     "priceOnRequest": "Price on Request",
