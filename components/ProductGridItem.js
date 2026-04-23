@@ -23,7 +23,7 @@ import T from '../utils/typography';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
 
-export default function ProductGridItem({ product, onAddToCart, inCart, justAdded }) {
+export default function ProductGridItem({ product, onAddToCart, inCart, justAdded, inCartQty = 0 }) {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t, locale } = useLocalization();
   const { user } = useAuth();
@@ -257,7 +257,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
             />
             <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
               {inCart
-                ? (locale === 'ar' ? 'في الحقيبة ✓' : locale === 'ru' ? 'В корзине ✓' : 'In Bag ✓')
+                ? `${locale === 'ar' ? 'في الحقيبة' : locale === 'ru' ? 'В корзине' : 'In Bag'}${inCartQty > 0 ? ` (${inCartQty})` : ' ✓'}`
                 : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
             </Text>
           </TouchableOpacity>

@@ -209,9 +209,23 @@ export const CartProvider = ({ children }) => {
         });
       }
 
-      if (toAdd.length === 0 && keptPromo.length === prevPromo.length) return prev;
+      // Always rebuild so free/promo items are pushed to the END of the cart,
+      // even when no promo add/remove is needed. This handles the case where
+      // the user adds more non-promo items after free masks were already
+      // granted — without this reorder, new items would appear below the
+      // promo rows because addItem always pushes to the tail of `prev`.
+      const nextItems = [...prevNonPromo, ...keptPromo, ...toAdd];
 
-      return [...prevNonPromo, ...keptPromo, ...toAdd];
+      // Bail out if nothing actually changed (same refs in same order) to
+      // avoid unnecessary re-renders / infinite effect loops.
+      if (
+        nextItems.length === prev.length &&
+        nextItems.every((it, i) => it === prev[i])
+      ) {
+        return prev;
+      }
+
+      return nextItems;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promoTick, user, selectedEmirate, emirates, isLoading]);

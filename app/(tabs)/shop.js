@@ -107,7 +107,7 @@ export default function ShopScreen() {
   const { user } = useAuth();
   const { t, locale, setLocale, dir } = useLocalization();
   // Animations disabled (kept only for header in bag.js)
-  const { addItem } = useCart();
+  const { addItem, getItemQuantity } = useCart();
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
   const [products, setProducts] = useState([]);
@@ -356,34 +356,47 @@ export default function ShopScreen() {
                 {t('shop.requestQuote') || 'Request Quote'}
               </Text>
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={[
-                styles.addToCartButton,
-                isRTL && styles.addToCartButtonRTL,
-                (product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)) && styles.addToCartButtonDisabled,
-              ]}
-              onPress={() => handleAddToCart(product)}
-              disabled={product.status === 'out_of_stock' || product.stock === false || addingProducts.has(product.id)}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name={addingProducts.has(product.id) ? 'checkmark' : 'bag-add'}
-                size={16}
-                color="#ffffff"
-                style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
-              />
-              <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
-                {addingProducts.has(product.id)
-                  ? t('shop.added')
-                  : (product.status === 'out_of_stock' || product.stock === false)
-                    ? t('stock.outOfStock')
-                    : user
-                      ? t('shop.addToBag')
-                      : t('shop.loginToBuy')}
-              </Text>
-            </TouchableOpacity>
-          )}
+          ) : (() => {
+            const isAdding = addingProducts.has(product.id);
+            const outOfStock = product.status === 'out_of_stock' || product.stock === false;
+            const qtyInBag = user ? (getItemQuantity?.(product?.id, '', '') || 0) : 0;
+            const isInBag = qtyInBag > 0 && !outOfStock;
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.addToCartButton,
+                  isRTL && styles.addToCartButtonRTL,
+                  isInBag && styles.addToCartButtonInBag,
+                  (outOfStock || isAdding) && styles.addToCartButtonDisabled,
+                ]}
+                onPress={() => handleAddToCart(product)}
+                disabled={outOfStock || isAdding}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={isAdding ? 'checkmark' : (isInBag ? 'checkmark-circle' : 'bag-add')}
+                  size={16}
+                  color={isInBag ? '#15803D' : '#ffffff'}
+                  style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
+                />
+                <Text style={[
+                  styles.addToCartText,
+                  isRTL && styles.addToCartTextRTL,
+                  isInBag && styles.addToCartTextInBag,
+                ]}>
+                  {isAdding
+                    ? t('shop.added')
+                    : outOfStock
+                      ? t('stock.outOfStock')
+                      : !user
+                        ? t('shop.loginToBuy')
+                        : isInBag
+                          ? `${t('shop.inBag')} (${qtyInBag})`
+                          : t('shop.addToBag')}
+                </Text>
+              </TouchableOpacity>
+            );
+          })()}
         </View>
       </>
     );
@@ -910,14 +923,20 @@ export default function ShopScreen() {
                     return (
                       <View key={category} style={styles.categoryItem}>
                         {hasBadge && (
-                          <View style={[
-                            styles.categoryNewBadge,
-                            isActive && styles.categoryNewBadgeActive
-                          ]}>
-                            <Text style={[
-                              styles.categoryNewBadgeText,
-                              isActive && styles.categoryNewBadgeTextActive
-                            ]}>{t('common.new')}</Text>
+                          <View style={styles.categoryNewBadgeWrapper} pointerEvents="none">
+                            <View style={[
+                              styles.categoryNewBadge,
+                              isActive && styles.categoryNewBadgeActive
+                            ]}>
+                              <Text
+                                numberOfLines={1}
+                                allowFontScaling={false}
+                                style={[
+                                  styles.categoryNewBadgeText,
+                                  isActive && styles.categoryNewBadgeTextActive
+                                ]}
+                              >{t('common.new')}</Text>
+                            </View>
                           </View>
                         )}
                         <TouchableOpacity
@@ -1534,7 +1553,12 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     position: 'relative',
-    marginRight: 8,
+    // Wider gap so the localised "new" badge (e.g. Russian "Новинка", longer
+    // than English "NEW") can overflow the pill without touching the next
+    // pill. The badge is absolutely positioned above the pill and can be
+    // wider than the pill itself.
+    marginRight: 14,
+    overflow: 'visible',
   },
   categoryButton: {
     paddingHorizontal: 14,
@@ -1557,19 +1581,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
     borderColor: '#dc2626',
   },
-  categoryNewBadge: {
+  // Transparent positioner that spans the pill's horizontal extent and
+  // centers the badge above it. Using a wrapper (instead of a hard-coded
+  // translateX on the badge itself) lets the badge auto-size for any
+  // locale — "NEW" (EN), "Новинка" (RU), "جديد" (AR) — without forcing
+  // the text onto a second line. `overflow: visible` lets the badge
+  // extend slightly past the pill edges when the localized word is
+  // wider than the pill itself; the extra marginRight on categoryItem
+  // gives it room before the next pill starts.
+  categoryNewBadgeWrapper: {
     position: 'absolute',
     top: -10,
-    alignSelf: 'center',
-    left: '50%',
-    transform: [{ translateX: -14 }],
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10,
+    overflow: 'visible',
+  },
+  categoryNewBadge: {
     backgroundColor: '#22C55E',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
     borderWidth: 1.5,
     borderColor: '#ffffff',
-    zIndex: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.15,
@@ -1735,6 +1770,14 @@ const styles = StyleSheet.create({
   addToCartButtonDisabled: {
     backgroundColor: '#95A5A6',
     opacity: 0.6,
+  },
+  addToCartButtonInBag: {
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  addToCartTextInBag: {
+    color: '#15803D',
   },
   addToCartIcon: {
     marginRight: 6,
