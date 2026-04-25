@@ -5,8 +5,8 @@ import T from '../utils/typography';
 
 export default function BrandedLaunchScreen({ onDone, minimumMs = 650 }) {
   // IMPORTANT: This screen is rendered before `LocalizationProvider` (Expo Go only),
-  // so do not depend on i18n here. Keep the company line exact and stable.
-  const COMPANY_NAME = 'Genosys Middle East FZ-LLC';
+  // so do not depend on i18n here. Keep the brand line exact and stable.
+  const COMPANY_NAME = 'GENOSYS';
   useEffect(() => {
     let cancelled = false;
     const startedAt = Date.now();

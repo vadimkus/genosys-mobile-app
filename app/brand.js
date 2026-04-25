@@ -197,7 +197,7 @@ export default function BrandScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={[styles.footerText, isRTL && styles.textRTL]}>
-            {locale === 'ar' ? 'جينوسيس الشرق الأوسط FZ-LLC' : locale === 'ru' ? 'GENOSYS Middle East FZ-LLC' : 'GENOSYS Middle East FZ-LLC'}
+            GENOSYS
           </Text>
           <Text style={[styles.footerSub, isRTL && styles.textRTL]}>
             {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}

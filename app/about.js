@@ -122,7 +122,7 @@ export default function AboutScreen() {
         {/* Footer with website link and copyright */}
         <View style={styles.footer}>
           <Text style={[styles.footerText, isRTL && styles.footerTextRTL]}>
-            {locale === 'ar' ? 'جينوسيس الشرق الأوسط FZ-LLC' : locale === 'ru' ? 'GENOSYS Middle East FZ-LLC' : 'GENOSYS Middle East FZ-LLC'}
+            GENOSYS
           </Text>
           <Text style={[styles.footerSub, isRTL && styles.footerSubRTL]}>
             {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}

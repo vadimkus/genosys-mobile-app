@@ -333,7 +333,7 @@ export default function TrainingScreen() {
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={[styles.footerText, isRTL && styles.textRTL]}>
-              {l('GENOSYS Middle East FZ-LLC', 'جينوسيس الشرق الأوسط FZ-LLC', 'GENOSYS Middle East FZ-LLC')}
+              GENOSYS
             </Text>
             <Text style={[styles.footerSub, isRTL && styles.textRTL]}>
               {l('Professional Training Resources', 'موارد التدريب المهني', 'Профессиональные учебные ресурсы')}

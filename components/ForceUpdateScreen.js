@@ -46,7 +46,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
         </Pressable>
       </View>
 
-      <Text style={styles.footer}>Genosys Middle East FZ-LLC</Text>
+      <Text style={styles.footer}>GENOSYS</Text>
     </View>
   );
 }
