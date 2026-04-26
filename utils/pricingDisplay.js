@@ -69,7 +69,7 @@ const getPricingDisplay = (product, options = {}) => {
     hasContract: Boolean(pricing),
     basePrice: toNumber(pricing?.basePrice ?? product?.price ?? displayPrice, displayPrice),
     displayPrice,
-    unitPrice: toNumber(pricing?.unitPrice ?? displayPrice, displayPrice),
+    unitPrice: displayPrice,
     originalPrice,
     discountAmount: toNumber(pricing?.discountAmount, 0),
     discountPercentage,

@@ -34,7 +34,8 @@
     "screenshots": "bash scripts/capture-appstore-screenshots.sh",
     "screenshots:interactive": "bash scripts/capture-screenshots-interactive.sh",
     "screenshots:russian": "bash scripts/capture-russian-screenshots.sh",
-    "smoke:pricing-display": "node scripts/smoke-pricing-display.js"
+    "smoke:pricing-display": "node scripts/smoke-pricing-display.js",
+    "smoke:cart-pricing-contract": "tsx scripts/smoke-cart-pricing-contract.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -82,6 +83,7 @@
     "@babel/core": "^7.29.0",
     "@types/react": "~19.1.10",
     "babel-preset-expo": "~54.0.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.2"
   },
   "private": true

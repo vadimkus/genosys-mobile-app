@@ -6,6 +6,7 @@
  */
 
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isUserDiscountExcludedProduct, isDeviceProduct, isBeautyBoxProduct } from './productRules';
+import { getPricingDisplay } from './pricingDisplay';
 
 // UAE Emirates for shipping - fallback data (used when /api/mobile/shipping-rates is unavailable).
 // MUST match backend mobileCheckoutConfig.ts to avoid display vs. charge mismatch.
@@ -21,6 +22,14 @@ export const UAE_EMIRATES = [
 ];
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1000;
+
+const hasUsableCartContract = (pricing, hasUserDiscount) => {
+  if (!pricing?.hasContract) return false;
+  // If a saved cart only has a guest contract, keep legacy user-discount
+  // fallback after login until a user-aware product payload refreshes it.
+  if (hasUserDiscount && pricing.canSeePrice === false) return false;
+  return true;
+};
 
 /**
  * Calculate basic cart totals for display purposes
@@ -82,33 +91,48 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
       : null;
     const variantPrice = Number(selectedVariant?.price);
     const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
+    const pricing = getPricingDisplay(item.product, {
+      selectedSize: item.selectedSize,
+      selectedColor: item.selectedColor,
+    });
+    const useContract = hasUsableCartContract(pricing, hasUserDiscount);
 
     const rawDisplay =
-      (hasVariantPrice ? variantPrice : undefined) ??
-      item.product?.displayPrice ??
-      item.product?.price ??
-      item.product?.priceIncludingVat ??
-      item.product?.price_including_vat ??
-      item.price ??
-      0;
+      useContract
+        ? pricing.unitPrice
+        : (
+            (hasVariantPrice ? variantPrice : undefined) ??
+            item.product?.displayPrice ??
+            item.product?.price ??
+            item.product?.priceIncludingVat ??
+            item.product?.price_including_vat ??
+            item.price ??
+            0
+          );
 
-    const productOriginal = Number(item.product?.originalPrice);
-    const variantOriginal = Number(selectedVariant?.originalPrice);
+    const productOriginal = useContract ? Number(pricing.originalPrice) : Number(item.product?.originalPrice);
+    const variantOriginal = useContract ? Number(pricing.originalPrice) : Number(selectedVariant?.originalPrice);
 
-    const itemPrice = forceCanonicalPrice
+    const itemPrice = !useContract && forceCanonicalPrice
       ? getCanonicalUnitPrice(item.product)
       : (() => {
           // Bundle items ("Build Your Set"): bundle discount ONLY on retail price — NO VIP/user discount.
           if (isBundleItem) {
             const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;
-            const retailBase = (Number.isFinite(productOriginal) && productOriginal > 0)
-              ? productOriginal
-              : Number(item.product?.price ?? 0);
+            const retailBase =
+              (Number.isFinite(productOriginal) && productOriginal > 0 ? productOriginal : 0) ||
+              (useContract && Number.isFinite(pricing.basePrice) && pricing.basePrice > 0 ? pricing.basePrice : 0) ||
+              Number(item.product?.price ?? 0);
             // Only apply bundle discount (no VIP)
             if (bundlePct > 0 && bundlePct < 100) {
               return Math.round(retailBase * (1 - bundlePct / 100) * 100) / 100;
             }
             return retailBase;
+          }
+
+          // User-aware server contract is final for non-bundle cart lines.
+          if (useContract) {
+            return Number(rawDisplay);
           }
 
           // Apply user discount to variant-priced items too (otherwise size-selected items show no discount).
@@ -252,6 +276,10 @@ export function computeWaterfallBreakdown(items, user) {
     const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
     const variantOriginal = Number(selectedVariant?.originalPrice);
     const productOriginal = Number(product?.originalPrice);
+    const pricing = getPricingDisplay(product, {
+      selectedSize: item.selectedSize,
+      selectedColor: item.selectedColor,
+    });
 
     const forceCanonicalPrice =
       isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
@@ -259,21 +287,30 @@ export function computeWaterfallBreakdown(items, user) {
     // Bundle items: NO VIP discount — bundle discount only. Non-bundle excluded products still skip VIP.
     const excludedFromUserDiscount = isBundleItem || isUserDiscountExcludedProduct(product);
     const beautyBox = isBeautyBoxProduct(product);
+    const useContract = hasUsableCartContract(pricing, hasUserDiscountPct);
 
     // Retail unit price: the price *before* any discounts
     let retailUnitPrice;
-    if (forceCanonicalPrice) {
+    if (!useContract && forceCanonicalPrice) {
       retailUnitPrice = getCanonicalUnitPrice(product);
     } else if (hasVariantPrice) {
       const orig = (Number.isFinite(variantOriginal) && variantOriginal > 0) ? variantOriginal
         : (Number.isFinite(productOriginal) && productOriginal > 0) ? productOriginal
+        : (Number.isFinite(pricing.originalPrice) && pricing.originalPrice > 0) ? pricing.originalPrice
         : variantPrice;
       retailUnitPrice = Math.max(variantPrice, orig);
     } else if (isBundleItem) {
       // For bundle items, retailUnitPrice = originalPrice (the full retail, pre-any-discount)
-      retailUnitPrice = (Number.isFinite(productOriginal) && productOriginal > 0)
-        ? productOriginal
-        : Number(product?.displayPrice ?? product?.price ?? 0);
+      retailUnitPrice =
+        (Number.isFinite(productOriginal) && productOriginal > 0 ? productOriginal : 0) ||
+        (useContract && Number.isFinite(pricing.originalPrice) && pricing.originalPrice > 0 ? pricing.originalPrice : 0) ||
+        (useContract && Number.isFinite(pricing.basePrice) && pricing.basePrice > 0 ? pricing.basePrice : 0) ||
+        Number(product?.displayPrice ?? product?.price ?? 0);
+    } else if (useContract) {
+      retailUnitPrice =
+        (Number.isFinite(pricing.originalPrice) && pricing.originalPrice > 0 ? pricing.originalPrice : 0) ||
+        (Number.isFinite(pricing.basePrice) && pricing.basePrice > 0 ? pricing.basePrice : 0) ||
+        (Number.isFinite(pricing.displayPrice) ? pricing.displayPrice : 0);
     } else {
       const displayPrice = Number(product?.displayPrice ?? product?.price ?? 0);
       retailUnitPrice = (Number.isFinite(productOriginal) && productOriginal > 0)
@@ -293,10 +330,13 @@ export function computeWaterfallBreakdown(items, user) {
 
     // --- Bundle discount (step 2): applied on retail price (VIP excluded for bundle items) ---
     if (beautyBox) {
-      const bbOriginal = (Number.isFinite(productOriginal) && productOriginal > 0)
-        ? productOriginal
-        : retailUnitPrice;
-      const bbDisplay = Number(product?.displayPrice ?? product?.price ?? 0);
+      const bbOriginal =
+        (Number.isFinite(productOriginal) && productOriginal > 0 ? productOriginal : 0) ||
+        (useContract && Number.isFinite(pricing.originalPrice) && pricing.originalPrice > 0 ? pricing.originalPrice : 0) ||
+        retailUnitPrice;
+      const bbDisplay = useContract
+        ? Number(pricing.displayPrice)
+        : Number(product?.displayPrice ?? product?.price ?? 0);
       if (Number.isFinite(bbOriginal) && Number.isFinite(bbDisplay) && bbOriginal > bbDisplay) {
         _bundleDiscountTotal += (bbOriginal - bbDisplay) * qty;
         const pct = Math.round(((bbOriginal - bbDisplay) / bbOriginal) * 100);
