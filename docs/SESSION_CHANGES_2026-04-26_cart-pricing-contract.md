@@ -100,7 +100,15 @@ Follow-up bundle-builder contract preservation slice published to EAS Update pro
 - Android update: `019dc9a4-2fdc-7d4f-b759-8f41fca30e7f`
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/39f3af3b-537f-43e4-9f2c-14bf4eda8030
 
-Final native display cleanup is not yet OTA-published in this session.
+Final native display cleanup published to EAS Update production:
+
+- Commit: `4b3d8ca0f348197e395a88e1e8ac1df8ab0c4344`
+- Runtime: `1.9.0`
+- Branch: `production`
+- Update group: `c41e2c23-73b9-48c8-88aa-08ff6d310604`
+- iOS update: `019dc9e0-30a6-7469-b116-42192c440ca9`
+- Android update: `019dc9e0-30a6-74a3-bc8a-441a10a648ef`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/c41e2c23-73b9-48c8-88aa-08ff6d310604
 
 ## Rollback
 
