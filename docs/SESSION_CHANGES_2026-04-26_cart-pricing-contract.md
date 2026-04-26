@@ -41,6 +41,18 @@ Still not changed:
 
 The cart UI display is closer to server contract behavior, but checkout remains protected by existing server-side recalculation.
 
+## Deployment
+
+Published to EAS Update production after the runtime fix that pins bare-workflow runtime to `1.9.0`.
+
+- Update group: `82647d72-944c-4b07-9796-fd60b0ff0356`
+- Branch: `production`
+- Runtime: `1.9.0`
+- Commit: `a102dc880243fa71a33ccd01df491d32ddf59ae7`
+- iOS update: `019dc8c2-a33e-7998-a5cb-26a995b39d45`
+- Android update: `019dc8c2-a33e-75df-871b-f9e7d052e388`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/82647d72-944c-4b07-9796-fd60b0ff0356
+
 ## Rollback
 
 Revert:
