@@ -24,3 +24,15 @@ The website backend must accept the Android OAuth client ID as a valid ID-token 
 - IDE diagnostics: clean
 
 Mobile repo has no ESLint config, so direct `npx eslint` is not available there.
+
+## OTA
+
+Published to EAS Update production:
+
+- Commit: `e020edd045580fac9fcf421fa3a4e65412d5a0e6`
+- Runtime: `1.9.0`
+- Branch: `production`
+- Update group: `352c5c56-81ff-4294-a3d0-577281002817`
+- iOS update: `019dc9ea-6a8a-74fe-a121-908b6e88375f`
+- Android update: `019dc9ea-6a8a-79e7-be43-9deaad22c026`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/352c5c56-81ff-4294-a3d0-577281002817
