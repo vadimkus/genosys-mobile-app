@@ -33,7 +33,8 @@
     "submit:ios": "eas submit --platform ios --profile production",
     "screenshots": "bash scripts/capture-appstore-screenshots.sh",
     "screenshots:interactive": "bash scripts/capture-screenshots-interactive.sh",
-    "screenshots:russian": "bash scripts/capture-russian-screenshots.sh"
+    "screenshots:russian": "bash scripts/capture-russian-screenshots.sh",
+    "smoke:pricing-display": "node scripts/smoke-pricing-display.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

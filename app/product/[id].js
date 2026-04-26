@@ -57,6 +57,7 @@ import {
   deriveDiscountFromBadges,
 } from '../../utils/productDetailUtils';
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
+import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 import T from '../../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -517,6 +518,8 @@ export default function ProductDetailScreen() {
     return Number.isFinite(base) ? base : 0;
   };
 
+  const getSelectedPricingDisplay = () => getPricingDisplay(product, { selectedSize, selectedColor });
+
   const handleColorChange = (color) => {
     haptics.selectionTick();
     setSelectedColor(color);
@@ -544,7 +547,8 @@ export default function ProductDetailScreen() {
     if (!product) return;
     haptics.lightTap();
     const url = `${AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}/products/${product.id}`;
-    const message = `${asText(getLocalizedProductName(product, locale) || product.name)}\n${formatPrice(product.displayPrice || product.price)} AED\n${url}`;
+    const displayPricing = getSelectedPricingDisplay();
+    const message = `${asText(getLocalizedProductName(product, locale) || product.name)}\n${formatAed(displayPricing.displayPrice)}\n${url}`;
     try {
       await Share.share(
         {
@@ -1009,7 +1013,7 @@ export default function ProductDetailScreen() {
                 {asText(getLocalizedProductName(product, locale) || product.name)}
               </Text>
               {(() => {
-                const unit = getSelectedUnitPrice();
+                const unit = getSelectedPricingDisplay().displayPrice;
                 if (!unit) return null;
                 return (
                   <Text style={[styles.miniHeaderPrice, isRTL && styles.textRTL]} numberOfLines={1}>
@@ -1237,18 +1241,45 @@ export default function ProductDetailScreen() {
                 // Special pricing display for Beauty Boxes on detail page
                 <View style={styles.beautyBoxDetailPricing}>
                   <Text style={styles.beautyBoxDetailFullPrice}>
-                    {t('product.fullPrice', { price: formatPrice(product.originalPrice || product.displayPrice || product.price || 0) })}
+                    {t('product.fullPrice', { price: formatPrice(getSelectedPricingDisplay().originalPrice || getSelectedPricingDisplay().displayPrice || 0) })}
                   </Text>
                   <View style={[styles.beautyBoxDetailDiscountRow, isRTL && { flexDirection: 'row-reverse' }]}>
                     <Text style={styles.beautyBoxDetailDiscount}>{t('product.bundleDiscount')}</Text>
                     <Text style={[styles.beautyBoxDetailFinalPrice, isRTL && { textAlign: 'left' }]}>
-                      {t('product.finalPrice', { price: formatPrice(product.displayPrice || product.price || 0) })}
+                      {t('product.finalPrice', { price: formatPrice(getSelectedPricingDisplay().displayPrice || 0) })}
                     </Text>
                   </View>
                 </View>
               ) : (
                 <View style={styles.priceBlock}>
                   {(() => {
+                    const pricing = getSelectedPricingDisplay();
+                    if (pricing.hasContract) {
+                      const base = Number(pricing.displayPrice || 0);
+                      const original = Number(pricing.originalPrice || 0);
+                      const hasDiscount = original > base + 0.01;
+                      const label = pricing.discountLabel ||
+                        (pricing.discountPercentage > 0 ? `${Math.round(pricing.discountPercentage)}% OFF` : null);
+
+                      if (!hasDiscount) {
+                        return <Text style={styles.price}>{formatAed(base)}</Text>;
+                      }
+
+                      return (
+                        <View>
+                          <Text style={[styles.originalPrice, isRTL && styles.textRTL]}>{formatAed(original)}</Text>
+                          <View style={[styles.discountRow, isRTL && styles.discountRowRTL]}>
+                            <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatAed(base)}</Text>
+                            {label ? (
+                              <View style={styles.discountBadge}>
+                                <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{label}</Text>
+                              </View>
+                            ) : null}
+                          </View>
+                        </View>
+                      );
+                    }
+
                     // Canonical-price / no-user-discount products: show canonical/base price only.
                     if (isUserDiscountExcludedProduct(product) || hasFixedPriceOverride(product)) {
                       return <Text style={styles.price}>{`${formatPrice(getCanonicalUnitPrice(product))} AED`}</Text>;

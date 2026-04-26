@@ -12,6 +12,7 @@
 |-----|-------------|
 | [Main README](../README.md) | Project overview, install, and run |
 | [Session Changes 26 Apr 2026](./SESSION_CHANGES_2026-04-26_runtime-and-api-media.md) | **Runtime alignment + API media priority** — Expo runtime now follows app version `1.9.0`, sync script added for package/iOS plist alignment, and PDP media/docs helpers now prefer API/DB fields before static fallback config. |
+| [Pricing Contract Display Slice](./SESSION_CHANGES_2026-04-26_pricing-display-contract.md) | **Native read-only pricing contract migration** — display surfaces now prefer server `product.pricing` with legacy fallback; cart totals, checkout totals, bundle math, and order payload pricing remain untouched. |
 | [Build & Submit (iOS)](./build/BUILD_AND_SUBMIT_COMMANDS.md) | Build and submit to App Store |
 | [Android Build Guide](./build/ANDROID_BUILD_GUIDE.md) | Build and run on Android (emulator/device) |
 | [Build Status](./build/BUILD_STATUS.md) | Current build status |

@@ -28,6 +28,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
+import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { handleDeepLink } from '../utils/deepLinking';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
@@ -214,7 +215,8 @@ export default function ChatScreen() {
     }
 
     const name = getLocalizedProductName(product, locale) || product.name || '';
-    const price = product.displayPrice ?? product.price ?? 0;
+    const pricing = getPricingDisplay(product);
+    const price = pricing.displayPrice;
     const imageUri = product.image ? `${ASSET_ORIGIN}${product.image}` : null;
     const isAdded = addedProducts.has(product.id);
 
@@ -231,13 +233,13 @@ export default function ChatScreen() {
           <Text style={[styles.productName, isRTL && styles.textRTL]} numberOfLines={2}>
             {name}
           </Text>
-          {product.isPriceOnRequest ? (
+          {pricing.isPriceOnRequest ? (
             <Text style={styles.productPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
           ) : (
-            <Text style={styles.productPrice}>AED {Number(price).toFixed(2)}</Text>
+            <Text style={styles.productPrice}>{formatAed(price)}</Text>
           )}
           <View style={styles.productActions}>
-            {product.isPriceOnRequest ? (
+            {pricing.isPriceOnRequest ? (
               <TouchableOpacity
                 style={styles.requestQuoteBtn}
                 onPress={() => {

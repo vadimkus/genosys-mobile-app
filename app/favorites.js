@@ -17,6 +17,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../utils/productRules';
+import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
 import { computeProductBadges } from '../utils/badges';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
@@ -254,30 +255,53 @@ export default function FavoritesScreen() {
                   </Text>
                   
                   {/* Pricing */}
-                  {product.isPriceOnRequest ? (
-                    <View style={styles.priceContainer}>
-                      <Text style={styles.priceOnRequestText}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
-                    </View>
-                  ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
-                    <View style={styles.priceContainer}>
-                      <Text style={styles.gridPrice}>{Number(getCanonicalUnitPrice(product) || 0).toFixed(2)} AED</Text>
-                      <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                    </View>
-                  ) : product.originalPrice && Number(product.originalPrice) > Number(product.displayPrice || product.price || 0) ? (
-                    <View style={styles.priceContainer}>
-                      <Text style={styles.originalPrice}>{Number(product.originalPrice).toFixed(2)} AED</Text>
-                      <Text style={styles.discountedPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-                      {product.discountLabel && (
-                        <Text style={styles.savings}>{product.discountLabel}</Text>
-                      )}
-                      <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                    </View>
-                  ) : (
-                    <View style={styles.priceContainer}>
-                      <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-                      <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                    </View>
-                  )}
+                  {(() => {
+                    const pricing = getPricingDisplay(product);
+                    const contractPrice = hasServerPricing(product);
+                    const displayPrice = contractPrice
+                      ? pricing.displayPrice
+                      : Number(product.displayPrice || product.price || 0);
+                    const originalPrice = contractPrice
+                      ? pricing.originalPrice
+                      : Number(product.originalPrice);
+
+                    if (pricing.isPriceOnRequest) {
+                      return (
+                        <View style={styles.priceContainer}>
+                          <Text style={styles.priceOnRequestText}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                        </View>
+                      );
+                    }
+
+                    if (!contractPrice && (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product))) {
+                      return (
+                        <View style={styles.priceContainer}>
+                          <Text style={styles.gridPrice}>{formatAed(getCanonicalUnitPrice(product))}</Text>
+                          <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                        </View>
+                      );
+                    }
+
+                    if (originalPrice && Number(originalPrice) > Number(displayPrice || 0)) {
+                      return (
+                        <View style={styles.priceContainer}>
+                          <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
+                          <Text style={styles.discountedPrice}>{formatAed(displayPrice)}</Text>
+                          {pricing.discountLabel && (
+                            <Text style={styles.savings}>{pricing.discountLabel}</Text>
+                          )}
+                          <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                        </View>
+                      );
+                    }
+
+                    return (
+                      <View style={styles.priceContainer}>
+                        <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
+                        <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                      </View>
+                    );
+                  })()}
                 </View>
               </TouchableOpacity>
               

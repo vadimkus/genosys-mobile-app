@@ -22,6 +22,7 @@ import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import AUTH_CONFIG from '../../config/auth';
 import { computeWaterfallBreakdown } from '../../utils/cartUtils';
+import { getPricingDisplay } from '../../utils/pricingDisplay';
 import { mediumTap } from '../../utils/haptics';
 import T from '../../utils/typography';
 
@@ -313,14 +314,18 @@ export default function BagScreen() {
                   : null;
                 const variantPrice = Number(selectedVariant?.price);
                 const hasVariantPrice = selectedSize && Number.isFinite(variantPrice) && variantPrice > 0;
+                const pricing = getPricingDisplay(item.product, {
+                  selectedSize: item.selectedSize,
+                  selectedColor: item.selectedColor,
+                });
 
                 const base = (isHydro || isDevice || isFixed)
                   ? getCanonicalUnitPrice(item.product)
-                  : (hasVariantPrice ? variantPrice : Number(item.product?.displayPrice || item.product?.price || 0));
+                  : (hasVariantPrice ? variantPrice : pricing.displayPrice);
 
                 // IMPORTANT: if we're using a selected variant price, product.originalPrice may correspond to another size.
                 // Do not apply user-discount math from a mismatched originalPrice; rely on variant price directly.
-                const original = hasVariantPrice ? Number(selectedVariant?.originalPrice) : Number(item.product?.originalPrice);
+                const original = hasVariantPrice ? Number(selectedVariant?.originalPrice) : Number(pricing.originalPrice);
                 const isBeautyBox = isBeautyBoxProduct(item.product);
                 const isBundleItem = item?.fromBundle === true || item?.product?.fromBundle === true;
                 const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;

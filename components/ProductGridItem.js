@@ -13,6 +13,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct, isUserDiscountExcludedProduct } from '../utils/productRules';
+import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getLocalizedProductName, getLocalizedProductSize, getLocalizedProductDescription, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
@@ -51,6 +52,8 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
   const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
   const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
   const isBeautyBox = isBeautyBoxProduct(product);
+  const pricingDisplay = getPricingDisplay(product);
+  const hasPricingContract = hasServerPricing(product);
 
   const baseBadges = (product.badges || []).filter((b) => {
     const text = (b.text || '').toLowerCase().trim();
@@ -188,7 +191,11 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
         
         {/* Enhanced Pricing from Server with Beauty Boxes Special Display */}
         <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-          {(() => {
+          {pricingDisplay.isPriceOnRequest ? (
+            <Text style={[styles.price, isRTL && styles.valueRTL]}>
+              {t('product.priceOnRequest') || 'Price on Request'}
+            </Text>
+          ) : (() => {
             const category = product?.category;
             const name = product?.name || '';
             const hasBeautyBoxInName = name.toUpperCase().includes('BEAUTY BOX');
@@ -198,20 +205,48 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
             // Special pricing display for Beauty Boxes - show full price + 15% discount clearly
             <View style={[styles.beautyBoxPricing, isRTL && styles.alignEndRTL]}>
               <Text style={[styles.beautyBoxFullPrice, isRTL && styles.textRTL]}>
-                {t('product.fullPrice', { price: (product.originalPrice || product.displayPrice || product.price || 0).toFixed(2) })}
+                {t('product.fullPrice', { price: (pricingDisplay.originalPrice || pricingDisplay.displayPrice || 0).toFixed(2) })}
               </Text>
               <View style={[styles.beautyBoxDiscountContainer, isRTL && styles.rowRTL]}>
                 <Text style={styles.beautyBoxDiscount}>{t('bag.bundleDiscount15')}</Text>
                 <Text style={[styles.beautyBoxFinalPrice, isRTL && styles.valueRTL]}>
-                  {t('product.finalPrice', { price: (product.displayPrice || product.price || 0).toFixed(2) })}
+                  {t('product.finalPrice', { price: (pricingDisplay.displayPrice || 0).toFixed(2) })}
                 </Text>
               </View>
             </View>
           ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
             <Text style={[styles.price, isRTL && styles.valueRTL]}>
-              {getCanonicalUnitPrice(product).toFixed(2)} AED
+              {formatAed(hasPricingContract ? pricingDisplay.displayPrice : getCanonicalUnitPrice(product))}
             </Text>
           ) : (() => {
+            if (hasPricingContract) {
+              const finalPrice = pricingDisplay.displayPrice;
+              const retailPrice = pricingDisplay.originalPrice || finalPrice;
+              const hasDiscount = retailPrice > finalPrice + 0.01;
+              const label = pricingDisplay.discountLabel ||
+                (pricingDisplay.discountPercentage > 0 ? `${Math.round(pricingDisplay.discountPercentage)}% OFF` : null);
+
+              return hasDiscount ? (
+                <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
+                  <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
+                    {formatAed(retailPrice)}
+                  </Text>
+                  <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
+                    {formatAed(finalPrice)}
+                  </Text>
+                  {label ? (
+                    <View style={styles.savingsContainer}>
+                      <Text style={styles.savings}>{label}</Text>
+                    </View>
+                  ) : null}
+                </View>
+              ) : (
+                <Text style={[styles.price, isRTL && styles.valueRTL]}>
+                  {formatAed(finalPrice)}
+                </Text>
+              );
+            }
+
             const displayP = Number(product.displayPrice || product.price || 0);
             const serverOriginal = Number(product.originalPrice);
             const hasServerOriginal = Number.isFinite(serverOriginal) && serverOriginal > 0;

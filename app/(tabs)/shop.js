@@ -44,6 +44,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../../utils/productRules';
+import { getPricingDisplay, hasServerPricing, formatAed } from '../../utils/pricingDisplay';
 import { computeProductBadges } from '../../utils/badges';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import {
@@ -294,44 +295,66 @@ export default function ShopScreen() {
           )}
 
           {/* Pricing Display */}
-          {product.isPriceOnRequest ? (
-            <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest') || 'Price on Request'}</Text>
-            </View>
-          ) : (() => {
+          {(() => {
+            const pricing = getPricingDisplay(product);
+            const contractPrice = hasServerPricing(product);
+            const displayPrice = contractPrice ? pricing.displayPrice : Number(product.displayPrice || product.price || 0);
+            const originalPrice = contractPrice ? pricing.originalPrice : Number(product.originalPrice);
+
+            if (pricing.isPriceOnRequest) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest') || 'Price on Request'}</Text>
+                </View>
+              );
+            }
+
             const category = product.category;
             const nm = getLocalizedProductName(product, locale) || product.name || '';
             const hasBeautyBoxInName = nm.toUpperCase().includes('BEAUTY BOX');
             const isCategoryBeautyBoxes = category === 'Beauty Boxes';
             const isBeautyBox = isCategoryBeautyBoxes || hasBeautyBoxInName;
-            return isBeautyBox;
-          })() ? (
-            <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              {Number(product.originalPrice) > Number(product.displayPrice || product.price || 0) && (
-                <Text style={styles.originalPrice}>{Number(product.originalPrice).toFixed(2)} AED</Text>
-              )}
-              <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
-              <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-              <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-            </View>
-          ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
-            <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.gridPrice}>{Number(getCanonicalUnitPrice(product) || 0).toFixed(2)} AED</Text>
-              <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-            </View>
-          ) : product.originalPrice && Number(product.originalPrice) > Number(product.displayPrice || product.price || 0) ? (
-            <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.originalPrice}>{Number(product.originalPrice).toFixed(2)} AED</Text>
-              <Text style={styles.discountedPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-              {product.discountLabel && <Text style={styles.userDiscount}>{product.discountLabel}</Text>}
-              <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-            </View>
-          ) : (
-            <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-              <Text style={styles.gridPrice}>{Number(product.displayPrice || product.price || 0).toFixed(2)} AED</Text>
-              <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-            </View>
-          )}
+
+            if (isBeautyBox) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  {Number(originalPrice) > Number(displayPrice || 0) && (
+                    <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
+                  )}
+                  <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
+                  <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
+                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                </View>
+              );
+            }
+
+            if (!contractPrice && (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product))) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.gridPrice}>{formatAed(getCanonicalUnitPrice(product))}</Text>
+                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                </View>
+              );
+            }
+
+            if (originalPrice && Number(originalPrice) > Number(displayPrice || 0)) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
+                  <Text style={styles.discountedPrice}>{formatAed(displayPrice)}</Text>
+                  {pricing.discountLabel && <Text style={styles.userDiscount}>{pricing.discountLabel}</Text>}
+                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                </View>
+              );
+            }
+
+            return (
+              <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
+                <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+              </View>
+            );
+          })()}
 
           {/* Add to Cart / Request Quote Button */}
           {product.isPriceOnRequest ? (

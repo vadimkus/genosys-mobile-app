@@ -8,6 +8,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { fetchProductById } from '../../services/api';
 import { isBeautyBoxProduct } from '../../utils/productRules';
+import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 import { getLocalizedProductName } from '../../utils/productLocalization';
 import { asText } from '../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../config/auth';
@@ -261,9 +262,10 @@ export default function PerfectCombinationCard({ product, user, styles }) {
   const { intro, benefits } = getPerfectCombinationCopy(t, currentId, recId, currentName, recName);
 
   const canSeePrices = user?.canSeePrices !== false;
-  const recBase = Number(recommendedProduct?.displayPrice ?? recommendedProduct?.price ?? 0) || 0;
-  const recOrig = Number(recommendedProduct?.originalPrice ?? 0) || 0;
-  const recHasDiscount = Number.isFinite(recOrig) && recOrig > recBase && recOrig > 0;
+  const recPricing = getPricingDisplay(recommendedProduct);
+  const recBase = recPricing.displayPrice;
+  const recOrig = recPricing.originalPrice || 0;
+  const recHasDiscount = recPricing.hasDiscount;
 
   const imageUri = recommendedProduct?.image
     ? `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${recommendedProduct.image}`
@@ -308,12 +310,12 @@ export default function PerfectCombinationCard({ product, user, styles }) {
             </Text>
           ) : null}
 
-          {recommendedProduct.isPriceOnRequest ? (
+          {recPricing.isPriceOnRequest ? (
             <Text style={styles.pcPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
           ) : canSeePrices ? (
             <View style={styles.pcPriceRow}>
-              <Text style={styles.pcPriceMain}>{recBase.toFixed(2)} AED</Text>
-              {recHasDiscount ? <Text style={styles.pcPriceOld}>{recOrig.toFixed(2)} AED</Text> : null}
+              <Text style={styles.pcPriceMain}>{formatAed(recBase)}</Text>
+              {recHasDiscount ? <Text style={styles.pcPriceOld}>{formatAed(recOrig)}</Text> : null}
             </View>
           ) : (
             <Text style={styles.pcLoginText}>{t('product.loginToSeePrice')}</Text>
