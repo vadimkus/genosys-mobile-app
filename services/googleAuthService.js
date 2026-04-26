@@ -18,9 +18,10 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Client ID selection:
 // - Expo Go: we keep using the web client id + AuthSession proxy.
-// - Standalone/TestFlight: on iOS we should use the iOS client id + reversed-scheme redirect
-//   to avoid "404" redirects in the browser and ensure iOS can reopen the app.
+// - Standalone/TestFlight: native builds must use native OAuth clients + code/PKCE.
+//   Android cannot safely use the web implicit flow; Google rejects it as invalid_request.
 const IOS_CLIENT_ID = AUTH_CONFIG?.GOOGLE_OAUTH?.iosClientId || AUTH_CONFIG?.GOOGLE_OAUTH?.clientId;
+const ANDROID_CLIENT_ID = AUTH_CONFIG?.GOOGLE_OAUTH?.androidClientId || '';
 const WEB_CLIENT_ID = AUTH_CONFIG?.GOOGLE_OAUTH?.webClientId || AUTH_CONFIG?.GOOGLE_OAUTH?.clientId;
 const IOS_URL_SCHEME = AUTH_CONFIG?.GOOGLE_OAUTH?.iosUrlScheme; // com.googleusercontent.apps....
 const GENOSYS_SCHEME_REDIRECT = AUTH_CONFIG?.GOOGLE_OAUTH?.redirectUri || 'genosys://oauth/google';
@@ -140,9 +141,18 @@ export const loginWithGoogleDirect = async () => {
     log.debug('Starting direct Google OAuth...');
     
     const isStandaloneIos = !isExpoGo && Platform.OS === 'ios';
-    const googleClientId = (isExpoGo ? WEB_CLIENT_ID : (isStandaloneIos ? IOS_CLIENT_ID : WEB_CLIENT_ID));
+    const isStandaloneAndroid = !isExpoGo && Platform.OS === 'android';
+    const isStandaloneNative = isStandaloneIos || isStandaloneAndroid;
+    const googleClientId = isExpoGo
+      ? WEB_CLIENT_ID
+      : (isStandaloneIos ? IOS_CLIENT_ID : ANDROID_CLIENT_ID);
     if (!googleClientId) {
-      return { success: false, error: 'Google OAuth client ID missing' };
+      return {
+        success: false,
+        error: isStandaloneAndroid
+          ? 'Google Sign-In is not configured for Android yet. Please use email & password login.'
+          : 'Google OAuth client ID missing',
+      };
     }
 
     const { googleRedirectUri, returnUrl, mode } = getRedirectConfig();
@@ -151,13 +161,13 @@ export const loginWithGoogleDirect = async () => {
     const nonce = await randomPkceVerifier(32);
     const state = await randomPkceVerifier(16);
 
-    // For iOS standalone/TestFlight, Google's iOS OAuth client does NOT accept response_type=id_token.
-    // Use Authorization Code + PKCE (no client_secret required for native iOS clients), then exchange for id_token.
+    // Native Google OAuth clients should use Authorization Code + PKCE.
+    // The blocked Android bug came from using the web client's implicit id_token flow.
     let pkceVerifier = null;
     let pkceChallenge = null;
     let responseType = 'id_token';
     let responseMode = 'fragment';
-    if (isStandaloneIos) {
+    if (isStandaloneNative) {
       pkceVerifier = await randomPkceVerifier(64);
       pkceChallenge = await sha256Base64Url(pkceVerifier);
       responseType = 'code';
@@ -189,7 +199,7 @@ export const loginWithGoogleDirect = async () => {
     log.debug('OAuth result', { type: result.type });
     
     if (result.type === 'success' && result.url) {
-      if (isStandaloneIos) {
+      if (isStandaloneNative) {
         const code = extractAuthCodeFromUrl(result.url);
         if (!code || !pkceVerifier) {
           const oauthErr = extractOAuthErrorFromUrl(result.url);

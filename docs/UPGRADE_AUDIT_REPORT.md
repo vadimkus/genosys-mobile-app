@@ -110,6 +110,7 @@ npx expo install expo-updates
 2. Create an Android client ID for package `ae.genosys.app`
 3. Get SHA-1 from: `eas credentials --platform android`
 4. Set `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` in EAS secrets
+5. Publish a production OTA update so the JavaScript bundle uses the Android client ID and PKCE flow
 
 ---
 

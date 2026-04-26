@@ -87,7 +87,10 @@ export const AUTH_CONFIG = {
     //   4. Add the SHA-1 fingerprint from your signing key (debug + production)
     //   5. Set EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID in your .env
     // Without this, Google Sign-In will not work on Android builds.
-    androidClientId: env('EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID', ''),
+    androidClientId: env(
+      'EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID',
+      '590508205468-vc262gtfqo5a94iifen6gqvlsr5h3to5.apps.googleusercontent.com'
+    ),
     // Used by Expo Go / web contexts
     webClientId: env(
       'EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID',
