@@ -71,6 +71,16 @@ Published to EAS Update production after the runtime fix that pins bare-workflow
 - Android update: `019dc8c2-a33e-75df-871b-f9e7d052e388`
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/82647d72-944c-4b07-9796-fd60b0ff0356
 
+Follow-up checkout payload pricing slice published to EAS Update production:
+
+- Update group: `562e7fea-22b7-478d-abec-f3f871d7285d`
+- Branch: `production`
+- Runtime: `1.9.0`
+- Commit: `db8bc986088bc443b62fe9614e19ded285b70b1a`
+- iOS update: `019dc99d-7080-795e-a8a1-088a50209b46`
+- Android update: `019dc99d-7080-75e3-9c85-087ab3e26767`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/562e7fea-22b7-478d-abec-f3f871d7285d
+
 ## Rollback
 
 Revert:
