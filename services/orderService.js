@@ -5,6 +5,7 @@
 
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import { buildMobileOrderItemPayload } from '../utils/orderPayloadPricing';
 
 const log = createLogger('orderService');
 
@@ -143,33 +144,7 @@ export async function submitCODOrder(orderData) {
         emirate: orderData.emirate,
         customerEmirate: orderData.emirate,
       },
-      items: orderData.items.map(item => {
-        const productId = item.product?.id || item.id;
-        const rawPrice = item.product?.displayPrice ?? item.product?.price ?? item.price ?? 0;
-        const price = Number(rawPrice);
-        const quantity = Number(item.quantity) || 0;
-        const isPromo = item.isPromotionItem === true;
-        const isBundleItem = item.fromBundle === true || item.product?.fromBundle === true;
-        return {
-          // Required by backend
-          productId,
-          quantity,
-          price: Number.isFinite(price) ? price : 0,
-
-          // Keep compatibility fields (safe extras)
-          id: productId,
-          name: item.product?.name || item.name,
-          image: item.product?.image_url || item.product?.image || item.image,
-          size: isPromo ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
-          color: item.selectedColor || item.color,
-          isPromotionItem: isPromo,
-          promotionKey: item.promotionKey || null,
-          // Bundle metadata (Build Your Set) — server needs per-item flags
-          fromBundle: isBundleItem,
-          bundleDiscountPercent: isBundleItem ? (Number(item.bundleDiscountPercent || item.product?.bundleDiscountPercent) || 0) : 0,
-          originalPrice: isBundleItem ? (Number(item.product?.originalPrice) || 0) : 0,
-        };
-      }),
+      items: orderData.items.map(buildMobileOrderItemPayload),
       subtotal: orderData.subtotal,
       shippingCost: orderData.shippingCost,
       vatAmount: orderData.vatAmount,
@@ -267,23 +242,7 @@ export async function submitCardOrder(orderData) {
       },
       emirate: orderData.emirate,
       paymentMethod: 'card',
-      items: orderData.items.map(item => {
-        const isBundleItem = item.fromBundle === true || item.product?.fromBundle === true;
-        return {
-          id: item.product?.id || item.id,
-          name: item.product?.name || item.name,
-          price: Number(item.product?.displayPrice || item.product?.price || item.price) || 0,
-          quantity: Number(item.quantity) || 0,
-          image: item.product?.image_url || item.product?.image || item.image,
-          size: item.isPromotionItem === true ? null : (item.selectedSize && item.selectedSize !== '__PROMO__' ? item.selectedSize : (item.size || null)),
-          color: item.selectedColor || item.color,
-          isPromotionItem: item.isPromotionItem === true,
-          promotionKey: item.promotionKey || null,
-          fromBundle: isBundleItem,
-          bundleDiscountPercent: isBundleItem ? (Number(item.bundleDiscountPercent || item.product?.bundleDiscountPercent) || 0) : 0,
-          originalPrice: isBundleItem ? (Number(item.product?.originalPrice) || 0) : 0,
-        };
-      }),
+      items: orderData.items.map(buildMobileOrderItemPayload),
       shippingCost: Number(orderData.shippingCost) || 0,
       vatAmount: Number(orderData.vatAmount) || 0,
       subtotal: Number(orderData.subtotal) || 0,

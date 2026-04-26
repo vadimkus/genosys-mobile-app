@@ -19,6 +19,16 @@ The native app already had a read-only display helper that prefers the server `p
 - Added `npm run smoke:cart-pricing-contract`.
 - Added `tsx` as a dev dependency so smoke scripts can import native ESM modules directly.
 
+## Follow-Up: Checkout Payload Pricing
+
+- Added `utils/orderPayloadPricing.js`, a pure helper for mobile order item payload construction.
+- `services/orderService.js` now routes both `submitCODOrder()` and `submitCardOrder()` item payload prices through that helper.
+- The helper prefers `product.pricing` via `getPricingDisplay()`, preserves selected variant prices, keeps promo/free items at zero, and keeps Build Your Set bundle pricing as bundle-only without VIP stacking.
+- Added `scripts/smoke-order-payload-pricing-contract.js`.
+- Added `npm run smoke:order-payload-pricing-contract`.
+
+The backend remains authoritative for final checkout totals. This slice only removes legacy `displayPrice || price` payload math from the native app so submitted item hints match the contract-backed cart display more closely.
+
 ## Test Matrix
 
 Smoke coverage checks:
@@ -29,15 +39,23 @@ Smoke coverage checks:
 - Build Your Set bundle keeps bundle discount only.
 - Selected variant price overrides default contract price.
 - Waterfall summary uses contract original price and explicit bundle discount.
+- Order item payload uses server contract unit price.
+- Order item payload preserves selected variant override.
+- Order item payload keeps bundle-only pricing and bundle metadata.
+- Order item payload keeps promo/free gift lines at zero.
+- Order item payload preserves zero-price contracts.
 
 ## Guardrails
 
 Still not changed:
 
-- Checkout screen payload construction.
 - Mobile order API.
 - Stripe checkout session.
 - Server checkout recalculation.
+
+Now changed in the follow-up slice:
+
+- Native checkout item payload construction for COD and card submission.
 
 The cart UI display is closer to server contract behavior, but checkout remains protected by existing server-side recalculation.
 
@@ -61,5 +79,12 @@ Revert:
 - `utils/pricingDisplay.js` selected-variant unit-price tweak
 - `scripts/smoke-cart-pricing-contract.js`
 - the `smoke:cart-pricing-contract` script / `tsx` dev dependency
+
+For the checkout payload follow-up, revert:
+
+- `utils/orderPayloadPricing.js`
+- the `services/orderService.js` import and `items.map(buildMobileOrderItemPayload)` calls
+- `scripts/smoke-order-payload-pricing-contract.js`
+- the `smoke:order-payload-pricing-contract` script
 
 Legacy fields remain available in cart items, so rollback is low-risk.

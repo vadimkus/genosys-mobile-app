@@ -35,7 +35,8 @@
     "screenshots:interactive": "bash scripts/capture-screenshots-interactive.sh",
     "screenshots:russian": "bash scripts/capture-russian-screenshots.sh",
     "smoke:pricing-display": "node scripts/smoke-pricing-display.js",
-    "smoke:cart-pricing-contract": "tsx scripts/smoke-cart-pricing-contract.js"
+    "smoke:cart-pricing-contract": "tsx scripts/smoke-cart-pricing-contract.js",
+    "smoke:order-payload-pricing-contract": "tsx scripts/smoke-order-payload-pricing-contract.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
