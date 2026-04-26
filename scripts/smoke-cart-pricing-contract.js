@@ -1,4 +1,5 @@
 import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils.js';
+import { computeSavingsAED } from '../utils/checkoutFormUtils.js';
 
 function assertEqual(name, actual, expected) {
   if (actual !== expected) {
@@ -148,9 +149,13 @@ assertEqual('waterfall user discount comes from contract original', waterfall.us
 assertEqual('waterfall bundle discount stays explicit', waterfall.bundleDiscountTotal, 20);
 assertEqual('waterfall total saved', waterfall.totalSaved, 60);
 
+const checkoutSavings = computeSavingsAED([contractDiscountItem, promoItem], contractTotals.subtotal);
+assertEqual('checkout savings uses contract original price', checkoutSavings, 40);
+
 console.log('[cart-pricing-contract] contract subtotal:', contractTotals.subtotal);
 console.log('[cart-pricing-contract] legacy fallback subtotal:', legacyFallbackTotals.subtotal);
 console.log('[cart-pricing-contract] bundle subtotal:', bundleTotals.subtotal);
 console.log('[cart-pricing-contract] variant subtotal:', variantTotals.subtotal);
 console.log('[cart-pricing-contract] waterfall saved:', waterfall.totalSaved);
-console.log('[cart-pricing-contract] 5 cart pricing scenarios passed');
+console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
+console.log('[cart-pricing-contract] 6 cart pricing scenarios passed');

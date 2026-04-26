@@ -29,7 +29,8 @@ import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import T from '../utils/typography';
-import { isUserDiscountExcludedProduct, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
+import { computeWaterfallBreakdown } from '../utils/cartUtils';
+import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { useAuth } from '../contexts/AuthContext';
 import AUTH_CONFIG from '../config/auth';
 import { CONCERNS } from './skin-concerns';
@@ -47,8 +48,6 @@ export default function ConcernDetailScreen() {
 
   const { items: cartItems, addItem, removeItem, clearCart, getCartSummary } = useCart();
   const { user } = useAuth();
-  const discountPct = Number(user?.discountPercentage);
-  const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRoutineSteps, setExpandedRoutineSteps] = useState({});
@@ -319,13 +318,12 @@ export default function ConcernDetailScreen() {
                                 const matchedProduct = productId ? productLookup[productId] : null;
                                 const cartId = matchedProduct ? String(matchedProduct.id) : null;
                                 const chipInCart = productId && (justAddedIds[productId] || (cartId && isProductInCart(cartId)));
-                                const excluded = matchedProduct ? isUserDiscountExcludedProduct(matchedProduct) : false;
-                                const forceCanonical = matchedProduct && (hasFixedPriceOverride(matchedProduct) || isHydroCoolMask(matchedProduct) || isDeviceProduct(matchedProduct));
                                 const rawNum = parseFloat(String(p.price).replace(/[^0-9.]/g, ''));
-                                const retailUnit = Number.isFinite(rawNum) ? rawNum : 0;
-                                const canDiscount = hasUserDiscount && !excluded && !forceCanonical && retailUnit > 0;
-                                const finalUnit = canDiscount ? Math.round(retailUnit * (1 - discountPct / 100) * 100) / 100 : retailUnit;
-                                const hasDisc = canDiscount && retailUnit > finalUnit + 0.01;
+                                const fallbackUnit = Number.isFinite(rawNum) ? rawNum : 0;
+                                const pricing = matchedProduct ? getPricingDisplay(matchedProduct) : null;
+                                const retailUnit = Number(pricing?.originalPrice || pricing?.basePrice || fallbackUnit) || 0;
+                                const finalUnit = Number(pricing?.displayPrice ?? fallbackUnit) || 0;
+                                const hasDisc = retailUnit > finalUnit + 0.01;
                                 return (
                                   <TouchableOpacity
                                     key={pi}
@@ -342,10 +340,12 @@ export default function ConcernDetailScreen() {
                                     {hasDisc ? (
                                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: '#9CA3AF' }]}>{retailUnit.toFixed(0)}</Text>
-                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: '#dc2626' }]}>{finalUnit.toFixed(0)} AED</Text>
+                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: '#dc2626' }]}>{formatAed(finalUnit)}</Text>
                                       </View>
                                     ) : (
-                                      <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>{p.price}</Text>
+                                      <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>
+                                        {pricing ? formatAed(finalUnit) : p.price}
+                                      </Text>
                                     )}
                                   </TouchableOpacity>
                                 );
@@ -518,25 +518,23 @@ export default function ConcernDetailScreen() {
 
             {/* Expanded: item list + pricing */}
             {stickyExpanded && (() => {
-              let retailTotal = 0;
-              let discountedTotal = 0;
               const nonPromoItems = cartItems.filter(i => !i.isPromotionItem);
+              const breakdown = computeWaterfallBreakdown(nonPromoItems, user);
               const rows = nonPromoItems.map((item, idx) => {
                 const name = getLocalizedProductName(item.product, locale) || item.product?.name || '';
                 const qty = item.quantity || 1;
-                const forceCanonical = hasFixedPriceOverride(item.product) || isHydroCoolMask(item.product) || isDeviceProduct(item.product);
-                const excluded = isUserDiscountExcludedProduct(item.product);
-                const displayP = forceCanonical
-                  ? getCanonicalUnitPrice(item.product)
-                  : Number(item.product?.displayPrice ?? item.product?.price ?? 0);
-                const origPrice = Number(item.product?.originalPrice);
-                const hasServerOriginal = Number.isFinite(origPrice) && origPrice > 0;
-                const retailUnit = (hasServerOriginal && origPrice > displayP) ? origPrice : displayP;
-                const serverAlreadyDiscounted = hasServerOriginal && origPrice > displayP;
-                const canApplyUserDiscount = hasUserDiscount && !excluded && !forceCanonical && !serverAlreadyDiscounted;
-                const finalUnit = canApplyUserDiscount ? retailUnit * (1 - discountPct / 100) : displayP;
-                retailTotal += retailUnit * qty;
-                discountedTotal += finalUnit * qty;
+                const pricing = getPricingDisplay(item.product, {
+                  selectedSize: item.selectedSize,
+                  selectedColor: item.selectedColor,
+                });
+                const isBundleItem = item?.fromBundle === true || item.product?.fromBundle === true;
+                const bundlePct = Number(item?.bundleDiscountPercent || item.product?.bundleDiscountPercent) || 0;
+                const retailUnit = isBundleItem
+                  ? (Number(item.product?.originalPrice || pricing.basePrice || pricing.displayPrice) || 0)
+                  : (Number(pricing.originalPrice || pricing.basePrice || pricing.displayPrice) || 0);
+                const finalUnit = isBundleItem && bundlePct > 0
+                  ? Math.round(retailUnit * (1 - bundlePct / 100) * 100) / 100
+                  : Number(pricing.displayPrice || 0);
                 const showStrike = retailUnit > finalUnit + 0.01;
                 const pid = String(item.product?.id);
                 return (
@@ -551,15 +549,15 @@ export default function ConcernDetailScreen() {
                     <Text style={[styles.stickyItemName, isRTL && styles.textRTL]} numberOfLines={1}>{name}{qty > 1 ? ` ×${qty}` : ''}</Text>
                     <View style={{ alignItems: 'flex-end' }}>
                       {showStrike && (
-                        <Text style={styles.stickyItemOriginalPrice}>{(retailUnit * qty).toFixed(0)} AED</Text>
+                        <Text style={styles.stickyItemOriginalPrice}>{formatAed(retailUnit * qty)}</Text>
                       )}
-                      <Text style={[styles.stickyItemPrice, showStrike && { color: '#dc2626' }]}>{(finalUnit * qty).toFixed(0)} AED</Text>
+                      <Text style={[styles.stickyItemPrice, showStrike && { color: '#dc2626' }]}>{formatAed(finalUnit * qty)}</Text>
                     </View>
                   </View>
                 );
               });
-              const discountAmount = retailTotal - discountedTotal;
-              const showDiscountRow = hasUserDiscount && discountAmount > 0.5;
+              const discountAmount = Number(breakdown.userDiscountTotal) || 0;
+              const showDiscountRow = discountAmount > 0.5;
               return (
                 <View style={styles.stickyDetails}>
                   {rows}
@@ -582,13 +580,13 @@ export default function ConcernDetailScreen() {
                         <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#86868B', fontWeight: '500' }]}>
                           {locale === 'ar' ? 'السعر الأصلي' : locale === 'ru' ? 'Полная цена' : 'Retail Price'}
                         </Text>
-                        <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{retailTotal.toFixed(0)} AED</Text>
+                        <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{formatAed(breakdown.retailTotal)}</Text>
                       </View>
                       <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
                         <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#16a34a', fontWeight: '600' }]}>
-                          {locale === 'ar' ? `خصم ${discountPct}%` : locale === 'ru' ? `Скидка ${discountPct}%` : `${discountPct}% Discount`}
+                          {locale === 'ar' ? `خصم ${breakdown.userDiscountPct}%` : locale === 'ru' ? `Скидка ${breakdown.userDiscountPct}%` : `${breakdown.userDiscountPct}% Discount`}
                         </Text>
-                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#16a34a' }}>-{discountAmount.toFixed(0)} AED</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#16a34a' }}>-{formatAed(discountAmount)}</Text>
                       </View>
                     </>
                   )}
@@ -596,7 +594,7 @@ export default function ConcernDetailScreen() {
                     <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL]}>
                       {locale === 'ar' ? 'المجموع الفرعي' : locale === 'ru' ? 'Промежуточный итог' : 'Subtotal'}
                     </Text>
-                    <Text style={styles.stickyPricingValue}>{discountedTotal.toFixed(0)} AED</Text>
+                    <Text style={styles.stickyPricingValue}>{formatAed(summary.subtotal)}</Text>
                   </View>
                   {summary.amountForFreeShipping > 0 && (
                     <Text style={[styles.stickyFreeShipping, isRTL && styles.textRTL]}>

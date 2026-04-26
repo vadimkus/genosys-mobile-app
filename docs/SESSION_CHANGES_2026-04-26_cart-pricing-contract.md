@@ -28,6 +28,13 @@ The native app already had a read-only display helper that prefers the server `p
 - Added `scripts/smoke-order-payload-pricing-contract.js`.
 - Added `npm run smoke:order-payload-pricing-contract`.
 
+## Follow-Up: Final Native Display Cleanup
+
+- `utils/checkoutFormUtils.js` now computes checkout savings through `getPricingDisplay()`, so the "You saved" line uses the same contract-backed original/display prices as cart totals.
+- `app/concern-detail.js` now uses `getPricingDisplay()` for routine product chips and the sticky cart preview rows, and uses `computeWaterfallBreakdown()` for sticky summary retail/VIP savings.
+- `components/ChatButton.js` now renders product-card prices through `getPricingDisplay()` instead of direct `displayPrice || price` fallback.
+- Extended `scripts/smoke-cart-pricing-contract.js` with checkout-savings coverage.
+
 The backend remains authoritative for final checkout totals. This slice only removes legacy `displayPrice || price` payload math from the native app so submitted item hints match the contract-backed cart display more closely.
 
 ## Test Matrix
@@ -45,6 +52,7 @@ Smoke coverage checks:
 - Order item payload keeps bundle-only pricing and bundle metadata.
 - Order item payload keeps promo/free gift lines at zero.
 - Order item payload preserves zero-price contracts.
+- Checkout savings uses contract original/display prices.
 
 ## Guardrails
 
@@ -92,6 +100,8 @@ Follow-up bundle-builder contract preservation slice published to EAS Update pro
 - Android update: `019dc9a4-2fdc-7d4f-b759-8f41fca30e7f`
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/39f3af3b-537f-43e4-9f2c-14bf4eda8030
 
+Final native display cleanup is not yet OTA-published in this session.
+
 ## Rollback
 
 Revert:
@@ -107,5 +117,12 @@ For the checkout payload follow-up, revert:
 - the `services/orderService.js` import and `items.map(buildMobileOrderItemPayload)` calls
 - `scripts/smoke-order-payload-pricing-contract.js`
 - the `smoke:order-payload-pricing-contract` script
+
+For the final native display cleanup, revert:
+
+- `utils/checkoutFormUtils.js`
+- `app/concern-detail.js`
+- `components/ChatButton.js`
+- the checkout-savings assertion in `scripts/smoke-cart-pricing-contract.js`
 
 Legacy fields remain available in cart items, so rollback is low-risk.

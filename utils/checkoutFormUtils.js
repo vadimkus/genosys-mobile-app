@@ -1,6 +1,7 @@
 // Pure helpers extracted from app/checkout.js to keep the screen declarative.
 
 import { isUserDiscountExcludedProduct } from './productRules';
+import { getPricingDisplay } from './pricingDisplay';
 
 export function isValidEmail(value) {
   const email = String(value || '').trim();
@@ -92,8 +93,12 @@ export function computeSavingsAED(items, totalsSubtotal) {
     if (isUserDiscountExcludedProduct(it?.product)) return sum;
 
     const qty = Number(it?.quantity) || 0;
-    const original = Number(it?.product?.originalPrice);
-    const current = Number(it?.product?.displayPrice ?? it?.product?.price ?? 0);
+    const pricing = getPricingDisplay(it?.product, {
+      selectedSize: it?.selectedSize,
+      selectedColor: it?.selectedColor,
+    });
+    const original = Number(pricing.originalPrice);
+    const current = Number(pricing.displayPrice);
     const unit = Number.isFinite(original) && original > 0 ? original : (Number.isFinite(current) ? current : 0);
     return sum + unit * qty;
   }, 0);
