@@ -8,10 +8,11 @@ require a full build + store submission.
 
 - **Enabled** on iOS and Android, `production` channel
 - **Expo project URL**: `https://u.expo.dev/b874a5c1-c47e-4c4e-9286-42e431978d51`
-- **Runtime version**: app-version policy, currently resolves to `1.9.0`.
-  `app.json` uses `{ "policy": "appVersion" }`, and
-  `scripts/sync-runtime-version.js` keeps `package.json`, `package-lock.json`,
-  and iOS `Expo.plist` aligned to `expo.version`.
+- **Runtime version**: concrete app-version-aligned runtime, currently `1.9.0`.
+  This project uses the bare workflow, so EAS Update requires a string runtime
+  instead of `{ "policy": "appVersion" }`. `scripts/sync-runtime-version.js`
+  keeps `app.json`, `package.json`, `package-lock.json`, and iOS `Expo.plist`
+  aligned to `expo.version`.
 - **Launch wait**: 5000 ms — iOS waits up to 5 s for the JS bundle at launch
   before falling back to the embedded bundle
 
@@ -19,7 +20,7 @@ require a full build + store submission.
 
 | File | Applies to | Notes |
 |------|-----------|-------|
-| `app.json` `updates` block + `runtimeVersion` policy | Source of truth for Expo/EAS Update | `runtimeVersion` uses `appVersion`, so the resolved runtime follows `expo.version`. |
+| `app.json` `updates` block + concrete `runtimeVersion` | Source of truth for Expo/EAS Update | `runtimeVersion` is written as the current `expo.version` because bare workflow updates reject runtime policies. |
 | `ios/GenosysUAE/Supporting/Expo.plist` | iOS native runtime source of truth | EAS iOS production runs `node scripts/sync-runtime-version.js` before build. The script writes `EXUpdatesRuntimeVersion` from `app.json` `expo.version`. |
 
 Before local release work, run:
@@ -44,7 +45,7 @@ launch wait window, otherwise on the launch after).
 
 ## When to bump `runtimeVersion`
 
-Bump `expo.version` (which now bumps runtime automatically) **only** when you change:
+Bump `expo.version` (then run `npm run sync:runtime`, which writes the matching concrete runtime) **only** when you change:
 
 - Native dependencies (`react-native`, `expo-*` with native code, custom modules)
 - `app.json` that affects native code (permissions, bundle identifiers, icons, splash, URL schemes)

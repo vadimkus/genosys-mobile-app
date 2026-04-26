@@ -342,9 +342,7 @@
       }
     },
     "sdkVersion": "54.0.0",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.9.0",
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",

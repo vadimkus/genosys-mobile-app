@@ -9,9 +9,9 @@ Follow-up cleanup from the GPT-5.5 platform audit for the native iOS/Android app
 ## Changes
 
 - Aligned package metadata to the app release: `package.json` and `package-lock.json` now use version `1.9.0`.
-- Replaced hardcoded Expo `runtimeVersion: "1.0.0"` with Expo's app-version runtime policy in `app.json`.
+- Replaced hardcoded Expo `runtimeVersion: "1.0.0"` with concrete app-version-aligned runtime `1.9.0` in `app.json`.
 - Updated iOS `Expo.plist` resolved runtime to `1.9.0`.
-- Added `scripts/sync-runtime-version.js`, which reads `app.json` `expo.version`, sets the runtime policy, syncs package versions, and writes iOS `EXUpdatesRuntimeVersion`.
+- Added `scripts/sync-runtime-version.js`, which reads `app.json` `expo.version`, writes that concrete value to `runtimeVersion`, syncs package versions, and writes iOS `EXUpdatesRuntimeVersion`.
 - Added `npm run sync:runtime` and wired it into production iOS/Android build scripts.
 - Added EAS `prebuildCommand` hooks so production builds sync runtime before building.
 - Updated `docs/OTA_UPDATES.md` to document the new app-version runtime strategy.
@@ -25,7 +25,7 @@ Follow-up cleanup from the GPT-5.5 platform audit for the native iOS/Android app
 
 - `npm run sync:runtime` passes and reports `Synced Expo runtime to app version 1.9.0`.
 - `node --check scripts/sync-runtime-version.js` passes.
-- `npx expo config --json` resolves `version: "1.9.0"` and `runtimeVersion: { "policy": "appVersion" }`.
+- `npx expo config --json` resolves `version: "1.9.0"` and `runtimeVersion: "1.9.0"`.
 - `ReadLints` reported no diagnostics on `data/productConfig.js` or the sync script.
 
 ## Notes

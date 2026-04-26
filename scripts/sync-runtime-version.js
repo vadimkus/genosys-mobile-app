@@ -22,7 +22,9 @@ if (!appVersion) {
   throw new Error('app.json must define expo.version before syncing runtimeVersion')
 }
 
-appConfig.expo.runtimeVersion = { policy: 'appVersion' }
+// EAS Update rejects runtime version policies in bare workflow projects.
+// Keep the runtime automatic by writing the current app version as a concrete string.
+appConfig.expo.runtimeVersion = appVersion
 writeJson(appJsonPath, appConfig)
 
 const packageJson = readJson(packageJsonPath)
