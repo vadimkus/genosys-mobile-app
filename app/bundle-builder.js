@@ -30,6 +30,7 @@ import { useCart } from '../contexts/CartContext';
 import AUTH_CONFIG from '../config/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from '../utils/logger';
+import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 
 const log = createLogger('BundleBuilder');
 
@@ -56,6 +57,11 @@ function getNextTier(count) {
     if (count < tier.minItems) return tier;
   }
   return null;
+}
+
+function getBundleRetailPrice(product) {
+  const pricing = getPricingDisplay(product);
+  return Number(pricing.basePrice || product?.price || 0) || 0;
 }
 
 export default function BundleBuilderScreen() {
@@ -166,7 +172,7 @@ export default function BundleBuilderScreen() {
   const nextTier = getNextTier(itemCount);
 
   // Bundle pricing: bundle discount ONLY on retail price — NO VIP/user discount stacking
-  const retailTotal = selectedArray.reduce((sum, item) => sum + (item.product.price), 0);
+  const retailTotal = selectedArray.reduce((sum, item) => sum + getBundleRetailPrice(item.product), 0);
   const discountAmount = Math.round((retailTotal * discountPercent) / 100 * 100) / 100;
   const total = Math.round((retailTotal - discountAmount) * 100) / 100;
   const totalSaved = discountAmount;
@@ -211,7 +217,7 @@ export default function BundleBuilderScreen() {
     // Add each selected product to cart with bundle discount ONLY (no VIP stacking)
     selectedArray.forEach(({ product }) => {
       // Bundle discount applied to retail price only
-      const retailPrice = product.price;
+      const retailPrice = getBundleRetailPrice(product);
       const finalPrice = Math.round(retailPrice * (1 - discountPercent / 100) * 100) / 100;
 
       // Build a cart-compatible product object
@@ -221,7 +227,7 @@ export default function BundleBuilderScreen() {
         name: product.name,
         price: finalPrice,
         displayPrice: finalPrice,
-        originalPrice: product.price, // retail price for reference
+        originalPrice: retailPrice, // retail price for reference
         image: product.image,
         category: product.category,
         size: product.size,
@@ -282,7 +288,7 @@ export default function BundleBuilderScreen() {
           {user ? (
             <View style={styles.priceRow}>
               <Text style={styles.priceMain}>
-                {Math.round(product.price)} AED
+                {formatAed(getBundleRetailPrice(product))}
               </Text>
             </View>
           ) : (
@@ -599,7 +605,7 @@ export default function BundleBuilderScreen() {
                       <Text style={styles.summaryItemName} numberOfLines={1}>{product.name}</Text>
                       <Text style={styles.summaryItemStep}>{step?.icon} {step?.name}</Text>
                     </View>
-                    <Text style={styles.summaryItemPrice}>{Math.round(product.displayPrice || product.price)} AED</Text>
+                    <Text style={styles.summaryItemPrice}>{formatAed(getBundleRetailPrice(product))}</Text>
                     <TouchableOpacity onPress={() => toggleProduct(product, stepId)} style={styles.summaryRemoveBtn}>
                       <Ionicons name="close-circle" size={22} color="#EF4444" />
                     </TouchableOpacity>

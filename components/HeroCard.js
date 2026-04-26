@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask } from '../utils/productRules';
+import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
 import { useLocalization } from '../contexts/LocalizationContext';
 import {
   getLocalizedProductName,
@@ -32,9 +33,12 @@ export default function HeroCard({ product }) {
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
   const shouldUseCanonical = hasFixedPriceOverride(product) || isHydroCoolMask(product);
-  const displayPrice = shouldUseCanonical
-    ? getCanonicalUnitPrice(product)
-    : Number(product?.displayPrice ?? product?.price ?? 0) || 0;
+  const pricing = getPricingDisplay(product);
+  const displayPrice = hasServerPricing(product)
+    ? pricing.displayPrice
+    : shouldUseCanonical
+      ? getCanonicalUnitPrice(product)
+      : Number(product?.displayPrice ?? product?.price ?? 0) || 0;
 
   return (
     <TouchableOpacity
@@ -73,7 +77,7 @@ export default function HeroCard({ product }) {
         </Text>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>
-            {displayPrice.toFixed(2)} AED
+            {formatAed(displayPrice)}
           </Text>
           {!isOutOfStock && !isHolidayKit && (
             isMesopeciaKit ? (

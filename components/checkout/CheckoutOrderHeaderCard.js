@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../../utils/productLocalization';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
+import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 
 export default function CheckoutOrderHeaderCard({
   styles,
@@ -76,11 +77,14 @@ export default function CheckoutOrderHeaderCard({
             ]
               .filter(Boolean)
               .join(' • ');
-            const price = Number(it.product?.displayPrice ?? it.product?.price ?? 0) || 0;
+            const pricing = getPricingDisplay(it.product, {
+              selectedSize: it.selectedSize,
+              selectedColor: it.selectedColor,
+            });
             return (
               <Text key={`${it.product?.id || name}-${idx}`} style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                 {qty}× {name}
-                {extras ? ` — ${extras}` : ''} — AED {price.toFixed(2)}
+                {extras ? ` — ${extras}` : ''} — {formatAed(pricing.displayPrice)}
               </Text>
             );
           })}
