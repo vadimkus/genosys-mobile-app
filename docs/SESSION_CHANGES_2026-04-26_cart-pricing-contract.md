@@ -82,6 +82,16 @@ Follow-up checkout payload pricing slice published to EAS Update production:
 - Android update: `019dc99d-7080-75e3-9c85-087ab3e26767`
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/562e7fea-22b7-478d-abec-f3f871d7285d
 
+Follow-up bundle-builder contract preservation slice published to EAS Update production:
+
+- Update group: `39f3af3b-537f-43e4-9f2c-14bf4eda8030`
+- Branch: `production`
+- Runtime: `1.9.0`
+- Commit: `ae156714154ca37fae79b43782f0470d6b4c2990`
+- iOS update: `019dc9a4-2fdc-7ea5-9fb7-b3beb2ac1728`
+- Android update: `019dc9a4-2fdc-7d4f-b759-8f41fca30e7f`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/39f3af3b-537f-43e4-9f2c-14bf4eda8030
+
 ## Rollback
 
 Revert:
