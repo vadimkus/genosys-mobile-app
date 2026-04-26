@@ -8,21 +8,29 @@ require a full build + store submission.
 
 - **Enabled** on iOS and Android, `production` channel
 - **Expo project URL**: `https://u.expo.dev/b874a5c1-c47e-4c4e-9286-42e431978d51`
-- **Runtime version**: `1.0.0` (decoupled from `version` — only changes when
-  native code / native deps change)
+- **Runtime version**: app-version policy, currently resolves to `1.9.0`.
+  `app.json` uses `{ "policy": "appVersion" }`, and
+  `scripts/sync-runtime-version.js` keeps `package.json`, `package-lock.json`,
+  and iOS `Expo.plist` aligned to `expo.version`.
 - **Launch wait**: 5000 ms — iOS waits up to 5 s for the JS bundle at launch
   before falling back to the embedded bundle
 
-## Config lives in two places (keep them in sync)
+## Config lives in two places (synced automatically before builds)
 
 | File | Applies to | Notes |
 |------|-----------|-------|
-| `app.json` `updates` block + `runtimeVersion` | Source of truth for Android (and managed iOS) | Android production profile in `eas.json` runs `npx expo prebuild --no-install`, which regenerates the native Android OTA config from here on every build. |
-| `ios/GenosysUAE/Supporting/Expo.plist` | iOS runtime source of truth | iOS production profile in `eas.json` does **not** run prebuild, so the committed `ios/` folder is used as-is. Manual edits here persist across builds. |
+| `app.json` `updates` block + `runtimeVersion` policy | Source of truth for Expo/EAS Update | `runtimeVersion` uses `appVersion`, so the resolved runtime follows `expo.version`. |
+| `ios/GenosysUAE/Supporting/Expo.plist` | iOS native runtime source of truth | EAS iOS production runs `node scripts/sync-runtime-version.js` before build. The script writes `EXUpdatesRuntimeVersion` from `app.json` `expo.version`. |
 
-If you change one, change the other. The two files must carry identical
-values for `EXUpdatesURL` / `updates.url` and `EXUpdatesRuntimeVersion` /
-`runtimeVersion`.
+Before local release work, run:
+
+```bash
+npm run sync:runtime
+```
+
+The two files must carry identical values for `EXUpdatesURL` / `updates.url`;
+runtime uses the app-version policy in Expo config and the resolved app
+version in native iOS.
 
 ## Publishing an OTA update
 
@@ -36,15 +44,15 @@ launch wait window, otherwise on the launch after).
 
 ## When to bump `runtimeVersion`
 
-Bump it (e.g. `1.0.0` → `1.1.0`) **only** when you change:
+Bump `expo.version` (which now bumps runtime automatically) **only** when you change:
 
 - Native dependencies (`react-native`, `expo-*` with native code, custom modules)
 - `app.json` that affects native code (permissions, bundle identifiers, icons, splash, URL schemes)
 - Anything that touches `ios/` or Android `android/` (generated) content
 
-Changing `runtimeVersion` means users on the old runtime will **not** receive
-the new JS bundle until they upgrade through the store. Both `app.json` and
-`Expo.plist` must be bumped together.
+Changing the resolved runtime means users on the old runtime will **not**
+receive the new JS bundle until they upgrade through the store. Do not hand-edit
+`runtimeVersion`; update `expo.version`, then run `npm run sync:runtime`.
 
 ## When NOT to bump `runtimeVersion`
 

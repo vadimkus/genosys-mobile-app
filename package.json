@@ -1,6 +1,6 @@
 {
   "name": "genosys-mobile-app",
-  "version": "1.0.0",
+  "version": "1.9.0",
   "main": "expo-router/entry",
   "expo": {
     "install": {
@@ -26,8 +26,9 @@
     "prebuild:android": "expo prebuild --platform android --no-install",
     "android:assemble:release": "cd android && ./gradlew assembleRelease",
     "android:bundle:release": "cd android && ./gradlew bundleRelease",
-    "build:android:production": "eas build --platform android --profile production:android",
-    "build:ios:production": "eas build --platform ios --profile production",
+    "sync:runtime": "node scripts/sync-runtime-version.js",
+    "build:android:production": "npm run sync:runtime && eas build --platform android --profile production:android",
+    "build:ios:production": "npm run sync:runtime && eas build --platform ios --profile production",
     "submit:android": "eas submit --platform android --profile production",
     "submit:ios": "eas submit --platform ios --profile production",
     "screenshots": "bash scripts/capture-appstore-screenshots.sh",

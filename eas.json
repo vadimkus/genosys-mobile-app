@@ -29,12 +29,13 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "prebuildCommand": "node scripts/sync-runtime-version.js"
     },
     "production:android": {
       "autoIncrement": true,
       "channel": "production",
-      "prebuildCommand": "npx expo prebuild --no-install",
+      "prebuildCommand": "node scripts/sync-runtime-version.js && npx expo prebuild --no-install",
       "android": {
         "buildType": "app-bundle"
       }

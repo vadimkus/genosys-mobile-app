@@ -1,15 +1,66 @@
 /**
  * Product Configuration for Native App
  * 
- * Mirrors cosmetics-website/data/productConfig.ts for:
+ * Static fallback configuration for:
  * - Additional images (gallery)
  * - Video URLs
  * - Documentation/PDF links
+ *
+ * API/DB product fields are the source of truth. These maps are used only
+ * when the backend does not provide product media or documentation.
  * 
  * Images and videos are served from genosys.ae
  */
 
 const ASSET_ORIGIN = 'https://genosys.ae';
+
+function toAssetUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  return url.startsWith('http') ? url : `${ASSET_ORIGIN}${url}`;
+}
+
+function parseMaybeJson(value) {
+  if (!value) return null;
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+function normalizeStringArray(value) {
+  const parsed = parseMaybeJson(value);
+  if (!parsed) return [];
+  const items = Array.isArray(parsed) ? parsed : [parsed];
+  return items
+    .map((item) => (typeof item === 'string' ? item : item?.url || item?.src || item?.path))
+    .map(toAssetUrl)
+    .filter(Boolean);
+}
+
+function normalizeDocs(value) {
+  const parsed = parseMaybeJson(value);
+  if (!parsed) return [];
+  const items = Array.isArray(parsed) ? parsed : [parsed];
+
+  return items
+    .map((doc) => {
+      if (typeof doc === 'string') {
+        const url = toAssetUrl(doc);
+        return url ? { title: 'Product guide', url } : null;
+      }
+
+      const url = toAssetUrl(doc?.url || doc?.href || doc?.path || doc?.fileUrl);
+      if (!url) return null;
+
+      return {
+        title: doc?.title || doc?.name || doc?.label || 'Product guide',
+        url,
+      };
+    })
+    .filter(Boolean);
+}
 
 export const PRODUCT_CONFIG = {
   '9': {
@@ -109,9 +160,9 @@ export const PRODUCT_DOCS = {
  * Get all images for a product (DB/API images preferred, config as fallback)
  * 
  * Priority order:
- *   1. DB/API `images` field (dynamic – updated from backend without app resubmission)
- *   2. Hardcoded PRODUCT_CONFIG images (static fallback)
- *   3. Single main `image` field from API
+ *   1. DB/API gallery fields (dynamic – updated from backend without app resubmission)
+ *   2. Single main `image` field from API
+ *   3. Hardcoded PRODUCT_CONFIG images (static fallback only)
  *
  * @param {string} productId 
  * @param {Object} product - product data from API (may have .images JSON string)
@@ -120,25 +171,27 @@ export const PRODUCT_DOCS = {
 export function getProductImages(productId, product) {
   const id = String(productId);
   const config = PRODUCT_CONFIG[id];
-  
-  // Priority 1: DB/API images field (dynamic – no app update needed)
-  if (product?.images) {
-    try {
-      const parsed = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map(img => img.startsWith('http') ? img : `${ASSET_ORIGIN}${img}`);
-      }
-    } catch {}
+
+  // Priority 1: DB/API gallery fields (dynamic – no app update needed)
+  const apiImages = [
+    ...normalizeStringArray(product?.images),
+    ...normalizeStringArray(product?.galleryImages),
+    ...normalizeStringArray(product?.additionalImages),
+  ];
+
+  if (apiImages.length > 0) {
+    return apiImages;
+  }
+
+  // Priority 2: Single main image from API
+  const mainImage = toAssetUrl(product?.image);
+  if (mainImage) {
+    return [mainImage];
   }
   
-  // Priority 2: Hardcoded config images (static fallback for products without DB images)
+  // Priority 3: Hardcoded config images (static fallback for products without API images)
   if (config?.images?.length) {
-    return config.images.map(img => `${ASSET_ORIGIN}${img}`);
-  }
-  
-  // Priority 3: Single main image from API
-  if (product?.image) {
-    return [product.image.startsWith('http') ? product.image : `${ASSET_ORIGIN}${product.image}`];
+    return config.images.map(toAssetUrl).filter(Boolean);
   }
   
   return [];
@@ -157,21 +210,21 @@ export function getProductImages(productId, product) {
  */
 export function getProductVideoUrl(productId, product) {
   // Priority 1: API/DB videoUrl (dynamic)
-  if (product?.videoUrl) {
-    const url = product.videoUrl;
-    return url.startsWith('http') ? url : `${ASSET_ORIGIN}${url}`;
+  const apiVideoUrl = toAssetUrl(product?.videoUrl || product?.videoURL || product?.video);
+  if (apiVideoUrl) {
+    return apiVideoUrl;
   }
   
   // Priority 2: Hardcoded config (static fallback)
   const config = PRODUCT_CONFIG[String(productId)];
-  return config?.videoUrl ? `${ASSET_ORIGIN}${config.videoUrl}` : null;
+  return toAssetUrl(config?.videoUrl);
 }
 
 /**
  * Get documentation links for a product (API preferred, local config as fallback)
  * 
  * Priority order:
- *   1. product.documentation from API/DB (dynamic – no app update needed)
+ *   1. product documentation fields from API/DB (dynamic – no app update needed)
  *   2. Hardcoded PRODUCT_DOCS (static fallback)
  *
  * @param {string} productId
@@ -180,11 +233,15 @@ export function getProductVideoUrl(productId, product) {
  */
 export function getProductDocs(productId, product) {
   // Priority 1: API-provided documentation (dynamic – no app update needed)
-  if (product?.documentation && Array.isArray(product.documentation) && product.documentation.length > 0) {
-    return product.documentation.map(doc => ({
-      title: doc.title,
-      url: doc.url.startsWith('http') ? doc.url : `${ASSET_ORIGIN}${doc.url}`,
-    }));
+  const apiDocs = [
+    ...normalizeDocs(product?.documentation),
+    ...normalizeDocs(product?.documents),
+    ...normalizeDocs(product?.productDocuments),
+    ...normalizeDocs(product?.documentationLinks),
+  ];
+
+  if (apiDocs.length > 0) {
+    return apiDocs;
   }
   
   // Priority 2: Hardcoded local config (static fallback)

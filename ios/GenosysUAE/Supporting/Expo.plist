@@ -3,10 +3,9 @@
 <!--
   iOS Expo Updates config.
 
-  KEEP IN SYNC with ../../../app.json ("updates" block + "runtimeVersion").
-  iOS production builds in eas.json do not run `expo prebuild`, so this
-  file is the runtime source of truth for iOS OTA. Android is generated
-  from app.json on each prebuild.
+  Runtime is synced from app.json expo.version by scripts/sync-runtime-version.js.
+  iOS production builds run that script before EAS build so this plist and
+  Expo's appVersion runtime policy stay aligned.
 
   See docs/OTA_UPDATES.md for release workflow.
 -->
@@ -21,6 +20,6 @@
     <key>EXUpdatesURL</key>
     <string>https://u.expo.dev/b874a5c1-c47e-4c4e-9286-42e431978d51</string>
     <key>EXUpdatesRuntimeVersion</key>
-    <string>1.0.0</string>
+    <string>1.9.0</string>
   </dict>
 </plist>
