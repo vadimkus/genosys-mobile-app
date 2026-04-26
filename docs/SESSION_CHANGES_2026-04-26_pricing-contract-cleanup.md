@@ -23,6 +23,16 @@ This is the first cleanup pass after the pricing contract migration was deployed
 - `npm run smoke:pricing-display`
 - `npm run smoke:cart-pricing-contract`
 
+## Deployment
+
+- EAS branch: `production`
+- Runtime version: `1.9.0`
+- Commit: `626a59575bc2d06e697cbdf027bf86a5ad2949c0`
+- Update group ID: `aac0b5f7-a53a-4bcf-a6a8-03ab57e300d4`
+- Android update ID: `019dc8df-3faa-76f0-b9b4-708cbfb8997d`
+- iOS update ID: `019dc8df-3faa-7516-9922-868c1f72c7ac`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/aac0b5f7-a53a-4bcf-a6a8-03ab57e300d4
+
 Manual status:
 
 - Desktop website: verified by Vadim.
