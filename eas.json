@@ -33,9 +33,8 @@
       "prebuildCommand": "node scripts/sync-runtime-version.js"
     },
     "production:android": {
-      "autoIncrement": true,
+      "autoIncrement": false,
       "channel": "production",
-      "prebuildCommand": "node scripts/sync-runtime-version.js && npx expo prebuild --no-install",
       "android": {
         "buildType": "app-bundle"
       }
@@ -47,7 +46,6 @@
         "ascAppId": "6756648064"
       },
       "android": {
-        "serviceAccountKeyPath": "./google-play-service-account.json",
         "track": "internal"
       }
     }

@@ -225,8 +225,6 @@ export default function OrdersScreen() {
           s !== 'cancelled' &&
           s !== 'canceled' &&
           s !== 'deleted' &&
-          ps !== 'cancelled' &&
-          ps !== 'canceled' &&
           ps !== 'deleted'
         );
       })
