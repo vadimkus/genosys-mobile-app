@@ -24,6 +24,7 @@ The native app already had a read-only display helper that prefers the server `p
 - Added `utils/orderPayloadPricing.js`, a pure helper for mobile order item payload construction.
 - `services/orderService.js` now routes both `submitCODOrder()` and `submitCardOrder()` item payload prices through that helper.
 - The helper prefers `product.pricing` via `getPricingDisplay()`, preserves selected variant prices, keeps promo/free items at zero, and keeps Build Your Set bundle pricing as bundle-only without VIP stacking.
+- Follow-up bundle-builder slice: `app/bundle-builder.js` now preserves `product.pricing` when adding bundle items to the cart, while still pre-calculating bundle-only item price and clearing variants because the builder does not expose variant selection.
 - Added `scripts/smoke-order-payload-pricing-contract.js`.
 - Added `npm run smoke:order-payload-pricing-contract`.
 
