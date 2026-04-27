@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking } from 'react-native';
 import { Image } from 'expo-image';
+import Constants from 'expo-constants';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -19,6 +20,14 @@ import T from '../../utils/typography';
 const log = createLogger('Orders');
 
 const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
+const ORDERS_DIAGNOSTIC_BUILD = 'orders-diag-2026-04-26-2358';
+
+const maskEmail = (emailRaw) => {
+  const email = String(emailRaw || '').trim();
+  if (!email || !email.includes('@')) return email ? 'set' : 'empty';
+  const [name, domain] = email.split('@');
+  return `${name.slice(0, 2)}***@${domain}`;
+};
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -142,7 +151,7 @@ const isDeletableByUser = (order) => {
 export default function OrdersScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { refreshOrdersCount } = useOrders();
+  const { orders: contextOrders, refreshOrdersCount } = useOrders();
   const token = user?.token || user?.accessToken || '';
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -170,16 +179,36 @@ export default function OrdersScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState('');
+  const [loadDiagnostics, setLoadDiagnostics] = useState(null);
   const [payingOrderId, setPayingOrderId] = useState('');
   const [expandedOrderKey, setExpandedOrderKey] = useState('');
 
   const load = async () => {
-    if (!token) return;
+    if (!token) {
+      setLoadDiagnostics({
+        build: ORDERS_DIAGNOSTIC_BUILD,
+        reason: 'missing-token',
+        local: 0,
+        pending: 0,
+        recent: 0,
+      });
+      return;
+    }
     setError('');
     try {
       // Prefer pending orders first if backend supports status filter.
-      const pending = await fetchUserOrders(token, { status: 'pending', page: 1, limit: 20 }).catch((e) => { log.warn('Failed to fetch pending orders', e?.message); return []; });
-      const recent = await fetchUserOrders(token, { page: 1, limit: 30 }).catch((e) => { log.warn('Failed to fetch recent orders', e?.message); return []; });
+      let pendingError = '';
+      let recentError = '';
+      const pending = await fetchUserOrders(token, { status: 'pending', page: 1, limit: 20 }).catch((e) => {
+        pendingError = e?.message || 'pending fetch failed';
+        log.warn('Failed to fetch pending orders', e?.message);
+        return [];
+      });
+      const recent = await fetchUserOrders(token, { page: 1, limit: 30 }).catch((e) => {
+        recentError = e?.message || 'recent fetch failed';
+        log.warn('Failed to fetch recent orders', e?.message);
+        return [];
+      });
       const merged = [
         ...(Array.isArray(pending) ? pending : []),
         ...(Array.isArray(recent) ? recent : []),
@@ -195,9 +224,25 @@ export default function OrdersScreen() {
       });
       const data = deduped;
       setOrders(Array.isArray(data) ? data : []);
+      setLoadDiagnostics({
+        build: ORDERS_DIAGNOSTIC_BUILD,
+        reason: 'loaded',
+        pending: Array.isArray(pending) ? pending.length : -1,
+        recent: Array.isArray(recent) ? recent.length : -1,
+        local: Array.isArray(data) ? data.length : -1,
+        pendingError,
+        recentError,
+        statuses: (Array.isArray(data) ? data : []).slice(0, 5).map((o) => `${o?.status || 'no-status'}/${o?.paymentStatus || o?.payment_status || 'no-pay'}`),
+      });
       // Refresh the orders count in the tab bar
       refreshOrdersCount();
     } catch (e) {
+      setLoadDiagnostics({
+        build: ORDERS_DIAGNOSTIC_BUILD,
+        reason: 'load-error',
+        message: e?.message || 'Failed to load orders',
+        local: 0,
+      });
       setError(e?.message || 'Failed to load orders');
     }
   };
@@ -217,7 +262,20 @@ export default function OrdersScreen() {
   };
 
   const sortedOrders = useMemo(() => {
-    return [...orders]
+    const sourceOrders = [
+      ...orders,
+      ...(Array.isArray(contextOrders) ? contextOrders : []),
+    ];
+    const seen = new Set();
+
+    return sourceOrders
+      .filter((o) => {
+        const key = String(o?.id || o?.orderId || o?.orderNumber || o?.order_number || o?.number || '');
+        if (!key) return true;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .filter((o) => {
         const s = String(o.status || '').toLowerCase();
         const ps = String(o.paymentStatus || o.payment_status || '').toLowerCase();
@@ -233,7 +291,22 @@ export default function OrdersScreen() {
       const db = new Date(b.createdAt || b.created_at || b.date || 0).getTime() || 0;
       return db - da;
     });
-  }, [orders]);
+  }, [orders, contextOrders]);
+
+  const emptyDiagnostics = useMemo(() => {
+    const context = Array.isArray(contextOrders) ? contextOrders : [];
+    return {
+      build: ORDERS_DIAGNOSTIC_BUILD,
+      runtime: Constants?.expoConfig?.runtimeVersion || Constants?.manifest?.runtimeVersion || 'unknown',
+      app: `${Constants?.nativeAppVersion || 'unknown'} (${Constants?.nativeBuildVersion || 'unknown'})`,
+      local: orders.length,
+      shared: context.length,
+      token: token ? 'yes' : 'no',
+      email: maskEmail(user?.email),
+      contact: maskEmail(user?.contactEmail),
+      last: loadDiagnostics || null,
+    };
+  }, [contextOrders, loadDiagnostics, orders.length, token, user?.contactEmail, user?.email]);
 
   const handlePay = async (order) => {
     haptics.mediumTap();
@@ -402,6 +475,9 @@ export default function OrdersScreen() {
             <Image source={EMPTY_UNI_IMAGE} style={styles.emptyUniImage} contentFit="contain" />
             <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersYet')}</Text>
             <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersHint')}</Text>
+            <Text selectable style={[styles.diagnosticText, isRTL && styles.textRTLRight]}>
+              {JSON.stringify(emptyDiagnostics, null, 2)}
+            </Text>
             <TouchableOpacity
               style={styles.shopButton}
               onPress={() => router.replace('/(tabs)/shop')}
@@ -766,6 +842,18 @@ const styles = StyleSheet.create({
   },
   shopButtonText: {
     ...T.button,
+  },
+  diagnosticText: {
+    marginTop: 16,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#F2F2F7',
+    color: '#3C3C43',
+    fontFamily: 'Courier',
+    fontSize: 10,
+    lineHeight: 14,
+    textAlign: 'left',
+    width: '92%',
   },
   shopButtonTextRTL: {
     writingDirection: 'rtl',

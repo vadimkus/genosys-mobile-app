@@ -10,12 +10,14 @@ export function OrdersProvider({ children }) {
   const { user, refreshSession } = useAuth();
   const token = user?.token || user?.accessToken || '';
   const [ordersCount, setOrdersCount] = useState(0);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const retryRef = useRef(false);
 
   const loadOrdersCount = useCallback(async () => {
     if (!token) {
       setOrdersCount(0);
+      setOrders([]);
       return;
     }
 
@@ -61,9 +63,11 @@ export function OrdersProvider({ children }) {
       const count = activeOrders.length;
       
       log.debug('Active orders (excluding DELETED/CANCELLED):', count);
+      setOrders(activeOrders);
       setOrdersCount(count);
     } catch (error) {
       log.error('Failed to load orders count:', error?.message || error);
+      setOrders([]);
       setOrdersCount(0);
     } finally {
       setLoading(false);
@@ -83,6 +87,7 @@ export function OrdersProvider({ children }) {
   return (
     <OrdersContext.Provider
       value={{
+        orders,
         ordersCount,
         loading,
         refreshOrdersCount,
