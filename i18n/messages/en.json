@@ -64,7 +64,12 @@
     "quickDiscount": "20% OFF!",
     "quickDiscountQuery": "How do I get 20% off? Tell me about Build Your Set",
     "quickAiSkin": "AI Skin Analysis",
-    "quickAiSkinQuery": "I don't know my skin type, can you analyze it with AI?"
+    "quickAiSkinQuery": "I don't know my skin type, can you analyze it with AI?",
+    "a11y": {
+      "openChat": "Open chat with Genie",
+      "collapseChat": "Collapse chat",
+      "expandChat": "Expand chat to full screen"
+    }
   },
   "skinAnalysis": {
     "title": "AI Skin Analysis",
@@ -117,7 +122,12 @@
     "pigmentation": "Pigmentation",
     "pores": "Pores",
     "firmness": "Firmness",
-    "hydration": "Hydration"
+    "hydration": "Hydration",
+    "recommendationsFailed": "Could not load recommendations.",
+    "recommendationsFailedFull": "Could not load recommendations. Please check your connection and try again.",
+    "browseByConcernTitle": "Browse by Skin Concern",
+    "browseByConcernDesc": "Curated products & daily routines for every concern",
+    "browseByConcernButton": "Explore"
   },
   "orders": {
     "title": "Orders",
@@ -147,7 +157,14 @@
     "paymentLinkMissingMessage": "We could not open the payment link. Please try again.",
     "couldNotOpenPaymentTitle": "Could not open payment",
     "pleaseTryAgain": "Please try again.",
-    "pendingNote": "If payment is not completed yet, your order will stay pending until the payment is confirmed."
+    "pendingNote": "If payment is not completed yet, your order will stay pending until the payment is confirmed.",
+    "statusPending": "Pending",
+    "statusProcessing": "Processing",
+    "statusPaid": "Paid",
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed",
+    "statusCancelled": "Cancelled",
+    "statusRefunded": "Refunded"
   },
   "bag": {
     "title": "Bag",
@@ -343,6 +360,13 @@
     "fullPrice": "Full Price: {price} AED",
     "bundleDiscount": "15% OFF (Bundle Discount)",
     "finalPrice": "Final: {price} AED",
+    "discountPercent": "{percent}% OFF",
+    "a11y": {
+      "openImageViewer": "Open image viewer",
+      "openImage": "Open image {current} of {total}",
+      "closeImageViewer": "Close image viewer",
+      "reviewSummary": "{rating} out of 5, {count} reviews"
+    },
     "spec": {
       "size": "Size",
       "sizeOptions": "Size options",
@@ -1110,7 +1134,10 @@
     "product": "product",
     "products": "products",
     "in": "in",
-    "foundFor": "found for \"{query}\""
+    "foundFor": "found for \"{query}\"",
+    "a11y": {
+      "openMenu": "Open menu"
+    }
   },
   "categories": {
     "all": "All",
@@ -1431,7 +1458,8 @@
   "variant": {
     "size": "Size",
     "color": "Color",
-    "unavailable": "Unavailable"
+    "unavailable": "Unavailable",
+    "cushionBBSizeLabel": "15g (includes replacement refill)"
   },
   "stock": {
     "outOfStock": "Out of Stock",
@@ -1458,6 +1486,7 @@
     "login": "Login",
     "logout": "Sign Out",
     "close": "Close",
+    "switchLanguage": "Switch language",
     "save": "Save",
     "done": "Done",
     "continue": "Continue",

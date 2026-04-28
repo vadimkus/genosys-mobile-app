@@ -24,9 +24,9 @@ const parseMaybeJSON = (value) => {
   return value;
 };
 
-const getSingleSizeLabel = (product) => {
+const getSingleSizeLabel = (product, t) => {
   // Cushion BB: force exact label requested for the size block.
-  if (isCushionBB(product)) return '15g (includees replacement refill)';
+  if (isCushionBB(product)) return t('variant.cushionBBSizeLabel');
 
   const obj = parseMaybeJSON(product?.productDetails);
   if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
@@ -57,7 +57,7 @@ export default function ProductVariantSelector({
   // Enhanced API provides complete variant data with calculated prices
   const availableSizes = (product.variants || []).filter((v) => v && v.size);
   const availableColors = product.colorVariants || [];
-  const singleSizeLabel = getSingleSizeLabel(product);
+  const singleSizeLabel = getSingleSizeLabel(product, t);
 
   return (
     <View style={styles.container}>

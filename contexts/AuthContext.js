@@ -34,6 +34,7 @@ import { loginWithGoogleDirect } from '../services/googleAuthService';
 import { createLogger } from '../utils/logger';
 import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
 import { storeUserSession, getUserSession, clearUserSession } from '../services/secureTokenStorage';
+import { setSentryUser } from '../config/sentry';
 
 const AuthContext = createContext({});
 const log = createLogger('Auth');
@@ -69,6 +70,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     initializeAuth();
   }, []);
+
+  useEffect(() => {
+    setSentryUser(user);
+  }, [user]);
 
   const initializeAuth = async () => {
     await checkBiometricAvailability();

@@ -234,7 +234,7 @@ export default function ChatScreen() {
             {name}
           </Text>
           {pricing.isPriceOnRequest ? (
-            <Text style={styles.productPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+            <Text style={styles.productPriceOnRequest}>{t('product.priceOnRequest')}</Text>
           ) : (
             <Text style={styles.productPrice}>{formatAed(price)}</Text>
           )}
@@ -244,14 +244,14 @@ export default function ChatScreen() {
                 style={styles.requestQuoteBtn}
                 onPress={() => {
                   const msg = encodeURIComponent(
-                    (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name)
+                    t('product.requestQuoteMessage', { name })
                   );
                   Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
                 }}
                 activeOpacity={0.8}
               >
                 <Ionicons name="logo-whatsapp" size={14} color="#fff" />
-                <Text style={styles.addToBagText}>{t('product.requestQuote') || 'Request Quote'}</Text>
+                <Text style={styles.addToBagText}>{t('product.requestQuote')}</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity

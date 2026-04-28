@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
-import { calculateCartTotals, UAE_EMIRATES } from '../utils/cartUtils';
+import { calculateCartTotals, reconcileBuildSetBundleDiscounts, UAE_EMIRATES } from '../utils/cartUtils';
 import { fetchShippingRates } from '../services/api';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
 import { createLogger } from '../utils/logger';
@@ -309,7 +309,7 @@ export const CartProvider = ({ children }) => {
           return acc;
         }, []);
 
-        setItems(merged);
+        setItems(reconcileBuildSetBundleDiscounts(merged));
       }
 
       if (emirateData) {
@@ -455,14 +455,15 @@ export const CartProvider = ({ children }) => {
         item.product.id === normalizedProduct.id &&
         item.selectedColor === normalizedColor &&
         item.selectedSize === normalizedSize &&
-        !isPromotionItem(item)
+        !isPromotionItem(item) &&
+        Boolean(item?.fromBundle || item?.product?.fromBundle) === isBundleAdd
       );
       if (existingIdx >= 0) {
-        return prev.map((item, i) =>
+        return reconcileBuildSetBundleDiscounts(prev.map((item, i) =>
           i === existingIdx ? { ...item, quantity: item.quantity + quantity } : item
-        );
+        ));
       }
-      return [...prev, newItem];
+      return reconcileBuildSetBundleDiscounts([...prev, newItem]);
     });
 
     bumpPromoTick();
@@ -476,7 +477,7 @@ export const CartProvider = ({ children }) => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
     
-    setItems(prev => prev.filter(item => {
+    setItems(prev => reconcileBuildSetBundleDiscounts(prev.filter(item => {
       // Never remove promotion items via this method
       if (isPromotionItem(item)) return true;
       return !(
@@ -484,7 +485,7 @@ export const CartProvider = ({ children }) => {
         item.selectedColor === normalizedColor && 
         item.selectedSize === normalizedSize
       );
-    }));
+    })));
 
     bumpPromoTick();
     log.debug('Removed from cart', { productId });
@@ -517,9 +518,9 @@ export const CartProvider = ({ children }) => {
       const target = prev[targetIdx];
       const nextQty = (Number(target?.quantity) || 0) - 1;
       if (nextQty <= 0) {
-        return prev.filter((_, i) => i !== targetIdx);
+        return reconcileBuildSetBundleDiscounts(prev.filter((_, i) => i !== targetIdx));
       }
-      return prev.map((it, i) => (i === targetIdx ? { ...it, quantity: nextQty } : it));
+      return reconcileBuildSetBundleDiscounts(prev.map((it, i) => (i === targetIdx ? { ...it, quantity: nextQty } : it)));
     });
 
     bumpPromoTick();
@@ -538,13 +539,13 @@ export const CartProvider = ({ children }) => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
     
-    setItems(prev => prev.map(item =>
+    setItems(prev => reconcileBuildSetBundleDiscounts(prev.map(item =>
       item.product.id === productId && 
       item.selectedColor === normalizedColor && 
       item.selectedSize === normalizedSize
         ? (isPromotionItem(item) ? item : { ...item, quantity })
         : item
-    ));
+    )));
 
     bumpPromoTick();
     log.debug('Updated quantity', { productId, quantity });

@@ -23,6 +23,7 @@ import {
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalization } from '../../contexts/LocalizationContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -32,6 +33,7 @@ export default function ImageLightbox({
   initialIndex = 0,
   onClose,
 }) {
+  const { t } = useLocalization();
   const [index, setIndex] = useState(initialIndex);
   const listRef = useRef(null);
 
@@ -75,7 +77,7 @@ export default function ImageLightbox({
               onPress={onClose}
               style={styles.closeButton}
               accessibilityRole="button"
-              accessibilityLabel="Close image viewer"
+              accessibilityLabel={t('product.a11y.closeImageViewer')}
               activeOpacity={0.8}
               hitSlop={{ top: 12, left: 12, right: 12, bottom: 12 }}
             >

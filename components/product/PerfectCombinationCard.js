@@ -311,7 +311,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
           ) : null}
 
           {recPricing.isPriceOnRequest ? (
-            <Text style={styles.pcPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+            <Text style={styles.pcPriceOnRequest}>{t('product.priceOnRequest')}</Text>
           ) : canSeePrices ? (
             <View style={styles.pcPriceRow}>
               <Text style={styles.pcPriceMain}>{formatAed(recBase)}</Text>
@@ -329,7 +329,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
               style={[styles.pcAddBtn, { backgroundColor: '#25D366' }]}
               onPress={() => {
                 const msg = encodeURIComponent(
-                  (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', recName)
+                  t('product.requestQuoteMessage', { name: recName })
                 );
                 Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
               }}
@@ -337,7 +337,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
             >
               <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
               <Text style={styles.pcAddBtnText}>
-                {t('product.requestQuote') || 'Request Quote'}
+                {t('product.requestQuote')}
               </Text>
             </TouchableOpacity>
           ) : (

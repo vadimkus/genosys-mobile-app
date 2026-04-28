@@ -21,7 +21,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { getAddressLine, parseGenosysAddress } from '../../utils/addressUtils';
+import { isValidEmailValue, normalizeUserProfile } from '../../utils/userProfile';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
@@ -138,28 +138,21 @@ export default function EditProfileScreen() {
   // Populate form with user data when component loads
   useEffect(() => {
     if (user) {
-      const nameParts = user.name ? user.name.split(' ') : ['', ''];
-      const parsedAddr = parseGenosysAddress(user.address || '');
-      const birthday = user.birthday || user.dateOfBirth || '';
-      const authEmail = String(user.email || '').trim();
-      const isAppleRelay = authEmail.includes('@privaterelay.appleid.com');
-      const derivedContactEmail =
-        String(user.contactEmail || '').trim() ||
-        (!isAppleRelay ? authEmail : '');
+      const profile = normalizeUserProfile(user);
       const nextForm = {
-        firstName: nameParts[0] || '',
-        lastName: nameParts.slice(1).join(' ') || '',
-        email: authEmail,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
         // "Real email" used for notifications/checkout. Mandatory for all login methods.
         // For non-Apple-relay accounts, default to the auth email if contactEmail is empty.
-        contactEmail: derivedContactEmail,
-        phone: user.phone || '',
+        contactEmail: profile.contactEmail || (!profile.hasAppleRelayEmail ? profile.email : ''),
+        phone: profile.phone,
         // Backend uses `birthday` (YYYY-MM-DD). Keep local field name for UI.
-        dateOfBirth: birthday,
-        gender: normalizeGenderValue(user.gender),
+        dateOfBirth: profile.birthday,
+        gender: normalizeGenderValue(profile.gender),
         // Don't show GENOSYS_ADDR_V1 payload in the input
-        address: getAddressLine(parsedAddr || (user.address || '')),
-        profilePicture: user.profilePicture || null,
+        address: profile.addressLine,
+        profilePicture: profile.profilePicture,
       };
       setFormData(nextForm);
 
@@ -172,8 +165,8 @@ export default function EditProfileScreen() {
       setIsEditing(true);
       
       // Set initial date if available
-      if (birthday) {
-        setSelectedDate(new Date(birthday));
+      if (profile.birthday) {
+        setSelectedDate(new Date(profile.birthday));
       }
     }
   }, [user]);
@@ -366,15 +359,14 @@ export default function EditProfileScreen() {
     }
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!isValidEmailValue(formData.email)) {
       Alert.alert(t('common.error'), t('editProfile.validationInvalidEmail'));
       return;
     }
 
     // Contact Email validation (mandatory)
     const contactEmail = String(formData.contactEmail || '').trim();
-    if (!emailRegex.test(contactEmail)) {
+    if (!isValidEmailValue(contactEmail)) {
       Alert.alert(t('common.error'), t('editProfile.validationInvalidContactEmail'));
       return;
     }

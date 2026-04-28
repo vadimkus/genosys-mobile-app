@@ -64,7 +64,12 @@
     "quickDiscount": "20% скидка!",
     "quickDiscountQuery": "Как получить скидку 20%? Расскажите о создании набора",
     "quickAiSkin": "AI анализ кожи",
-    "quickAiSkinQuery": "Не знаю свой тип кожи, можете проанализировать?"
+    "quickAiSkinQuery": "Не знаю свой тип кожи, можете проанализировать?",
+    "a11y": {
+      "openChat": "Открыть чат с Genie",
+      "collapseChat": "Свернуть чат",
+      "expandChat": "Развернуть чат на весь экран"
+    }
   },
   "skinAnalysis": {
     "title": "AI Анализ кожи",
@@ -117,7 +122,12 @@
     "pigmentation": "Пигментация",
     "pores": "Поры",
     "firmness": "Упругость",
-    "hydration": "Увлажнённость"
+    "hydration": "Увлажнённость",
+    "recommendationsFailed": "Не удалось загрузить рекомендации.",
+    "recommendationsFailedFull": "Не удалось загрузить рекомендации. Проверьте подключение и попробуйте ещё раз.",
+    "browseByConcernTitle": "Подберите по проблеме кожи",
+    "browseByConcernDesc": "Подобранные продукты и ежедневный уход для каждой проблемы",
+    "browseByConcernButton": "Смотреть"
   },
   "orders": {
     "title": "Заказы",
@@ -147,7 +157,14 @@
     "paymentLinkMissingMessage": "Не удалось открыть ссылку на оплату. Попробуйте ещё раз.",
     "couldNotOpenPaymentTitle": "Не удалось открыть оплату",
     "pleaseTryAgain": "Попробуйте ещё раз.",
-    "pendingNote": "Если оплата ещё не завершена, заказ останется в статусе «в ожидании» до подтверждения оплаты."
+    "pendingNote": "Если оплата ещё не завершена, заказ останется в статусе «в ожидании» до подтверждения оплаты.",
+    "statusPending": "В ожидании",
+    "statusProcessing": "Обрабатывается",
+    "statusPaid": "Оплачен",
+    "statusCompleted": "Завершён",
+    "statusFailed": "Ошибка",
+    "statusCancelled": "Отменён",
+    "statusRefunded": "Возвращён"
   },
   "bag": {
     "title": "Корзина",
@@ -343,6 +360,13 @@
     "fullPrice": "Полная цена: {price} AED",
     "bundleDiscount": "Скидка 15% (набор)",
     "finalPrice": "Итого: {price} AED",
+    "discountPercent": "Скидка {percent}%",
+    "a11y": {
+      "openImageViewer": "Открыть просмотр изображений",
+      "openImage": "Открыть изображение {current} из {total}",
+      "closeImageViewer": "Закрыть просмотр изображений",
+      "reviewSummary": "{rating} из 5, отзывов: {count}"
+    },
     "spec": {
       "size": "Размер",
       "sizeOptions": "Варианты размера",
@@ -1110,7 +1134,10 @@
     "product": "товар",
     "products": "товаров",
     "in": "в",
-    "foundFor": "по запросу «{query}»"
+    "foundFor": "по запросу «{query}»",
+    "a11y": {
+      "openMenu": "Открыть меню"
+    }
   },
   "categories": {
     "all": "Все товары",
@@ -1431,7 +1458,8 @@
   "variant": {
     "size": "Размер",
     "color": "Цвет",
-    "unavailable": "Недоступно"
+    "unavailable": "Недоступно",
+    "cushionBBSizeLabel": "15 г (включая сменный рефилл)"
   },
   "stock": {
     "outOfStock": "Нет в наличии",
@@ -1458,6 +1486,7 @@
     "login": "Войти",
     "logout": "Выйти",
     "close": "Закрыть",
+    "switchLanguage": "Сменить язык",
     "save": "Сохранить",
     "done": "Готово",
     "continue": "Продолжить",

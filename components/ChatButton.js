@@ -227,7 +227,7 @@ export default function ChatButton({ visible = true }) {
         <View style={s.productInfo}>
           <Text style={[s.productName, isRTL && s.textRTL]} numberOfLines={2}>{name}</Text>
           {pricing.isPriceOnRequest ? (
-            <Text style={s.productPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+            <Text style={s.productPriceOnRequest}>{t('product.priceOnRequest')}</Text>
           ) : (
             <Text style={s.productPrice}>{formatAed(pricing.displayPrice)}</Text>
           )}
@@ -243,7 +243,7 @@ export default function ChatButton({ visible = true }) {
                 activeOpacity={0.8}
               >
                 <Ionicons name="logo-whatsapp" size={12} color="#fff" />
-                <Text style={s.addToBagText}>{t('product.requestQuote') || 'Request Quote'}</Text>
+                <Text style={s.addToBagText}>{t('product.requestQuote')}</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -356,7 +356,7 @@ export default function ChatButton({ visible = true }) {
             onPress={() => { haptics.lightTap(); setIsOpen(true); }}
             activeOpacity={0.85}
             accessibilityRole="button"
-            accessibilityLabel="Open chat with Genie"
+            accessibilityLabel={t('chat.a11y.openChat')}
           >
             <Ionicons name="chatbubble-ellipses" size={26} color="#ffffff" />
             <View style={s.notificationDot} />
@@ -397,11 +397,18 @@ export default function ChatButton({ visible = true }) {
                   onPress={() => setIsExpanded((prev) => !prev)}
                   style={s.headerActionBtn}
                   activeOpacity={0.7}
-                  accessibilityLabel={isExpanded ? 'Collapse chat' : 'Expand chat to full screen'}
+                  accessibilityRole="button"
+                  accessibilityLabel={isExpanded ? t('chat.a11y.collapseChat') : t('chat.a11y.expandChat')}
                 >
                   <Ionicons name={isExpanded ? 'contract-outline' : 'expand-outline'} size={18} color="#ffffff" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { haptics.lightTap(); setIsOpen(false); setIsExpanded(false); }} style={s.headerActionBtn} activeOpacity={0.7}>
+                <TouchableOpacity
+                  onPress={() => { haptics.lightTap(); setIsOpen(false); setIsExpanded(false); }}
+                  style={s.headerActionBtn}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.close')}
+                >
                   <Ionicons name="close" size={20} color="#ffffff" />
                 </TouchableOpacity>
               </View>

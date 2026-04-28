@@ -1,6 +1,6 @@
 {
   "name": "genosys-mobile-app",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "main": "expo-router/entry",
   "expo": {
     "install": {
@@ -36,12 +36,15 @@
     "screenshots:russian": "bash scripts/capture-russian-screenshots.sh",
     "smoke:pricing-display": "node scripts/smoke-pricing-display.js",
     "smoke:cart-pricing-contract": "tsx scripts/smoke-cart-pricing-contract.js",
-    "smoke:order-payload-pricing-contract": "tsx scripts/smoke-order-payload-pricing-contract.js"
+    "smoke:order-payload-pricing-contract": "tsx scripts/smoke-order-payload-pricing-contract.js",
+    "smoke:orders-repository": "tsx scripts/smoke-orders-repository.js",
+    "verify:release": "npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "^8.4.4",
+    "@sentry/react-native": "~7.2.0",
     "@stripe/stripe-react-native": "0.50.3",
     "expo": "~54.0.33",
     "expo-apple-authentication": "~8.0.8",

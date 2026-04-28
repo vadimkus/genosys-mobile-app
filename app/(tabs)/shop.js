@@ -59,6 +59,7 @@ import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
 import TrustStrip from '../../components/TrustStrip';
+import NavigationDrawer from '../../components/NavigationDrawer';
 
 
 const log = createLogger('Shop');
@@ -120,10 +121,22 @@ export default function ShopScreen() {
   const [categoryBadges, setCategoryBadges] = useState({}); // { "Cream": "new", "Beauty Boxes": "new" }
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [addingProducts, setAddingProducts] = useState(new Set()); // Track which products are being added
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const isRTL = dir === 'rtl';
+  const discountLabel = useCallback(
+    (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) }),
+    [t]
+  );
+  const localizeDiscountLabel = useCallback(
+    (label) => {
+      const match = String(label || '').trim().match(/^(\d+(?:\.\d+)?)%\s*OFF$/i);
+      return match ? discountLabel(Number(match[1])) : label;
+    },
+    [discountLabel]
+  );
 
   // ─── Voice Search (only when native module is available) ───
   const speechAvailable = _speechAvailable;
@@ -301,10 +314,18 @@ export default function ShopScreen() {
             const displayPrice = contractPrice ? pricing.displayPrice : Number(product.displayPrice || product.price || 0);
             const originalPrice = contractPrice ? pricing.originalPrice : Number(product.originalPrice);
 
+            if (!user) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.loginToSeePriceText}>{t('product.loginToSeePrice')}</Text>
+                </View>
+              );
+            }
+
             if (pricing.isPriceOnRequest) {
               return (
                 <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest') || 'Price on Request'}</Text>
+                  <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest')}</Text>
                 </View>
               );
             }
@@ -342,7 +363,7 @@ export default function ShopScreen() {
                 <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
                   <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
                   <Text style={styles.discountedPrice}>{formatAed(displayPrice)}</Text>
-                  {pricing.discountLabel && <Text style={styles.userDiscount}>{pricing.discountLabel}</Text>}
+                  {pricing.discountLabel && <Text style={styles.userDiscount}>{localizeDiscountLabel(pricing.discountLabel)}</Text>}
                   <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                 </View>
               );
@@ -363,7 +384,7 @@ export default function ShopScreen() {
               onPress={() => {
                 const productName = getLocalizedProductName(product, locale) || product.name || '';
                 const message = encodeURIComponent(
-                  (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
+                  t('product.requestQuoteMessage', { name: productName })
                 );
                 Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
               }}
@@ -376,7 +397,7 @@ export default function ShopScreen() {
                 style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
               />
               <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
-                {t('shop.requestQuote') || 'Request Quote'}
+                {t('shop.requestQuote')}
               </Text>
             </TouchableOpacity>
           ) : (() => {
@@ -393,8 +414,8 @@ export default function ShopScreen() {
             // In-bag state: show a [-] [N in Bag] [+] stepper so the user
             // can adjust quantity from the grid without opening the bag.
             if (isInBag) {
-              const decLabel = t('shop.decreaseQuantity') || 'Decrease quantity';
-              const incLabel = t('shop.increaseQuantity') || 'Increase quantity';
+              const decLabel = t('shop.decreaseQuantity');
+              const incLabel = t('shop.increaseQuantity');
               return (
                 <View
                   style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
@@ -692,7 +713,13 @@ export default function ShopScreen() {
         t('checkout.loginRequiredMessage'),
         [
           { text: t('common.cancel'), style: 'cancel' },
-          { text: t('common.login'), onPress: () => router.push('/auth/login') }
+          {
+            text: t('common.login'),
+            onPress: () => router.push({
+              pathname: '/auth/login',
+              params: { returnTo: '/(tabs)/shop' },
+            }),
+          }
         ]
       );
       return;
@@ -763,12 +790,21 @@ export default function ShopScreen() {
         {/* Left: Language selector */}
         <View style={[styles.headerLeft, isRTL && styles.headerLeftRtl]}>
           <TouchableOpacity
+            onPress={() => { haptics.lightTap(); setDrawerOpen(true); }}
+            activeOpacity={0.85}
+            style={styles.menuButton}
+            accessibilityRole="button"
+            accessibilityLabel={t('shop.a11y.openMenu')}
+          >
+            <Ionicons name="menu-outline" size={22} color="#1D1D1F" />
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => setLangOpen((v) => !v)}
             disabled={langSwitching}
             activeOpacity={0.85}
             style={styles.langButton}
             accessibilityRole="button"
-            accessibilityLabel="Switch language"
+            accessibilityLabel={t('common.switchLanguage')}
           >
             <Text style={styles.langButtonText}>{currentLangCode}</Text>
             <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#16A34A" />
@@ -836,6 +872,12 @@ export default function ShopScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <NavigationDrawer
+        visible={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        headerHeight={(insets?.top || 0) + (headerHeight || 56)}
+      />
 
       {/* Language dropdown menu (modal overlay) */}
       <Modal
@@ -1069,7 +1111,7 @@ export default function ShopScreen() {
                     </Text>
                   </View>
                   <View style={styles.buildSetBadge}>
-                    <Text style={styles.buildSetBadgeText}>{t('shop.upTo20Off') || 'Up to 20% OFF'}</Text>
+                    <Text style={styles.buildSetBadgeText}>{t('shop.upTo20Off')}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -1193,6 +1235,11 @@ const styles = StyleSheet.create({
   },
   headerRightRtl: {
     justifyContent: 'flex-start',
+  },
+  menuButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 10,
   },
   langButton: {
     flexDirection: 'row',
@@ -1843,6 +1890,12 @@ const styles = StyleSheet.create({
     ...T.label,
     letterSpacing: 0.3,
     color: '#dc2626',
+  },
+  loginToSeePriceText: {
+    ...T.labelSmall,
+    color: '#86868B',
+    fontWeight: '700',
+    marginBottom: 4,
   },
   addToCartButtonDisabled: {
     backgroundColor: '#95A5A6',

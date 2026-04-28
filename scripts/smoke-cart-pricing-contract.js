@@ -1,4 +1,4 @@
-import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils.js';
+import { calculateCartTotals, computeWaterfallBreakdown, reconcileBuildSetBundleDiscounts } from '../utils/cartUtils.js';
 import { computeSavingsAED } from '../utils/checkoutFormUtils.js';
 
 function assertEqual(name, actual, expected) {
@@ -152,10 +152,37 @@ assertEqual('waterfall total saved', waterfall.totalSaved, 60);
 const checkoutSavings = computeSavingsAED([contractDiscountItem, promoItem], contractTotals.subtotal);
 assertEqual('checkout savings uses contract original price', checkoutSavings, 40);
 
+const buildSetItems = Array.from({ length: 5 }, (_, index) => ({
+  product: product({
+    id: `bundle-${index + 1}`,
+    price: 80,
+    displayPrice: 80,
+    originalPrice: 100,
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+  }),
+  quantity: 1,
+  fromBundle: true,
+  bundleDiscountPercent: 20,
+}));
+const fiveItemBundle = reconcileBuildSetBundleDiscounts(buildSetItems);
+assertEqual('5-item build set keeps 20% discount', fiveItemBundle[0].bundleDiscountPercent, 20);
+assertEqual('5-item build set subtotal', calculateCartTotals(fiveItemBundle, user, 'Dubai', shippingConfig).subtotal, 400);
+
+const fourItemBundle = reconcileBuildSetBundleDiscounts(buildSetItems.slice(0, 4));
+assertEqual('4-item build set downgrades to 15% discount', fourItemBundle[0].bundleDiscountPercent, 15);
+assertEqual('4-item build set subtotal', calculateCartTotals(fourItemBundle, user, 'Dubai', shippingConfig).subtotal, 340);
+
+const singleLeftoverBundle = reconcileBuildSetBundleDiscounts(buildSetItems.slice(0, 1));
+assertEqual('single build set leftover loses bundle flag', singleLeftoverBundle[0].fromBundle, undefined);
+assertEqual('single build set leftover returns to retail subtotal', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal, 100);
+assertEqual('single build set leftover has no bundle waterfall', computeWaterfallBreakdown(singleLeftoverBundle, null).hasBundleDiscount, false);
+
 console.log('[cart-pricing-contract] contract subtotal:', contractTotals.subtotal);
 console.log('[cart-pricing-contract] legacy fallback subtotal:', legacyFallbackTotals.subtotal);
 console.log('[cart-pricing-contract] bundle subtotal:', bundleTotals.subtotal);
 console.log('[cart-pricing-contract] variant subtotal:', variantTotals.subtotal);
 console.log('[cart-pricing-contract] waterfall saved:', waterfall.totalSaved);
 console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
-console.log('[cart-pricing-contract] 6 cart pricing scenarios passed');
+console.log('[cart-pricing-contract] build-set single-leftover subtotal:', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal);
+console.log('[cart-pricing-contract] 10 cart pricing scenarios passed');

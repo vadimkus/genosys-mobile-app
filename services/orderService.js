@@ -6,6 +6,7 @@
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
 import { buildMobileOrderItemPayload } from '../utils/orderPayloadPricing';
+import { authenticatedFetch } from './authFetch';
 
 const log = createLogger('orderService');
 
@@ -32,6 +33,51 @@ function getMobileHeaders(orderData) {
     'x-api-key': API_KEY,
     ...getAuthHeader(orderData),
   };
+}
+
+async function readResponseBody(response) {
+  const text = await response.text().catch(() => '');
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
+}
+
+function getSafeOrderErrorMessage(kind) {
+  if (kind === 'card') return 'Could not start card payment. Please try again.';
+  if (kind === 'resume') return 'Could not start payment for this order yet. Please try again later.';
+  return 'Could not place order. Please try again.';
+}
+
+async function postMobileJson(url, payload, orderDataOrToken, kind) {
+  const token = getToken(orderDataOrToken);
+  const headers = typeof orderDataOrToken === 'string'
+    ? {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        Authorization: `Bearer ${orderDataOrToken}`,
+      }
+    : getMobileHeaders(orderDataOrToken);
+
+  const response = await authenticatedFetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  }, token);
+
+  const body = await readResponseBody(response);
+  if (!response.ok) {
+    log.warn('Mobile order request failed', {
+      kind,
+      url,
+      status: response.status,
+      message: body?.error || body?.message || '',
+    });
+    throw new Error(getSafeOrderErrorMessage(kind));
+  }
+  return body;
 }
 
 /**
@@ -83,23 +129,24 @@ export async function getPaymentUrlForExistingOrder({ token, orderId, orderNumbe
 
   for (const attempt of attempts) {
     try {
-      const res = await fetch(attempt.url, {
+      const res = await authenticatedFetch(attempt.url, {
         method: 'POST',
         headers,
         body: JSON.stringify(attempt.body),
-      });
+      }, t);
 
-      if (!res.ok) {
-        // Continue trying other shapes; keep last error in case all fail.
-        continue;
-      }
+      if (!res.ok) continue;
 
-      const json = await res.json().catch(() => ({}));
+      const json = await readResponseBody(res);
       const paymentUrl = json?.paymentUrl || json?.paymentLink || json?.url || json?.data?.paymentUrl || '';
       if (paymentUrl) {
         return { success: true, paymentUrl: String(paymentUrl), raw: json };
       }
-    } catch {
+    } catch (e) {
+      log.warn('Payment resume attempt failed', {
+        url: attempt.url,
+        error: e?.message || e,
+      });
       // continue
     }
   }
@@ -158,27 +205,13 @@ export async function submitCODOrder(orderData) {
       discountAmount: orderData.discountAmount || 0,
       bundleDiscountPercentage: orderData.bundleDiscountPercentage || 0,
       bundleDiscountAmount: orderData.bundleDiscountAmount || 0,
+      clientPricingSnapshot: orderData.clientPricingSnapshot || null,
       // Email/notification hints (backend may use these)
       sendEmails: true,
       notifyAdmin: true,
     };
 
-    const response = await fetch(`${API_BASE_URL}/orders`, {
-      method: 'POST',
-      headers: getMobileHeaders(orderData),
-      body: JSON.stringify(orderPayload),
-    });
-
-    log.debug('COD order response status', { status: response.status });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      let errorData = {};
-      try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
-      throw new Error(`Order submission failed: ${response.status} - ${errorData.error || errorData.message || errorText || 'Unknown error'}`);
-    }
-
-    const result = await response.json();
+    const result = await postMobileJson(`${API_BASE_URL}/orders`, orderPayload, orderData, 'cod');
     const orderNumberFromApi =
       result?.orderNumber ||
       result?.data?.orderNumber ||
@@ -207,8 +240,7 @@ export async function submitCODOrder(orderData) {
     log.error('COD order submission failed', error?.message || error);
     return {
       success: false,
-      error: error.message || 'Failed to submit order',
-      details: error
+      error: getSafeOrderErrorMessage('cod'),
     };
   }
 }
@@ -254,27 +286,13 @@ export async function submitCardOrder(orderData) {
       discountAmount: orderData.discountAmount || 0,
       bundleDiscountPercentage: orderData.bundleDiscountPercentage || 0,
       bundleDiscountAmount: orderData.bundleDiscountAmount || 0,
+      clientPricingSnapshot: orderData.clientPricingSnapshot || null,
       sendEmails: true,
       notifyAdmin: true,
       source: 'mobile_app',
     };
 
-    const response = await fetch(`${API_BASE_URL}/checkout/stripe`, {
-      method: 'POST',
-      headers: getMobileHeaders(orderData),
-      body: JSON.stringify(orderPayload),
-    });
-
-    log.debug('Card order response status', { status: response.status });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      let errorData = {};
-      try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
-      throw new Error(`Card order submission failed: ${response.status} - ${errorData.error || errorData.message || errorText || 'Unknown error'}`);
-    }
-
-    const result = await response.json();
+    const result = await postMobileJson(`${API_BASE_URL}/checkout/stripe`, orderPayload, orderData, 'card');
     log.debug('Card order submitted successfully', {
       success: result.success,
       orderNumber: result.orderNumber || orderData.orderNumber,
@@ -294,8 +312,7 @@ export async function submitCardOrder(orderData) {
     log.error('Card order submission failed', error?.message || error);
     return {
       success: false,
-      error: error.message || 'Failed to submit card order',
-      details: error
+      error: getSafeOrderErrorMessage('card'),
     };
   }
 }

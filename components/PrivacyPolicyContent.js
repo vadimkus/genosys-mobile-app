@@ -3,7 +3,11 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Activity
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { AUTH_CONFIG } from '../config/auth';
+import { getJson } from '../services/httpClient';
+import { createLogger } from '../utils/logger';
 import T from '../utils/typography';
+
+const log = createLogger('PrivacyPolicy');
 
 export default function PrivacyPolicyContent({ showLastUpdated = true }) {
   const { t, locale, dir } = useLocalization();
@@ -18,17 +22,14 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
       try {
         setLoading(true);
         setError(false);
-        const res = await fetch(`${AUTH_CONFIG.API_BASE_URL}/privacy-policy`, {
+        const data = await getJson(`${AUTH_CONFIG.API_BASE_URL}/privacy-policy`, {
           headers: {
-            'x-api-key': AUTH_CONFIG.API_KEY,
-            'x-locale': locale || 'en',
+            locale: locale || 'en',
           },
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
         if (!cancelled) setPolicy(data);
       } catch (e) {
-        console.warn('Failed to fetch privacy policy from API:', e.message);
+        log.warn('Failed to fetch privacy policy from API', e?.message || e);
         if (!cancelled) setError(true);
       } finally {
         if (!cancelled) setLoading(false);

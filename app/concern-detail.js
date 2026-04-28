@@ -146,6 +146,13 @@ export default function ConcernDetailScreen() {
 
   const handleChipPress = useCallback((routeId) => {
     if (!routeId) return;
+    if (!user) {
+      router.push({
+        pathname: '/auth/login',
+        params: { returnTo: `/concern-detail?slug=${encodeURIComponent(String(slug || ''))}` },
+      });
+      return;
+    }
     const fullProduct = productLookup[routeId];
     if (!fullProduct || fullProduct.isPriceOnRequest) {
       router.push(`/product/${routeId}`);
@@ -163,7 +170,7 @@ export default function ConcernDetailScreen() {
       setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [routeId]: false })), 1200);
       showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено في корзину' : 'Added to bag');
     }
-  }, [productLookup, addItem, removeItem, findCartItem, showToast, locale, router]);
+  }, [productLookup, addItem, removeItem, findCartItem, showToast, locale, router, slug, user]);
 
   const handleChipLongPress = useCallback((productId) => {
     if (!productId) return;
@@ -337,7 +344,11 @@ export default function ConcernDetailScreen() {
                                       <Ionicons name="checkmark-circle" size={14} color="#16a34a" />
                                     ) : null}
                                     <Text style={[styles.stepProductName, chipInCart && styles.stepProductNameInCart]}>{p.name}</Text>
-                                    {hasDisc ? (
+                                    {!user ? (
+                                      <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>
+                                        {t('product.loginToSeePrice')}
+                                      </Text>
+                                    ) : hasDisc ? (
                                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: '#9CA3AF' }]}>{retailUnit.toFixed(0)}</Text>
                                         <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: '#dc2626' }]}>{formatAed(finalUnit)}</Text>
@@ -399,6 +410,13 @@ export default function ConcernDetailScreen() {
                             if (ci) removeItem(pid, ci.selectedColor || '', ci.selectedSize || '');
                             showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
                           } else {
+                            if (!user) {
+                              router.push({
+                                pathname: '/auth/login',
+                                params: { returnTo: `/concern-detail?slug=${encodeURIComponent(String(slug || ''))}` },
+                              });
+                              return;
+                            }
                             addItem(product, 1, '', '');
                             setJustAddedIds(prev => ({ ...prev, [pid]: true }));
                             setTimeout(() => setJustAddedIds(prev => ({ ...prev, [pid]: false })), 1200);
@@ -497,11 +515,11 @@ export default function ConcernDetailScreen() {
 
         {/* SEO intro text hidden — only relevant for web crawlers, not native app */}
 
-        <View style={{ height: cartItems.length > 0 ? 120 : 40 }} />
+        <View style={{ height: user && cartItems.length > 0 ? 120 : 40 }} />
       </ScrollView>
 
       {/* Sticky Bottom Bar — expandable, visible when cart has items */}
-      {cartItems.length > 0 && (() => {
+      {user && cartItems.length > 0 && (() => {
         const summary = getCartSummary();
         return (
           <View style={styles.stickyBar}>
@@ -622,7 +640,7 @@ export default function ConcernDetailScreen() {
                   {cartItems.length} {cartItems.length === 1
                     ? (locale === 'ar' ? 'منتج' : locale === 'ru' ? 'товар' : 'item')
                     : (locale === 'ar' ? 'منتجات' : locale === 'ru' ? 'товаров' : 'items')}
-                  {' · '}{Number(summary.subtotal).toFixed(0)} AED
+                  {user ? ` · ${Number(summary.subtotal).toFixed(0)} AED` : ''}
                 </Text>
               </View>
               <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/concern-detail', params: { slug } })).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>

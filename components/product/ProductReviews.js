@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
+import { getJson, httpRequest, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 import T from '../../utils/typography';
 
@@ -46,9 +47,9 @@ export default function ProductReviews({ productId }) {
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${WEB_ORIGIN}/api/products/${productId}/reviews`);
-      if (!response.ok) throw new Error('Failed to fetch reviews');
-      const data = await response.json();
+      const data = await getJson(`${WEB_ORIGIN}/api/products/${productId}/reviews`, {
+        headers: { apiKey: false },
+      });
       if (data.reviews) {
         setReviews(data.reviews);
         setAverageRating(data.averageRating || null);
@@ -92,26 +93,22 @@ export default function ProductReviews({ productId }) {
 
       const method = editingReview ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
+      const data = await sendJson(url, {
+        email: user.email,
+        rating: formRating,
+        title: formTitle.trim() || null,
+        comment: formComment.trim(),
+      }, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          rating: formRating,
-          title: formTitle.trim() || null,
-          comment: formComment.trim(),
-        }),
+        headers: { apiKey: false },
+        safeMessage: t('reviews.submitFailed') || 'Failed to submit review',
       });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || (t('reviews.submitFailed') || 'Failed to submit review'));
-      }
+      if (data?.success === false) throw new Error('review-submit-failed');
 
       resetForm();
       await fetchReviews();
     } catch (error) {
-      Alert.alert(t('common.error') || 'Error', error?.message || (t('reviews.submitFailed') || 'Failed to submit review'));
+      Alert.alert(t('common.error') || 'Error', t('reviews.submitFailed') || 'Failed to submit review');
     } finally {
       setSubmitting(false);
     }
@@ -128,11 +125,11 @@ export default function ProductReviews({ productId }) {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(
+              await httpRequest(
                 `${WEB_ORIGIN}/api/products/${productId}/reviews/${reviewId}?email=${encodeURIComponent(user?.email || '')}`,
-                { method: 'DELETE' }
+                { method: 'DELETE' },
+                { safeMessage: t('reviews.deleteFailed') || 'Failed to delete review' }
               );
-              if (!response.ok) throw new Error('Failed to delete');
               await fetchReviews();
             } catch (error) {
               Alert.alert(t('common.error') || 'Error', t('reviews.deleteFailed') || 'Failed to delete review');

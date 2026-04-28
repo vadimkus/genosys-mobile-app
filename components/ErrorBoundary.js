@@ -13,6 +13,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { createLogger } from '../utils/logger';
+import { captureException } from '../config/sentry';
 import T from '../utils/typography';
 
 const log = createLogger('ErrorBoundary');
@@ -35,6 +36,12 @@ export class ErrorBoundary extends React.Component {
     });
     
     this.setState({ errorInfo });
+    captureException(error, {
+      screen: this.props.screenName || 'unknown',
+      extra: {
+        componentStack: errorInfo?.componentStack?.slice(0, 1000),
+      },
+    });
     
     // If a custom error handler is provided, call it
     if (this.props.onError) {

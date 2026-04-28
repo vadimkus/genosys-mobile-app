@@ -2,13 +2,13 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
   Alert,
   I18nManager,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -29,6 +29,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
   const { t, locale } = useLocalization();
   const { user } = useAuth();
   const isRTL = !!I18nManager.isRTL;
+  const canSeePrices = !!user;
 
   const discountPct = Number(user?.discountPercentage);
   const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
@@ -54,6 +55,11 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
   const isBeautyBox = isBeautyBoxProduct(product);
   const pricingDisplay = getPricingDisplay(product);
   const hasPricingContract = hasServerPricing(product);
+  const discountLabel = (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) });
+  const localizeDiscountLabel = (label) => {
+    const match = String(label || '').trim().match(/^(\d+(?:\.\d+)?)%\s*OFF$/i);
+    return match ? discountLabel(Number(match[1])) : label;
+  };
 
   const baseBadges = (product.badges || []).filter((b) => {
     const text = (b.text || '').toLowerCase().trim();
@@ -191,9 +197,13 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
         
         {/* Enhanced Pricing from Server with Beauty Boxes Special Display */}
         <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-          {pricingDisplay.isPriceOnRequest ? (
+          {!canSeePrices ? (
+            <Text style={[styles.loginToSeePrice, isRTL && styles.valueRTL]}>
+              {t('product.loginToSeePrice')}
+            </Text>
+          ) : pricingDisplay.isPriceOnRequest ? (
             <Text style={[styles.price, isRTL && styles.valueRTL]}>
-              {t('product.priceOnRequest') || 'Price on Request'}
+              {t('product.priceOnRequest')}
             </Text>
           ) : (() => {
             const category = product?.category;
@@ -223,8 +233,8 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
               const finalPrice = pricingDisplay.displayPrice;
               const retailPrice = pricingDisplay.originalPrice || finalPrice;
               const hasDiscount = retailPrice > finalPrice + 0.01;
-              const label = pricingDisplay.discountLabel ||
-                (pricingDisplay.discountPercentage > 0 ? `${Math.round(pricingDisplay.discountPercentage)}% OFF` : null);
+              const label = localizeDiscountLabel(pricingDisplay.discountLabel) ||
+                (pricingDisplay.discountPercentage > 0 ? discountLabel(pricingDisplay.discountPercentage) : null);
 
               return hasDiscount ? (
                 <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
@@ -256,7 +266,9 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
             const canApplyUserDiscount = hasUserDiscount && !excluded && !serverAlreadyDiscounted;
             const finalPrice = canApplyUserDiscount ? retailPrice * (1 - discountPct / 100) : displayP;
             const hasDiscount = retailPrice > finalPrice + 0.01;
-            const label = serverAlreadyDiscounted ? product.discountLabel : (canApplyUserDiscount ? `${discountPct}% OFF` : null);
+            const label = serverAlreadyDiscounted
+              ? localizeDiscountLabel(product.discountLabel)
+              : (canApplyUserDiscount ? discountLabel(discountPct) : null);
 
             return hasDiscount ? (
               <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
@@ -282,7 +294,17 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
         {onAddToCart && !isOutOfStock && (
           <TouchableOpacity
             style={[styles.addToCartBtn, inCart && styles.addToCartBtnInCart]}
-            onPress={(e) => { e.stopPropagation?.(); onAddToCart(); }}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              if (!user) {
+                router.push({
+                  pathname: '/auth/login',
+                  params: { returnTo: `/product/${product.id}` },
+                });
+                return;
+              }
+              onAddToCart();
+            }}
             activeOpacity={0.8}
           >
             <Ionicons
@@ -293,7 +315,9 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
             <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
               {inCart
                 ? `${locale === 'ar' ? 'في الحقيبة' : locale === 'ru' ? 'В корзине' : 'In Bag'}${inCartQty > 0 ? ` (${inCartQty})` : ' ✓'}`
-                : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
+                : !user
+                  ? t('shop.loginToBuy')
+                  : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
             </Text>
           </TouchableOpacity>
         )}
@@ -417,6 +441,11 @@ const styles = StyleSheet.create({
   },
   price: {
     ...T.price,
+  },
+  loginToSeePrice: {
+    ...T.labelSmall,
+    fontWeight: '700',
+    color: '#86868B',
   },
   discountPricing: {
     alignItems: 'flex-start',

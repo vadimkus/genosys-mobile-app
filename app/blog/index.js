@@ -10,15 +10,16 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
+import { getJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
@@ -43,19 +44,15 @@ export default function BlogScreen() {
       setError(null);
 
       const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/mobile/blog?limit=20`, {
+      const data = await getJson(`${baseUrl}/api/mobile/blog?limit=20`, {
         headers: {
-          'x-api-key': AUTH_CONFIG.API_KEY,
-          'x-locale': locale,
+          locale,
         },
       });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
       setPosts(data.posts || []);
     } catch (err) {
       log.error('Blog fetch error', err?.message);
-      setError(err.message);
+      setError(l('Failed to load', 'فشل التحميل', 'Ошибка загрузки'));
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -22,7 +22,8 @@ import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUti
 import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { parseGenosysAddress, getAddressLine, formatAddressForDisplay } from '../utils/addressUtils';
+import { formatAddressForDisplay } from '../utils/addressUtils';
+import { normalizeUserProfile } from '../utils/userProfile';
 import CollapsibleFooter from '../components/CollapsibleFooter';
 import * as haptics from '../utils/haptics';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
@@ -186,26 +187,19 @@ export default function CheckoutScreen() {
   useEffect(() => {
     if (userPickedSavedAddressRef.current) return;
     if (user) {
-      const nameParts = user.name?.split(' ') || [];
-      setFirstName(nameParts[0] || '');
-      setLastName(nameParts.slice(1).join(' ') || '');
-      setEmail(String(user.contactEmail || user.email || '').trim());
-      // phone: prefer user.phone, else addressDetails.phone (both may be in different formats)
-      const phoneRaw = String(user.phone || '').trim() || '';
-      const parsed = parseGenosysAddress(user.address || '');
-      setAddressDetails(parsed);
-      // Show only the clean address line in the text input (no GENOSYS_ADDR_V1 payload)
-      setAddress(getAddressLine(parsed || (user.address || '')));
+      const profile = normalizeUserProfile(user);
+      setFirstName(profile.firstName);
+      setLastName(profile.lastName);
+      setEmail(profile.primaryEmail);
+      setAddressDetails(profile.addressDetails);
+      setAddress(profile.addressLine);
 
-      // If the saved address contains a phone, use it only when profile phone is empty
-      const addrPhoneRaw = !phoneRaw && parsed?.phone ? String(parsed.phone) : '';
-      const national = normalizeUaeToNationalDigits(phoneRaw || addrPhoneRaw);
+      const national = normalizeUaeToNationalDigits(profile.phone);
       setPhoneNational(national);
 
       // If saved address contains emirate, pre-select it when possible
-      if (parsed?.emirate && typeof setSelectedEmirate === 'function') {
-        const next = String(parsed.emirate);
-        setSelectedEmirate(next);
+      if (profile.emirate && typeof setSelectedEmirate === 'function') {
+        setSelectedEmirate(profile.emirate);
       }
     }
   }, [user]);
@@ -439,7 +433,16 @@ export default function CheckoutScreen() {
           ? formatAddressForDisplay(addressDetails)
           : cleanedAddress;
 
-      // Prepare order data
+      // Recompute totals immediately before submission so saved carts don't submit stale numbers.
+      const finalTotals = calculateCartTotals(items, user, selectedEmirate, {
+        emirates: getAvailableEmirates(),
+        freeShippingThreshold: shippingRates?.freeShippingThreshold,
+        vatRate: shippingRates?.vatRate,
+      });
+      const finalWaterfall = computeWaterfallBreakdown(items, user);
+
+      // Prepare order data. Backend remains the pricing authority; these totals are client hints
+      // and must match the cart snapshot being submitted.
       const userDiscountPct = Number(user?.discountPercentage) || 0;
       const orderData = {
         orderNumber,
@@ -451,10 +454,10 @@ export default function CheckoutScreen() {
           : addressFromV1,
         emirate: selectedEmirate,
         items: items,
-        subtotal: safeSubtotal,
-        shippingCost: safeShipping,
-        vatAmount: safeVat,
-        total: safeTotal,
+        subtotal: Number(finalTotals.subtotal) || 0,
+        shippingCost: Number(finalTotals.shipping) || 0,
+        vatAmount: Number(finalTotals.vatAmount) || 0,
+        total: Number(finalTotals.total) || 0,
         paymentMethod: selectedPaymentMethod,
         orderNotes: orderNotes.trim(),
         locale: locale || 'en',
@@ -468,9 +471,14 @@ export default function CheckoutScreen() {
           return Number(bundleItem?.bundleDiscountPercent || bundleItem?.product?.bundleDiscountPercent) || 0;
         })(),
         bundleDiscountAmount: (() => {
-          const wf = computeWaterfallBreakdown(items, user);
-          return wf?.bundleDiscountTotal || 0;
+          return finalWaterfall?.bundleDiscountTotal || 0;
         })(),
+        clientPricingSnapshot: {
+          retailTotal: finalWaterfall?.retailTotal || 0,
+          userDiscountTotal: finalWaterfall?.userDiscountTotal || 0,
+          bundleDiscountTotal: finalWaterfall?.bundleDiscountTotal || 0,
+          source: 'mobile-pre-submit',
+        },
       };
 
       log.info('Submitting order:', {

@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
+import { getJson } from '../services/httpClient';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { createLogger } from '../utils/logger';
@@ -67,15 +68,11 @@ export default function FAQScreen() {
       setError(null);
 
       const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/mobile/faq`, {
+      const data = await getJson(`${baseUrl}/api/mobile/faq`, {
         headers: {
-          'x-api-key': AUTH_CONFIG.API_KEY,
-          'x-locale': locale || 'en',
+          locale: locale || 'en',
         },
       });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
 
       setFaqData(data.items || []);
       setSubtitle(data.subtitle || '');

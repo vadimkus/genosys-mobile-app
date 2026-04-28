@@ -6,6 +6,8 @@ const appJsonPath = path.join(root, 'app.json')
 const packageJsonPath = path.join(root, 'package.json')
 const packageLockPath = path.join(root, 'package-lock.json')
 const expoPlistPath = path.join(root, 'ios', 'GenosysUAE', 'Supporting', 'Expo.plist')
+const infoPlistPath = path.join(root, 'ios', 'GenosysUAE', 'Info.plist')
+const androidBuildGradlePath = path.join(root, 'android', 'app', 'build.gradle')
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'))
@@ -17,6 +19,8 @@ function writeJson(filePath, data) {
 
 const appConfig = readJson(appJsonPath)
 const appVersion = appConfig?.expo?.version
+const iosBuildNumber = appConfig?.expo?.ios?.buildNumber
+const androidVersionCode = appConfig?.expo?.android?.versionCode
 
 if (!appVersion) {
   throw new Error('app.json must define expo.version before syncing runtimeVersion')
@@ -58,4 +62,68 @@ if (fs.existsSync(expoPlistPath)) {
   fs.writeFileSync(expoPlistPath, updated)
 }
 
-console.log(`Synced Expo runtime to app version ${appVersion}`)
+if (fs.existsSync(infoPlistPath)) {
+  let plist = fs.readFileSync(infoPlistPath, 'utf8')
+  let foundShortVersion = false
+  let foundBuildNumber = false
+
+  plist = plist.replace(
+    /(<key>CFBundleShortVersionString<\/key>\s*<string>)([^<]+)(<\/string>)/,
+    (_match, before, _currentVersion, after) => {
+      foundShortVersion = true
+      return `${before}${appVersion}${after}`
+    }
+  )
+
+  if (iosBuildNumber) {
+    plist = plist.replace(
+      /(<key>CFBundleVersion<\/key>\s*<string>)([^<]+)(<\/string>)/,
+      (_match, before, _currentBuild, after) => {
+        foundBuildNumber = true
+        return `${before}${iosBuildNumber}${after}`
+      }
+    )
+  } else {
+    foundBuildNumber = true
+  }
+
+  if (!foundShortVersion) {
+    throw new Error('Could not find CFBundleShortVersionString in Info.plist')
+  }
+  if (!foundBuildNumber) {
+    throw new Error('Could not find CFBundleVersion in Info.plist')
+  }
+
+  fs.writeFileSync(infoPlistPath, plist)
+}
+
+if (fs.existsSync(androidBuildGradlePath)) {
+  let gradle = fs.readFileSync(androidBuildGradlePath, 'utf8')
+  let foundVersionName = false
+  let foundVersionCode = false
+
+  gradle = gradle.replace(/versionName\s+"[^"]+"/, () => {
+    foundVersionName = true
+    return `versionName "${appVersion}"`
+  })
+
+  if (androidVersionCode) {
+    gradle = gradle.replace(/versionCode\s+\d+/, () => {
+      foundVersionCode = true
+      return `versionCode ${androidVersionCode}`
+    })
+  } else {
+    foundVersionCode = true
+  }
+
+  if (!foundVersionName) {
+    throw new Error('Could not find versionName in android/app/build.gradle')
+  }
+  if (!foundVersionCode) {
+    throw new Error('Could not find versionCode in android/app/build.gradle')
+  }
+
+  fs.writeFileSync(androidBuildGradlePath, gradle)
+}
+
+console.log(`Synced Expo runtime/native versions to app version ${appVersion}`)

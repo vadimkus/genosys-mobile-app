@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
+import { getJson } from '../services/httpClient';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { createLogger } from '../utils/logger';
@@ -99,14 +100,7 @@ export default function PartnersScreen() {
       setError(null);
 
       const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/mobile/partners`, {
-        headers: {
-          'x-api-key': AUTH_CONFIG.API_KEY,
-        },
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const data = await getJson(`${baseUrl}/api/mobile/partners`);
       setPartners(data.partners || []);
     } catch (err) {
       log.warn('Failed to fetch partners:', err.message);

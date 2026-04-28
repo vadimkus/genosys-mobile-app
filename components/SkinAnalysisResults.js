@@ -11,10 +11,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Platform,
   Linking,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -54,16 +54,16 @@ function buildProfileFromConcerns(concerns) {
   return profile;
 }
 
-function ScoreBar({ label, value, inverted = false, icon }) {
+function ScoreBar({ label, value, inverted = false, icon, isRTL = false }) {
   // inverted: true means lower value = better (blemishes, wrinkles, etc.)
   const displayValue = inverted ? 100 - value : value;
   const color = displayValue >= 70 ? '#16A34A' : displayValue >= 45 ? '#F59E0B' : '#dc2626';
 
   return (
     <View style={styles.scoreRow}>
-      <View style={styles.scoreLabelRow}>
+      <View style={[styles.scoreLabelRow, isRTL && styles.scoreLabelRowRTL]}>
         <Ionicons name={icon} size={16} color={color} />
-        <Text style={styles.scoreLabel}>{label}</Text>
+        <Text style={[styles.scoreLabel, isRTL && styles.textRTL]}>{label}</Text>
         <Text style={[styles.scoreValue, { color }]}>{Math.round(displayValue)}/100</Text>
       </View>
       <View style={styles.barBg}>
@@ -96,6 +96,13 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
 
   const handleAddToBag = async (product) => {
     if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
+    if (!user) {
+      router.push({
+        pathname: '/auth/login',
+        params: { returnTo: '/skin-analysis-camera' },
+      });
+      return;
+    }
     try {
       await addItem(product, 1, '', '');
       setAddedProducts((prev) => new Set([...prev, product.id]));
@@ -152,36 +159,42 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
             value={result.blemishes}
             inverted
             icon="alert-circle-outline"
+            isRTL={isRTL}
           />
           <ScoreBar
             label={t('skinAnalysis.wrinkles')}
             value={result.wrinkles}
             inverted
             icon="resize-outline"
+            isRTL={isRTL}
           />
           <ScoreBar
             label={t('skinAnalysis.pigmentation')}
             value={result.pigmentation}
             inverted
             icon="ellipse-outline"
+            isRTL={isRTL}
           />
           <ScoreBar
             label={t('skinAnalysis.pores')}
             value={result.pores}
             inverted
             icon="scan-outline"
+            isRTL={isRTL}
           />
           <ScoreBar
             label={t('skinAnalysis.firmness')}
             value={result.firmness}
             inverted={false}
             icon="shield-outline"
+            isRTL={isRTL}
           />
           <ScoreBar
             label={t('skinAnalysis.hydration')}
             value={result.hydration}
             inverted={false}
             icon="water-outline"
+            isRTL={isRTL}
           />
         </View>
 
@@ -209,8 +222,10 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                   )}
                   <View style={styles.recInfo}>
                     <Text style={[styles.recName, isRTL && styles.textRTL]} numberOfLines={2}>{name}</Text>
-                    {pricing.isPriceOnRequest ? (
-                      <Text style={styles.recPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                    {!user ? (
+                      <Text style={styles.recPriceOnRequest}>{t('product.loginToSeePrice')}</Text>
+                    ) : pricing.isPriceOnRequest ? (
+                      <Text style={styles.recPriceOnRequest}>{t('product.priceOnRequest')}</Text>
                     ) : (
                       <Text style={styles.recPrice}>{formatAed(price)}</Text>
                     )}
@@ -220,14 +235,14 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                           style={styles.recQuoteBtn}
                           onPress={() => {
                             const msg = encodeURIComponent(
-                              (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name)
+                              t('product.requestQuoteMessage', { name })
                             );
                             Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
                           }}
                           activeOpacity={0.8}
                         >
                           <Ionicons name="logo-whatsapp" size={14} color="#fff" />
-                          <Text style={styles.recAddText}>{t('product.requestQuote') || 'Request Quote'}</Text>
+                          <Text style={styles.recAddText}>{t('product.requestQuote')}</Text>
                         </TouchableOpacity>
                       ) : (
                         <TouchableOpacity
@@ -237,7 +252,9 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                           activeOpacity={0.8}
                         >
                           <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
-                          <Text style={styles.recAddText}>{isAdded ? t('chat.added') : t('chat.addToBag')}</Text>
+                          <Text style={styles.recAddText}>
+                            {isAdded ? t('chat.added') : !user ? t('shop.loginToBuy') : t('chat.addToBag')}
+                          </Text>
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
@@ -263,18 +280,14 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
         >
           <Text style={styles.concernCtaIcon}>🌿</Text>
           <Text style={[styles.concernCtaTitle, isRTL && styles.textRTL]}>
-            {locale === 'ar' ? 'استكشفي حسب مشكلة البشرة' : locale === 'ru' ? 'Подберите по проблеме кожи' : 'Browse by Skin Concern'}
+            {t('skinAnalysis.browseByConcernTitle')}
           </Text>
           <Text style={[styles.concernCtaDesc, isRTL && styles.textRTL]}>
-            {locale === 'ar'
-              ? 'منتجات مختارة وروتين يومي لكل مشكلة'
-              : locale === 'ru'
-              ? 'Подобранные продукты и ежедневный уход для каждой проблемы'
-              : 'Curated products & daily routines for every concern'}
+            {t('skinAnalysis.browseByConcernDesc')}
           </Text>
           <View style={[styles.concernCtaBtnRow, isRTL && { flexDirection: 'row-reverse' }]}>
             <Text style={styles.concernCtaBtnText}>
-              {locale === 'ar' ? 'اكتشفي' : locale === 'ru' ? 'Смотреть' : 'Explore'}
+              {t('skinAnalysis.browseByConcernButton')}
             </Text>
             <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color="#fff" />
           </View>
@@ -366,6 +379,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  scoreLabelRowRTL: {
+    flexDirection: 'row-reverse',
   },
   scoreLabel: { ...T.labelSmall, color: '#374151', flex: 1 },
   scoreValue: { ...T.labelSmall, fontWeight: '800' },

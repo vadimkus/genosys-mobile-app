@@ -1,15 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking } from 'react-native';
 import { Image } from 'expo-image';
-import Constants from 'expo-constants';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOrders } from '../../contexts/OrdersContext';
-import { fetchUserOrders, fetchUserOrderById, deleteUserOrder } from '../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../services/orderService';
+import {
+  canResumeOrderPayment,
+  fetchOrdersOverview,
+  findOrder,
+  getOrderId,
+  getOrderKey,
+  getOrderNumber,
+  getOrderPaymentUrl,
+  isUserDeletableOrder,
+  mergeOrders,
+  removeOrder,
+  sortOrdersNewestFirst,
+} from '../../services/ordersRepository';
 import { OrdersSkeleton } from '../../components/SkeletonLoader';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
@@ -20,14 +31,6 @@ import T from '../../utils/typography';
 const log = createLogger('Orders');
 
 const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
-const ORDERS_DIAGNOSTIC_BUILD = 'orders-diag-2026-04-26-2358';
-
-const maskEmail = (emailRaw) => {
-  const email = String(emailRaw || '').trim();
-  if (!email || !email.includes('@')) return email ? 'set' : 'empty';
-  const [name, domain] = email.split('@');
-  return `${name.slice(0, 2)}***@${domain}`;
-};
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -46,11 +49,12 @@ const isUserDiscountExcludedOrderItemName = (nameRaw) => {
   return false;
 };
 
-const formatDate = (value) => {
+const formatDate = (value, locale = 'en') => {
   if (!value) return '';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString();
+  const localeTag = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-US';
+  return d.toLocaleDateString(localeTag, { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
 const inferOriginalUnitPriceFromPct = ({ unitPrice, discountPct }) => {
@@ -122,38 +126,12 @@ const isApplePayLike = (order) => {
   return metaFlow === 'apple_pay';
 };
 
-const isPaidLike = (order) => {
-  const s = String(order?.status || '').toLowerCase();
-  const ps = String(order?.paymentStatus || order?.payment_status || '').toLowerCase();
-  return s === 'paid' || s === 'confirmed' || ps === 'paid' || ps === 'confirmed';
-};
-
-const isCodLike = (order) => {
-  const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
-  return pm === 'cod' || pm === 'cash' || pm === 'cash_on_delivery' || pm === 'cash on delivery';
-};
-
-const isCardLike = (order) => {
-  const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
-  if (!pm) return false;
-  return pm.includes('card') || pm.includes('stripe') || pm.includes('apple') || pm.includes('online');
-};
-
-const isDeletableByUser = (order) => {
-  const s = String(order?.status || '').toLowerCase();
-  const ps = String(order?.paymentStatus || order?.payment_status || '').toLowerCase();
-  // Align with backend: only allow deletion for PENDING orders that are NOT paid.
-  if (s !== 'pending') return false;
-  if (ps === 'paid' || ps === 'confirmed') return false;
-  return true;
-};
-
 export default function OrdersScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { orders: contextOrders, refreshOrdersCount } = useOrders();
   const token = user?.token || user?.accessToken || '';
-  const { t, dir } = useLocalization();
+  const { t, dir, locale } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
 
@@ -179,71 +157,22 @@ export default function OrdersScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState('');
-  const [loadDiagnostics, setLoadDiagnostics] = useState(null);
   const [payingOrderId, setPayingOrderId] = useState('');
   const [expandedOrderKey, setExpandedOrderKey] = useState('');
 
   const load = async () => {
     if (!token) {
-      setLoadDiagnostics({
-        build: ORDERS_DIAGNOSTIC_BUILD,
-        reason: 'missing-token',
-        local: 0,
-        pending: 0,
-        recent: 0,
-      });
       return;
     }
     setError('');
     try {
-      // Prefer pending orders first if backend supports status filter.
-      let pendingError = '';
-      let recentError = '';
-      const pending = await fetchUserOrders(token, { status: 'pending', page: 1, limit: 20 }).catch((e) => {
-        pendingError = e?.message || 'pending fetch failed';
-        log.warn('Failed to fetch pending orders', e?.message);
-        return [];
-      });
-      const recent = await fetchUserOrders(token, { page: 1, limit: 30 }).catch((e) => {
-        recentError = e?.message || 'recent fetch failed';
-        log.warn('Failed to fetch recent orders', e?.message);
-        return [];
-      });
-      const merged = [
-        ...(Array.isArray(pending) ? pending : []),
-        ...(Array.isArray(recent) ? recent : []),
-      ];
-      // De-dupe by id/orderNumber
-      const seen = new Set();
-      const deduped = merged.filter((o) => {
-        const key = String(o?.id || o?.orderId || o?.orderNumber || o?.order_number || o?.number || '');
-        if (!key) return true;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-      const data = deduped;
+      const data = await fetchOrdersOverview(token);
       setOrders(Array.isArray(data) ? data : []);
-      setLoadDiagnostics({
-        build: ORDERS_DIAGNOSTIC_BUILD,
-        reason: 'loaded',
-        pending: Array.isArray(pending) ? pending.length : -1,
-        recent: Array.isArray(recent) ? recent.length : -1,
-        local: Array.isArray(data) ? data.length : -1,
-        pendingError,
-        recentError,
-        statuses: (Array.isArray(data) ? data : []).slice(0, 5).map((o) => `${o?.status || 'no-status'}/${o?.paymentStatus || o?.payment_status || 'no-pay'}`),
-      });
       // Refresh the orders count in the tab bar
       refreshOrdersCount();
     } catch (e) {
-      setLoadDiagnostics({
-        build: ORDERS_DIAGNOSTIC_BUILD,
-        reason: 'load-error',
-        message: e?.message || 'Failed to load orders',
-        local: 0,
-      });
-      setError(e?.message || 'Failed to load orders');
+      log.warn('Failed to load orders', e?.message || e);
+      setError(t('ordersDetailAlerts.pleaseTryAgain'));
     }
   };
 
@@ -262,81 +191,26 @@ export default function OrdersScreen() {
   };
 
   const sortedOrders = useMemo(() => {
-    const sourceOrders = [
-      ...orders,
-      ...(Array.isArray(contextOrders) ? contextOrders : []),
-    ];
-    const seen = new Set();
-
-    return sourceOrders
-      .filter((o) => {
-        const key = String(o?.id || o?.orderId || o?.orderNumber || o?.order_number || o?.number || '');
-        if (!key) return true;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      })
-      .filter((o) => {
-        const s = String(o.status || '').toLowerCase();
-        const ps = String(o.paymentStatus || o.payment_status || '').toLowerCase();
-        return (
-          s !== 'cancelled' &&
-          s !== 'canceled' &&
-          s !== 'deleted' &&
-          ps !== 'deleted'
-        );
-      })
-      .sort((a, b) => {
-      const da = new Date(a.createdAt || a.created_at || a.date || 0).getTime() || 0;
-      const db = new Date(b.createdAt || b.created_at || b.date || 0).getTime() || 0;
-      return db - da;
-    });
+    return sortOrdersNewestFirst(mergeOrders(orders, contextOrders));
   }, [orders, contextOrders]);
-
-  const emptyDiagnostics = useMemo(() => {
-    const context = Array.isArray(contextOrders) ? contextOrders : [];
-    return {
-      build: ORDERS_DIAGNOSTIC_BUILD,
-      runtime: Constants?.expoConfig?.runtimeVersion || Constants?.manifest?.runtimeVersion || 'unknown',
-      app: `${Constants?.nativeAppVersion || 'unknown'} (${Constants?.nativeBuildVersion || 'unknown'})`,
-      local: orders.length,
-      shared: context.length,
-      token: token ? 'yes' : 'no',
-      email: maskEmail(user?.email),
-      contact: maskEmail(user?.contactEmail),
-      last: loadDiagnostics || null,
-    };
-  }, [contextOrders, loadDiagnostics, orders.length, token, user?.contactEmail, user?.email]);
 
   const handlePay = async (order) => {
     haptics.mediumTap();
     if (!token) return;
-    const orderId = String(order?.id || order?.orderId || '');
-    const orderNumber = String(order?.orderNumber || order?.order_number || order?.number || '');
-    const key = String(order?.id || orderNumber);
+    const orderId = getOrderId(order);
+    const orderNumber = getOrderNumber(order);
+    const key = getOrderKey(order);
     setPayingOrderId(key);
     try {
       // First, re-fetch this order (many backends only include paymentUrl on the detail payload).
       let hydratedOrder = order;
       try {
-        if (orderId) {
-          hydratedOrder = (await fetchUserOrderById(token, orderId)) || hydratedOrder;
-        } else {
-          const list = await fetchUserOrders(token, { page: 1, limit: 50 });
-          const arr = Array.isArray(list) ? list : [];
-          hydratedOrder =
-            arr.find((o) => String(o?.orderNumber || o?.order_number || o?.number || '') === orderNumber) || hydratedOrder;
-        }
+        hydratedOrder = (await findOrder(token, orderId || orderNumber)) || hydratedOrder;
       } catch {
         // ignore hydration errors and fall back to resume helper
       }
 
-      const existingUrl =
-        hydratedOrder?.paymentUrl ||
-        hydratedOrder?.paymentLink ||
-        hydratedOrder?.payment_url ||
-        hydratedOrder?.payment_link ||
-        '';
+      const existingUrl = getOrderPaymentUrl(hydratedOrder);
       if (existingUrl) {
         router.push({
           pathname: '/payment/stripe',
@@ -367,7 +241,8 @@ export default function OrdersScreen() {
         },
       });
     } catch (e) {
-      Alert.alert(t('orders.couldNotStartPayment'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
+      log.warn('Could not start payment', e?.message || e);
+      Alert.alert(t('orders.couldNotStartPayment'), t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
       setPayingOrderId('');
     }
@@ -386,13 +261,13 @@ export default function OrdersScreen() {
 
   const handleDelete = (order) => {
     haptics.heavyTap();
-    const orderId = String(order?.id || order?.orderId || '').trim();
-    const orderNumber = order?.orderNumber || order?.order_number || order?.number || order?.id || '';
+    const orderId = getOrderId(order);
+    const orderNumber = getOrderNumber(order);
     if (!orderId) {
       Alert.alert(t('ordersScreen.cannotDeleteTitle'), t('ordersScreen.cannotDeleteMessage1'));
       return;
     }
-    if (!isDeletableByUser(order)) {
+    if (!isUserDeletableOrder(order)) {
       Alert.alert(t('ordersScreen.cannotDeleteTitle'), t('ordersScreen.cannotDeleteMessage2'));
       return;
     }
@@ -407,13 +282,14 @@ export default function OrdersScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await deleteUserOrder(token, orderId);
-              setOrders((prev) => prev.filter((o) => String(o?.id || o?.orderId || '') !== orderId));
+              await removeOrder(token, orderId);
+              setOrders((prev) => prev.filter((o) => getOrderId(o) !== orderId));
               setExpandedOrderKey((prev) => (prev === orderId ? '' : prev));
               // Refresh the orders count in the tab bar
               refreshOrdersCount();
             } catch (e) {
-              Alert.alert(t('ordersScreen.deleteFailedTitle'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
+              log.warn('Delete order failed', e?.message || e);
+              Alert.alert(t('ordersScreen.deleteFailedTitle'), t('ordersDetailAlerts.pleaseTryAgain'));
             }
           },
         },
@@ -475,9 +351,6 @@ export default function OrdersScreen() {
             <Image source={EMPTY_UNI_IMAGE} style={styles.emptyUniImage} contentFit="contain" />
             <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersYet')}</Text>
             <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.noOrdersHint')}</Text>
-            <Text selectable style={[styles.diagnosticText, isRTL && styles.textRTLRight]}>
-              {JSON.stringify(emptyDiagnostics, null, 2)}
-            </Text>
             <TouchableOpacity
               style={styles.shopButton}
               onPress={() => router.replace('/(tabs)/shop')}
@@ -506,9 +379,7 @@ export default function OrdersScreen() {
                 o.itemCount ??
                 (Array.isArray(o.items) ? o.items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0) : 0);
               const emirate = o.customerEmirate || o.emirate || '';
-              const hasExistingPaymentUrl =
-                !!(o?.paymentUrl || o?.paymentLink || o?.payment_url || o?.payment_link);
-              const showPay = !isPaidLike(o) && !isCodLike(o) && (hasExistingPaymentUrl || isCardLike(o));
+              const showPay = canResumeOrderPayment(o);
               const keyId = String(o.id || orderNumber);
               const isPaying = payingOrderId === keyId;
               const isExpanded = expandedOrderKey === keyId;
@@ -568,7 +439,7 @@ export default function OrdersScreen() {
 
                   <View style={[styles.metaRow, isRTL && styles.metaRowRTL]}>
                     <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>
-                      {formatDate(createdAt)}
+                      {formatDate(createdAt, locale)}
                       {emirate ? ` • ${formatEmirateLabel(t, emirate)}` : ''}
                     </Text>
                     <View style={[styles.metaRight, isRTL && styles.metaRightRTL]}>
@@ -842,18 +713,6 @@ const styles = StyleSheet.create({
   },
   shopButtonText: {
     ...T.button,
-  },
-  diagnosticText: {
-    marginTop: 16,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: '#F2F2F7',
-    color: '#3C3C43',
-    fontFamily: 'Courier',
-    fontSize: 10,
-    lineHeight: 14,
-    textAlign: 'left',
-    width: '92%',
   },
   shopButtonTextRTL: {
     writingDirection: 'rtl',

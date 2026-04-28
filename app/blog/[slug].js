@@ -11,7 +11,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
   RefreshControl,
   TextInput,
@@ -20,6 +19,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -35,6 +35,7 @@ import T from '../../utils/typography';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
+import { getJson, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 
 const log = createLogger('BlogPost');
@@ -71,15 +72,11 @@ export default function BlogPostScreen() {
         setError(null);
 
         const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-        const res = await fetch(`${baseUrl}/api/mobile/blog/${slug}`, {
+        const data = await getJson(`${baseUrl}/api/mobile/blog/${slug}`, {
           headers: {
-            'x-api-key': AUTH_CONFIG.API_KEY,
-            'x-locale': locale || 'en',
+            locale: locale || 'en',
           },
         });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
 
         // Fix relative URLs in HTML content so images/links resolve correctly
         const origin = AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae';
@@ -155,23 +152,16 @@ export default function BlogPostScreen() {
     try {
       setSubmitting(true);
       const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/mobile/blog/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': AUTH_CONFIG.API_KEY,
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          postId: post.id,
-          content: commentText.trim(),
-        }),
+      const data = await sendJson(`${baseUrl}/api/mobile/blog/comments`, {
+        postId: post.id,
+        content: commentText.trim(),
+      }, {
+        authenticated: true,
+        token,
+        headers: { token },
+        safeMessage: l('Failed to post comment', 'فشل إرسال التعليق', 'Не удалось отправить комментарий'),
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to post comment');
-      }
+      if (!data?.success) throw new Error('comment-submit-failed');
 
       haptics.success();
       // Prepend new comment to list
@@ -180,7 +170,7 @@ export default function BlogPostScreen() {
     } catch (err) {
       Alert.alert(
         l('Error', 'خطأ', 'Ошибка'),
-        err.message || l('Failed to post comment', 'فشل إرسال التعليق', 'Не удалось отправить комментарий')
+        l('Failed to post comment', 'فشل إرسال التعليق', 'Не удалось отправить комментарий')
       );
     } finally {
       setSubmitting(false);

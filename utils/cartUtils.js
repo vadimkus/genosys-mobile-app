@@ -31,6 +31,98 @@ const hasUsableCartContract = (pricing, hasUserDiscount) => {
   return true;
 };
 
+export function getBuildSetDiscountForCount(count) {
+  const n = Number(count) || 0;
+  if (n >= 5) return 20;
+  if (n >= 4) return 15;
+  if (n >= 3) return 10;
+  if (n >= 2) return 5;
+  return 0;
+}
+
+export function isBuildSetBundleItem(item) {
+  return Boolean(
+    item?.fromBundle === true ||
+    item?.product?.fromBundle === true ||
+    Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) > 0
+  );
+}
+
+const getStoredBundleRetailPrice = (item) => {
+  const product = item?.product || {};
+  const explicitOriginal = Number(product.originalPrice);
+  if (Number.isFinite(explicitOriginal) && explicitOriginal > 0) return explicitOriginal;
+
+  const stalePct = Number(item?.bundleDiscountPercent || product?.bundleDiscountPercent) || 0;
+  const staleUnit = Number(product.displayPrice ?? product.price);
+  if (stalePct > 0 && stalePct < 100 && Number.isFinite(staleUnit) && staleUnit > 0) {
+    return Math.round((staleUnit / (1 - stalePct / 100)) * 100) / 100;
+  }
+
+  const pricingBase = Number(product?.pricing?.basePrice || product?.pricing?.originalPrice);
+  if (Number.isFinite(pricingBase) && pricingBase > 0) return pricingBase;
+
+  return Number.isFinite(staleUnit) && staleUnit > 0 ? staleUnit : 0;
+};
+
+export function getCartBuildSetBundleDiscountPercent(items) {
+  const count = Array.isArray(items)
+    ? items.filter((item) => !item?.isPromotionItem && String(item?.selectedSize || '').trim() !== '__PROMO__' && isBuildSetBundleItem(item)).length
+    : 0;
+  return getBuildSetDiscountForCount(count);
+}
+
+export function reconcileBuildSetBundleDiscounts(items) {
+  if (!Array.isArray(items) || items.length === 0) return items || [];
+
+  const bundleCount = items.filter((item) => !item?.isPromotionItem && String(item?.selectedSize || '').trim() !== '__PROMO__' && isBuildSetBundleItem(item)).length;
+  const activePct = getBuildSetDiscountForCount(bundleCount);
+
+  return items.map((item) => {
+    if (!isBuildSetBundleItem(item)) return item;
+
+    const product = item?.product || {};
+    const retailPrice = getStoredBundleRetailPrice(item);
+
+    if (activePct <= 0) {
+      const { fromBundle: _itemFromBundle, bundleDiscountPercent: _itemBundlePct, ...itemRest } = item;
+      const {
+        fromBundle: _productFromBundle,
+        bundleDiscountPercent: _productBundlePct,
+        pricing: _pricing,
+        ...productRest
+      } = product;
+      return {
+        ...itemRest,
+        product: {
+          ...productRest,
+          price: retailPrice,
+          displayPrice: retailPrice,
+          originalPrice: null,
+          discountLabel: null,
+          discountPercentage: 0,
+        },
+      };
+    }
+
+    const discountedPrice = Math.round(retailPrice * (1 - activePct / 100) * 100) / 100;
+    const { pricing: _pricing, ...productRest } = product;
+    return {
+      ...item,
+      fromBundle: true,
+      bundleDiscountPercent: activePct,
+      product: {
+        ...productRest,
+        price: discountedPrice,
+        displayPrice: discountedPrice,
+        originalPrice: retailPrice,
+        fromBundle: true,
+        bundleDiscountPercent: activePct,
+      },
+    };
+  });
+}
+
 /**
  * Calculate basic cart totals for display purposes
  * Note: Server should recalculate final totals during checkout

@@ -5,9 +5,9 @@ import {
   StyleSheet,
   Animated,
   TouchableOpacity,
-  Image,
   Alert,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleFooter from '../../components/CollapsibleFooter';
@@ -276,7 +276,7 @@ export default function BagScreen() {
               const currentSize = item.selectedSize || '';
               return (
                 <View style={styles.variantSelectorWrap}>
-                  <Text style={[styles.variantSelectorLabel, isRTL && styles.variantTextRTL]}>{t('product.size') || 'Size'}:</Text>
+                  <Text style={[styles.variantSelectorLabel, isRTL && styles.variantTextRTL]}>{t('product.size')}:</Text>
                   <View style={[styles.variantChipsRow, isRTL && { flexDirection: 'row-reverse' }]}>
                     {uniqueSizes.map((v) => {
                       const sel = currentSize === v.size;
@@ -330,15 +330,23 @@ export default function BagScreen() {
                 const isBundleItem = item?.fromBundle === true || item?.product?.fromBundle === true;
                 const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;
 
-                // "Build Your Set" bundle items: bundle discount ONLY (no VIP)
+                // "Build Your Set" items: bundle and VIP discounts do not stack.
+                // If VIP/user discount is better than the bundle tier, show the
+                // same per-line VIP badge users see for normally added products.
                 if (isBundleItem && bundlePct > 0 && Number.isFinite(base) && base > 0) {
                   const retailPrice = (Number.isFinite(original) && original > base) ? original : base / (1 - bundlePct / 100);
-                  const discountLabel = `${bundlePct}%`;
+                  const userEligible = hasUserDiscount && !isUserDiscountExcludedProduct(item.product);
+                  const vipPrice = userEligible ? retailPrice * (1 - pct / 100) : Number.POSITIVE_INFINITY;
+                  const bundlePrice = retailPrice * (1 - bundlePct / 100);
+                  const vipWins = userEligible && vipPrice <= bundlePrice + 0.01;
+                  const discountLabel = vipWins ? `${Math.round(pct)}%` : `${bundlePct}%`;
+                  const labelText = vipWins ? t('bag.off') : t('bag.bundleOff');
+                  const labelStyle = vipWins ? styles.itemDiscountLabel : styles.itemBundleLabel;
                   return (
                     <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
                       <View style={styles.itemPriceRow}>
                         <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>
-                        <Text style={styles.itemBundleLabel}>{discountLabel} {t('bag.bundleOff') || 'OFF'}</Text>
+                        <Text style={labelStyle}>{discountLabel} {labelText}</Text>
                       </View>
                       <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
                     </View>

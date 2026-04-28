@@ -5,8 +5,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
-import { fetchUserOrderById, fetchUserOrders, fetchProductById } from '../../../services/api';
+import { fetchProductById } from '../../../services/api';
 import { getPaymentUrlForExistingOrder } from '../../../services/orderService';
+import {
+  canResumeOrderPayment,
+  findOrder,
+  getOrderId,
+  getOrderNumber,
+  getOrderPaymentUrl,
+  isCardLikeOrder,
+  isCodLikeOrder,
+  isPaidLikeOrder,
+} from '../../../services/ordersRepository';
 import { Image } from 'expo-image';
 import { useLocalization } from '../../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../../utils/emirateUtils';
@@ -14,6 +24,7 @@ import { isBeautyBoxProduct } from '../../../utils/productRules';
 import { parseBeautyBoxDescription } from '../../../utils/beautyBoxDescription';
 import { asText } from '../../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../../config/auth';
+import { getOrderContactEmail } from '../../../utils/userProfile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as haptics from '../../../utils/haptics';
 import T from '../../../utils/typography';
@@ -61,12 +72,6 @@ const formatDateTime = (dateString, locale, t) => {
   }
 };
 
-const isPaidLike = (order) => {
-  const s = String(order?.status || '').toLowerCase();
-  const ps = String(order?.paymentStatus || order?.payment_status || '').toLowerCase();
-  return s === 'paid' || s === 'confirmed' || ps === 'paid' || ps === 'confirmed';
-};
-
 const parsePaymentMetadata = (order) => {
   const raw =
     order?.paymentMetadata ??
@@ -91,17 +96,6 @@ const isApplePayLike = (order) => {
   const flow = String(meta?.paymentFlow || meta?.payment_flow || '').toLowerCase();
   const provider = String(meta?.provider || meta?.paymentProvider || '').toLowerCase();
   return flow === 'apple_pay' || provider.includes('apple');
-};
-
-const isCodLike = (order) => {
-  const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
-  return pm === 'cod' || pm === 'cash' || pm === 'cash_on_delivery' || pm === 'cash on delivery';
-};
-
-const isCardLike = (order) => {
-  const pm = String(order?.paymentMethod || order?.payment_method || '').toLowerCase();
-  if (!pm) return false;
-  return pm.includes('card') || pm.includes('stripe') || pm.includes('apple') || pm.includes('online');
 };
 
 const isPromoItem = (item) => {
@@ -155,25 +149,10 @@ export default function OrderDetailScreen() {
     if (!token) return;
     setLoading(true);
     try {
-      let match = null;
-      try {
-        match = await fetchUserOrderById(token, idParam);
-      } catch {
-        match = null;
-      }
-
-      if (!match) {
-        const list = await fetchUserOrders(token, { page: 1, limit: 50 }).catch(() => []);
-        const orders = Array.isArray(list) ? list : [];
-        match =
-          orders.find((o) => String(o?.id || o?.orderId || '') === idParam) ||
-          orders.find((o) => String(o?.orderNumber || o?.order_number || o?.number || '') === idParam) ||
-          null;
-      }
-
+      const match = await findOrder(token, idParam);
       setOrder(match);
     } catch (e) {
-      Alert.alert(t('common.error'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
+      Alert.alert(t('common.error'), t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
       setLoading(false);
     }
@@ -195,14 +174,7 @@ export default function OrderDetailScreen() {
   const total = Number(order?.total ?? order?.totalAmount ?? order?.total_amount ?? order?.amount ?? 0) || 0;
   
   const customerName = order?.customerName || order?.customer_name || user?.name || '';
-  const orderEmailRaw = String(order?.customerEmail || order?.customer_email || '').trim();
-  const contactEmailRaw = String(user?.contactEmail || '').trim();
-  const isAppleRelayEmail = orderEmailRaw.includes('@privaterelay.appleid.com');
-  // If the order stored an Apple relay email but the user has provided a real contact email,
-  // show the real email in Order Details.
-  const customerEmail =
-    (isAppleRelayEmail && contactEmailRaw) ? contactEmailRaw
-    : (orderEmailRaw || contactEmailRaw || String(user?.email || '').trim() || '');
+  const customerEmail = getOrderContactEmail(order, user);
   const customerPhone = order?.customerPhone || order?.customer_phone || user?.phone || '';
   const customerAddress = order?.customerAddress || order?.customer_address || order?.address || '';
   const emirate = order?.emirate || '';
@@ -234,8 +206,8 @@ export default function OrderDetailScreen() {
 
   const getPaymentMethodLabel = () => {
     if (isApplePayLike(order)) return t('ordersDetail.paymentMethodApplePay');
-    if (isCodLike(order)) return t('ordersDetail.paymentMethodCod');
-    if (isCardLike(order)) return t('ordersDetail.paymentMethodCard');
+    if (isCodLikeOrder(order)) return t('ordersDetail.paymentMethodCod');
+    if (isCardLikeOrder(order)) return t('ordersDetail.paymentMethodCard');
     const pm = String(paymentMethod || '').trim();
     if (!pm) return t('ordersDetail.paymentMethodUnknown');
     return t('ordersDetail.paymentMethodOther', { method: pm.toUpperCase() });
@@ -288,8 +260,7 @@ export default function OrderDetailScreen() {
 
   const showPay = useMemo(() => {
     if (!order) return false;
-    const hasExistingPaymentUrl = !!(order?.paymentUrl || order?.paymentLink || order?.payment_url || order?.payment_link);
-    return !isPaidLike(order) && !isCodLike(order) && (hasExistingPaymentUrl || isCardLike(order));
+    return canResumeOrderPayment(order);
   }, [order]);
 
   const onPay = async () => {
@@ -297,10 +268,10 @@ export default function OrderDetailScreen() {
     if (!token || !order) return;
     setPaying(true);
     try {
-      const orderId = String(order?.id || order?.orderId || '');
-      const orderNum = String(order?.orderNumber || order?.order_number || order?.number || '');
+      const orderId = getOrderId(order);
+      const orderNum = getOrderNumber(order);
 
-      const existingUrl = order?.paymentUrl || order?.paymentLink || order?.payment_url || order?.payment_link || '';
+      const existingUrl = getOrderPaymentUrl(order);
       if (existingUrl) {
         router.push({
           pathname: '/payment/stripe',
@@ -311,17 +282,14 @@ export default function OrderDetailScreen() {
 
       const res = await getPaymentUrlForExistingOrder({ token, orderId, orderNumber: orderNum, order });
       if (!res?.success || !res?.paymentUrl) {
-        throw new Error(
-          res?.error ||
-            'Could not start payment. This usually means the backend does not yet support resuming Stripe payments for pending orders.'
-        );
+        throw new Error(res?.error || t('ordersDetailAlerts.pleaseTryAgain'));
       }
       router.push({
         pathname: '/payment/stripe',
         params: { orderId, orderNumber: orderNum, paymentUrl: String(res.paymentUrl), fromOrders: '1' },
       });
     } catch (e) {
-      Alert.alert(t('ordersDetailAlerts.couldNotStartPaymentTitle'), e?.message || t('ordersDetailAlerts.pleaseTryAgain'));
+      Alert.alert(t('ordersDetailAlerts.couldNotStartPaymentTitle'), t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
       setPaying(false);
     }
@@ -354,7 +322,7 @@ export default function OrderDetailScreen() {
     
     try {
       for (const item of itemsToReorder) {
-        const productId = item?.productId || item?.id;
+    const productId = item?.productId || item?.id;
         const qty = Number(item?.quantity) || 1;
         const size = item?.size || item?.selectedSize || '';
         const color = item?.color || item?.selectedColor || '';
@@ -394,7 +362,7 @@ export default function OrderDetailScreen() {
         Alert.alert(t('ordersDetail.reorderTitle'), t('ordersDetail.reorderFailed'));
       }
     } catch (e) {
-      Alert.alert(t('common.error'), e?.message || t('ordersDetail.reorderFailed'));
+      Alert.alert(t('common.error'), t('ordersDetail.reorderFailed'));
     } finally {
       setReordering(false);
     }
@@ -473,7 +441,7 @@ export default function OrderDetailScreen() {
                   <Ionicons name="logo-apple" size={16} color="#111827" style={styles.appleLogo} />
                 ) : null}
                 <Text style={[styles.paymentMethodText, isRTL && styles.textRTL]}>{getPaymentMethodLabel()}</Text>
-                {isPaidLike(order) && isApplePayLike(order) ? (
+                {isPaidLikeOrder(order) && isApplePayLike(order) ? (
                   <Text style={[styles.paymentMethodPaidHint, isRTL && styles.textRTL]}> • {t('ordersDetail.paid')}</Text>
                 ) : null}
               </View>

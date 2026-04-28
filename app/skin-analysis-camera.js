@@ -15,9 +15,9 @@ import {
   Alert,
   Platform,
   ScrollView,
-  Image,
   Linking,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -30,6 +30,7 @@ import { useCart } from '../contexts/CartContext';
 import SkinAnalysisResults from '../components/SkinAnalysisResults';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
 import AUTH_CONFIG from '../config/auth';
+import { getJson, sendJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
 import T from '../utils/typography';
 
@@ -81,17 +82,16 @@ export default function SkinAnalysisCameraScreen() {
     await Promise.all(
       ids.map(async (id) => {
         try {
-          const res = await fetch(`${baseUrl}/api/products/${id}`);
-          if (res.ok) {
-            const product = await res.json();
-            const img = product.image || '';
-            details[parseInt(id, 10)] = {
-              image: img.startsWith('http') ? img : `${ASSET_ORIGIN}${img}`,
-              size: product.size || null,
-              price: product.displayPrice ?? product.price ?? null,
-              isPriceOnRequest: product.isPriceOnRequest || false,
-            };
-          }
+          const product = await getJson(`${baseUrl}/api/products/${id}`, {
+            headers: { apiKey: false },
+          });
+          const img = product.image || '';
+          details[parseInt(id, 10)] = {
+            image: img.startsWith('http') ? img : `${ASSET_ORIGIN}${img}`,
+            size: product.size || null,
+            price: product.displayPrice ?? product.price ?? null,
+            isPriceOnRequest: product.isPriceOnRequest || false,
+          };
         } catch { /* silent */ }
       })
     );
@@ -125,16 +125,13 @@ export default function SkinAnalysisCameraScreen() {
       setAiAnalyzing(true);
       try {
         const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
-        const res = await fetch(`${baseUrl}/api/skin-analysis/ai`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: `data:image/jpeg;base64,${resized.base64}`,
-            locale: locale || 'en',
-          }),
+        const json = await sendJson(`${baseUrl}/api/skin-analysis/ai`, {
+          image: `data:image/jpeg;base64,${resized.base64}`,
+          locale: locale || 'en',
+        }, {
+          headers: { apiKey: false },
+          safeMessage: t('skinCamera.errorAnalysisFailed'),
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
         if (json.success && json.data) {
           setAiResult(json.data);
           haptics.success();
@@ -175,21 +172,27 @@ export default function SkinAnalysisCameraScreen() {
 
   const handleAddToBag = useCallback(async (productId, productName) => {
     if (!productId || addedProducts.has(productId)) return;
+    if (!user) {
+      router.push({
+        pathname: '/auth/login',
+        params: { returnTo: '/skin-analysis-camera' },
+      });
+      return;
+    }
     try {
       // Fetch the real product data to add to cart properly
       const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/products/${productId}`);
-      if (res.ok) {
-        const product = await res.json();
-        await addItem(product, 1, '', '');
-        haptics.success();
-        setAddedProducts((prev) => new Set([...prev, productId]));
-        setTimeout(() => {
-          setAddedProducts((prev) => { const n = new Set(prev); n.delete(productId); return n; });
-        }, 2000);
-      }
+      const product = await getJson(`${baseUrl}/api/products/${productId}`, {
+        headers: { apiKey: false },
+      });
+      await addItem(product, 1, '', '');
+      haptics.success();
+      setAddedProducts((prev) => new Set([...prev, productId]));
+      setTimeout(() => {
+        setAddedProducts((prev) => { const n = new Set(prev); n.delete(productId); return n; });
+      }, 2000);
     } catch { /* silent */ }
-  }, [addItem, addedProducts]);
+  }, [addItem, addedProducts, user]);
 
   // Permission loading
   if (!permission) {
@@ -319,7 +322,9 @@ export default function SkinAnalysisCameraScreen() {
                       )}
                       <View style={styles.aiRecBody}>
                         <Text style={styles.aiRecName} numberOfLines={2}>{productName}</Text>
-                        {details?.isPriceOnRequest ? (
+                        {!user ? (
+                          <Text style={styles.aiRecPriceOnRequest}>{t('product.loginToSeePrice')}</Text>
+                        ) : details?.isPriceOnRequest ? (
                           <Text style={styles.aiRecPriceOnRequest}>{t('skinCamera.priceOnRequest')}</Text>
                         ) : details?.price ? (
                           <Text style={styles.aiRecPrice}>AED {Number(details.price).toFixed(0)}</Text>
@@ -334,7 +339,9 @@ export default function SkinAnalysisCameraScreen() {
                               activeOpacity={0.8}
                             >
                               <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
-                              <Text style={styles.aiRecAddText}>{isAdded ? t('skinCamera.added') : t('skinCamera.addToBag')}</Text>
+                              <Text style={styles.aiRecAddText}>
+                                {isAdded ? t('skinCamera.added') : !user ? t('shop.loginToBuy') : t('skinCamera.addToBag')}
+                              </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={styles.aiRecViewBtn}

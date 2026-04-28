@@ -29,11 +29,13 @@
     },
     "production": {
       "autoIncrement": true,
+      "environment": "production",
       "channel": "production",
       "prebuildCommand": "node scripts/sync-runtime-version.js"
     },
     "production:android": {
       "autoIncrement": false,
+      "environment": "production",
       "channel": "production",
       "android": {
         "buildType": "app-bundle"

@@ -12,11 +12,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
   Platform,
   Linking,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -26,6 +26,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
+import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
 import T from '../utils/typography';
 
@@ -85,11 +86,9 @@ export default function SkinAnalysisScreen() {
           ageGroup,
           targetConcerns: concerns.join(','),
         });
-        const res = await fetch(`${baseUrl}/api/skin-recommendations?${params.toString()}`, {
-          headers: { 'Accept': 'application/json' },
+        const data = await getJson(`${baseUrl}/api/skin-recommendations?${params.toString()}`, {
+          headers: { apiKey: false },
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
         // API returns an array of product objects directly
         const mapped = (Array.isArray(data) ? data : []).map((p) => ({
           product: p,
@@ -98,7 +97,7 @@ export default function SkinAnalysisScreen() {
         setResults(mapped);
       } catch (err) {
         log.warn('Skin recommendations API failed, using empty results:', err.message);
-        setApiError(err.message);
+        setApiError(t('skinAnalysis.recommendationsFailed'));
         setResults([]);
       } finally {
         setLoading(false);
@@ -128,6 +127,13 @@ export default function SkinAnalysisScreen() {
 
   const handleAddToBag = async (product) => {
     if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
+    if (!user) {
+      router.push({
+        pathname: '/auth/login',
+        params: { returnTo: '/skin-analysis' },
+      });
+      return;
+    }
     try {
       await addItem(product, 1, '', '');
       setAddedProducts((prev) => new Set([...prev, product.id]));
@@ -239,10 +245,10 @@ export default function SkinAnalysisScreen() {
             {apiError ? (
               <View style={styles.errorBox}>
                 <Ionicons name="cloud-offline-outline" size={28} color="#dc2626" />
-                <Text style={styles.errorText}>Could not load recommendations. Please check your connection and try again.</Text>
+                <Text style={styles.errorText}>{t('skinAnalysis.recommendationsFailedFull')}</Text>
                 <TouchableOpacity style={styles.retryBtn} onPress={handleReset} activeOpacity={0.85}>
                   <Ionicons name="refresh" size={16} color="#fff" />
-                  <Text style={styles.retryBtnText}>Try Again</Text>
+                  <Text style={styles.retryBtnText}>{t('skinAnalysis.tryAgain')}</Text>
                 </TouchableOpacity>
               </View>
             ) : results.length === 0 ? (
@@ -268,8 +274,10 @@ export default function SkinAnalysisScreen() {
                     )}
                     <View style={styles.recInfo}>
                       <Text style={[styles.recName, isRTL && styles.textRTL]} numberOfLines={2}>{name}</Text>
-                      {product.isPriceOnRequest ? (
-                        <Text style={styles.recPriceOnRequest}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                      {!user ? (
+                        <Text style={styles.recPriceOnRequest}>{t('product.loginToSeePrice')}</Text>
+                      ) : product.isPriceOnRequest ? (
+                        <Text style={styles.recPriceOnRequest}>{t('product.priceOnRequest')}</Text>
                       ) : (
                         <Text style={styles.recPrice}>AED {Number(price).toFixed(2)}</Text>
                       )}
@@ -279,14 +287,14 @@ export default function SkinAnalysisScreen() {
                             style={styles.recQuoteBtn}
                             onPress={() => {
                               const msg = encodeURIComponent(
-                                (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name)
+                                t('product.requestQuoteMessage', { name })
                               );
                               Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
                             }}
                             activeOpacity={0.8}
                           >
                             <Ionicons name="logo-whatsapp" size={14} color="#fff" />
-                            <Text style={styles.recAddText}>{t('product.requestQuote') || 'Request Quote'}</Text>
+                            <Text style={styles.recAddText}>{t('product.requestQuote')}</Text>
                           </TouchableOpacity>
                         ) : (
                           <TouchableOpacity
@@ -296,7 +304,9 @@ export default function SkinAnalysisScreen() {
                             activeOpacity={0.8}
                           >
                             <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
-                            <Text style={styles.recAddText}>{isAdded ? t('chat.added') : t('chat.addToBag')}</Text>
+                            <Text style={styles.recAddText}>
+                              {isAdded ? t('chat.added') : !user ? t('shop.loginToBuy') : t('chat.addToBag')}
+                            </Text>
                           </TouchableOpacity>
                         )}
                         <TouchableOpacity
@@ -321,18 +331,14 @@ export default function SkinAnalysisScreen() {
             >
               <Text style={styles.concernCtaIcon}>🌿</Text>
               <Text style={[styles.concernCtaTitle, isRTL && styles.textRTL]}>
-                {locale === 'ar' ? 'استكشفي حسب مشكلة البشرة' : locale === 'ru' ? 'Подберите по проблеме кожи' : 'Browse by Skin Concern'}
+                {t('skinAnalysis.browseByConcernTitle')}
               </Text>
               <Text style={[styles.concernCtaDesc, isRTL && styles.textRTL]}>
-                {locale === 'ar'
-                  ? 'منتجات مختارة وروتين يومي لكل مشكلة'
-                  : locale === 'ru'
-                  ? 'Подобранные продукты и ежедневный уход для каждой проблемы'
-                  : 'Curated products & daily routines for every concern'}
+                {t('skinAnalysis.browseByConcernDesc')}
               </Text>
               <View style={[styles.concernCtaBtnRow, isRTL && { flexDirection: 'row-reverse' }]}>
                 <Text style={styles.concernCtaBtnText}>
-                  {locale === 'ar' ? 'اكتشفي' : locale === 'ru' ? 'Смотреть' : 'Explore'}
+                  {t('skinAnalysis.browseByConcernButton')}
                 </Text>
                 <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color="#fff" />
               </View>

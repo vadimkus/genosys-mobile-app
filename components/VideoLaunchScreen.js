@@ -56,17 +56,36 @@ async function downloadAndCache(remoteUrl, cacheTTL) {
 export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onDone }) {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const [videoSource, setVideoSource] = useState(localSource || null);
+  const [isReady, setIsReady] = useState(false);
   const dismissed = useRef(false);
   const timeoutRef = useRef(null);
+  const fallbackTimeoutRef = useRef(null);
+  const onDoneRef = useRef(onDone);
+
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  }, [onDone]);
 
   const dismiss = useCallback(() => {
     if (dismissed.current) return;
     dismissed.current = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
-      onDone?.();
+    if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
+
+    // Do not rely only on the native animation completion callback. On a cold
+    // TestFlight launch the first video frame can stall until touch, so remove
+    // the overlay from JS after the fade duration regardless.
+    fallbackTimeoutRef.current = setTimeout(() => {
+      onDoneRef.current?.();
+    }, 350);
+
+    Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(({ finished }) => {
+      if (finished) {
+        if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
+        onDoneRef.current?.();
+      }
     });
-  }, [fadeAnim, onDone]);
+  }, [fadeAnim]);
 
   useEffect(() => {
     if (localSource) return;
@@ -92,7 +111,10 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
 
   useEffect(() => {
     timeoutRef.current = setTimeout(dismiss, duration + 500);
-    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
+    };
   }, [duration, dismiss]);
 
   // expo-video replaces expo-av's declarative `<Video shouldPlay isMuted … />`
@@ -108,6 +130,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   useEffect(() => {
     if (!player || !videoSource) return;
     try {
+      setIsReady(false);
       player.replace(videoSource);
       player.play();
     } catch (e) {
@@ -121,6 +144,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     if (!player) return undefined;
     const onEnd = () => dismiss();
     const onStatus = ({ status }) => {
+      if (status === 'readyToPlay') setIsReady(true);
       if (status === 'error') dismiss();
     };
     const endSub = player.addListener('playToEnd', onEnd);
@@ -135,7 +159,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <StatusBar hidden />
 
-      {posterUrl && !videoSource && (
+      {posterUrl && !isReady && (
         <Image source={{ uri: posterUrl }} style={StyleSheet.absoluteFill} contentFit="cover" />
       )}
 
@@ -143,15 +167,15 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         <Pressable style={StyleSheet.absoluteFill} onPress={dismiss}>
           <VideoView
             player={player}
-            style={StyleSheet.absoluteFill}
+            style={[StyleSheet.absoluteFill, !isReady && styles.hiddenVideo]}
             contentFit="cover"
             nativeControls={false}
           />
         </Pressable>
       )}
 
-      {/* Fallback logo while video loads */}
-      {!videoSource && !posterUrl && (
+      {/* Fallback logo while video loads or if the first video frame stalls. */}
+      {!isReady && !posterUrl && (
         <View style={styles.fallback}>
           <Image
             source={require('../assets/splash-logo.png')}
@@ -167,8 +191,11 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
     zIndex: 999,
+  },
+  hiddenVideo: {
+    opacity: 0,
   },
   fallback: {
     flex: 1,

@@ -56,7 +56,13 @@ export default function FavoritesScreen() {
         t('favorites.loginRequiredMessage'),
         [
           { text: t('common.cancel'), style: 'cancel' },
-          { text: t('common.login'), onPress: () => router.push('/auth/login') }
+          {
+            text: t('common.login'),
+            onPress: () => router.push({
+              pathname: '/auth/login',
+              params: { returnTo: '/favorites' },
+            }),
+          }
         ]
       );
       return;
@@ -265,10 +271,18 @@ export default function FavoritesScreen() {
                       ? pricing.originalPrice
                       : Number(product.originalPrice);
 
+                    if (!user) {
+                      return (
+                        <View style={styles.priceContainer}>
+                          <Text style={styles.loginToSeePriceText}>{t('product.loginToSeePrice')}</Text>
+                        </View>
+                      );
+                    }
+
                     if (pricing.isPriceOnRequest) {
                       return (
                         <View style={styles.priceContainer}>
-                          <Text style={styles.priceOnRequestText}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                          <Text style={styles.priceOnRequestText}>{t('product.priceOnRequest')}</Text>
                         </View>
                       );
                     }
@@ -312,7 +326,7 @@ export default function FavoritesScreen() {
                   onPress={() => {
                     const productName = getLocalizedProductName(product, locale) || product.name || '';
                     const msg = encodeURIComponent(
-                      (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
+                      t('product.requestQuoteMessage', { name: productName })
                     );
                     Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
                   }}
@@ -320,7 +334,7 @@ export default function FavoritesScreen() {
                 >
                   <Ionicons name="logo-whatsapp" size={16} color="#ffffff" style={styles.addToCartIcon} />
                   <Text style={styles.addToCartText}>
-                    {t('product.requestQuote') || 'Request Quote'}
+                    {t('product.requestQuote')}
                   </Text>
                 </TouchableOpacity>
               ) : (
@@ -643,6 +657,11 @@ const styles = StyleSheet.create({
     ...T.label,
     fontWeight: '700',
     color: '#25D366',
+  },
+  loginToSeePriceText: {
+    ...T.labelSmall,
+    fontWeight: '700',
+    color: '#86868B',
   },
   addToCartIcon: {
     marginEnd: 4,

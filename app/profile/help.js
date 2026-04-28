@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
+import { getJson } from '../../services/httpClient';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { createLogger } from '../../utils/logger';
@@ -48,14 +49,11 @@ export default function HelpSupportScreen() {
     try {
       setFaqLoading(true);
       const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const res = await fetch(`${baseUrl}/api/mobile/faq`, {
+      const data = await getJson(`${baseUrl}/api/mobile/faq`, {
         headers: {
-          'x-api-key': AUTH_CONFIG.API_KEY,
-          'x-locale': locale || 'en',
+          locale: locale || 'en',
         },
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
       setFaqData((data.items || []).map((item, i) => ({
         id: item.id ?? i + 1,
         question: item.question,

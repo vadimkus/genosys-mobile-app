@@ -383,7 +383,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
               style={styles.langButton}
               accessibilityRole="button"
-              accessibilityLabel="Switch language"
+              accessibilityLabel={t('common.switchLanguage')}
             >
               <Text style={styles.langButtonText}>{currentLangCode}</Text>
               <Ionicons name="chevron-down" size={14} color="#16A34A" />

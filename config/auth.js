@@ -55,8 +55,8 @@ export const AUTH_CONFIG = {
     WEB_ORIGIN
   ),
   
-  // SECURITY: Set EXPO_PUBLIC_API_KEY in EAS secrets for production builds.
-  // The fallback value below is for development only and should be rotated.
+  // Mobile API key is a public client identifier, not a secret authorization boundary.
+  // Keep a fallback so OTA exports cannot accidentally ship an auth-broken bundle.
   API_KEY: env('EXPO_PUBLIC_API_KEY', 'genosys_secure_mobile_2025_v1'),
 
   // Canonical web origins used across the app for image/link building.

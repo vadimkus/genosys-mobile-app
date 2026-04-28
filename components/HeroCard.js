@@ -2,15 +2,16 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask } from '../utils/productRules';
 import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { useAuth } from '../contexts/AuthContext';
 import {
   getLocalizedProductName,
   getLocalizedProductDescription,
@@ -23,6 +24,7 @@ const CARD_WIDTH = SCREEN_WIDTH * 0.8;
 
 export default function HeroCard({ product }) {
   const { t, locale, dir } = useLocalization();
+  const { user } = useAuth();
   const isRTL = dir === 'rtl';
   const handlePress = () => {
     router.push(`/product/${product.id}`);
@@ -76,8 +78,8 @@ export default function HeroCard({ product }) {
           {getLocalizedProductDescription(product, locale) || product?.localizedDescription || product?.description}
         </Text>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>
-            {formatAed(displayPrice)}
+          <Text style={user ? styles.price : styles.loginToSeePrice}>
+            {user ? formatAed(displayPrice) : t('product.loginToSeePrice')}
           </Text>
           {!isOutOfStock && !isHolidayKit && (
             isMesopeciaKit ? (
@@ -169,6 +171,11 @@ const styles = StyleSheet.create({
   price: {
     ...T.sectionTitleSmall,
     letterSpacing: 0,
+  },
+  loginToSeePrice: {
+    ...T.labelSmall,
+    fontWeight: '700',
+    color: '#86868B',
   },
   inStockBadge: {
     backgroundColor: '#34C759',

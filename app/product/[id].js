@@ -24,6 +24,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { fetchProductById } from '../../services/api';
+import { getJson } from '../../services/httpClient';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isUserDiscountExcludedProduct } from '../../utils/productRules';
 import { isBeautyBoxProduct } from '../../utils/productRules';
@@ -327,6 +328,19 @@ export default function ProductDetailScreen() {
   const galleryRef = useRef(null);
   const scrollRef = useRef(null);
   const reviewsWrapperRef = useRef(null);
+
+  const discountLabel = useCallback(
+    (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) }),
+    [t]
+  );
+
+  const localizeDiscountLabel = useCallback(
+    (label) => {
+      const match = String(label || '').trim().match(/^(\d+(?:\.\d+)?)%\s*OFF$/i);
+      return match ? discountLabel(Number(match[1])) : label;
+    },
+    [discountLabel]
+  );
   const condensedHeaderRef = useRef(false);
 
   useEffect(() => {
@@ -341,8 +355,7 @@ export default function ProductDetailScreen() {
     if (!id) return;
     let cancelled = false;
     const base = AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae';
-    fetch(`${base}/api/products/${id}/reviews`)
-      .then((res) => (res.ok ? res.json() : null))
+    getJson(`${base}/api/products/${id}/reviews`, { headers: { apiKey: false } })
       .then((data) => {
         if (cancelled || !data) return;
         setReviewAggregate({
@@ -427,6 +440,15 @@ export default function ProductDetailScreen() {
 
   const handleAddToBag = () => {
     if (!product || product.isPriceOnRequest) return;
+
+    if (!user) {
+      haptics.lightTap();
+      router.push({
+        pathname: '/auth/login',
+        params: { returnTo: `/product/${id}` },
+      });
+      return;
+    }
 
     // OOS guard — no-op if product is out of stock (defensive, UI also disables the button).
     if (isOutOfStock) {
@@ -548,7 +570,8 @@ export default function ProductDetailScreen() {
     haptics.lightTap();
     const url = `${AUTH_CONFIG.WEB_ORIGIN || 'https://genosys.ae'}/products/${product.id}`;
     const displayPricing = getSelectedPricingDisplay();
-    const message = `${asText(getLocalizedProductName(product, locale) || product.name)}\n${formatAed(displayPricing.displayPrice)}\n${url}`;
+    const priceLine = user && displayPricing?.displayPrice ? `\n${formatAed(displayPricing.displayPrice)}` : '';
+    const message = `${asText(getLocalizedProductName(product, locale) || product.name)}${priceLine}\n${url}`;
     try {
       await Share.share(
         {
@@ -997,7 +1020,7 @@ export default function ProductDetailScreen() {
                 router.back();
               }}
               accessibilityRole="button"
-              accessibilityLabel="Back"
+              accessibilityLabel={t('common.back')}
             >
               <Ionicons
                 name={isRTL ? 'chevron-forward' : 'chevron-back'}
@@ -1013,6 +1036,7 @@ export default function ProductDetailScreen() {
                 {asText(getLocalizedProductName(product, locale) || product.name)}
               </Text>
               {(() => {
+                if (!user) return null;
                 const unit = getSelectedPricingDisplay().displayPrice;
                 if (!unit) return null;
                 return (
@@ -1086,7 +1110,7 @@ export default function ProductDetailScreen() {
                   activeOpacity={0.9}
                   onPress={() => openLightbox(0)}
                   accessibilityRole="imagebutton"
-                  accessibilityLabel="Open image viewer"
+                  accessibilityLabel={t('product.a11y.openImageViewer')}
                   style={{ flex: 1 }}
                 >
                   <Image
@@ -1121,7 +1145,7 @@ export default function ProductDetailScreen() {
                       activeOpacity={0.9}
                       onPress={() => openLightbox(index)}
                       accessibilityRole="imagebutton"
-                      accessibilityLabel={`Open image ${index + 1} of ${galleryImages.length}`}
+                      accessibilityLabel={t('product.a11y.openImage', { current: index + 1, total: galleryImages.length })}
                     >
                       <Image
                         source={item}
@@ -1177,7 +1201,10 @@ export default function ProductDetailScreen() {
                     activeOpacity={0.6}
                     style={[styles.reviewSummary, isRTL && styles.reviewSummaryRTL]}
                     accessibilityRole="button"
-                    accessibilityLabel={`${averageRating.toFixed(1)} out of 5, ${reviewCount} reviews`}
+                    accessibilityLabel={t('product.a11y.reviewSummary', {
+                      rating: averageRating.toFixed(1),
+                      count: reviewCount,
+                    })}
                   >
                     <View style={[styles.reviewStarsRow, isRTL && styles.reviewStarsRowRTL]}>
                       {[1, 2, 3, 4, 5].map((i) => (
@@ -1202,6 +1229,7 @@ export default function ProductDetailScreen() {
                   activeOpacity={0.6}
                   style={[styles.reviewSummary, isRTL && styles.reviewSummaryRTL]}
                   accessibilityRole="button"
+                  accessibilityLabel={t('product.beTheFirstToReview')}
                 >
                   <Text style={[styles.reviewSummaryLink, isRTL && styles.textRTL]}>
                     {t('product.beTheFirstToReview') || 'Be the first to review'}
@@ -1233,9 +1261,15 @@ export default function ProductDetailScreen() {
             )}
               
               {/* Enhanced Pricing with Beauty Boxes Special Display */}
-              {product.isPriceOnRequest ? (
+              {!user ? (
                 <View style={styles.priceBlock}>
-                  <Text style={styles.priceOnRequestLabel}>{t('product.priceOnRequest') || 'Price on Request'}</Text>
+                  <Text style={[styles.loginToSeePriceText, isRTL && styles.textRTL]}>
+                    {t('product.loginToSeePrice')}
+                  </Text>
+                </View>
+              ) : product.isPriceOnRequest ? (
+                <View style={styles.priceBlock}>
+                  <Text style={styles.priceOnRequestLabel}>{t('product.priceOnRequest')}</Text>
                 </View>
               ) : product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box')) ? (
                 // Special pricing display for Beauty Boxes on detail page
@@ -1258,8 +1292,8 @@ export default function ProductDetailScreen() {
                       const base = Number(pricing.displayPrice || 0);
                       const original = Number(pricing.originalPrice || 0);
                       const hasDiscount = original > base + 0.01;
-                      const label = pricing.discountLabel ||
-                        (pricing.discountPercentage > 0 ? `${Math.round(pricing.discountPercentage)}% OFF` : null);
+                      const label = localizeDiscountLabel(pricing.discountLabel) ||
+                        (pricing.discountPercentage > 0 ? discountLabel(pricing.discountPercentage) : null);
 
                       if (!hasDiscount) {
                         return <Text style={styles.price}>{formatAed(base)}</Text>;
@@ -1327,7 +1361,7 @@ export default function ProductDetailScreen() {
                         <View style={[styles.discountRow, isRTL && styles.discountRowRTL]}>
                           <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatPrice(discounted)} AED</Text>
                           <View style={styles.discountBadge}>
-                            <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{`${Math.round(effectivePct)}% OFF`}</Text>
+                            <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{discountLabel(effectivePct)}</Text>
                           </View>
                         </View>
                       </View>
@@ -1339,7 +1373,7 @@ export default function ProductDetailScreen() {
             {/* VAT-inclusive disclosure — matches web PDP. Hidden for
                 price-on-request and beauty-box bundles which render
                 their own pricing treatment above. */}
-            {!product.isPriceOnRequest && !(product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box'))) && (
+            {user && !product.isPriceOnRequest && !(product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box'))) && (
               <Text style={[styles.vatNote, isRTL && styles.textRTL]}>
                 {PDP_COPY.vatIncluded}
               </Text>
@@ -1549,7 +1583,7 @@ export default function ProductDetailScreen() {
               style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
             />
             <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
-              {t('product.requestQuote') || 'Request Quote'}
+              {t('product.requestQuote')}
             </Text>
           </TouchableOpacity>
         ) : (() => {
@@ -1558,13 +1592,15 @@ export default function ProductDetailScreen() {
           const disabled = isOutOfStock;
           const buttonLabel = disabled
             ? PDP_COPY.outOfStock
-            : inBagForSelection
+            : !user
+              ? t('shop.loginToBuy')
+              : inBagForSelection
               ? t('product.inBag', { count: qtyForSelection })
               : t('product.addToBag');
           return (
             <View style={[styles.bottomRow, isRTL && styles.bottomRowRTL]}>
               {/* Quantity stepper — web PDP parity. Hidden when OOS. */}
-              {!disabled && (
+              {!disabled && user && (
                 <View
                   style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
                   accessibilityLabel={PDP_COPY.quantity}
@@ -1575,7 +1611,7 @@ export default function ProductDetailScreen() {
                     disabled={quantity <= 1}
                     activeOpacity={0.7}
                     accessibilityRole="button"
-                    accessibilityLabel="Decrease quantity"
+                    accessibilityLabel={t('shop.decreaseQuantity')}
                     hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                   >
                     <Ionicons name="remove" size={18} color={quantity <= 1 ? '#C7C7CC' : '#1D1D1F'} />
@@ -1586,7 +1622,7 @@ export default function ProductDetailScreen() {
                     onPress={incrementQty}
                     activeOpacity={0.7}
                     accessibilityRole="button"
-                    accessibilityLabel="Increase quantity"
+                    accessibilityLabel={t('shop.increaseQuantity')}
                     hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                   >
                     <Ionicons name="add" size={18} color="#1D1D1F" />
@@ -2369,6 +2405,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#dc2626',
     letterSpacing: 0.3,
+  },
+  loginToSeePriceText: {
+    ...T.label,
+    fontWeight: '700',
+    color: '#86868B',
+    letterSpacing: 0.2,
   },
   addToBagButtonRTL: {
     flexDirection: 'row-reverse',

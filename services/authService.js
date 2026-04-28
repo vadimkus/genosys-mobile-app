@@ -5,6 +5,7 @@
 
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
+import { getJson, httpRequest, sendJson, HttpClientError } from './httpClient';
 
 const log = createLogger('authService');
 
@@ -55,9 +56,9 @@ export const loginWithEmail = async (email, password) => {
         (errorText && errorText.slice(0, 200)) ||
         'Login failed';
       log.warn('Login failed', { status: response.status, message });
-      return { 
-        success: false, 
-        error: message
+      return {
+        success: false,
+        error: 'Invalid email or password. Please try again.',
       };
     }
   } catch (error) {
@@ -120,9 +121,9 @@ export const registerUser = async (name, email, password, extra = {}) => {
       let errorData = {};
       try { errorData = errorText ? JSON.parse(errorText) : {}; } catch {}
       log.warn('Registration failed', errorData || errorText);
-      return { 
-        success: false, 
-        error: errorData.error || errorData.message || 'Registration failed' 
+      return {
+        success: false,
+        error: 'Could not create account. Please check your details and try again.',
       };
     }
   } catch (error) {
@@ -177,7 +178,7 @@ export const processGoogleAuth = async (idToken) => {
         (errorText && errorText.slice(0, 200)) ||
         'Google authentication failed';
       log.warn('Google auth failed', { status: response.status, message });
-      return { success: false, error: message };
+      return { success: false, error: 'Google authentication failed. Please try again.' };
     }
   } catch (error) {
     log.error('Google auth error', error?.message || error);
@@ -232,7 +233,7 @@ export const processAppleAuth = async (identityToken, meta = {}) => {
         (errorText && errorText.slice(0, 200)) ||
         'Apple authentication failed';
       log.warn('Apple auth failed', { status: response.status, message });
-      return { success: false, error: message };
+      return { success: false, error: 'Apple authentication failed. Please try again.' };
     }
   } catch (error) {
     log.error('Apple auth error', error?.message || error);
@@ -248,40 +249,29 @@ export const processAppleAuth = async (identityToken, meta = {}) => {
 export const validateSession = async (token) => {
   try {
     log.debug('Validating user session');
-    
-    const response = await fetch(`${API_BASE_URL}/auth/validate`, {
-      method: 'GET',
-      headers: {
-        'x-api-key': API_KEY,
-        'Authorization': `Bearer ${token}`,
-      },
+
+    const result = await getJson(`${API_BASE_URL}/auth/validate`, {
+      authenticated: true,
+      token,
+      headers: { token },
+      safeMessage: 'Session expired',
     });
 
-    if (response.ok) {
-      const result = await response.json();
-      if (result.success && result.valid && result.user) {
-        log.debug('Session validation successful');
-        return { success: true, user: result.user, valid: result.valid };
-      } else {
-        log.warn('Session validation failed', result?.error);
-        return { success: false, error: result.error || 'Session expired' };
-      }
-    } else {
-      // If the validate route isn't deployed yet, Next.js will return a 404 HTML page.
-      // Do NOT treat this as session expiration; keep the stored session.
-      if (response.status === 404) {
-        const txt = await response.text().catch(() => '');
-        log.warn('Session validation endpoint unavailable (404), skipping validation', {
-          status: response.status,
-          bodySnippet: String(txt || '').slice(0, 120),
-        });
-        return { success: true, valid: true, user: null, skipped: true };
-      }
-
-      log.warn('Session validation failed', { status: response.status });
-      return { success: false, valid: false, error: 'Session expired' };
+    if (result?.success && result?.valid && result?.user) {
+      log.debug('Session validation successful');
+      return { success: true, user: result.user, valid: result.valid };
     }
+
+    log.warn('Session validation failed', result?.error);
+    return { success: false, error: result.error || 'Session expired' };
   } catch (error) {
+    // If the validate route isn't deployed yet, Next.js will return a 404 HTML page.
+    // Do NOT treat this as session expiration; keep the stored session.
+    if (error instanceof HttpClientError && error.status === 404) {
+      log.warn('Session validation endpoint unavailable (404), skipping validation');
+      return { success: true, valid: true, user: null, skipped: true };
+    }
+
     log.error('Session validation error', error?.message || error);
     return { success: false, valid: false, user: null, error: 'Network error' };
   }
@@ -308,7 +298,7 @@ export const requestPasswordReset = async (email) => {
     if (!response.ok) {
       return {
         success: false,
-        error: (json && (json.error || json.message)) || 'Could not request password reset',
+        error: 'Could not request password reset. Please try again.',
       };
     }
 
@@ -344,7 +334,7 @@ export const resetPasswordWithToken = async (token, newPassword) => {
     if (!response.ok) {
       return {
         success: false,
-        error: (json && (json.error || json.message)) || 'Could not reset password',
+        error: 'Could not reset password. Please try again.',
       };
     }
 
@@ -367,27 +357,17 @@ export const resetPasswordWithToken = async (token, newPassword) => {
 export const updateUserProfile = async (token, profileData) => {
   try {
     log.debug('Updating user profile via API...');
-    
-    const response = await fetch(`${API_BASE_URL}/user/profile`, {
+
+    const result = await sendJson(`${API_BASE_URL}/user/profile`, profileData, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(profileData),
+      authenticated: true,
+      token,
+      headers: { token },
+      safeMessage: 'Could not update profile. Please try again.',
     });
 
-    if (response.ok) {
-      const result = await response.json();
-      log.debug('Profile update successful');
-      return { success: true, user: result.user, message: 'Profile updated successfully' };
-    } else {
-      let errorData;
-      try { errorData = await response.json(); } catch { errorData = { message: await response.text().catch(() => '') }; }
-      log.warn('Profile update failed', errorData);
-      return { success: false, error: errorData.error || errorData.message || 'Failed to update profile' };
-    }
+    log.debug('Profile update successful');
+    return { success: true, user: result.user, message: 'Profile updated successfully' };
   } catch (error) {
     log.error('Profile update error', error?.message || error);
     return { 
@@ -405,23 +385,16 @@ export const updateUserProfile = async (token, profileData) => {
 export const logoutUser = async (token) => {
   try {
     log.debug('Logging out user');
-    
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'x-api-key': API_KEY,
-      },
+
+    await sendJson(`${API_BASE_URL}/auth/logout`, {}, {
+      authenticated: true,
+      token,
+      headers: { token },
+      safeMessage: 'Logout failed',
     });
 
-    if (response.ok) {
-      log.debug('Logout successful');
-      return { success: true };
-    } else {
-      log.warn('Logout failed on server, but continuing locally');
-      return { success: true }; // Still allow local logout
-    }
+    log.debug('Logout successful');
+    return { success: true };
   } catch (error) {
     log.error('Logout error', error?.message || error);
     return { success: true }; // Still allow local logout
@@ -437,27 +410,19 @@ export const deleteUserAccount = async (token) => {
   try {
     log.debug('Deleting user account');
 
-    const response = await fetch(`${API_BASE_URL}/user/account`, {
+    await httpRequest(`${API_BASE_URL}/user/account`, {
       method: 'DELETE',
       headers: {
         'x-api-key': API_KEY,
         'Authorization': `Bearer ${token}`,
       },
+    }, {
+      authenticated: true,
+      token,
+      safeMessage: 'Could not delete account. Please try again.',
     });
 
-    if (response.ok) {
-      return { success: true };
-    }
-
-    const errorText = await response.text().catch(() => '');
-    let errorJson = null;
-    try { errorJson = errorText ? JSON.parse(errorText) : null; } catch {}
-    const message =
-      (errorJson && (errorJson.error || errorJson.message)) ||
-      (errorText && errorText.slice(0, 200)) ||
-      'Could not delete account';
-    log.warn('Delete account failed', { status: response.status, message });
-    return { success: false, error: message };
+    return { success: true };
   } catch (error) {
     log.error('Delete account error', error?.message || error);
     return { success: false, error: 'Network error. Please try again.' };

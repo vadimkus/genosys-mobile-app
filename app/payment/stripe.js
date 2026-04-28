@@ -6,19 +6,14 @@ import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
-import { fetchUserOrderById, fetchUserOrders } from '../../services/api';
+import { findOrder, isPaidLikeOrder } from '../../services/ordersRepository';
 import AUTH_CONFIG from '../../config/auth';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
+import { getJson } from '../../services/httpClient';
 import T from '../../utils/typography';
 
 const log = createLogger('StripePayment');
-
-const isPaidLike = (order) => {
-  const s = String(order?.status || '').toLowerCase();
-  const ps = String(order?.paymentStatus || order?.payment_status || '').toLowerCase();
-  return s === 'paid' || s === 'confirmed' || ps === 'paid' || ps === 'confirmed';
-};
 
 const extractStripeSessionIdFromUrl = (url) => {
   const u = String(url || '');
@@ -26,6 +21,22 @@ const extractStripeSessionIdFromUrl = (url) => {
   // https://checkout.stripe.com/c/pay/cs_test_...
   const m = u.match(/\/c\/pay\/(cs_[A-Za-z0-9_]+)/);
   return m?.[1] || '';
+};
+
+const getPaymentStatusLabel = (status, t) => {
+  const key = String(status || '').trim().toLowerCase();
+  const map = {
+    pending: 'payment.statusPending',
+    processing: 'payment.statusProcessing',
+    paid: 'payment.statusPaid',
+    succeeded: 'payment.statusPaid',
+    completed: 'payment.statusCompleted',
+    failed: 'payment.statusFailed',
+    cancelled: 'payment.statusCancelled',
+    canceled: 'payment.statusCancelled',
+    refunded: 'payment.statusRefunded',
+  };
+  return map[key] ? t(map[key]) : (status || t('payment.statusPending'));
 };
 
 export default function StripePaymentScreen() {
@@ -54,19 +65,7 @@ export default function StripePaymentScreen() {
     setChecking(true);
     try {
       // Prefer canonical detail endpoint (it returns a single order object).
-      let match = null;
-      if (orderId) {
-        try {
-          match = await fetchUserOrderById(token, orderId);
-        } catch {
-          match = null;
-        }
-      }
-      if (!match && orderNumber) {
-        const list = await fetchUserOrders(token, { page: 1, limit: 50 });
-        const orders = Array.isArray(list) ? list : [];
-        match = orders.find((o) => String(o?.orderNumber || o?.order_number || o?.number || '') === orderNumber) || null;
-      }
+      let match = await findOrder(token, orderId || orderNumber);
 
       if (!match) {
         setStatusText(t('payment.couldNotFindOrderYet'));
@@ -76,39 +75,38 @@ export default function StripePaymentScreen() {
 
       // If not paid yet, optionally trigger a server-side Stripe session refresh.
       // This helps when Stripe webhook is delayed.
-      if (!isPaidLike(match)) {
+      if (!isPaidLikeOrder(match)) {
         const sessionId = extractStripeSessionIdFromUrl(paymentUrl);
         if (sessionId) {
           try {
             const apiRoot = String(AUTH_CONFIG.API_BASE_URL || '').replace(/\/mobile\/?$/, '');
             const statusUrl = `${apiRoot}/stripe/payment-status?session_id=${encodeURIComponent(sessionId)}`;
-            await fetch(statusUrl, { method: 'GET' }).catch(() => null);
+            await getJson(statusUrl, {
+              authenticated: true,
+              token,
+              headers: { token },
+            }).catch(() => null);
           } catch {
             // ignore
           }
           // Re-fetch after refresh attempt
-          if (orderId) {
-            try {
-              match = await fetchUserOrderById(token, orderId);
-            } catch {
-              // ignore
-            }
-          }
+          match = (await findOrder(token, orderId || orderNumber).catch(() => null)) || match;
         }
       }
 
       const s = String(match?.status || '');
       const ps = String(match?.paymentStatus || match?.payment_status || '');
-      const label = ps || s || 'PENDING';
+      const label = getPaymentStatusLabel(ps || s, t);
       setStatusText(t('payment.currentStatus', { status: label }));
 
-      if (isPaidLike(match)) {
+      if (isPaidLikeOrder(match)) {
         setPaid(true);
       } else {
         setPaid(false);
       }
     } catch (e) {
-      setStatusText(e?.message || t('payment.checkStatusFailed'));
+      log.warn('Payment status check failed', e?.message || e);
+      setStatusText(t('payment.checkStatusFailed'));
       setPaid(false);
     } finally {
       setChecking(false);
@@ -184,7 +182,12 @@ export default function StripePaymentScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/bag')} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/bag')}
+          style={styles.backButton}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+        >
           <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>

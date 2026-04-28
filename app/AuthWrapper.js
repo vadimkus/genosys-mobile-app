@@ -1,8 +1,7 @@
 import React from 'react';
-import { Stack, Redirect, usePathname } from 'expo-router';
+import { Stack, Redirect, useLocalSearchParams, usePathname } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import LoginScreen from './auth/login';
 import ChatButton from '../components/ChatButton';
 
 // Screens where the chat button should be hidden
@@ -31,9 +30,51 @@ const CHAT_HIDDEN_ROUTES = [
   '/concern-detail',       // skin concern detail pages
 ];
 
+const PROTECTED_ROUTE_PREFIXES = [
+  '/bag',
+  '/(tabs)/bag',
+  '/orders',
+  '/(tabs)/orders',
+  '/profile',
+  '/checkout',
+  '/payment',
+  '/chat',
+];
+
+const isProtectedRoute = (pathname) => {
+  if (!pathname) return false;
+  return PROTECTED_ROUTE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+};
+
+const normalizeReturnTo = (value) => {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw || typeof raw !== 'string') return '/(tabs)/shop';
+  const decoded = (() => {
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  })();
+  if (!decoded.startsWith('/') || decoded.startsWith('/auth')) return '/(tabs)/shop';
+  return decoded;
+};
+
+const buildReturnTo = (pathname, params = {}) => {
+  const query = Object.entries(params)
+    .filter(([key, value]) => key !== 'returnTo' && value !== undefined && value !== null)
+    .flatMap(([key, value]) => {
+      const values = Array.isArray(value) ? value : [value];
+      return values.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(String(v))}`);
+    })
+    .join('&');
+  return query ? `${pathname}?${query}` : pathname;
+};
+
 export default function AuthWrapper() {
   const { isAuthenticated, loading } = useAuth();
   const pathname = usePathname();
+  const params = useLocalSearchParams();
   const showChatButton = isAuthenticated && !CHAT_HIDDEN_ROUTES.some((r) => pathname?.startsWith(r));
 
   if (loading) {
@@ -44,31 +85,20 @@ export default function AuthWrapper() {
     );
   }
 
-  if (!isAuthenticated) {
-    // Prevent access to non-auth routes when logged out
-    if (pathname && !pathname.startsWith('/auth')) {
-      return <Redirect href="/auth/login" />;
-    }
-
+  if (!isAuthenticated && pathname && isProtectedRoute(pathname)) {
     return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-          gestureEnabled: true,
-          gestureDirection: 'horizontal',
+      <Redirect
+        href={{
+          pathname: '/auth/login',
+          params: { returnTo: buildReturnTo(pathname, params) },
         }}
-      >
-        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/forgot-password" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
-      </Stack>
+      />
     );
   }
 
-  // Prevent access to auth routes when logged in
-  if (pathname && pathname.startsWith('/auth')) {
-    return <Redirect href="/(tabs)/shop" />;
+  // Prevent access to auth routes when logged in, preserving the original intent.
+  if (isAuthenticated && pathname && pathname.startsWith('/auth')) {
+    return <Redirect href={normalizeReturnTo(params?.returnTo)} />;
   }
 
   return (

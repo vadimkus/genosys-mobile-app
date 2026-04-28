@@ -12,6 +12,7 @@
 import { createLogger } from '../utils/logger';
 import AUTH_CONFIG from '../config/auth';
 import { authenticatedFetch } from './authFetch';
+import { getJson, HttpClientError } from './httpClient';
 
 const log = createLogger('api');
 
@@ -59,21 +60,7 @@ const API_CONFIG = {
 export const fetchPromo = async (locale = 'en') => {
   try {
     const url = `${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.PROMO}?locale=${encodeURIComponent(String(locale || 'en'))}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'Accept': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const txt = await response.text().catch(() => '');
-      throw new Error(`Promo request failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim());
-    }
-
-    const body = await response.json();
+    const body = await getJson(url);
     return body?.data ?? null;
   } catch (error) {
     log.warn('Failed to fetch promo', error?.message || error);
@@ -90,40 +77,9 @@ export const fetchShippingRates = async () => {
     const url = `${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.SHIPPING_RATES}`;
     // Keep this log minimal to avoid noisy dev console.
     log.debug('Fetching shipping rates');
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'Accept': 'application/json',
-      },
+    const body = await getJson(url, {
+      safeMessage: 'Could not load shipping rates.',
     });
-
-    if (!response.ok) {
-      // If the backend route isn't deployed yet, Next.js often returns an HTML 404 page.
-      // Treat 404 as "endpoint unavailable" and fall back to the known website rates.
-      if (response.status === 404) {
-        const txt = await response.text().catch(() => '');
-        if (!shipping404Warned) {
-          shipping404Warned = true;
-          log.warn('Shipping rates endpoint unavailable (404), using fallback', {
-            url,
-            status: response.status,
-            bodySnippet: String(txt || '').slice(0, 120),
-          });
-        } else {
-          log.debug('Shipping rates endpoint unavailable (404), using fallback', { url });
-        }
-        return { ...FALLBACK_SHIPPING_RATES, _source: 'fallback' };
-      }
-
-      const txt = await response.text().catch(() => '');
-      throw new Error(
-        `Shipping rates request failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim()
-      );
-    }
-
-    const body = await response.json();
     const data = body?.data || body;
     if (!data || !Array.isArray(data.emirates)) {
       throw new Error('Invalid shipping rates response format');
@@ -132,8 +88,13 @@ export const fetchShippingRates = async () => {
   } catch (error) {
     // Don't spam error logs for known "endpoint not deployed" scenarios.
     // Return fallback so Bag/Checkout can still compute shipping.
-    const msg = String(error?.message || '');
-    if (msg.includes('Shipping rates request failed: 404')) {
+    if (error instanceof HttpClientError && error.status === 404) {
+      if (!shipping404Warned) {
+        shipping404Warned = true;
+        log.warn('Shipping rates endpoint unavailable (404), using fallback');
+      } else {
+        log.debug('Shipping rates endpoint unavailable (404), using fallback');
+      }
       return { ...FALLBACK_SHIPPING_RATES, _source: 'fallback' };
     }
     log.warn('Failed to fetch shipping rates, using fallback', error?.message || error);
@@ -151,46 +112,15 @@ export const fetchProducts = async (user = null, options = {}) => {
   log.debug('Fetching products');
   
   try {
-    const headers = {
-      [API_CONFIG.HEADERS.CONTENT_TYPE]: 'application/json',
-      [API_CONFIG.HEADERS.API_KEY]: API_KEY,
-    };
-
-    // Optional locale for localized product fields (server may return localizedName/Description)
-    if (options?.locale) {
-      headers['x-locale'] = String(options.locale);
-    }
-    
-    if (user?.token) {
-      headers['Authorization'] = `Bearer ${user.token}`;
-    }
-    if (user?.id) {
-      headers[API_CONFIG.HEADERS.USER_ID] = user.id;
-    }
-    
-    const response = await fetch(`${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.PRODUCTS}`, {
-      method: 'GET',
-      headers,
+    const data = await getJson(`${API_BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.PRODUCTS}`, {
+      authenticated: !!user?.token,
+      token: user?.token,
+      headers: {
+        token: user?.token,
+        userId: user?.id,
+        locale: options?.locale,
+      },
     });
-
-    log.debug('Products response status', { status: response.status });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      log.error('Products API error', { status: response.status, body: String(errorText || '').slice(0, 300) });
-      
-      if (response.status === 401) {
-        throw new Error('Authentication required. Please login again.');
-      } else if (response.status === 403) {
-        throw new Error('Access denied. Invalid API key.');
-      } else if (response.status >= 500) {
-        throw new Error('Server error. Please try again later.');
-      } else {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-    }
-
-    const data = await response.json();
     log.debug('Products response received', { isArray: Array.isArray(data) });
     
     // Server should return array of complete product objects
@@ -223,15 +153,10 @@ export const fetchProductCategories = async () => {
   try {
     log.debug('Fetching categories');
     
-    const response = await fetch(`${API_BASE_URL}/categories`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-      },
-    });
-
-    if (!response.ok) {
+    let data;
+    try {
+      data = await getJson(`${API_BASE_URL}/categories`);
+    } catch {
       log.warn('Categories endpoint not available, will extract from products');
       // If categories endpoint doesn't exist, extract from products
       const products = await fetchProducts();
@@ -239,7 +164,6 @@ export const fetchProductCategories = async () => {
       return categories;
     }
 
-    const data = await response.json();
     // Support backend shapes:
     // - { success: true, data: string[], categoriesWithBadges: [{name, badge}] }
     // - { categories: string[] }
@@ -282,42 +206,26 @@ export const fetchProductById = async (productId, user = null, options = {}) => 
     const targetIdStr = String(productId);
     const targetIdNum = Number.isNaN(Number(productId)) ? null : Number(productId);
     
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-    };
-
     // Optional locale header for localized product fields
     const locale = options?.locale || user?.locale;
-    if (locale) {
-      headers['x-locale'] = String(locale);
-    }
-    
-    // Add user context for personalized pricing (match fetchProducts behavior)
     if (user?.id) {
-      headers[API_CONFIG.HEADERS.USER_ID] = user.id;
       log.debug('Including user for pricing (detail)');
-    }
-    if (user?.token) {
-      headers['Authorization'] = `Bearer ${user.token}`;
     }
     
     // Try direct product endpoint first
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
-        method: 'GET',
-        headers,
+      const body = await getJson(`${API_BASE_URL}/products/${productId}`, {
+        authenticated: !!user?.token,
+        token: user?.token,
+        headers: {
+          token: user?.token,
+          userId: user?.id,
+          locale,
+        },
       });
-      
-      if (response.ok) {
-        const body = await response.json();
-        const product = body?.data || body?.product || body;
-        log.debug('Found product directly');
-        return product;
-      } else {
-        const text = await response.text();
-        log.debug('Direct product endpoint non-OK', { status: response.status });
-      }
+      const product = body?.data || body?.product || body;
+      log.debug('Found product directly');
+      return product;
     } catch (directError) {
       log.debug('Direct product endpoint not available, searching in all products');
     }
@@ -358,23 +266,13 @@ export const fetchUserProfile = async (token) => {
   try {
     log.debug('Fetching user profile');
     
-    const response = await authenticatedFetch(`${API_BASE_URL}/auth/validate`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'x-api-key': API_KEY,
-      },
-    }, token);
-
-    if (response.ok) {
-      const result = await response.json();
-      log.debug('User profile received');
-      return result.user;
-    } else {
-      log.warn('Failed to fetch user profile', { status: response.status });
-      return null;
-    }
+    const result = await getJson(`${API_BASE_URL}/auth/validate`, {
+      authenticated: true,
+      token,
+      headers: { token },
+    });
+    log.debug('User profile received');
+    return result?.user || null;
   } catch (error) {
     log.error('Error fetching user profile', error?.message || error);
     return null;
@@ -397,22 +295,12 @@ export const fetchUserOrders = async (token, params = {}) => {
 
     log.debug('Fetching user orders:', url);
 
-    const response = await authenticatedFetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'x-api-key': API_KEY,
-      },
-    }, token);
-
-    if (!response.ok) {
-      const txt = await response.text().catch(() => '');
-      throw new Error(`Orders request failed: ${response.status} ${txt}`.trim());
-    }
-
-    const body = await response.json();
+    const body = await getJson(url, {
+      authenticated: true,
+      token,
+      headers: { token },
+      safeMessage: 'Could not load orders. Please try again.',
+    });
     log.debug('Orders response received', {
       orderCount: Array.isArray(body) ? body.length : (body?.data?.length || body?.orders?.length || 'unknown'),
     });
@@ -436,22 +324,12 @@ export const fetchUserOrderById = async (token, orderId) => {
   const id = String(orderId || '').trim();
   if (!id) throw new Error('Missing order id');
 
-  const response = await authenticatedFetch(`${API_BASE_URL}/orders/${id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'x-api-key': API_KEY,
-    },
-  }, token);
-
-  if (!response.ok) {
-    const txt = await response.text().catch(() => '');
-    throw new Error(`Order request failed: ${response.status} ${txt}`.trim());
-  }
-
-  const body = await response.json().catch(() => ({}));
+  const body = await getJson(`${API_BASE_URL}/orders/${id}`, {
+    authenticated: true,
+    token,
+    headers: { token },
+    safeMessage: 'Could not load order. Please try again.',
+  });
   // Support common response shapes
   return body?.data || body?.order || body;
 };
@@ -529,7 +407,11 @@ export const deleteUserOrder = async (token, orderId) => {
       return `${a.method} ${a.url} -> ${a.status}${allow}${a.body ? ` | ${a.body}` : ''}`;
     })
     .join('\n');
-  throw new Error((lastErr?.message || 'Delete failed') + (details ? `\n\nDebug:\n${details}` : ''));
+  log.warn('Delete order exhausted all attempts', {
+    error: lastErr?.message || 'Delete failed',
+    details,
+  });
+  throw new Error('Could not delete order. Please try again.');
 };
 
 /**
@@ -543,30 +425,23 @@ export const searchProducts = async (query, category = '', user = null) => {
   try {
     log.debug('Searching products', { query, category });
     
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-    };
-    
-    if (user?.token) {
-      headers['Authorization'] = `Bearer ${user.token}`;
-    }
-    
     const params = new URLSearchParams();
     if (query) params.append('q', query);
     if (category) params.append('category', category);
     
-    const response = await fetch(`${API_BASE_URL}/products/search?${params.toString()}`, {
-      method: 'GET',
-      headers,
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
+    try {
+      const data = await getJson(`${API_BASE_URL}/products/search?${params.toString()}`, {
+        authenticated: !!user?.token,
+        token: user?.token,
+        headers: {
+          token: user?.token,
+          userId: user?.id,
+        },
+      });
       const products = Array.isArray(data) ? data : data.products || [];
       log.debug('Search returned', { count: products.length });
       return products;
-    } else {
+    } catch {
       // Fallback to client-side filtering if search endpoint not available
       log.debug('Search endpoint not available, using client-side filter');
       const allProducts = await fetchProducts(user);
@@ -597,24 +472,12 @@ export const searchProducts = async (query, category = '', user = null) => {
  */
 export const fetchConcernDetail = async (slug, options = {}) => {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-    };
-    if (options?.locale) headers['x-locale'] = String(options.locale);
-    if (options?.user?.id) headers[API_CONFIG.HEADERS.USER_ID] = options.user.id;
-
-    const response = await fetch(`${API_BASE_URL}/concerns/${encodeURIComponent(slug)}`, {
-      method: 'GET',
-      headers,
+    const body = await getJson(`${API_BASE_URL}/concerns/${encodeURIComponent(slug)}`, {
+      headers: {
+        locale: options?.locale,
+        userId: options?.user?.id,
+      },
     });
-
-    if (!response.ok) {
-      const txt = await response.text().catch(() => '');
-      throw new Error(`Concern detail failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim());
-    }
-
-    const body = await response.json();
     return body?.data ?? null;
   } catch (error) {
     log.error('Failed to fetch concern detail', error?.message || error);
@@ -630,23 +493,11 @@ export const fetchConcernDetail = async (slug, options = {}) => {
  */
 export const fetchTraining = async (options = {}) => {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-    };
-    if (options?.locale) headers['x-locale'] = String(options.locale);
-
-    const response = await fetch(`${API_BASE_URL}/training`, {
-      method: 'GET',
-      headers,
+    return await getJson(`${API_BASE_URL}/training`, {
+      headers: {
+        locale: options?.locale,
+      },
     });
-
-    if (!response.ok) {
-      const txt = await response.text().catch(() => '');
-      throw new Error(`Training request failed: ${response.status} ${String(txt || '').slice(0, 200)}`.trim());
-    }
-
-    return await response.json();
   } catch (error) {
     log.error('Failed to fetch training', error?.message || error);
     throw error;

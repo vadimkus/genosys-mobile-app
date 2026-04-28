@@ -11,7 +11,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
   Dimensions,
   Alert,
@@ -19,6 +18,7 @@ import {
   Animated,
   PanResponder,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -28,6 +28,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import AUTH_CONFIG from '../config/auth';
+import { getJson } from '../services/httpClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from '../utils/logger';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
@@ -142,15 +143,12 @@ export default function BundleBuilderScreen() {
       setError(null);
 
       const baseUrl = AUTH_CONFIG.API_BASE_URL.replace('/api/mobile', '');
-      const headers = {
-        'x-api-key': AUTH_CONFIG.API_KEY,
-        'x-locale': locale || 'en',
-      };
-      if (user?.id) headers['x-user-id'] = user.id;
-
-      const res = await fetch(`${baseUrl}/api/mobile/bundle-builder`, { headers });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const data = await getJson(`${baseUrl}/api/mobile/bundle-builder`, {
+        headers: {
+          locale: locale || 'en',
+          userId: user?.id,
+        },
+      });
 
       setSteps(data.steps || []);
     } catch (err) {
@@ -293,7 +291,7 @@ export default function BundleBuilderScreen() {
               </Text>
             </View>
           ) : (
-            <Text style={styles.loginToSee}>{l('Login to see price', 'سجل لرؤية السعر', 'Войдите для цены')}</Text>
+            <Text style={styles.loginToSee}>{t('product.loginToSeePrice')}</Text>
           )}
         </View>
 
@@ -573,7 +571,7 @@ export default function BundleBuilderScreen() {
             <Ionicons name="bag-add" size={20} color="#fff" />
             <Text style={styles.addToCartText}>
               {l('Add Bundle to Cart', 'أضف المجموعة للسلة', 'Добавить набор в корзину')}
-              {discountPercent > 0 ? ` (${discountPercent}% OFF)` : ''}
+              {discountPercent > 0 ? ` (${t('product.discountPercent', { percent: discountPercent })})` : ''}
             </Text>
           </TouchableOpacity>
         )}

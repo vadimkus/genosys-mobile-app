@@ -19,6 +19,8 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { setupDeepLinkListener } from '../utils/deepLinking';
 import AUTH_CONFIG from '../config/auth';
 import { checkForUpdates } from '../config/updates';
+import { initSentry } from '../config/sentry';
+import { getJson } from '../services/httpClient';
 
 const UPDATE_DISMISSED_KEY = '@update_dismissed_version';
 
@@ -46,6 +48,10 @@ export default function RootLayout() {
   const [splashVideo, setSplashVideo] = useState(null);
 
   useEffect(() => {
+    initSentry();
+  }, []);
+
+  useEffect(() => {
     const cleanup = setupDeepLinkListener();
     return cleanup;
   }, []);
@@ -55,11 +61,11 @@ export default function RootLayout() {
 
     async function checkVersion() {
       try {
-        const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/app-version?platform=${Platform.OS}`, {
-          headers: { 'Cache-Control': 'no-cache' },
+        const data = await getJson(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/app-version?platform=${Platform.OS}`, {
+          headers: {
+            extra: { 'Cache-Control': 'no-cache' },
+          },
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
 
         if (cancelled) return;
 
@@ -98,11 +104,11 @@ export default function RootLayout() {
 
       // 2. Fetch fresh config from API and persist for next cold start
       try {
-        const res = await fetch(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/splash-config`, {
-          headers: { 'Cache-Control': 'no-cache' },
+        const data = await getJson(`${AUTH_CONFIG.WEB_ORIGIN}/api/mobile/splash-config`, {
+          headers: {
+            extra: { 'Cache-Control': 'no-cache' },
+          },
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
 
         await AsyncStorage.setItem(SPLASH_CACHE_KEY, JSON.stringify(data)).catch(() => {});
 

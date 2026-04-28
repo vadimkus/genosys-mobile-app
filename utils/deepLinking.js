@@ -12,6 +12,51 @@ const log = createLogger('DeepLink');
 
 const WEB_DOMAIN = 'genosys.ae';
 
+const getCleanPathFromUrl = (url) => {
+  const parsed = Linking.parse(url);
+  let path = (parsed.path || '').replace(/^\/+/, '').replace(/\/+$/, '');
+
+  // `genosys://product/123` is parsed with `product` as the host on iOS.
+  // Normalize it to the same `product/123` shape as triple-slash URLs.
+  if (String(url || '').startsWith('genosys://')) {
+    try {
+      const urlObj = new URL(url);
+      const host = String(urlObj.hostname || '').replace(/^\/+/, '').replace(/\/+$/, '');
+      const pathname = String(urlObj.pathname || '').replace(/^\/+/, '').replace(/\/+$/, '');
+      path = [host, pathname].filter(Boolean).join('/') || path;
+    } catch {
+      // Keep Linking.parse result.
+    }
+  }
+
+  return {
+    cleanPath: path.replace(/^(en|ar|ru)\//, ''),
+    queryParams: parsed.queryParams || {},
+  };
+};
+
+const shouldForceLoginOnColdStart = (url) => {
+  try {
+    const { cleanPath } = getCleanPathFromUrl(url);
+
+    if ((cleanPath.startsWith('products/') || cleanPath.startsWith('product/')) && cleanPath !== 'products/concern') {
+      const id = cleanPath.replace(/^products?\//, '');
+      if (id && !id.startsWith('concern/')) {
+        return true;
+      }
+    }
+
+    if (cleanPath.startsWith('track/')) {
+      const orderNumber = cleanPath.replace('track/', '');
+      if (orderNumber) return true;
+    }
+  } catch {
+    // Fall through to normal deep-link handling if parsing fails.
+  }
+
+  return false;
+};
+
 /**
  * Parse a URL and navigate to the matching in-app route.
  * Returns true if the URL was handled, false otherwise.
@@ -52,7 +97,7 @@ export function handleDeepLink(url) {
 
     const path = (parsed.path || '').replace(/^\/+/, '').replace(/\/+$/, '');
     // Strip locale prefix (en/, ar/, ru/)
-    const cleanPath = path.replace(/^(en|ar|ru)\//, '');
+    const { cleanPath } = getCleanPathFromUrl(url);
 
     // Products listing page
     if (cleanPath === 'products') {
@@ -60,9 +105,24 @@ export function handleDeepLink(url) {
       return true;
     }
 
-    // Product detail: products/[id] or products/[slug]
-    if (cleanPath.startsWith('products/')) {
-      const id = cleanPath.replace('products/', '');
+    // Skin concerns — specific concern detail page
+    if (cleanPath.startsWith('products/concern/') && cleanPath.split('/').length >= 3) {
+      const slug = cleanPath.replace('products/concern/', '').split('/')[0];
+      if (slug) {
+        router.push({ pathname: '/concern-detail', params: { slug } });
+        return true;
+      }
+    }
+
+    // Skin concerns — list page
+    if (cleanPath === 'skin-concerns' || cleanPath === 'products/concern') {
+      router.push('/skin-concerns');
+      return true;
+    }
+
+    // Product detail: products/[id], product/[id], or products/[slug]
+    if (cleanPath.startsWith('products/') || cleanPath.startsWith('product/')) {
+      const id = cleanPath.replace(/^products?\//, '');
       if (id) {
         router.push({ pathname: '/product/[id]', params: { id } });
         return true;
@@ -84,8 +144,14 @@ export function handleDeepLink(url) {
     // Order tracking: track/[orderNumber]
     if (cleanPath.startsWith('track/')) {
       const orderNumber = cleanPath.replace('track/', '');
-      // Navigate to orders - specific order tracking can be handled later
-      router.push('/(tabs)/orders');
+      if (orderNumber) {
+        router.push({
+          pathname: '/profile/orders/[id]',
+          params: { id: orderNumber },
+        });
+      } else {
+        router.push('/(tabs)/orders');
+      }
       return true;
     }
 
@@ -104,21 +170,6 @@ export function handleDeepLink(url) {
     // Skin analysis / recommendation
     if (cleanPath === 'skin-recommendation' || cleanPath === 'skin-analysis') {
       router.push('/skin-analysis');
-      return true;
-    }
-
-    // Skin concerns — specific concern detail page
-    if (cleanPath.startsWith('products/concern/') && cleanPath.split('/').length >= 3) {
-      const slug = cleanPath.replace('products/concern/', '').split('/')[0];
-      if (slug) {
-        router.push({ pathname: '/concern-detail', params: { slug } });
-        return true;
-      }
-    }
-
-    // Skin concerns — list page
-    if (cleanPath === 'skin-concerns' || cleanPath === 'products/concern') {
-      router.push('/skin-concerns');
       return true;
     }
 
@@ -217,7 +268,13 @@ export function setupDeepLinkListener() {
     if (url) {
       log.debug('App opened with URL', { url });
       // Small delay to let navigation mount
-      setTimeout(() => handleDeepLink(url), 500);
+      setTimeout(() => {
+        if (shouldForceLoginOnColdStart(url)) {
+          router.replace('/auth/login');
+          return;
+        }
+        handleDeepLink(url);
+      }, 500);
     }
   });
 

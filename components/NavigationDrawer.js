@@ -12,40 +12,24 @@ import {
   TouchableOpacity,
   Pressable,
   ScrollView,
-  Animated,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
-import { useFavorites } from '../contexts/FavoritesContext';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { buildAuthenticatedWebViewUrl } from '../utils/webViewAuth';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 
 export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }) {
   const { user, logout } = useAuth();
-  const { getFavoritesCount } = useFavorites();
-  const { t, locale, dir } = useLocalization();
+  const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const favCount = getFavoritesCount();
 
   const navigateTo = (path) => {
     onClose();
     // Small delay so modal closes before navigation
     setTimeout(() => router.push(path), 120);
-  };
-
-  const navigateWebView = (urlPath, title) => {
-    onClose();
-    const url = buildAuthenticatedWebViewUrl(urlPath, locale, user);
-    setTimeout(() => {
-      router.push({
-        pathname: '/webview',
-        params: { url, title: title || '' },
-      });
-    }, 120);
   };
 
   const handleLogout = () => {
@@ -81,7 +65,9 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
               onPress={() => { haptics.lightTap(); navigateTo('/bundle-builder'); }}
               activeOpacity={0.7}
             >
-              <Text style={styles.highlightBtnText}>🎁 {t('navigation.bundleBuilder') || 'Bundle Builder'}</Text>
+              <Text style={[styles.highlightBtnText, isRTL && styles.highlightBtnTextRTL]}>
+                🎁 {t('navigation.bundleBuilder') || 'Bundle Builder'}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -89,7 +75,9 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
               onPress={() => { haptics.lightTap(); navigateTo('/skin-analysis'); }}
               activeOpacity={0.7}
             >
-              <Text style={styles.highlightBtnText}>✨ {t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}</Text>
+              <Text style={[styles.highlightBtnText, isRTL && styles.highlightBtnTextRTL]}>
+                ✨ {t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -99,7 +87,9 @@ export default function NavigationDrawer({ visible, onClose, headerHeight = 56 }
               onPress={() => { haptics.lightTap(); navigateTo('/skin-concerns'); }}
               activeOpacity={0.7}
             >
-              <Text style={styles.highlightBtnText}>🌿 {t('categories.skinConcern') || 'Skin Concern'}</Text>
+              <Text style={[styles.highlightBtnText, isRTL && styles.highlightBtnTextRTL]}>
+                🌿 {t('categories.skinConcern') || 'Skin Concern'}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -271,6 +261,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#dc2626',
     letterSpacing: -0.1,
+    textAlign: 'center',
+  },
+  highlightBtnTextRTL: {
+    writingDirection: 'rtl',
   },
   /* ── Badge ── */
   badgeRow: {

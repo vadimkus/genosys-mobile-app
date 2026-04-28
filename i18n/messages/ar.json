@@ -64,7 +64,12 @@
     "quickDiscount": "20% خصم!",
     "quickDiscountQuery": "كيف أحصل على خصم 20%؟ أخبريني عن بناء الطقم",
     "quickAiSkin": "تحليل AI للبشرة",
-    "quickAiSkinQuery": "لا أعرف نوع بشرتي، هل يمكنك تحليلها؟"
+    "quickAiSkinQuery": "لا أعرف نوع بشرتي، هل يمكنك تحليلها؟",
+    "a11y": {
+      "openChat": "فتح الدردشة مع جيني",
+      "collapseChat": "تصغير الدردشة",
+      "expandChat": "توسيع الدردشة إلى ملء الشاشة"
+    }
   },
   "skinAnalysis": {
     "title": "تحليل البشرة بالذكاء الاصطناعي",
@@ -117,7 +122,12 @@
     "pigmentation": "التصبغات",
     "pores": "المسام",
     "firmness": "المرونة",
-    "hydration": "الترطيب"
+    "hydration": "الترطيب",
+    "recommendationsFailed": "تعذر تحميل التوصيات.",
+    "recommendationsFailedFull": "تعذر تحميل التوصيات. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
+    "browseByConcernTitle": "استكشفي حسب مشكلة البشرة",
+    "browseByConcernDesc": "منتجات مختارة وروتين يومي لكل مشكلة",
+    "browseByConcernButton": "اكتشفي"
   },
   "orders": {
     "title": "الطلبات",
@@ -147,7 +157,14 @@
     "paymentLinkMissingMessage": "تعذر فتح رابط الدفع. يرجى المحاولة مرة أخرى.",
     "couldNotOpenPaymentTitle": "تعذر فتح الدفع",
     "pleaseTryAgain": "يرجى المحاولة مرة أخرى.",
-    "pendingNote": "إذا لم تكتمل عملية الدفع بعد، فسيظل طلبك معلقًا حتى يتم تأكيد الدفع."
+    "pendingNote": "إذا لم تكتمل عملية الدفع بعد، فسيظل طلبك معلقًا حتى يتم تأكيد الدفع.",
+    "statusPending": "معلق",
+    "statusProcessing": "قيد المعالجة",
+    "statusPaid": "مدفوع",
+    "statusCompleted": "مكتمل",
+    "statusFailed": "فشل",
+    "statusCancelled": "ملغي",
+    "statusRefunded": "مسترد"
   },
   "bag": {
     "title": "السلة",
@@ -343,6 +360,13 @@
     "fullPrice": "السعر الكامل: {price} AED",
     "bundleDiscount": "خصم 15% (باقة)",
     "finalPrice": "النهائي: {price} AED",
+    "discountPercent": "خصم {percent}%",
+    "a11y": {
+      "openImageViewer": "فتح عارض الصور",
+      "openImage": "فتح الصورة {current} من {total}",
+      "closeImageViewer": "إغلاق عارض الصور",
+      "reviewSummary": "{rating} من 5، {count} تقييمات"
+    },
     "spec": {
       "size": "الحجم",
       "sizeOptions": "خيارات الحجم",
@@ -1110,7 +1134,10 @@
     "product": "منتج",
     "products": "منتجات",
     "in": "في",
-    "foundFor": "لـ \"{query}\""
+    "foundFor": "لـ \"{query}\"",
+    "a11y": {
+      "openMenu": "فتح القائمة"
+    }
   },
   "categories": {
     "all": "الكل",
@@ -1431,7 +1458,8 @@
   "variant": {
     "size": "الحجم",
     "color": "اللون",
-    "unavailable": "غير متوفر"
+    "unavailable": "غير متوفر",
+    "cushionBBSizeLabel": "15غ (يشمل عبوة إعادة التعبئة)"
   },
   "stock": {
     "outOfStock": "غير متوفر",
@@ -1458,6 +1486,7 @@
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "close": "إغلاق",
+    "switchLanguage": "تغيير اللغة",
     "save": "حفظ",
     "done": "تم",
     "continue": "متابعة",

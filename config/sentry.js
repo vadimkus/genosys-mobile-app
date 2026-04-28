@@ -1,16 +1,11 @@
+import Constants from 'expo-constants';
+
 /**
  * Sentry Crash Reporting Configuration
  * 
- * SETUP INSTRUCTIONS:
- * 1. Install: npx expo install @sentry/react-native
- * 2. Set EXPO_PUBLIC_SENTRY_DSN in your .env and EAS secrets
- * 3. Add Sentry plugin to app.json plugins array:
- *    ["@sentry/react-native/expo", { "organization": "genosys", "project": "mobile-app" }]
- * 4. Initialize in app/_layout.js: import './config/sentry'
- * 
- * This file is a configuration placeholder. It does NOT install or initialize
- * Sentry until the package is installed and DSN is configured.
- * This prevents crashes in the current app build.
+ * Set EXPO_PUBLIC_SENTRY_DSN in local env/EAS secrets to enable event upload.
+ * The native package and Expo config plugin are installed; without a DSN this
+ * module intentionally no-ops so production builds remain stable.
  */
 
 const SENTRY_DSN = (() => {
@@ -18,6 +13,16 @@ const SENTRY_DSN = (() => {
     return process?.env?.EXPO_PUBLIC_SENTRY_DSN || '';
   } catch {
     return '';
+  }
+})();
+
+const APP_VERSION = Constants.expoConfig?.version || '0.0.0';
+const RUNTIME_VERSION = Constants.expoConfig?.runtimeVersion || APP_VERSION;
+const SENTRY_ENVIRONMENT = (() => {
+  try {
+    return process?.env?.EXPO_PUBLIC_APP_ENV || (__DEV__ ? 'development' : 'production');
+  } catch {
+    return __DEV__ ? 'development' : 'production';
   }
 })();
 
@@ -40,7 +45,9 @@ export async function initSentry() {
     Sentry.init({
       dsn: SENTRY_DSN,
       debug: __DEV__,
-      environment: __DEV__ ? 'development' : 'production',
+      environment: SENTRY_ENVIRONMENT,
+      release: `genosys-mobile@${APP_VERSION}`,
+      dist: RUNTIME_VERSION,
       
       // Performance monitoring
       tracesSampleRate: __DEV__ ? 1.0 : 0.2,
@@ -88,6 +95,7 @@ export async function captureException(error, context) {
     if (context) {
       Sentry.withScope((scope) => {
         if (context.screen) scope.setTag('screen', context.screen);
+        scope.setTag('runtimeVersion', RUNTIME_VERSION);
         if (context.user) scope.setUser(context.user);
         if (context.extra) scope.setExtras(context.extra);
         Sentry.captureException(error);
@@ -108,8 +116,7 @@ export async function setSentryUser(user) {
     const Sentry = await import('@sentry/react-native');
     if (user) {
       Sentry.setUser({
-        id: user.id,
-        email: user.email,
+        id: user.id ? String(user.id) : undefined,
         username: user.name,
       });
     } else {
