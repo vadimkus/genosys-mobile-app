@@ -40,12 +40,36 @@ function compareVersions(current, minimum) {
 }
 
 const SPLASH_CACHE_KEY = '@splash_config';
+const DEFAULT_SPLASH_CONFIG = {
+  enabled: true,
+  type: 'video',
+  videoUrl: `${AUTH_CONFIG.WEB_ORIGIN}/videos/Splash.mp4`,
+  posterUrl: null,
+  duration: 5000,
+  cacheTTL: 86400,
+};
+
+function isSameSplashConfig(a, b) {
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return a === b;
+  return (
+    a.enabled === b.enabled &&
+    a.type === b.type &&
+    a.videoUrl === b.videoUrl &&
+    a.posterUrl === b.posterUrl &&
+    Number(a.duration || 0) === Number(b.duration || 0) &&
+    Number(a.cacheTTL || 0) === Number(b.cacheTTL || 0)
+  );
+}
+
+function setSplashConfigIfChanged(setter, next) {
+  setter((prev) => (isSameSplashConfig(prev, next) ? prev : next));
+}
 
 export default function RootLayout() {
   const [showLaunch, setShowLaunch] = useState(true);
   const [forceUpdate, setForceUpdate] = useState(null);
   const [softUpdate, setSoftUpdate] = useState(null);
-  const [splashVideo, setSplashVideo] = useState(null);
+  const [splashVideo, setSplashVideo] = useState(DEFAULT_SPLASH_CONFIG);
 
   useEffect(() => {
     initSentry();
@@ -97,7 +121,7 @@ export default function RootLayout() {
         if (cached && !cancelled) {
           const config = JSON.parse(cached);
           if (config.enabled && config.type === 'video' && config.videoUrl) {
-            setSplashVideo(config);
+            setSplashConfigIfChanged(setSplashVideo, config);
           }
         }
       } catch {}
@@ -115,9 +139,9 @@ export default function RootLayout() {
         if (cancelled) return;
 
         if (data.enabled && data.type === 'video' && data.videoUrl) {
-          setSplashVideo(data);
+          setSplashConfigIfChanged(setSplashVideo, data);
         } else {
-          setSplashVideo(false);
+          setSplashConfigIfChanged(setSplashVideo, false);
         }
       } catch {
         if (!cancelled) setSplashVideo((prev) => prev || false);

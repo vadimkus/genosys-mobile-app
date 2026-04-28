@@ -11,6 +11,7 @@
 | Doc | Description |
 |-----|-------------|
 | [Main README](../README.md) | Project overview, install, and run |
+| [Native Splash Video Restore](./SESSION_CHANGES_2026-04-28_native-splash-video-restore.md) | **TestFlight splash restore** — remote `Splash.mp4` now mounts on first JS render, avoids cached/fresh config remount flicker, and uses a WebView video fallback with launch fail-safes. Published OTA to runtime `1.10.0`. |
 | [Native Bundle VIP Badges](./SESSION_CHANGES_2026-04-28_native-bundle-vip-badges.md) | **Bag display fix** — Build Your Set cart rows now show the effective `50% off` VIP badge when the user's personal discount beats the bundle tier. Published OTA to runtime `1.10.0`. |
 | [TestFlight Startup Splash Black Screen Fix](./SESSION_CHANGES_2026-04-28_testflight-startup-splash-black-screen.md) | **Startup UX fix** — video splash overlay no longer shows/sticks as a black screen on TestFlight cold start; white branded fallback + ready-state guard + JS fail-safe. Published OTA to runtime `1.10.0`. |
 | [Build Set Bundle Discount Recalc](./SESSION_CHANGES_2026-04-27_bundle-discount-recalc.md) | **Security/pricing fix** — native cart now recalculates Build Your Set discounts after removal/quantity changes, so a single leftover bundle item cannot keep stale 20% bundle pricing. Published OTA to runtime `1.10.0`. |

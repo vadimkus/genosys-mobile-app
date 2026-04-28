@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, StatusBar, Animated, Pressable } from 'react-native';
-import { VideoView, useVideoPlayer } from 'expo-video';
 import { Image } from 'expo-image';
 import * as FileSystem from 'expo-file-system';
+import { WebView } from 'react-native-webview';
 
 const CACHE_DIR = `${FileSystem.cacheDirectory}splash/`;
 const CACHE_FILE = `${CACHE_DIR}splash.mp4`;
@@ -55,21 +55,32 @@ async function downloadAndCache(remoteUrl, cacheTTL) {
  */
 export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onDone }) {
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  const [videoSource, setVideoSource] = useState(localSource || null);
-  const [isReady, setIsReady] = useState(false);
+  const [videoSource, setVideoSource] = useState(() => localSource || (videoUrl ? { uri: videoUrl } : null));
+  const [playbackStarted, setPlaybackStarted] = useState(false);
   const dismissed = useRef(false);
   const timeoutRef = useRef(null);
+  const loadingTimeoutRef = useRef(null);
   const fallbackTimeoutRef = useRef(null);
   const onDoneRef = useRef(onDone);
+  const sourceUri = typeof videoSource === 'number' ? null : videoSource?.uri;
 
   useEffect(() => {
     onDoneRef.current = onDone;
   }, [onDone]);
 
+  useEffect(() => {
+    setVideoSource(localSource || (videoUrl ? { uri: videoUrl } : null));
+  }, [localSource, videoUrl]);
+
+  useEffect(() => {
+    setPlaybackStarted(false);
+  }, [sourceUri]);
+
   const dismiss = useCallback(() => {
     if (dismissed.current) return;
     dismissed.current = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
     if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
 
     // Do not rely only on the native animation completion callback. On a cold
@@ -88,94 +99,146 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   }, [fadeAnim]);
 
   useEffect(() => {
-    if (localSource) return;
+    if (localSource || !videoUrl) return;
 
     let cancelled = false;
 
-    async function loadVideo() {
+    async function warmVideoCache() {
       const cached = await getCachedVideo(videoUrl, cacheTTL);
-      if (cancelled) return;
-
-      if (cached) {
-        setVideoSource({ uri: cached });
-      } else {
-        setVideoSource({ uri: videoUrl });
+      if (!cancelled && !cached) {
         downloadAndCache(videoUrl, cacheTTL);
       }
     }
 
-    loadVideo();
+    warmVideoCache();
 
     return () => { cancelled = true; };
   }, [localSource, videoUrl, cacheTTL]);
 
   useEffect(() => {
+    if (!playbackStarted) return undefined;
+    // Count the splash duration from the moment the video has produced its
+    // first playable frame. This avoids cutting the animation short during
+    // WebView's native document/video startup.
     timeoutRef.current = setTimeout(dismiss, duration + 500);
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [duration, dismiss, playbackStarted]);
+
+  useEffect(() => {
+    if (playbackStarted) return undefined;
+    // Separate fail-safe while resolving cached/remote source or waiting for
+    // WebView's first playable frame. This prevents an indefinite overlay if
+    // native media startup hangs before playback.
+    loadingTimeoutRef.current = setTimeout(dismiss, Math.max(8000, duration + 3000));
+    return () => {
+      if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
       if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
     };
-  }, [duration, dismiss]);
+  }, [duration, dismiss, playbackStarted]);
 
-  // expo-video replaces expo-av's declarative `<Video shouldPlay isMuted … />`
-  // with an imperative `useVideoPlayer` instance. The initial source is passed
-  // once at creation; any later source change goes through `player.replace()`.
-  const player = useVideoPlayer(videoSource ?? null, (p) => {
-    p.loop = false;
-    p.muted = true;
-    p.play();
-  });
-
-  // Remote source resolves asynchronously — swap it into the player when ready.
-  useEffect(() => {
-    if (!player || !videoSource) return;
-    try {
-      setIsReady(false);
-      player.replace(videoSource);
-      player.play();
-    } catch (e) {
-      dismiss();
-    }
-  }, [player, videoSource, dismiss]);
-
-  // `playToEnd` replaces `onPlaybackStatusUpdate({ didJustFinish })`.
-  // `statusChange` catches load errors (the old `onError` path).
-  useEffect(() => {
-    if (!player) return undefined;
-    const onEnd = () => dismiss();
-    const onStatus = ({ status }) => {
-      if (status === 'readyToPlay') setIsReady(true);
-      if (status === 'error') dismiss();
-    };
-    const endSub = player.addListener('playToEnd', onEnd);
-    const statusSub = player.addListener('statusChange', onStatus);
-    return () => {
-      endSub.remove();
-      statusSub.remove();
-    };
-  }, [player, dismiss]);
+  const splashHtml = sourceUri ? `
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      video {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="splashVideo" autoplay muted playsinline webkit-playsinline preload="auto">
+      <source src="${sourceUri}" type="video/mp4" />
+    </video>
+    <script>
+      (function () {
+        var video = document.getElementById('splashVideo');
+        function post(type) {
+          try { window.ReactNativeWebView.postMessage(type); } catch (e) {}
+        }
+        video.addEventListener('ended', function () { post('ended'); });
+        video.addEventListener('error', function () { post('error'); });
+        video.addEventListener('loadeddata', function () { post('ready'); });
+        video.addEventListener('playing', function () { post('ready'); });
+        document.addEventListener('click', function () { post('skip'); });
+        document.addEventListener('touchend', function () { post('skip'); });
+        video.addEventListener('canplay', function () {
+          post('ready');
+          var playPromise = video.play();
+          if (playPromise && playPromise.catch) {
+            playPromise.catch(function () {
+              setTimeout(function () { video.play().catch(function () {}); }, 250);
+            });
+          }
+        });
+        var playPromise = video.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(function () {
+            setTimeout(function () { video.play().catch(function () {}); }, 250);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
+` : null;
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <StatusBar hidden />
 
-      {posterUrl && !isReady && (
+      {posterUrl && !videoSource && (
         <Image source={{ uri: posterUrl }} style={StyleSheet.absoluteFill} contentFit="cover" />
       )}
 
-      {videoSource && (
+      {splashHtml ? (
         <Pressable style={StyleSheet.absoluteFill} onPress={dismiss}>
-          <VideoView
-            player={player}
-            style={[StyleSheet.absoluteFill, !isReady && styles.hiddenVideo]}
-            contentFit="cover"
-            nativeControls={false}
+          <WebView
+            source={{ html: splashHtml, baseUrl: 'https://genosys.ae' }}
+            style={styles.webVideo}
+            containerStyle={StyleSheet.absoluteFill}
+            javaScriptEnabled
+            domStorageEnabled={false}
+            scrollEnabled={false}
+            bounces={false}
+            mediaPlaybackRequiresUserAction={false}
+            allowsInlineMediaPlayback
+            allowsFullscreenVideo={false}
+            overScrollMode="never"
+            onMessage={(event) => {
+              const type = event?.nativeEvent?.data;
+              if (type === 'ready') {
+                setPlaybackStarted(true);
+                return;
+              }
+              if (type === 'ended' || type === 'error' || type === 'skip') dismiss();
+            }}
           />
         </Pressable>
-      )}
+      ) : null}
 
-      {/* Fallback logo while video loads or if the first video frame stalls. */}
-      {!isReady && !posterUrl && (
+      {splashHtml && !playbackStarted ? (
+        <View pointerEvents="none" style={styles.webLoadingCover} />
+      ) : null}
+
+      {/* Fallback logo while the remote/cached video source resolves. */}
+      {!videoSource && !posterUrl && (
         <View style={styles.fallback}>
           <Image
             source={require('../assets/splash-logo.png')}
@@ -191,11 +254,16 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     zIndex: 999,
   },
-  hiddenVideo: {
-    opacity: 0,
+  webVideo: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000',
+  },
+  webLoadingCover: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000',
   },
   fallback: {
     flex: 1,
