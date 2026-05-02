@@ -3,12 +3,35 @@ import { StyleSheet, StatusBar, Animated, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import * as FileSystem from 'expo-file-system';
 import { WebView } from 'react-native-webview';
+import Constants from 'expo-constants';
 
-// Bundled fallback that mirrors the iOS LaunchScreen.storyboard image. Used as
-// the default poster when the API does not provide one. Keeping this on the
-// same white background as the native splash makes the JS hand-off pixel-
-// matched to the native splash, eliminating the white→black→video flash.
-const BUNDLED_SPLASH_IMAGE = require('../assets/splash.png');
+// The iOS LaunchScreen storyboard rasterizes whatever PNG was committed to
+// `ios/.../SplashScreenLegacy.imageset/image*.png` at build time — the binary
+// can't be OTA'd. The shipped 1.10.0 binaries up to and including build 82
+// were prebuilt with an older version of the brand asset (md5 8344b5ff…,
+// RGBA), while `assets/splash.png` (md5 63204fba…, RGB) is the current
+// source-of-truth and what the iOS imageset will hold from build 83 onwards
+// (synced in commit 53a1df0).
+//
+// To make the native→JS handoff pixel-identical on whichever binary is
+// running this OTA bundle, we ship BOTH images and pick the one matching
+// the native LaunchScreen at runtime. When binary <= 82 fully rolls off,
+// we can drop the legacy asset and revert this to a single require().
+const SPLASH_IMAGE_CURRENT = require('../assets/splash.png');
+const SPLASH_IMAGE_LEGACY_BINARY_82 = require('../assets/splash-launchscreen-binary82.png');
+
+const NATIVE_BUILD_NUMBER = parseInt(
+  Constants.nativeBuildVersion || Constants.expoConfig?.ios?.buildNumber || '0',
+  10,
+);
+// Builds 0..82 ship the legacy asset; 83+ ship the current asset. If we
+// somehow can't read the build number (parse failure → 0), fall back to
+// "legacy" which is always-correct on the binary that's in the App Store
+// today and the worst-case scenario on a future binary is one transient
+// pixel mismatch on first launch (then the OTA after binary 83 ships will
+// repoint to current).
+const BUNDLED_SPLASH_IMAGE =
+  NATIVE_BUILD_NUMBER >= 83 ? SPLASH_IMAGE_CURRENT : SPLASH_IMAGE_LEGACY_BINARY_82;
 
 const CACHE_DIR = `${FileSystem.cacheDirectory}splash/`;
 const CACHE_FILE = `${CACHE_DIR}splash.mp4`;
@@ -145,15 +168,17 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     };
   }, [duration, dismiss, playbackStarted]);
 
-  // Cross-fade the splash-image cover out once the WebView reports its first
-  // playable frame. Holding the cover until that point hides WebView's blank
-  // bootstrap paint; cross-fading (rather than hard-cutting) softens the
-  // hand-off if the splash image and video first frame are not pixel-identical.
+  // Hide the splash cover the instant the WebView reports actual playback
+  // (NOT canplay/loadeddata — those fire when the first frame is decoded but
+  // may not yet be on screen, which leaves a brief no-logo gap during the
+  // hide animation). Use a very short 90ms fade so the cover→video hand-off
+  // looks clean if the cover image and video first frame are near-but-not-
+  // pixel-identical, but doesn't linger long enough to look like a flicker.
   useEffect(() => {
     if (!playbackStarted) return;
     Animated.timing(splashCoverOpacity, {
       toValue: 0,
-      duration: 280,
+      duration: 90,
       useNativeDriver: true,
     }).start();
   }, [playbackStarted, splashCoverOpacity]);
@@ -210,12 +235,18 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         }
         video.addEventListener('ended', function () { post('ended'); });
         video.addEventListener('error', function () { post('error'); });
-        video.addEventListener('loadeddata', function () { post('ready'); });
-        video.addEventListener('playing', function () { post('ready'); });
         document.addEventListener('click', function () { post('skip'); });
         document.addEventListener('touchend', function () { post('skip'); });
+        // Fire 'ready' ONLY when the video is actually playing, i.e. frames
+        // are being painted to screen. 'loadeddata' / 'canplay' fire when
+        // the first frame is decoded into memory but may precede the
+        // actual paint — flipping the cover off then exposes a brief
+        // logo-less white gap that reads as a flicker.
+        video.addEventListener('playing', function () { post('ready'); });
+        // Trigger playback. canplay's call is the primary path; the
+        // immediate call below covers WebViews that already have buffered
+        // frames before our listener attached.
         video.addEventListener('canplay', function () {
-          post('ready');
           var playPromise = video.play();
           if (playPromise && playPromise.catch) {
             playPromise.catch(function () {

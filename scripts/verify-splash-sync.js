@@ -40,6 +40,12 @@ const crypto = require('crypto')
 const root = path.resolve(__dirname, '..')
 const appJsonPath = path.join(root, 'app.json')
 const sourcePath = path.join(root, 'assets', 'splash.png')
+// Frozen reference image: the exact bytes of the iOS LaunchScreen as
+// rasterized into shipped 1.10.0 binaries up to and including build 82.
+// Bundled into the OTA so VideoLaunchScreen can render a pixel-matched
+// JS cover on those binaries (see VideoLaunchScreen.js header).
+const legacyBinary82Path = path.join(root, 'assets', 'splash-launchscreen-binary82.png')
+const LEGACY_BINARY_82_MD5 = '8344b5ff5bbc0f05fe68b18e3bdc4896'
 const imagesetDir = path.join(
   root,
   'ios',
@@ -142,17 +148,38 @@ if (!isWhite) {
   )
 }
 
-// 4. JS overlay must require the same source-of-truth splash image. If
-//    someone swaps it for a different asset path the JS cover will mismatch.
+// 4. JS overlay must require BOTH splash assets — the current source of
+//    truth (matches iOS LaunchScreen on build 83+) and the legacy binary-82
+//    snapshot (matches iOS LaunchScreen on shipped binaries 0..82). The
+//    component picks between them at runtime by Constants.nativeBuildVersion.
 const componentSource = fs.readFileSync(launchScreenComponent, 'utf8')
 if (!/require\(['"]\.\.\/assets\/splash\.png['"]\)/.test(componentSource)) {
   fail(
     `${path.relative(root, launchScreenComponent)} no longer require()s '../assets/splash.png'. ` +
-      `JS cover image is now out of sync with the iOS LaunchScreen image.`,
+      `JS cover image is now out of sync with the iOS LaunchScreen image (build 83+).`,
+  )
+}
+if (!/require\(['"]\.\.\/assets\/splash-launchscreen-binary82\.png['"]\)/.test(componentSource)) {
+  fail(
+    `${path.relative(root, launchScreenComponent)} no longer require()s '../assets/splash-launchscreen-binary82.png'. ` +
+      `OTA-targeted binaries 0..82 will see a logo flicker between native LaunchScreen and JS cover.`,
   )
 }
 
-// 5. The hash test that caught the original regression: assets/splash.png
+// 5. Legacy binary-82 reference image must NOT drift. Its content is frozen
+//    to match what's compiled into the App Store binary; if anyone replaces
+//    it the JS cover stops matching the native LaunchScreen on those builds.
+const legacyHash = md5(legacyBinary82Path)
+if (legacyHash !== LEGACY_BINARY_82_MD5) {
+  fail(
+    `${path.relative(root, legacyBinary82Path)} has md5 ${legacyHash}, expected ${LEGACY_BINARY_82_MD5}. ` +
+      `This file is a frozen snapshot of the iOS LaunchScreen image baked into binaries up to build 82 — ` +
+      `do not modify. If you genuinely need to update it (e.g. all binary-82 users have upgraded to 83+), ` +
+      `delete the file, drop the require() in components/VideoLaunchScreen.js, and update LEGACY_BINARY_82_MD5 here.`,
+  )
+}
+
+// 6. The hash test that caught the original regression: assets/splash.png
 //    must byte-match all three iOS imageset slots. This is the check that
 //    actually fails first when the bug returns.
 const sourceHash = md5(sourcePath)
