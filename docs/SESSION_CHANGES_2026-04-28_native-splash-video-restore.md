@@ -238,3 +238,93 @@ For the user testing the OTA in production:
 
 - Bump `app.json buildNumber` and `Info.plist CFBundleVersion` for the next binary (autoIncrement will set them to 83 at build time; current uncommitted working-tree values reflect the already-shipped 82 binary).
 - Optional: have the cosmetics-website backend start returning a real `posterUrl` for `/api/mobile/splash-config` so future splash variants don't need a binary rebuild to swap the cover image.
+
+---
+
+## 2026-05-02 Update #2 — Pin JS cover to the actual native LaunchScreen image per binary
+
+### Symptom (post-OTA `1092630b-f956-45eb-bd9b-6fc4cd16c5b6`)
+
+User on production iOS reported the OTA fixed the *background* mismatch but the splash now shows two **logo** flicks instead of two color flashes:
+
+> "white logo screen before the splash, then comes splash and logo quickly flicks again and then splash continues."
+
+### Root cause
+
+The OTA bundled `assets/splash.png` (md5 `63204fba8ff5d1f979eef57d35f3d73d`, RGB) as the JS cover. But shipped binary 82's iOS LaunchScreen storyboard rasterizes a *different* version of the brand asset — committed pre-`53a1df0` — with md5 `8344b5ff5bbc0f05fe68b18e3bdc4896` (RGBA). Both 2400×2400 but different bytes (different brand asset version, different background/alpha treatment). Option C synced the iOS imageset to the current asset for *next* binary (83), but binary 82 in the App Store still holds the legacy bytes.
+
+So on cold start of binary 82 with the previous OTA:
+
+1. Native LaunchScreen paints **legacy** logo (md5 `8344b5ff…`)
+2. JS root mounts → cover paints **current** logo (md5 `63204fba…`) — visible image swap (flick #1)
+3. Cover cross-fades 280ms → video first frame visible — visible blend (flick #2)
+4. Video plays
+
+### Change — OTA #2
+
+Pixel-match the JS cover to whatever the native LaunchScreen on the *running* binary actually paints, not the source-of-truth asset:
+
+- Bundle the legacy asset as `assets/splash-launchscreen-binary82.png`, extracted from `git show 53a1df0~1:ios/GenosysUAE/Images.xcassets/SplashScreenLegacy.imageset/image.png`. Its md5 is frozen by `verify-splash-sync.js` so future commits can't silently replace the snapshot.
+- `components/VideoLaunchScreen.js` now picks the cover image at runtime by `Constants.nativeBuildVersion`:
+  - build < 83 → **legacy** asset (matches binary 82 native LaunchScreen byte-for-byte)
+  - build ≥ 83 → `assets/splash.png` (will match binary 83+ native LaunchScreen after option C is in the binary)
+- Cross-fade duration tightened from 280ms → 90ms. Long fades visibly blend two near-identical-but-not-identical images and read as flicker; 90ms is short enough to look near-instantaneous on matched pixels and still soften any micro-mismatch with the video first frame.
+- The WebView's `playbackStarted` flag now only flips on the `playing` event — no longer on `loadeddata` or `canplay`. Those earlier events fire when the first frame is decoded into memory but may *precede* the actual paint to screen, leaving a brief logo-less white gap between cover hide and video paint. `playing` fires when frames are actually being painted. (`canplay` still calls `video.play()` to ensure playback starts on autoplay-restricted WebViews.)
+- `verify-splash-sync.js` now (a) requires the legacy asset to be `require()`d in `VideoLaunchScreen.js` and (b) freezes its md5 so future commits can't silently replace the frozen reference with an arbitrary asset.
+
+### Expected sequence on binary 82 cold start (after OTA #2 applies)
+
+1. iOS LaunchScreen — white + **legacy** logo, ~700ms
+2. expo-splash-screen — white + **legacy** logo (same pixels)
+3. JS root → cover renders **legacy** asset on white — byte-identical to step 1/2 ← no flick #1
+4. WebView buffers behind the cover (invisible)
+5. WebView fires `playing` → 90ms cover fade → video frame painted
+6. Video plays → final fade-out → app revealed
+
+### Expected sequence on binary 83+ cold start (when next build ships)
+
+1. iOS LaunchScreen — white + **current** logo (option C asset, md5 `63204fba…`)
+2. expo-splash-screen — white + **current** logo
+3. JS root → cover renders **current** asset (build ≥ 83 branch) — byte-identical
+4. WebView buffers
+5. `playing` → 90ms fade → video plays
+6. Final fade-out → app revealed
+
+### Files
+
+- `assets/splash-launchscreen-binary82.png` (new, frozen)
+- `components/VideoLaunchScreen.js`
+- `scripts/verify-splash-sync.js`
+
+Commit: `a8d868c`
+
+### OTA
+
+Published via `npx eas-cli@latest update --branch production` against the same runtime version as the prior OTA. Replaces (latest-wins) the previous bundle for users on runtime `1.10.0`.
+
+- Branch: `production`
+- Runtime: `1.10.0`
+- Platforms: iOS, Android
+- Update group ID: `afe4b237-b680-4ec5-be42-2b332479c65f`
+- Android update ID: `019de812-5ade-75a3-90bc-353ff07283c5`
+- iOS update ID: `019de812-5ade-76b9-8b17-e2e73a1c588a`
+- Commit: `a8d868ca929a154c67485ac8694f3c1f162daa0c`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/afe4b237-b680-4ec5-be42-2b332479c65f
+
+### Verification checklist (for the user)
+
+The OTA is downloaded *during* a cold start and applied on the *next* one. So:
+
+1. Open the app on the production build (1.10.0 / build 82). First open after this OTA published may still run the prior bundle.
+2. Kill the app from the App Switcher.
+3. Reopen. This launch should run the new bundle.
+4. Expected: continuous logo on white from icon tap through to the splash video starting. No image swap, no logo flicker, no white-without-logo gap. The video then plays normally and fades out into the app shell.
+
+If you still see flicker after reopening twice from the App Switcher: report what stage the flicker happens at (icon tap → first paint, OR somewhere mid-video) and I'll iterate.
+
+### Cleanup once binary 83 is fully rolled out
+
+- Drop `assets/splash-launchscreen-binary82.png` and the legacy `require()` from `VideoLaunchScreen.js`.
+- Remove the `Constants.nativeBuildVersion` branch (always use `SPLASH_IMAGE_CURRENT`).
+- Remove the legacy-asset checks from `verify-splash-sync.js`.
+- The verify-splash-sync md5-parity test on `assets/splash.png` ↔ `SplashScreenLegacy.imageset/*.png` continues to enforce the option-C invariant indefinitely.
