@@ -392,3 +392,71 @@ Published via `npx eas-cli@latest update --branch production` against runtime `1
 5. Video completes / timeout fires, then app shell is revealed.
 
 No visible WebView restart should occur between steps 3 and 4.
+
+---
+
+## 2026-05-02 Update #4 — Remove JS logo cover entirely
+
+### Symptom (post-OTA #3)
+
+User reported:
+
+> "white logo is not static - it blinks 2 times and then splash starts normally"
+
+At this point the video was starting normally, but the logo itself still blinked before the video. That means the JS logo cover was still participating in the visible startup path. Even if the asset bytes match, rendering a second logo layer in React Native after the native LaunchScreen can create a visible disappearance/repaint on production iOS.
+
+### Decision
+
+Stop rendering the logo in JavaScript. The native iOS LaunchScreen is the only layer allowed to show the logo. Once React mounts, the `VideoLaunchScreen` cover becomes a plain white veil whose only job is to hide WebView bootstrap frames until the video is already stable.
+
+This trades "persistent logo while waiting" for a safer production behavior:
+
+1. Native iOS LaunchScreen shows logo once.
+2. JS overlay switches to plain white while WebView starts behind it.
+3. After WebView `playing` + 650ms, JS hard-cuts to already-moving video.
+4. Video plays normally and dismisses into the app.
+
+No JS logo means no JS-controlled logo blink is possible.
+
+### Change — OTA #4
+
+- Removed `expo-constants` and runtime build-number image selection from `components/VideoLaunchScreen.js`.
+- Removed `assets/splash-launchscreen-binary82.png` from the app bundle; it is no longer needed because JS no longer tries to pixel-match the native logo.
+- Removed React Native `Image` rendering from the splash cover.
+- Kept the existing WebView stabilization logic from OTA #3:
+  - launch config frozen on mount
+  - WebView source memoized
+  - cover stays up until `playing + 650ms`
+  - hard-cut to video
+- Updated `scripts/verify-splash-sync.js` to enforce the new invariant: `VideoLaunchScreen.js` must not `require('../assets/splash.png')` or `require('../assets/splash-launchscreen-binary82.png')`. The JS cover must remain plain white.
+- Native iOS imageset parity remains checked so build 83 still ships with synced native assets.
+
+### Files
+
+- `components/VideoLaunchScreen.js`
+- `scripts/verify-splash-sync.js`
+- `assets/splash-launchscreen-binary82.png` (deleted)
+
+Commit: `28ba69d`
+
+### OTA
+
+Published via `npx eas-cli@latest update --branch production` against runtime `1.10.0`.
+
+- Branch: `production`
+- Runtime: `1.10.0`
+- Platforms: iOS, Android
+- Update group ID: `8bdfe95d-5e82-4d99-b03f-4f0cebd0dd4d`
+- Android update ID: `019de9fc-d90f-7dfd-97ee-bc2c0d31ac0d`
+- iOS update ID: `019de9fc-d90f-706a-9655-a4a4828c2bfc`
+- Commit: `28ba69ddf21f3febfded018101487710d49db8db`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/8bdfe95d-5e82-4d99-b03f-4f0cebd0dd4d
+
+### Verification
+
+- `npm run verify:splash` passed.
+- `npx expo export --platform ios --output-dir /tmp/genosys-splash-white-cover-ota` passed.
+
+### If flicker remains
+
+If a white logo still blinks after OTA #4 is definitely applied, the flicker is no longer coming from `VideoLaunchScreen.js` because that code no longer renders any logo. The next safest production move is to disable the remote video splash server-side (`/api/mobile/splash-config enabled: false`) until binary 83 ships, leaving only the native LaunchScreen and eliminating all JS/WebView startup splash layers.
