@@ -328,3 +328,67 @@ If you still see flicker after reopening twice from the App Switcher: report wha
 - Remove the `Constants.nativeBuildVersion` branch (always use `SPLASH_IMAGE_CURRENT`).
 - Remove the legacy-asset checks from `verify-splash-sync.js`.
 - The verify-splash-sync md5-parity test on `assets/splash.png` ↔ `SplashScreenLegacy.imageset/*.png` continues to enforce the option-C invariant indefinitely.
+
+---
+
+## 2026-05-02 Update #3 — Prevent WebView restart and hide unstable first frames
+
+### Symptom (post-OTA #2)
+
+User still saw multiple startup artifacts:
+
+> "white logo flicks two times, then a bit of splash, then flicks again and then splash starts."
+
+OTA #2 fixed the native-vs-JS image mismatch, but the observed "bit of splash → flick → splash starts" pointed to WebView/video instability rather than only an asset mismatch.
+
+### Root cause
+
+Two remaining races were still possible in `VideoLaunchScreen`:
+
+1. `app/_layout.js` runs startup checks (`/app-version`, cached `/splash-config`, fresh `/splash-config`, OTA check). These can re-render the root while `VideoLaunchScreen` is mounted. The component memoized the HTML string, but still passed a new `{ html, baseUrl }` object to `react-native-webview` on each render. On iOS this can be treated as a source change and restart/repaint the embedded video.
+2. WKWebView can emit `playing` before the first visually stable frame. Revealing the WebView immediately after `playing` can expose WebKit's own white/poster/bootstrap frames before the actual video motion is stable.
+
+### Change — OTA #3
+
+`components/VideoLaunchScreen.js` now makes each cold-start splash deterministic:
+
+- Freezes the initial `localSource`, `videoUrl`, `posterUrl`, `duration`, and `cacheTTL` in a ref for the lifetime of the launch overlay. Fresh config can be saved for the next launch, but cannot replace the running overlay's media mid-playback.
+- Removes the prop-driven `setVideoSource` effect so the video source is chosen once and never swapped while visible.
+- Memoizes the full WebView `source` object, not just the HTML string, to prevent WebView reloads on unrelated root re-renders.
+- Replaces `expo-image` for the static local cover with React Native's native `Image` and disables image fade (`fadeDuration={0}`) to avoid an extra image-pipeline transition while the native splash is handing off to JS.
+- Keeps the static cover visible for `650ms` after WKWebView reports `playing`, then hard-cuts to the already-playing video (`duration: 0`). This hides WebView's unstable first frames instead of showing them as a logo flicker / video restart.
+- Clears the reveal timer on dismiss/unmount.
+
+### Files
+
+- `components/VideoLaunchScreen.js`
+
+Commit: `9b01967`
+
+### OTA
+
+Published via `npx eas-cli@latest update --branch production` against runtime `1.10.0`.
+
+- Branch: `production`
+- Runtime: `1.10.0`
+- Platforms: iOS, Android
+- Update group ID: `a80139c1-ece2-41f0-9b28-268e17771d0c`
+- Android update ID: `019de840-6e81-7be6-922a-baf8dcd4af5b`
+- iOS update ID: `019de840-6e81-7f71-bd49-52b1e54ad19b`
+- Commit: `9b01967785bf40317ca0baa85edec5426ecc51f3`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/a80139c1-ece2-41f0-9b28-268e17771d0c
+
+### Verification
+
+- `npm run verify:splash` passed.
+- `npx expo export --platform ios --output-dir /tmp/genosys-splash-stability-ota` passed and included `assets/splash-launchscreen-binary82.png`.
+
+### Expected sequence after OTA #3 applies
+
+1. Native iOS LaunchScreen shows white + baked-in binary-82 logo.
+2. JS overlay shows the matching static cover.
+3. WebView starts and plays behind the static cover.
+4. After `playing` + 650ms, cover hard-cuts to already-moving video.
+5. Video completes / timeout fires, then app shell is revealed.
+
+No visible WebView restart should occur between steps 3 and 4.
