@@ -72,6 +72,24 @@ No IDE linter errors were reported for `components/VideoLaunchScreen.js`.
 
 Published via EAS Update.
 
+## iOS Binary Build
+
+After the OTA was committed (`115cb11`), a fresh iOS production binary was built so the splash fix is baked into the App Store build rather than relying only on OTA.
+
+- App version: `1.10.0`
+- iOS build number: `82`
+- EAS build ID: `421465b3-1922-4b55-9f5b-10f1286f16d9`
+- Commit: `115cb11b3d43d6551f6d472d57e48408674ec9c9`
+- Build logs: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/builds/421465b3-1922-4b55-9f5b-10f1286f16d9
+- IPA: https://expo.dev/artifacts/eas/9agyWourTPngj2LD2Z5u9a.ipa
+
+The binary upload to App Store Connect completed successfully through EAS Submit.
+
+- ASC App ID: `6756648064`
+- Submission ID: `92e3d6cf-0c3c-4a0e-bd94-e108a9d2d164`
+- Build uploaded: `1.10.0 (82)`
+- App Store Connect build page: https://appstoreconnect.apple.com/apps/6756648064/testflight/ios
+
 Latest blink-reduction fix:
 
 - Branch: `production`
@@ -135,3 +153,88 @@ Earlier immediate-render OTA:
 ## TestFlight Note
 
 Expo updates are downloaded/applied on launch. If TestFlight opens once with the old bundle, fully close the app and reopen. The restored splash should show after the OTA is active.
+
+---
+
+## 2026-05-02 Update — Eliminate White → Black Hand-off Blink
+
+### Symptom
+
+After 1.10.0 (build 82) reached the App Store, real production users on iOS reported the splash blinking twice during cold start. TestFlight users on fast WiFi did not perceive it. Two-launch sanity check ruled out an OTA-not-applied issue.
+
+### Root cause
+
+The previously-shipped fix eliminated WebView's blank bootstrap paint but did not eliminate the structural color mismatch between the iOS native LaunchScreen (white `#ffffff` + GENOSYS logo) and the JS `VideoLaunchScreen` overlay (`#000` black). On a cold prod launch the sequence was:
+
+1. iOS native LaunchScreen — white + logo (~300–700ms)
+2. expo-splash-screen view — white + logo (~50–300ms)
+3. JS root mounts → `VideoLaunchScreen` container — **black** (blink #1: white → black)
+4. WebView loads HTML video, black cover hides blank paint
+5. Cover removes when `playbackStarted` → first video frame visible (blink #2: black → video)
+
+In TestFlight on fast WiFi the WebView load was fast enough that the eye fused both transitions into one visual beat. On cellular / cold cache the gap between #1 and #2 stretched to 600–1500ms and they were clearly perceived as two separate blinks.
+
+A second contributing factor: the iOS LaunchScreen image at `ios/GenosysUAE/Images.xcassets/SplashScreenLegacy.imageset/image{,@2x,@3x}.png` was a stale prebuild artefact (`md5 8344b5ff…`) that did not match the source-of-truth `assets/splash.png` (`md5 63204fba…`) declared in `app.json`. Even after fixing the JS overlay color, the JS-rendered logo wouldn't have been pixel-identical to what the native splash drew.
+
+### Change — OTA (option B)
+
+Rewrote `components/VideoLaunchScreen.js`:
+
+- Container, WebView surface, and HTML body backgrounds all flipped from `#000` → `#ffffff` to match `ios/GenosysUAE/Images.xcassets/SplashScreenBackground.colorset` (white).
+- Added a persistent splash-image cover (white background + bundled `assets/splash.png`) layered on top of the WebView from the first JS render. Mirrors the iOS native LaunchScreen so the JS hand-off is pixel-matched.
+- Cover stays at full opacity until the WebView posts `loadeddata` / `canplay` / `playing`, then cross-fades out over 280ms revealing the video underneath. Cross-fade (rather than hard cut) softens the hand-off if the splash image and video first frame are not pixel-identical.
+- API-provided `posterUrl` (when supplied by `/api/mobile/splash-config`) overrides the bundled image as the cover. Backend currently returns `null`, so we fall back to the bundled asset.
+- `splashHtml` wrapped in `useMemo` keyed on `sourceUri` so the WebView's `source` prop is stable across parent re-renders and doesn't reload mid-playback.
+- Dropped the now-unused `View` import and the orphaned `webLoadingCover` / `fallback` / `logo` styles.
+
+Net cold-start sequence after the change:
+
+1. iOS LaunchScreen — white + logo
+2. expo-splash-screen — white + logo (same pixels)
+3. JS root → `VideoLaunchScreen` cover — white + logo (same pixels) ← no blink
+4. WebView buffers behind the cover (invisible)
+5. First video frame ready → cross-fade cover out → video plays
+6. Splash fade-out → app revealed
+
+### Change — next binary (option C)
+
+Synced `ios/GenosysUAE/Images.xcassets/SplashScreenLegacy.imageset/image{,@2x,@3x}.png` to the current `assets/splash.png`. All three scale slots now hash to `63204fba8ff5d1f979eef57d35f3d73d`, identical to `assets/splash.png` and to what the JS cover renders.
+
+This change does not affect the binary already in the App Store (build 82, which still ships the stale image). It will be picked up by the next `eas build --profile production`. With `autoIncrement: true` in `eas.json`, that build will be 83.
+
+Once build 83 ships, even users on the first launch (before OTA applies) will see a pixel-matched native → JS hand-off because both layers will render the same image bytes.
+
+### Files
+
+- `components/VideoLaunchScreen.js`
+- `ios/GenosysUAE/Images.xcassets/SplashScreenLegacy.imageset/image.png`
+- `ios/GenosysUAE/Images.xcassets/SplashScreenLegacy.imageset/image@2x.png`
+- `ios/GenosysUAE/Images.xcassets/SplashScreenLegacy.imageset/image@3x.png`
+
+Commit: `53a1df0`
+
+### OTA
+
+Published via `eas update --branch production --platform all`.
+
+- Branch: `production`
+- Runtime: `1.10.0`
+- Platforms: iOS, Android
+- Update group ID: `1092630b-f956-45eb-bd9b-6fc4cd16c5b6`
+- Android update ID: `019de7d4-40b8-7913-8efd-8395aa469df1`
+- iOS update ID: `019de7d4-40b8-71f5-a66e-3072b59d0aee`
+- Commit: `53a1df09521077c8f1b3ad4c20987c2072cf2962`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/1092630b-f956-45eb-bd9b-6fc4cd16c5b6
+
+### Verification checklist
+
+For the user testing the OTA in production:
+
+1. Open the app on iOS production build (App Store 1.10.0 / 82). First launch will still run the bundled (old) JS — kill the app from the App Switcher.
+2. Reopen. The OTA will be applied on this cold start. Expect: white background continuously from icon tap → video plays → app shell. No black flash.
+3. If the splash video itself starts on a non-white frame, the cross-fade will reveal that frame over 280ms — that is intentional and should look like a single smooth transition, not a snap.
+
+### Pending follow-ups
+
+- Bump `app.json buildNumber` and `Info.plist CFBundleVersion` for the next binary (autoIncrement will set them to 83 at build time; current uncommitted working-tree values reflect the already-shipped 82 binary).
+- Optional: have the cosmetics-website backend start returning a real `posterUrl` for `/api/mobile/splash-config` so future splash variants don't need a binary rebuild to swap the cover image.
