@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, StatusBar, Animated, Pressable } from 'react-native';
-import { Image } from 'expo-image';
+import { StyleSheet, StatusBar, Animated, Pressable, Image as RNImage } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
@@ -83,18 +82,29 @@ async function downloadAndCache(remoteUrl, cacheTTL) {
  *   onDone      — called when the screen should be dismissed
  */
 export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onDone }) {
+  const launchConfigRef = useRef({
+    localSource,
+    videoUrl,
+    posterUrl,
+    duration,
+    cacheTTL,
+  });
+  const launchConfig = launchConfigRef.current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   // Splash cover starts fully opaque and only fades out once the WebView
   // reports its first playable frame. This keeps the iOS-LaunchScreen-matched
   // logo on screen during the entire WebView/video bootstrap so the user
   // never sees the underlying WebView blank/black paint.
   const splashCoverOpacity = useRef(new Animated.Value(1)).current;
-  const [videoSource, setVideoSource] = useState(() => localSource || (videoUrl ? { uri: videoUrl } : null));
+  const [videoSource] = useState(() => (
+    launchConfig.localSource || (launchConfig.videoUrl ? { uri: launchConfig.videoUrl } : null)
+  ));
   const [playbackStarted, setPlaybackStarted] = useState(false);
   const dismissed = useRef(false);
   const timeoutRef = useRef(null);
   const loadingTimeoutRef = useRef(null);
   const fallbackTimeoutRef = useRef(null);
+  const revealTimeoutRef = useRef(null);
   const onDoneRef = useRef(onDone);
   const sourceUri = typeof videoSource === 'number' ? null : videoSource?.uri;
 
@@ -102,17 +112,13 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   // asset (same image as the iOS LaunchScreen). useMemo so we don't mint a
   // new source object on every parent re-render.
   const coverImageSource = useMemo(
-    () => (posterUrl ? { uri: posterUrl } : BUNDLED_SPLASH_IMAGE),
-    [posterUrl],
+    () => (launchConfig.posterUrl ? { uri: launchConfig.posterUrl } : BUNDLED_SPLASH_IMAGE),
+    [launchConfig.posterUrl],
   );
 
   useEffect(() => {
     onDoneRef.current = onDone;
   }, [onDone]);
-
-  useEffect(() => {
-    setVideoSource(localSource || (videoUrl ? { uri: videoUrl } : null));
-  }, [localSource, videoUrl]);
 
   useEffect(() => {
     setPlaybackStarted(false);
@@ -124,6 +130,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
     if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
+    if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
 
     // Do not rely only on the native animation completion callback. On a cold
     // TestFlight launch the first video frame can stall until touch, so remove
@@ -141,46 +148,50 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   }, [fadeAnim]);
 
   useEffect(() => {
-    if (localSource || !videoUrl) return;
+    if (launchConfig.localSource || !launchConfig.videoUrl) return;
 
     let cancelled = false;
 
     async function warmVideoCache() {
-      const cached = await getCachedVideo(videoUrl, cacheTTL);
+      const cached = await getCachedVideo(launchConfig.videoUrl, launchConfig.cacheTTL);
       if (!cancelled && !cached) {
-        downloadAndCache(videoUrl, cacheTTL);
+        downloadAndCache(launchConfig.videoUrl, launchConfig.cacheTTL);
       }
     }
 
     warmVideoCache();
 
     return () => { cancelled = true; };
-  }, [localSource, videoUrl, cacheTTL]);
+  }, [launchConfig.cacheTTL, launchConfig.localSource, launchConfig.videoUrl]);
 
   useEffect(() => {
     if (!playbackStarted) return undefined;
     // Count the splash duration from the moment the video has produced its
     // first playable frame. This avoids cutting the animation short during
     // WebView's native document/video startup.
-    timeoutRef.current = setTimeout(dismiss, duration + 500);
+    timeoutRef.current = setTimeout(dismiss, launchConfig.duration + 500);
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [duration, dismiss, playbackStarted]);
+  }, [dismiss, launchConfig.duration, playbackStarted]);
 
-  // Hide the splash cover the instant the WebView reports actual playback
-  // (NOT canplay/loadeddata — those fire when the first frame is decoded but
-  // may not yet be on screen, which leaves a brief no-logo gap during the
-  // hide animation). Use a very short 90ms fade so the cover→video hand-off
-  // looks clean if the cover image and video first frame are near-but-not-
-  // pixel-identical, but doesn't linger long enough to look like a flicker.
+  // Do not reveal the WebView on the first `playing` tick. On iOS WKWebView
+  // the first painted frames can still include the video element's own white
+  // bootstrap/poster transition, and revealing those frames is what users are
+  // perceiving as logo flicker / restart. Let playback run invisibly for a
+  // short moment, then hard-cut from the static cover to already-moving video.
   useEffect(() => {
     if (!playbackStarted) return;
-    Animated.timing(splashCoverOpacity, {
-      toValue: 0,
-      duration: 90,
-      useNativeDriver: true,
-    }).start();
+    revealTimeoutRef.current = setTimeout(() => {
+      Animated.timing(splashCoverOpacity, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: true,
+      }).start();
+    }, 650);
+    return () => {
+      if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
+    };
   }, [playbackStarted, splashCoverOpacity]);
 
   useEffect(() => {
@@ -188,12 +199,13 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     // Separate fail-safe while resolving cached/remote source or waiting for
     // WebView's first playable frame. This prevents an indefinite overlay if
     // native media startup hangs before playback.
-    loadingTimeoutRef.current = setTimeout(dismiss, Math.max(8000, duration + 3000));
+    loadingTimeoutRef.current = setTimeout(dismiss, Math.max(8000, launchConfig.duration + 3000));
     return () => {
       if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
       if (fallbackTimeoutRef.current) clearTimeout(fallbackTimeoutRef.current);
+      if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
     };
-  }, [duration, dismiss, playbackStarted]);
+  }, [dismiss, launchConfig.duration, playbackStarted]);
 
   // Memoize the HTML payload so the WebView doesn't see a fresh `source`
   // object on every parent re-render and reload mid-playback.
@@ -266,6 +278,10 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
 </html>
 `;
   }, [sourceUri]);
+  const webViewSource = useMemo(
+    () => (splashHtml ? { html: splashHtml, baseUrl: 'https://genosys.ae' } : null),
+    [splashHtml],
+  );
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
@@ -273,10 +289,10 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
 
       {/* Layer 1 (bottom): WebView playing the remote splash video. Mounted
           immediately so it can begin downloading/decoding behind the cover. */}
-      {splashHtml ? (
+      {webViewSource ? (
         <Pressable style={StyleSheet.absoluteFill} onPress={dismiss}>
           <WebView
-            source={{ html: splashHtml, baseUrl: 'https://genosys.ae' }}
+            source={webViewSource}
             style={styles.webVideo}
             containerStyle={StyleSheet.absoluteFill}
             javaScriptEnabled
@@ -315,11 +331,11 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         pointerEvents="none"
         style={[styles.splashCover, { opacity: splashCoverOpacity }]}
       >
-        <Image
+        <RNImage
           source={coverImageSource}
           style={styles.splashCoverImage}
-          contentFit="contain"
-          transition={0}
+          resizeMode="contain"
+          fadeDuration={0}
         />
       </Animated.View>
     </Animated.View>
