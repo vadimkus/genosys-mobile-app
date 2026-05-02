@@ -38,7 +38,8 @@
     "smoke:cart-pricing-contract": "tsx scripts/smoke-cart-pricing-contract.js",
     "smoke:order-payload-pricing-contract": "tsx scripts/smoke-order-payload-pricing-contract.js",
     "smoke:orders-repository": "tsx scripts/smoke-orders-repository.js",
-    "verify:release": "npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository"
+    "verify:splash": "node scripts/verify-splash-sync.js",
+    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
