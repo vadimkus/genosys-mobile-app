@@ -1,36 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, StatusBar, Animated, Pressable, Image as RNImage } from 'react-native';
+import { StyleSheet, StatusBar, Animated, Pressable } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { WebView } from 'react-native-webview';
-import Constants from 'expo-constants';
-
-// The iOS LaunchScreen storyboard rasterizes whatever PNG was committed to
-// `ios/.../SplashScreenLegacy.imageset/image*.png` at build time — the binary
-// can't be OTA'd. The shipped 1.10.0 binaries up to and including build 82
-// were prebuilt with an older version of the brand asset (md5 8344b5ff…,
-// RGBA), while `assets/splash.png` (md5 63204fba…, RGB) is the current
-// source-of-truth and what the iOS imageset will hold from build 83 onwards
-// (synced in commit 53a1df0).
-//
-// To make the native→JS handoff pixel-identical on whichever binary is
-// running this OTA bundle, we ship BOTH images and pick the one matching
-// the native LaunchScreen at runtime. When binary <= 82 fully rolls off,
-// we can drop the legacy asset and revert this to a single require().
-const SPLASH_IMAGE_CURRENT = require('../assets/splash.png');
-const SPLASH_IMAGE_LEGACY_BINARY_82 = require('../assets/splash-launchscreen-binary82.png');
-
-const NATIVE_BUILD_NUMBER = parseInt(
-  Constants.nativeBuildVersion || Constants.expoConfig?.ios?.buildNumber || '0',
-  10,
-);
-// Builds 0..82 ship the legacy asset; 83+ ship the current asset. If we
-// somehow can't read the build number (parse failure → 0), fall back to
-// "legacy" which is always-correct on the binary that's in the App Store
-// today and the worst-case scenario on a future binary is one transient
-// pixel mismatch on first launch (then the OTA after binary 83 ships will
-// repoint to current).
-const BUNDLED_SPLASH_IMAGE =
-  NATIVE_BUILD_NUMBER >= 83 ? SPLASH_IMAGE_CURRENT : SPLASH_IMAGE_LEGACY_BINARY_82;
 
 const CACHE_DIR = `${FileSystem.cacheDirectory}splash/`;
 const CACHE_FILE = `${CACHE_DIR}splash.mp4`;
@@ -91,10 +62,10 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   });
   const launchConfig = launchConfigRef.current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  // Splash cover starts fully opaque and only fades out once the WebView
-  // reports its first playable frame. This keeps the iOS-LaunchScreen-matched
-  // logo on screen during the entire WebView/video bootstrap so the user
-  // never sees the underlying WebView blank/black paint.
+  // Plain white cover starts fully opaque and hides WebView startup until
+  // video playback is stable. We intentionally do NOT render the logo here:
+  // the native iOS LaunchScreen already shows it, and rendering a second JS
+  // logo layer caused visible double-blinks on production binary 82.
   const splashCoverOpacity = useRef(new Animated.Value(1)).current;
   const [videoSource] = useState(() => (
     launchConfig.localSource || (launchConfig.videoUrl ? { uri: launchConfig.videoUrl } : null)
@@ -107,14 +78,6 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   const revealTimeoutRef = useRef(null);
   const onDoneRef = useRef(onDone);
   const sourceUri = typeof videoSource === 'number' ? null : videoSource?.uri;
-
-  // Use the API-provided poster when supplied, otherwise the bundled splash
-  // asset (same image as the iOS LaunchScreen). useMemo so we don't mint a
-  // new source object on every parent re-render.
-  const coverImageSource = useMemo(
-    () => (launchConfig.posterUrl ? { uri: launchConfig.posterUrl } : BUNDLED_SPLASH_IMAGE),
-    [launchConfig.posterUrl],
-  );
 
   useEffect(() => {
     onDoneRef.current = onDone;
@@ -320,24 +283,14 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         </Pressable>
       ) : null}
 
-      {/* Layer 2 (top): poster cover that mirrors the iOS native LaunchScreen
-          (white background + bundled splash image, or API-provided posterUrl).
-          Stays fully opaque until the WebView reports its first playable
-          frame, then cross-fades out, revealing the video underneath. This is
-          what eliminates the white→black→video double-blink: the cover keeps
-          the screen on the same color as the native LaunchScreen during the
-          entire WebView/video bootstrap. */}
+      {/* Layer 2 (top): plain white cover. The native LaunchScreen owns the
+          logo; this JS layer only prevents WebView bootstrap frames from being
+          visible before the video is already moving. Rendering another logo
+          here caused repeated logo blinks on production iOS. */}
       <Animated.View
         pointerEvents="none"
         style={[styles.splashCover, { opacity: splashCoverOpacity }]}
-      >
-        <RNImage
-          source={coverImageSource}
-          style={styles.splashCoverImage}
-          resizeMode="contain"
-          fadeDuration={0}
-        />
-      </Animated.View>
+      />
     </Animated.View>
   );
 }
@@ -358,11 +311,5 @@ const styles = StyleSheet.create({
   splashCover: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  splashCoverImage: {
-    width: '100%',
-    height: '100%',
   },
 });

@@ -2,21 +2,21 @@
  * verify-splash-sync.js
  *
  * Guards against the splash double-blink regression. The cold-start splash
- * sequence relies on a chain of identical-pixel handoffs:
+ * sequence relies on a native splash and JS overlay sharing the same white
+ * background:
  *
  *   iOS LaunchScreen.storyboard → expo splash view → JS VideoLaunchScreen cover
  *
- * If any of these layers paints a different image (or the wrong color) the
- * user sees a flash on cold launch. Three things must all agree:
+ * If any of these layers paints the wrong color the user sees a flash on cold
+ * launch. Native image assets still need to stay synchronized for binary
+ * builds, but JS deliberately does NOT render a logo cover anymore: the native
+ * LaunchScreen owns the logo, and a second JS logo layer caused repeated
+ * logo blinks in production.
  *
  *   1. assets/splash.png                                  ← source of truth in app.json
  *   2. ios/GenosysUAE/.../SplashScreenLegacy.imageset/    ← what iOS LaunchScreen draws
  *      image.png, image@2x.png, image@3x.png              ← must all be identical bytes
- *   3. components/VideoLaunchScreen.js                    ← bundled splash for JS cover
- *      `require('../assets/splash.png')`                  ← references (1)
- *
- * (1) and (3) share a single file, so they're always in sync. (2) is a
- * separate copy in the iOS asset catalog that drifts whenever
+ * (2) is a separate copy in the iOS asset catalog that drifts whenever
  * `npx expo prebuild` runs without re-syncing, or when assets/splash.png is
  * updated without copying to the imageset.
  *
@@ -40,12 +40,6 @@ const crypto = require('crypto')
 const root = path.resolve(__dirname, '..')
 const appJsonPath = path.join(root, 'app.json')
 const sourcePath = path.join(root, 'assets', 'splash.png')
-// Frozen reference image: the exact bytes of the iOS LaunchScreen as
-// rasterized into shipped 1.10.0 binaries up to and including build 82.
-// Bundled into the OTA so VideoLaunchScreen can render a pixel-matched
-// JS cover on those binaries (see VideoLaunchScreen.js header).
-const legacyBinary82Path = path.join(root, 'assets', 'splash-launchscreen-binary82.png')
-const LEGACY_BINARY_82_MD5 = '8344b5ff5bbc0f05fe68b18e3bdc4896'
 const imagesetDir = path.join(
   root,
   'ios',
@@ -148,38 +142,19 @@ if (!isWhite) {
   )
 }
 
-// 4. JS overlay must require BOTH splash assets — the current source of
-//    truth (matches iOS LaunchScreen on build 83+) and the legacy binary-82
-//    snapshot (matches iOS LaunchScreen on shipped binaries 0..82). The
-//    component picks between them at runtime by Constants.nativeBuildVersion.
+// 4. JS overlay must NOT render a logo cover. The native LaunchScreen already
+//    shows the logo; the JS layer should only be a plain white veil over
+//    WebView bootstrap frames. Rendering another splash image here caused the
+//    production "white logo blinks twice" regression.
 const componentSource = fs.readFileSync(launchScreenComponent, 'utf8')
-if (!/require\(['"]\.\.\/assets\/splash\.png['"]\)/.test(componentSource)) {
+if (/require\(['"]\.\.\/assets\/splash(?:-launchscreen-binary82)?\.png['"]\)/.test(componentSource)) {
   fail(
-    `${path.relative(root, launchScreenComponent)} no longer require()s '../assets/splash.png'. ` +
-      `JS cover image is now out of sync with the iOS LaunchScreen image (build 83+).`,
-  )
-}
-if (!/require\(['"]\.\.\/assets\/splash-launchscreen-binary82\.png['"]\)/.test(componentSource)) {
-  fail(
-    `${path.relative(root, launchScreenComponent)} no longer require()s '../assets/splash-launchscreen-binary82.png'. ` +
-      `OTA-targeted binaries 0..82 will see a logo flicker between native LaunchScreen and JS cover.`,
+    `${path.relative(root, launchScreenComponent)} require()s a splash logo image for the JS cover. ` +
+      `Keep the JS cover plain white; otherwise the native logo and JS logo can blink against each other.`,
   )
 }
 
-// 5. Legacy binary-82 reference image must NOT drift. Its content is frozen
-//    to match what's compiled into the App Store binary; if anyone replaces
-//    it the JS cover stops matching the native LaunchScreen on those builds.
-const legacyHash = md5(legacyBinary82Path)
-if (legacyHash !== LEGACY_BINARY_82_MD5) {
-  fail(
-    `${path.relative(root, legacyBinary82Path)} has md5 ${legacyHash}, expected ${LEGACY_BINARY_82_MD5}. ` +
-      `This file is a frozen snapshot of the iOS LaunchScreen image baked into binaries up to build 82 — ` +
-      `do not modify. If you genuinely need to update it (e.g. all binary-82 users have upgraded to 83+), ` +
-      `delete the file, drop the require() in components/VideoLaunchScreen.js, and update LEGACY_BINARY_82_MD5 here.`,
-  )
-}
-
-// 6. The hash test that caught the original regression: assets/splash.png
+// 5. The hash test that caught the original regression: assets/splash.png
 //    must byte-match all three iOS imageset slots. This is the check that
 //    actually fails first when the bug returns.
 const sourceHash = md5(sourcePath)
