@@ -450,7 +450,7 @@ export default function ProfileScreen() {
                 <View style={styles.onlineDot} />
               </View>
 
-              {Number.isFinite(Number(user?.discountPercentage)) && Number(user?.discountPercentage) > 0 && (
+              {!!user?.discountType && Number.isFinite(Number(user?.discountPercentage)) && Number(user?.discountPercentage) > 0 && (
                 <View style={[styles.discountBadge, isRTL && styles.memberBadgeRTL, { marginTop: 8 }]}>
                   <Ionicons name="pricetag-outline" size={12} color="#ffffff" />
                   <Text

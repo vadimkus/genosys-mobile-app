@@ -127,7 +127,7 @@ export const CartProvider = ({ children }) => {
       if (!Number.isFinite(vp) || vp <= 0) return it;
       const variantOriginal = Number(v?.originalPrice);
       const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
-      const discountPct = Number(user?.discountPercentage);
+      const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
       const inferredOriginal = serverConfirmed
         ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
         : null;
@@ -258,7 +258,7 @@ export const CartProvider = ({ children }) => {
             if (Number.isFinite(vp) && vp > 0) {
               const variantOriginal = Number(v?.originalPrice);
               const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
-              const discountPct = Number(user?.discountPercentage);
+              const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
               const inferredOriginal = serverConfirmed
                 ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
                 : null;
@@ -411,7 +411,7 @@ export const CartProvider = ({ children }) => {
           const variantOriginal = Number(v?.originalPrice);
           const productOriginal = Number(product?.originalPrice);
           const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
-          const discountPct = Number(user?.discountPercentage);
+          const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
           const inferredOriginal = serverConfirmed
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
             : null;
@@ -468,6 +468,61 @@ export const CartProvider = ({ children }) => {
 
     bumpPromoTick();
     log.debug('Added to cart', { productId: normalizedProduct?.id, quantity });
+  };
+
+  const addBundleItems = (products, discountPercent) => {
+    const bundlePct = Number(discountPercent) || 0;
+    const bundleProducts = Array.isArray(products) ? products.filter(Boolean) : [];
+    if (bundleProducts.length === 0) return;
+
+    const newItems = bundleProducts.map((product) => ({
+      product: {
+        ...product,
+        variants: [],
+        fromBundle: true,
+        bundleDiscountPercent: bundlePct,
+      },
+      quantity: 1,
+      selectedColor: '',
+      selectedSize: '',
+      addedAt: new Date().toISOString(),
+      fromBundle: true,
+      bundleDiscountPercent: bundlePct,
+    }));
+
+    setItems(prev => {
+      const next = [...prev];
+
+      newItems.forEach((newItem) => {
+        const existingIdx = next.findIndex(item =>
+          item.product.id === newItem.product.id &&
+          item.selectedColor === '' &&
+          item.selectedSize === '' &&
+          !isPromotionItem(item) &&
+          (item?.fromBundle === true || item?.product?.fromBundle === true)
+        );
+
+        if (existingIdx >= 0) {
+          next[existingIdx] = {
+            ...next[existingIdx],
+            quantity: (Number(next[existingIdx].quantity) || 0) + 1,
+            fromBundle: true,
+            bundleDiscountPercent: bundlePct,
+            product: {
+              ...next[existingIdx].product,
+              ...newItem.product,
+            },
+          };
+        } else {
+          next.push(newItem);
+        }
+      });
+
+      return reconcileBuildSetBundleDiscounts(next);
+    });
+
+    bumpPromoTick();
+    log.debug('Added bundle items to cart', { count: bundleProducts.length, bundleDiscountPercent: bundlePct });
   };
 
   /**
@@ -594,7 +649,7 @@ export const CartProvider = ({ children }) => {
         if (Number.isFinite(vp) && vp > 0) {
           const variantOriginal = Number(v?.originalPrice);
           const serverConfirmed = hasServerDiscount(variantOriginal, vp, variants, updatedProduct);
-          const discountPct = Number(user?.discountPercentage);
+          const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
           const inferredOriginal = serverConfirmed
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
             : null;
@@ -666,7 +721,7 @@ export const CartProvider = ({ children }) => {
         if (Number.isFinite(vp) && vp > 0) {
           const variantOriginal = Number(newVariant?.originalPrice);
           const serverConfirmed = hasServerDiscount(variantOriginal, vp, variants, itemToUpdate.product);
-          const discountPct = Number(user?.discountPercentage);
+          const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
           const inferredOriginal = serverConfirmed
             ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
             : null;
@@ -858,6 +913,7 @@ export const CartProvider = ({ children }) => {
     selectedEmirate,
     isLoading,
     addItem,
+    addBundleItems,
     removeItem,
     decrementProductFromCart,
     updateQuantity,

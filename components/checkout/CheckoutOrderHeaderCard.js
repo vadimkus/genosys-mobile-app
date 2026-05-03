@@ -53,6 +53,11 @@ export default function CheckoutOrderHeaderCard({
               label: itemCount === 1 ? t('bag.item') : t('bag.items'),
             })}
           </Text>
+          {wf.hasBundleDiscount && wf.bundleDiscountPct > 0 ? (
+            <Text style={[styles.orderHeaderDiscountBadge, isRTL && styles.textRTL]}>
+              {t('checkout.bundleDiscount')} ({Math.round(wf.bundleDiscountPct)}%)
+            </Text>
+          ) : null}
         </View>
         <Ionicons
           name={orderSummaryExpanded ? 'chevron-up' : 'chevron-down'}
@@ -81,10 +86,48 @@ export default function CheckoutOrderHeaderCard({
               selectedSize: it.selectedSize,
               selectedColor: it.selectedColor,
             });
+            const isBundleItem = it?.fromBundle === true || it.product?.fromBundle === true;
+            const bundlePct = Number(it?.bundleDiscountPercent || it.product?.bundleDiscountPercent) || 0;
+            const unitPrice = isBundleItem
+              ? Number(it.product?.displayPrice ?? it.product?.price ?? pricing.displayPrice)
+              : Number(pricing.displayPrice);
+            const retailUnit = isBundleItem
+              ? Number(it.product?.originalPrice || pricing.originalPrice || pricing.basePrice || 0)
+              : Number(pricing.originalPrice || pricing.basePrice || unitPrice);
+            const hasLineDiscount =
+              bundlePct > 0 &&
+              Number.isFinite(unitPrice) &&
+              Number.isFinite(retailUnit) &&
+              retailUnit > unitPrice + 0.01;
+            const finalLine = (Number.isFinite(unitPrice) ? unitPrice : 0) * qty;
+            const retailLine = (Number.isFinite(retailUnit) ? retailUnit : 0) * qty;
+
+            if (hasLineDiscount) {
+              return (
+                <View key={`${it.product?.id || name}-${idx}`} style={styles.orderSummaryLineBlock}>
+                  <Text style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
+                    {qty}× {name}
+                    {extras ? ` — ${extras}` : ''}
+                  </Text>
+                  <View style={[styles.orderSummaryPriceRow, isRTL && styles.orderTotalsRowRTL]}>
+                    <Text style={[styles.orderSummaryOriginalPrice, isRTL && styles.textRTL]}>
+                      {formatAed(retailLine)}
+                    </Text>
+                    <Text style={styles.orderSummaryDiscountPill}>
+                      -{Math.round(bundlePct)}%
+                    </Text>
+                    <Text style={[styles.orderSummaryDiscountedPrice, isRTL && styles.textRTL]}>
+                      {formatAed(finalLine)}
+                    </Text>
+                  </View>
+                </View>
+              );
+            }
+
             return (
               <Text key={`${it.product?.id || name}-${idx}`} style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                 {qty}× {name}
-                {extras ? ` — ${extras}` : ''} — {formatAed(pricing.displayPrice)}
+                {extras ? ` — ${extras}` : ''} — {formatAed(finalLine)}
               </Text>
             );
           })}

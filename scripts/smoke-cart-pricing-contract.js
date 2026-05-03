@@ -21,6 +21,7 @@ function product(overrides = {}) {
 const user = {
   id: 'user-1',
   canSeePrices: true,
+  discountType: 'VIP',
   discountPercentage: 10,
 };
 

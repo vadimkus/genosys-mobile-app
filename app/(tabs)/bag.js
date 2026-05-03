@@ -104,8 +104,6 @@ export default function BagScreen() {
 
   const scrollPaddingTop = Math.max(headerHeight, 160);
 
-  // Discount display in summary (e.g. user has 50% off)
-  const discountPct = Number(user?.discountPercentage);
   const safeSubtotal = Number(cartSummary.subtotal) || 0;
   const safeShipping = Number(cartSummary.shippingCost) || 0;
   const safeVat = Number(cartSummary.vatAmount) || 0;
@@ -304,7 +302,7 @@ export default function BagScreen() {
             ) : (
               (() => {
                 const pct = Number(user?.discountPercentage);
-                const hasUserDiscount = Number.isFinite(pct) && pct > 0 && pct < 100;
+                const hasUserDiscount = !!user?.discountType && Number.isFinite(pct) && pct > 0 && pct < 100;
                 const isHydro = isHydroCoolMask(item.product);
                 const isFixed = hasFixedPriceOverride(item.product);
                 const isDevice = isDeviceProduct(item.product);

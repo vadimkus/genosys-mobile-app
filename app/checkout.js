@@ -443,7 +443,11 @@ export default function CheckoutScreen() {
 
       // Prepare order data. Backend remains the pricing authority; these totals are client hints
       // and must match the cart snapshot being submitted.
-      const userDiscountPct = Number(user?.discountPercentage) || 0;
+      const rawUserDiscountPct = Number(user?.discountPercentage);
+      const userDiscountPct =
+        user?.discountType && Number.isFinite(rawUserDiscountPct) && rawUserDiscountPct > 0 && rawUserDiscountPct < 100
+          ? rawUserDiscountPct
+          : 0;
       const orderData = {
         orderNumber,
         customerName: `${firstName.trim()} ${lastName.trim()}`,
@@ -1000,6 +1004,17 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 1,
   },
+  orderHeaderDiscountBadge: {
+    alignSelf: 'flex-start',
+    marginTop: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: '#DCFCE7',
+    color: '#15803D',
+    fontSize: 11,
+    fontWeight: '800',
+  },
   orderSummaryBody: {
     backgroundColor: '#F2F2F7',
     borderTopWidth: 1,
@@ -1022,6 +1037,35 @@ const styles = StyleSheet.create({
     color: '#3C3C43',
     lineHeight: 18,
     marginBottom: 4,
+  },
+  orderSummaryLineBlock: {
+    marginBottom: 7,
+  },
+  orderSummaryPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: -1,
+  },
+  orderSummaryOriginalPrice: {
+    ...T.captionTiny,
+    color: '#9CA3AF',
+    textDecorationLine: 'line-through',
+  },
+  orderSummaryDiscountPill: {
+    overflow: 'hidden',
+    borderRadius: 999,
+    backgroundColor: '#DCFCE7',
+    color: '#15803D',
+    fontSize: 10,
+    fontWeight: '900',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  orderSummaryDiscountedPrice: {
+    ...T.captionSmall,
+    color: '#1D1D1F',
+    fontWeight: '800',
   },
   orderSummaryDivider: {
     height: 1,

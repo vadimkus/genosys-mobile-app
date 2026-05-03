@@ -17,6 +17,30 @@ const log = createLogger('SecureTokenStorage');
 const SECURE_TOKEN_KEY = 'auth_token_secure';
 const USER_DATA_KEY = '@user_profile';
 const LEGACY_KEY = '@user'; // Old key for migration
+const PRODUCT_CACHE_KEY = '@product_catalog';
+
+export function sanitizeUserSession(userData) {
+  if (!userData || typeof userData !== 'object') return userData;
+
+  const discountType = String(userData.discountType || userData.discount_type || '').trim();
+  const discountPercentage = Number(userData.discountPercentage ?? userData.discount_percentage ?? 0);
+  const hasActiveDiscount =
+    discountType &&
+    Number.isFinite(discountPercentage) &&
+    discountPercentage > 0 &&
+    discountPercentage < 100;
+
+  return {
+    ...userData,
+    discountType: hasActiveDiscount ? discountType : null,
+    discountPercentage: hasActiveDiscount ? discountPercentage : 0,
+  };
+}
+
+const getDiscountSignature = (userData) => {
+  const sanitized = sanitizeUserSession(userData) || {};
+  return `${sanitized.discountType || 'none'}:${Number(sanitized.discountPercentage) || 0}`;
+};
 
 /**
  * Store auth token securely and user data in AsyncStorage
@@ -24,9 +48,11 @@ const LEGACY_KEY = '@user'; // Old key for migration
 export async function storeUserSession(userData) {
   try {
     if (!userData) return;
+
+    const sanitizedUserData = sanitizeUserSession(userData);
     
-    const token = userData.token;
-    const profileData = { ...userData };
+    const token = sanitizedUserData.token;
+    const profileData = { ...sanitizedUserData };
     delete profileData.token;
     
     if (token) {
@@ -38,8 +64,22 @@ export async function storeUserSession(userData) {
       }
     }
     
+    const previousRaw = await AsyncStorage.getItem(USER_DATA_KEY);
+    let previousProfile = null;
+    try {
+      previousProfile = previousRaw ? JSON.parse(previousRaw) : null;
+    } catch {
+      previousProfile = null;
+    }
+    const discountChanged = previousProfile && getDiscountSignature(previousProfile) !== getDiscountSignature(profileData);
+
     await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(profileData));
     await AsyncStorage.setItem(LEGACY_KEY, JSON.stringify(profileData));
+
+    if (discountChanged) {
+      await AsyncStorage.removeItem(PRODUCT_CACHE_KEY).catch(() => {});
+      log.debug('Product cache cleared after user discount changed');
+    }
     
     log.debug('User session stored securely');
   } catch (error) {
@@ -58,7 +98,7 @@ export async function getUserSession() {
     
     if (token && profileRaw) {
       const profileData = JSON.parse(profileRaw);
-      return { ...profileData, token };
+      return sanitizeUserSession({ ...profileData, token });
     }
     
     // Migration: check legacy key
@@ -69,9 +109,9 @@ export async function getUserSession() {
         log.info('Migrating legacy session to secure storage');
         await storeUserSession(legacyData);
         await AsyncStorage.removeItem(LEGACY_KEY).catch(() => {});
-        return legacyData;
+        return sanitizeUserSession(legacyData);
       }
-      return legacyData;
+      return sanitizeUserSession(legacyData);
     }
     
     return null;
@@ -80,7 +120,7 @@ export async function getUserSession() {
     // Fallback: try legacy key
     try {
       const legacyRaw = await AsyncStorage.getItem(LEGACY_KEY);
-      return legacyRaw ? JSON.parse(legacyRaw) : null;
+      return legacyRaw ? sanitizeUserSession(JSON.parse(legacyRaw)) : null;
     } catch {
       return null;
     }

@@ -1320,7 +1320,7 @@ export default function ProductDetailScreen() {
                     }
 
                     const base = Number(getSelectedUnitPrice() || 0);
-                    const userPct = Number(user?.discountPercentage);
+                    const userPct = user?.discountType ? Number(user?.discountPercentage) : 0;
                     const derived = deriveDiscountFromBadges(product);
                     const serverOrig = Number(product?.originalPrice);
                     const serverBase = Number(product?.displayPrice ?? product?.price);

@@ -32,7 +32,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
   const canSeePrices = !!user;
 
   const discountPct = Number(user?.discountPercentage);
-  const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+  const hasUserDiscount = !!user?.discountType && Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
 
   const handlePress = () => {
     haptics.lightTap();

@@ -388,7 +388,7 @@ export default function OrdersScreen() {
               const orderDiscPct = Number(o?.discountPercentage);
               const discountPct = (Number.isFinite(orderDiscPct) && orderDiscPct > 0)
                 ? orderDiscPct
-                : Number(user?.discountPercentage);
+                : (user?.discountType ? Number(user?.discountPercentage) : 0);
               return (
                 <View key={`${String(o.id || orderNumber)}-${orderIndex}`} style={styles.card}>
                   <View style={[styles.cardTop, isRTL && styles.cardTopRTL]}>

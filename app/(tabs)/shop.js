@@ -545,7 +545,7 @@ export default function ShopScreen() {
         applyProducts(enhancedProducts);
         log.debug('Products loaded from API', { count: enhancedProducts.length });
         
-        if (user?.discountPercentage) {
+        if (user?.discountType && user?.discountPercentage) {
           log.debug('User discount applied', { discountPercentage: user.discountPercentage, discountType: user.discountType });
         }
         

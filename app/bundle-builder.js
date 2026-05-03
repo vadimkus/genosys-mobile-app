@@ -69,7 +69,7 @@ export default function BundleBuilderScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const { user } = useAuth();
-  const { addItem } = useCart();
+  const { addBundleItems } = useCart();
   const isRTL = dir === 'rtl';
   const stepsScrollRef = useRef(null);
   const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -212,14 +212,15 @@ export default function BundleBuilderScreen() {
 
     haptics.success();
 
-    // Add each selected product to cart with bundle discount ONLY (no VIP stacking)
-    selectedArray.forEach(({ product }) => {
+    // Add selected products as one batch so the bundle tier is reconciled after
+    // all items are present. Adding one-by-one can temporarily strip bundle flags.
+    const bundleProducts = selectedArray.map(({ product }) => {
       // Bundle discount applied to retail price only
       const retailPrice = getBundleRetailPrice(product);
       const finalPrice = Math.round(retailPrice * (1 - discountPercent / 100) * 100) / 100;
 
       // Build a cart-compatible product object
-      const cartProduct = {
+      return {
         id: product.id,
         productNumber: product.productNumber,
         name: product.name,
@@ -235,8 +236,8 @@ export default function BundleBuilderScreen() {
         fromBundle: true,
         bundleDiscountPercent: discountPercent,
       };
-      addItem(cartProduct, 1, '', '', { fromBundle: true, bundleDiscountPercent: discountPercent });
     });
+    addBundleItems(bundleProducts, discountPercent);
 
     // Clear selection
     setSelectedItems({});

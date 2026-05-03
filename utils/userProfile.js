@@ -28,6 +28,9 @@ export const normalizeUserProfile = (user = {}) => {
   const primaryEmail = contactEmail || authEmail;
   const parsedAddress = parseGenosysAddress(user?.address || '');
   const { firstName, lastName } = getUserDisplayNameParts(user);
+  const discountType = String(user?.discountType || user?.discount_type || '').trim();
+  const discountPercentage = Number(user?.discountPercentage ?? user?.discount_percentage ?? 0) || 0;
+  const hasActiveDiscount = discountType && discountPercentage > 0 && discountPercentage < 100;
 
   return {
     id: user?.id || user?.userId || '',
@@ -42,7 +45,8 @@ export const normalizeUserProfile = (user = {}) => {
     phone: String(user?.phone || parsedAddress?.phone || '').trim(),
     birthday: user?.birthday || user?.dateOfBirth || '',
     gender: user?.gender || '',
-    discountPercentage: Number(user?.discountPercentage ?? user?.discount_percentage ?? 0) || 0,
+    discountType: hasActiveDiscount ? discountType : null,
+    discountPercentage: hasActiveDiscount ? discountPercentage : 0,
     addressRaw: user?.address || '',
     addressDetails: parsedAddress,
     addressLine: getAddressLine(parsedAddress || (user?.address || '')),

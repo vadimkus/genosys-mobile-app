@@ -506,7 +506,7 @@ export default function OrderDetailScreen() {
               } else {
                 discountPct = (Number.isFinite(orderDiscountPct) && orderDiscountPct > 0)
                   ? orderDiscountPct
-                  : Number(user?.discountPercentage);
+                  : (user?.discountType ? Number(user?.discountPercentage) : 0);
                 inferredOriginalUnit = inferOriginalUnitPriceFromPct({ unitPrice: price, discountPct });
                 canShowDiscountBreakdown = !isPromoItem(it) && !excludedFromUserDiscount && inferredOriginalUnit != null;
               }

@@ -169,7 +169,7 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
     if (isPromoItem) return sum;
 
     const discountPct = Number(user?.discountPercentage);
-    const hasUserDiscount = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+    const hasUserDiscount = !!user?.discountType && Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
     const isBundleItem = item?.fromBundle === true || item?.product?.fromBundle === true;
     const excludedFromUserDiscount = isUserDiscountExcludedProduct(item.product);
     const forceCanonicalPrice =
@@ -349,7 +349,7 @@ export function computeWaterfallBreakdown(items, user) {
   let _bundleDiscountPct = 0;
 
   const discountPct = Number(user?.discountPercentage);
-  const hasUserDiscountPct = Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+  const hasUserDiscountPct = !!user?.discountType && Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
 
   items.forEach((item) => {
     // Skip promo items (free add-ons)

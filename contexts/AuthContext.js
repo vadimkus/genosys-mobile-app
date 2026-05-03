@@ -33,7 +33,7 @@ import {
 import { loginWithGoogleDirect } from '../services/googleAuthService';
 import { createLogger } from '../utils/logger';
 import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
-import { storeUserSession, getUserSession, clearUserSession } from '../services/secureTokenStorage';
+import { storeUserSession, getUserSession, clearUserSession, sanitizeUserSession } from '../services/secureTokenStorage';
 import { setSentryUser } from '../config/sentry';
 
 const AuthContext = createContext({});
@@ -125,8 +125,9 @@ export const AuthProvider = ({ children }) => {
             const mergedUser = validation.user
               ? { ...validation.user, token: userData.token }
               : userData;
-            setUser(mergedUser);
-            await storeUserSession(mergedUser);
+            const sanitizedUser = sanitizeUserSession(mergedUser);
+            setUser(sanitizedUser);
+            await storeUserSession(sanitizedUser);
             await checkBiometricAvailability();
           } else if (validation.success && validation.valid === false) {
             // Session expired, clear stored data
@@ -134,10 +135,10 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
           } else {
             // Validation failed for other reasons: keep stored session to avoid forced logout loops.
-            setUser(userData);
+            setUser(sanitizeUserSession(userData));
           }
         } else {
-          setUser(userData);
+          setUser(sanitizeUserSession(userData));
         }
       }
     } catch (error) {
@@ -165,7 +166,7 @@ export const AuthProvider = ({ children }) => {
       if (result && result.token) {
         const updatedUser = await persistRefreshedToken(result);
         if (updatedUser) {
-          setUser(updatedUser);
+          setUser(sanitizeUserSession(updatedUser));
           log.info('Session refreshed successfully');
           return result.token;
         }
@@ -199,8 +200,9 @@ export const AuthProvider = ({ children }) => {
         const authResult = await apiProcessGoogleAuth(result.idToken);
         
         if (authResult.success) {
-          await storeUserSession(authResult.user);
-          setUser(authResult.user);
+          const sanitizedUser = sanitizeUserSession(authResult.user);
+          await storeUserSession(sanitizedUser);
+          setUser(sanitizedUser);
           
           if (authResult.isNewUser) {
             log.debug('New Google user created successfully');
@@ -230,8 +232,9 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const result = await apiProcessAppleAuth(identityToken, { fullName });
       if (result.success) {
-        await storeUserSession(result.user);
-        setUser(result.user);
+        const sanitizedUser = sanitizeUserSession(result.user);
+        await storeUserSession(sanitizedUser);
+        setUser(sanitizedUser);
         return { success: true };
       }
       return { success: false, error: result.error };
@@ -250,8 +253,9 @@ export const AuthProvider = ({ children }) => {
       const result = await apiLoginWithEmail(String(email || '').trim(), password);
       
       if (result.success) {
-        await storeUserSession(result.user);
-        setUser(result.user);
+        const sanitizedUser = sanitizeUserSession(result.user);
+        await storeUserSession(sanitizedUser);
+        setUser(sanitizedUser);
         
         // Offer biometric setup after successful login (if available and not enabled)
         if (biometricAvailable && !biometricEnabled) {
@@ -280,8 +284,9 @@ export const AuthProvider = ({ children }) => {
       const result = await apiRegisterUser(name, String(email || '').trim(), password, extra);
       
       if (result.success) {
-        await storeUserSession(result.user);
-        setUser(result.user);
+        const sanitizedUser = sanitizeUserSession(result.user);
+        await storeUserSession(sanitizedUser);
+        setUser(sanitizedUser);
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -316,8 +321,9 @@ export const AuthProvider = ({ children }) => {
               email: baseUser.email || creds.email || baseUser.userEmail || '',
               authType: baseUser.authType || 'biometric',
             };
-            await storeUserSession(userWithToken);
-            setUser(userWithToken);
+            const sanitizedUser = sanitizeUserSession(userWithToken);
+            await storeUserSession(sanitizedUser);
+            setUser(sanitizedUser);
             return { success: true };
           }
 
@@ -334,8 +340,9 @@ export const AuthProvider = ({ children }) => {
         if (creds.email && creds.password) {
           const loginResult = await apiLoginWithEmail(creds.email, creds.password);
           if (loginResult.success) {
-            await storeUserSession(loginResult.user);
-            setUser(loginResult.user);
+            const sanitizedUser = sanitizeUserSession(loginResult.user);
+            await storeUserSession(sanitizedUser);
+            setUser(sanitizedUser);
             return { success: true };
           }
 
@@ -475,7 +482,7 @@ export const AuthProvider = ({ children }) => {
             if (storedData.token) {
               log.debug('Found token in storage, attempting to restore session...');
               // Update user with token and retry
-              const userWithToken = { ...user, token: storedData.token };
+              const userWithToken = sanitizeUserSession({ ...user, token: storedData.token });
               setUser(userWithToken);
               // Continue with the profile update
             } else {
@@ -523,11 +530,11 @@ export const AuthProvider = ({ children }) => {
           null;
 
         // Update user in context and storage, preserving the token
-        const updatedUser = { 
+        const updatedUser = sanitizeUserSession({ 
           ...user, 
           ...(serverUser || {}),
           token: user.token  // Always preserve the token
-        };
+        });
         setUser(updatedUser);
         await storeUserSession(updatedUser);
         log.debug('User profile updated (token preserved)');
