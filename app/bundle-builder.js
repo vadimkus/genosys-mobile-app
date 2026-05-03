@@ -31,7 +31,7 @@ import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from '../utils/logger';
-import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
+import { formatAed } from '../utils/pricingDisplay';
 
 const log = createLogger('BundleBuilder');
 
@@ -61,8 +61,20 @@ function getNextTier(count) {
 }
 
 function getBundleRetailPrice(product) {
-  const pricing = getPricingDisplay(product);
-  return Number(pricing.basePrice || product?.price || 0) || 0;
+  const variants = Array.isArray(product?.variants) ? product.variants : [];
+  const explicitSize = String(product?.size || '').trim();
+  const selectedVariant =
+    (explicitSize && variants.find((variant) => String(variant?.size || '').trim() === explicitSize)) ||
+    variants.find((variant) => variant?.isDefault) ||
+    variants.find((variant) => variant?.available !== false) ||
+    variants[0];
+  const variantPrice = Number(selectedVariant?.price);
+
+  // Bundle Builder must use the actual selectable retail price, not
+  // pricing.basePrice/originalPrice from regular product discount contracts.
+  if (Number.isFinite(variantPrice) && variantPrice > 0) return variantPrice;
+
+  return Number(product?.displayPrice || product?.price || 0) || 0;
 }
 
 export default function BundleBuilderScreen() {
@@ -217,7 +229,6 @@ export default function BundleBuilderScreen() {
     const bundleProducts = selectedArray.map(({ product }) => {
       // Bundle discount applied to retail price only
       const retailPrice = getBundleRetailPrice(product);
-      const finalPrice = Math.round(retailPrice * (1 - discountPercent / 100) * 100) / 100;
 
       // Build a cart-compatible product object
       return {
@@ -225,9 +236,9 @@ export default function BundleBuilderScreen() {
         id: product.id,
         productNumber: product.productNumber,
         name: product.name,
-        price: finalPrice,
-        displayPrice: finalPrice,
-        originalPrice: retailPrice, // retail price for reference
+        price: retailPrice,
+        displayPrice: retailPrice,
+        originalPrice: null,
         image: product.image,
         category: product.category,
         size: product.size,

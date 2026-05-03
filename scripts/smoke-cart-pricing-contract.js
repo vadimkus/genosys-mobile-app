@@ -224,6 +224,41 @@ assertEqual('bundle selected variant keeps retail original', variantBundle[0].pr
 assertEqual('bundle selected variant applies discount once', variantBundle[0].product.price, 408);
 assertEqual('bundle selected variant subtotal', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal, 728);
 
+const discountedContractBundleItems = [
+  {
+    product: product({
+      id: 'bundle-cleanser-contract',
+      price: 330,
+      displayPrice: 330,
+      originalPrice: null,
+      fromBundle: true,
+      bundleDiscountPercent: 20,
+      variants: [
+        { id: 'cleanser-180-contract', size: '180ml', price: 330, isDefault: true },
+        { id: 'cleanser-500-contract', size: '500ml', price: 510, isDefault: false },
+      ],
+      pricing: {
+        source: 'server',
+        basePrice: 412.5,
+        unitPrice: 330,
+        displayPrice: 330,
+        originalPrice: 412.5,
+        discountPercentage: 20,
+        discountLabel: '20% off',
+      },
+    }),
+    quantity: 1,
+    selectedSize: '180ml',
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+  },
+  ...buildSetItems.slice(1, 5),
+];
+const contractBundle = reconcileBuildSetBundleDiscounts(discountedContractBundleItems);
+assertEqual('bundle ignores regular discount contract original', contractBundle[0].product.originalPrice, 330);
+assertEqual('bundle applies discount to selected retail once', contractBundle[0].product.price, 264);
+assertEqual('bundle contract-original subtotal', calculateCartTotals(contractBundle, user, 'Dubai', shippingConfig).subtotal, 584);
+
 console.log('[cart-pricing-contract] contract subtotal:', contractTotals.subtotal);
 console.log('[cart-pricing-contract] legacy fallback subtotal:', legacyFallbackTotals.subtotal);
 console.log('[cart-pricing-contract] bundle subtotal:', bundleTotals.subtotal);
@@ -232,4 +267,5 @@ console.log('[cart-pricing-contract] waterfall saved:', waterfall.totalSaved);
 console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
 console.log('[cart-pricing-contract] build-set single-leftover subtotal:', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle variant subtotal:', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal);
+console.log('[cart-pricing-contract] bundle contract-original subtotal:', calculateCartTotals(contractBundle, user, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] cart pricing scenarios passed');
