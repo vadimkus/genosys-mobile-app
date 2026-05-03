@@ -71,6 +71,8 @@ No new permissions. No new native SDKs. No data collection changes.
 - Bundle tier reconciliation reruns after size/color changes so the Build Your Set discount remains active.
 - Bundle size changes now calculate from the selected size's retail price, so products like SNOW O2 Cleanser `500ml` apply 20% to `510 AED` instead of reverse-calculating an inflated retail base.
 - Bundle Builder now ignores regular product pricing-contract originals when calculating bundle retail, so SNOW O2 Cleanser `180ml` uses `330 AED` retail and becomes `264 AED` at 20% off instead of showing `412.50 AED -> 330 AED`.
+- Bundle cart rows now store explicit `bundleRetailPrice` metadata and refresh it when the customer changes size, preventing stale `180ml` retail from sticking after switching to `500ml`.
+- Bag and order payload pricing prefer selected variant retail over stored bundle metadata, so stale carts still submit the current selected-size price.
 
 ### Dynamic Bundle Tier Fix
 
@@ -97,6 +99,10 @@ No new permissions. No new native SDKs. No data collection changes.
 | Fix bundle variant price calculation | iOS | 1.10.0 | `43640643-b030-4198-9886-e8c6f0f6fe9e` |
 | Reconcile dynamic bundle discounts | iOS | 1.10.0 | `49b12202-b29f-4e92-9080-c7b948bcb110` |
 | Fix bundle builder retail pricing | iOS | 1.10.0 | `4703c6b2-e015-4a29-85aa-26c035c5c54a` |
+| Fix bundle bag line pricing | iOS | 1.10.0 | `8dad1d7d-f0fb-43cb-a402-078be9b58669` |
+| Fix stale bundle bag prices | iOS | 1.10.0 | `555e10e8-2d7b-445b-930d-748c98dcd897` |
+| Fix bundle retail metadata | iOS | 1.10.0 | `e913c2a1-fb36-460b-b374-e5a9d031510e` |
+| Fix bundle size price updates | iOS | 1.10.0 | `46ff469a-7aca-4df7-a2eb-17f824704432` |
 
 ## Modified Areas
 

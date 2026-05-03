@@ -16,9 +16,11 @@ function getBundleRetailBase(item, pricing) {
   const variantPrice = Number(selectedVariant?.price);
   const variantOriginal = Number(selectedVariant?.originalPrice);
   const productUnit = Number(item?.product?.displayPrice ?? item?.product?.price);
+  const explicitBundleRetail = Number(item?.bundleRetailPrice || item?.product?.bundleRetailPrice);
   return (
     (Number.isFinite(variantOriginal) && variantOriginal > variantPrice ? variantOriginal : 0) ||
     (Number.isFinite(variantPrice) && variantPrice > 0 ? variantPrice : 0) ||
+    (Number.isFinite(explicitBundleRetail) && explicitBundleRetail > 0 ? explicitBundleRetail : 0) ||
     (Number.isFinite(Number(item?.product?.originalPrice)) && Number(item.product.originalPrice) > 0 ? Number(item.product.originalPrice) : 0) ||
     (!selectedSize && !selectedColor && variants.length === 0 && Number.isFinite(productUnit) && productUnit > 0 ? productUnit : 0) ||
     (Number.isFinite(Number(pricing?.basePrice)) && Number(pricing.basePrice) > 0 ? Number(pricing.basePrice) : 0) ||

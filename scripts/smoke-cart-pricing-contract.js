@@ -224,6 +224,34 @@ assertEqual('bundle selected variant keeps retail original', variantBundle[0].pr
 assertEqual('bundle selected variant applies discount once', variantBundle[0].product.price, 408);
 assertEqual('bundle selected variant subtotal', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal, 728);
 
+const resizedVariantBundleItems = [
+  {
+    product: product({
+      id: 'bundle-cleanser-resized',
+      price: 264,
+      displayPrice: 264,
+      originalPrice: 330,
+      bundleRetailPrice: 330,
+      fromBundle: true,
+      bundleDiscountPercent: 20,
+      variants: [
+        { id: 'cleanser-resize-180', size: '180ml', price: 330, isDefault: true },
+        { id: 'cleanser-resize-500', size: '500ml', price: 510, isDefault: false },
+      ],
+    }),
+    quantity: 1,
+    selectedSize: '500ml',
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+    bundleRetailPrice: 330,
+  },
+  ...buildSetItems.slice(1, 5),
+];
+const resizedVariantBundle = reconcileBuildSetBundleDiscounts(resizedVariantBundleItems);
+assertEqual('bundle size change prefers selected variant over stale retail metadata', resizedVariantBundle[0].product.originalPrice, 510);
+assertEqual('bundle size change recalculates discounted variant price', resizedVariantBundle[0].product.price, 408);
+assertEqual('bundle size change refreshes explicit retail metadata', resizedVariantBundle[0].product.bundleRetailPrice, 510);
+
 const discountedContractBundleItems = [
   {
     product: product({
@@ -281,6 +309,7 @@ const nullVariantBundleItems = [
 const nullVariantBundle = reconcileBuildSetBundleDiscounts(nullVariantBundleItems);
 assertEqual('bundle ignores null default variant price', nullVariantBundle[0].product.originalPrice, 160);
 assertEqual('bundle applies discount to mist base price', nullVariantBundle[0].product.price, 128);
+assertEqual('bundle stores explicit retail price', nullVariantBundle[0].product.bundleRetailPrice, 160);
 assertEqual('bundle null-variant subtotal', calculateCartTotals(nullVariantBundle, user, 'Dubai', shippingConfig).subtotal, 448);
 
 console.log('[cart-pricing-contract] contract subtotal:', contractTotals.subtotal);
@@ -291,6 +320,7 @@ console.log('[cart-pricing-contract] waterfall saved:', waterfall.totalSaved);
 console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
 console.log('[cart-pricing-contract] build-set single-leftover subtotal:', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle variant subtotal:', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal);
+console.log('[cart-pricing-contract] bundle resized variant subtotal:', calculateCartTotals(resizedVariantBundle, user, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle contract-original subtotal:', calculateCartTotals(contractBundle, user, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle null-variant subtotal:', calculateCartTotals(nullVariantBundle, user, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] cart pricing scenarios passed');

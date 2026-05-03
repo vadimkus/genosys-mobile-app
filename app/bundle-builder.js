@@ -241,6 +241,7 @@ export default function BundleBuilderScreen() {
         price: retailPrice,
         displayPrice: retailPrice,
         originalPrice: null,
+        bundleRetailPrice: retailPrice,
         image: product.image,
         category: product.category,
         size: product.size,

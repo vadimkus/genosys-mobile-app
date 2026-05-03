@@ -349,12 +349,27 @@ export default function BagScreen() {
                 // "Build Your Set" items: bundle and VIP discounts do not stack.
                 // If VIP/user discount is better than the bundle tier, show the
                 // same per-line VIP badge users see for normally added products.
-                if (isBundleItem && bundlePct > 0 && Number.isFinite(base) && base > 0) {
-                  const retailPrice = (Number.isFinite(original) && original > base) ? original : base / (1 - bundlePct / 100);
+                if (isBundleItem && bundlePct > 0) {
+                  const lineUnit = Number(item.product?.displayPrice ?? item.product?.price);
+                  const explicitBundleRetail = Number(item?.bundleRetailPrice || item.product?.bundleRetailPrice);
+                  const variantRetail = hasVariantPrice ? variantPrice : null;
+                  const hasNormalPricingContract = item.product?.pricing?.source === 'server';
+                  const retailPrice =
+                    (Number.isFinite(variantRetail) && variantRetail > 0 ? variantRetail : null) ||
+                    (Number.isFinite(explicitBundleRetail) && explicitBundleRetail > 0 ? explicitBundleRetail : null) ||
+                    (!hasNormalPricingContract && hasVariantPrice && Number.isFinite(original) && original > 0 ? original : null) ||
+                    (Number.isFinite(lineUnit) && lineUnit > 0 ? lineUnit : null) ||
+                    (Number.isFinite(base) && base > 0 ? base : 0);
+                  if (!retailPrice) return null;
+
                   const userEligible = hasUserDiscount && !isUserDiscountExcludedProduct(item.product);
                   const vipPrice = userEligible ? retailPrice * (1 - pct / 100) : Number.POSITIVE_INFINITY;
                   const bundlePrice = retailPrice * (1 - bundlePct / 100);
                   const vipWins = userEligible && vipPrice <= bundlePrice + 0.01;
+                  const lineLooksDiscounted = Number.isFinite(lineUnit) && lineUnit > 0 && lineUnit < retailPrice - 0.01;
+                  const finalPrice = vipWins
+                    ? vipPrice
+                    : (lineLooksDiscounted ? lineUnit : bundlePrice);
                   const discountLabel = vipWins ? `${Math.round(pct)}%` : `${bundlePct}%`;
                   const labelText = vipWins ? t('bag.off') : t('bag.bundleOff');
                   const labelStyle = vipWins ? styles.itemDiscountLabel : styles.itemBundleLabel;
@@ -364,7 +379,7 @@ export default function BagScreen() {
                         <Text style={styles.itemOriginalPrice}>{retailPrice.toFixed(2)} AED</Text>
                         <Text style={labelStyle}>{discountLabel} {labelText}</Text>
                       </View>
-                      <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
+                      <Text style={styles.itemDiscountedPrice}>{finalPrice.toFixed(2)} AED</Text>
                     </View>
                   );
                 }

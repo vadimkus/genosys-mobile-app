@@ -205,6 +205,79 @@ EAS Update:
 
 - Not yet published for this follow-up. The DB correction fixes current native list prices after the app refetches bundle data; the code hardening still needs the next OTA/release.
 
+## Native Bag Bundle Line Display Correction
+
+Native bag testing still showed Build Your Set lines as if the retail price was already discounted:
+
+- `SNOW O2 CLEANSER 180ml`: showed `412.50 AED -> 330.00 AED` with `20% OFF (Bundle)`.
+- Correct display should be `330.00 AED -> 264.00 AED`.
+
+Root cause:
+
+- The cart reconciler stores bundle lines as `product.originalPrice = retail` and `product.price/displayPrice = discounted`.
+- In `app/(tabs)/bag.js`, the display branch recalculated `base` from the selected variant price whenever a size was selected.
+- For `SNOW O2 CLEANSER 180ml`, this replaced the reconciled discounted cart price `264` with the variant retail price `330`.
+- The UI then reverse-inferred `330 / 0.8 = 412.50` as the original price.
+
+Fix:
+
+- Bundle display now uses the selected variant price as the retail base, but uses the cart-reconciled line price when it is already discounted.
+- Stale cart lines that still carry retail as the line price are displayed with the bundle discount calculated from retail, so `330` becomes `264`.
+- VIP-vs-bundle best-discount behavior is preserved.
+- Added explicit `bundleRetailPrice` metadata through bundle add, cart reconciliation, bag display, and order payload pricing so future rows do not depend on ambiguous `originalPrice` fields.
+- Existing stale non-variant rows without `bundleRetailPrice` now treat their current line unit as retail and calculate the bundle final price from it.
+- Size changes now prefer the selected variant retail over any stored `bundleRetailPrice`, then refresh that metadata during cart reconciliation.
+
+Verification:
+
+- `npm run smoke:cart-pricing-contract` passed.
+- `npm run smoke:order-payload-pricing-contract` passed.
+- `npm run smoke:pricing-display` passed.
+- `npx tsc --noEmit` passed.
+- `ReadLints` reported no errors for `app/(tabs)/bag.js`.
+
+EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Fix bundle bag line pricing`
+- Update group ID: `8dad1d7d-f0fb-43cb-a402-078be9b58669`
+- iOS update ID: `019dedc6-0634-7606-af76-eccb0eb3b993`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/8dad1d7d-f0fb-43cb-a402-078be9b58669
+
+Follow-up EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Fix stale bundle bag prices`
+- Update group ID: `555e10e8-2d7b-445b-930d-748c98dcd897`
+- iOS update ID: `019dedd0-ac35-7dd2-9168-8ffeaa6c533f`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/555e10e8-2d7b-445b-930d-748c98dcd897
+
+Second follow-up EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Fix bundle retail metadata`
+- Update group ID: `e913c2a1-fb36-460b-b374-e5a9d031510e`
+- iOS update ID: `019dee34-1f15-71cc-87ec-b58240e0f205`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/e913c2a1-fb36-460b-b374-e5a9d031510e
+
+Size-change follow-up:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Fix bundle size price updates`
+- Update group ID: `46ff469a-7aca-4df7-a2eb-17f824704432`
+- iOS update ID: `019dee57-072b-76e0-867c-1fe46642c642`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/46ff469a-7aca-4df7-a2eb-17f824704432
+
+Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.
+
 ## Bundle Builder Retail Pricing Correction
 
 After the dynamic bundle tier OTA, native testing still showed Build Your Set lines using regular pricing-contract originals. Example: SNOW O2 Cleanser `180ml` displayed `412.50 AED -> 330.00 AED` with `20% OFF (Bundle)`, which means the app used `412.50` as the retail base and treated `330` as the bundle-discounted price. For Build Your Set, the selected variant retail is `330 AED`, so the 20% bundle price should be `264 AED`.

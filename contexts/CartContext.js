@@ -509,6 +509,7 @@ export const CartProvider = ({ children }) => {
         ...product,
         fromBundle: true,
         bundleDiscountPercent: bundlePct,
+        bundleRetailPrice: Number(product?.bundleRetailPrice || product?.displayPrice || product?.price) || null,
       },
       quantity: 1,
       selectedColor: '',
@@ -539,6 +540,7 @@ export const CartProvider = ({ children }) => {
             product: {
               ...next[existingIdx].product,
               ...newItem.product,
+              bundleRetailPrice: newItem.product.bundleRetailPrice || next[existingIdx].product?.bundleRetailPrice || null,
             },
           };
         } else {
@@ -748,11 +750,28 @@ export const CartProvider = ({ children }) => {
         updatedProduct = applySelectedVariantPrice(updatedProduct, normalizedNewSize, user, {
           forceRetailOriginal: isBundleLine(itemToUpdate),
         });
+        if (isBundleLine(itemToUpdate)) {
+          const selectedVariant = variants.find(v => String(v?.size || '').trim() === normalizedNewSize);
+          const variantPrice = Number(selectedVariant?.price);
+          if (Number.isFinite(variantPrice) && variantPrice > 0) {
+            updatedProduct = {
+              ...updatedProduct,
+              bundleRetailPrice: variantPrice,
+            };
+          }
+        }
       }
 
       const nextItems = prev.map(item =>
         item === itemToUpdate
-          ? { ...item, selectedSize: normalizedNewSize, product: updatedProduct }
+          ? {
+              ...item,
+              selectedSize: normalizedNewSize,
+              ...(isBundleLine(itemToUpdate) && Number.isFinite(Number(updatedProduct?.bundleRetailPrice)) && Number(updatedProduct.bundleRetailPrice) > 0
+                ? { bundleRetailPrice: Number(updatedProduct.bundleRetailPrice) }
+                : {}),
+              product: updatedProduct,
+            }
           : item
       );
       return reconcileBuildSetBundleDiscounts(nextItems);

@@ -71,6 +71,9 @@ const getStoredBundleRetailPrice = (item) => {
   if (Number.isFinite(variantOriginal) && variantOriginal > variantPrice) return variantOriginal;
   if (Number.isFinite(variantPrice) && variantPrice > 0) return variantPrice;
 
+  const explicitBundleRetail = Number(item?.bundleRetailPrice || product?.bundleRetailPrice);
+  if (Number.isFinite(explicitBundleRetail) && explicitBundleRetail > 0) return explicitBundleRetail;
+
   const explicitOriginal = Number(product.originalPrice);
   if (Number.isFinite(explicitOriginal) && explicitOriginal > 0) return explicitOriginal;
 
@@ -136,6 +139,7 @@ export function reconcileBuildSetBundleDiscounts(items) {
       ...item,
       fromBundle: true,
       bundleDiscountPercent: activePct,
+      bundleRetailPrice: retailPrice,
       product: {
         ...productRest,
         price: discountedPrice,
@@ -143,6 +147,7 @@ export function reconcileBuildSetBundleDiscounts(items) {
         originalPrice: retailPrice,
         fromBundle: true,
         bundleDiscountPercent: activePct,
+        bundleRetailPrice: retailPrice,
       },
     };
   });
