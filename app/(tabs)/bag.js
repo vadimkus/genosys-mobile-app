@@ -131,11 +131,17 @@ export default function BagScreen() {
 
   const handleQuantityChange = useCallback((item, change) => {
     const newQuantity = item.quantity + change;
-    updateQuantity(item.product.id, newQuantity, item.selectedColor, item.selectedSize);
+    updateQuantity(item.product.id, newQuantity, item.selectedColor, item.selectedSize, {
+      fromBundle: item.fromBundle === true || item.product?.fromBundle === true,
+      bundleDiscountPercent: item.bundleDiscountPercent || item.product?.bundleDiscountPercent || 0,
+    });
   }, [updateQuantity]);
 
   const handleRemoveItem = useCallback((item) => {
-    removeItem(item.product.id, item.selectedColor, item.selectedSize);
+    removeItem(item.product.id, item.selectedColor, item.selectedSize, {
+      fromBundle: item.fromBundle === true || item.product?.fromBundle === true,
+      bundleDiscountPercent: item.bundleDiscountPercent || item.product?.bundleDiscountPercent || 0,
+    });
   }, [removeItem]);
 
   const handleCheckout = () => {
@@ -250,7 +256,13 @@ export default function BagScreen() {
                         <TouchableOpacity
                           key={c.value}
                           style={[styles.variantChip, sel && styles.variantChipSelected]}
-                          onPress={() => { mediumTap(); updateColor(item.product.id, c.value, item.selectedColor, item.selectedSize); }}
+                          onPress={() => {
+                            mediumTap();
+                            updateColor(item.product.id, c.value, item.selectedColor, item.selectedSize, {
+                              fromBundle: item.fromBundle === true || item.product?.fromBundle === true,
+                              bundleDiscountPercent: item.bundleDiscountPercent || item.product?.bundleDiscountPercent || 0,
+                            });
+                          }}
                         >
                           <Text style={[styles.variantChipText, sel && styles.variantChipTextSelected]}>{c.label || c.value}</Text>
                         </TouchableOpacity>
@@ -282,7 +294,13 @@ export default function BagScreen() {
                         <TouchableOpacity
                           key={v.size}
                           style={[styles.variantChip, sel && styles.variantChipSizeSelected]}
-                          onPress={() => { mediumTap(); updateSize(item.product.id, v.size, item.selectedSize, item.selectedColor); }}
+                          onPress={() => {
+                            mediumTap();
+                            updateSize(item.product.id, v.size, item.selectedSize, item.selectedColor, {
+                              fromBundle: item.fromBundle === true || item.product?.fromBundle === true,
+                              bundleDiscountPercent: item.bundleDiscountPercent || item.product?.bundleDiscountPercent || 0,
+                            });
+                          }}
                         >
                           <Text style={[styles.variantChipText, sel && styles.variantChipTextSizeSelected]}>{v.size}</Text>
                         </TouchableOpacity>

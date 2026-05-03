@@ -41,6 +41,19 @@ const PROMO_THRESHOLDS = {
 };
 
 const isPromotionItem = (item) => item?.isPromotionItem === true || item?.selectedSize === PROMO_VARIANT_SIZE;
+const isBundleLine = (item) => item?.fromBundle === true || item?.product?.fromBundle === true;
+
+const normalizeLineMeta = (meta = null) => ({
+  fromBundle: meta?.fromBundle === true,
+  bundleDiscountPercent: Number(meta?.bundleDiscountPercent) || 0,
+});
+
+const lineMetaMatches = (item, meta = null) => {
+  const normalized = normalizeLineMeta(meta);
+  const itemIsBundle = isBundleLine(item);
+  if (itemIsBundle !== normalized.fromBundle) return false;
+  return true;
+};
 
 const pickDefaultVariantSize = (product) => {
   const variants = product?.variants;
@@ -56,6 +69,13 @@ const normalizeSizeKey = (product, selectedSize) => {
   const s = String(selectedSize || '').trim();
   if (s) return s;
   return pickDefaultVariantSize(product) || '';
+};
+
+const getBundleDefaultSize = (product) => {
+  const explicit = String(product?.size || '').trim();
+  const variants = Array.isArray(product?.variants) ? product.variants : [];
+  if (explicit && variants.some((variant) => String(variant?.size || '').trim() === explicit)) return explicit;
+  return pickDefaultVariantSize(product) || explicit || '';
 };
 
 const hasServerDiscount = (variantOriginal, variantPrice, variants, product) => {
@@ -77,6 +97,35 @@ const inferOriginalFromUserDiscount = ({ discountedPrice, discountPct }) => {
   if (!Number.isFinite(multiplier) || multiplier <= 0) return null;
   const inferred = base / multiplier;
   return Number.isFinite(inferred) && inferred > base ? inferred : null;
+};
+
+const applySelectedVariantPrice = (product, selectedSize, user, { forceRetailOriginal = false } = {}) => {
+  const variants = product?.variants;
+  const normalizedSize = String(selectedSize || '').trim();
+  if (!Array.isArray(variants) || !normalizedSize) return product;
+
+  const selectedVariant = variants.find(v => String(v?.size || '').trim() === normalizedSize);
+  const variantPrice = Number(selectedVariant?.price);
+  if (!Number.isFinite(variantPrice) || variantPrice <= 0) return product;
+
+  const variantOriginal = Number(selectedVariant?.originalPrice);
+  const serverConfirmed = hasServerDiscount(variantOriginal, variantPrice, variants, product);
+  const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
+  const inferredOriginal = serverConfirmed
+    ? inferOriginalFromUserDiscount({ discountedPrice: variantPrice, discountPct })
+    : null;
+  const keptOriginal =
+    (Number.isFinite(variantOriginal) && variantOriginal > variantPrice ? variantOriginal : null) ||
+    inferredOriginal ||
+    (forceRetailOriginal ? variantPrice : null);
+
+  return {
+    ...product,
+    size: normalizedSize,
+    price: variantPrice,
+    displayPrice: variantPrice,
+    originalPrice: keptOriginal,
+  };
 };
 
 export const CartProvider = ({ children }) => {
@@ -250,7 +299,9 @@ export const CartProvider = ({ children }) => {
           const product = it?.product;
           if (!product || isPromotionItem(it)) return it;
 
-          const selectedSize = normalizeSizeKey(product, it?.selectedSize);
+          const selectedSize = isBundleLine(it)
+            ? String(it?.selectedSize || product?.size || '').trim()
+            : normalizeSizeKey(product, it?.selectedSize);
 
           if (selectedSize && Array.isArray(product?.variants)) {
             const v = product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize);
@@ -394,9 +445,7 @@ export const CartProvider = ({ children }) => {
 
     const normalizedColor = selectedColor || '';
     const isBundleAdd = itemMeta?.fromBundle === true;
-    // Bundle items already have correct pricing — don't auto-pick a variant size
-    // (which would cause the bag to read variant prices instead of bundle prices).
-    const normalizedSize = isBundleAdd ? '' : normalizeSizeKey(product, selectedSize);
+    const normalizedSize = isBundleAdd ? String(selectedSize || product?.size || '').trim() : normalizeSizeKey(product, selectedSize);
     const normalizedProduct = (() => {
       // Bundle items already have correct pricing from the bundle builder —
       // skip variant/discount inference to avoid inflating originalPrice.
@@ -405,27 +454,7 @@ export const CartProvider = ({ children }) => {
       // If a size variant is selected and the product includes variant pricing, store the selected variant price
       // as the product unit price in the cart item.
       if (normalizedSize && Array.isArray(product?.variants) && product.variants.length > 0) {
-        const v = product.variants.find((vv) => String(vv?.size || '').trim() === String(normalizedSize).trim());
-        const vp = Number(v?.price);
-        if (Number.isFinite(vp) && vp > 0) {
-          const variantOriginal = Number(v?.originalPrice);
-          const productOriginal = Number(product?.originalPrice);
-          const serverConfirmed = hasServerDiscount(variantOriginal, vp, product.variants, product);
-          const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
-          const inferredOriginal = serverConfirmed
-            ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
-            : null;
-          const keptOriginal =
-            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            inferredOriginal ||
-            null;
-          return {
-            ...product,
-            price: vp,
-            displayPrice: vp,
-            originalPrice: keptOriginal,
-          };
-        }
+        return applySelectedVariantPrice(product, normalizedSize, user);
       }
 
       const needsCanonical = isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
@@ -456,7 +485,7 @@ export const CartProvider = ({ children }) => {
         item.selectedColor === normalizedColor &&
         item.selectedSize === normalizedSize &&
         !isPromotionItem(item) &&
-        Boolean(item?.fromBundle || item?.product?.fromBundle) === isBundleAdd
+        lineMetaMatches(item, itemMeta)
       );
       if (existingIdx >= 0) {
         return reconcileBuildSetBundleDiscounts(prev.map((item, i) =>
@@ -478,13 +507,12 @@ export const CartProvider = ({ children }) => {
     const newItems = bundleProducts.map((product) => ({
       product: {
         ...product,
-        variants: [],
         fromBundle: true,
         bundleDiscountPercent: bundlePct,
       },
       quantity: 1,
       selectedColor: '',
-      selectedSize: '',
+      selectedSize: getBundleDefaultSize(product),
       addedAt: new Date().toISOString(),
       fromBundle: true,
       bundleDiscountPercent: bundlePct,
@@ -497,9 +525,9 @@ export const CartProvider = ({ children }) => {
         const existingIdx = next.findIndex(item =>
           item.product.id === newItem.product.id &&
           item.selectedColor === '' &&
-          item.selectedSize === '' &&
+          item.selectedSize === newItem.selectedSize &&
           !isPromotionItem(item) &&
-          (item?.fromBundle === true || item?.product?.fromBundle === true)
+          lineMetaMatches(item, { fromBundle: true, bundleDiscountPercent: bundlePct })
         );
 
         if (existingIdx >= 0) {
@@ -528,7 +556,7 @@ export const CartProvider = ({ children }) => {
   /**
    * Remove item from cart
    */
-  const removeItem = (productId, selectedColor = '', selectedSize = '') => {
+  const removeItem = (productId, selectedColor = '', selectedSize = '', itemMeta = null) => {
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
     
@@ -538,7 +566,8 @@ export const CartProvider = ({ children }) => {
       return !(
         item.product.id === productId && 
         item.selectedColor === normalizedColor && 
-        item.selectedSize === normalizedSize
+        item.selectedSize === normalizedSize &&
+        lineMetaMatches(item, itemMeta)
       );
     })));
 
@@ -552,7 +581,7 @@ export const CartProvider = ({ children }) => {
    * grid stepper so users can undo a tap without opening the bag.
    *
    * Behaviour:
-   *   - Picks the most recently added non-promo line that matches productId.
+   *   - Picks the most recently added non-promo, non-bundle line that matches productId.
    *   - If quantity > 1 → decrements by 1.
    *   - If quantity === 1 → removes the line entirely.
    *   - Never touches promotion/free items (they are auto-managed by the
@@ -564,7 +593,7 @@ export const CartProvider = ({ children }) => {
       let targetIdx = -1;
       for (let i = prev.length - 1; i >= 0; i -= 1) {
         const it = prev[i];
-        if (it?.product?.id === productId && !isPromotionItem(it)) {
+        if (it?.product?.id === productId && !isPromotionItem(it) && !isBundleLine(it)) {
           targetIdx = i;
           break;
         }
@@ -585,9 +614,9 @@ export const CartProvider = ({ children }) => {
   /**
    * Update item quantity
    */
-  const updateQuantity = (productId, quantity, selectedColor = '', selectedSize = '') => {
+  const updateQuantity = (productId, quantity, selectedColor = '', selectedSize = '', itemMeta = null) => {
     if (quantity <= 0) {
-      removeItem(productId, selectedColor, selectedSize);
+      removeItem(productId, selectedColor, selectedSize, itemMeta);
       return;
     }
 
@@ -597,7 +626,8 @@ export const CartProvider = ({ children }) => {
     setItems(prev => reconcileBuildSetBundleDiscounts(prev.map(item =>
       item.product.id === productId && 
       item.selectedColor === normalizedColor && 
-      item.selectedSize === normalizedSize
+      item.selectedSize === normalizedSize &&
+      lineMetaMatches(item, itemMeta)
         ? (isPromotionItem(item) ? item : { ...item, quantity })
         : item
     )));
@@ -609,7 +639,7 @@ export const CartProvider = ({ children }) => {
   /**
    * Update item color variant
    */
-  const updateColor = (productId, newColor, oldColor = '', selectedSize = '') => {
+  const updateColor = (productId, newColor, oldColor = '', selectedSize = '', itemMeta = null) => {
     const normalizedOldColor = oldColor || '';
     const normalizedSize = selectedSize || '';
     const normalizedNewColor = newColor || '';
@@ -618,7 +648,8 @@ export const CartProvider = ({ children }) => {
       const matchOld = (item) =>
         item.product.id === productId &&
         item.selectedColor === normalizedOldColor &&
-        item.selectedSize === normalizedSize;
+        item.selectedSize === normalizedSize &&
+        lineMetaMatches(item, itemMeta);
 
       const itemToUpdate = prev.find(matchOld);
       if (!itemToUpdate) return prev;
@@ -627,18 +658,20 @@ export const CartProvider = ({ children }) => {
         item.product.id === productId &&
         item.selectedColor === normalizedNewColor &&
         item.selectedSize === normalizedSize &&
-        item !== itemToUpdate;
+        item !== itemToUpdate &&
+        lineMetaMatches(item, itemMeta);
 
       const existingWithNewColor = prev.find(matchNew);
 
       if (existingWithNewColor) {
-        return prev
+        const nextItems = prev
           .map(item =>
             matchNew(item)
               ? { ...item, quantity: item.quantity + itemToUpdate.quantity }
               : item
           )
           .filter(item => item !== itemToUpdate);
+        return reconcileBuildSetBundleDiscounts(nextItems);
       }
 
       let updatedProduct = itemToUpdate.product;
@@ -647,25 +680,18 @@ export const CartProvider = ({ children }) => {
         const v = variants.find(vv => String(vv?.size || '').trim() === normalizedSize);
         const vp = Number(v?.price);
         if (Number.isFinite(vp) && vp > 0) {
-          const variantOriginal = Number(v?.originalPrice);
-          const serverConfirmed = hasServerDiscount(variantOriginal, vp, variants, updatedProduct);
-          const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
-          const inferredOriginal = serverConfirmed
-            ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
-            : null;
-          const keptOriginal =
-            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            inferredOriginal ||
-            null;
-          updatedProduct = { ...updatedProduct, price: vp, displayPrice: vp, originalPrice: keptOriginal };
+          updatedProduct = applySelectedVariantPrice(updatedProduct, normalizedSize, user, {
+            forceRetailOriginal: isBundleLine(itemToUpdate),
+          });
         }
       }
 
-      return prev.map(item =>
+      const nextItems = prev.map(item =>
         item === itemToUpdate
           ? { ...item, selectedColor: normalizedNewColor, product: updatedProduct }
           : item
       );
+      return reconcileBuildSetBundleDiscounts(nextItems);
     });
 
     bumpPromoTick();
@@ -675,7 +701,7 @@ export const CartProvider = ({ children }) => {
   /**
    * Update item size variant
    */
-  const updateSize = (productId, newSize, oldSize = '', selectedColor = '') => {
+  const updateSize = (productId, newSize, oldSize = '', selectedColor = '', itemMeta = null) => {
     const normalizedOldSize = oldSize || '';
     const normalizedColor = selectedColor || '';
     const normalizedNewSize = newSize || '';
@@ -684,7 +710,8 @@ export const CartProvider = ({ children }) => {
       const matchOld = (item) =>
         item.product.id === productId &&
         item.selectedSize === normalizedOldSize &&
-        item.selectedColor === normalizedColor;
+        item.selectedColor === normalizedColor &&
+        lineMetaMatches(item, itemMeta);
 
       const itemToUpdate = prev.find(matchOld);
       if (!itemToUpdate) return prev;
@@ -693,18 +720,20 @@ export const CartProvider = ({ children }) => {
         item.product.id === productId &&
         item.selectedSize === normalizedNewSize &&
         item.selectedColor === normalizedColor &&
-        item !== itemToUpdate;
+        item !== itemToUpdate &&
+        lineMetaMatches(item, itemMeta);
 
       const existingWithNewSize = prev.find(matchNew);
 
       if (existingWithNewSize) {
-        return prev
+        const nextItems = prev
           .map(item =>
             matchNew(item)
               ? { ...item, quantity: item.quantity + itemToUpdate.quantity }
               : item
           )
           .filter(item => item !== itemToUpdate);
+        return reconcileBuildSetBundleDiscounts(nextItems);
       }
 
       // Update size and recalculate price from the new variant.
@@ -716,33 +745,17 @@ export const CartProvider = ({ children }) => {
       const variants = itemToUpdate.product?.variants;
       let updatedProduct = itemToUpdate.product;
       if (Array.isArray(variants)) {
-        const newVariant = variants.find(v => String(v?.size || '').trim() === normalizedNewSize);
-        const vp = Number(newVariant?.price);
-        if (Number.isFinite(vp) && vp > 0) {
-          const variantOriginal = Number(newVariant?.originalPrice);
-          const serverConfirmed = hasServerDiscount(variantOriginal, vp, variants, itemToUpdate.product);
-          const discountPct = user?.discountType ? Number(user?.discountPercentage) : 0;
-          const inferredOriginal = serverConfirmed
-            ? inferOriginalFromUserDiscount({ discountedPrice: vp, discountPct })
-            : null;
-          const keptOriginal =
-            (Number.isFinite(variantOriginal) && variantOriginal > vp ? variantOriginal : null) ||
-            inferredOriginal ||
-            null;
-          updatedProduct = {
-            ...updatedProduct,
-            price: vp,
-            displayPrice: vp,
-            originalPrice: keptOriginal,
-          };
-        }
+        updatedProduct = applySelectedVariantPrice(updatedProduct, normalizedNewSize, user, {
+          forceRetailOriginal: isBundleLine(itemToUpdate),
+        });
       }
 
-      return prev.map(item =>
+      const nextItems = prev.map(item =>
         item === itemToUpdate
           ? { ...item, selectedSize: normalizedNewSize, product: updatedProduct }
           : item
       );
+      return reconcileBuildSetBundleDiscounts(nextItems);
     });
 
     bumpPromoTick();

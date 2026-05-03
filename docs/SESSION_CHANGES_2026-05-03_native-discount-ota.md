@@ -108,3 +108,34 @@ All native app changes from the three iOS OTAs above have been folded into the n
 - `android/app/build.gradle`
 
 Important OTA note: runtime `1.10.1` is a new runtime for the next binary. Existing App Store users on runtime `1.10.0` continue receiving the already-published iOS OTA fixes listed above.
+
+## Cart Size Selection Follow-up
+
+After the bundle discount fixes, customers could see size selectors for regular cart items, but Build Your Set lines still did not preserve variant data in the native bag. That meant a customer who added a bundle item could not switch to a larger size in-cart while keeping the Build Your Set discount.
+
+Fix:
+
+- `app/bundle-builder.js` now preserves product variants when adding Build Your Set products to the bag.
+- `contexts/CartContext.js` defaults bundle lines to the selected/default size where available.
+- Native cart line operations now distinguish bundle and non-bundle rows for the same product, preventing quantity/remove/variant changes from touching the wrong line.
+- `updateSize()` and `updateColor()` now recalculate variant pricing and rerun Build Your Set reconciliation, so the bundle tier discount remains active after switching sizes.
+- `app/(tabs)/bag.js` passes bundle line identity through quantity, remove, color, and size actions.
+
+Verification:
+
+- `npm run smoke:cart-pricing-contract` passed.
+- `npm run smoke:order-payload-pricing-contract` passed.
+- `npm run smoke:pricing-display` passed.
+- `ReadLints` reported no errors for `contexts/CartContext.js`, `app/bundle-builder.js`, or `app/(tabs)/bag.js`.
+
+EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Allow cart size changes for bundle items`
+- Update group ID: `11785f59-af40-4583-b524-782448cf2ac5`
+- iOS update ID: `019dece6-1bc3-7b59-bab3-87520b4e2a19`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/11785f59-af40-4583-b524-782448cf2ac5
+
+Note: this OTA was intentionally published against runtime `1.10.0` so existing App Store/TestFlight installs receive the JavaScript-only cart fix. The source tree remains on runtime `1.10.1` for the next binary release, where these changes are also included.

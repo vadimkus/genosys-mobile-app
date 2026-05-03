@@ -221,6 +221,7 @@ export default function BundleBuilderScreen() {
 
       // Build a cart-compatible product object
       return {
+        ...product,
         id: product.id,
         productNumber: product.productNumber,
         name: product.name,
@@ -230,7 +231,7 @@ export default function BundleBuilderScreen() {
         image: product.image,
         category: product.category,
         size: product.size,
-        variants: [],  // no variant selection in bundle — prices are pre-calculated
+        variants: Array.isArray(product.variants) ? product.variants : [],
         pricing: product.pricing || null,
         inStock: true,
         fromBundle: true,

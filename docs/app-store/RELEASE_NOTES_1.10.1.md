@@ -5,7 +5,7 @@
 ```
 This update improves professional pricing clarity and checkout reliability.
 
-Build Your Set discounts now show clearly in the bag and checkout, including per-line savings and the bundle discount percentage. We also fixed stale account discounts so removed customer discounts no longer continue to appear after restart.
+Build Your Set discounts now show clearly in the bag and checkout, including per-line savings and the bundle discount percentage. Bundle items can also keep their discount when customers switch sizes in the cart. We also fixed stale account discounts so removed customer discounts no longer continue to appear after restart.
 
 Includes checkout pricing display refinements and stability improvements delivered via recent iOS updates.
 ```
@@ -31,10 +31,11 @@ Key areas to review:
 1. Sign in with a normal user account that has no user discount.
 2. Open Build Your Set, select 5+ products, and add them to the bag.
 3. Confirm bag lines show discounted bundle prices and the total includes the 20% bundle discount.
-4. Proceed to checkout and expand the order summary.
-5. Confirm each Build Your Set line shows retail price, -20%, and final discounted price.
-6. Confirm the checkout order header and totals show Bundle Discount (20%).
-7. Confirm free promotional masks remain free and do not affect paid subtotal.
+4. Change the size for a Build Your Set item that has multiple sizes and confirm the bundle discount remains applied.
+5. Proceed to checkout and expand the order summary.
+6. Confirm each Build Your Set line shows retail price, -20%, and final discounted price.
+7. Confirm the checkout order header and totals show Bundle Discount (20%).
+8. Confirm free promotional masks remain free and do not affect paid subtotal.
 
 No new permissions. No new native SDKs. No data collection changes.
 ```
@@ -61,6 +62,13 @@ No new permissions. No new native SDKs. No data collection changes.
 - Collapsed checkout order header now indicates `Bundle Discount (20%)` when active.
 - Existing waterfall totals remain unchanged; this is a display clarity improvement over already-correct math.
 
+### Cart Size Selection Fix
+
+- Build Your Set cart lines now preserve product variants instead of stripping them before the bag renders.
+- Bundle lines default to the selected/default size where possible.
+- Cart quantity, remove, color, and size operations now target the exact bundle/non-bundle line.
+- Bundle tier reconciliation reruns after size/color changes so the Build Your Set discount remains active.
+
 ## Verification
 
 - `npm run smoke:cart-pricing-contract` passed.
@@ -75,6 +83,7 @@ No new permissions. No new native SDKs. No data collection changes.
 | Fix stale user discount after admin removal | iOS | 1.10.0 | `39296562-2748-4a55-95b4-b6a66ed95406` |
 | Fix Build Your Set bundle discounts in bag | iOS | 1.10.0 | `8102a436-5380-47a6-b2e1-bbf712a35b8e` |
 | Show bundle discount per checkout line | iOS | 1.10.0 | `68863a35-ce2d-4887-8d2e-43eb1db079fe` |
+| Allow cart size changes for bundle items | iOS | 1.10.0 | `11785f59-af40-4583-b524-782448cf2ac5` |
 
 ## Modified Areas
 
