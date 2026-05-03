@@ -169,6 +169,42 @@ EAS Update:
 
 Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.
 
+## Bundle Builder Retail Pricing Correction
+
+After the dynamic bundle tier OTA, native testing still showed Build Your Set lines using regular pricing-contract originals. Example: SNOW O2 Cleanser `180ml` displayed `412.50 AED -> 330.00 AED` with `20% OFF (Bundle)`, which means the app used `412.50` as the retail base and treated `330` as the bundle-discounted price. For Build Your Set, the selected variant retail is `330 AED`, so the 20% bundle price should be `264 AED`.
+
+Root cause:
+
+- `app/bundle-builder.js` used `pricing.basePrice` from the normal product pricing contract.
+- For products carrying regular discount/original-price metadata, that contract can expose an original like `412.50`.
+- Build Your Set should ignore those regular discount originals and use the selected/default variant retail price.
+
+Fix:
+
+- `getBundleRetailPrice()` now prefers the selected/default variant price, then falls back to product display/price.
+- Bundle products are added to cart as retail-priced lines; `reconcileBuildSetBundleDiscounts()` applies the active bundle tier once.
+- Added smoke coverage for the exact failure shape: selected `180ml` variant retail `330`, regular contract original `412.50`, bundle `20%` should produce `264`, not `330`.
+
+Verification:
+
+- `npm run smoke:cart-pricing-contract` passed, including the new contract-original bundle case.
+- `npm run smoke:order-payload-pricing-contract` passed.
+- `npm run smoke:pricing-display` passed.
+- `npx tsc --noEmit` passed.
+- `ReadLints` reported no errors for `app/bundle-builder.js` or the updated smoke script.
+
+EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Fix bundle builder retail pricing`
+- Update group ID: `4703c6b2-e015-4a29-85aa-26c035c5c54a`
+- iOS update ID: `019ded44-cfdc-7d8b-b741-7a62db4094de`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/4703c6b2-e015-4a29-85aa-26c035c5c54a
+
+Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.
+
 ## Dynamic Build Your Set Tier Reconciliation
 
 When customers remove Build Your Set items from the cart, the remaining bundle discount should follow the current bundle size instead of preserving a stale original tier.
