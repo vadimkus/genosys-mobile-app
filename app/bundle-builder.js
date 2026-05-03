@@ -61,7 +61,9 @@ function getNextTier(count) {
 }
 
 function getBundleRetailPrice(product) {
-  const variants = Array.isArray(product?.variants) ? product.variants : [];
+  const variants = (Array.isArray(product?.variants) ? product.variants : []).filter((variant) =>
+    String(variant?.size || '').trim() || String(variant?.color || '').trim()
+  );
   const explicitSize = String(product?.size || '').trim();
   const selectedVariant =
     (explicitSize && variants.find((variant) => String(variant?.size || '').trim() === explicitSize)) ||

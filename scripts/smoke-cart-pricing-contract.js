@@ -259,6 +259,30 @@ assertEqual('bundle ignores regular discount contract original', contractBundle[
 assertEqual('bundle applies discount to selected retail once', contractBundle[0].product.price, 264);
 assertEqual('bundle contract-original subtotal', calculateCartTotals(contractBundle, user, 'Dubai', shippingConfig).subtotal, 584);
 
+const nullVariantBundleItems = [
+  {
+    product: product({
+      id: 'bundle-mist-null-variant',
+      price: 160,
+      displayPrice: 160,
+      originalPrice: null,
+      fromBundle: true,
+      bundleDiscountPercent: 20,
+      variants: [
+        { id: 'mist-default-null', size: null, color: null, price: 320, isDefault: true },
+      ],
+    }),
+    quantity: 1,
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+  },
+  ...buildSetItems.slice(1, 5),
+];
+const nullVariantBundle = reconcileBuildSetBundleDiscounts(nullVariantBundleItems);
+assertEqual('bundle ignores null default variant price', nullVariantBundle[0].product.originalPrice, 160);
+assertEqual('bundle applies discount to mist base price', nullVariantBundle[0].product.price, 128);
+assertEqual('bundle null-variant subtotal', calculateCartTotals(nullVariantBundle, user, 'Dubai', shippingConfig).subtotal, 448);
+
 console.log('[cart-pricing-contract] contract subtotal:', contractTotals.subtotal);
 console.log('[cart-pricing-contract] legacy fallback subtotal:', legacyFallbackTotals.subtotal);
 console.log('[cart-pricing-contract] bundle subtotal:', bundleTotals.subtotal);
@@ -268,4 +292,5 @@ console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
 console.log('[cart-pricing-contract] build-set single-leftover subtotal:', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle variant subtotal:', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle contract-original subtotal:', calculateCartTotals(contractBundle, user, 'Dubai', shippingConfig).subtotal);
+console.log('[cart-pricing-contract] bundle null-variant subtotal:', calculateCartTotals(nullVariantBundle, user, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] cart pricing scenarios passed');

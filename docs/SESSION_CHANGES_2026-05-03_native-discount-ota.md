@@ -169,6 +169,42 @@ EAS Update:
 
 Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.
 
+## Native Build Your Set List Price Correction
+
+Native testing showed inflated product-card prices inside Build Your Set before adding items to cart. Examples:
+
+- `ALL FOR SENSITIVE SERUM`: showed `450 AED`, correct base `330 AED`.
+- `MOISTURE REPLENISHING HYALURON SERUM`: showed `450 AED`, correct base `330 AED`.
+- `MULTI VITA RADIANCE SERUM`: showed `490 AED`, correct base `330 AED`.
+- `MULTI FUNCTIONAL ANTI-WRINKLE SERUM`: showed `520 AED`, correct base `330 AED`.
+- `EGF REPAIR OXYMASK CREAM`: showed `450 AED`, correct base `290 AED`.
+- `INTENSIVE BLEMISH BALM CREAM`: showed `350 AED`, correct base `250 AED`.
+
+Root cause:
+
+- The product-level DB `price` values were correct.
+- 41 default `product_variants` rows had `size: null` and `color: null` but stale prices.
+- The native Build Your Set screen treated those null variants as selectable/default variants and displayed their stale prices.
+
+Fix:
+
+- Normalized all null size/color variants in the database to match their parent product price (`41` rows updated, `0` mismatches remaining).
+- Native bundle-builder pricing now ignores variants that have neither size nor color.
+- Native cart and order payload pricing fallbacks also ignore null variants and prefer product retail base for non-variant bundle items.
+
+Verification:
+
+- Spot-checked the screenshot products after DB correction; each null variant now matches product base price.
+- `npm run smoke:cart-pricing-contract` passed, including null-variant bundle regression (`160 -> 128` at 20%).
+- `npm run smoke:order-payload-pricing-contract` passed.
+- `npm run smoke:pricing-display` passed.
+- `npx tsc --noEmit` passed.
+- `ReadLints` reported no errors for touched native files.
+
+EAS Update:
+
+- Not yet published for this follow-up. The DB correction fixes current native list prices after the app refetches bundle data; the code hardening still needs the next OTA/release.
+
 ## Bundle Builder Retail Pricing Correction
 
 After the dynamic bundle tier OTA, native testing still showed Build Your Set lines using regular pricing-contract originals. Example: SNOW O2 Cleanser `180ml` displayed `412.50 AED -> 330.00 AED` with `20% OFF (Bundle)`, which means the app used `412.50` as the retail base and treated `330` as the bundle-discounted price. For Build Your Set, the selected variant retail is `330 AED`, so the 20% bundle price should be `264 AED`.

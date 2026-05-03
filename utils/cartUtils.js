@@ -52,7 +52,9 @@ const getStoredBundleRetailPrice = (item) => {
   const product = item?.product || {};
   const selectedSize = String(item?.selectedSize || '').trim();
   const selectedColor = String(item?.selectedColor || '').trim();
-  const variants = Array.isArray(product?.variants) ? product.variants : [];
+  const variants = (Array.isArray(product?.variants) ? product.variants : []).filter((variant) =>
+    String(variant?.size || '').trim() || String(variant?.color || '').trim()
+  );
   const selectedVariant = variants.find((variant) => {
     const size = String(variant?.size || '').trim();
     const color = String(variant?.color || '').trim();
@@ -72,8 +74,12 @@ const getStoredBundleRetailPrice = (item) => {
   const explicitOriginal = Number(product.originalPrice);
   if (Number.isFinite(explicitOriginal) && explicitOriginal > 0) return explicitOriginal;
 
-  const stalePct = Number(item?.bundleDiscountPercent || product?.bundleDiscountPercent) || 0;
   const staleUnit = Number(product.displayPrice ?? product.price);
+  if (!selectedSize && !selectedColor && variants.length === 0 && Number.isFinite(staleUnit) && staleUnit > 0) {
+    return staleUnit;
+  }
+
+  const stalePct = Number(item?.bundleDiscountPercent || product?.bundleDiscountPercent) || 0;
   if (stalePct > 0 && stalePct < 100 && Number.isFinite(staleUnit) && staleUnit > 0) {
     return Math.round((staleUnit / (1 - stalePct / 100)) * 100) / 100;
   }

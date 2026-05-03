@@ -3,7 +3,9 @@ import { getPricingDisplay } from './pricingDisplay';
 function getBundleRetailBase(item, pricing) {
   const selectedSize = String(item?.selectedSize || '').trim();
   const selectedColor = String(item?.selectedColor || '').trim();
-  const variants = Array.isArray(item?.product?.variants) ? item.product.variants : [];
+  const variants = (Array.isArray(item?.product?.variants) ? item.product.variants : []).filter((variant) =>
+    String(variant?.size || '').trim() || String(variant?.color || '').trim()
+  );
   const selectedVariant = variants.find((variant) => {
     const size = String(variant?.size || '').trim();
     const color = String(variant?.color || '').trim();
@@ -13,10 +15,12 @@ function getBundleRetailBase(item, pricing) {
   });
   const variantPrice = Number(selectedVariant?.price);
   const variantOriginal = Number(selectedVariant?.originalPrice);
+  const productUnit = Number(item?.product?.displayPrice ?? item?.product?.price);
   return (
     (Number.isFinite(variantOriginal) && variantOriginal > variantPrice ? variantOriginal : 0) ||
     (Number.isFinite(variantPrice) && variantPrice > 0 ? variantPrice : 0) ||
     (Number.isFinite(Number(item?.product?.originalPrice)) && Number(item.product.originalPrice) > 0 ? Number(item.product.originalPrice) : 0) ||
+    (!selectedSize && !selectedColor && variants.length === 0 && Number.isFinite(productUnit) && productUnit > 0 ? productUnit : 0) ||
     (Number.isFinite(Number(pricing?.basePrice)) && Number(pricing.basePrice) > 0 ? Number(pricing.basePrice) : 0) ||
     (Number.isFinite(Number(item?.product?.price)) && Number(item.product.price) > 0 ? Number(item.product.price) : 0)
   );
