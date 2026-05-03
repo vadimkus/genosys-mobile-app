@@ -539,3 +539,12 @@ This brings back the same remote video overlay path as before: cached/fresh `/ap
 
 - `npm run verify:splash` passed.
 - `npx expo export --platform ios --output-dir /tmp/genosys-splash-restored-ota` passed.
+- Mobile OTA published:
+  - Update group ID: `f6988478-ceac-44b9-8d8a-4c6c9ea64637`
+  - iOS update ID: `019decc6-a3dd-7da7-bee9-bfe6f5c90ff5`
+  - Android update ID: `019decc6-a3dd-72c7-81dc-012f457fc6d9`
+  - Commit: `dd2e3e4e4d61659077aa0ff2964222408b1a8fce`
+  - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/f6988478-ceac-44b9-8d8a-4c6c9ea64637
+- Website config restored in `cosmetics-website` commit `14b1a2d8`.
+- Live uncached endpoint verified after Vercel deploy:
+  - `https://genosys.ae/api/mobile/splash-config?ts=<now>` returns `{"enabled":true,...}`.
