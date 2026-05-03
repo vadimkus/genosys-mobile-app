@@ -50,6 +50,25 @@ export function isBuildSetBundleItem(item) {
 
 const getStoredBundleRetailPrice = (item) => {
   const product = item?.product || {};
+  const selectedSize = String(item?.selectedSize || '').trim();
+  const selectedColor = String(item?.selectedColor || '').trim();
+  const variants = Array.isArray(product?.variants) ? product.variants : [];
+  const selectedVariant = variants.find((variant) => {
+    const size = String(variant?.size || '').trim();
+    const color = String(variant?.color || '').trim();
+    const sizeMatches = selectedSize ? size === selectedSize : true;
+    const colorMatches = selectedColor ? color === selectedColor : true;
+    return sizeMatches && colorMatches;
+  });
+  const variantPrice = Number(selectedVariant?.price);
+  const variantOriginal = Number(selectedVariant?.originalPrice);
+
+  // Build Your Set discounts are applied to the selected size's retail price.
+  // Do not reverse-calculate from the current line price when variant data exists:
+  // for products like SNOW O2 Cleanser 500ml, the variant retail is already 510 AED.
+  if (Number.isFinite(variantOriginal) && variantOriginal > variantPrice) return variantOriginal;
+  if (Number.isFinite(variantPrice) && variantPrice > 0) return variantPrice;
+
   const explicitOriginal = Number(product.originalPrice);
   if (Number.isFinite(explicitOriginal) && explicitOriginal > 0) return explicitOriginal;
 

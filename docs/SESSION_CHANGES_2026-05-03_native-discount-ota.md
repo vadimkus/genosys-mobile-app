@@ -139,3 +139,32 @@ EAS Update:
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/11785f59-af40-4583-b524-782448cf2ac5
 
 Note: this OTA was intentionally published against runtime `1.10.0` so existing App Store/TestFlight installs receive the JavaScript-only cart fix. The source tree remains on runtime `1.10.1` for the next binary release, where these changes are also included.
+
+## Bundle Variant Price Correction
+
+After testing the native bag, bundle items with size selection could apply the bundle percentage to an inflated fallback retail price. Example: SNOW O2 Cleanser `500ml` showed `637.50 AED -> 510.00 AED`, because the cart fallback reverse-calculated `510 / 0.8` even though `510 AED` was already the selected variant retail price.
+
+Fix:
+
+- `utils/cartUtils.js` now resolves Build Your Set retail price from the selected variant first.
+- `utils/orderPayloadPricing.js` uses the same selected-variant retail base for checkout/order payload pricing.
+- Added smoke coverage for the cleanser-style case: selected bundle variant `500ml` retail `510 AED` should become `408 AED` after a 20% bundle discount.
+
+Verification:
+
+- `npm run smoke:cart-pricing-contract` passed, including bundle variant subtotal coverage.
+- `npm run smoke:order-payload-pricing-contract` passed, including bundle variant payload coverage.
+- `npm run smoke:pricing-display` passed.
+- `ReadLints` reported no errors for `utils/cartUtils.js`, `utils/orderPayloadPricing.js`, or the updated smoke scripts.
+
+EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Fix bundle variant price calculation`
+- Update group ID: `43640643-b030-4198-9886-e8c6f0f6fe9e`
+- iOS update ID: `019ded05-7481-7093-ace8-aa3095e2bd31`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/43640643-b030-4198-9886-e8c6f0f6fe9e
+
+Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.

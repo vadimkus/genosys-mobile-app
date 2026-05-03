@@ -88,6 +88,36 @@ assertEqual('bundle payload keeps bundle-only price', bundleItem.price, 80);
 assertEqual('bundle payload preserves discount percent', bundleItem.bundleDiscountPercent, 20);
 assertEqual('bundle payload preserves retail original price', bundleItem.originalPrice, 100);
 
+const bundleVariantItem = buildMobileOrderItemPayload({
+  product: product({
+    price: 510,
+    displayPrice: 408,
+    originalPrice: 637.5,
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+    variants: [
+      { id: 'cleanser-180', size: '180ml', price: 330, isDefault: true },
+      { id: 'cleanser-500', size: '500ml', price: 510, isDefault: false },
+    ],
+    pricing: {
+      source: 'server',
+      basePrice: 330,
+      unitPrice: 330,
+      displayPrice: 330,
+      originalPrice: null,
+      discountPercentage: 0,
+      canSeePrice: true,
+      isPriceOnRequest: false,
+    },
+  }),
+  quantity: 1,
+  selectedSize: '500ml',
+  fromBundle: true,
+  bundleDiscountPercent: 20,
+});
+assertEqual('bundle variant payload discounts selected retail once', bundleVariantItem.price, 408);
+assertEqual('bundle variant payload original is selected retail', bundleVariantItem.originalPrice, 510);
+
 const promoItem = buildMobileOrderItemPayload({
   product: product({
     id: 'promo-1',
@@ -125,5 +155,6 @@ assertEqual('zero contract price is preserved', zeroContractItem.price, 0);
 console.log('[order-payload-pricing-contract] contract price:', contractItem.price);
 console.log('[order-payload-pricing-contract] variant price:', variantItem.price);
 console.log('[order-payload-pricing-contract] bundle price:', bundleItem.price);
+console.log('[order-payload-pricing-contract] bundle variant price:', bundleVariantItem.price);
 console.log('[order-payload-pricing-contract] promo price:', promoItem.price);
-console.log('[order-payload-pricing-contract] 5 order payload pricing scenarios passed');
+console.log('[order-payload-pricing-contract] 7 order payload pricing scenarios passed');

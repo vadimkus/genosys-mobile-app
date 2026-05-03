@@ -68,6 +68,7 @@ No new permissions. No new native SDKs. No data collection changes.
 - Bundle lines default to the selected/default size where possible.
 - Cart quantity, remove, color, and size operations now target the exact bundle/non-bundle line.
 - Bundle tier reconciliation reruns after size/color changes so the Build Your Set discount remains active.
+- Bundle size changes now calculate from the selected size's retail price, so products like SNOW O2 Cleanser `500ml` apply 20% to `510 AED` instead of reverse-calculating an inflated retail base.
 
 ## Verification
 
@@ -84,6 +85,7 @@ No new permissions. No new native SDKs. No data collection changes.
 | Fix Build Your Set bundle discounts in bag | iOS | 1.10.0 | `8102a436-5380-47a6-b2e1-bbf712a35b8e` |
 | Show bundle discount per checkout line | iOS | 1.10.0 | `68863a35-ce2d-4887-8d2e-43eb1db079fe` |
 | Allow cart size changes for bundle items | iOS | 1.10.0 | `11785f59-af40-4583-b524-782448cf2ac5` |
+| Fix bundle variant price calculation | iOS | 1.10.0 | `43640643-b030-4198-9886-e8c6f0f6fe9e` |
 
 ## Modified Areas
 

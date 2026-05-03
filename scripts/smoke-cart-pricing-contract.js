@@ -179,6 +179,31 @@ assertEqual('single build set leftover loses bundle flag', singleLeftoverBundle[
 assertEqual('single build set leftover returns to retail subtotal', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal, 100);
 assertEqual('single build set leftover has no bundle waterfall', computeWaterfallBreakdown(singleLeftoverBundle, null).hasBundleDiscount, false);
 
+const variantBundleItems = [
+  {
+    product: product({
+      id: 'bundle-cleanser',
+      price: 510,
+      displayPrice: 510,
+      fromBundle: true,
+      bundleDiscountPercent: 20,
+      variants: [
+        { id: 'cleanser-180', size: '180ml', price: 330, isDefault: true },
+        { id: 'cleanser-500', size: '500ml', price: 510, isDefault: false },
+      ],
+    }),
+    quantity: 1,
+    selectedSize: '500ml',
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+  },
+  ...buildSetItems.slice(1, 5),
+];
+const variantBundle = reconcileBuildSetBundleDiscounts(variantBundleItems);
+assertEqual('bundle selected variant keeps retail original', variantBundle[0].product.originalPrice, 510);
+assertEqual('bundle selected variant applies discount once', variantBundle[0].product.price, 408);
+assertEqual('bundle selected variant subtotal', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal, 728);
+
 console.log('[cart-pricing-contract] contract subtotal:', contractTotals.subtotal);
 console.log('[cart-pricing-contract] legacy fallback subtotal:', legacyFallbackTotals.subtotal);
 console.log('[cart-pricing-contract] bundle subtotal:', bundleTotals.subtotal);
@@ -186,4 +211,5 @@ console.log('[cart-pricing-contract] variant subtotal:', variantTotals.subtotal)
 console.log('[cart-pricing-contract] waterfall saved:', waterfall.totalSaved);
 console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
 console.log('[cart-pricing-contract] build-set single-leftover subtotal:', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal);
-console.log('[cart-pricing-contract] 10 cart pricing scenarios passed');
+console.log('[cart-pricing-contract] bundle variant subtotal:', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal);
+console.log('[cart-pricing-contract] 13 cart pricing scenarios passed');
