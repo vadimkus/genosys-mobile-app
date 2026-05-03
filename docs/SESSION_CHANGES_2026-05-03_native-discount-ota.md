@@ -194,3 +194,15 @@ Verification:
 - `npm run smoke:pricing-display` passed.
 - `npx tsc --noEmit` passed.
 - `ReadLints` reported no errors for the updated smoke script.
+
+EAS Update:
+
+- Branch: `production`
+- Platform: `ios`
+- Runtime: `1.10.0`
+- Message: `Reconcile dynamic bundle discounts`
+- Update group ID: `49b12202-b29f-4e92-9080-c7b948bcb110`
+- iOS update ID: `019ded2b-0410-7426-9148-7d4c673ffcbf`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/49b12202-b29f-4e92-9080-c7b948bcb110
+
+Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.

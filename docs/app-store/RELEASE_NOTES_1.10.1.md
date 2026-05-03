@@ -94,6 +94,7 @@ No new permissions. No new native SDKs. No data collection changes.
 | Show bundle discount per checkout line | iOS | 1.10.0 | `68863a35-ce2d-4887-8d2e-43eb1db079fe` |
 | Allow cart size changes for bundle items | iOS | 1.10.0 | `11785f59-af40-4583-b524-782448cf2ac5` |
 | Fix bundle variant price calculation | iOS | 1.10.0 | `43640643-b030-4198-9886-e8c6f0f6fe9e` |
+| Reconcile dynamic bundle discounts | iOS | 1.10.0 | `49b12202-b29f-4e92-9080-c7b948bcb110` |
 
 ## Modified Areas
 
