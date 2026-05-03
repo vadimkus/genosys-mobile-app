@@ -460,3 +460,59 @@ Published via `npx eas-cli@latest update --branch production` against runtime `1
 ### If flicker remains
 
 If a white logo still blinks after OTA #4 is definitely applied, the flicker is no longer coming from `VideoLaunchScreen.js` because that code no longer renders any logo. The next safest production move is to disable the remote video splash server-side (`/api/mobile/splash-config enabled: false`) until binary 83 ships, leaving only the native LaunchScreen and eliminating all JS/WebView startup splash layers.
+
+---
+
+## 2026-05-03 Update #5 — Temporarily disable remote video splash
+
+### Symptom (post-OTA #4)
+
+User reported:
+
+> "white logo screen then just white screen appears without logo and then splash screen normally"
+
+OTA #4 successfully removed the JS logo blink, but it exposed the unavoidable blank white holding screen between native LaunchScreen and WebView video startup. This is still a poor production UX.
+
+### Decision
+
+Temporarily disable the remote WebView video splash entirely for App Store build 82. This is the cleanest production trade-off:
+
+- Native iOS LaunchScreen shows the logo once.
+- App opens directly.
+- No JS splash logo.
+- No plain white waiting veil.
+- No WebView/video startup artifact.
+
+The remote video splash should only be re-enabled when build 83+ ships with a native-level handoff strategy. OTA JavaScript cannot keep the iOS native LaunchScreen alive while a WebView buffers.
+
+### Mobile app change
+
+`app/_layout.js` now has:
+
+- `REMOTE_VIDEO_SPLASH_ENABLED = false`
+- `DEFAULT_SPLASH_CONFIG = false`
+- `checkSplash()` clears `@splash_config` from `AsyncStorage`, sets `splashVideo` to `false`, and returns before reading cached config or calling `/api/mobile/splash-config`.
+
+This matters because users may already have cached `{ enabled: true }` splash config locally. The OTA must ignore and remove that cache immediately, otherwise the old WebView splash can still appear for one more launch.
+
+### Website API change
+
+`cosmetics-website/app/api/mobile/splash-config/route.ts` now returns `enabled: false`.
+
+This is a server-side kill switch for older bundles that have not yet applied the latest OTA. Once those clients fetch fresh config, they also stop showing the video splash.
+
+### Expected sequence after OTA #5 applies
+
+1. Native iOS LaunchScreen: white + logo.
+2. React/app shell opens.
+
+No remote video splash is shown.
+
+### Verification
+
+- `npm run verify:splash` passed.
+- `npx expo export --platform ios --output-dir /tmp/genosys-splash-disabled-ota` passed.
+
+### Re-enable criteria
+
+Do not re-enable `/api/mobile/splash-config` until build 83+ includes a native-safe startup path. A safe future implementation should avoid WebView during cold start or use a native module/player that can be coordinated with native splash hide timing.
