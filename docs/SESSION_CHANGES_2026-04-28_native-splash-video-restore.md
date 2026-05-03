@@ -516,3 +516,26 @@ No remote video splash is shown.
 ### Re-enable criteria
 
 Do not re-enable `/api/mobile/splash-config` until build 83+ includes a native-safe startup path. A safe future implementation should avoid WebView during cold start or use a native module/player that can be coordinated with native splash hide timing.
+
+---
+
+## 2026-05-03 Update #6 — Re-enable remote video splash
+
+### User request
+
+User asked to "put it back" after OTA #5 disabled the remote WebView video splash.
+
+### Change
+
+Restored the remote video splash controls:
+
+- `app/_layout.js` now uses the default video splash config again.
+- Removed the app-side `REMOTE_VIDEO_SPLASH_ENABLED = false` bypass.
+- `cosmetics-website/app/api/mobile/splash-config/route.ts` restored `enabled: true`.
+
+This brings back the same remote video overlay path as before: cached/fresh `/api/mobile/splash-config` drives `VideoLaunchScreen`, which still uses the OTA #4 plain-white JS cover while WebView buffers, then reveals the video after stable playback.
+
+### Verification
+
+- `npm run verify:splash` passed.
+- `npx expo export --platform ios --output-dir /tmp/genosys-splash-restored-ota` passed.

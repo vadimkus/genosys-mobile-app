@@ -40,13 +40,14 @@ function compareVersions(current, minimum) {
 }
 
 const SPLASH_CACHE_KEY = '@splash_config';
-// Temporarily disable the remote WebView video splash in production. On the
-// shipped iOS 1.10.0 / build 82 binary, the native LaunchScreen -> React ->
-// WebView chain creates visible white/logo flashes that cannot be fully fixed
-// with OTA JavaScript. Keep only the native LaunchScreen until build 83 can
-// ship a proper native-level handoff.
-const REMOTE_VIDEO_SPLASH_ENABLED = false;
-const DEFAULT_SPLASH_CONFIG = false;
+const DEFAULT_SPLASH_CONFIG = {
+  enabled: true,
+  type: 'video',
+  videoUrl: `${AUTH_CONFIG.WEB_ORIGIN}/videos/Splash.mp4`,
+  posterUrl: null,
+  duration: 5000,
+  cacheTTL: 86400,
+};
 
 function isSameSplashConfig(a, b) {
   if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return a === b;
@@ -114,12 +115,6 @@ export default function RootLayout() {
     }
 
     async function checkSplash() {
-      if (!REMOTE_VIDEO_SPLASH_ENABLED) {
-        await AsyncStorage.removeItem(SPLASH_CACHE_KEY).catch(() => {});
-        if (!cancelled) setSplashVideo(false);
-        return;
-      }
-
       // 1. Instantly apply cached config so returning users see splash without delay
       try {
         const cached = await AsyncStorage.getItem(SPLASH_CACHE_KEY);
