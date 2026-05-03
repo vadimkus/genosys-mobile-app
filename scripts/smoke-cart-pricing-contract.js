@@ -166,6 +166,26 @@ const buildSetItems = Array.from({ length: 5 }, (_, index) => ({
   fromBundle: true,
   bundleDiscountPercent: 20,
 }));
+const sixItemBundle = reconcileBuildSetBundleDiscounts([
+  ...buildSetItems,
+  {
+    product: product({
+      id: 'bundle-6',
+      price: 80,
+      displayPrice: 80,
+      originalPrice: 100,
+      fromBundle: true,
+      bundleDiscountPercent: 20,
+    }),
+    quantity: 1,
+    fromBundle: true,
+    bundleDiscountPercent: 20,
+  },
+]);
+const sixToFiveBundle = reconcileBuildSetBundleDiscounts(sixItemBundle.slice(0, 5));
+assertEqual('6->5 build set keeps 20% discount', sixToFiveBundle[0].bundleDiscountPercent, 20);
+assertEqual('6->5 build set subtotal', calculateCartTotals(sixToFiveBundle, user, 'Dubai', shippingConfig).subtotal, 400);
+
 const fiveItemBundle = reconcileBuildSetBundleDiscounts(buildSetItems);
 assertEqual('5-item build set keeps 20% discount', fiveItemBundle[0].bundleDiscountPercent, 20);
 assertEqual('5-item build set subtotal', calculateCartTotals(fiveItemBundle, user, 'Dubai', shippingConfig).subtotal, 400);
@@ -212,4 +232,4 @@ console.log('[cart-pricing-contract] waterfall saved:', waterfall.totalSaved);
 console.log('[cart-pricing-contract] checkout savings:', checkoutSavings);
 console.log('[cart-pricing-contract] build-set single-leftover subtotal:', calculateCartTotals(singleLeftoverBundle, null, 'Dubai', shippingConfig).subtotal);
 console.log('[cart-pricing-contract] bundle variant subtotal:', calculateCartTotals(variantBundle, user, 'Dubai', shippingConfig).subtotal);
-console.log('[cart-pricing-contract] 13 cart pricing scenarios passed');
+console.log('[cart-pricing-contract] cart pricing scenarios passed');

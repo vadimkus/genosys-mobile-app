@@ -168,3 +168,29 @@ EAS Update:
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/43640643-b030-4198-9886-e8c6f0f6fe9e
 
 Note: this OTA was intentionally published against runtime `1.10.0` for existing installs. The source tree remains on runtime `1.10.1` for the next binary.
+
+## Dynamic Build Your Set Tier Reconciliation
+
+When customers remove Build Your Set items from the cart, the remaining bundle discount should follow the current bundle size instead of preserving a stale original tier.
+
+Rule:
+
+- 5+ remaining Build Your Set lines: keep `20%`.
+- 4 remaining lines: downgrade to `15%`.
+- 3 remaining lines: downgrade to `10%`.
+- 2 remaining lines: downgrade to `5%`.
+- 1 remaining line: remove bundle discount and price normally.
+
+Fix:
+
+- Native reconciliation behavior already supported this rule after cart mutations.
+- Added explicit smoke coverage for the missing `6 -> 5` case, ensuring five remaining bundle lines still keep `20%`.
+- Existing smoke coverage verifies `5 -> 4` downgrades to `15%` and a single leftover bundle item loses the bundle discount.
+
+Verification:
+
+- `npm run smoke:cart-pricing-contract` passed.
+- `npm run smoke:order-payload-pricing-contract` passed.
+- `npm run smoke:pricing-display` passed.
+- `npx tsc --noEmit` passed.
+- `ReadLints` reported no errors for the updated smoke script.

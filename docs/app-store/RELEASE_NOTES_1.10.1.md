@@ -5,7 +5,7 @@
 ```
 This update improves professional pricing clarity and checkout reliability.
 
-Build Your Set discounts now show clearly in the bag and checkout, including per-line savings and the bundle discount percentage. Bundle items can also keep their discount when customers switch sizes in the cart. We also fixed stale account discounts so removed customer discounts no longer continue to appear after restart.
+Build Your Set discounts now show clearly in the bag and checkout, including per-line savings and the bundle discount percentage. Bundle discounts also adjust correctly when customers remove items or switch sizes in the cart. We also fixed stale account discounts so removed customer discounts no longer continue to appear after restart.
 
 Includes checkout pricing display refinements and stability improvements delivered via recent iOS updates.
 ```
@@ -31,11 +31,12 @@ Key areas to review:
 1. Sign in with a normal user account that has no user discount.
 2. Open Build Your Set, select 5+ products, and add them to the bag.
 3. Confirm bag lines show discounted bundle prices and the total includes the 20% bundle discount.
-4. Change the size for a Build Your Set item that has multiple sizes and confirm the bundle discount remains applied.
-5. Proceed to checkout and expand the order summary.
-6. Confirm each Build Your Set line shows retail price, -20%, and final discounted price.
-7. Confirm the checkout order header and totals show Bundle Discount (20%).
-8. Confirm free promotional masks remain free and do not affect paid subtotal.
+4. Remove one item from a 5-item Build Your Set and confirm the remaining four lines use 15%, not stale 20%.
+5. Change the size for a Build Your Set item that has multiple sizes and confirm the current bundle tier remains applied.
+6. Proceed to checkout and expand the order summary.
+7. Confirm each Build Your Set line shows retail price, the current discount percentage, and final discounted price.
+8. Confirm the checkout order header and totals show the current Bundle Discount percentage.
+9. Confirm free promotional masks remain free and do not affect paid subtotal.
 
 No new permissions. No new native SDKs. No data collection changes.
 ```
@@ -70,11 +71,18 @@ No new permissions. No new native SDKs. No data collection changes.
 - Bundle tier reconciliation reruns after size/color changes so the Build Your Set discount remains active.
 - Bundle size changes now calculate from the selected size's retail price, so products like SNOW O2 Cleanser `500ml` apply 20% to `510 AED` instead of reverse-calculating an inflated retail base.
 
+### Dynamic Bundle Tier Fix
+
+- Removing Build Your Set items now recalculates the remaining bundle tier instead of preserving stale `20%` metadata.
+- Remaining bundle lines follow the proportional rule: 5+ lines = 20%, 4 lines = 15%, 3 lines = 10%, 2 lines = 5%, and 1 line = no bundle discount.
+- Server checkout computes the allowed bundle tier from submitted bundle line count, so stale clients are downgraded safely before payment/order creation.
+
 ## Verification
 
 - `npm run smoke:cart-pricing-contract` passed.
 - `npm run smoke:order-payload-pricing-contract` passed.
 - `npm run smoke:pricing-display` passed.
+- Website/server guard regression tests passed for stale bundle tier downgrade behavior.
 - `ReadLints` reported no errors on changed native files.
 
 ## EAS Updates Included Before Binary
