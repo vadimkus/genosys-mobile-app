@@ -6,6 +6,7 @@
 import AUTH_CONFIG from '../config/auth';
 import { createLogger } from '../utils/logger';
 import { getJson, httpRequest, sendJson, HttpClientError } from './httpClient';
+import { deviceInfoHeaders } from '../utils/deviceInfo';
 
 const log = createLogger('authService');
 
@@ -91,6 +92,7 @@ export const registerUser = async (name, email, password, extra = {}) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': API_KEY,
+        ...deviceInfoHeaders(),
       },
       body: JSON.stringify({ 
         name,
@@ -149,6 +151,7 @@ export const processGoogleAuth = async (idToken) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': API_KEY,
+        ...deviceInfoHeaders(),
       },
       body: JSON.stringify({ 
         idToken: idToken
@@ -204,6 +207,7 @@ export const processAppleAuth = async (identityToken, meta = {}) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': API_KEY,
+        ...deviceInfoHeaders(),
       },
       body: JSON.stringify({
         identityToken,
