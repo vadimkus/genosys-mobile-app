@@ -2,7 +2,7 @@
 
 > Build and run the Genosys app on Android devices and emulators.
 
-**Last Updated**: February 2026
+**Last Updated**: May 2026
 
 ---
 
@@ -62,22 +62,25 @@ npm run submit:android
   "expo": {
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 58,
+      "versionCode": 84,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "INTERNET",
-        "VIBRATE",
-        "RECORD_AUDIO",
-        "CAMERA",
-        "READ_MEDIA_IMAGES",
-        "POST_NOTIFICATIONS",
-        "USE_BIOMETRIC",
-        "USE_FINGERPRINT",
-        "ACCESS_NETWORK_STATE"
+        "android.permission.INTERNET",
+        "android.permission.VIBRATE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
       ],
       "intentFilters": [
         {
@@ -145,7 +148,7 @@ The Android app has **full feature parity** with iOS (aligned February 11, 2026)
 | Shopping Cart | ✅ | ✅ | Same functionality |
 | **COD Payment** | ✅ | ✅ | Same flow |
 | **Stripe Payment** | ✅ | ✅ | Stripe SDK |
-| Google Sign-In | ✅ | ✅ | Uses web client ID |
+| Google Sign-In | ✅ | ✅ | Android uses native OAuth client + Authorization Code/PKCE |
 | Apple Sign-In | ✅ | ❌ | iOS only (hidden on Android) |
 | Biometric Auth | Face ID / Touch ID | Fingerprint | Platform-specific |
 | Multi-language | ✅ | ✅ | EN, AR, RU |
@@ -172,7 +175,7 @@ The Android app has **full feature parity** with iOS (aligned February 11, 2026)
 
 ### Authentication
 
-- **Google Sign-In**: Works on Android using web client ID
+- **Google Sign-In**: Works on Android using the Android OAuth client ID and Authorization Code + PKCE flow. Do not use the web implicit `id_token` flow for standalone Android builds.
 - **Apple Sign-In**: Not available on Android (button hidden automatically)
 - **Biometric**: Uses fingerprint scanner via `expo-local-authentication`
 
@@ -210,7 +213,7 @@ All deep links route to **native screens** (not WebView). The deep link handler 
 
 ### Permissions
 
-Required permissions (9 total, updated Feb 11, 2026):
+Required permissions (8 declared permissions plus blocked broad media permissions, updated May 31, 2026):
 
 | Permission | Purpose | Android Version |
 |------------|---------|-----------------|
@@ -218,11 +221,16 @@ Required permissions (9 total, updated Feb 11, 2026):
 | `VIBRATE` | Haptic feedback, notification alerts | All |
 | `RECORD_AUDIO` | Voice search | All |
 | `CAMERA` | AI Skin Analysis, profile photo | All |
-| `READ_MEDIA_IMAGES` | Photo library for profile picture | 13+ (API 33) |
 | `POST_NOTIFICATIONS` | Push notifications for order updates | 13+ (API 33) |
 | `USE_BIOMETRIC` | Fingerprint authentication | 9+ (API 28) |
 | `USE_FINGERPRINT` | Legacy fingerprint (older devices) | 6+ (API 23) |
 | `ACCESS_NETWORK_STATE` | Network connectivity checks | All |
+
+`READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` are intentionally blocked. Android profile-photo selection uses the system photo picker through `expo-image-picker` without requesting broad media-library access, which keeps Android 13+ behavior aligned with Google Play's scoped media permission expectations.
+
+### Android OS / SDK Target
+
+The app is on Expo SDK 54 / React Native 0.81. React Native 0.81 targets Android 16 (API 36) by default, so no checked-in Gradle override is required in this managed Expo project. If Google Play ever reports a lower target SDK for an uploaded artifact, add `expo-build-properties` and explicitly set `android.compileSdkVersion` / `android.targetSdkVersion` to `36`.
 
 ### Notification Channels
 
@@ -241,12 +249,12 @@ Configured in `contexts/NotificationContext.js` and `services/pushNotificationsS
 
 ### Recommended Emulator Configuration
 
-For optimal performance, use **Android 14 (API 34)** instead of preview versions:
+For day-to-day performance, use **Android 15 (API 35)** or **Android 16 (API 36)** stable system images instead of preview/canary images:
 
 | Setting | Recommended Value |
 |---------|-------------------|
 | **Device** | Pixel 6 |
-| **System Image** | Android 14 (API 34) - Google APIs ARM64 |
+| **System Image** | Android 15/16 - Google APIs ARM64 |
 | **RAM** | 4096 MB |
 | **GPU** | Host (hardware acceleration) |
 

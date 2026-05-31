@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useOrders } from '../../contexts/OrdersContext';
@@ -22,6 +23,8 @@ export default function TabLayout() {
   const cartCount = getTotalItems();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const androidBottomInset = Platform.OS === 'android' ? Math.max(insets.bottom, 0) : 0;
 
   // Always use Ionicons for tab icons.
   // This avoids device/build-specific SF Symbols rendering issues that can appear as "triangles".
@@ -58,6 +61,10 @@ export default function TabLayout() {
                 shadowRadius: 8,
               }
             : styles.androidTabBar,
+          Platform.OS === 'android' && {
+            height: 60 + androidBottomInset,
+            paddingBottom: 8 + androidBottomInset,
+          },
           isRTL && { flexDirection: 'row-reverse' },
         ],
         tabBarActiveTintColor: '#dc2626',

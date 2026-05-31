@@ -548,3 +548,66 @@ This brings back the same remote video overlay path as before: cached/fresh `/ap
 - Website config restored in `cosmetics-website` commit `14b1a2d8`.
 - Live uncached endpoint verified after Vercel deploy:
   - `https://genosys.ae/api/mobile/splash-config?ts=<now>` returns `{"enabled":true,...}`.
+
+---
+
+## 2026-05-03 Update #7 — Restore Logo Cover During Video Warm-up
+
+### Symptom
+
+User reported the launch sequence as:
+
+> "white logo then white screen and then splash starts"
+
+The video splash itself starts normally, but the plain white JS cover introduced in OTA #4 creates a logo-less gap between the native LaunchScreen and the WebView video.
+
+### Root Cause
+
+`components/VideoLaunchScreen.js` intentionally used a plain white cover while the WebView video buffers. That removed JS-logo repaint flicker, but it also made the startup sequence feel broken:
+
+1. Native iOS LaunchScreen: white + logo.
+2. JS `VideoLaunchScreen` cover: plain white, no logo.
+3. WebView video: splash starts.
+
+### Change
+
+Restored a static logo cover, but with native-build-aware asset selection:
+
+- Build `<83` uses frozen `assets/splash-launchscreen-binary82.png`, matching the launch image baked into App Store build 82.
+- Build `>=83` uses `assets/splash.png`, matching the synced native launch image in build 83+.
+- The cover still hides WebView bootstrap frames and remains visible until `playing + 650ms`.
+- The video is revealed only after playback is already stable, preserving the startup hardening from OTA #3.
+
+Expected sequence:
+
+1. Native LaunchScreen: white + matching logo.
+2. JS cover: same white + matching logo.
+3. WebView video is already playing behind the cover.
+4. Cover hides, splash video starts visibly.
+
+### Verification
+
+- `npm run verify:splash` passed.
+- `ReadLints` reported no errors for `components/VideoLaunchScreen.js` and `scripts/verify-splash-sync.js`.
+
+### OTA
+
+- Published to current runtime:
+  - Branch: `production`
+  - Runtime: `1.10.1`
+  - Platforms: iOS, Android
+  - Update group ID: `e9015ee6-5aaa-4212-b4e0-d93dbfe86c88`
+  - Android update ID: `019dee79-e1b7-7b92-b254-84b3942a7790`
+  - iOS update ID: `019dee79-e1b7-749d-ae96-f7b3bb621276`
+  - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/e9015ee6-5aaa-4212-b4e0-d93dbfe86c88
+
+- Published to older installed runtime:
+  - Branch: `production`
+  - Runtime: `1.10.0`
+  - Platforms: iOS, Android
+  - Update group ID: `788089f1-3b8b-4e57-9829-2025e9cd358b`
+  - Android update ID: `019dee7a-b49b-7ebe-9bd9-c2f08a2b84cc`
+  - iOS update ID: `019dee7a-b49b-7b21-8980-4eb79e38aa78`
+  - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/788089f1-3b8b-4e57-9829-2025e9cd358b
+
+Note: source `app.json` was restored to runtime `1.10.1` after publishing the compatibility OTA for runtime `1.10.0`.

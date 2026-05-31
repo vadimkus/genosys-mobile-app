@@ -242,10 +242,12 @@ export default function EditProfileScreen() {
 
   const pickImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.libraryPermission'));
-        return;
+      if (Platform.OS !== 'android') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(t('editProfile.permissionNeeded'), t('editProfile.libraryPermission'));
+          return;
+        }
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({

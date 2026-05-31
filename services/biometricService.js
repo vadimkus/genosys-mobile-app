@@ -5,7 +5,7 @@
 
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('biometric');
@@ -33,7 +33,7 @@ export const checkBiometricSupport = async () => {
         case LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION:
           return 'Face ID';
         case LocalAuthentication.AuthenticationType.FINGERPRINT:
-          return 'Touch ID / Fingerprint';
+          return Platform.OS === 'ios' ? 'Touch ID' : 'Fingerprint';
         case LocalAuthentication.AuthenticationType.IRIS:
           return 'Iris Recognition';
         default:
@@ -111,9 +111,10 @@ export const enableBiometricAuth = async (emailOrPayload, password) => {
     }
 
     if (!support.isEnrolled) {
+      const setupLabel = Platform.OS === 'ios' ? 'Face ID or Touch ID' : 'fingerprint or biometric authentication';
       return {
         success: false,
-        error: 'No biometric data is enrolled on this device. Please set up Face ID or Touch ID in Settings.'
+        error: `No biometric data is enrolled on this device. Please set up ${setupLabel} in Settings.`
       };
     }
 

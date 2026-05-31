@@ -1,7 +1,7 @@
 # Genosys Mobile App
 
 [![App Store](https://img.shields.io/badge/App%20Store-Live-blue?logo=apple)](https://apps.apple.com/app/id6756648064)
-[![Version](https://img.shields.io/badge/version-1.3.0-green)](https://apps.apple.com/app/id6756648064)
+[![Version](https://img.shields.io/badge/version-1.10.1-green)](https://apps.apple.com/app/id6756648064)
 
 A production-ready **iOS and Android** e-commerce app for GENOSYS Professional skincare, built with React Native (Expo) featuring Apple Store design system aesthetics.
 
@@ -9,7 +9,7 @@ A production-ready **iOS and Android** e-commerce app for GENOSYS Professional s
 
 ## Features
 
-### AI-Powered (v1.3.0)
+### AI-Powered
 - **AI Skin Analysis**: Take a selfie for instant AI assessment with GPT-4 Vision
 - **Health Score**: Get a 1-10 skin health rating with concerns and analysis
 - **Personalized Routine**: Custom AM/PM skincare routines based on your skin

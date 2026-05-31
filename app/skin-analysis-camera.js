@@ -18,7 +18,7 @@ import {
   Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -54,6 +54,8 @@ function cleanProductText(text) {
 export default function SkinAnalysisCameraScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const cameraHeaderTop = Math.max(insets.top + 8, Platform.OS === 'ios' ? 50 : 10);
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [capturing, setCapturing] = useState(false);
@@ -439,7 +441,7 @@ export default function SkinAnalysisCameraScreen() {
   // Camera view (main)
   return (
     <SafeAreaView style={styles.cameraContainer} edges={['top']}>
-      <View style={[styles.header, styles.headerOverCamera, isRTL && styles.headerRTL]}>
+      <View style={[styles.header, styles.headerOverCamera, { top: cameraHeaderTop }, isRTL && styles.headerRTL]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
           <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#ffffff" />
         </TouchableOpacity>
@@ -529,7 +531,7 @@ const styles = StyleSheet.create({
   },
   headerOverCamera: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 10,
+    top: 10,
     left: 0,
     right: 0,
     backgroundColor: 'transparent',

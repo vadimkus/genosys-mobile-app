@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, StatusBar, Animated, Pressable } from 'react-native';
+import { StyleSheet, StatusBar, Animated, Pressable, Image, Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
+import Constants from 'expo-constants';
 import { WebView } from 'react-native-webview';
 
 const CACHE_DIR = `${FileSystem.cacheDirectory}splash/`;
 const CACHE_FILE = `${CACHE_DIR}splash.mp4`;
 const META_FILE = `${CACHE_DIR}splash-meta.json`;
+const SPLASH_IMAGE_CURRENT = require('../assets/splash.png');
+const SPLASH_IMAGE_BINARY_82 = require('../assets/splash-launchscreen-binary82.png');
+
+function getNativeBuildNumber() {
+  const configuredBuild = Constants.expoConfig?.[Platform.OS];
+  const build = Number(Constants.nativeBuildVersion || configuredBuild?.buildNumber || configuredBuild?.versionCode || 0);
+  return Number.isFinite(build) ? build : 0;
+}
 
 async function ensureCacheDir() {
   const info = await FileSystem.getInfoAsync(CACHE_DIR);
@@ -62,11 +71,13 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   });
   const launchConfig = launchConfigRef.current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  // Plain white cover starts fully opaque and hides WebView startup until
-  // video playback is stable. We intentionally do NOT render the logo here:
-  // the native iOS LaunchScreen already shows it, and rendering a second JS
-  // logo layer caused visible double-blinks on production binary 82.
+  // Static cover starts fully opaque and hides WebView startup until video
+  // playback is stable. Use the same asset as the native LaunchScreen for the
+  // running binary so startup reads as one continuous white logo before video.
   const splashCoverOpacity = useRef(new Animated.Value(1)).current;
+  const splashCoverImage = useMemo(() => (
+    getNativeBuildNumber() >= 83 ? SPLASH_IMAGE_CURRENT : SPLASH_IMAGE_BINARY_82
+  ), []);
   const [videoSource] = useState(() => (
     launchConfig.localSource || (launchConfig.videoUrl ? { uri: launchConfig.videoUrl } : null)
   ));
@@ -78,6 +89,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   const revealTimeoutRef = useRef(null);
   const onDoneRef = useRef(onDone);
   const sourceUri = typeof videoSource === 'number' ? null : videoSource?.uri;
+  const coverRevealDelayMs = Platform.OS === 'android' ? 250 : 650;
 
   useEffect(() => {
     onDoneRef.current = onDone;
@@ -151,11 +163,11 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         duration: 0,
         useNativeDriver: true,
       }).start();
-    }, 650);
+    }, coverRevealDelayMs);
     return () => {
       if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
     };
-  }, [playbackStarted, splashCoverOpacity]);
+  }, [coverRevealDelayMs, playbackStarted, splashCoverOpacity]);
 
   useEffect(() => {
     if (playbackStarted) return undefined;
@@ -283,14 +295,20 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         </Pressable>
       ) : null}
 
-      {/* Layer 2 (top): plain white cover. The native LaunchScreen owns the
-          logo; this JS layer only prevents WebView bootstrap frames from being
-          visible before the video is already moving. Rendering another logo
-          here caused repeated logo blinks on production iOS. */}
+      {/* Layer 2 (top): native-matched logo cover. It prevents the logo-less
+          white gap while WebView buffers, then hard-cuts to already-moving
+          video after playback is stable. */}
       <Animated.View
         pointerEvents="none"
         style={[styles.splashCover, { opacity: splashCoverOpacity }]}
-      />
+      >
+        <Image
+          source={splashCoverImage}
+          style={styles.splashCoverImage}
+          resizeMode="contain"
+          fadeDuration={0}
+        />
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -311,5 +329,12 @@ const styles = StyleSheet.create({
   splashCover: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashCoverImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
 });

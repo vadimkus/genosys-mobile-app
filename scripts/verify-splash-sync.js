@@ -2,16 +2,15 @@
  * verify-splash-sync.js
  *
  * Guards against the splash double-blink regression. The cold-start splash
- * sequence relies on a native splash and JS overlay sharing the same white
- * background:
+ * sequence relies on a native splash and JS overlay sharing the same image and
+ * white background:
  *
  *   iOS LaunchScreen.storyboard → expo splash view → JS VideoLaunchScreen cover
  *
- * If any of these layers paints the wrong color the user sees a flash on cold
- * launch. Native image assets still need to stay synchronized for binary
- * builds, but JS deliberately does NOT render a logo cover anymore: the native
- * LaunchScreen owns the logo, and a second JS logo layer caused repeated
- * logo blinks in production.
+ * If any of these layers paints the wrong color or mismatched image the user
+ * sees a flash on cold launch. Native image assets need to stay synchronized
+ * for binary builds, and the JS logo cover must choose the asset matching the
+ * running native build before revealing the video.
  *
  *   1. assets/splash.png                                  ← source of truth in app.json
  *   2. ios/GenosysUAE/.../SplashScreenLegacy.imageset/    ← what iOS LaunchScreen draws
@@ -67,6 +66,8 @@ const launchScreenComponent = path.join(
   'components',
   'VideoLaunchScreen.js',
 )
+const legacyBinary82SplashPath = path.join(root, 'assets', 'splash-launchscreen-binary82.png')
+const legacyBinary82SplashHash = '8344b5ff5bbc0f05fe68b18e3bdc4896'
 
 function fail(msg) {
   console.error(`\n✗ verify-splash-sync: ${msg}\n`)
@@ -142,15 +143,31 @@ if (!isWhite) {
   )
 }
 
-// 4. JS overlay must NOT render a logo cover. The native LaunchScreen already
-//    shows the logo; the JS layer should only be a plain white veil over
-//    WebView bootstrap frames. Rendering another splash image here caused the
-//    production "white logo blinks twice" regression.
+// 4. JS overlay renders a logo cover only from native-matched assets. Build 82
+//    needs the frozen legacy image because that binary shipped a stale
+//    LaunchScreen raster. Build 83+ uses assets/splash.png, which is enforced
+//    below to match the native imageset.
 const componentSource = fs.readFileSync(launchScreenComponent, 'utf8')
-if (/require\(['"]\.\.\/assets\/splash(?:-launchscreen-binary82)?\.png['"]\)/.test(componentSource)) {
+if (!/require\(['"]\.\.\/assets\/splash\.png['"]\)/.test(componentSource)) {
   fail(
-    `${path.relative(root, launchScreenComponent)} require()s a splash logo image for the JS cover. ` +
-      `Keep the JS cover plain white; otherwise the native logo and JS logo can blink against each other.`,
+    `${path.relative(root, launchScreenComponent)} must require ../assets/splash.png for build 83+ JS cover parity.`,
+  )
+}
+if (!/require\(['"]\.\.\/assets\/splash-launchscreen-binary82\.png['"]\)/.test(componentSource)) {
+  fail(
+    `${path.relative(root, launchScreenComponent)} must require ../assets/splash-launchscreen-binary82.png for build 82 JS cover parity.`,
+  )
+}
+if (!/nativeBuildVersion/.test(componentSource) || !/>=\s*83/.test(componentSource)) {
+  fail(
+    `${path.relative(root, launchScreenComponent)} must choose current splash only for native build >= 83.`,
+  )
+}
+
+const legacyHash = md5(legacyBinary82SplashPath)
+if (legacyHash !== legacyBinary82SplashHash) {
+  fail(
+    `${path.relative(root, legacyBinary82SplashPath)} hash is ${legacyHash}, expected frozen build-82 hash ${legacyBinary82SplashHash}.`,
   )
 }
 
