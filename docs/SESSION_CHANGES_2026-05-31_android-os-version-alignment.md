@@ -47,3 +47,21 @@ Reviewed the Android side of the Expo mobile app for OS-version behavior, versio
   - Android broad media permissions blocked
   - iOS build `83`
 
+## Google Play AAB Build
+
+- Source pushed to `main`.
+- Commit used for the successful EAS build: `c1762e97b5cfbd9d4fa3a6839f61a92b6e3e7f44`.
+- EAS Android build ID: `242bf2ad-1983-4c97-a256-c0520b769961`.
+- Build profile: `production:android`.
+- Version: `1.10.1`.
+- Android versionCode: `84`.
+- Runtime: `1.10.1`.
+- Artifact downloaded to: `/Users/vadimkus/Desktop/genosys-uae-1.10.1-84.aab`.
+- Downloaded artifact size: ~83 MB.
+
+### Build Notes
+
+- First local build failed because `ANDROID_HOME` / Android SDK was not configured in the shell.
+- First EAS cloud build failed because Sentry source-map upload required `SENTRY_AUTH_TOKEN`.
+- Added `SENTRY_DISABLE_AUTO_UPLOAD=true` to `production:android` in `eas.json`; rerun EAS cloud build succeeded.
+
