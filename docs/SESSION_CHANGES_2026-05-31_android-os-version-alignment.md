@@ -23,6 +23,7 @@ Reviewed the Android side of the Expo mobile app for OS-version behavior, versio
 - `app/(tabs)/_layout.js`: Android tab bar now adds the bottom safe-area inset to height/padding so it does not collide with gesture navigation on edge-to-edge Android builds.
 - `app/skin-analysis-camera.js`: camera header now uses safe-area top inset instead of a hardcoded Android `top: 10`.
 - `services/biometricService.js`: Android biometric copy now says fingerprint/biometric authentication instead of Face ID / Touch ID.
+- `eas.json`: Android production builds now set `SENTRY_DISABLE_AUTO_UPLOAD=true` so missing Sentry upload credentials cannot fail a Google Play bundle build.
 - `docs/build/ANDROID_BUILD_GUIDE.md`: updated Android version, OAuth, media permission, and API 36 notes.
 - `README.md`: updated displayed app version to `1.10.1`.
 
