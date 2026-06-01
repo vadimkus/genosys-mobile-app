@@ -76,6 +76,17 @@ Native follow-up:
 - Android `versionCode` is now `85`.
 - A fresh AAB is required because verified app links are native manifest data.
 
+### v85 Build
+
+- Source commit used for the successful EAS build: `38df70366114e3bb014a34e5a673c268d280ac40`.
+- EAS Android build ID: `aff0748a-2c07-49ab-954c-e3c0342dcb1c`.
+- Build profile: `production:android`.
+- Version: `1.10.1`.
+- Android versionCode: `85`.
+- Runtime: `1.10.1`.
+- Artifact downloaded to: `/Users/vadimkus/Desktop/genosys-uae-1.10.1-85.aab`.
+- Downloaded artifact size: ~83 MB.
+
 ### Build Notes
 
 - First local build failed because `ANDROID_HOME` / Android SDK was not configured in the shell.
