@@ -43,12 +43,13 @@ Replace `TEAM_ID` with the Apple Developer Team ID.
 
 ### Android - Intent Filters
 
-Configured in `app.json` under `android.intentFilters` (updated Feb 11, 2026):
+Configured in `app.json` under `android.intentFilters` (updated Jun 1, 2026):
 
 - **Action**: `VIEW`
 - **Auto-verify**: `true`
-- **Supported paths** (13 total):
-  - `/products/*` (including `www.genosys.ae`)
+- **Verified host**: `genosys.ae`
+- **Supported paths** (20 total):
+  - `/products/*`
   - `/cart`
   - `/orders`
   - `/profile`
@@ -60,8 +61,18 @@ Configured in `app.json` under `android.intentFilters` (updated Feb 11, 2026):
   - `/training`
   - `/chat`
   - `/checkout`
+  - `/track`
+  - `/locations`
+  - `/brand`
+  - `/delivery`
+  - `/faq`
+  - `/partners`
+  - `/about`
+  - `/contact`
 
 **Requirement**: A Digital Asset Links file must be hosted at `https://genosys.ae/.well-known/assetlinks.json`.
+
+`www.genosys.ae` is intentionally not listed for Android App Links because it redirects to `genosys.ae`; Google Digital Asset Links requires `/.well-known/assetlinks.json` to be served directly without redirects. The app's URL parser can still route `www.genosys.ae` URLs if they arrive via the custom scheme or other app entry points.
 
 ### Custom URL Scheme
 

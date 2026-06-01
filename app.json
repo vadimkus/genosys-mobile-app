@@ -55,7 +55,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 84,
+      "versionCode": 85,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -87,17 +87,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/products"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/cart"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/cart"
             },
             {
@@ -107,17 +97,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/orders"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/profile"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/profile"
             },
             {
@@ -127,17 +107,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/favorites"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/skin-recommendation"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/skin-recommendation"
             },
             {
@@ -147,17 +117,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/skin-analysis"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/blog"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/blog"
             },
             {
@@ -167,17 +127,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/bundle-builder"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/training"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/training"
             },
             {
@@ -187,17 +137,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/chat"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/checkout"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/checkout"
             },
             {
@@ -207,17 +147,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/track"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/locations"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/locations"
             },
             {
@@ -227,17 +157,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/brand"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/delivery"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/delivery"
             },
             {
@@ -247,17 +167,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/faq"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/partners"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/partners"
             },
             {
@@ -267,17 +177,7 @@
             },
             {
               "scheme": "https",
-              "host": "www.genosys.ae",
-              "pathPrefix": "/about"
-            },
-            {
-              "scheme": "https",
               "host": "genosys.ae",
-              "pathPrefix": "/contact"
-            },
-            {
-              "scheme": "https",
-              "host": "www.genosys.ae",
               "pathPrefix": "/contact"
             }
           ],
