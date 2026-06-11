@@ -11,6 +11,7 @@
 | Doc | Description |
 |-----|-------------|
 | [Main README](../README.md) | Project overview, install, and run |
+| [iOS Full Audit](./SESSION_CHANGES_2026-06-11_ios-full-audit.md) | **iOS audit (read-only)** — CRITICAL: AASA missing on genosys.ae (Universal Links broken); iOS binary behind OTA runtime (ship 1.10.2/84); www applinks can't verify; unused sfsymbols dep; Apple Pay entitlement unused. |
 | [Android Full Audit](./SESSION_CHANGES_2026-06-11_android-full-audit.md) | **Android audit & hygiene** — expo packages aligned to SDK 54 patches, critical/high npm vulns cleared, stale local `android/` regenerated (www App Links gone), tracked `.pid` junk removed, expo-doctor now 17/17. No runtime code changes. |
 | [.env.backup Scrub](./SESSION_CHANGES_2026-06-10_env-backup-scrub.md) | **Security** — git-tracked `.env.backup` (live website DB credentials) untracked, `.gitignore` hardened, and all env files purged from full git history via `filter-repo` force-push. No app impact; credential rotation pending; other clones must re-clone. |
 | [Android Play Release v85](./SESSION_CHANGES_2026-06-01_android-play-v85-release.md) | **Google Play v85 release record** — documents the Play Console deep-link warning, website `assetlinks.json` fix, Android `www` App Links removal, EAS build `aff0748a`, Desktop AAB path, upload confirmation, and release notes. |
