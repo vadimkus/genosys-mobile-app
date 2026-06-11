@@ -1,6 +1,6 @@
 {
   "name": "genosys-mobile-app",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "main": "expo-router/entry",
   "expo": {
     "install": {
