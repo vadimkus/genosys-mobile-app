@@ -234,7 +234,8 @@
           "organization": "genosys",
           "project": "mobile-app"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

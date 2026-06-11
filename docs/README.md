@@ -11,6 +11,7 @@
 | Doc | Description |
 |-----|-------------|
 | [Main README](../README.md) | Project overview, install, and run |
+| [Android Full Audit](./SESSION_CHANGES_2026-06-11_android-full-audit.md) | **Android audit & hygiene** — expo packages aligned to SDK 54 patches, critical/high npm vulns cleared, stale local `android/` regenerated (www App Links gone), tracked `.pid` junk removed, expo-doctor now 17/17. No runtime code changes. |
 | [.env.backup Scrub](./SESSION_CHANGES_2026-06-10_env-backup-scrub.md) | **Security** — git-tracked `.env.backup` (live website DB credentials) untracked, `.gitignore` hardened, and all env files purged from full git history via `filter-repo` force-push. No app impact; credential rotation pending; other clones must re-clone. |
 | [Android Play Release v85](./SESSION_CHANGES_2026-06-01_android-play-v85-release.md) | **Google Play v85 release record** — documents the Play Console deep-link warning, website `assetlinks.json` fix, Android `www` App Links removal, EAS build `aff0748a`, Desktop AAB path, upload confirmation, and release notes. |
 | [Native Splash Video Restore](./SESSION_CHANGES_2026-04-28_native-splash-video-restore.md) | **TestFlight splash restore** — remote `Splash.mp4` now mounts on first JS render, avoids cached/fresh config remount flicker, and uses a WebView video fallback with launch fail-safes. Published OTA to runtime `1.10.0`. |
