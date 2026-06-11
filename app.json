@@ -22,8 +22,7 @@
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
-        "applinks:genosys.ae",
-        "applinks:www.genosys.ae"
+        "applinks:genosys.ae"
       ],
       "entitlements": {
         "com.apple.developer.in-app-payments": [
@@ -40,7 +39,7 @@
         "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account.",
         "NSSpeechRecognitionUsageDescription": "Genosys uses speech recognition for voice search to help you find products quickly.",
         "NSMicrophoneUsageDescription": "Genosys uses the microphone for voice search to help you find products by speaking.",
-        "NSCameraUsageDescription": "Genosys uses the camera to take a profile photo.",
+        "NSCameraUsageDescription": "Genosys uses the camera to take a profile photo and to capture skin photos for the in-app skin analysis feature.",
         "NSPhotoLibraryUsageDescription": "Genosys uses your photo library to let you choose a profile photo.",
         "NSPhotoLibraryAddUsageDescription": "Genosys can save your profile photo to your photo library.",
         "ITSAppUsesNonExemptEncryption": false,

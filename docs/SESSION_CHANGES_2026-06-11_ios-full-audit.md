@@ -20,6 +20,10 @@ Full audit of the iOS app (`ae.genosys.app`, Expo SDK 54). Read-only — no code
 1. **iOS Universal Links are broken — AASA file missing on genosys.ae.**
    `https://genosys.ae/.well-known/apple-app-site-association` and `/apple-app-site-association` both return the site's 404 page. The Android equivalent (`assetlinks.json`) exists and works. Result: `genosys.ae` links never open the iOS app — they open Safari. The app declares `applinks:genosys.ae` in `associatedDomains`, so the entitlement is wasted until the website serves the AASA JSON (needs `appID: <TEAMID>.ae.genosys.app` + paths, `application/json` content type — Next.js needs an explicit route or headers config for the extensionless file).
 
+   **UPDATE (same day, follow-up fix):** AASA deployed to genosys.ae (Team ID `2842PLB7CS` from EAS credentials) and verified live on Apple's CDN — see website repo doc `SESSION_CHANGES_2026-06-11_IOS_UNIVERSAL_LINKS_AASA.md`.
+
+   **ESCALATION discovered while fixing:** the shipped iOS binary has **no associated-domains entitlement at all**. `ios/` is a tracked bare project (since Dec 2025; no `.easignore`; the production EAS profile never runs `expo prebuild`), and `ios/GenosysUAE/GenosysUAE.entitlements` never contained `com.apple.developer.associated-domains` — `app.json`'s `ios.associatedDomains` is ignored for bare iOS builds. So AASA alone does not light up Universal Links for current users; **a new iOS binary is required**. Entitlement added to the tracked entitlements file in this session. Note the same applies to the Apple Pay entitlement (`in-app-payments` was dropped from the entitlements file at some point) and any future `app.json`-only iOS config change.
+
 ### HIGH
 
 2. **iOS binary is behind and will stop receiving OTA updates.**
@@ -44,6 +48,15 @@ Full audit of the iOS app (`ae.genosys.app`, Expo SDK 54). Read-only — no code
 
 ## Recommended order of work
 
-1. **Website:** serve AASA at `/.well-known/apple-app-site-association` (fixes Universal Links for the already-shipped app — no app release needed since the domain entitlement is already in build 82).
-2. **App:** remove `www` from `associatedDomains`, broaden camera string, drop sfsymbols, then ship iOS 1.10.2 (build 84) so iOS rejoins the OTA runtime.
-3. Decide Apple Pay: implement or remove entitlement.
+1. **Website:** serve AASA at `/.well-known/apple-app-site-association`. ✅ DONE (live + on Apple CDN)
+2. **App:** add associated-domains entitlement to the tracked `ios/` project (required — see escalation above), remove `www` from `app.json` `associatedDomains`, broaden camera string, drop sfsymbols. ✅ DONE this session
+3. **Ship iOS 1.10.2 (build 84)** — now required both for Universal Links (entitlement) and to rejoin the OTA runtime. ⏳ PENDING
+4. Decide Apple Pay: implement or drop. (The entitlement is currently declared only in `app.json`, which bare iOS builds ignore — effectively not shipped.) ⏳ PENDING DECISION
+
+## Fixes applied in this session (follow-up to the read-only audit)
+
+- `ios/GenosysUAE/GenosysUAE.entitlements`: added `com.apple.developer.associated-domains` = `applinks:genosys.ae`
+- `ios/GenosysUAE/Info.plist`: camera usage string now covers skin-analysis capture
+- `app.json`: removed unverifiable `applinks:www.genosys.ae`; camera string updated (kept in sync even though bare builds use the plist)
+- Removed unused `react-native-sfsymbols` dependency, its `react-native.config.js` Android autolink exclusion (file deleted — that was its only content), and its expo-doctor exclusion
+- Verified after changes: tsc clean, all release smokes pass, expo-doctor 17/17, iOS production bundle exports cleanly, plists lint OK
