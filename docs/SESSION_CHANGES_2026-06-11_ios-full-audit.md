@@ -51,7 +51,7 @@ Full audit of the iOS app (`ae.genosys.app`, Expo SDK 54). Read-only — no code
 1. **Website:** serve AASA at `/.well-known/apple-app-site-association`. ✅ DONE (live + on Apple CDN)
 2. **App:** add associated-domains entitlement to the tracked `ios/` project (required — see escalation above), remove `www` from `app.json` `associatedDomains`, broaden camera string, drop sfsymbols. ✅ DONE this session
 3. **Ship iOS 1.10.2 (build 84)** — now required both for Universal Links (entitlement) and to rejoin the OTA runtime. ⏳ PENDING
-4. Decide Apple Pay: implement or drop. (The entitlement is currently declared only in `app.json`, which bare iOS builds ignore — effectively not shipped.) ⏳ PENDING DECISION
+4. Decide Apple Pay: implement or drop. ✅ DECIDED — Apple Pay already works for users via Stripe hosted Checkout (wallets enabled in Stripe Dashboard; confirmed working by owner). The never-shipped native entitlement and the entirely unused `@stripe/stripe-react-native` package (zero JS usage; checkout opens Stripe in the browser) were removed from `app.json` and dependencies. Native PaymentSheet can be revisited only if checkout ever moves in-app.
 
 ## Fixes applied in this session (follow-up to the read-only audit)
 

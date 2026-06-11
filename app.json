@@ -24,11 +24,6 @@
       "associatedDomains": [
         "applinks:genosys.ae"
       ],
-      "entitlements": {
-        "com.apple.developer.in-app-payments": [
-          "merchant.ae.genosys.app"
-        ]
-      },
       "splash": {
         "image": "./assets/splash.png",
         "resizeMode": "contain",
@@ -197,12 +192,6 @@
       "expo-secure-store",
       "expo-font",
       "expo-apple-authentication",
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.ae.genosys.app"
-        }
-      ],
       "expo-speech-recognition",
       [
         "expo-notifications",
