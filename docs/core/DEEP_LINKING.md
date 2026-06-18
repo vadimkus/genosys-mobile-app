@@ -122,17 +122,31 @@ Locale prefixes (`/en/`, `/ar/`, `/ru/`) are automatically stripped before routi
 
 | File | Purpose |
 |---|---|
-| `utils/deepLinking.js` | URL parsing, route mapping, listener setup |
-| `app/_layout.js` | Initializes the deep link listener at app startup |
+| `app/+native-intent.js` | **Primary handler.** Rewrites incoming external deep/universal links to valid Expo Router paths before resolution (`redirectSystemPath`). |
+| `utils/deepLinking.js` | `handleDeepLink()` — used for **in-app** link taps (chat / chat button), not external entry. |
+| `app/AuthWrapper.js` | Declarative auth gating (redirects unauthenticated users away from protected routes). |
 | `app.json` | iOS `associatedDomains`, Android `intentFilters`, custom `scheme` |
 
 ---
 
 ## How It Works
 
-1. **Cold start**: `Linking.getInitialURL()` captures the URL that launched the app. After a 500ms delay (to allow navigation to mount), it routes to the matched screen.
-2. **Background/foreground**: `Linking.addEventListener('url', ...)` handles URLs received while the app is already running.
-3. **Fallback**: Any `genosys.ae` URL that doesn't match a known route is opened in the in-app WebView.
+Expo Router resolves the launching URL against the file-based route tree. Because
+the website uses **plural** product URLs (`/products/{id}`) while the app route is
+**singular** (`app/product/[id].js`), the raw universal link does not match and
+Expo Router renders its built-in **"Unmatched Route"** screen.
+
+`app/+native-intent.js` fixes this: Expo Router calls `redirectSystemPath` for both
+cold-start (`initial: true`) and warm (`initial: false`) links, passing the full URL.
+The handler maps the web URL shape to the real route (e.g. `/products/{id}` →
+`/product/{id}`, `/cart` → `/(tabs)/bag`, `/track/{n}` → `/profile/orders/{n}`) and
+returns the rewritten path. Any other `genosys.ae` content page falls back to the
+in-app WebView so links never dead-end.
+
+> **Historical note (Jun 18, 2026):** External links previously used a custom
+> `Linking` listener (`setupDeepLinkListener`) in `app/_layout.js`. That listener
+> lost the race against Expo Router's built-in linking, which matched `products/{id}`
+> first and showed "Unmatched Route". It was replaced by `+native-intent.js`.
 
 ---
 
@@ -141,7 +155,9 @@ Locale prefixes (`/en/`, `/ar/`, `/ru/`) are automatically stripped before routi
 ```bash
 # iOS Simulator
 xcrun simctl openurl booted "genosys://product/42"
-xcrun simctl openurl booted "https://genosys.ae/products/42"
+xcrun simctl openurl booted "https://genosys.ae/products/42"   # plural web URL (was "Unmatched Route" before +native-intent)
+xcrun simctl openurl booted "https://genosys.ae/products/29"
+xcrun simctl openurl booted "https://genosys.ae/products/32"
 
 # Android Emulator
 adb shell am start -a android.intent.action.VIEW -d "genosys://product/42"

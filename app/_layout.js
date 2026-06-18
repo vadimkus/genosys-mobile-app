@@ -16,7 +16,6 @@ import ForceUpdateScreen from '../components/ForceUpdateScreen';
 import VideoLaunchScreen from '../components/VideoLaunchScreen';
 import UpdateBanner from '../components/UpdateBanner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { setupDeepLinkListener } from '../utils/deepLinking';
 import AUTH_CONFIG from '../config/auth';
 import { checkForUpdates } from '../config/updates';
 import { initSentry } from '../config/sentry';
@@ -75,10 +74,9 @@ export default function RootLayout() {
     initSentry();
   }, []);
 
-  useEffect(() => {
-    const cleanup = setupDeepLinkListener();
-    return cleanup;
-  }, []);
+  // External deep links / universal links are routed by `app/+native-intent.js`
+  // (which rewrites web URL shapes like `/products/<id>` to the real route),
+  // and auth gating is handled declaratively by AuthWrapper.
 
   useEffect(() => {
     let cancelled = false;
