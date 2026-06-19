@@ -318,6 +318,62 @@ export async function submitCardOrder(orderData) {
 }
 
 /**
+ * Create a Stripe PaymentIntent for the native Payment Sheet (card / Apple Pay /
+ * Google Pay / Link). Persists/updates the order server-side (PENDING) exactly
+ * like submitCardOrder, but returns a clientSecret to confirm in-app instead of
+ * a hosted-checkout URL.
+ *
+ * @param {Object} orderData - same shape as submitCardOrder
+ * @returns {Promise<{success:boolean, orderId?:string, orderNumber?:string, clientSecret?:string, error?:string}>}
+ */
+export async function createCardPaymentSheetIntent(orderData) {
+  if (!Array.isArray(orderData?.items) || orderData.items.length === 0) {
+    return { success: false, error: 'Order must contain at least one item' };
+  }
+
+  log.debug('Creating card Payment Sheet intent', { orderNumber: orderData?.orderNumber });
+
+  try {
+    const intentPayload = {
+      orderNumber: orderData.orderNumber,
+      customer: {
+        name: orderData.customerName,
+        email: orderData.customerEmail,
+        phone: orderData.customerPhone,
+        address: orderData.customerAddress,
+      },
+      emirate: orderData.emirate,
+      items: orderData.items.map(buildMobileOrderItemPayload),
+      orderNotes: orderData.orderNotes || '',
+      locale: orderData.locale || 'en',
+    };
+
+    const result = await postMobileJson(
+      `${API_BASE_URL}/payments/applepay/intent`,
+      intentPayload,
+      orderData,
+      'card'
+    );
+
+    const clientSecret = result?.clientSecret || result?.client_secret || '';
+    if (!result?.success || !clientSecret) {
+      log.warn('Payment Sheet intent missing clientSecret', { success: result?.success });
+      return { success: false, error: getSafeOrderErrorMessage('card') };
+    }
+
+    return {
+      success: true,
+      orderId: result.orderId || result.id || '',
+      orderNumber: result.orderNumber || orderData.orderNumber,
+      clientSecret,
+    };
+  } catch (error) {
+    log.error('Payment Sheet intent creation failed', error?.message || error);
+    return { success: false, error: getSafeOrderErrorMessage('card') };
+  }
+}
+
+/**
  * Generate professional order number
  * @returns {string} Professional order number (GEN + YYMMDD + 4-digit sequence)
  */
@@ -331,12 +387,17 @@ export function generateOrderNumber() {
   return `GEN${year}${month}${day}${seq}${entropy}`;
 }
 
-// Note: Apple Pay was removed due to Apple's high in-app payment fees (15-30%)
-// Use Card payment via Stripe checkout instead - this redirects to web and avoids the IAP fees
+// Card / Apple Pay / Google Pay / Link are handled by the native Stripe Payment
+// Sheet via createCardPaymentSheetIntent (PaymentIntent confirmed in-app).
+// Note: Apple's 15-30% IAP commission does NOT apply here — these are physical
+// goods, which Apple requires to use standard payment processing (no Apple cut).
+// getPaymentUrlForExistingOrder remains the hosted fallback for retrying older
+// pending orders.
 
 export default {
   submitCODOrder,
   submitCardOrder,
+  createCardPaymentSheetIntent,
   getPaymentUrlForExistingOrder,
   generateOrderNumber,
 };

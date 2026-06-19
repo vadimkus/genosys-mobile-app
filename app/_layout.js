@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { LogBox, Platform } from 'react-native';
 import Constants from 'expo-constants';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -169,8 +170,13 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <LocalizationProvider>
+    <StripeProvider
+      publishableKey={AUTH_CONFIG.STRIPE.publishableKey}
+      merchantIdentifier={AUTH_CONFIG.STRIPE.merchantIdentifier}
+      urlScheme={AUTH_CONFIG.STRIPE.urlScheme}
+    >
+      <AuthProvider>
+        <LocalizationProvider>
         <AnimationProvider>
           <NotificationProvider>
             <FavoritesProvider>
@@ -206,6 +212,7 @@ export default function RootLayout() {
           </NotificationProvider>
         </AnimationProvider>
       </LocalizationProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </StripeProvider>
   );
 }

@@ -102,6 +102,23 @@ export const AUTH_CONFIG = {
     iosUrlScheme: 'com.googleusercontent.apps.998688135686-qmhvfcksth50r9ukk0pefqu1r7cqil73',
   },
   
+  // Stripe (native Payment Sheet).
+  // The publishable key is a public client identifier (already shipped in the
+  // website bundle), safe to embed with an env override — same pattern as API_KEY.
+  STRIPE: {
+    publishableKey: env(
+      'EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+      'pk_live_51MTmj1CtEeBBw5M6j2Hi06bN4XJQ2yaqYtcubD4yVAFhgQcU0qY9e0X6Ye0gSJbR2utMSKyQsrfk69wNcty17uYM00GiEoLx1a'
+    ),
+    // Apple Pay merchant identifier (created in Apple Developer; must match the
+    // @stripe/stripe-react-native config plugin in app.json).
+    merchantIdentifier: env('EXPO_PUBLIC_STRIPE_MERCHANT_ID', 'merchant.ae.genosys.app'),
+    merchantCountryCode: 'AE',
+    merchantDisplayName: 'Genosys UAE',
+    // Used for 3-D Secure / redirect return; matches app.json "scheme".
+    urlScheme: 'genosys',
+  },
+
   // App Settings
   TOKEN_STORAGE_KEY: '@user',
   SESSION_TIMEOUT: 30 * 24 * 60 * 60 * 1000, // 30 days (matches backend JWT expiration)

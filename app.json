@@ -3,7 +3,7 @@
     "name": "Genosys UAE",
     "owner": "vadimkus",
     "slug": "genosys-mobile-app",
-    "version": "1.10.2",
+    "version": "1.10.3",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "88",
+      "buildNumber": "89",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
@@ -49,7 +49,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 86,
+      "versionCode": 87,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -223,7 +223,14 @@
           "project": "mobile-app"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.ae.genosys.app",
+          "enableGooglePay": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -238,7 +245,7 @@
       }
     },
     "sdkVersion": "54.0.0",
-    "runtimeVersion": "1.10.2",
+    "runtimeVersion": "1.10.3",
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",

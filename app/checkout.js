@@ -19,7 +19,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils';
-import { submitCODOrder, submitCardOrder, generateOrderNumber } from '../services/orderService';
+import { submitCODOrder, createCardPaymentSheetIntent, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { formatAddressForDisplay } from '../utils/addressUtils';
@@ -497,12 +497,13 @@ export default function CheckoutScreen() {
       if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
         result = await submitCODOrder(orderData);
       } else {
-        result = await submitCardOrder(orderData);
+        // Card / Apple Pay / Google Pay / Link via the native Stripe Payment Sheet.
+        result = await createCardPaymentSheetIntent(orderData);
       }
 
       if (result.success) {
         const finalOrderNumber = String(result.orderNumber || orderNumber);
-        log.debug('Checkout step success', { success: true, hasPaymentUrl: !!result.paymentUrl });
+        log.debug('Checkout step success', { success: true, hasClientSecret: !!result.clientSecret });
 
         // COD: submit immediately (no payment step)
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
@@ -516,8 +517,8 @@ export default function CheckoutScreen() {
           return;
         }
 
-        // Card: DO NOT claim success until payment is confirmed.
-        if (!result.paymentUrl) {
+        // Card: DO NOT claim success until payment is confirmed in the Payment Sheet.
+        if (!result.clientSecret) {
           Alert.alert(
             t('checkout.paymentLinkUnavailableTitle'),
             t('checkout.paymentLinkUnavailableMessage')
@@ -530,7 +531,7 @@ export default function CheckoutScreen() {
           params: {
             orderId: String(result.orderId || ''),
             orderNumber: String(finalOrderNumber),
-            paymentUrl: String(result.paymentUrl),
+            clientSecret: String(result.clientSecret),
           },
         });
       } else {

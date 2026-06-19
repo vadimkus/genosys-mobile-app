@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Pla
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
+import { useStripe } from '@stripe/stripe-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -45,53 +46,67 @@ export default function StripePaymentScreen() {
   const token = user?.token || user?.accessToken || '';
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const params = useLocalSearchParams();
+  const clientSecret = String(params.clientSecret || '');
   const paymentUrl = String(params.paymentUrl || '');
   const orderId = params.orderId ? String(params.orderId) : '';
   const orderNumber = params.orderNumber ? String(params.orderNumber) : '';
   const fromOrders = String(params.fromOrders || '') === '1';
 
-  const [opening, setOpening] = useState(false);
+  // Native Stripe Payment Sheet when we have a PaymentIntent client secret
+  // (new in-app checkout). Falls back to the hosted browser flow when only a
+  // paymentUrl is provided (e.g. retrying an older pending order).
+  const useNativeSheet = !!clientSecret;
+
+  const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(false);
   const [paid, setPaid] = useState(false);
   const [statusText, setStatusText] = useState('');
+  const [errorText, setErrorText] = useState('');
   const hasShownSuccessRef = useRef(false);
+  const sheetReadyRef = useRef(false);
+  const autoStartedRef = useRef(false);
 
   const canCheck = !!token && (!!orderId || !!orderNumber);
 
-  const checkPayment = useCallback(async () => {
-    if (!canCheck) return;
-    setChecking(true);
+  const checkPayment = useCallback(async (silent = false) => {
+    if (!canCheck) return false;
+    if (!silent) setChecking(true);
     try {
-      // Prefer canonical detail endpoint (it returns a single order object).
       let match = await findOrder(token, orderId || orderNumber);
 
       if (!match) {
-        setStatusText(t('payment.couldNotFindOrderYet'));
-        setPaid(false);
-        return;
+        if (!silent) {
+          setStatusText(t('payment.couldNotFindOrderYet'));
+          setPaid(false);
+        }
+        return false;
       }
 
-      // If not paid yet, optionally trigger a server-side Stripe session refresh.
-      // This helps when Stripe webhook is delayed.
+      // If not paid yet, optionally trigger a server-side Stripe refresh
+      // (helps when the webhook is briefly delayed). Works for both the hosted
+      // session (cs_...) and PaymentIntent (the status route handles both).
       if (!isPaidLikeOrder(match)) {
         const sessionId = extractStripeSessionIdFromUrl(paymentUrl);
-        if (sessionId) {
-          try {
-            const apiRoot = String(AUTH_CONFIG.API_BASE_URL || '').replace(/\/mobile\/?$/, '');
-            const statusUrl = `${apiRoot}/stripe/payment-status?session_id=${encodeURIComponent(sessionId)}`;
-            await getJson(statusUrl, {
-              authenticated: true,
-              token,
-              headers: { token },
-            }).catch(() => null);
-          } catch {
-            // ignore
+        // PaymentIntent id is the part of the client secret before "_secret_".
+        const paymentIntentId = clientSecret ? String(clientSecret).split('_secret_')[0] : '';
+        try {
+          const apiRoot = String(AUTH_CONFIG.API_BASE_URL || '').replace(/\/mobile\/?$/, '');
+          let statusUrl = '';
+          if (sessionId) {
+            statusUrl = `${apiRoot}/stripe/payment-status?session_id=${encodeURIComponent(sessionId)}`;
+          } else if (paymentIntentId) {
+            statusUrl = `${apiRoot}/stripe/payment-status?payment_intent=${encodeURIComponent(paymentIntentId)}${orderId ? `&order_id=${encodeURIComponent(orderId)}` : ''}`;
           }
-          // Re-fetch after refresh attempt
-          match = (await findOrder(token, orderId || orderNumber).catch(() => null)) || match;
+          if (statusUrl) {
+            await getJson(statusUrl, { authenticated: true, token, headers: { token } }).catch(() => null);
+          }
+        } catch {
+          // ignore
         }
+        match = (await findOrder(token, orderId || orderNumber).catch(() => null)) || match;
       }
 
       const s = String(match?.status || '');
@@ -99,28 +114,83 @@ export default function StripePaymentScreen() {
       const label = getPaymentStatusLabel(ps || s, t);
       setStatusText(t('payment.currentStatus', { status: label }));
 
-      if (isPaidLikeOrder(match)) {
-        setPaid(true);
-      } else {
-        setPaid(false);
-      }
+      const isPaid = isPaidLikeOrder(match);
+      if (isPaid) setPaid(true);
+      return isPaid;
     } catch (e) {
       log.warn('Payment status check failed', e?.message || e);
-      setStatusText(t('payment.checkStatusFailed'));
-      setPaid(false);
+      if (!silent) setStatusText(t('payment.checkStatusFailed'));
+      return false;
     } finally {
-      setChecking(false);
+      if (!silent) setChecking(false);
     }
-  }, [canCheck, orderId, orderNumber, token]);
+  }, [canCheck, orderId, orderNumber, token, paymentUrl, clientSecret, t]);
 
-  const openPayment = useCallback(async () => {
+  // --- Native Stripe Payment Sheet -----------------------------------------
+  const payWithSheet = useCallback(async () => {
+    if (!clientSecret) return;
+    setBusy(true);
+    setErrorText('');
+    try {
+      if (!sheetReadyRef.current) {
+        const { error: initError } = await initPaymentSheet({
+          merchantDisplayName: AUTH_CONFIG.STRIPE.merchantDisplayName,
+          paymentIntentClientSecret: clientSecret,
+          // iOS native Apple Pay overlay
+          applePay: { merchantCountryCode: AUTH_CONFIG.STRIPE.merchantCountryCode },
+          // Android native Google Pay
+          googlePay: {
+            merchantCountryCode: AUTH_CONFIG.STRIPE.merchantCountryCode,
+            currencyCode: 'AED',
+            testEnv: __DEV__,
+          },
+          // 3-D Secure / redirect return (matches app scheme + StripeProvider)
+          returnURL: `${AUTH_CONFIG.STRIPE.urlScheme}://stripe-redirect`,
+          allowsDelayedPaymentMethods: false,
+          defaultBillingDetails: {
+            ...(user?.name ? { name: user.name } : {}),
+            ...(user?.email ? { email: user.email } : {}),
+          },
+        });
+        if (initError) {
+          log.warn('initPaymentSheet failed', initError.code, initError.message);
+          setErrorText(t('payment.pleaseTryAgain'));
+          return;
+        }
+        sheetReadyRef.current = true;
+      }
+
+      const { error: presentError } = await presentPaymentSheet();
+
+      if (presentError) {
+        // User dismissed the sheet — let them retry, no error banner.
+        if (presentError.code === 'Canceled') return;
+        log.warn('presentPaymentSheet error', presentError.code, presentError.message);
+        setErrorText(presentError.message || t('payment.checkStatusFailed'));
+        return;
+      }
+
+      // Success: the PaymentIntent is confirmed on-device. The webhook finalizes
+      // the order + emails server-side; sync status in the background but show
+      // success immediately (no waiting on webhook lag).
+      checkPayment(true).catch(() => {});
+      setPaid(true);
+    } catch (e) {
+      log.warn('Payment Sheet flow failed', e?.message || e);
+      setErrorText(t('payment.pleaseTryAgain'));
+    } finally {
+      setBusy(false);
+    }
+  }, [clientSecret, initPaymentSheet, presentPaymentSheet, checkPayment, user, t]);
+
+  // --- Hosted browser fallback (retry of older pending orders) --------------
+  const openHosted = useCallback(async () => {
     if (!paymentUrl) {
-      Alert.alert(t('payment.paymentLinkMissingTitle'), t('payment.paymentLinkMissingMessage'));
+      setErrorText(t('payment.paymentLinkMissingMessage'));
       return;
     }
-    setOpening(true);
+    setBusy(true);
     try {
-      // In-app browser (SFSafariViewController on iOS / Chrome Custom Tabs on Android).
       await WebBrowser.openBrowserAsync(paymentUrl, {
         ...(Platform.OS === 'ios' && {
           presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
@@ -128,25 +198,27 @@ export default function StripePaymentScreen() {
         }),
         showTitle: true,
       });
-      // When user returns from the payment sheet, automatically check status once.
-      if (canCheck) {
-        await checkPayment();
-      }
+      if (canCheck) await checkPayment();
     } catch (e) {
-      log.warn('Failed to open Stripe payment link', e?.message || e);
+      log.warn('Failed to open hosted payment link', e?.message || e);
       Alert.alert(t('payment.couldNotOpenPaymentTitle'), t('payment.pleaseTryAgain'));
     } finally {
-      setOpening(false);
+      setBusy(false);
     }
-  }, [paymentUrl, canCheck, checkPayment]);
+  }, [paymentUrl, canCheck, checkPayment, t]);
 
+  // Auto-start the appropriate flow once on mount.
   useEffect(() => {
-    // Auto open payment link on mount.
+    if (autoStartedRef.current) return;
+    autoStartedRef.current = true;
     (async () => {
-      await openPayment();
+      if (useNativeSheet) await payWithSheet();
+      else if (paymentUrl) await openHosted();
+      else setErrorText(t('payment.paymentLinkMissingMessage'));
     })();
-  }, [openPayment]);
+  }, [useNativeSheet, paymentUrl, payWithSheet, openHosted, t]);
 
+  // Success → confirm + route out.
   useEffect(() => {
     if (!paid || hasShownSuccessRef.current) return;
     hasShownSuccessRef.current = true;
@@ -172,12 +244,14 @@ export default function StripePaymentScreen() {
         },
       ]
     );
-  }, [paid, orderNumber, clearCart, fromOrders]);
+  }, [paid, orderNumber, clearCart, t]);
 
   const title = useMemo(() => {
     if (orderNumber) return t('payment.payForOrderTitle', { orderNumber });
     return t('payment.completePaymentTitle');
   }, [orderNumber, t]);
+
+  const onPrimaryPress = useNativeSheet ? payWithSheet : openHosted;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -188,7 +262,7 @@ export default function StripePaymentScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.headerSpacer} />
@@ -198,24 +272,25 @@ export default function StripePaymentScreen() {
         <View style={styles.card}>
           <Text style={styles.title}>{t('payment.stripeTitle')}</Text>
           <Text style={styles.subtitle}>
-            {t('payment.completeInWindow')}
+            {useNativeSheet ? t('payment.pendingNote') : t('payment.completeInWindow')}
           </Text>
 
           {statusText ? <Text style={styles.status}>{statusText}</Text> : null}
+          {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
 
           <TouchableOpacity
-            style={[styles.primaryButton, opening && styles.buttonDisabled]}
-            onPress={openPayment}
-            disabled={opening}
+            style={[styles.primaryButton, busy && styles.buttonDisabled]}
+            onPress={onPrimaryPress}
+            disabled={busy}
             activeOpacity={0.85}
           >
-            {opening ? <ActivityIndicator color="#fff" /> : <Ionicons name="open-outline" size={18} color="#fff" />}
-            <Text style={styles.primaryButtonText}>{opening ? t('common.opening') : t('payment.openStripePayment')}</Text>
+            {busy ? <ActivityIndicator color="#fff" /> : <Ionicons name={useNativeSheet ? 'card-outline' : 'open-outline'} size={18} color="#fff" />}
+            <Text style={styles.primaryButtonText}>{busy ? t('common.opening') : t('payment.openStripePayment')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.secondaryButton, (!canCheck || checking) && styles.buttonDisabled]}
-            onPress={checkPayment}
+            onPress={() => checkPayment(false)}
             disabled={!canCheck || checking}
             activeOpacity={0.85}
           >
@@ -266,6 +341,7 @@ const styles = StyleSheet.create({
   title: { ...T.sectionTitleSmall },
   subtitle: { ...T.label, fontWeight: '400', color: '#8E8E93', lineHeight: 20, marginTop: 6 },
   status: { ...T.label, color: '#1D1D1F', marginTop: 10 },
+  errorText: { ...T.label, color: '#dc2626', marginTop: 10 },
   primaryButton: {
     marginTop: 14,
     flexDirection: 'row',
@@ -295,6 +371,3 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.6 },
   note: { ...T.captionSmall, color: '#8E8E93', lineHeight: 18, marginTop: 12 },
 });
-
-
-
