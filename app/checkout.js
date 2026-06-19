@@ -6,8 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Modal,
-  Animated,
   ActivityIndicator,
   Linking,
   Platform,
@@ -28,6 +26,7 @@ import CollapsibleFooter from '../components/CollapsibleFooter';
 import * as haptics from '../utils/haptics';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
 import CheckoutSteps from '../components/checkout/CheckoutSteps';
+import OrderSuccessScreen from '../components/OrderSuccessScreen';
 import CheckoutAddressForm from '../components/checkout/CheckoutAddressForm';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
 import OrderSummaryCard from '../components/checkout/OrderSummaryCard';
@@ -92,8 +91,6 @@ export default function CheckoutScreen() {
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
   const [successOrder, setSuccessOrder] = useState(null);
-  const successScale = useRef(new Animated.Value(0.8)).current;
-  const successOpacity = useRef(new Animated.Value(0)).current;
 
   const totals = useMemo(() => calculateCartTotals(items, user, selectedEmirate, {
     emirates: getAvailableEmirates(),
@@ -505,15 +502,11 @@ export default function CheckoutScreen() {
         const finalOrderNumber = String(result.orderNumber || orderNumber);
         log.debug('Checkout step success', { success: true, hasClientSecret: !!result.clientSecret });
 
-        // COD: submit immediately (no payment step)
+        // COD: submit immediately (no payment step). The shared success screen
+        // (OrderSuccessScreen) self-animates and fires the success haptic.
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
-          haptics.success();
           clearCart();
           setSuccessOrder(finalOrderNumber);
-          Animated.parallel([
-            Animated.spring(successScale, { toValue: 1, tension: 60, friction: 8, useNativeDriver: true }),
-            Animated.timing(successOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-          ]).start();
           return;
         }
 
@@ -603,44 +596,23 @@ export default function CheckoutScreen() {
     return null; // Will redirect via useEffect
   }
 
+  // COD order success → shared full-screen confirmation (identical to the
+  // card / Apple Pay success screen in app/payment/stripe.js).
+  if (successOrder) {
+    return (
+      <OrderSuccessScreen
+        title={t('checkout.orderSubmittedTitle')}
+        message={t('checkout.orderSubmittedMessageCOD', { orderNumber: successOrder || '' })}
+        viewOrderLabel={t('checkout.viewOrder')}
+        continueLabel={t('checkout.continueShopping')}
+        onViewOrder={() => router.replace('/(tabs)/orders')}
+        onContinueShopping={() => router.replace('/(tabs)/shop')}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-
-      {/* COD Order Success Modal */}
-      <Modal visible={!!successOrder} transparent animationType="none">
-        <View style={styles.successOverlay}>
-          <Animated.View style={[styles.successCard, { opacity: successOpacity, transform: [{ scale: successScale }] }]}>
-            <View style={styles.successIconCircle}>
-              <Ionicons name="checkmark" size={40} color="#ffffff" />
-            </View>
-
-            <Text style={[styles.successTitle, isRTL && { textAlign: 'right' }]}>
-              {t('checkout.orderSubmittedTitle')}
-            </Text>
-
-            <Text style={[styles.successBody, isRTL && { textAlign: 'right' }]}>
-              {t('checkout.orderSubmittedMessageCOD', { orderNumber: successOrder || '' })}
-            </Text>
-
-            <TouchableOpacity
-              style={styles.successPrimaryBtn}
-              activeOpacity={0.85}
-              onPress={() => router.replace('/(tabs)/orders')}
-            >
-              <Ionicons name="receipt-outline" size={18} color="#fff" style={{ marginEnd: 6 }} />
-              <Text style={styles.successPrimaryText}>{t('checkout.viewOrder')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.successSecondaryBtn}
-              activeOpacity={0.7}
-              onPress={() => router.replace('/(tabs)/shop')}
-            >
-              <Text style={styles.successSecondaryText}>{t('checkout.continueShopping')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      </Modal>
 
       {/* Header with Step Indicator */}
       <CheckoutSteps

@@ -12,6 +12,7 @@ import AUTH_CONFIG from '../../config/auth';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
 import { getJson } from '../../services/httpClient';
+import OrderSuccessScreen from '../../components/OrderSuccessScreen';
 import T from '../../utils/typography';
 
 const log = createLogger('StripePayment');
@@ -65,7 +66,6 @@ export default function StripePaymentScreen() {
   const [paid, setPaid] = useState(false);
   const [statusText, setStatusText] = useState('');
   const [errorText, setErrorText] = useState('');
-  const hasShownSuccessRef = useRef(false);
   const sheetReadyRef = useRef(false);
   const autoStartedRef = useRef(false);
 
@@ -218,33 +218,15 @@ export default function StripePaymentScreen() {
     })();
   }, [useNativeSheet, paymentUrl, payWithSheet, openHosted, t]);
 
-  // Success → confirm + route out.
-  useEffect(() => {
-    if (!paid || hasShownSuccessRef.current) return;
-    hasShownSuccessRef.current = true;
-    Alert.alert(
-      t('payment.paymentReceivedTitle'),
-      orderNumber ? t('payment.paymentSuccessMessageWithOrder', { orderNumber }) : t('payment.paymentSuccessMessage'),
-      [
-        {
-          text: t('payment.viewOrder'),
-          onPress: () => {
-            clearCart();
-            router.replace('/(tabs)/orders');
-          },
-          style: 'default',
-        },
-        {
-          text: t('common.continueShopping'),
-          onPress: () => {
-            clearCart();
-            router.replace('/(tabs)/shop');
-          },
-          style: 'cancel',
-        },
-      ]
-    );
-  }, [paid, orderNumber, clearCart, t]);
+  const onViewOrder = useCallback(() => {
+    clearCart();
+    router.replace('/(tabs)/orders');
+  }, [clearCart]);
+
+  const onContinueShopping = useCallback(() => {
+    clearCart();
+    router.replace('/(tabs)/shop');
+  }, [clearCart]);
 
   const title = useMemo(() => {
     if (orderNumber) return t('payment.payForOrderTitle', { orderNumber });
@@ -252,6 +234,22 @@ export default function StripePaymentScreen() {
   }, [orderNumber, t]);
 
   const onPrimaryPress = useNativeSheet ? payWithSheet : openHosted;
+
+  // Modern full-screen success confirmation (shared with the COD flow).
+  if (paid) {
+    return (
+      <OrderSuccessScreen
+        title={t('payment.paymentReceivedTitle')}
+        message={orderNumber
+          ? t('payment.paymentSuccessMessageWithOrder', { orderNumber })
+          : t('payment.paymentSuccessMessage')}
+        viewOrderLabel={t('payment.viewOrder')}
+        continueLabel={t('common.continueShopping')}
+        onViewOrder={onViewOrder}
+        onContinueShopping={onContinueShopping}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -268,49 +266,87 @@ export default function StripePaymentScreen() {
         <View style={styles.headerSpacer} />
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{t('payment.stripeTitle')}</Text>
-          <Text style={styles.subtitle}>
-            {useNativeSheet ? t('payment.pendingNote') : t('payment.completeInWindow')}
-          </Text>
+      {useNativeSheet ? (
+        // --- Native Payment Sheet: clean branded screen behind the sheet ------
+        <View style={styles.nativeContent}>
+          <View style={styles.nativeIconCircle}>
+            <Ionicons name="card" size={30} color="#dc2626" />
+          </View>
+          <Text style={styles.nativeTitle}>{t('payment.securePaymentTitle')}</Text>
+          <Text style={styles.nativeSubtitle}>{t('payment.securePaymentSubtitle')}</Text>
 
-          {statusText ? <Text style={styles.status}>{statusText}</Text> : null}
-          {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+          {busy ? (
+            <View style={styles.nativeBusyRow}>
+              <ActivityIndicator color="#dc2626" />
+              <Text style={styles.nativeBusyText}>{t('payment.preparingSecurePayment')}</Text>
+            </View>
+          ) : (
+            <>
+              {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+              <Text style={styles.nativeCancelledNote}>{t('payment.paymentNotCompletedNote')}</Text>
+              <TouchableOpacity
+                style={[styles.primaryButton, styles.nativeButton]}
+                onPress={payWithSheet}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="card-outline" size={18} color="#fff" />
+                <Text style={styles.primaryButtonText}>{t('payment.payNow')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
 
           <TouchableOpacity
-            style={[styles.primaryButton, busy && styles.buttonDisabled]}
-            onPress={onPrimaryPress}
-            disabled={busy}
+            style={styles.linkButton}
+            onPress={() => router.replace('/profile/orders')}
             activeOpacity={0.85}
           >
-            {busy ? <ActivityIndicator color="#fff" /> : <Ionicons name={useNativeSheet ? 'card-outline' : 'open-outline'} size={18} color="#fff" />}
-            <Text style={styles.primaryButtonText}>{busy ? t('common.opening') : t('payment.openStripePayment')}</Text>
+            <Text style={styles.linkText}>{fromOrders ? t('payment.backToOrders') : t('payment.viewOrders')}</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.secondaryButton, (!canCheck || checking) && styles.buttonDisabled]}
-            onPress={() => checkPayment(false)}
-            disabled={!canCheck || checking}
-            activeOpacity={0.85}
-          >
-            {checking ? <ActivityIndicator color="#dc2626" /> : <Ionicons name="refresh" size={18} color="#dc2626" />}
-            <Text style={styles.secondaryButtonText}>{checking ? t('payment.checking') : t('payment.checkPaymentStatus')}</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.note}>
-            {t('payment.pendingNote')}
-          </Text>
         </View>
+      ) : (
+        // --- Hosted browser fallback (retry of older pending orders) ----------
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.title}>{t('payment.stripeTitle')}</Text>
+            <Text style={styles.subtitle}>{t('payment.completeInWindow')}</Text>
 
-        <TouchableOpacity
-          style={styles.linkButton}
-          onPress={() => router.replace('/profile/orders')}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.linkText}>{fromOrders ? t('payment.backToOrders') : t('payment.viewOrders')}</Text>
-        </TouchableOpacity>
-      </View>
+            {statusText ? <Text style={styles.status}>{statusText}</Text> : null}
+            {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+
+            <TouchableOpacity
+              style={[styles.primaryButton, busy && styles.buttonDisabled]}
+              onPress={onPrimaryPress}
+              disabled={busy}
+              activeOpacity={0.85}
+            >
+              {busy ? <ActivityIndicator color="#fff" /> : <Ionicons name="open-outline" size={18} color="#fff" />}
+              <Text style={styles.primaryButtonText}>{busy ? t('common.opening') : t('payment.openStripePayment')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.secondaryButton, (!canCheck || checking) && styles.buttonDisabled]}
+              onPress={() => checkPayment(false)}
+              disabled={!canCheck || checking}
+              activeOpacity={0.85}
+            >
+              {checking ? <ActivityIndicator color="#dc2626" /> : <Ionicons name="refresh" size={18} color="#dc2626" />}
+              <Text style={styles.secondaryButtonText}>{checking ? t('payment.checking') : t('payment.checkPaymentStatus')}</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.note}>
+              {t('payment.pendingNote')}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={() => router.replace('/profile/orders')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.linkText}>{fromOrders ? t('payment.backToOrders') : t('payment.viewOrders')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -331,6 +367,46 @@ const styles = StyleSheet.create({
   headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700' },
   headerSpacer: { width: 28 },
   content: { flex: 1, padding: 20, gap: 12 },
+  nativeContent: {
+    flex: 1,
+    paddingHorizontal: 28,
+    paddingTop: 48,
+    alignItems: 'center',
+  },
+  nativeIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FFF5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 18,
+  },
+  nativeTitle: { ...T.sectionTitle, textAlign: 'center' },
+  nativeSubtitle: {
+    ...T.label,
+    fontWeight: '400',
+    color: '#8E8E93',
+    lineHeight: 20,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  nativeBusyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 28,
+  },
+  nativeBusyText: { ...T.label, color: '#1D1D1F' },
+  nativeButton: { alignSelf: 'stretch', marginTop: 16 },
+  nativeCancelledNote: {
+    ...T.label,
+    fontWeight: '400',
+    color: '#8E8E93',
+    lineHeight: 20,
+    marginTop: 28,
+    textAlign: 'center',
+  },
   card: {
     borderWidth: 1,
     borderColor: '#E5E5EA',

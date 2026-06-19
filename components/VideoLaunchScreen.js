@@ -61,7 +61,7 @@ async function downloadAndCache(remoteUrl, cacheTTL) {
  *   cacheTTL    — seconds to keep cached video
  *   onDone      — called when the screen should be dismissed
  */
-export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onDone }) {
+export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onCoverReady, onDone }) {
   const launchConfigRef = useRef({
     localSource,
     videoUrl,
@@ -88,12 +88,32 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   const fallbackTimeoutRef = useRef(null);
   const revealTimeoutRef = useRef(null);
   const onDoneRef = useRef(onDone);
+  const onCoverReadyRef = useRef(onCoverReady);
+  const coverReadyFiredRef = useRef(false);
   const sourceUri = typeof videoSource === 'number' ? null : videoSource?.uri;
   const coverRevealDelayMs = Platform.OS === 'android' ? 250 : 650;
 
   useEffect(() => {
     onDoneRef.current = onDone;
   }, [onDone]);
+
+  useEffect(() => {
+    onCoverReadyRef.current = onCoverReady;
+  }, [onCoverReady]);
+
+  // Tell the parent the cover logo is on screen so it can hide the native
+  // splash with no white gap. Fires on Image load, with a short fail-safe in
+  // case onLoad is missed for the bundled asset.
+  const signalCoverReady = useCallback(() => {
+    if (coverReadyFiredRef.current) return;
+    coverReadyFiredRef.current = true;
+    onCoverReadyRef.current?.();
+  }, []);
+
+  useEffect(() => {
+    const id = setTimeout(signalCoverReady, 350);
+    return () => clearTimeout(id);
+  }, [signalCoverReady]);
 
   useEffect(() => {
     setPlaybackStarted(false);
@@ -158,9 +178,11 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
   useEffect(() => {
     if (!playbackStarted) return;
     revealTimeoutRef.current = setTimeout(() => {
+      // Short crossfade from the static logo cover to the already-moving video
+      // (instead of a hard cut), which removes the perceived logo "jump".
       Animated.timing(splashCoverOpacity, {
         toValue: 0,
-        duration: 0,
+        duration: 260,
         useNativeDriver: true,
       }).start();
     }, coverRevealDelayMs);
@@ -307,6 +329,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
           style={styles.splashCoverImage}
           resizeMode="contain"
           fadeDuration={0}
+          onLoad={signalCoverReady}
         />
       </Animated.View>
     </Animated.View>

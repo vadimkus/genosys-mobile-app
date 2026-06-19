@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LogBox, Platform } from 'react-native';
 import Constants from 'expo-constants';
+import * as SplashScreen from 'expo-splash-screen';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartProvider } from '../contexts/CartContext';
@@ -23,6 +24,11 @@ import { initSentry } from '../config/sentry';
 import { getJson } from '../services/httpClient';
 
 const UPDATE_DISMISSED_KEY = '@update_dismissed_version';
+
+// Keep the native splash (logo) on screen until the JS launch layer has
+// actually painted, so there is no white gap during the native→JS handoff.
+// hideAsync() is called once the JS cover is ready (see hideNativeSplash).
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 LogBox.ignoreLogs([
   'expo-notifications: Android Push notifications',
@@ -70,6 +76,20 @@ export default function RootLayout() {
   const [forceUpdate, setForceUpdate] = useState(null);
   const [softUpdate, setSoftUpdate] = useState(null);
   const [splashVideo, setSplashVideo] = useState(DEFAULT_SPLASH_CONFIG);
+
+  // Hide the native splash exactly once, after the JS launch layer is painted.
+  const nativeSplashHiddenRef = useRef(false);
+  const hideNativeSplash = useCallback(() => {
+    if (nativeSplashHiddenRef.current) return;
+    nativeSplashHiddenRef.current = true;
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  // Safety net: never let the native splash stick if the cover signal is missed.
+  useEffect(() => {
+    const id = setTimeout(hideNativeSplash, 2500);
+    return () => clearTimeout(id);
+  }, [hideNativeSplash]);
 
   useEffect(() => {
     initSentry();
@@ -193,6 +213,7 @@ export default function RootLayout() {
                       posterUrl={splashVideo.posterUrl}
                       duration={splashVideo.duration || 5000}
                       cacheTTL={splashVideo.cacheTTL || 86400}
+                      onCoverReady={hideNativeSplash}
                       onDone={() => setSplashVideo(false)}
                     />
                   )}
