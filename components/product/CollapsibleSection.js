@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 if (
   Platform.OS === 'android' &&
@@ -59,12 +60,15 @@ export default function CollapsibleSection({
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <View style={[styles.headerLeft, isRTL && styles.headerLeftRTL]}>
             {icon ? (
-              <Ionicons
-                name={icon}
-                size={18}
-                color={iconColor}
-                style={isRTL ? styles.iconRTL : styles.icon}
-              />
+              <View
+                style={[
+                  surfaces.iconTile,
+                  { backgroundColor: iconColor },
+                  isRTL ? styles.iconRTL : styles.icon,
+                ]}
+              >
+                <Ionicons name={icon} size={16} color="#ffffff" />
+              </View>
             ) : null}
             <Text
               style={[styles.title, isRTL && styles.titleRTL]}
@@ -76,7 +80,7 @@ export default function CollapsibleSection({
           <Ionicons
             name={isOpen ? 'chevron-up' : 'chevron-down'}
             size={20}
-            color="#86868B"
+            color={colors.tertiary}
           />
         </View>
       </TouchableOpacity>
@@ -90,8 +94,10 @@ export default function CollapsibleSection({
 
 const styles = StyleSheet.create({
   section: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E7EB',
+    ...surfaces.card,
+    ...shadow.card,
+    paddingHorizontal: 18,
+    marginBottom: 14,
   },
   headerTouchable: {
     paddingVertical: 16,
@@ -119,7 +125,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   title: {
-    ...T.sectionTitle,
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
     flex: 1,
   },
   titleRTL: {

@@ -12,6 +12,7 @@ import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 import { getLocalizedProductName } from '../../utils/productLocalization';
 import { asText } from '../../utils/productDetailUtils';
 import AUTH_CONFIG from '../../config/auth';
+import { colors } from '../../utils/theme';
 
 function getProductIdForCombo(p) {
   return String(p?.productNumber || p?.id || '').trim();
@@ -275,7 +276,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
   return (
     <View style={styles.pcOuter}>
       <View style={styles.pcHeaderRow}>
-        <Ionicons name="sparkles" size={18} color="#dc2626" />
+        <Ionicons name="sparkles" size={18} color={colors.brand} />
         <Text style={styles.pcHeaderTitle}>{t('product.perfectCombination')}</Text>
       </View>
 
@@ -326,7 +327,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
 
           {recommendedProduct.isPriceOnRequest ? (
             <TouchableOpacity
-              style={[styles.pcAddBtn, { backgroundColor: '#25D366' }]}
+              style={[styles.pcAddBtn, { backgroundColor: colors.whatsapp }]}
               onPress={() => {
                 const msg = encodeURIComponent(
                   t('product.requestQuoteMessage', { name: recName })
@@ -342,7 +343,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={[styles.pcAddBtn, inBagForRec ? { backgroundColor: '#27AE60' } : null]}
+              style={[styles.pcAddBtn, inBagForRec ? { backgroundColor: colors.greenDeep } : null]}
               onPress={handleAddRecommendedToBag}
               activeOpacity={0.9}
             >
@@ -356,7 +357,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
 
         <View style={styles.pcBenefitsCard}>
           <View style={styles.pcBenefitsHeader}>
-            <Ionicons name="sparkles" size={14} color="#dc2626" />
+            <Ionicons name="sparkles" size={14} color={colors.brand} />
             <Text style={styles.pcBenefitsTitle}>{t('product.whyCombineTheseProducts')}</Text>
           </View>
           <View style={styles.pcBenefitsList}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import CollapsibleFooter from '../../components/CollapsibleFooter';
 import ProgressCard from '../../components/ProgressCard';
 import { useCart } from '../../contexts/CartContext';
@@ -23,8 +24,9 @@ import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCa
 import AUTH_CONFIG from '../../config/auth';
 import { computeWaterfallBreakdown } from '../../utils/cartUtils';
 import { getPricingDisplay } from '../../utils/pricingDisplay';
-import { mediumTap } from '../../utils/haptics';
+import { mediumTap, lightTap } from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 export default function BagScreen() {
   const { user } = useAuth();
@@ -46,9 +48,11 @@ export default function BagScreen() {
   } = useCart();
   
   const [footerHeight, setFooterHeight] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
 
+  // Shared scroll-aware header: navBarHeight is the bar height + top safe-area inset.
+  const { headerHeight: navBarHeight } = useCollapsibleHeader();
+  // Keep our own scrollY ref so the CollapsibleHeader fade stays driven by this list.
   const scrollY = useRef(new Animated.Value(0)).current;
 
   useFocusEffect(
@@ -83,7 +87,7 @@ export default function BagScreen() {
     }
   }, [navSource]);
 
-  const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
+  const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
 
   const cartSummary = getCartSummary();
   const paidItemCount = getTotalItems();
@@ -92,17 +96,6 @@ export default function BagScreen() {
   const promoSubtotal = Number(cartSummary.subtotal) || 0;
   const promo500Met = promoSubtotal >= 500;
   const promo700Met = promoSubtotal >= 700;
-
-  const headerTranslateY = useMemo(() => {
-    const h = headerHeight || 100;
-    return scrollY.interpolate({
-      inputRange: [0, h],
-      outputRange: [0, -h],
-      extrapolate: 'clamp',
-    });
-  }, [scrollY, headerHeight]);
-
-  const scrollPaddingTop = Math.max(headerHeight, 160);
 
   const safeSubtotal = Number(cartSummary.subtotal) || 0;
   const safeShipping = Number(cartSummary.shippingCost) || 0;
@@ -165,6 +158,11 @@ export default function BagScreen() {
 
     // Navigate to checkout page
     router.push('/checkout');
+  };
+
+  const onBack = () => {
+    lightTap();
+    router.canGoBack() ? router.back() : router.replace('/(tabs)/shop');
   };
 
   const handleClearBag = () => {
@@ -491,27 +489,11 @@ export default function BagScreen() {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.header}>
-            <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
-              <TouchableOpacity 
-                style={[styles.backButton, isRTL && styles.backButtonRTL]}
-                onPress={handleHeaderBack}
-              >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-              </TouchableOpacity>
-              
-              <View style={styles.headerCenter}>
-                <Text style={styles.title}>{t('bag.title')}</Text>
-                <Text style={styles.subtitle}>{t('bag.loading')}</Text>
-              </View>
-              
-              <View style={styles.headerRight} />
-            </View>
+        <CollapsibleHeader title={t('bag.title')} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <View style={[styles.emptyContainer, { paddingTop: navBarHeight }]}>
+          <View style={styles.iconContainer}>
+            <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
           </View>
-        </SafeAreaView>
-        <View style={styles.emptyContainer}>
-          <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
         </View>
       </View>
     );
@@ -520,27 +502,8 @@ export default function BagScreen() {
   if (items.length === 0) {
     return (
       <View style={styles.container}>
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.header}>
-            <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
-              <TouchableOpacity 
-                style={[styles.backButton, isRTL && styles.backButtonRTL]}
-                onPress={handleHeaderBack}
-              >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-              </TouchableOpacity>
-              
-              <View style={styles.headerCenter}>
-                <Text style={styles.title}>{t('bag.title')}</Text>
-                <Text style={styles.subtitle}>{t('bag.selectedProducts')}</Text>
-              </View>
-              
-              <View style={styles.headerRight} />
-            </View>
-          </View>
-        </SafeAreaView>
-        
-        <View style={[styles.emptyContainer, styles.emptyContainerTop]}>
+        <CollapsibleHeader title={t('bag.title')} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <View style={[styles.emptyContainer, styles.emptyContainerTop, { paddingTop: navBarHeight + 24 }]}>
           <View style={styles.iconContainer}>
             <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
           </View>
@@ -551,6 +514,7 @@ export default function BagScreen() {
           <TouchableOpacity 
             style={styles.shopButton}
             onPress={() => router.push('/(tabs)/shop')}
+            activeOpacity={0.85}
           >
             <Text style={[styles.shopButtonText, isRTL && styles.shopButtonTextRTL]}>{t('bag.startShopping')}</Text>
           </TouchableOpacity>
@@ -561,41 +525,23 @@ export default function BagScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Collapsible header: slides up as the user scrolls to free vertical space */}
-      <Animated.View
-        style={[styles.headerWrapper, { transform: [{ translateY: headerTranslateY }] }]}
-        onLayout={(e) => {
-          const h = e?.nativeEvent?.layout?.height;
-          if (typeof h === 'number' && Number.isFinite(h) && h > 0) setHeaderHeight(h);
-        }}
-      >
-        <SafeAreaView edges={['top']} style={styles.safeArea}>
-          <View style={styles.header}>
-            <View style={[styles.headerTop, isRTL && styles.headerTopRTL]}>
-              <TouchableOpacity 
-                style={[styles.backButton, isRTL && styles.backButtonRTL]}
-                onPress={handleHeaderBack}
-              >
-                <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-              </TouchableOpacity>
+      {/* Shared scroll-aware header (transparent at top, fades a white fill in on scroll). */}
+      <CollapsibleHeader
+        title={t('bag.title')}
+        scrollY={scrollY}
+        onBack={onBack}
+        isRTL={isRTL}
+        right={
+          <TouchableOpacity
+            onPress={handleClearBag}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            activeOpacity={0.6}
+          >
+            <Ionicons name="trash-outline" size={20} color={colors.brand} />
+          </TouchableOpacity>
+        }
+      />
 
-              <View pointerEvents="none" style={styles.headerCenterAbsolute}>
-                <Text style={[styles.titleInline, isRTL && styles.titleInlineRTL]}>
-                  {t('bag.header', {
-                    count: paidItemCount,
-                    label: paidItemCount === 1 ? t('bag.item') : t('bag.items'),
-                  })}
-                </Text>
-              </View>
-
-              <TouchableOpacity onPress={handleClearBag} style={[styles.clearButton, isRTL && styles.clearButtonRTL]}>
-                <Text style={[styles.clearText, isRTL && styles.clearTextRTL]}>{t('bag.clear')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </SafeAreaView>
-      </Animated.View>
-      
       {/* Items List - Animated FlatList (better perf than map in ScrollView) */}
       <Animated.FlatList
         style={styles.itemsList}
@@ -607,7 +553,7 @@ export default function BagScreen() {
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: scrollPaddingTop + 12 },
+          { paddingTop: navBarHeight + 12 },
           { paddingBottom: Math.max(footerHeight + 24, 240) },
         ]}
         ListFooterComponent={
@@ -616,7 +562,9 @@ export default function BagScreen() {
             <View style={[styles.sectionCard, isRTL && styles.sectionCardRTL]}>
               <View style={[styles.sectionTitleRow, isRTL && styles.sectionTitleRowRTL]}>
                 <View style={[styles.sectionTitleLeft, isRTL && styles.sectionTitleLeftRTL]}>
-                  <Ionicons name="gift-outline" size={18} color="#dc2626" />
+                  <View style={[surfaces.iconTile, { backgroundColor: colors.brand }]}>
+                    <Ionicons name="gift" size={16} color={colors.white} />
+                  </View>
                   <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('bag.freeMaskPromotion')}</Text>
                 </View>
               </View>
@@ -658,7 +606,9 @@ export default function BagScreen() {
               <ProgressCard
                 headerLeft={
                   <View style={styles.sectionTitleLeft}>
-                    <Ionicons name="car-outline" size={18} color="#dc2626" />
+                    <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
+                      <Ionicons name="car" size={16} color={colors.white} />
+                    </View>
                     <Text style={styles.sectionTitle}>{t('bag.freeDeliveryTitle')}</Text>
                   </View>
                 }
@@ -704,6 +654,14 @@ export default function BagScreen() {
           chevronButtonStyle={styles.footerChevronBtn}
           details={
             <>
+              {/* Summary header (indigo tile, matches order details) */}
+              <View style={[styles.summaryHeader, isRTL && styles.summaryRowRTL]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.indigo }]}>
+                  <Ionicons name="calculator" size={16} color={colors.white} />
+                </View>
+                <Text style={[styles.summaryHeaderTitle, isRTL && styles.summaryLabelRTL]}>{t('checkout.orderSummary')}</Text>
+              </View>
+
               {/* Waterfall Discount Breakdown */}
               {waterfall.hasAnyDiscount ? (
                 <>
@@ -843,92 +801,23 @@ export default function BagScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  safeArea: {
-    backgroundColor: '#ffffff',
-  },
-  headerWrapper: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
-    backgroundColor: '#ffffff',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-    backgroundColor: '#ffffff',
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: 44,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingRight: 8,
-    flex: 1,
-  },
-  headerCenter: {
-    flex: 2,
-    alignItems: 'center',
-  },
-  headerCenterAbsolute: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleInline: {
-    ...T.sectionTitle,
-    textAlign: 'center',
-  },
-  headerRight: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  clearButton: {
-    paddingVertical: 8,
-    paddingLeft: 8,
-  },
-  title: {
-    ...T.sectionTitle,
-    marginBottom: 2,
-    textAlign: 'center',
-  },
-  subtitle: {
-    ...T.caption,
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  clearText: {
-    ...T.button,
-    color: '#dc2626',
+    backgroundColor: colors.groupedBg,
   },
   // Layout Sections
   itemsList: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     // paddingBottom is computed dynamically from the footer height (see ScrollView contentContainerStyle)
   },
 
-  // New sections (Promotion + Free Delivery)
+  // New sections (Promotion + Free Delivery) — soft Apple-native cards
   sectionCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
+    ...surfaces.card,
+    ...shadow.card,
     padding: 14,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
   },
   sectionTitleRow: {
     flexDirection: 'row',
@@ -945,7 +834,10 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   sectionTitle: {
-    ...T.sectionTitleSmall,
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+    color: colors.label,
   },
   progressCard: {
     marginBottom: 12,
@@ -1023,20 +915,15 @@ const styles = StyleSheet.create({
   },
   vatNoteRed: {
     ...T.captionTiny,
-    color: '#dc2626',
+    color: colors.brand,
     paddingVertical: 2,
   },
   cartItem: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    ...surfaces.card,
+    ...shadow.card,
+    padding: 14,
+    marginBottom: 14,
   },
   cartItemRTL: {
     flexDirection: 'row-reverse',
@@ -1232,6 +1119,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingTop: 16,
   },
+  // The gray unicorn illustration shares the grouped-gray canvas, so it blends
+  // straight into the background and floats without a card frame.
   iconContainer: {
     marginBottom: 24,
   },
@@ -1252,10 +1141,11 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   shopButton: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 32,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 14,
+    ...shadow.cta(colors.brand),
   },
   shopButtonText: {
     ...T.button,

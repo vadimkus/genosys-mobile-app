@@ -18,7 +18,8 @@ import {
   Alert,
   Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
@@ -29,6 +30,7 @@ import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import T from '../utils/typography';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { computeWaterfallBreakdown } from '../utils/cartUtils';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { useAuth } from '../contexts/AuthContext';
@@ -45,6 +47,9 @@ export default function ConcernDetailScreen() {
   const { slug } = useLocalSearchParams();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/skin-concerns'); };
 
   const { items: cartItems, addItem, removeItem, clearCart, getCartSummary } = useCart();
   const { user } = useAuth();
@@ -181,21 +186,15 @@ export default function ConcernDetailScreen() {
   // --- Loading skeleton ---
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-          <View style={{ width: 36 }} />
-        </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#dc2626" />
+      <View style={styles.container}>
+        <CollapsibleHeader title="" scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
+          <ActivityIndicator size="large" color={colors.brand} />
           <Text style={styles.loadingText}>
-            {locale === 'ar' ? 'جارٍ التحميل...' : locale === 'ru' ? 'Загрузка...' : 'Loading...'}
+            {locale === 'ar' ? 'جارٍ التحميل...' : locale === 'ru' ? 'Загرузка...' : 'Loading...'}
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -206,19 +205,16 @@ export default function ConcernDetailScreen() {
   const icon = localConcern?.icon || apiIcon;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]} numberOfLines={1}>
-          {seo?.h1 || ''}
-        </Text>
-        <View style={{ width: 36 }} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={seo?.h1 || ''} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight + 8 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+      >
 
         {/* Hero */}
         <View style={styles.hero}>
@@ -516,13 +512,13 @@ export default function ConcernDetailScreen() {
         {/* SEO intro text hidden — only relevant for web crawlers, not native app */}
 
         <View style={{ height: user && cartItems.length > 0 ? 120 : 40 }} />
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Sticky Bottom Bar — expandable, visible when cart has items */}
       {user && cartItems.length > 0 && (() => {
         const summary = getCartSummary();
         return (
-          <View style={styles.stickyBar}>
+          <View style={[styles.stickyBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
             {/* Chevron handle */}
             <TouchableOpacity
               style={styles.stickyChevron}
@@ -661,12 +657,12 @@ export default function ConcernDetailScreen() {
           <Text style={styles.toastText}>{toastMessage}</Text>
         </Animated.View>
       ) : null}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
 
   // Header
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#E5E5EA' },
@@ -696,13 +692,13 @@ const styles = StyleSheet.create({
 
   // Why
   whyGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  whyCard: { width: (SCREEN_WIDTH - SIDE_PADDING * 2 - 10) / 2, backgroundColor: '#F9FAFB', borderRadius: 14, borderWidth: 1, borderColor: '#F0F0F0', padding: 14, marginBottom: 10, alignItems: 'center' },
+  whyCard: { width: (SCREEN_WIDTH - SIDE_PADDING * 2 - 10) / 2, ...surfaces.card, ...shadow.card, borderRadius: 14, padding: 14, marginBottom: 10, alignItems: 'center' },
   whyIcon: { fontSize: 26, marginBottom: 8 },
   whyLabel: { ...T.labelSmall, textAlign: 'center', marginBottom: 4 },
   whyDetail: { ...T.captionTiny, textAlign: 'center', lineHeight: 16 },
 
   // Protocol PDF
-  pdfCard: { marginTop: 16, marginBottom: 8, backgroundColor: '#FFFBEB', borderRadius: 16, borderWidth: 1, borderColor: '#FDE68A', padding: 16 },
+  pdfCard: { marginTop: 16, marginBottom: 8, backgroundColor: '#FFFBEB', borderRadius: 16, padding: 16, ...shadow.card },
   pdfRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   pdfIconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FEF3C7', justifyContent: 'center', alignItems: 'center' },
   pdfContent: { flex: 1 },
@@ -717,11 +713,11 @@ const styles = StyleSheet.create({
   // Routine
   routineSectionTitle: { ...T.sectionTitle, marginBottom: 4 },
   routineSubtitle: { ...T.caption, marginBottom: 12 },
-  routineStep: { backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#E5E5EA', marginBottom: 8, overflow: 'hidden' },
-  routineStepExpanded: { borderColor: '#FECACA' },
+  routineStep: { ...surfaces.card, ...shadow.card, borderRadius: 14, marginBottom: 10, overflow: 'hidden' },
+  routineStepExpanded: { backgroundColor: '#FFF8F8' },
   routineStepHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 10 },
-  stepNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#1D1D1F', justifyContent: 'center', alignItems: 'center' },
-  stepNumberActive: { backgroundColor: '#dc2626' },
+  stepNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.label, justifyContent: 'center', alignItems: 'center' },
+  stepNumberActive: { backgroundColor: colors.brand },
   stepNumberText: { ...T.badgeMedium },
   stepNumberTextActive: { color: '#fff' },
   stepTitleWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
@@ -731,8 +727,8 @@ const styles = StyleSheet.create({
   stepBody: { paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
   stepDetail: { ...T.caption, color: '#555', lineHeight: 20, marginBottom: 10 },
   stepProducts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F9FAFB', borderWidth: 1, borderColor: '#E5E5EA', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
-  stepProductChipInCart: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
+  stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.fillSecondary, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
+  stepProductChipInCart: { backgroundColor: tint(colors.greenDeep, '1A') },
   stepProductName: { ...T.captionSmall, fontWeight: '600', color: '#1D1D1F' },
   stepProductNameInCart: { color: '#15803D' },
   stepProductPrice: { ...T.captionSmall },
@@ -742,16 +738,16 @@ const styles = StyleSheet.create({
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
 
   // FAQ
-  faqSection: { marginTop: 24, marginBottom: 8, backgroundColor: '#F9FAFB', borderRadius: 16, padding: 16, marginHorizontal: -SIDE_PADDING, paddingHorizontal: SIDE_PADDING },
-  faqItem: { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#E5E5EA', marginBottom: 8, overflow: 'hidden' },
-  faqItemOpen: { borderColor: '#FECACA' },
+  faqSection: { marginTop: 24, marginBottom: 8 },
+  faqItem: { ...surfaces.card, ...shadow.card, borderRadius: 12, marginBottom: 8, overflow: 'hidden' },
+  faqItemOpen: { backgroundColor: '#FFF8F8' },
   faqHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 8 },
   faqQuestion: { ...T.faqQuestion, fontWeight: '600', lineHeight: 20 },
   faqAnswer: { ...T.faqAnswer, fontSize: 13, paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
 
   // Related concerns
   relatedScroll: { gap: 10, paddingRight: 16 },
-  relatedCard: { width: 180, backgroundColor: '#F9FAFB', borderRadius: 14, borderWidth: 1, borderColor: '#F0F0F0', padding: 14 },
+  relatedCard: { width: 180, ...surfaces.card, ...shadow.card, borderRadius: 14, padding: 14 },
   relatedIcon: { fontSize: 28, marginBottom: 8 },
   relatedTitle: { ...T.label, marginBottom: 4, lineHeight: 19 },
   relatedDesc: { ...T.captionTiny, lineHeight: 16 },
@@ -760,11 +756,9 @@ const styles = StyleSheet.create({
   ctaBlock: {
     marginTop: 28,
     marginBottom: 8,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: tint(colors.brand, '0F'),
     borderRadius: 20,
     padding: 24,
-    marginHorizontal: -SIDE_PADDING,
-    paddingHorizontal: SIDE_PADDING + 4,
     alignItems: 'center',
   },
   ctaTitle: {

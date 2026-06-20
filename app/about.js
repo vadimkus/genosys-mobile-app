@@ -1,46 +1,60 @@
 /**
  * About Screen - Standalone (accessed from hamburger menu)
- * Same content as profile/about.js but with standard back arrow navigation
+ * Company About page (opened from the Profile → Information section)
  * and footer with website link + copyright.
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Linking,
   Image,
   I18nManager,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, shadow, surfaces } from '../utils/theme';
 
 export default function AboutScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const appVersion = String(Constants?.expoConfig?.version || Constants?.manifest?.version || '1.0.0');
 
-  const openUrl = async (url) => {
-    const u = String(url || '').trim();
-    if (!u) return;
-    try {
-      await Linking.openURL(u);
-    } catch {
-      // ignore
-    }
-  };
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
-  const InfoRow = ({ label, value, onPress }) => (
-    <View style={[styles.infoRow, isRTL && styles.infoRowRTL]}>
+  const SectionHeader = ({ icon, tileColor, title }) => (
+    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+        <Ionicons name={icon} size={16} color={colors.white} />
+      </View>
+      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+    </View>
+  );
+
+  const InfoRow = ({ label, value, onPress, isLast }) => (
+    <View style={[styles.infoRow, isRTL && styles.infoRowRTL, isLast && styles.infoRowLast]}>
       <Text style={[styles.infoLabel, isRTL && styles.infoLabelRTL]}>{label}</Text>
       {onPress ? (
         <TouchableOpacity onPress={() => { haptics.lightTap(); onPress(); }} activeOpacity={0.7}>
@@ -52,146 +66,173 @@ export default function AboutScreen() {
     </View>
   );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header - generic back arrow */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {t('about.title')}
-        </Text>
-        <View style={styles.headerSpacer} />
-      </View>
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <Image
-            source={require('../assets/splash-logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>{t('about.companyName')}</Text>
-          <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
-            <Text style={styles.flagText}>🇦🇪</Text>
-            <Text style={[styles.countryText, isRTL && styles.textRTL]}>{t('about.country')}</Text>
-            <View>
-              <Ionicons name="heart" size={14} color="#dc2626" />
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('about.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 12 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          {/* Hero Section */}
+          <View style={styles.heroSection}>
+            <Image
+              source={require('../assets/genosys-logo-gray.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{t('about.companyName')}</Text>
+            <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
+              <Text style={styles.flagText}>🇦🇪</Text>
+              <Text style={[styles.countryText, isRTL && styles.textRTLCenter]}>{t('about.country')}</Text>
+              <Ionicons name="heart" size={14} color={colors.brand} />
             </View>
           </View>
-        </View>
 
-        {/* About Us */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('about.aboutUsTitle')}</Text>
-          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>{t('about.aboutUsLine1')}</Text>
-          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>{t('about.aboutUsLine2')}</Text>
-        </View>
+          {/* About Us */}
+          <View style={[styles.card, styles.cardPad, shadow.card]}>
+            <SectionHeader icon="information-circle" tileColor={colors.blue} title={t('about.aboutUsTitle')} />
+            <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{t('about.aboutUsLine1')}</Text>
+            <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{t('about.aboutUsLine2')}</Text>
+          </View>
 
-        {/* Mission */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('about.missionTitle')}</Text>
-          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>{t('about.missionText')}</Text>
-        </View>
+          {/* Mission */}
+          <View style={[styles.card, styles.cardPad, shadow.card]}>
+            <SectionHeader icon="flag" tileColor={colors.brand} title={t('about.missionTitle')} />
+            <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{t('about.missionText')}</Text>
+          </View>
 
-        {/* Legal Information & Contact */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('about.legalTitle')}</Text>
-
-          <View style={styles.card}>
-            <Text style={[styles.cardTitle, isRTL && styles.cardTitleRTL]}>{t('about.companyDetailsTitle')}</Text>
+          {/* Company Details */}
+          <View style={[styles.card, styles.cardPad, shadow.card]}>
+            <SectionHeader icon="business" tileColor={colors.indigo} title={t('about.companyDetailsTitle')} />
             <InfoRow label={t('about.companyLabel')} value={t('about.companyName')} />
             <InfoRow label={t('about.yearLabel')} value={t('about.yearValue')} />
             <InfoRow label={t('about.licenseLabel')} value={t('about.licenseValue')} />
             <InfoRow label={t('about.trnLabel')} value={t('about.trnValue')} />
             <InfoRow label={t('about.mainOfficeLabel')} value={t('about.mainOfficeValue')} />
-            <InfoRow label={t('about.dubaiOfficeLabel')} value={t('about.dubaiOfficeValue')} />
+            <InfoRow label={t('about.dubaiOfficeLabel')} value={t('about.dubaiOfficeValue')} isLast />
           </View>
 
-          <View style={styles.card}>
-            <Text style={[styles.cardTitle, isRTL && styles.cardTitleRTL]}>{t('about.businessInfoTitle')}</Text>
+          {/* Business Info */}
+          <View style={[styles.card, styles.cardPad, shadow.card]}>
+            <SectionHeader icon="briefcase" tileColor={colors.teal} title={t('about.businessInfoTitle')} />
             <InfoRow label={t('about.distributorLabel')} value={t('about.distributorValue')} />
             <InfoRow label={t('about.certificationLabel')} value={t('about.certificationValue')} />
             <InfoRow label={t('about.productsLabel')} value={t('about.productsValue')} />
-            <InfoRow label={t('about.areaLabel')} value={t('about.areaValue')} />
+            <InfoRow label={t('about.areaLabel')} value={t('about.areaValue')} isLast />
           </View>
-        </View>
 
-        {/* Footer with website link and copyright */}
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, isRTL && styles.footerTextRTL]}>
-            GENOSYS
-          </Text>
-          <Text style={[styles.footerSub, isRTL && styles.footerSubRTL]}>
-            {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
-          </Text>
-          <TouchableOpacity onPress={() => Linking.openURL('https://www.genosys.ae')} activeOpacity={0.7} style={{ marginTop: 8 }}>
-            <Text style={styles.footerLink}>www.genosys.ae</Text>
-          </TouchableOpacity>
-          <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
-          <Text style={[styles.footerVersion, isRTL && styles.footerVersionRTL]}>{t('about.versionLabel', { version: appVersion })}</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          {/* Footer with website link and copyright */}
+          <View style={styles.footer}>
+            <Text style={[styles.footerBrand, isRTL && styles.textRTLCenter]}>GENOSYS</Text>
+            <Text style={[styles.footerSub, isRTL && styles.textRTLCenter]}>
+              {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
+            </Text>
+            <TouchableOpacity onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae'); }} activeOpacity={0.7} style={styles.footerLinkWrap}>
+              <Text style={styles.footerLink}>www.genosys.ae</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
+            <Text style={[styles.footerVersion, isRTL && styles.textRTLCenter]}>{t('about.versionLabel', { version: appVersion })}</Text>
+          </View>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-
-  // Header - generic back arrow style
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
-  headerSpacer: { width: 40 },
-
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
 
   // Hero Section
-  heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#ffffff' },
+  heroSection: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
   logo: { width: 240, height: 72, marginBottom: 14 },
-  heroTitle: { ...T.pageTitle, color: '#000000', textAlign: 'center', marginBottom: 8 },
-  countryRow: { marginTop: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
+  countryRow: {
+    marginTop: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
   countryRowRtl: { flexDirection: 'row-reverse' },
   flagText: { fontSize: 14 },
-  countryText: { ...T.body, color: '#8E8E93', lineHeight: undefined },
+  countryText: { ...T.body, color: colors.secondaryLabel },
 
-  // Sections
-  section: { paddingHorizontal: 20, paddingVertical: 24 },
-  sectionTitle: { ...T.sectionTitle, fontSize: 22, color: '#000000', marginBottom: 16, letterSpacing: -0.4 },
-  paragraph: { ...T.body, color: '#1D1D1F', marginBottom: 12 },
+  // Cards
+  card: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+  },
+  cardPad: { padding: 18 },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  rowRTL: { flexDirection: 'row-reverse' },
+  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label },
 
-  card: { backgroundColor: '#F2F2F7', borderRadius: 14, padding: 16, marginBottom: 14 },
-  cardTitle: { ...T.label, fontSize: 16, fontWeight: '800', color: '#111827', marginBottom: 12 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#E5E5EA' },
-  infoLabel: { ...T.caption, fontWeight: '700', color: '#6B7280', width: '38%', paddingEnd: 8 },
-  infoValue: { ...T.label, fontWeight: '700', color: '#111827', width: '62%', textAlign: 'right' },
-  infoValueLink: { color: '#2563eb' },
+  paragraph: { ...T.body, marginBottom: 12, lineHeight: 23 },
+  paragraphLast: { marginBottom: 0 },
+
+  // Info rows
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  infoRowLast: { borderBottomWidth: 0, paddingBottom: 0 },
+  infoRowRTL: { flexDirection: 'row-reverse' },
+  infoLabel: {
+    ...T.labelSmall,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+    width: '38%',
+    paddingEnd: 8,
+  },
+  infoValue: {
+    ...T.labelSmall,
+    fontWeight: '600',
+    color: colors.label,
+    width: '62%',
+    textAlign: 'right',
+  },
+  infoValueLink: { color: colors.blue },
+  infoLabelRTL: { textAlign: 'right', writingDirection: 'rtl' },
+  infoValueRTL: { textAlign: 'left' },
 
   // Footer
-  footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
-  footerText: { ...T.bodySmall, fontWeight: '600', color: '#6B7280', lineHeight: undefined },
-  footerSub: { ...T.caption, color: '#9CA3AF', marginTop: 4 },
-  footerLink: { ...T.link, color: '#dc2626' },
-  footerCopyright: { ...T.captionSmall, color: '#C7C7CC', marginTop: 12 },
-  footerVersion: { ...T.captionSmall, color: '#C7C7CC', marginTop: 6 },
+  footer: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 28,
+    alignItems: 'center',
+  },
+  footerBrand: { ...T.bodySmall, fontWeight: '700', color: colors.secondaryLabel, letterSpacing: 0.5 },
+  footerSub: { ...T.caption, color: colors.tertiary, marginTop: 4, textAlign: 'center' },
+  footerLinkWrap: { marginTop: 8 },
+  footerLink: { ...T.link, color: colors.brand },
+  footerCopyright: { ...T.captionSmall, color: colors.tertiary, marginTop: 12, textAlign: 'center' },
+  footerVersion: { ...T.captionSmall, color: colors.tertiary, marginTop: 6, textAlign: 'center' },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  sectionTitleRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  paragraphRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  cardTitleRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  infoRowRTL: { flexDirection: 'row-reverse' },
-  infoLabelRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  infoValueRTL: { textAlign: 'left' },
-  footerTextRTL: { textAlign: 'center', writingDirection: 'rtl' },
-  footerSubRTL: { textAlign: 'center', writingDirection: 'rtl' },
-  footerVersionRTL: { textAlign: 'center' },
+  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });

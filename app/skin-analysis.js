@@ -10,25 +10,27 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
   TouchableOpacity,
   ActivityIndicator,
   Platform,
   Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
 import T from '../utils/typography';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 
 const log = createLogger('SkinAnalysis');
 
@@ -49,6 +51,8 @@ export default function SkinAnalysisScreen() {
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const { addItem } = useCart();
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
 
   const [step, setStep] = useState(0); // 0 = landing, 1-4 = quiz steps, 5 = results
   const [skinType, setSkinType] = useState('');
@@ -154,18 +158,21 @@ export default function SkinAnalysisScreen() {
   // Landing screen
   if (step === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('skinAnalysis.title')}</Text>
-          <View style={styles.backBtn} />
-        </View>
-
-        <ScrollView contentContainerStyle={styles.landingContent}>
+      <View style={styles.container}>
+        <CollapsibleHeader
+          title={t('skinAnalysis.title')}
+          scrollY={scrollY}
+          onBack={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); }}
+          isRTL={isRTL}
+        />
+        <Animated.ScrollView
+          contentContainerStyle={[styles.landingContent, { paddingTop: headerHeight + 40, paddingBottom: insets.bottom + 32 }]}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.landingIcon}>
-            <Ionicons name="sparkles" size={48} color="#dc2626" />
+            <Ionicons name="sparkles" size={48} color={colors.brand} />
           </View>
           <Text style={[styles.landingTitle, isRTL && styles.textCenter]}>
             {t('skinAnalysis.title')}
@@ -188,33 +195,37 @@ export default function SkinAnalysisScreen() {
             onPress={() => router.push('/skin-analysis-camera')}
             activeOpacity={0.85}
           >
-            <Ionicons name="camera-outline" size={20} color="#dc2626" />
+            <Ionicons name="camera-outline" size={20} color={colors.brand} />
             <Text style={styles.cameraButtonText}>{t('skinAnalysis.startCamera')}</Text>
           </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
+        </Animated.ScrollView>
+      </View>
     );
   }
 
   // Results screen
   if (step === 5) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={handleReset} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('skinAnalysis.yourResults')}</Text>
-          <View style={styles.backBtn} />
-        </View>
+      <View style={styles.container}>
+        <CollapsibleHeader
+          title={t('skinAnalysis.yourResults')}
+          scrollY={loading ? null : scrollY}
+          onBack={handleReset}
+          isRTL={isRTL}
+        />
 
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#dc2626" />
+          <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
+            <ActivityIndicator size="large" color={colors.brand} />
             <Text style={styles.loadingText}>{t('skinAnalysis.analyzing')}</Text>
           </View>
         ) : (
-          <ScrollView contentContainerStyle={styles.resultsContent} showsVerticalScrollIndicator={false}>
+          <Animated.ScrollView
+            contentContainerStyle={[styles.resultsContent, { paddingTop: headerHeight + 8, paddingBottom: insets.bottom + 40 }]}
+            showsVerticalScrollIndicator={false}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+          >
             {/* Profile summary */}
             <View style={styles.profileSummary}>
               <View style={styles.profileRow}>
@@ -244,7 +255,7 @@ export default function SkinAnalysisScreen() {
 
             {apiError ? (
               <View style={styles.errorBox}>
-                <Ionicons name="cloud-offline-outline" size={28} color="#dc2626" />
+                <Ionicons name="cloud-offline-outline" size={28} color={colors.brand} />
                 <Text style={styles.errorText}>{t('skinAnalysis.recommendationsFailedFull')}</Text>
                 <TouchableOpacity style={styles.retryBtn} onPress={handleReset} activeOpacity={0.85}>
                   <Ionicons name="refresh" size={16} color="#fff" />
@@ -269,7 +280,7 @@ export default function SkinAnalysisScreen() {
                       <Image source={{ uri: imageUri }} style={styles.recImage} resizeMode="cover" />
                     ) : (
                       <View style={[styles.recImage, styles.recImagePlaceholder]}>
-                        <Ionicons name="leaf-outline" size={24} color="#D1D5DB" />
+                        <Ionicons name="leaf-outline" size={24} color={colors.tertiary} />
                       </View>
                     )}
                     <View style={styles.recInfo}>
@@ -345,12 +356,12 @@ export default function SkinAnalysisScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.85}>
-              <Ionicons name="refresh" size={18} color="#dc2626" />
+              <Ionicons name="refresh" size={18} color={colors.brand} />
               <Text style={styles.resetButtonText}>{t('skinAnalysis.tryAgain')}</Text>
             </TouchableOpacity>
-          </ScrollView>
+          </Animated.ScrollView>
         )}
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -364,24 +375,24 @@ export default function SkinAnalysisScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={handleBack} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {t('skinAnalysis.step', { current: step, total: TOTAL_STEPS })}
-        </Text>
-        <View style={styles.backBtn} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('skinAnalysis.step', { current: step, total: TOTAL_STEPS })}
+        scrollY={scrollY}
+        onBack={handleBack}
+        isRTL={isRTL}
+      />
 
-      {/* Progress bar */}
-      <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView
+        contentContainerStyle={[styles.stepContent, { paddingTop: headerHeight + 8 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+      >
+        {/* Progress bar */}
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        </View>
         <Text style={[styles.stepTitle, isRTL && styles.textCenter]}>{stepTitles[step]}</Text>
 
         {/* Step 1: Skin Type */}
@@ -481,10 +492,10 @@ export default function SkinAnalysisScreen() {
             })}
           </View>
         )}
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Footer button */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) + 4 }]}>
         <TouchableOpacity
           style={[styles.nextButton, !canProceed() && styles.nextButtonDisabled]}
           onPress={handleNext}
@@ -497,32 +508,24 @@ export default function SkinAnalysisScreen() {
           <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={18} color="#fff" />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700', color: '#1F2937', flex: 1, textAlign: 'center' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
 
-  // Progress bar
+  // Progress bar (sits at top of quiz content, bleeds full-width)
   progressBar: {
     height: 3,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.separator,
+    marginHorizontal: -24,
+    marginTop: -8,
+    marginBottom: 20,
   },
   progressFill: {
     height: 3,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderRadius: 2,
   },
 
@@ -530,13 +533,12 @@ const styles = StyleSheet.create({
   landingContent: {
     alignItems: 'center',
     paddingHorizontal: 32,
-    paddingTop: 60,
   },
   landingIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FEE2E2',
+    backgroundColor: tint(colors.brand, '14'),
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -596,16 +598,16 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: '47%',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
     padding: 20,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
   },
   optionCardSelected: {
-    borderColor: '#dc2626',
-    backgroundColor: '#FEF2F2',
+    borderColor: colors.brand,
+    backgroundColor: tint(colors.brand, '0F'),
   },
   optionLabel: {
     ...T.label,
@@ -663,8 +665,8 @@ const styles = StyleSheet.create({
   // Results
   resultsContent: { padding: 16, paddingBottom: 40 },
   profileSummary: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
     padding: 16,
     marginBottom: 24,
   },
@@ -681,16 +683,10 @@ const styles = StyleSheet.create({
   // Recommendation card
   recCard: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
     padding: 12,
     marginBottom: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E5E7EB',
-    ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 },
-      android: { elevation: 1 },
-    }),
   },
   recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#F3F4F6' },
   recImagePlaceholder: { alignItems: 'center', justifyContent: 'center' },

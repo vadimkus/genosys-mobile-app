@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Alert,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -19,6 +21,7 @@ import { createLogger } from '../../utils/logger';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, tint, shadow, surfaces } from '../../utils/theme';
 
 const log = createLogger('Addresses');
 
@@ -27,9 +30,15 @@ export default function AddressesScreen() {
   const { user, getAddresses, removeAddress, setAddressAsDefault } = useAuth();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Subtle entrance motion (matches order details feel).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
 
   const normalizeKey = (s) => String(s || '').trim().toLowerCase();
   const getTypeMeta = (rawType) => {
@@ -67,6 +76,17 @@ export default function AddressesScreen() {
       loadAddresses();
     }, [])
   );
+
+  useEffect(() => {
+    if (!loading) {
+      fade.setValue(0);
+      lift.setValue(12);
+      Animated.parallel([
+        Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }
+  }, [loading, fade, lift]);
 
   const loadAddresses = async () => {
     try {
@@ -144,45 +164,56 @@ export default function AddressesScreen() {
     }
   };
 
+  const openOptions = (address) => {
+    haptics.lightTap();
+    Alert.alert(
+      t('addresses.optionsTitle'),
+      '',
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.edit'), onPress: () => handleEditAddress(address) },
+        !address.isDefault && { text: t('addresses.setAsDefault'), onPress: () => handleSetDefault(address.id) },
+        { text: t('common.delete'), style: 'destructive', onPress: () => handleDeleteAddress(address.id) },
+      ].filter(Boolean)
+    );
+  };
+
+  const onBack = () => {
+    haptics.lightTap();
+    router.canGoBack() ? router.back() : router.replace('/profile');
+  };
+
   const AddressCard = ({ address }) => {
     const typeMeta = getTypeMeta(address?.type);
     return (
-      <View style={styles.addressCard}>
-        <View style={[styles.addressHeader, isRTL && styles.addressHeaderRTL]}>
-          <View style={[styles.addressTypeContainer, isRTL && styles.addressTypeContainerRTL]}>
-            <Ionicons
-              name={typeMeta.icon}
-              size={20}
-              color="#dc2626"
-            />
-            <Text style={[styles.addressType, isRTL && styles.textRTL]}>{typeMeta.label}</Text>
-            {address.isDefault && (
-              <View style={[styles.defaultBadge, isRTL && styles.defaultBadgeRTL]}>
-                <Text style={[styles.defaultText, isRTL && styles.textRTL]}>{t('addresses.default')}</Text>
-              </View>
-            )}
+      <View style={[styles.card, shadow.card]}>
+        <View style={[styles.cardHead, isRTL && styles.rowRTL]}>
+          <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
+            <Ionicons name={typeMeta.icon} size={17} color="#ffffff" />
+          </View>
+          <View style={styles.headMiddle}>
+            <View style={[styles.typeRow, isRTL && styles.rowRTL]}>
+              <Text style={[styles.addressType, isRTL && styles.textRTL]} numberOfLines={1}>{typeMeta.label}</Text>
+              {address.isDefault ? (
+                <View style={[styles.defaultBadge, isRTL && styles.rowRTL]}>
+                  <View style={styles.defaultDot} />
+                  <Text style={styles.defaultText}>{t('addresses.default')}</Text>
+                </View>
+              ) : null}
+            </View>
           </View>
           <TouchableOpacity
             style={styles.moreButton}
-            onPress={() => {
-              haptics.lightTap();
-              Alert.alert(
-                t('addresses.optionsTitle'),
-                '',
-                [
-                  { text: t('common.cancel'), style: 'cancel' },
-                  { text: t('common.edit'), onPress: () => handleEditAddress(address) },
-                  !address.isDefault && { text: t('addresses.setAsDefault'), onPress: () => handleSetDefault(address.id) },
-                  { text: t('common.delete'), style: 'destructive', onPress: () => handleDeleteAddress(address.id) },
-                ].filter(Boolean)
-              );
-            }}
+            onPress={() => openOptions(address)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name="ellipsis-horizontal" size={20} color="#8E8E93" />
+            <Ionicons name="ellipsis-horizontal" size={20} color={colors.secondaryLabel} />
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.addressDetails, isRTL && styles.addressDetailsRTL]}>
+        <View style={styles.hairline} />
+
+        <View style={[styles.addressDetails, isRTL && styles.alignEndRTL]}>
           <Text style={[styles.addressName, isRTL && styles.textRTL]}>{address.name}</Text>
           <Text style={[styles.addressText, isRTL && styles.textRTL]}>{address.address}</Text>
           <Text style={[styles.addressText, isRTL && styles.textRTL]}>{address.city}, {formatEmirate(address.emirate)}</Text>
@@ -193,303 +224,106 @@ export default function AddressesScreen() {
     );
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('addresses.title')}</Text>
-        <TouchableOpacity onPress={handleAddAddress} style={styles.addButton}>
-          <Ionicons name="add" size={24} color="#dc2626" />
-        </TouchableOpacity>
-      </View>
+  const addButton = (
+    <TouchableOpacity onPress={handleAddAddress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+      <Ionicons name="add" size={26} color={colors.brand} />
+    </TouchableOpacity>
+  );
 
-      <ScrollView 
-        style={styles.scrollView} 
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor="#dc2626"
-          />
-        }
-      >
-        {/* Info Section */}
-        <View style={styles.infoSection}>
-          <Text style={[styles.infoText, isRTL && styles.textRTL]}>
-            {t('addresses.manageHint')}
-          </Text>
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <CollapsibleHeader title={t('addresses.title')} onBack={onBack} right={addButton} isRTL={isRTL} />
+        <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text style={styles.loadingText}>{t('addresses.loading')}</Text>
         </View>
+      </View>
+    );
+  }
 
-        {/* Addresses List */}
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#dc2626" />
-            <Text style={styles.loadingText}>{t('addresses.loading')}</Text>
-          </View>
-        ) : (
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('addresses.title')} scrollY={scrollY} onBack={onBack} right={addButton} isRTL={isRTL} />
+
+      <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
+        <Animated.ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.brand}
+              progressViewOffset={headerHeight}
+            />
+          }
+        >
+          {/* Manage hint */}
+          <Text style={[styles.infoText, isRTL && styles.textRTL]}>{t('addresses.manageHint')}</Text>
+
+          {/* Addresses List */}
           <View style={styles.addressesList}>
             {Array.isArray(addresses) && addresses.length > 0 ? (
               addresses.map((address, index) => (
                 <AddressCard key={`${address.id}-${index}`} address={address} />
               ))
             ) : (
-              <View style={styles.emptyState}>
+              <View style={[styles.emptyState, shadow.card]}>
+                <View style={[surfaces.iconTile, styles.emptyTile, { backgroundColor: colors.teal }]}>
+                  <Ionicons name="location" size={22} color="#ffffff" />
+                </View>
                 <Text style={[styles.emptyTitle, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
                 <Text style={[styles.emptySubtitle, isRTL && styles.textRTL]}>{t('addresses.emptySubtitle')}</Text>
               </View>
             )}
           </View>
-        )}
 
-        {/* Add New Address Button */}
-        <TouchableOpacity style={styles.addNewButton} onPress={handleAddAddress}>
-          <View style={[styles.addNewContent, isRTL && styles.rowRTL]}>
-            <View style={[styles.addIconContainer, isRTL && styles.addIconContainerRTL]}>
-              <Ionicons name="add" size={24} color="#dc2626" />
-            </View>
-            <Text
-              style={[styles.addNewText, isRTL && styles.textRTL]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {t('addresses.addNew')}
-            </Text>
-          </View>
-        </TouchableOpacity>
+          {/* Add New Address — primary action */}
+          <TouchableOpacity
+            style={[styles.addButton, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
+            onPress={handleAddAddress}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="add" size={20} color="#ffffff" />
+            <Text style={styles.addButtonText} numberOfLines={1} ellipsizeMode="tail">{t('addresses.addNew')}</Text>
+          </TouchableOpacity>
 
-        {/* Tips Section */}
-        <View style={styles.tipsSection}>
-          <Text style={[styles.tipsTitle, isRTL && styles.textRTL]}>{t('addresses.deliveryTips')}</Text>
-          <View style={styles.tipsList}>
+          {/* Tips */}
+          <View style={[styles.tipsCard, shadow.card]}>
+            <Text style={[styles.tipsTitle, isRTL && styles.textRTL]}>{t('addresses.deliveryTips')}</Text>
             <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
               <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipDefault')}</Text>
             </View>
             <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
               <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipApt')}</Text>
             </View>
             <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
               <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipPhone')}</Text>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </Animated.ScrollView>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  headerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    ...T.sectionTitleSmall,
-    color: '#000000',
-  },
-  addButton: {
-    padding: 4,
+    backgroundColor: colors.groupedBg,
   },
   scrollView: {
     flex: 1,
   },
-  emptyState: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    borderWidth: 0.5,
-    borderColor: '#E5E5EA',
-  },
-  emptyTitle: {
-    ...T.body,
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: 6,
-  },
-  emptySubtitle: {
-    ...T.label,
-    fontWeight: '400',
-    color: '#6B7280',
-    lineHeight: 20,
-  },
-
-  // Info Section
-  infoSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#F8F9FA',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
-  },
-  infoText: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    textAlign: 'center',
-  },
-
-  // Addresses List
-  addressesList: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  addressCard: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  addressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  addressHeaderRTL: {
-    flexDirection: 'row-reverse',
-  },
-  addressTypeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  addressTypeContainerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  addressType: {
-    ...T.navTitle,
-    color: '#000000',
-    marginStart: 8,
-  },
-  defaultBadge: {
-    backgroundColor: '#27AE60',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    marginStart: 8,
-  },
-  defaultBadgeRTL: {
-    marginStart: 0,
-    marginEnd: 8,
-  },
-  defaultText: {
-    ...T.badgeMedium,
-    fontWeight: '600',
-  },
-  moreButton: {
-    padding: 4,
-  },
-  addressDetails: {
-    paddingStart: 28,
-  },
-  addressDetailsRTL: {
-    paddingStart: 0,
-    paddingEnd: 28,
-    alignItems: 'flex-end',
-  },
-  addressName: {
-    ...T.body,
-    fontWeight: '500',
-    color: '#000000',
-    marginBottom: 4,
-  },
-  addressText: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    marginBottom: 2,
-  },
-  addressPhone: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    marginTop: 4,
-  },
-
-  // Add New Button
-  addNewButton: {
-    marginHorizontal: 20,
-    marginVertical: 20,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E5E5EA',
-    borderStyle: 'dashed',
-  },
-  addNewContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    gap: 12,
-  },
   rowRTL: {
     flexDirection: 'row-reverse',
-  },
-  addIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addIconContainerRTL: {
-    // When the row is reversed, keep spacing on the correct side.
-    marginEnd: 0,
-    marginStart: 0,
-  },
-  addNewText: {
-    ...T.navTitle,
-    color: '#dc2626',
-    fontWeight: '500',
-    flexShrink: 1,
-    minWidth: 0,
-  },
-
-  // Tips Section
-  tipsSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#F8F9FA',
-    marginTop: 20,
-  },
-  tipsTitle: {
-    ...T.sectionTitleSmall,
-    color: '#000000',
-    marginBottom: 12,
-  },
-  tipsList: {
-    gap: 8,
-  },
-  tipItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  tipText: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    marginStart: 8,
-    flex: 1,
-    lineHeight: 20,
   },
   textRTL: {
     textAlign: 'right',
@@ -498,6 +332,170 @@ const styles = StyleSheet.create({
   valueLTR: {
     writingDirection: 'ltr',
     textAlign: 'left',
+  },
+  alignEndRTL: {
+    alignItems: 'flex-end',
+  },
+
+  // Manage hint
+  infoText: {
+    ...T.caption,
+    color: colors.secondaryLabel,
+    textAlign: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 8,
+  },
+
+  // Addresses List
+  addressesList: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    gap: 14,
+  },
+  card: {
+    ...surfaces.card,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
+  },
+  cardHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headMiddle: {
+    flex: 1,
+    minWidth: 0,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  addressType: {
+    ...T.label,
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.label,
+  },
+  defaultBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: tint(colors.greenDeep, '1A'),
+  },
+  defaultDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.greenDeep,
+  },
+  defaultText: {
+    ...T.captionTiny,
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: colors.greenDeep,
+  },
+  moreButton: {
+    padding: 4,
+  },
+  hairline: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  addressDetails: {},
+  addressName: {
+    ...T.label,
+    fontWeight: '600',
+    color: colors.label,
+    marginBottom: 4,
+  },
+  addressText: {
+    ...T.bodySmall,
+    color: colors.secondaryLabel,
+    marginBottom: 2,
+  },
+  addressPhone: {
+    ...T.bodySmall,
+    color: colors.secondaryLabel,
+    marginTop: 4,
+  },
+
+  // Empty state
+  emptyState: {
+    ...surfaces.card,
+    alignItems: 'center',
+    paddingVertical: 28,
+    paddingHorizontal: 24,
+  },
+  emptyTile: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    marginBottom: 14,
+  },
+  emptyTitle: {
+    ...T.sectionTitleSmall,
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    ...T.label,
+    fontWeight: '400',
+    color: colors.secondaryLabel,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+
+  // Add New — primary
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.brand,
+    borderRadius: 14,
+    paddingVertical: 16,
+    marginHorizontal: 16,
+    marginTop: 18,
+  },
+  addButtonText: {
+    ...T.button,
+    fontWeight: '700',
+    flexShrink: 1,
+    minWidth: 0,
+  },
+
+  // Tips
+  tipsCard: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginTop: 18,
+    padding: 16,
+    gap: 12,
+  },
+  tipsTitle: {
+    ...T.label,
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.label,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  tipText: {
+    ...T.bodySmall,
+    color: colors.secondaryLabel,
+    flex: 1,
+    lineHeight: 20,
   },
 
   // Loading
@@ -509,7 +507,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...T.body,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     marginTop: 12,
   },
 });

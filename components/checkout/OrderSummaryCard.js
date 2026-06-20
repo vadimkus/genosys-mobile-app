@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { colors, surfaces } from '../../utils/theme';
 
 /**
  * OrderSummaryCard
@@ -25,12 +27,18 @@ export default function OrderSummaryCard({
 
   return (
     <View style={styles.section}>
-      <Text style={[styles.label, isRTL && styles.textRTL]}>{t('checkout.orderNotesOptional')}</Text>
+      <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
+        <View style={[surfaces.iconTile, { backgroundColor: colors.secondaryLabel }]}>
+          <Ionicons name="chatbubble-ellipses" size={17} color="#ffffff" />
+        </View>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.orderNotesOptional')}</Text>
+      </View>
       <TextInput
         style={[styles.input, styles.textArea, isRTL && styles.inputRTL]}
         value={orderNotes}
         onChangeText={setOrderNotes}
         placeholder={t('checkout.orderNotesPlaceholder')}
+        placeholderTextColor={colors.tertiary}
         multiline
         numberOfLines={2}
         textAlignVertical="top"

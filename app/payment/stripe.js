@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform, Image } from 'react-native';
+import { colors } from '../../utils/theme';
+
+const GRAY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -269,31 +272,22 @@ export default function StripePaymentScreen() {
       {useNativeSheet ? (
         // --- Native Payment Sheet: clean branded screen behind the sheet ------
         <View style={styles.nativeContent}>
-          <View style={styles.nativeIconCircle}>
-            <Ionicons name="card" size={30} color="#dc2626" />
-          </View>
+          <Image source={{ uri: GRAY_UNI_IMAGE }} style={styles.nativeUni} resizeMode="contain" />
           <Text style={styles.nativeTitle}>{t('payment.securePaymentTitle')}</Text>
           <Text style={styles.nativeSubtitle}>{t('payment.securePaymentSubtitle')}</Text>
+          <Text style={styles.nativeTagline}>{t('payment.securePaymentTagline')}</Text>
 
-          {busy ? (
-            <View style={styles.nativeBusyRow}>
-              <ActivityIndicator color="#dc2626" />
-              <Text style={styles.nativeBusyText}>{t('payment.preparingSecurePayment')}</Text>
-            </View>
-          ) : (
-            <>
-              {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
-              <Text style={styles.nativeCancelledNote}>{t('payment.paymentNotCompletedNote')}</Text>
-              <TouchableOpacity
-                style={[styles.primaryButton, styles.nativeButton]}
-                onPress={payWithSheet}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="card-outline" size={18} color="#fff" />
-                <Text style={styles.primaryButtonText}>{t('payment.payNow')}</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+
+          <TouchableOpacity
+            style={[styles.primaryButton, styles.nativeButton, busy && styles.buttonDisabled]}
+            onPress={payWithSheet}
+            disabled={busy}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="card-outline" size={18} color="#fff" />
+            <Text style={styles.primaryButtonText}>{t('payment.payNow')}</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.linkButton}
@@ -352,7 +346,7 @@ export default function StripePaymentScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -370,23 +364,28 @@ const styles = StyleSheet.create({
   nativeContent: {
     flex: 1,
     paddingHorizontal: 28,
-    paddingTop: 48,
+    paddingTop: 32,
     alignItems: 'center',
   },
-  nativeIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#FFF5F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 18,
+  // Gray unicorn blends into the grouped-gray background (no card frame).
+  nativeUni: {
+    width: 168,
+    height: 168,
+    marginBottom: 8,
   },
   nativeTitle: { ...T.sectionTitle, textAlign: 'center' },
   nativeSubtitle: {
     ...T.label,
     fontWeight: '400',
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
+    lineHeight: 20,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  nativeTagline: {
+    ...T.label,
+    fontWeight: '500',
+    color: colors.label,
     lineHeight: 20,
     marginTop: 8,
     textAlign: 'center',

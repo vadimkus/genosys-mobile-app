@@ -9,24 +9,26 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
   TouchableOpacity,
   Platform,
   Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import CollapsibleHeader, { useCollapsibleHeader } from './CollapsibleHeader';
 import { fetchProducts } from '../services/api';
 import { getRecommendations } from '../utils/skinRecommendations';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -78,6 +80,8 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const { addItem } = useCart();
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [recommendations, setRecommendations] = useState([]);
   const [addedProducts, setAddedProducts] = useState(new Set());
 
@@ -115,17 +119,20 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
   const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : '#dc2626';
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={onBack || (() => router.back())} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('skinAnalysis.yourResults')}</Text>
-        <View style={styles.backBtn} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('skinAnalysis.yourResults')}
+        scrollY={scrollY}
+        onBack={onBack || (() => router.back())}
+        isRTL={isRTL}
+      />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: headerHeight + 8, paddingBottom: insets.bottom + 40 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+      >
         {/* Overall Score */}
         <View style={styles.overallCard}>
           <View style={[styles.overallCircle, { borderColor: overallColor }]}>
@@ -144,7 +151,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
             <View style={styles.concernChips}>
               {result.concerns.map((concern, idx) => (
                 <View key={idx} style={styles.concernChip}>
-                  <Ionicons name="alert-circle" size={14} color="#dc2626" />
+                  <Ionicons name="alert-circle" size={14} color={colors.brand} />
                   <Text style={styles.concernChipText}>{concern}</Text>
                 </View>
               ))}
@@ -217,7 +224,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                     <Image source={{ uri: imageUri }} style={styles.recImage} resizeMode="cover" />
                   ) : (
                     <View style={[styles.recImage, styles.recImagePlaceholder]}>
-                      <Ionicons name="leaf-outline" size={24} color="#D1D5DB" />
+                      <Ionicons name="leaf-outline" size={24} color={colors.tertiary} />
                     </View>
                   )}
                   <View style={styles.recInfo}>
@@ -296,33 +303,22 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
         {/* Actions */}
         <View style={styles.actionsRow}>
           <TouchableOpacity style={styles.quizBtn} onPress={() => router.push('/skin-analysis')} activeOpacity={0.85}>
-            <Ionicons name="clipboard-outline" size={18} color="#dc2626" />
+            <Ionicons name="clipboard-outline" size={18} color={colors.brand} />
             <Text style={styles.quizBtnText}>{t('skinAnalysis.startQuiz')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.retakeBtn} onPress={onReset} activeOpacity={0.85}>
-            <Ionicons name="camera-outline" size={18} color="#374151" />
+            <Ionicons name="camera-outline" size={18} color={colors.secondaryLabel} />
             <Text style={styles.retakeBtnText}>{t('skinAnalysis.tryAgain')}</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700', color: '#1F2937', flex: 1, textAlign: 'center' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   content: { padding: 16, paddingBottom: 40 },
   textRTL: { textAlign: 'right' },
 
@@ -347,7 +343,7 @@ const styles = StyleSheet.create({
 
   // Concerns
   concernsCard: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: tint(colors.brand, '0F'),
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -369,8 +365,8 @@ const styles = StyleSheet.create({
 
   // Score bars
   scoresCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
     padding: 16,
     gap: 14,
   },
@@ -399,16 +395,10 @@ const styles = StyleSheet.create({
   // Recommendations
   recCard: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
     padding: 12,
     marginBottom: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E5E7EB',
-    ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 },
-      android: { elevation: 1 },
-    }),
   },
   recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#F3F4F6' },
   recImagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
@@ -450,9 +440,7 @@ const styles = StyleSheet.create({
   concernCta: {
     marginTop: 24,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-    backgroundColor: '#FFF5F5',
+    backgroundColor: tint(colors.brand, '0F'),
     padding: 20,
     alignItems: 'center',
   },

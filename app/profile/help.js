@@ -1,17 +1,19 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Alert,
   Linking,
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -20,6 +22,7 @@ import { getJson } from '../../services/httpClient';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { createLogger } from '../../utils/logger';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const log = createLogger('Help');
 
@@ -28,22 +31,24 @@ export default function HelpSupportScreen() {
   const { t, dir, locale: localeFromHook } = useLocalization();
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [returnModalVisible, setReturnModalVisible] = useState(false);
   const [faqData, setFaqData] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
 
-  const colors = {
-    primary: '#dc2626',
-    text: '#000000',
-    textSecondary: '#8E8E93',
-    textMuted: '#C7C7CC',
-    card: '#F2F2F7',
-    card2: '#ffffff',
-    borderSubtle: '#E5E5EA',
-  };
-
   const locale = localeFromHook;
+
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const fetchFAQ = useCallback(async () => {
     try {
@@ -93,6 +98,7 @@ export default function HelpSupportScreen() {
       subtitle: t('help.support.emailSubtitle'),
       description: 'sales@genosys.ae',
       icon: 'mail',
+      tileColor: colors.blue,
       action: () => Linking.openURL('mailto:sales@genosys.ae'),
     },
     {
@@ -101,6 +107,7 @@ export default function HelpSupportScreen() {
       subtitle: t('help.support.phoneSubtitle'),
       description: '+971 58 548 76 65',
       icon: 'call',
+      tileColor: colors.green,
       action: () => Linking.openURL('tel:+971585487665'),
     },
     {
@@ -109,6 +116,7 @@ export default function HelpSupportScreen() {
       subtitle: t('help.support.whatsappSubtitle'),
       description: '+971 58 548 76 65',
       icon: 'logo-whatsapp',
+      tileColor: colors.whatsapp,
       action: () => Linking.openURL('https://wa.me/971585487665'),
     },
   ];
@@ -122,7 +130,6 @@ export default function HelpSupportScreen() {
       const lineRaw = lines[i] ?? '';
       const line = String(lineRaw).trim();
       if (!line) {
-        // Paragraph break
         if (rows.length && rows[rows.length - 1]?.type !== 'spacer') rows.push({ type: 'spacer', key: `sp-${i}` });
         continue;
       }
@@ -177,507 +184,321 @@ export default function HelpSupportScreen() {
     setExpandedFaq(expandedFaq === faqId ? null : faqId);
   };
 
-  const SupportOptionCard = ({ option }) => (
-    <TouchableOpacity style={[styles.supportCard, isRTL && styles.supportCardRTL, { backgroundColor: colors.card, borderColor: colors.borderSubtle }]} onPress={() => { haptics.lightTap(); option.action(); }}>
-      <View style={[styles.supportIcon, isRTL && styles.supportIconRTL, { backgroundColor: colors.card2 }]}>
-        <Ionicons name={option.icon} size={24} color={colors.primary} />
-      </View>
-      <View style={styles.supportDetails}>
-        <Text style={[styles.supportTitle, isRTL && styles.textRTL, { color: colors.text }]}>{option.title}</Text>
-        <Text style={[styles.supportSubtitle, isRTL && styles.textRTL, { color: colors.textSecondary }]}>{option.subtitle}</Text>
-        <Text
-          style={[
-            styles.supportDescription,
-            isRTL
-              ? (option.id === 'phone' || option.id === 'whatsapp' || option.id === 'email'
-                  ? styles.valueLTRRight
-                  : styles.textRTL)
-              : null,
-            { color: colors.primary },
-          ]}
-        >
-          {option.description}
-        </Text>
-      </View>
-      <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color={colors.textMuted} />
-    </TouchableOpacity>
-  );
-
-  const FaqItem = ({ faq }) => (
-    <View style={[styles.faqItem, { borderBottomColor: colors.borderSubtle }]}>
-      <TouchableOpacity 
-        style={[styles.faqQuestion, isRTL && styles.faqQuestionRTL]}
-        onPress={() => handleFaqPress(faq.id)}
+  const SupportOptionRow = ({ option, showDivider }) => (
+    <View>
+      {showDivider ? <View style={styles.hairline} /> : null}
+      <TouchableOpacity
+        style={[styles.row, isRTL && styles.rowRTL]}
+        onPress={() => { haptics.lightTap(); option.action(); }}
+        activeOpacity={0.6}
       >
-        <Text style={[styles.faqQuestionText, isRTL && styles.textRTL, { color: colors.text }]}>{faq.question}</Text>
-        <Ionicons 
-          name={expandedFaq === faq.id ? 'chevron-up' : 'chevron-down'} 
-          size={20} 
-          color={colors.textSecondary}
-        />
-      </TouchableOpacity>
-      
-      {expandedFaq === faq.id && (
-        <View style={[styles.faqAnswer, { backgroundColor: colors.card }]}>
-          {renderFormattedAnswer(faq.answer)}
+        <View style={[surfaces.iconTile, { backgroundColor: option.tileColor }]}>
+          <Ionicons name={option.icon} size={17} color={colors.white} />
         </View>
-      )}
+        <View style={styles.rowMiddle}>
+          <Text style={[styles.rowTitle, isRTL && styles.textRTL]}>{option.title}</Text>
+          <Text style={[styles.rowSubtitle, isRTL && styles.textRTL]} numberOfLines={1}>{option.subtitle}</Text>
+          <Text style={[styles.rowValue, isRTL ? styles.valueLTRRight : styles.valueLTR]} numberOfLines={1}>{option.description}</Text>
+        </View>
+        <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.tertiary} />
+      </TouchableOpacity>
     </View>
   );
 
+  const FaqItem = ({ faq, showDivider }) => (
+    <View>
+      {showDivider ? <View style={styles.hairline} /> : null}
+      <TouchableOpacity
+        style={[styles.faqQuestion, isRTL && styles.faqQuestionRTL]}
+        onPress={() => handleFaqPress(faq.id)}
+        activeOpacity={0.6}
+      >
+        <Text style={[styles.faqQuestionText, isRTL && styles.textRTL]}>{faq.question}</Text>
+        <Ionicons
+          name={expandedFaq === faq.id ? 'chevron-up' : 'chevron-down'}
+          size={18}
+          color={colors.secondaryLabel}
+        />
+      </TouchableOpacity>
+      {expandedFaq === faq.id ? (
+        <View style={styles.faqAnswer}>
+          {renderFormattedAnswer(faq.answer)}
+        </View>
+      ) : null}
+    </View>
+  );
+
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/profile')} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('help.title')}</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('help.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>{t('help.hero')}</Text>
-          <Text style={[styles.heroSubtitle, isRTL && styles.textRTL]}>
-            {t('help.heroSubtitle')}
-          </Text>
-        </View>
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          {/* Hero */}
+          <View style={styles.heroSection}>
+            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{t('help.hero')}</Text>
+            <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>{t('help.heroSubtitle')}</Text>
+          </View>
 
-        {/* Contact Options */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.contactUs')}</Text>
-          {supportOptions.map((option, index) => (
-            <SupportOptionCard key={`${option.id}-${index}`} option={option} />
-          ))}
-        </View>
+          {/* Contact Options */}
+          <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('help.contactUs')}</Text>
+          <View style={[styles.card, shadow.card]}>
+            {supportOptions.map((option, index) => (
+              <SupportOptionRow key={`${option.id}-${index}`} option={option} showDivider={index > 0} />
+            ))}
+          </View>
 
-        {/* FAQ Section (API-driven) */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.faqTitle')}</Text>
+          {/* FAQ */}
+          <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('help.faqTitle')}</Text>
           {faqLoading ? (
-            <View style={{ paddingVertical: 24, alignItems: 'center' }}>
-              <ActivityIndicator size="small" color="#dc2626" />
+            <View style={[styles.card, styles.cardCenter, shadow.card]}>
+              <ActivityIndicator size="small" color={colors.brand} />
             </View>
           ) : faqData.length > 0 ? (
-            <View style={styles.faqContainer}>
+            <View style={[styles.card, shadow.card]}>
               {faqData.map((faq, index) => (
-                <FaqItem key={`${faq.id}-${index}`} faq={faq} />
+                <FaqItem key={`${faq.id}-${index}`} faq={faq} showDivider={index > 0} />
               ))}
             </View>
           ) : (
             <TouchableOpacity
-              style={{ paddingVertical: 16, alignItems: 'center' }}
+              style={[styles.card, styles.cardCenter, shadow.card]}
               onPress={fetchFAQ}
               activeOpacity={0.7}
             >
-              <Text style={[styles.faqQuestionText, { color: colors.textSecondary, textAlign: 'center' }]}>
+              <Text style={[styles.retryText, isRTL && styles.textRTLCenter]}>
                 {t('common.tryAgain') || 'Tap to retry'}
               </Text>
             </TouchableOpacity>
           )}
-        </View>
 
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('help.quickActions')}</Text>
+          {/* Quick Actions */}
+          <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('help.quickActions')}</Text>
           <View style={styles.quickActionsGrid}>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/profile/orders')}
+            <TouchableOpacity
+              style={[styles.quickActionCard, shadow.card]}
+              onPress={() => { haptics.lightTap(); router.push('/profile/orders'); }}
+              activeOpacity={0.7}
             >
-              <View style={styles.quickActionIcon}>
-                <Ionicons name="receipt-outline" size={24} color="#27AE60" />
+              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.greenDeep }]}>
+                <Ionicons name="receipt" size={20} color={colors.white} />
               </View>
-              <Text style={[styles.quickActionTitle, isRTL && styles.textRTL]}>{t('help.trackOrder')}</Text>
+              <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.trackOrder')}</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => setReturnModalVisible(true)}
-              activeOpacity={0.8}
+
+            <TouchableOpacity
+              style={[styles.quickActionCard, shadow.card]}
+              onPress={() => { haptics.lightTap(); setReturnModalVisible(true); }}
+              activeOpacity={0.7}
             >
-              <View style={styles.quickActionIcon}>
-                <Ionicons name="refresh-outline" size={24} color="#007AFF" />
+              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.blue }]}>
+                <Ionicons name="refresh" size={20} color={colors.white} />
               </View>
-              <Text style={[styles.quickActionTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
+              <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.returnItem')}</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => Linking.openURL('https://wa.me/971585487665')}
+
+            <TouchableOpacity
+              style={[styles.quickActionCard, shadow.card]}
+              onPress={() => { haptics.lightTap(); Linking.openURL('https://wa.me/971585487665'); }}
+              activeOpacity={0.7}
             >
-              <View style={styles.quickActionIcon}>
-                <Ionicons name="logo-whatsapp" size={24} color="#27AE60" />
+              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.whatsapp }]}>
+                <Ionicons name="logo-whatsapp" size={20} color={colors.white} />
               </View>
-              <Text style={[styles.quickActionTitle, isRTL && styles.textRTL]}>{t('help.whatsappSupport')}</Text>
+              <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.whatsappSupport')}</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Return item modal (keeps Quick Actions compact) */}
-        <Modal
-          visible={returnModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setReturnModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.returnModalCard}>
-              <View style={[styles.returnModalHeader, isRTL && styles.returnModalHeaderRTL]}>
-                <View style={[styles.returnModalHeaderLeft, isRTL && styles.returnModalHeaderLeftRTL]}>
-                  <View style={[styles.quickActionIcon, { marginBottom: 0 }]}>
-                    <Ionicons name="refresh-outline" size={22} color="#007AFF" />
-                  </View>
-                  <Text style={[styles.returnModalTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
-                </View>
-                <TouchableOpacity onPress={() => setReturnModalVisible(false)} style={styles.modalCloseBtn}>
-                  <Ionicons name="close" size={22} color="#8E8E93" />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={[styles.returnChecklistTitle, isRTL && styles.textRTL]}>{t('help.returnChecklistTitle')}</Text>
-              <View style={styles.returnChecklistList}>
-                <View style={[styles.returnChecklistItem, isRTL && styles.returnChecklistItemRTL]}>
-                  <Text style={styles.returnBullet}>•</Text>
-                  <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist1')}</Text>
-                </View>
-                <View style={[styles.returnChecklistItem, isRTL && styles.returnChecklistItemRTL]}>
-                  <Text style={styles.returnBullet}>•</Text>
-                  <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist2')}</Text>
-                </View>
-                <View style={[styles.returnChecklistItem, isRTL && styles.returnChecklistItemRTL]}>
-                  <Text style={styles.returnBullet}>•</Text>
-                  <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist3')}</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                style={[styles.returnEmailButton, isRTL && styles.returnEmailButtonRTL]}
-                onPress={async () => {
-                  setReturnModalVisible(false);
-                  await handleReturnItem();
-                }}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="mail-outline" size={16} color="#ffffff" />
-                <Text style={styles.returnEmailButtonText}>{t('help.emailSales')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.modalSecondaryBtn}
-                onPress={() => setReturnModalVisible(false)}
-                activeOpacity={0.85}
-              >
-                <Text style={[styles.modalSecondaryBtnText, isRTL && styles.textRTL]}>{t('common.close')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Business Hours */}
-        <View style={styles.businessHoursSection}>
-          <Text style={[styles.businessHoursTitle, isRTL && styles.textRTL]}>{t('help.serviceHours')}</Text>
-          <View style={styles.businessHoursCard}>
-            <View style={[styles.businessHoursItem, isRTL && styles.businessHoursItemRTL]}>
+          {/* Business Hours */}
+          <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('help.serviceHours')}</Text>
+          <View style={[styles.card, styles.cardPad, shadow.card]}>
+            <View style={[styles.businessHoursItem, isRTL && styles.rowRTL]}>
               <Text style={[styles.dayText, isRTL && styles.textRTL]}>{t('help.everyDay')}</Text>
               <Text style={[styles.hoursText, isRTL && styles.textRTL]}>{t('help.everyDayHours')}</Text>
             </View>
+            <Text style={[styles.timezoneText, isRTL && styles.textRTLCenter]}>{t('help.timezone')}</Text>
           </View>
-          <Text style={[styles.timezoneText, isRTL && styles.textRTL]}>{t('help.timezone')}</Text>
+        </Animated.View>
+      </Animated.ScrollView>
+
+      {/* Return item modal (keeps Quick Actions compact) */}
+      <Modal
+        visible={returnModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setReturnModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.returnModalCard, shadow.card]}>
+            <View style={[styles.returnModalHeader, isRTL && styles.returnModalHeaderRTL]}>
+              <View style={[styles.returnModalHeaderLeft, isRTL && styles.returnModalHeaderLeftRTL]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                  <Ionicons name="refresh" size={17} color={colors.white} />
+                </View>
+                <Text style={[styles.returnModalTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setReturnModalVisible(false)} style={styles.modalCloseBtn}>
+                <Ionicons name="close" size={20} color={colors.secondaryLabel} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.returnChecklistTitle, isRTL && styles.textRTL]}>{t('help.returnChecklistTitle')}</Text>
+            <View style={styles.returnChecklistList}>
+              <View style={[styles.returnChecklistItem, isRTL && styles.rowRTL]}>
+                <View style={styles.returnBulletDot} />
+                <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist1')}</Text>
+              </View>
+              <View style={[styles.returnChecklistItem, isRTL && styles.rowRTL]}>
+                <View style={styles.returnBulletDot} />
+                <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist2')}</Text>
+              </View>
+              <View style={[styles.returnChecklistItem, isRTL && styles.rowRTL]}>
+                <View style={styles.returnBulletDot} />
+                <Text style={[styles.returnChecklistText, isRTL && styles.textRTL]}>{t('help.returnChecklist3')}</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.returnEmailButton, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
+              onPress={async () => {
+                haptics.lightTap();
+                setReturnModalVisible(false);
+                await handleReturnItem();
+              }}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="mail" size={17} color={colors.white} />
+              <Text style={styles.returnEmailButtonText}>{t('help.emailSales')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.modalSecondaryBtn}
+              onPress={() => setReturnModalVisible(false)}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.modalSecondaryBtnText, isRTL && styles.textRTLCenter]}>{t('common.close')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  headerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backButton: {
-    padding: 4,
-    width: 130,
-  },
-  backButtonRTL: { alignItems: 'flex-end' },
-  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { ...T.link, color: '#dc2626' },
-  backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  headerTitle: {
-    ...T.sectionTitleSmall,
-  },
-  headerSpacer: { width: 130 },
-  scrollView: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
+  scrollView: { flex: 1 },
 
-  // Hero Section
+  // Hero
   heroSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 32,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 20,
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
   },
-  heroTitle: {
-    ...T.pageTitle,
-    color: '#000000',
-    textAlign: 'center',
+  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
+  heroSubtitle: { ...T.body, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 22 },
+
+  // Group header
+  groupHeader: {
+    ...T.captionSmall,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+    marginHorizontal: 32,
+    marginTop: 14,
     marginBottom: 8,
   },
-  heroSubtitle: {
-    ...T.body,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
 
-  // Sections
-  section: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+  // Cards / rows
+  card: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    paddingHorizontal: 14,
   },
-  sectionTitle: {
-    ...T.sectionTitle,
-    color: '#000000',
-    marginBottom: 16,
+  cardPad: { paddingVertical: 6 },
+  cardCenter: { paddingVertical: 22, alignItems: 'center' },
+  hairline: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+    marginLeft: 40,
   },
-
-  // Support Cards
-  supportCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    padding: 16,
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    borderWidth: 1,
-    backgroundColor: '#F2F2F7',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    gap: 12,
+    paddingVertical: 12,
   },
-  supportCardRTL: {
-    flexDirection: 'row-reverse',
-  },
-  supportIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  supportIconRTL: {
-    marginRight: 0,
-    marginLeft: 16,
-  },
-  supportDetails: {
-    flex: 1,
-  },
-  supportTitle: {
-    ...T.navTitle,
-    color: '#000000',
-    marginBottom: 2,
-  },
-  supportSubtitle: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    marginBottom: 4,
-  },
-  valueLTRRight: {
-    writingDirection: 'ltr',
-    textAlign: 'right',
-  },
-  supportDescription: {
-    ...T.bodySmall,
-    color: '#dc2626',
-    fontWeight: '500',
-  },
+  rowRTL: { flexDirection: 'row-reverse' },
+  rowMiddle: { flex: 1, minWidth: 0 },
+  rowTitle: { ...T.label, fontSize: 15, color: colors.label },
+  rowSubtitle: { ...T.captionSmall, color: colors.secondaryLabel, marginTop: 2 },
+  rowValue: { ...T.captionSmall, color: colors.brand, fontWeight: '600', marginTop: 2 },
+  retryText: { ...T.bodySmall, color: colors.secondaryLabel, textAlign: 'center' },
 
   // FAQ
-  faqContainer: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-  },
-  faqItem: {
-    borderBottomWidth: 0.5,
-  },
   faqQuestion: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: '#ffffff',
+    gap: 12,
   },
-  faqQuestionRTL: {
-    flexDirection: 'row-reverse',
-  },
-  faqQuestionText: {
-    ...T.faqQuestion,
-    flex: 1,
-    paddingEnd: 16,
-  },
-  faqAnswer: {
-    padding: 14,
-  },
-
-  // FAQ answer formatting
+  faqQuestionRTL: { flexDirection: 'row-reverse' },
+  faqQuestionText: { ...T.faqQuestion, flex: 1, color: colors.label },
+  faqAnswer: { paddingBottom: 14 },
   faqAnswerBody: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 14,
+    backgroundColor: colors.subtleBg,
+    borderRadius: 12,
     padding: 14,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
   },
-  answerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    marginBottom: 8,
-  },
-  answerRowRTL: {
-    flexDirection: 'row-reverse',
-  },
-  answerBullet: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: '#dc2626',
-    fontWeight: '800',
-  },
-  answerNumber: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: '#dc2626',
-    fontWeight: '800',
-    minWidth: 22,
-    textAlign: 'right',
-  },
-  answerNumberRTL: {
-    textAlign: 'left',
-  },
-  answerText: {
-    ...T.faqAnswer,
-    flex: 1,
-    color: '#3C3C43',
-    fontWeight: '500',
-  },
-  answerParagraph: {
-    ...T.faqAnswer,
-    color: '#3C3C43',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
+  answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 8 },
+  answerRowRTL: { flexDirection: 'row-reverse' },
+  answerBullet: { fontSize: 16, lineHeight: 22, color: colors.brand, fontWeight: '800' },
+  answerNumber: { fontSize: 14, lineHeight: 22, color: colors.brand, fontWeight: '800', minWidth: 22, textAlign: 'right' },
+  answerNumberRTL: { textAlign: 'left' },
+  answerText: { ...T.faqAnswer, flex: 1, color: '#3C3C43', fontWeight: '500' },
+  answerParagraph: { ...T.faqAnswer, color: '#3C3C43', fontWeight: '500', marginBottom: 8 },
 
   // Quick Actions
   quickActionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    paddingHorizontal: 16,
     gap: 12,
   },
   quickActionCard: {
-    width: '48%',
-    backgroundColor: '#F2F2F7',
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    padding: 12,
+    ...surfaces.card,
+    width: '31%',
+    flexGrow: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
     alignItems: 'center',
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 1,
   },
-  quickActionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    alignSelf: 'center',
-  },
-  quickActionTitle: {
-    ...T.label,
-    fontWeight: '700',
-    color: '#000000',
-    textAlign: 'center',
-  },
-  returnChecklistTitle: {
-    ...T.label,
-    fontWeight: '700',
-    color: '#000000',
-    marginBottom: 8,
-  },
-  returnChecklistList: {
-    gap: 6,
-  },
-  returnChecklistItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  returnChecklistItemRTL: {
-    flexDirection: 'row-reverse',
-  },
-  returnBullet: {
-    fontSize: 16,
-    lineHeight: 20,
-    color: '#007AFF',
-  },
-  returnChecklistText: {
-    ...T.faqAnswer,
-    flex: 1,
-    lineHeight: 20,
-    color: '#3C3C43',
-    fontWeight: '500',
-  },
-  returnEmailButton: {
-    marginTop: 12,
-    backgroundColor: '#dc2626',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  returnEmailButtonRTL: {
-    flexDirection: 'row-reverse',
-  },
-  returnEmailButtonText: {
-    ...T.buttonSmall,
-    fontWeight: '700',
-  },
+  quickTile: { width: 40, height: 40, borderRadius: 11, marginBottom: 10 },
+  quickActionTitle: { ...T.captionSmall, fontWeight: '700', color: colors.label, textAlign: 'center' },
 
-  // Modal (Return item)
+  // Business Hours
+  businessHoursItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  dayText: { ...T.body, fontWeight: '500', color: colors.label },
+  hoursText: { ...T.body, color: colors.secondaryLabel },
+  timezoneText: { ...T.caption, color: colors.tertiary, textAlign: 'center', marginTop: 8 },
+
+  // Return modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
@@ -685,102 +506,64 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   returnModalCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    padding: 18,
   },
   returnModalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  returnModalHeaderRTL: {
-    flexDirection: 'row-reverse',
-  },
-  returnModalHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  returnModalHeaderLeftRTL: {
-    flexDirection: 'row-reverse',
-  },
-  returnModalTitle: {
-    ...T.body,
-    fontWeight: '800',
-    color: '#1D1D1F',
-  },
+  returnModalHeaderRTL: { flexDirection: 'row-reverse' },
+  returnModalHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  returnModalHeaderLeftRTL: { flexDirection: 'row-reverse' },
+  returnModalTitle: { ...T.body, fontWeight: '800', color: colors.label },
   modalCloseBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F2F2F7',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.subtleBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  returnChecklistTitle: { ...T.label, fontWeight: '700', color: colors.label, marginBottom: 10 },
+  returnChecklistList: { gap: 8 },
+  returnChecklistItem: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  returnBulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.blue,
+    marginTop: 7,
+  },
+  returnChecklistText: { ...T.faqAnswer, flex: 1, lineHeight: 20, color: '#3C3C43', fontWeight: '500' },
+  returnEmailButton: {
+    marginTop: 16,
+    backgroundColor: colors.brand,
+    borderRadius: 14,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  returnEmailButtonText: { ...T.button, fontWeight: '700' },
   modalSecondaryBtn: {
     marginTop: 10,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    backgroundColor: colors.fillSecondary,
+    borderRadius: 14,
+    paddingVertical: 13,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
-  modalSecondaryBtnText: {
-    ...T.label,
-    fontWeight: '700',
-    color: '#1D1D1F',
-  },
+  modalSecondaryBtnText: { ...T.label, fontWeight: '700', color: colors.label },
 
-  // Business Hours
-  businessHoursSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#F8F9FA',
-  },
-  businessHoursTitle: {
-    ...T.sectionTitle,
-    color: '#000000',
-    marginBottom: 16,
-  },
-  businessHoursCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-  },
-  businessHoursItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  businessHoursItemRTL: {
-    flexDirection: 'row-reverse',
-  },
-  dayText: {
-    ...T.body,
-    fontWeight: '500',
-    color: '#000000',
-  },
-  hoursText: {
-    ...T.body,
-    color: '#8E8E93',
-  },
-  timezoneText: {
-    ...T.caption,
-    color: '#C7C7CC',
-    textAlign: 'center',
-    marginTop: 12,
-  },
-
-  // RTL Support Styles
-  textRTL: {
-    writingDirection: 'rtl',
-    textAlign: 'right',
-  },
+  // RTL
+  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
+  valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
+  valueLTRRight: { writingDirection: 'ltr', textAlign: 'right' },
 });

@@ -14,6 +14,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const COPY = {
   en: {
@@ -34,9 +35,9 @@ const COPY = {
 };
 
 const BADGES = [
-  { key: 'shipping', icon: 'car-outline', color: '#D97706' },
-  { key: 'authentic', icon: 'shield-checkmark-outline', color: '#16A34A' },
-  { key: 'vat', icon: 'card-outline', color: '#2563EB' },
+  { key: 'shipping', icon: 'car-outline', color: colors.orange },
+  { key: 'authentic', icon: 'shield-checkmark-outline', color: colors.greenDeep },
+  { key: 'vat', icon: 'card-outline', color: colors.blue },
 ];
 
 export default function TrustBadges() {
@@ -76,13 +77,12 @@ export default function TrustBadges() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 12,
-    marginBottom: 24,
-    paddingVertical: 14,
+    ...surfaces.card,
+    ...shadow.card,
+    marginBottom: 14,
+    paddingVertical: 16,
     paddingHorizontal: 16,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    gap: 10,
+    gap: 12,
   },
   row: {
     flexDirection: 'row',
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   text: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#374151',
+    color: colors.label,
     flex: 1,
   },
   textRTL: {

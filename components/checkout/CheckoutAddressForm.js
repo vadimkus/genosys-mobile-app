@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import EmirateFlagIcon from './EmirateFlagIcon';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
+import { colors, surfaces } from '../../utils/theme';
 import {
   isValidEmail,
   formatUaeNationalForInput,
@@ -88,7 +89,9 @@ export default function CheckoutAddressForm({
     <>
       <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
         <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-          <Ionicons name="location" size={20} color="#dc2626" />
+          <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
+            <Ionicons name="location" size={17} color="#ffffff" />
+          </View>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>
         </View>
 

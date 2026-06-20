@@ -3,19 +3,19 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
   TextInput,
   TouchableOpacity,
   Alert,
-  Switch,
   Image,
   Modal,
   ActionSheetIOS,
   Platform,
   Keyboard,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
@@ -25,6 +25,7 @@ import { isValidEmailValue, normalizeUserProfile } from '../../utils/userProfile
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces, tint } from '../../utils/theme';
 
 const log = createLogger('EditProfile');
 
@@ -76,13 +77,13 @@ const getGenderLabel = (t, genderValue) => {
   }
 };
 
-function FormSection({ title, children, isRTL, icon }) {
+function FormSection({ title, children, isRTL, icon, tileColor }) {
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, shadow.card]}>
       <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
         {icon ? (
-          <View style={styles.sectionIconWrap}>
-            <Ionicons name={icon} size={18} color="#dc2626" />
+          <View style={[surfaces.iconTile, { backgroundColor: tileColor || colors.brand }]}>
+            <Ionicons name={icon} size={17} color={colors.white} />
           </View>
         ) : null}
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
@@ -96,6 +97,8 @@ export default function EditProfileScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const { user, updateProfile, deleteAccount, isAuthenticated } = useAuth();
   
   // Check authentication immediately
@@ -445,6 +448,12 @@ export default function EditProfileScreen() {
     router.back();
   };
 
+  const onHeaderBack = () => {
+    haptics.lightTap();
+    if (isEditing) handleCancel();
+    else handleBack();
+  };
+
   const handleDeleteAccount = () => {
     haptics.heavyTap();
     Alert.alert(
@@ -479,48 +488,49 @@ export default function EditProfileScreen() {
     );
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        {isEditing ? (
-          <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-            <Text style={[styles.cancelText, isRTL && styles.textRTL]}>{t('editProfile.cancel')}</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={handleBack}
-            style={[styles.headerButton, styles.headerBackButton]}
-          >
-            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-        )}
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('editProfile.headerTitle')}</Text>
-        {isEditing ? (
-          <TouchableOpacity 
-            onPress={handleSave} 
-            style={[styles.headerButton, (isSaving || !isDirty) && styles.headerButtonDisabled]}
-            disabled={isSaving || !isDirty}
-          >
-            <Text style={[styles.saveText, isRTL && styles.textRTL, (isSaving || !isDirty) && styles.saveTextDisabled]}>
-              {isSaving ? t('editProfile.saving') : t('editProfile.save')}
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.headerButton}>
-            <Text style={[styles.saveText, isRTL && styles.textRTL]}>{t('common.edit')}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+  // Header trailing action: Save while editing, Edit when in view-mode.
+  const headerRight = isEditing ? (
+    <TouchableOpacity
+      onPress={handleSave}
+      style={styles.headerAction}
+      disabled={isSaving || !isDirty}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
+      <Text style={[styles.headerActionText, (isSaving || !isDirty) && styles.headerActionDisabled, isRTL && styles.textRTL]}>
+        {isSaving ? t('editProfile.saving') : t('editProfile.save')}
+      </Text>
+    </TouchableOpacity>
+  ) : (
+    <TouchableOpacity
+      onPress={() => setIsEditing(true)}
+      style={styles.headerAction}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
+      <Text style={[styles.headerActionText, isRTL && styles.textRTL]}>{t('common.edit')}</Text>
+    </TouchableOpacity>
+  );
 
-      <ScrollView 
-        style={styles.scrollView} 
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('editProfile.headerTitle')}
+        scrollY={scrollY}
+        onBack={onHeaderBack}
+        right={headerRight}
+        isRTL={isRTL}
+      />
+
+      <Animated.ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
       >
         {/* Profile Picture Section */}
-        <FormSection title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline">
+        <FormSection title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline" tileColor={colors.indigo}>
           <View style={styles.formContent}>
             <TouchableOpacity
               style={[styles.profilePictureContainer, !isEditing && styles.readOnlyBlock]}
@@ -532,11 +542,11 @@ export default function EditProfileScreen() {
                   <Image source={{ uri: formData.profilePicture }} style={styles.profilePicture} />
                 ) : (
                   <View style={styles.profilePicturePlaceholder}>
-                    <Ionicons name="person" size={40} color="#C7C7CC" />
+                    <Ionicons name="person" size={40} color={colors.tertiary} />
                   </View>
                 )}
                 <View style={[styles.editIconContainer, !isEditing && styles.editIconDisabled]}>
-                  <Ionicons name="camera" size={16} color="#ffffff" />
+                  <Ionicons name="camera" size={16} color={colors.white} />
                 </View>
               </View>
               <Text style={[styles.profilePictureText, isRTL && styles.textRTL]}>
@@ -547,7 +557,7 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Personal Information */}
-        <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline">
+        <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline" tileColor={colors.blue}>
           <View style={styles.formContent}>
             {/* Required asterisks dropped: at 5/7 fields, they carried no
                 information (redundant noise). Optional fields are marked
@@ -566,7 +576,7 @@ export default function EditProfileScreen() {
                 autoComplete="name-given"
                 returnKeyType="next"
                 blurOnSubmit={false}
-                placeholderTextColor="#C7C7CC"
+                placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
             </View>
@@ -585,7 +595,7 @@ export default function EditProfileScreen() {
                 autoComplete="name-family"
                 returnKeyType="next"
                 blurOnSubmit={false}
-                placeholderTextColor="#C7C7CC"
+                placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
             </View>
@@ -595,7 +605,7 @@ export default function EditProfileScreen() {
                 users also get the relay-specific info box beneath. */}
             <View style={styles.fieldContainer}>
               <View style={[styles.labelRow, isRTL && styles.rowRTL]}>
-                <Ionicons name="lock-closed-outline" size={12} color="#6B7280" />
+                <Ionicons name="lock-closed-outline" size={12} color={colors.secondaryLabel} />
                 <Text style={[styles.fieldLabel, styles.fieldLabelMuted, isRTL && styles.textRTL, { marginBottom: 0 }]}>
                   {t('editProfile.emailAddress')}
                 </Text>
@@ -610,7 +620,7 @@ export default function EditProfileScreen() {
                 autoComplete="email"
                 returnKeyType="next"
                 blurOnSubmit={false}
-                placeholderTextColor="#C7C7CC"
+                placeholderTextColor={colors.tertiary}
                 editable={false}
               />
               <Text style={[styles.hintText, isRTL && styles.textRTL]}>
@@ -618,7 +628,7 @@ export default function EditProfileScreen() {
               </Text>
               {String(formData.email || '').includes('@privaterelay.appleid.com') ? (
                 <View style={[styles.infoBox, isRTL && styles.rowRTL]}>
-                  <Ionicons name="shield-checkmark" size={16} color="#2563EB" />
+                  <Ionicons name="shield-checkmark" size={16} color={colors.blue} />
                   <Text style={[styles.infoBoxText, isRTL && styles.textRTL]}>{t('editProfile.appleRelayInfo')}</Text>
                 </View>
               ) : null}
@@ -639,20 +649,20 @@ export default function EditProfileScreen() {
                 autoComplete="email"
                 returnKeyType="next"
                 blurOnSubmit={false}
-                placeholderTextColor="#C7C7CC"
+                placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
               {/* Softened from amber warning banner to neutral gray hint —
                   this is helpful info, not a warning. */}
               <View style={[styles.hintRow, isRTL && styles.rowRTL]}>
-                <Ionicons name="mail-outline" size={12} color="#6B7280" />
+                <Ionicons name="mail-outline" size={12} color={colors.secondaryLabel} />
                 <Text style={[styles.hintText, styles.hintTextInline, isRTL && styles.textRTL]}>
                   {t('editProfile.contactEmailHint')}
                 </Text>
               </View>
             </View>
 
-            <View style={styles.fieldContainer}>
+            <View style={[styles.fieldContainer, styles.fieldContainerLast]}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.phoneNumber')}
               </Text>
@@ -666,7 +676,7 @@ export default function EditProfileScreen() {
                 autoComplete="tel"
                 returnKeyType="done"
                 blurOnSubmit={false}
-                placeholderTextColor="#C7C7CC"
+                placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
             </View>
@@ -674,7 +684,7 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Additional Information */}
-        <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline">
+        <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline" tileColor={colors.teal}>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
@@ -688,10 +698,10 @@ export default function EditProfileScreen() {
                 <Text style={[styles.selectFieldText, isRTL && styles.textRTL, !formData.dateOfBirth && styles.placeholderText]}>
                   {formatDisplayDate(formData.dateOfBirth) || t('editProfile.selectDateOfBirthPlaceholder')}
                 </Text>
-                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />
+                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color={colors.tertiary} />
               </TouchableOpacity>
             </View>
-            <View style={styles.fieldContainer}>
+            <View style={[styles.fieldContainer, styles.fieldContainerLast]}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.gender')} <Text style={styles.optionalMark}>{t('editProfile.optional')}</Text>
               </Text>
@@ -701,27 +711,27 @@ export default function EditProfileScreen() {
                 disabled={!isEditing}
               >
                 <Text style={[styles.selectFieldText, isRTL && styles.textRTL]}>{getGenderLabel(t, formData.gender)}</Text>
-                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />
+                <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color={colors.tertiary} />
               </TouchableOpacity>
             </View>
           </View>
         </FormSection>
 
         {/* Danger Zone */}
-        <View style={styles.dangerZone}>
-          <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL, { marginHorizontal: 0, marginBottom: 12 }]}>
-            <View style={[styles.sectionIconWrap, { backgroundColor: '#FEE2E2' }]}>
-              <Ionicons name="warning-outline" size={18} color="#dc2626" />
+        <View style={[styles.dangerZone, shadow.card]}>
+          <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
+            <View style={[surfaces.iconTile, { backgroundColor: colors.red }]}>
+              <Ionicons name="warning-outline" size={17} color={colors.white} />
             </View>
             <Text style={[styles.dangerTitle, isRTL && styles.textRTL]}>{t('editProfile.dangerZoneTitle')}</Text>
           </View>
           <TouchableOpacity
-            style={[styles.deleteAccountButton, isSaving && styles.deleteAccountButtonDisabled]}
+            style={[styles.deleteAccountButton, shadow.cta(colors.brand), isSaving && styles.deleteAccountButtonDisabled]}
             onPress={handleDeleteAccount}
             disabled={isSaving}
             activeOpacity={0.85}
           >
-            <Ionicons name="trash-outline" size={18} color="#ffffff" style={{ marginEnd: 8 }} />
+            <Ionicons name="trash-outline" size={18} color={colors.white} style={{ marginEnd: 8 }} />
             <Text style={[styles.deleteAccountText, isRTL && styles.textRTL]}>{t('editProfile.deleteAccountButton')}</Text>
           </TouchableOpacity>
         </View>
@@ -729,11 +739,11 @@ export default function EditProfileScreen() {
         {/* Privacy Note */}
         <View style={styles.privacyNote}>
           <View style={[styles.privacyRow, isRTL && styles.rowRTL]}>
-            <Ionicons name="lock-closed-outline" size={16} color="#8E8E93" />
+            <Ionicons name="lock-closed-outline" size={16} color={colors.secondaryLabel} />
             <Text style={[styles.privacyText, isRTL && styles.textRTL]}>{t('editProfile.privacyNote')}</Text>
           </View>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Date Picker Modal */}
       {showDatePicker && Platform.OS === 'android' && (
@@ -769,7 +779,7 @@ export default function EditProfileScreen() {
                 mode="date"
                 display="spinner"
                 themeVariant="light"
-                textColor="#000000"
+                textColor={colors.label}
                 onChange={(event, d) => setTempDate(d || tempDate)}
                 maximumDate={new Date()}
                 minimumDate={new Date(1950, 0, 1)}
@@ -791,7 +801,7 @@ export default function EditProfileScreen() {
             <View style={[styles.modalHeader, isRTL && styles.rowRTL]}>
               <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('editProfile.selectGender')}</Text>
               <TouchableOpacity onPress={() => setShowGenderModal(false)}>
-                <Ionicons name="close" size={24} color="#000" />
+                <Ionicons name="close" size={24} color={colors.label} />
               </TouchableOpacity>
             </View>
             <View style={styles.modalContent}>
@@ -813,7 +823,7 @@ export default function EditProfileScreen() {
                     {option.label}
                   </Text>
                   {formData.gender === option.value && (
-                    <Ionicons name="checkmark" size={20} color="#dc2626" />
+                    <Ionicons name="checkmark" size={20} color={colors.brand} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -821,129 +831,53 @@ export default function EditProfileScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  headerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  headerButton: {
-    minWidth: 60,
-  },
-  headerBackButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  headerTitle: {
-    ...T.sectionTitleSmall,
-    color: '#000000',
-  },
-  backText: {
-    ...T.navTitle,
-    color: '#dc2626',
-    fontWeight: '400',
-  },
-  cancelText: {
-    ...T.navTitle,
-    color: '#dc2626',
-    fontWeight: '400',
-  },
-  headerButtonDisabled: {
-    opacity: 0.5,
-  },
-  saveTextDisabled: {
-    color: '#999999',
-  },
-  saveText: {
-    ...T.navTitle,
-    color: '#dc2626',
-  },
-  readOnlyBlock: {
-    opacity: 0.75,
-  },
-  editIconDisabled: {
-    opacity: 0.55,
+    backgroundColor: colors.groupedBg,
   },
   scrollView: {
     flex: 1,
   },
-  
-  // Profile Picture
-  profilePictureSection: {
+
+  // Header trailing action (Save / Edit)
+  headerAction: {
     alignItems: 'center',
-    paddingVertical: 32,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#dc2626',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
   },
-  avatarText: {
-    ...T.pageTitleLarge,
-    fontSize: 36,
-    color: '#ffffff',
-  },
-  changePhotoButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  changePhotoText: {
+  headerActionText: {
     ...T.navTitle,
-    color: '#dc2626',
-    fontWeight: '400',
+    color: colors.brand,
+  },
+  headerActionDisabled: {
+    color: colors.tertiary,
   },
 
-  // Sections
+  // Sections (soft cards)
   section: {
-    paddingVertical: 24,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 16,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 16,
-    marginHorizontal: 20,
+    marginBottom: 12,
   },
   sectionHeaderRowRTL: {
     flexDirection: 'row-reverse',
   },
-  sectionIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 999,
-    backgroundColor: '#FFF5F5',
-    borderWidth: 1,
-    borderColor: '#FECACA',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   sectionTitle: {
-    ...T.sectionTitle,
-    color: '#000000',
+    ...T.body,
+    fontWeight: '700',
+    lineHeight: undefined,
+    color: colors.label,
   },
   textRTL: {
     textAlign: 'right',
@@ -962,28 +896,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   formContent: {
-    backgroundColor: '#F2F2F7',
-    marginHorizontal: 20,
-    borderRadius: 12,
     overflow: 'hidden',
   },
 
-  // Form Fields
+  // Form Fields (inset rows with hairline separators)
   fieldContainer: {
-    backgroundColor: '#F2F2F7',
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  fieldContainerLast: {
+    borderBottomWidth: 0,
   },
   fieldLabel: {
-    ...T.navTitle,
-    fontWeight: '400',
-    color: '#000000',
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
     marginBottom: 6,
   },
   fieldLabelMuted: {
-    color: '#6B7280',
+    color: colors.secondaryLabel,
   },
   labelRow: {
     flexDirection: 'row',
@@ -991,27 +923,22 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 6,
   },
-  requiredMark: {
-    color: '#dc2626',
-    fontSize: 17,
-  },
   optionalMark: {
-    color: '#8E8E93',
-    fontSize: 13,
+    color: colors.secondaryLabel,
+    fontSize: 12,
     fontWeight: '500',
   },
   textInput: {
-    ...T.navTitle,
-    fontWeight: '400',
-    color: '#000000',
-    paddingVertical: 8,
+    ...T.input,
+    fontSize: 16,
+    color: colors.label,
+    paddingVertical: 6,
     paddingHorizontal: 0,
     backgroundColor: 'transparent',
-    minHeight: 40,
-    textAlignVertical: 'top',
+    minHeight: 36,
   },
   textInputReadOnly: {
-    color: '#6B7280',
+    color: colors.secondaryLabel,
   },
   hintRow: {
     flexDirection: 'row',
@@ -1021,7 +948,7 @@ const styles = StyleSheet.create({
   },
   hintText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     lineHeight: 16,
     marginTop: 4,
   },
@@ -1033,9 +960,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: '#EFF6FF',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
+    backgroundColor: tint(colors.blue, '14'),
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: tint(colors.blue, '40'),
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
@@ -1043,25 +970,7 @@ const styles = StyleSheet.create({
   infoBoxText: {
     ...T.captionSmall,
     flex: 1,
-    color: '#1D4ED8',
-    lineHeight: 16,
-    fontWeight: '600',
-  },
-  warningBox: {
-    marginTop: 8,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: '#FFFBEB',
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  warningBoxText: {
-    ...T.captionSmall,
-    flex: 1,
-    color: '#92400E',
+    color: colors.blue,
     lineHeight: 16,
     fontWeight: '600',
   },
@@ -1069,72 +978,54 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   selectFieldRTL: {
     flexDirection: 'row-reverse',
   },
   selectFieldText: {
-    ...T.navTitle,
-    fontWeight: '400',
-    color: '#000000',
-  },
-
-  // Switch Components
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F2F2F7',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  switchLabel: {
-    flex: 1,
-  },
-  switchSubtext: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    marginTop: 2,
+    ...T.input,
+    fontSize: 16,
+    color: colors.label,
   },
 
   // Privacy Note
   privacyNote: {
     paddingHorizontal: 20,
-    paddingVertical: 24,
+    paddingVertical: 20,
   },
   privacyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
+    justifyContent: 'center',
   },
   privacyText: {
     ...T.bodySmall,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     lineHeight: 20,
     textAlign: 'center',
     flex: 1,
   },
 
+  // Danger Zone
   dangerZone: {
-    marginTop: 8,
-    marginHorizontal: 20,
-    paddingTop: 16,
-    borderTopWidth: 0.5,
-    borderTopColor: '#C6C6C8',
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 14,
+    padding: 16,
   },
   dangerTitle: {
-    ...T.label,
+    ...T.body,
     fontWeight: '700',
-    color: '#8E8E93',
-    marginBottom: 12,
+    lineHeight: undefined,
+    color: colors.label,
   },
   deleteAccountButton: {
-    backgroundColor: '#dc2626',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: colors.brand,
+    borderRadius: 14,
+    paddingVertical: 15,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1144,15 +1035,21 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   deleteAccountText: {
-    ...T.bodySmall,
+    ...T.button,
     fontWeight: '700',
-    color: '#ffffff',
+    color: colors.white,
   },
 
   // Profile Picture Styles
+  readOnlyBlock: {
+    opacity: 0.75,
+  },
+  editIconDisabled: {
+    opacity: 0.55,
+  },
   profilePictureContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 12,
   },
   profilePictureWrapper: {
     position: 'relative',
@@ -1162,13 +1059,13 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.subtleBg,
   },
   profilePicturePlaceholder: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.subtleBg,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1179,26 +1076,22 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: colors.card,
   },
   profilePictureText: {
-    ...T.body,
-    color: '#dc2626',
-    fontWeight: '500',
+    ...T.bodySmall,
+    lineHeight: undefined,
+    color: colors.brand,
+    fontWeight: '600',
   },
 
   // Additional Field Styles
-  multilineInput: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-    paddingTop: 12,
-  },
   placeholderText: {
-    color: '#C7C7CC',
+    color: colors.tertiary,
   },
 
   // Modal Styles
@@ -1214,7 +1107,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   iosDateModal: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     overflow: 'hidden',
@@ -1226,8 +1119,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
   },
   iosDateHeaderBtn: {
     paddingVertical: 6,
@@ -1235,14 +1128,14 @@ const styles = StyleSheet.create({
   },
   iosDateHeaderText: {
     ...T.button,
-    color: '#007AFF',
+    color: colors.blue,
     fontWeight: '500',
   },
   iosDateHeaderDone: {
     fontWeight: '700',
   },
   modalContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 20,
     margin: 20,
     maxHeight: '70%',
@@ -1253,12 +1146,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
   },
   modalTitle: {
     ...T.sectionTitleSmall,
-    color: '#000000',
+    color: colors.label,
   },
   modalContent: {
     paddingVertical: 10,
@@ -1269,24 +1162,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
   },
   selectedGenderOption: {
-    backgroundColor: '#FFF5F5',
+    backgroundColor: tint(colors.brand, '12'),
   },
   genderOptionText: {
     ...T.body,
-    color: '#000000',
+    color: colors.label,
   },
   selectedGenderOptionText: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '500',
-  },
-
-  // Required field indicator
-  requiredMark: {
-    ...T.button,
-    color: '#dc2626',
   },
 });

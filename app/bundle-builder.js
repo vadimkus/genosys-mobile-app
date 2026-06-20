@@ -24,6 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -676,22 +677,23 @@ export default function BundleBuilderScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
 
   // Header
   headerBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
+    backgroundColor: colors.card,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...T.navTitle, flex: 1, fontWeight: '700', color: '#1F2937', textAlign: 'center' },
+  headerTitle: { ...T.navTitle, flex: 1, fontWeight: '700', color: colors.label, textAlign: 'center' },
   cartBadgeBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: '#dc2626', borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
   cartBadgeText: { ...T.badge, color: '#fff' },
 
   // Progress bar
-  progressSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FAFAFA', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  progressSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
   progressBar: { height: 6, backgroundColor: '#E5E7EB', borderRadius: 3, position: 'relative', overflow: 'visible' },
   progressFill: { height: 6, backgroundColor: '#dc2626', borderRadius: 3 },
   tierMarker: { position: 'absolute', top: -3, alignItems: 'center', marginLeft: -4 },
@@ -705,7 +707,7 @@ const styles = StyleSheet.create({
   discountActiveText: { ...T.badgeMedium, color: '#16a34a' },
 
   // Step indicator
-  stepIndicator: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', height: 52 },
+  stepIndicator: { backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, height: 52 },
   stepIndicatorContent: { paddingHorizontal: 12, gap: 8, alignItems: 'center', paddingVertical: 10 },
   stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6', height: 32 },
   stepPillActive: { backgroundColor: '#FEF2F2', borderColor: '#dc2626' },
@@ -717,7 +719,7 @@ const styles = StyleSheet.create({
   stepCountText: { ...T.badge, color: '#fff' },
 
   // Step header
-  stepHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6' },
+  stepHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
   stepHeaderEmoji: { fontSize: 28 },
   stepHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   stepHeaderTitle: { ...T.sectionTitleSmall, color: '#111827' },
@@ -729,11 +731,10 @@ const styles = StyleSheet.create({
   productGrid: { paddingHorizontal: 12, paddingVertical: 12, paddingBottom: 200 },
   productRow: { gap: 12, marginBottom: 12 },
   productCard: {
-    width: CARD_WIDTH, backgroundColor: '#fff', borderRadius: 14,
-    borderWidth: 1.5, borderColor: '#F3F4F6', overflow: 'hidden',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1,
+    width: CARD_WIDTH, ...surfaces.card, ...shadow.card, borderRadius: 14,
+    borderWidth: 1.5, borderColor: 'transparent', overflow: 'hidden',
   },
-  productCardSelected: { borderColor: '#dc2626', backgroundColor: '#FFF5F5' },
+  productCardSelected: { borderColor: colors.brand, backgroundColor: tint(colors.brand, '0A') },
   selectedBadge: {
     position: 'absolute', top: 8, right: 8, zIndex: 10,
     width: 24, height: 24, borderRadius: 12, backgroundColor: '#dc2626',
@@ -757,7 +758,7 @@ const styles = StyleSheet.create({
   addBtnTextSelected: { color: '#fff' },
 
   // Bottom bar
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
   footerChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
   footerHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 2 },
   footerPricing: { paddingHorizontal: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 4 },

@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { sendChatMessage, segmentChatResponse } from '../services/chatService';
@@ -511,7 +512,7 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   flex: { flex: 1 },
 
   /* ─── Header (red, matches mobile web) ─── */
@@ -563,12 +564,9 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 4,
   },
   assistantBubble: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderBottomStartRadius: 4,
-    ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 },
-      android: { elevation: 1 },
-    }),
+    ...shadow.card,
   },
 
   messageText: { ...T.bodySmall, color: undefined },
@@ -625,12 +623,11 @@ const styles = StyleSheet.create({
   /* ─── Product card ─── */
   productCard: {
     flexDirection: 'row',
-    backgroundColor: '#F9FAFB',
+    ...surfaces.card,
+    ...shadow.card,
     borderRadius: 12,
     padding: 10,
     marginVertical: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E5E7EB',
   },
   productCardLoading: {
     height: 60,
@@ -693,23 +690,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 8,
     paddingBottom: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: colors.separator,
   },
   inputBarRTL: { flexDirection: 'row-reverse' },
   input: {
     ...T.input,
     flex: 1,
-    color: '#1F2937',
-    backgroundColor: '#F3F4F6',
+    color: colors.label,
+    backgroundColor: colors.fillSecondary,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: Platform.OS === 'ios' ? 10 : 8,
     maxHeight: 100,
     marginEnd: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.separator,
   },
   inputRTL: { textAlign: 'right', marginEnd: 0, marginStart: 8 },
   sendBtn: {

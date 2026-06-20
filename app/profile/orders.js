@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, RefreshControl, Alert, Linking, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../contexts/AuthContext';
@@ -27,10 +28,25 @@ import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces, statusStyle } from '../../utils/theme';
+import AUTH_CONFIG from '../../config/auth';
 
 const log = createLogger('Orders');
 
-const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi.png&w=512&q=75';
+const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
+const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
+
+// Enable LayoutAnimation on Android for the inline summary expand/collapse.
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const resolveImageUrl = (raw) => {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (s.startsWith('http://') || s.startsWith('https://')) return s;
+  return `${ASSET_ORIGIN}${s.startsWith('/') ? '' : '/'}${s}`;
+};
 
 const formatAED = (value) => {
   const num = Number(value);
@@ -95,15 +111,6 @@ const formatStatusLabel = (t, rawStatus) => {
   return key ? t(key) : (raw ? raw.toUpperCase() : t('ordersDetail.statusPending'));
 };
 
-const statusColor = (status) => {
-  const s = String(status || '').toLowerCase();
-  if (s === 'pending') return '#dc2626';
-  if (s === 'paid' || s === 'confirmed' || s === 'delivered') return '#27AE60';
-  if (s === 'cancelled' || s === 'canceled') return '#dc2626';
-  if (s === 'shipped') return '#007AFF';
-  return '#8E8E93';
-};
-
 const parsePaymentMetadata = (order) => {
   const raw = order?.paymentMetadata ?? order?.payment_metadata ?? null;
   if (!raw) return null;
@@ -126,6 +133,17 @@ const isApplePayLike = (order) => {
   return metaFlow === 'apple_pay';
 };
 
+/** Tinted status capsule with leading dot — shared look with details screen. */
+function StatusCapsule({ status, label, isRTL }) {
+  const s = statusStyle(status);
+  return (
+    <View style={[styles.statusPill, { backgroundColor: s.bg }, isRTL && styles.rowRTL]}>
+      <View style={[styles.statusDot, { backgroundColor: s.color }]} />
+      <Text style={[styles.statusText, { color: s.color }]} numberOfLines={1}>{label}</Text>
+    </View>
+  );
+}
+
 export default function OrdersScreen() {
   const router = useRouter();
   const { user } = useAuth();
@@ -134,6 +152,7 @@ export default function OrdersScreen() {
   const { t, dir, locale } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
 
   const [openedFromProfile, setOpenedFromProfile] = useState(false);
 
@@ -151,7 +170,6 @@ export default function OrdersScreen() {
   }, []);
 
   const backTo = openedFromProfile ? '/profile' : '/(tabs)/shop';
-  const backLabel = openedFromProfile ? t('profile.accountTitle') : t('tabs.home');
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -193,6 +211,12 @@ export default function OrdersScreen() {
   const sortedOrders = useMemo(() => {
     return sortOrdersNewestFirst(mergeOrders(orders, contextOrders));
   }, [orders, contextOrders]);
+
+  const openDetails = (o) => {
+    haptics.lightTap();
+    const orderNumber = o.orderNumber || o.order_number || o.number || o.id;
+    router.push({ pathname: '/profile/orders/[id]', params: { id: String(o.id || orderNumber) } });
+  };
 
   const handlePay = async (order) => {
     haptics.mediumTap();
@@ -249,6 +273,7 @@ export default function OrdersScreen() {
   };
 
   const contactSupportWhatsApp = (order) => {
+    haptics.lightTap();
     const orderNumber = order?.orderNumber || order?.order_number || order?.number || order?.id || '';
     const phoneNumber = '971585487665';
     const message = t('support.whatsappOrderHelpMessage', { orderNumber: String(orderNumber) });
@@ -299,45 +324,36 @@ export default function OrdersScreen() {
 
   const toggleExpanded = (key) => {
     haptics.lightTap();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const k = String(key || '');
     setExpandedOrderKey((prev) => (prev === k ? '' : k));
   };
 
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace(backTo); };
+
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace(backTo); }} style={styles.backButton}>
-            <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-        <View style={[styles.center, isRTL && styles.centerRTL]}>
+      <View style={styles.container}>
+        <CollapsibleHeader title={t('orders.title')} onBack={onBack} isRTL={isRTL} />
+        <View style={[styles.center, { paddingTop: headerHeight + 24 }, isRTL && styles.centerRTL]}>
           <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.loginRequired')}</Text>
           <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.loginRequiredText')}</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace(backTo); }} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('orders.title')}</Text>
-        <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
-          <Ionicons name="refresh" size={20} color="#8E8E93" />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('orders.title')} scrollY={scrollY} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
 
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: (insets?.bottom || 0) + 24 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#dc2626" />}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} progressViewOffset={headerHeight} />}
       >
         {loading ? (
           <OrdersSkeleton />
@@ -372,12 +388,16 @@ export default function OrdersScreen() {
               const vat = o.vat ?? o.vatAmount ?? 0;
               const subtotal = o.subtotal ?? o.subTotal ?? o.sub_total ?? 0;
               // Use server-provided shipping (already 0 when free shipping applied)
-              // Fallback: check threshold for display purposes
               const freeShipping = Number(shippingRaw) === 0 && Number(subtotal) > 0;
               const shipping = Number(shippingRaw) || 0;
+              const itemsArr = Array.isArray(o.items) ? o.items : [];
               const itemCount =
                 o.itemCount ??
-                (Array.isArray(o.items) ? o.items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0) : 0);
+                (itemsArr.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0) || 0);
+              const distinctItems = itemsArr.length;
+              const firstImage = resolveImageUrl(
+                itemsArr.map((it) => it?.image || it?.imageUrl || it?.thumbnail).find(Boolean) || ''
+              );
               const emirate = o.customerEmirate || o.emirate || '';
               const showPay = canResumeOrderPayment(o);
               const keyId = String(o.id || orderNumber);
@@ -390,87 +410,107 @@ export default function OrdersScreen() {
                 ? orderDiscPct
                 : (user?.discountType ? Number(user?.discountPercentage) : 0);
               return (
-                <View key={`${String(o.id || orderNumber)}-${orderIndex}`} style={styles.card}>
-                  <View style={[styles.cardTop, isRTL && styles.cardTopRTL]}>
-                    <TouchableOpacity
-                      style={[styles.orderToggle, isRTL && styles.orderToggleRTL]}
-                      onPress={() => toggleExpanded(keyId)}
-                      activeOpacity={0.85}
-                    >
-                      <Text style={[styles.orderNumber, isRTL && styles.textRTLRight]}>
-                        {t('ordersScreen.orderLabel')}: {String(orderNumber)}
+                <View key={`${String(o.id || orderNumber)}-${orderIndex}`} style={[styles.card, shadow.card]}>
+                  {/* Header — whole row taps through to details */}
+                  <TouchableOpacity
+                    style={[styles.cardHead, isRTL && styles.rowRTL]}
+                    onPress={() => openDetails(o)}
+                    activeOpacity={0.6}
+                  >
+                    {firstImage ? (
+                      <View style={styles.thumbWrap}>
+                        <Image
+                          source={{ uri: firstImage }}
+                          style={styles.thumb}
+                          contentFit="cover"
+                          transition={200}
+                          cachePolicy="memory-disk"
+                          recyclingKey={`order-thumb-${keyId}`}
+                        />
+                        {distinctItems > 1 ? (
+                          <View style={styles.thumbBadge}>
+                            <Text style={styles.thumbBadgeText}>+{distinctItems - 1}</Text>
+                          </View>
+                        ) : null}
+                      </View>
+                    ) : (
+                      <View style={[styles.thumb, styles.thumbPlaceholder]}>
+                        <Ionicons name="bag-handle-outline" size={22} color={colors.tertiary} />
+                      </View>
+                    )}
+
+                    <View style={styles.headMiddle}>
+                      <Text style={[styles.orderNumber, isRTL && styles.textRTLRight]} numberOfLines={1}>
+                        {String(orderNumber)}
                       </Text>
-                      <Ionicons
-                        name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                        size={18}
-                        color="#8E8E93"
-                      />
-                    </TouchableOpacity>
-
-                    <View style={[styles.detailsActions, isRTL && styles.detailsActionsRTL]}>
-                      <TouchableOpacity
-                        onPress={() => router.push({ pathname: '/profile/orders/[id]', params: { id: String(o.id || orderNumber) } })}
-                        activeOpacity={0.85}
-                        style={[styles.detailsPill, isRTL && styles.detailsPillRTL]}
-                      >
-                        <Text style={[styles.detailsPillText, isRTL && styles.textRTLRight]}>{t('ordersScreen.details')}</Text>
-                        <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={14} color="#8E8E93" />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        // Safer UX: delete is long-press only to prevent accidental taps.
-                        onPress={() => Alert.alert(t('ordersScreen.holdToDeleteTitle'), t('ordersScreen.holdToDeleteMessage'))}
-                        onLongPress={() => handleDelete(o)}
-                        delayLongPress={650}
-                        activeOpacity={0.85}
-                        style={styles.deletePill}
-                      >
-                        <Ionicons name="trash-outline" size={16} color="#dc2626" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  <View style={[styles.statusRow, isRTL && styles.statusRowRTL]}>
-                    <View style={[styles.statusPill, { backgroundColor: statusColor(status) + '20' }]}>
-                      <Text style={[styles.statusText, { color: statusColor(status) }]}>
-                        {formatStatusLabel(t, status)}
+                      <Text style={[styles.headSub, isRTL && styles.textRTLRight]} numberOfLines={1}>
+                        {formatDate(createdAt, locale)}{emirate ? ` · ${formatEmirateLabel(t, emirate)}` : ''}
                       </Text>
                     </View>
-                  </View>
 
-                  <View style={[styles.metaRow, isRTL && styles.metaRowRTL]}>
-                    <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>
-                      {formatDate(createdAt, locale)}
-                      {emirate ? ` • ${formatEmirateLabel(t, emirate)}` : ''}
-                    </Text>
-                    <View style={[styles.metaRight, isRTL && styles.metaRightRTL]}>
+                    <View style={[styles.headRight, isRTL && styles.headRightRTL]}>
+                      <StatusCapsule status={status} label={formatStatusLabel(t, status)} isRTL={isRTL} />
+                    </View>
+                    <Ionicons
+                      name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                      size={18}
+                      color={colors.tertiary}
+                      style={styles.disclosure}
+                    />
+                  </TouchableOpacity>
+
+                  {/* Meta footer: payment (left) · total + items (right) */}
+                  <View style={styles.hairline} />
+                  <View style={[styles.metaRow, isRTL && styles.rowRTL]}>
+                    <View style={[styles.metaLeft, isRTL && styles.rowRTL]}>
                       {isApplePayLike(o) ? (
-                        <>
-                          <Ionicons name="logo-apple" size={14} color="#111827" style={styles.appleLogo} />
-                          <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>{t('ordersDetail.paymentMethodApplePay')}</Text>
-                        </>
-                      ) : paymentMethod ? (
-                        <Text style={[styles.metaText, isRTL && styles.textRTLRight]}>{String(paymentMethod).toUpperCase()}</Text>
+                        <Ionicons name="logo-apple" size={14} color={colors.label} style={styles.appleLogo} />
                       ) : null}
-                      {paymentStatus ? <Text style={[styles.metaText, isRTL && styles.textRTLRight]}> • {formatStatusLabel(t, paymentStatus)}</Text> : null}
+                      <Text style={[styles.metaText, isRTL && styles.textRTLRight]} numberOfLines={1}>
+                        {isApplePayLike(o)
+                          ? t('ordersDetail.paymentMethodApplePay')
+                          : (paymentMethod ? String(paymentMethod).toUpperCase() : '')}
+                        {paymentStatus ? ` · ${formatStatusLabel(t, paymentStatus)}` : ''}
+                      </Text>
+                    </View>
+                    <View style={[styles.metaRightCol, isRTL && styles.metaRightColRTL]}>
+                      <Text style={[styles.totalText, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
+                      <Text style={[styles.itemsText, isRTL && styles.textRTLRight]}>
+                        {t('ordersScreen.itemsCount', { count: itemCount })}
+                        {freeShipping ? ` · ${t('common.free')}` : ''}
+                      </Text>
                     </View>
                   </View>
-                  <View style={[styles.cardBottom, isRTL && styles.cardBottomRTL]}>
-                    <Text style={[styles.totalText, isRTL && styles.valueLTR]}>AED {formatAED(total)}</Text>
-                    <Text style={[styles.itemsText, isRTL && styles.textRTLRight]}>
-                      {t('ordersScreen.itemsCount', { count: itemCount })}
-                    </Text>
-                  </View>
-                  <View style={[styles.breakdownRow, isRTL && styles.breakdownRowRTL]}>
-                    <Text style={[styles.breakdownText, isRTL && styles.textRTLRight]}>
-                      {t('ordersScreen.shipping')}: {freeShipping ? t('common.free') : `AED ${formatAED(shipping)}`}
-                    </Text>
+
+                  {/* Quiet actions row: summary toggle + delete */}
+                  <View style={[styles.quietRow, isRTL && styles.rowRTL]}>
+                    <TouchableOpacity
+                      style={[styles.summaryToggle, isRTL && styles.rowRTL]}
+                      onPress={() => toggleExpanded(keyId)}
+                      activeOpacity={0.6}
+                    >
+                      <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={15} color={colors.secondaryLabel} />
+                      <Text style={[styles.summaryToggleText, isRTL && styles.textRTLRight]}>
+                        {isExpanded ? t('ordersScreen.hideSummary') : t('ordersScreen.viewSummary')}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => Alert.alert(t('ordersScreen.holdToDeleteTitle'), t('ordersScreen.holdToDeleteMessage'))}
+                      onLongPress={() => handleDelete(o)}
+                      delayLongPress={650}
+                      activeOpacity={0.6}
+                      style={styles.deleteBtn}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Ionicons name="trash-outline" size={17} color={colors.secondaryLabel} />
+                    </TouchableOpacity>
                   </View>
 
                   {isExpanded ? (
                     <View style={styles.orderSummaryBody}>
                       <Text style={[styles.orderSummaryTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.orderSummary')}</Text>
 
-                      {(Array.isArray(o.items) ? o.items : []).map((it, idx) => {
+                      {itemsArr.map((it, idx) => {
                         const qty = Number(it?.quantity) || 0;
                         const name = it?.name || it?.productName || `${t('ordersScreen.item')} ${idx + 1}`;
                         const size = it?.size || it?.selectedSize || '';
@@ -539,7 +579,7 @@ export default function OrdersScreen() {
                         const retailTotal = Number(subtotal) + (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
                         const afterVipSubtotal = retailTotal - (hasVip ? discAmt : 0);
                         const totalSaved = (hasVip ? discAmt : 0) + (hasBundle ? bundleDiscAmt : 0);
-                        const paidCount = Array.isArray(o.items) ? o.items.filter(it => !(it?.isPromotionItem === true || String(it?.selectedSize || '').trim() === '__PROMO__' || Number(it?.price || 0) === 0)).length : 0;
+                        const paidCount = itemsArr.filter(it => !(it?.isPromotionItem === true || String(it?.selectedSize || '').trim() === '__PROMO__' || Number(it?.price || 0) === 0)).length;
 
                         return (
                           <>
@@ -605,7 +645,7 @@ export default function OrdersScreen() {
                             {/* Free Shipping banner */}
                             {freeShipping ? (
                               <View style={styles.freeShippingBanner}>
-                                <Ionicons name="checkmark-circle" size={12} color="#27AE60" style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                                <Ionicons name="checkmark-circle" size={12} color={colors.greenDeep} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
                                 <Text style={[styles.freeShippingText, isRTL && styles.textRTLRight]}>
                                   {t('checkout.freeShippingApplied')}
                                 </Text>
@@ -641,14 +681,15 @@ export default function OrdersScreen() {
                     </View>
                   ) : null}
 
+                  {/* Primary / tertiary actions */}
                   {showPay ? (
                     <TouchableOpacity
-                      style={[styles.payButton, isRTL && styles.buttonRTL, isPaying && styles.payButtonDisabled]}
+                      style={[styles.payButton, shadow.cta(colors.brand), isRTL && styles.buttonRTL, isPaying && styles.buttonDisabled]}
                       onPress={() => handlePay(o)}
                       disabled={isPaying}
                       activeOpacity={0.85}
                     >
-                      <Ionicons name="card-outline" size={16} color="#ffffff" />
+                      <Ionicons name="card" size={17} color={colors.white} />
                       <Text style={[styles.payButtonText, isRTL && styles.textRTLRight]}>{isPaying ? t('orders.startingPayment') : t('orders.payNow')}</Text>
                     </TouchableOpacity>
                   ) : null}
@@ -656,42 +697,38 @@ export default function OrdersScreen() {
                   <TouchableOpacity
                     style={[styles.supportButton, isRTL && styles.buttonRTL]}
                     onPress={() => contactSupportWhatsApp(o)}
-                    activeOpacity={0.85}
+                    activeOpacity={0.7}
                   >
-                    <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
-                    <Text style={[styles.supportButtonText, isRTL && styles.textRTLRight]}>{t('ordersScreen.supportWhatsapp')}</Text>
+                    <Ionicons name="logo-whatsapp" size={16} color={colors.whatsapp} />
+                    <Text style={[styles.supportButtonText, isRTL && styles.textRTLRight]}>{t('ordersScreen.support')}</Text>
                   </TouchableOpacity>
                 </View>
               );
             })}
           </View>
         )}
-      </ScrollView>
-    </SafeAreaView>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+    backgroundColor: colors.card,
   },
   headerRTL: {
     flexDirection: 'row-reverse',
   },
   backButton: { padding: 4 },
-  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { ...T.link, color: '#dc2626' },
-  backTextRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  headerTitle: { ...T.sectionTitleSmall, color: '#000000' },
+  headerTitle: { ...T.navTitle, color: '#000000' },
   headerSpacer: { width: 28 },
   refreshButton: { padding: 4 },
   scrollView: { flex: 1 },
@@ -699,189 +736,179 @@ const styles = StyleSheet.create({
   centerTop: { justifyContent: 'flex-start', paddingTop: 16 },
   emptyUniImage: { width: 240, height: 240, marginBottom: 24 },
   centerRTL: { alignItems: 'flex-end' },
-  loadingText: { marginTop: 12, color: '#8E8E93' },
   emptyTitle: { ...T.sectionTitleSmall, marginBottom: 6, textAlign: 'center' },
-  emptyText: { ...T.label, fontWeight: '400', color: '#8E8E93', textAlign: 'center', lineHeight: 20 },
+  emptyText: { ...T.label, fontWeight: '400', color: colors.secondaryLabel, textAlign: 'center', lineHeight: 20 },
   shopButton: {
     marginTop: 18,
-    backgroundColor: '#dc2626',
-    paddingVertical: 12,
+    backgroundColor: colors.brand,
+    paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 14,
     minWidth: 180,
     alignItems: 'center',
   },
-  shopButtonText: {
-    ...T.button,
-  },
-  shopButtonTextRTL: {
-    writingDirection: 'rtl',
-  },
-  textRTL: {
-    writingDirection: 'rtl',
-    textAlign: 'center',
-  },
-  textRTLRight: {
-    writingDirection: 'rtl',
-    textAlign: 'right',
-  },
-  list: { padding: 20, gap: 12 },
+  shopButtonText: { ...T.button },
+  shopButtonTextRTL: { writingDirection: 'rtl' },
+  textRTL: { writingDirection: 'rtl', textAlign: 'center' },
+  textRTLRight: { writingDirection: 'rtl', textAlign: 'right' },
+
+  list: { padding: 16, gap: 14 },
+
+  // ── Card ──────────────────────────────────────────────────────────
   card: {
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    ...surfaces.card,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 12,
+  },
+  rowRTL: { flexDirection: 'row-reverse' },
+  cardHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  thumbWrap: { width: 52, height: 52 },
+  thumb: {
+    width: 52,
+    height: 52,
     borderRadius: 12,
-    padding: 14,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
   },
-  cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
-  cardTopRTL: { flexDirection: 'row-reverse' },
-  orderToggle: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  orderToggleRTL: { flexDirection: 'row-reverse' },
-  // More spacing between Details and Delete to reduce accidental taps.
-  detailsActions: { alignItems: 'flex-end', gap: 16 },
-  detailsActionsRTL: { alignItems: 'flex-start' },
-  detailsPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#F2F2F7',
-  },
-  detailsPillRTL: { flexDirection: 'row-reverse' },
-  detailsPillText: { ...T.captionSmall, fontWeight: '700', color: '#1D1D1F' },
-  deletePill: {
-    width: 36,
-    height: 32,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#F2F2F7',
+  thumbPlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
-  statusRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
-  statusRowRTL: { justifyContent: 'flex-end' },
-  orderNumber: { ...T.bodySmall, fontWeight: '700', color: '#1D1D1F' },
-  statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  statusText: { ...T.badgeMedium },
-  metaRow: {
-    marginTop: 6,
+  thumbBadge: {
+    position: 'absolute',
+    right: -4,
+    bottom: -4,
+    minWidth: 20,
+    height: 20,
+    paddingHorizontal: 5,
+    borderRadius: 10,
+    backgroundColor: colors.label,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.card,
+  },
+  thumbBadgeText: { color: colors.white, fontSize: 10, fontWeight: '800' },
+  headMiddle: { flex: 1, minWidth: 0 },
+  orderNumber: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label },
+  headSub: { ...T.captionSmall, color: colors.secondaryLabel, marginTop: 3 },
+  headRight: { alignItems: 'flex-end' },
+  headRightRTL: { alignItems: 'flex-start' },
+  disclosure: { marginLeft: 2 },
+
+  // Status capsule
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  statusText: { ...T.captionTiny, fontSize: 11.5, fontWeight: '700' },
+
+  // Meta footer
+  hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginTop: 12, marginBottom: 10 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  metaLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, minWidth: 0 },
+  appleLogo: { marginEnd: 5 },
+  metaText: { ...T.captionSmall, color: colors.secondaryLabel, flexShrink: 1 },
+  metaRightCol: { alignItems: 'flex-end' },
+  metaRightColRTL: { alignItems: 'flex-start' },
+  totalText: { ...T.priceSmall, color: colors.brand },
+  itemsText: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 2 },
+
+  // Quiet actions
+  quietRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
+    marginTop: 12,
   },
-  metaRowRTL: { flexDirection: 'row-reverse' },
-  metaRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  metaRightRTL: { flexDirection: 'row-reverse' },
-  appleLogo: { marginEnd: 4 },
-  metaText: { ...T.captionSmall, marginTop: 6, color: '#8E8E93' },
-  cardBottom: { marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardBottomRTL: { flexDirection: 'row-reverse' },
-  totalText: { ...T.priceSmall, color: '#dc2626' },
-  itemsText: { ...T.captionSmall, color: '#8E8E93' },
-  breakdownRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'flex-start' },
-  breakdownRowRTL: { justifyContent: 'flex-end' },
-  breakdownText: { ...T.captionSmall, color: '#8E8E93' },
+  summaryToggle: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  summaryToggleText: { ...T.captionSmall, fontWeight: '600', color: colors.secondaryLabel },
+  deleteBtn: { padding: 4 },
+
   orderSummaryBody: {
     marginTop: 12,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 10,
+    backgroundColor: colors.subtleBg,
+    borderRadius: 12,
     padding: 12,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
   },
-  orderSummaryTitle: { ...T.labelSmall, fontWeight: '800', color: '#1D1D1F', marginBottom: 8 },
+  orderSummaryTitle: { ...T.labelSmall, fontWeight: '800', color: colors.label, marginBottom: 8 },
   orderSummaryLine: { ...T.captionSmall, color: '#3C3C43', lineHeight: 18, marginBottom: 4 },
   orderSummaryItemRow: { marginBottom: 6 },
   orderSummaryLineMuted: { ...T.captionSmall, color: '#6B7280', lineHeight: 18 },
   orderSummaryPriceStrike: { textDecorationLine: 'line-through', color: '#9CA3AF', fontWeight: '700' },
-  orderSummaryPriceFinal: { color: '#dc2626', fontWeight: '800' },
-  orderSummaryDivider: { height: 1, backgroundColor: '#E5E5EA', marginTop: 10, marginBottom: 6 },
+  orderSummaryPriceFinal: { color: colors.brand, fontWeight: '800' },
+  orderSummaryDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginTop: 10, marginBottom: 6 },
   orderSummaryDividerLight: { height: StyleSheet.hairlineWidth, backgroundColor: '#D1D5DB', marginVertical: 4 },
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   orderTotalsRowRTL: { flexDirection: 'row-reverse' },
   orderTotalsLabel: { fontSize: 12, color: '#3C3C43', fontWeight: '700' },
-  orderTotalsLabelGreen: { fontSize: 12, color: '#16A34A', fontWeight: '700' },
-  orderTotalsLabelPurple: { fontSize: 12, color: '#7C3AED', fontWeight: '700' },
+  orderTotalsLabelGreen: { fontSize: 12, color: colors.greenDeep, fontWeight: '700' },
+  orderTotalsLabelPurple: { fontSize: 12, color: colors.purple, fontWeight: '700' },
   orderTotalsLabelMuted: { fontSize: 12, color: '#9CA3AF', fontWeight: '600' },
-  orderTotalsValue: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
+  orderTotalsValue: { fontSize: 12, color: colors.label, fontWeight: '800' },
   orderTotalsValueMuted: { fontSize: 12, color: '#9CA3AF', fontWeight: '700', textDecorationLine: 'line-through' },
   orderTotalsValueMutedSmall: { fontSize: 12, color: '#9CA3AF', fontWeight: '700' },
-  orderTotalsValueGreen: { fontSize: 12, color: '#16A34A', fontWeight: '800' },
-  orderTotalsValuePurple: { fontSize: 12, color: '#7C3AED', fontWeight: '800' },
-  orderTotalsLabelBold: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
-  orderTotalsValueBold: { fontSize: 12, color: '#1D1D1F', fontWeight: '800' },
-  orderTotalsValueFree: { color: '#16A34A', fontWeight: '800' },
-  orderTotalsLabelStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
-  orderTotalsValueStrong: { fontSize: 13, color: '#1D1D1F', fontWeight: '900' },
+  orderTotalsValueGreen: { fontSize: 12, color: colors.greenDeep, fontWeight: '800' },
+  orderTotalsValuePurple: { fontSize: 12, color: colors.purple, fontWeight: '800' },
+  orderTotalsLabelBold: { fontSize: 12, color: colors.label, fontWeight: '800' },
+  orderTotalsValueBold: { fontSize: 12, color: colors.label, fontWeight: '800' },
+  orderTotalsValueFree: { color: colors.greenDeep, fontWeight: '800' },
+  orderTotalsLabelStrong: { fontSize: 13, color: colors.label, fontWeight: '900' },
+  orderTotalsValueStrong: { fontSize: 13, color: colors.label, fontWeight: '900' },
   freeShippingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F0FDF4',
-    borderRadius: 6,
+    borderRadius: 8,
     paddingVertical: 4,
     paddingHorizontal: 8,
     marginVertical: 2,
   },
-  freeShippingText: {
-    fontSize: 10,
-    color: '#27AE60',
-    fontWeight: '600',
-  },
-  vatNoteRed: {
-    fontSize: 10,
-    color: '#dc2626',
-    paddingVertical: 1,
-  },
+  freeShippingText: { fontSize: 10, color: colors.greenDeep, fontWeight: '600' },
+  vatNoteRed: { fontSize: 10, color: colors.brand, paddingVertical: 1 },
   youSavedBanner: {
     backgroundColor: '#F0FDF4',
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
     alignItems: 'center',
-    marginBottom: 6,
+    marginTop: 6,
     borderWidth: 1,
     borderColor: '#BBF7D0',
   },
-  youSavedText: { fontSize: 12, color: '#16A34A', fontWeight: '800' },
+  youSavedText: { fontSize: 12, color: colors.greenDeep, fontWeight: '800' },
+
+  // Buttons
   payButton: {
     marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#dc2626',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: colors.brand,
+    paddingVertical: 13,
+    borderRadius: 14,
   },
-  payButtonDisabled: { opacity: 0.6 },
-  payButtonText: { ...T.buttonSmall, fontWeight: '700' },
+  buttonDisabled: { opacity: 0.6 },
+  payButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
   supportButton: {
     marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#25D366',
+    gap: 7,
+    backgroundColor: 'rgba(37, 211, 102, 0.12)',
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 14,
   },
-  supportButtonText: { ...T.buttonSmall, fontWeight: '700' },
+  supportButtonText: { ...T.buttonSmall, fontSize: 14, fontWeight: '700', color: colors.whatsapp },
   buttonRTL: { flexDirection: 'row-reverse' },
-  // Keep prices readable in RTL contexts.
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
 });
-
-
-
-

@@ -1,13 +1,15 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform, Animated, Easing } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { updateUserSettings } from '../../services/databaseService';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const LOCALES = ['en', 'ru', 'ar'];
 
@@ -17,8 +19,20 @@ export default function LanguageScreen() {
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
 
   const [saving, setSaving] = useState(false);
+
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const options = useMemo(() => {
     return [
@@ -50,100 +64,96 @@ export default function LanguageScreen() {
     }
   };
 
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/profile')} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('profile.language')}</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('profile.language')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-      <View style={styles.card}>
-        <Text style={[styles.subtitle, isRTL && styles.textRTL]}>{t('profile.selectLanguage')}</Text>
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('profile.selectLanguage')}</Text>
 
-        {options.map((o) => {
-          const active = o.code === locale;
-          return (
-            <TouchableOpacity
-              key={o.code}
-              style={[styles.row, active && styles.rowActive]}
-              onPress={() => apply(o.code)}
-              disabled={saving}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.rowInner, isRTL && styles.rowInnerRTL]}>
-                <Text style={[styles.rowText, isRTL && styles.textRTL, active && styles.rowTextActive]}>{o.label}</Text>
-                {active ? <Ionicons name="checkmark" size={18} color="#27AE60" /> : <View style={{ width: 18 }} />}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
+          <View style={[styles.card, shadow.card]}>
+            {options.map((o, idx) => {
+              const active = o.code === locale;
+              return (
+                <View key={o.code}>
+                  {idx > 0 ? <View style={styles.hairline} /> : null}
+                  <TouchableOpacity
+                    style={[styles.row, isRTL && styles.rowRTL]}
+                    onPress={() => apply(o.code)}
+                    disabled={saving}
+                    activeOpacity={0.6}
+                  >
+                    <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                      <Ionicons name="globe" size={17} color={colors.white} />
+                    </View>
+                    <Text style={[styles.rowLabel, isRTL && styles.textRTL]}>{o.label}</Text>
+                    {active ? (
+                      <Ionicons name="checkmark" size={20} color={colors.blue} />
+                    ) : (
+                      <View style={styles.checkPlaceholder} />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </View>
 
-        <Text style={[styles.note, isRTL && styles.textRTL]}>
-          {Platform.OS === 'ios' ? t('profile.languageTipIOS') : t('profile.languageTipAndroid')}
-        </Text>
-      </View>
-    </SafeAreaView>
+          <Text style={[styles.note, isRTL && styles.textRTL]}>
+            {Platform.OS === 'ios' ? t('profile.languageTipIOS') : t('profile.languageTipAndroid')}
+          </Text>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2F2F7' },
-  // Header matches standard profile-stack convention
-  // (addresses.js, edit.js, terms.js, contact.js, etc.).
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-    backgroundColor: '#ffffff',
+  container: { flex: 1, backgroundColor: colors.groupedBg },
+  scrollView: { flex: 1 },
+  groupHeader: {
+    ...T.captionSmall,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+    marginHorizontal: 32,
+    marginTop: 8,
+    marginBottom: 8,
   },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backButton: { padding: 4 },
-  headerTitle: { ...T.sectionTitleSmall, color: '#000000' },
-  headerSpacer: { width: 32 },
   card: {
-    margin: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-  },
-  subtitle: { ...T.label, fontWeight: '700', color: '#1D1D1F', marginBottom: 12 },
-  row: {
-    paddingVertical: 14,
+    ...surfaces.card,
+    marginHorizontal: 16,
     paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    marginBottom: 10,
-    backgroundColor: '#ffffff',
   },
-  rowInner: {
+  hairline: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+    marginLeft: 40,
+  },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
+    paddingVertical: 13,
   },
-  rowInnerRTL: {
-    flexDirection: 'row-reverse',
+  rowRTL: { flexDirection: 'row-reverse' },
+  rowLabel: { ...T.label, fontSize: 16, flex: 1, color: colors.label },
+  checkPlaceholder: { width: 20 },
+  note: {
+    ...T.captionSmall,
+    marginHorizontal: 32,
+    marginTop: 10,
+    color: colors.secondaryLabel,
+    lineHeight: 18,
   },
-  rowActive: {
-    borderColor: '#27AE60',
-    backgroundColor: '#F0FFF4',
-  },
-  rowText: { ...T.bodySmall, fontWeight: '600', color: '#1D1D1F' },
-  rowTextActive: { color: '#14532D' },
-  note: { ...T.captionSmall, marginTop: 8, color: '#8E8E93', lineHeight: 18 },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });
-
-
-
-
-

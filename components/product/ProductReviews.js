@@ -21,6 +21,7 @@ import AUTH_CONFIG from '../../config/auth';
 import { getJson, httpRequest, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const log = createLogger('ProductReviews');
 
@@ -190,9 +191,14 @@ export default function ProductReviews({ productId }) {
       {/* Header */}
       <View style={[styles.headerRow, isRTL && styles.headerRowRTL]}>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            {t('reviews.title') || 'Customer Reviews'}
-          </Text>
+          <View style={[styles.titleRow, isRTL && styles.titleRowRTL]}>
+            <View style={[surfaces.iconTile, { backgroundColor: colors.orange }]}>
+              <Ionicons name="star" size={16} color="#ffffff" />
+            </View>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+              {t('reviews.title') || 'Customer Reviews'}
+            </Text>
+          </View>
           {averageRating != null && reviewCount > 0 && (
             <View style={[styles.ratingRow, isRTL && styles.ratingRowRTL]}>
               {renderStars(Math.floor(averageRating), 18)}
@@ -275,7 +281,7 @@ export default function ProductReviews({ productId }) {
       {/* Reviews List */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#dc2626" />
+          <ActivityIndicator size="small" color={colors.brand} />
           <Text style={styles.loadingText}>{t('reviews.loading') || 'Loading reviews...'}</Text>
         </View>
       ) : reviews.length > 0 ? (
@@ -296,10 +302,10 @@ export default function ProductReviews({ productId }) {
                 {user?.id === review.userId && (
                   <View style={[styles.reviewActions, isRTL && styles.reviewActionsRTL]}>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleEdit(review)}>
-                      <Ionicons name="create-outline" size={18} color="#6B7280" />
+                      <Ionicons name="create-outline" size={18} color={colors.secondaryLabel} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleDelete(review.id)}>
-                      <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                      <Ionicons name="trash-outline" size={18} color={colors.red} />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -310,7 +316,7 @@ export default function ProductReviews({ productId }) {
         </View>
       ) : (
         <View style={styles.emptyContainer}>
-          <Ionicons name="chatbubble-outline" size={32} color="#D1D5DB" />
+          <Ionicons name="chatbubble-outline" size={32} color={colors.tertiary} />
           <Text style={[styles.emptyText, isRTL && styles.textRTL]}>
             {t('reviews.noReviews') || 'No reviews yet. Be the first to review!'}
           </Text>
@@ -322,10 +328,10 @@ export default function ProductReviews({ productId }) {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 32,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingTop: 24,
+    ...surfaces.card,
+    ...shadow.card,
+    padding: 18,
+    marginBottom: 14,
   },
   headerRow: {
     flexDirection: 'row',
@@ -337,15 +343,24 @@ const styles = StyleSheet.create({
   headerRowRTL: {
     flexDirection: 'row-reverse',
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  titleRowRTL: {
+    flexDirection: 'row-reverse',
+  },
   sectionTitle: {
-    ...T.sectionTitle,
-    fontWeight: '600',
-    marginBottom: 6,
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginTop: 8,
   },
   ratingRowRTL: {
     flexDirection: 'row-reverse',
@@ -368,13 +383,13 @@ const styles = StyleSheet.create({
   reviewCountText: {
     ...T.label,
     fontWeight: '400',
-    color: '#6B7280',
+    color: colors.secondaryLabel,
   },
   writeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
@@ -385,7 +400,7 @@ const styles = StyleSheet.create({
   },
   // Form
   formContainer: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -398,16 +413,16 @@ const styles = StyleSheet.create({
   formLabel: {
     ...T.label,
     fontWeight: '500',
-    color: '#374151',
+    color: colors.label,
     marginTop: 12,
     marginBottom: 6,
   },
   input: {
     ...T.input,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -417,17 +432,17 @@ const styles = StyleSheet.create({
   },
   textarea: {
     ...T.input,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     minHeight: 100,
   },
   charCount: {
     ...T.captionSmall,
-    color: '#9CA3AF',
+    color: colors.secondaryLabel,
     marginTop: 4,
   },
   formButtons: {
@@ -440,7 +455,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
@@ -454,7 +469,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.fillSecondary,
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
@@ -462,14 +477,14 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     ...T.buttonSmall,
     fontSize: 15,
-    color: '#374151',
+    color: colors.label,
   },
   // Reviews list
   reviewsList: {
     gap: 12,
   },
   reviewCard: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
     padding: 14,
   },
@@ -502,7 +517,7 @@ const styles = StyleSheet.create({
   },
   reviewDate: {
     ...T.captionSmall,
-    color: '#9CA3AF',
+    color: colors.secondaryLabel,
     marginTop: 2,
   },
   reviewActions: {
@@ -518,7 +533,7 @@ const styles = StyleSheet.create({
   reviewComment: {
     ...T.label,
     fontWeight: '400',
-    color: '#374151',
+    color: colors.label,
     lineHeight: 20,
   },
   // Empty & loading
@@ -532,7 +547,7 @@ const styles = StyleSheet.create({
   loadingText: {
     ...T.label,
     fontWeight: '400',
-    color: '#6B7280',
+    color: colors.secondaryLabel,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -542,7 +557,7 @@ const styles = StyleSheet.create({
   emptyText: {
     ...T.label,
     fontWeight: '400',
-    color: '#9CA3AF',
+    color: colors.secondaryLabel,
     textAlign: 'center',
   },
   textRTL: {

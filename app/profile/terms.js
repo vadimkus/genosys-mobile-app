@@ -1,33 +1,49 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
+  Animated,
+  Easing,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 export default function TermsScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
 
   const lastUpdated = t('terms.lastUpdatedDate');
+
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const sections = [
     {
       key: 'agreement',
+      icon: 'document-text',
       title: t('terms.sections.agreement.title'),
       paragraphs: [t('terms.sections.agreement.p1')],
     },
     {
       key: 'useLicense',
+      icon: 'key',
       title: t('terms.sections.useLicense.title'),
       paragraphs: [t('terms.sections.useLicense.p1')],
       bullets: [
@@ -39,6 +55,7 @@ export default function TermsScreen() {
     },
     {
       key: 'accountTerms',
+      icon: 'person-circle',
       title: t('terms.sections.accountTerms.title'),
       paragraphs: [t('terms.sections.accountTerms.p1')],
       bullets: [
@@ -50,6 +67,7 @@ export default function TermsScreen() {
     },
     {
       key: 'products',
+      icon: 'cube',
       title: t('terms.sections.products.title'),
       paragraphs: [t('terms.sections.products.p1')],
       bullets: [
@@ -61,6 +79,7 @@ export default function TermsScreen() {
     },
     {
       key: 'orders',
+      icon: 'receipt',
       title: t('terms.sections.orders.title'),
       paragraphs: [t('terms.sections.orders.p1')],
       bullets: [
@@ -73,6 +92,7 @@ export default function TermsScreen() {
     },
     {
       key: 'shipping',
+      icon: 'car',
       title: t('terms.sections.shipping.title'),
       paragraphs: [t('terms.sections.shipping.p1')],
       bullets: [
@@ -84,16 +104,19 @@ export default function TermsScreen() {
     },
     {
       key: 'returns',
+      icon: 'refresh',
       title: t('terms.sections.returns.title'),
       paragraphs: [t('terms.sections.returns.p1')],
     },
     {
       key: 'privacy',
+      icon: 'lock-closed',
       title: t('terms.sections.privacy.title'),
       paragraphs: [t('terms.sections.privacy.p1')],
     },
     {
       key: 'prohibited',
+      icon: 'ban',
       title: t('terms.sections.prohibited.title'),
       paragraphs: [t('terms.sections.prohibited.p1')],
       bullets: [
@@ -105,6 +128,7 @@ export default function TermsScreen() {
     },
     {
       key: 'disclaimers',
+      icon: 'alert-circle',
       title: t('terms.sections.disclaimers.title'),
       paragraphs: [
         t('terms.sections.disclaimers.p1'),
@@ -113,183 +137,169 @@ export default function TermsScreen() {
     },
     {
       key: 'limitations',
+      icon: 'shield-checkmark',
       title: t('terms.sections.limitations.title'),
       paragraphs: [t('terms.sections.limitations.p1')],
     },
     {
       key: 'governingLaw',
+      icon: 'business',
       title: t('terms.sections.governingLaw.title'),
       paragraphs: [t('terms.sections.governingLaw.p1')],
     },
     {
       key: 'changes',
+      icon: 'sync',
       title: t('terms.sections.changes.title'),
       paragraphs: [t('terms.sections.changes.p1')],
     },
   ];
 
-  const Section = ({ title, children }) => (
-    <View style={styles.section}>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+  const SectionCard = ({ icon, title, children }) => (
+    <View style={[styles.card, shadow.card]}>
+      <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+        <View style={[surfaces.iconTile, { backgroundColor: colors.secondaryLabel }]}>
+          <Ionicons name={icon} size={16} color={colors.white} />
+        </View>
+        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+      </View>
       {children}
     </View>
   );
 
-  const Paragraph = ({ children }) => (
-    <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{children}</Text>
+  const Paragraph = ({ children, last }) => (
+    <Text style={[styles.paragraph, last && styles.paragraphLast, isRTL && styles.textRTL]}>{children}</Text>
   );
 
+  const Bullet = ({ children }) => (
+    <View style={[styles.bulletRow, isRTL && styles.rowRTL]}>
+      <View style={styles.bulletDot} />
+      <Text style={[styles.bulletText, isRTL && styles.textRTL]}>{children}</Text>
+    </View>
+  );
+
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); }} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('terms.title')}</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('terms.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Last Updated */}
-        <View style={styles.updateInfo}>
-          <Text style={[styles.updateText, isRTL && styles.updateTextRTL]}>{t('terms.lastUpdated', { date: lastUpdated })}</Text>
-        </View>
-
-        {sections.map((s) => (
-          <Section key={s.key} title={s.title}>
-            {Array.isArray(s.paragraphs) &&
-              s.paragraphs.map((p, idx) => <Paragraph key={`${s.key}-p-${idx}`}>{p}</Paragraph>)}
-            {Array.isArray(s.bullets) && s.bullets.length > 0 && (
-              <View style={styles.bulletList}>
-                {s.bullets.map((b, idx) => (
-                  <Text key={`${s.key}-b-${idx}`} style={[styles.bulletPoint, isRTL && styles.textRTL]}>
-                    {isRTL ? `${b} •` : `• ${b}`}
-                  </Text>
-                ))}
-              </View>
-            )}
-          </Section>
-        ))}
-
-        {/* Contact Information */}
-        <Section title={t('terms.sections.contact.title')}>
-          <Paragraph>{t('terms.sections.contact.p1')}</Paragraph>
-          <View style={styles.contactInfo}>
-            <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
-              {t('terms.contact.emailLabel')}: {t('contact.emailValue')}
-            </Text>
-            <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
-              {t('terms.contact.whatsappLabel')}: {t('contact.phoneDisplay')}
-            </Text>
-            <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
-              {t('terms.contact.addressLabel')}: {t('contact.locationValue')}
-            </Text>
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          {/* Last Updated */}
+          <View style={[styles.updatePillWrap, isRTL && styles.updatePillWrapRTL]}>
+            <View style={styles.updatePill}>
+              <Ionicons name="time-outline" size={13} color={colors.secondaryLabel} />
+              <Text style={styles.updatePillText}>{t('terms.lastUpdated', { date: lastUpdated })}</Text>
+            </View>
           </View>
-        </Section>
 
-        {/* Footer Space */}
-        <View style={styles.footerSpace} />
-      </ScrollView>
-    </SafeAreaView>
+          {sections.map((s) => (
+            <SectionCard key={s.key} icon={s.icon} title={s.title}>
+              {Array.isArray(s.paragraphs) &&
+                s.paragraphs.map((p, idx) => (
+                  <Paragraph key={`${s.key}-p-${idx}`} last={idx === s.paragraphs.length - 1 && !(s.bullets && s.bullets.length)}>{p}</Paragraph>
+                ))}
+              {Array.isArray(s.bullets) && s.bullets.length > 0 ? (
+                <View style={styles.bulletList}>
+                  {s.bullets.map((b, idx) => (
+                    <Bullet key={`${s.key}-b-${idx}`}>{b}</Bullet>
+                  ))}
+                </View>
+              ) : null}
+            </SectionCard>
+          ))}
+
+          {/* Contact Information */}
+          <SectionCard icon="chatbubbles" title={t('terms.sections.contact.title')}>
+            <Paragraph>{t('terms.sections.contact.p1')}</Paragraph>
+            <View style={styles.contactInfo}>
+              <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
+                {t('terms.contact.emailLabel')}: {t('contact.emailValue')}
+              </Text>
+              <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
+                {t('terms.contact.whatsappLabel')}: {t('contact.phoneDisplay')}
+              </Text>
+              <Text style={[styles.contactItem, styles.contactItemLast, isRTL && styles.textRTL]}>
+                {t('terms.contact.addressLabel')}: {t('contact.locationValue')}
+              </Text>
+            </View>
+          </SectionCard>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
+  container: { flex: 1, backgroundColor: colors.groupedBg },
+  scrollView: { flex: 1 },
+
+  // Last updated pill
+  updatePillWrap: {
+    paddingHorizontal: 20,
+    paddingTop: 4,
+    paddingBottom: 8,
+    alignItems: 'flex-start',
   },
-  header: {
+  updatePillWrapRTL: { alignItems: 'flex-end' },
+  updatePill: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
+    gap: 6,
+    backgroundColor: colors.card,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backButton: {
-    padding: 4,
-    width: 130,
-  },
-  backButtonRTL: { alignItems: 'flex-end' },
-  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { ...T.link, color: '#dc2626' },
-  backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  headerTitle: {
-    ...T.sectionTitleSmall,
-    color: '#000000',
-  },
-  headerSpacer: { width: 130 },
-  scrollView: {
-    flex: 1,
-  },
+  updatePillText: { ...T.captionSmall, color: colors.secondaryLabel, fontWeight: '500' },
 
-  // Update Info
-  updateInfo: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#F8F9FA',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
+  // Cards
+  card: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 18,
   },
-  updateText: {
-    ...T.label,
-    fontWeight: '400',
-    color: '#8E8E93',
-    textAlign: 'center',
-    fontStyle: 'italic',
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
   },
-  updateTextRTL: {
-    writingDirection: 'rtl',
-  },
+  rowRTL: { flexDirection: 'row-reverse' },
+  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
-  // Sections
-  section: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#F2F2F7',
-  },
-  sectionTitle: {
-    ...T.sectionTitle,
-    color: '#000000',
-    marginBottom: 12,
-  },
-  paragraph: {
-    ...T.body,
-    marginBottom: 12,
-  },
+  paragraph: { ...T.body, color: '#333333', marginBottom: 12, lineHeight: 23 },
+  paragraphLast: { marginBottom: 0 },
 
-  // Lists
-  bulletList: {
-    marginVertical: 8,
-    marginStart: 12,
-  },
-  bulletPoint: {
-    ...T.body,
-    marginBottom: 4,
-  },
-
-  // Contact Info
-  contactInfo: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 8,
-    padding: 16,
+  // Bullets
+  bulletList: { marginTop: 4, gap: 8 },
+  bulletRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.brand,
     marginTop: 8,
   },
-  contactItem: {
-    ...T.body,
-    color: '#dc2626',
-    marginBottom: 4,
-  },
-  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  bulletText: { ...T.bodySmall, color: '#333333', flex: 1, lineHeight: 22 },
 
-  // Footer
-  footerSpace: {
-    height: 40,
+  // Contact info
+  contactInfo: {
+    backgroundColor: colors.subtleBg,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 4,
   },
+  contactItem: { ...T.bodySmall, color: colors.brand, fontWeight: '600', marginBottom: 8 },
+  contactItemLast: { marginBottom: 0 },
+
+  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });

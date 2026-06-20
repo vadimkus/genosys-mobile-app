@@ -120,7 +120,10 @@ export default function TabLayout() {
         options={{
           title: t('tabs.bag'),
           tabBarLabel: t('tabs.bag'),
-          tabBarStyle: { display: 'none' }, // Hide tab bar on bag page
+          // Keep the tab bar visible on the EMPTY bag so there's always a way to
+          // navigate; only hide it once there are items (the sticky checkout bar
+          // takes over for a focused, full-screen checkout).
+          ...(cartCount > 0 ? { tabBarStyle: { display: 'none' } } : {}),
           tabBarIcon: ({ color, size, focused }) => {
             // Change bag icon color to green when cart has items
             const bagColor = cartCount > 0 ? '#10b981' : color; // green-500 when cart has items

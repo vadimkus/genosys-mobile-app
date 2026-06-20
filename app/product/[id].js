@@ -3,6 +3,7 @@ import {
   View,
   Text,
   Animated,
+  Easing,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
@@ -60,6 +61,7 @@ import {
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces, tint } from '../../utils/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Product detail hero image height
@@ -285,6 +287,18 @@ const getPdpCopy = (locale) => {
   return PDP_COPY_MAP[lang] || PDP_COPY_MAP.en;
 };
 
+/** iOS Settings–style filled glyph tile + bold section title (matches order details). */
+function PdpSectionHeader({ icon, tileColor, title, isRTL }) {
+  return (
+    <View style={[styles.cardSectionHeader, isRTL && styles.rowReverse]}>
+      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+        <Ionicons name={icon} size={16} color="#ffffff" />
+      </View>
+      <Text style={[styles.cardSectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+    </View>
+  );
+}
+
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
@@ -328,6 +342,11 @@ export default function ProductDetailScreen() {
   const galleryRef = useRef(null);
   const scrollRef = useRef(null);
   const reviewsWrapperRef = useRef(null);
+  // Subtle entrance motion for the content below the hero gallery (matches
+  // order-details mount feel). Independent Animated.Values → does not touch
+  // the scrollY-driven mini-header/gallery animation.
+  const contentFade = useRef(new Animated.Value(0)).current;
+  const contentLift = useRef(new Animated.Value(12)).current;
 
   const discountLabel = useCallback(
     (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) }),
@@ -346,6 +365,17 @@ export default function ProductDetailScreen() {
   useEffect(() => {
     loadProduct();
   }, [id]);
+
+  // Fade + lift the content in once the product is ready.
+  useEffect(() => {
+    if (loading || !product) return;
+    contentFade.setValue(0);
+    contentLift.setValue(12);
+    Animated.parallel([
+      Animated.timing(contentFade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(contentLift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [loading, product]);
 
   // Lightweight review aggregate fetch for the summary shown under product name.
   // The ProductReviews component renders its own full list further down — we keep
@@ -784,8 +814,8 @@ export default function ProductDetailScreen() {
     };
 
     return (
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('product.productDetails')}</Text>
+      <View style={[styles.section, shadow.card]}>
+        <PdpSectionHeader icon="information-circle" tileColor={colors.indigo} title={t('product.productDetails')} isRTL={isRTL} />
         <View style={styles.specList}>
           {rows.map((row, idx) => (
             <View
@@ -969,19 +999,19 @@ export default function ProductDetailScreen() {
               router.back();
             }}
           >
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color="#1D1D1F" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color={colors.label} />
           </TouchableOpacity>
 
           <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
             <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-              <Ionicons name="share-outline" size={20} color="#1D1D1F" />
+              <Ionicons name="share-outline" size={20} color={colors.label} />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.headerButton} onPress={handleWishlistToggle}>
               <Ionicons
                 name={isWishlisted ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isWishlisted ? '#dc2626' : '#1D1D1F'}
+                color={isWishlisted ? colors.brand : colors.label}
               />
             </TouchableOpacity>
           </View>
@@ -1025,7 +1055,7 @@ export default function ProductDetailScreen() {
               <Ionicons
                 name={isRTL ? 'chevron-forward' : 'chevron-back'}
                 size={20}
-                color="#1D1D1F"
+                color={colors.label}
               />
             </TouchableOpacity>
             <View style={styles.miniHeaderTextWrap}>
@@ -1177,8 +1207,8 @@ export default function ProductDetailScreen() {
         })()}
 
         {/* Product Info */}
-        <View style={styles.contentContainer}>
-          <View style={styles.productInfo}>
+        <Animated.View style={[styles.contentContainer, { opacity: contentFade, transform: [{ translateY: contentLift }] }]}>
+          <View style={[styles.productInfo, shadow.card]}>
             <Text style={[styles.category, isRTL && styles.textRTL]}>
               {(() => {
                 const canon = normalizeCategoryCanonical(product.category) || asText(product.category);
@@ -1416,21 +1446,19 @@ export default function ProductDetailScreen() {
             const docs = getProductDocs(productId, product);
             if (!docs.length) return null;
             return (
-              <View style={styles.docsSection}>
-                <Text style={[styles.docsSectionTitle, isRTL && styles.textRTL]}>
-                  {t('product.documentation') || 'Documentation'}
-                </Text>
+              <View style={[styles.section, shadow.card]}>
+                <PdpSectionHeader icon="document-attach" tileColor={colors.teal} title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
                 {docs.map((doc, index) => (
                   <TouchableOpacity
                     key={`doc-${index}`}
                     style={[styles.docLink, isRTL && { flexDirection: 'row-reverse' }]}
                     onPress={() => Linking.openURL(doc.url)}
                   >
-                    <Ionicons name="document-text-outline" size={20} color="#007AFF" />
+                    <Ionicons name="document-text-outline" size={20} color={colors.blue} />
                     <Text style={[styles.docLinkText, isRTL && { textAlign: 'right' }]} numberOfLines={2}>
                       {doc.title}
                     </Text>
-                    <Ionicons name="open-outline" size={16} color="#8E8E93" />
+                    <Ionicons name="open-outline" size={16} color={colors.secondaryLabel} />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -1452,10 +1480,8 @@ export default function ProductDetailScreen() {
                   ? fullText.substring(0, 500).trimEnd() + '…'
                   : fullText;
                 return (
-                  <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-                      {t('product.about')}
-                    </Text>
+                  <View style={[styles.section, shadow.card]}>
+                    <PdpSectionHeader icon="document-text" tileColor={colors.blue} title={t('product.about')} isRTL={isRTL} />
                     <View style={styles.descriptionContainer}>
                       <Text style={[styles.description, isRTL && styles.textRTL]}>
                         {visible}
@@ -1504,7 +1530,7 @@ export default function ProductDetailScreen() {
                   })(),
                 ]);
                 const filteredBenefits = filterListForLocale(benefits, locale);
-                const benefitsOpts = { collapsible: true, defaultOpen: true, icon: 'sparkles-outline', iconColor: '#dc2626' };
+                const benefitsOpts = { collapsible: true, defaultOpen: true, icon: 'sparkles-outline', iconColor: colors.brand };
 
                 if (filteredBenefits.length === 1 && filteredBenefits[0].length > 200 && !filteredBenefits[0].includes(' — ')) {
                   return renderInfoSection(t('product.benefits'), filteredBenefits[0], benefitsOpts);
@@ -1516,7 +1542,7 @@ export default function ProductDetailScreen() {
                 const steps = toHowToSteps(product?.howToUse);
                 const howToText = pickField(product, ['howToUse', 'how_to_use', 'application', 'usage']);
                 const fallbackDirections = pickField(product, ['directions']);
-                const directionsOpts = { collapsible: true, defaultOpen: false, icon: 'list-outline', iconColor: '#2563EB' };
+                const directionsOpts = { collapsible: true, defaultOpen: false, icon: 'list-outline', iconColor: colors.teal };
 
                 // If we have explicit how-to content, we keep it under "Directions"
                 // and treat `product.directions` as an extra "Note" (matches website behavior for many products).
@@ -1530,7 +1556,7 @@ export default function ProductDetailScreen() {
               {renderIngredientsSection(
                 t('product.keyIngredients'),
                 toIngredients(product?.ingredients || product?.keyIngredients),
-                { collapsible: true, defaultOpen: false, icon: 'leaf-outline', iconColor: '#16A34A' }
+                { collapsible: true, defaultOpen: false, icon: 'leaf-outline', iconColor: colors.green }
               )}
 
               {(() => {
@@ -1545,7 +1571,7 @@ export default function ProductDetailScreen() {
                       collapsible: true,
                       defaultOpen: false,
                       icon: 'information-circle-outline',
-                      iconColor: '#86868B',
+                      iconColor: colors.secondaryLabel,
                     })
                   : null;
               })()}
@@ -1559,7 +1585,7 @@ export default function ProductDetailScreen() {
           <View ref={reviewsWrapperRef} collapsable={false}>
             <ProductReviews productId={product.id} />
           </View>
-        </View>
+        </Animated.View>
       </Animated.ScrollView>
 
       {/* Fixed Bottom Button */}
@@ -1614,7 +1640,7 @@ export default function ProductDetailScreen() {
                     accessibilityLabel={t('shop.decreaseQuantity')}
                     hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                   >
-                    <Ionicons name="remove" size={18} color={quantity <= 1 ? '#C7C7CC' : '#1D1D1F'} />
+                    <Ionicons name="remove" size={18} color={quantity <= 1 ? colors.tertiary : colors.label} />
                   </TouchableOpacity>
                   <Text style={styles.qtyValue}>{quantity}</Text>
                   <TouchableOpacity
@@ -1625,7 +1651,7 @@ export default function ProductDetailScreen() {
                     accessibilityLabel={t('shop.increaseQuantity')}
                     hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                   >
-                    <Ionicons name="add" size={18} color="#1D1D1F" />
+                    <Ionicons name="add" size={18} color={colors.label} />
                   </TouchableOpacity>
                 </View>
               )}
@@ -1724,15 +1750,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   headerBar: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: colors.separator,
   },
   miniHeaderOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     paddingHorizontal: 20,
     paddingVertical: 8,
     justifyContent: 'center',
@@ -1753,20 +1779,20 @@ const styles = StyleSheet.create({
   miniHeaderName: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
     letterSpacing: -0.1,
   },
   miniHeaderPrice: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#86868B',
+    color: colors.secondaryLabel,
     marginTop: 1,
   },
   miniHeaderBagButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#1D1D1F',
+    backgroundColor: colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1830,17 +1856,20 @@ const styles = StyleSheet.create({
     color: '#dc2626',
   },
   contentContainer: {
-    paddingHorizontal: 20,
+    backgroundColor: colors.groupedBg,
+    paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 100, // Space for bottom button
   },
   productInfo: {
-    marginBottom: 32,
+    ...surfaces.card,
+    padding: 18,
+    marginBottom: 14,
   },
   category: {
     ...T.label,
     letterSpacing: 0.5,
-    color: '#dc2626',
+    color: colors.brand,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
@@ -1874,16 +1903,17 @@ const styles = StyleSheet.create({
   },
   reviewSummaryText: {
     ...T.captionSmall,
-    color: '#374151',
+    color: colors.label,
     fontWeight: '600',
   },
   reviewSummaryLink: {
     ...T.captionSmall,
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '600',
   },
   price: {
     ...T.priceLarge,
+    color: colors.brand,
     marginBottom: 8,
   },
   priceBlock: {
@@ -1891,7 +1921,7 @@ const styles = StyleSheet.create({
   },
   vatNote: {
     ...T.captionSmall,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     marginTop: 2,
     marginBottom: 4,
     fontWeight: '500',
@@ -1906,16 +1936,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   discountBadge: {
-    backgroundColor: '#27AE6020',
-    borderColor: '#27AE60',
-    borderWidth: 1,
+    backgroundColor: tint(colors.green),
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
   },
   discountBadgeText: {
     ...T.badgeMedium,
-    color: '#27AE60',
+    color: colors.greenDeep,
     letterSpacing: 0.2,
   },
   size: {
@@ -1924,26 +1952,41 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   section: {
-    marginBottom: 32,
+    ...surfaces.card,
+    padding: 18,
+    marginBottom: 14,
   },
   sectionTitle: {
     ...T.sectionTitle,
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 16,
+  },
+  // iOS Settings–style icon-tile section header (used on card sections).
+  cardSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+  },
+  cardSectionTitle: {
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
+  },
+  rowReverse: {
+    flexDirection: 'row-reverse',
   },
   beautyBoxPriceLineWrap: {
     marginTop: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 12,
-    backgroundColor: '#F8F9FA',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    backgroundColor: colors.subtleBg,
   },
   beautyBoxPriceLine: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
     lineHeight: 22,
   },
   beautyBoxTitleRow: {
@@ -1958,13 +2001,13 @@ const styles = StyleSheet.create({
   beautyBoxTitleText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
   },
   beautyBoxKitTitle: {
     marginTop: 14,
     fontSize: 15,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
   },
   beautyBoxKitList: {
     marginTop: 12,
@@ -1973,38 +2016,34 @@ const styles = StyleSheet.create({
   beautyBoxKitItem: {
     padding: 14,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
   },
   beautyBoxKitHeader: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#1D1D1F',
+    color: colors.label,
     marginBottom: 8,
     lineHeight: 20,
   },
   beautyBoxKitBody: {
     fontSize: 13,
-    color: '#1D1D1F',
+    color: colors.secondaryLabel,
     lineHeight: 19,
   },
   descriptionContainer: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: 'transparent',
   },
   noteContainer: {
-    backgroundColor: '#ECFDF5',
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
+    backgroundColor: tint(colors.green),
+    borderRadius: 12,
+    padding: 14,
   },
   description: {
     ...T.body,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   noteText: {
-    color: '#14532D',
+    color: colors.greenDeep,
   },
   readMoreButton: {
     marginTop: 12,
@@ -2013,7 +2052,7 @@ const styles = StyleSheet.create({
   readMoreText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#dc2626',
+    color: colors.brand,
   },
   // Rating styles removed (rating section not used)
   featureList: {
@@ -2033,10 +2072,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   listContainer: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 12,
-    gap: 8,
+    backgroundColor: 'transparent',
+    gap: 10,
   },
   listItem: {
     flexDirection: 'row',
@@ -2048,7 +2085,7 @@ const styles = StyleSheet.create({
   },
   listBullet: {
     fontSize: 18,
-    color: '#dc2626',
+    color: colors.brand,
     lineHeight: 22,
   },
   listBulletRTL: {
@@ -2057,21 +2094,18 @@ const styles = StyleSheet.create({
   listText: {
     ...T.bodySmall,
     flex: 1,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   specList: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    backgroundColor: 'transparent',
   },
   specItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 14,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ECEEF0',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
   },
   specItemRTL: {
     flexDirection: 'row-reverse',
@@ -2082,7 +2116,7 @@ const styles = StyleSheet.create({
   specLabel: {
     ...T.label,
     width: 124,
-    color: '#6E6E73',
+    color: colors.secondaryLabel,
     lineHeight: 20,
   },
   specLabelRTL: {
@@ -2098,7 +2132,7 @@ const styles = StyleSheet.create({
   },
   specValueText: {
     ...T.bodySmall,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   specValueTextRTL: {
     textAlign: 'right',
@@ -2114,49 +2148,42 @@ const styles = StyleSheet.create({
   },
   // Perfect Combination
   pcOuter: {
-    marginBottom: 32,
-    borderTopWidth: 2,
-    borderTopColor: '#E5E5EA',
-    paddingTop: 18,
+    ...surfaces.card,
+    padding: 18,
+    marginBottom: 14,
   },
   pcHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 10,
+    gap: 10,
+    marginBottom: 12,
   },
   pcHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1D1D1F',
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
   },
   pcLoading: {
     fontSize: 14,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     fontWeight: '600',
   },
   pcIntroText: {
-    fontSize: 13,
-    color: '#374151',
-    lineHeight: 19,
-    marginBottom: 12,
+    ...T.bodySmall,
+    color: colors.label,
+    lineHeight: 20,
+    marginBottom: 14,
   },
   pcIntroBold: {
     fontWeight: '800',
-    color: '#111827',
+    color: colors.label,
   },
   pcCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#FECACA', // red-200
-    padding: 12,
+    backgroundColor: 'transparent',
   },
   pcProductCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#FCA5A5', // red-300
     padding: 12,
     marginBottom: 12,
   },
@@ -2165,7 +2192,7 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.card,
     marginBottom: 10,
   },
   pcImage: {
@@ -2175,17 +2202,17 @@ const styles = StyleSheet.create({
   pcImageFallback: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.card,
   },
   pcProductName: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '700',
-    color: '#111827',
+    color: colors.label,
     marginBottom: 4,
   },
   pcProductSize: {
-    fontSize: 12,
-    color: '#6B7280',
+    ...T.captionSmall,
+    color: colors.secondaryLabel,
     fontWeight: '600',
     marginBottom: 6,
   },
@@ -2199,29 +2226,29 @@ const styles = StyleSheet.create({
   pcPriceMain: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#dc2626',
+    color: colors.brand,
   },
   pcPriceOld: {
     fontSize: 12,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     textDecorationLine: 'line-through',
     fontWeight: '600',
   },
   pcLoginText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     fontWeight: '600',
     marginBottom: 6,
   },
   pcPriceOnRequest: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#25D366',
+    color: colors.whatsapp,
     marginBottom: 6,
   },
   pcViewDetails: {
     fontSize: 12,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     fontWeight: '600',
     marginBottom: 10,
   },
@@ -2230,7 +2257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 12,
     borderRadius: 12,
   },
@@ -2240,10 +2267,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   pcBenefitsCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#FCA5A5',
     padding: 12,
   },
   pcBenefitsHeader: {
@@ -2253,9 +2278,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   pcBenefitsTitle: {
-    fontSize: 14,
+    ...T.label,
     fontWeight: '800',
-    color: '#111827',
+    color: colors.label,
     flex: 1,
   },
   pcBenefitsList: {
@@ -2267,7 +2292,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pcBenefitCheck: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '900',
     marginTop: 1,
   },
@@ -2275,11 +2300,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     lineHeight: 18,
-    color: '#374151',
+    color: colors.secondaryLabel,
   },
   pcBenefitTextBold: {
     fontWeight: '800',
-    color: '#111827',
+    color: colors.label,
   },
   detailItem: {
     flexDirection: 'row',
@@ -2304,31 +2329,27 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingBottom: 34, // Safe area for home indicator
-    borderTopWidth: 1,
-    borderTopColor: '#F2F2F7',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.separator,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
     elevation: 10,
   },
   addToBagButton: {
-    backgroundColor: '#dc2626',
-    borderRadius: 12,
+    backgroundColor: colors.brand,
+    borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 18,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    ...shadow.cta(colors.brand),
   },
   addToBagButtonFlex: {
     flex: 1,
@@ -2350,10 +2371,10 @@ const styles = StyleSheet.create({
   qtyStepper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    borderRadius: 12,
+    backgroundColor: colors.fillSecondary,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    borderRadius: 14,
     paddingVertical: 4,
     paddingHorizontal: 4,
     minHeight: 52,
@@ -2365,7 +2386,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -2384,40 +2405,37 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
     marginHorizontal: 4,
   },
   requestQuoteBottomButton: {
-    backgroundColor: '#25D366',
-    borderRadius: 12,
+    backgroundColor: colors.whatsapp,
+    borderRadius: 14,
     paddingVertical: 16,
+    minHeight: 52,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#25D366',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    ...shadow.cta(colors.whatsapp),
   },
   priceOnRequestLabel: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#dc2626',
+    color: colors.brand,
     letterSpacing: 0.3,
   },
   loginToSeePriceText: {
     ...T.label,
     fontWeight: '700',
-    color: '#86868B',
+    color: colors.secondaryLabel,
     letterSpacing: 0.2,
   },
   addToBagButtonRTL: {
     flexDirection: 'row-reverse',
   },
   inCartButton: {
-    backgroundColor: '#27AE60',
-    shadowColor: '#27AE60',
+    backgroundColor: colors.greenDeep,
+    shadowColor: colors.greenDeep,
     elevation: 6,
   },
   buttonIcon: {
@@ -2441,24 +2459,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   sizeInfo: {
-    ...T.label,
-    fontWeight: '400',
-    backgroundColor: '#F2F2F7',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    ...T.labelSmall,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+    backgroundColor: colors.fillSecondary,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
   },
   stockInfo: {
     ...T.captionSmall,
-    color: '#34C759',
-    fontWeight: '600',
-    backgroundColor: '#F0F9FF',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 6,
+    color: colors.greenDeep,
+    fontWeight: '700',
+    backgroundColor: tint(colors.green),
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
   },
   originalPrice: {
     ...T.priceStrikethrough,
+    color: colors.secondaryLabel,
   },
   discountedPrice: {
     ...T.priceDiscount,
@@ -2466,17 +2486,15 @@ const styles = StyleSheet.create({
   },
   // Beauty Boxes detail page pricing styles
   beautyBoxDetailPricing: {
-    backgroundColor: '#F8F9FA',
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#dc2626',
+    backgroundColor: colors.subtleBg,
+    padding: 14,
+    borderRadius: 12,
     marginVertical: 8,
   },
   beautyBoxDetailFullPrice: {
-    fontSize: 16,
-    color: '#2C3E50',
-    fontWeight: '600',
+    ...T.priceStrikethrough,
+    fontSize: 15,
+    color: colors.secondaryLabel,
     marginBottom: 8,
   },
   beautyBoxDetailDiscountRow: {
@@ -2487,19 +2505,19 @@ const styles = StyleSheet.create({
     columnGap: 10,
   },
   beautyBoxDetailDiscount: {
-    fontSize: 14,
-    color: '#dc2626',
-    fontWeight: 'bold',
-    backgroundColor: '#FFE5E5',
+    ...T.captionSmall,
+    color: colors.brand,
+    fontWeight: '700',
+    backgroundColor: tint(colors.brand),
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingVertical: 5,
+    borderRadius: 999,
     flexShrink: 1,
   },
   beautyBoxDetailFinalPrice: {
     fontSize: 18,
-    color: '#27AE60',
-    fontWeight: 'bold',
+    color: colors.greenDeep,
+    fontWeight: '800',
     marginStart: 'auto',
     flexShrink: 1,
     minWidth: 0,
@@ -2521,37 +2539,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#1D1D1F',
+    backgroundColor: colors.label,
     width: 8,
     height: 8,
     borderRadius: 4,
   },
   // Video styles moved to videoStyles (ProductVideo component)
-  // Documentation Section
-  docsSection: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  docsSectionTitle: {
-    ...T.body,
-    fontWeight: '600',
-    color: '#1D1D1F',
-    marginBottom: 10,
-  },
+  // Documentation link rows (inside the documentation card)
   docLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F7',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 8,
+    backgroundColor: colors.subtleBg,
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
     gap: 10,
   },
   docLinkText: {
     flex: 1,
     fontSize: 14,
-    color: '#007AFF',
+    color: colors.blue,
     fontWeight: '500',
   },
 });

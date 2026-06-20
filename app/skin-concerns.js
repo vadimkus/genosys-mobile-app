@@ -3,21 +3,23 @@
  * Each card navigates to the native concern-detail screen.
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, shadow, surfaces } from '../utils/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_GAP = 12;
@@ -87,6 +89,17 @@ export default function SkinConcernsScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); };
+
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const title = locale === 'ar' ? 'اختاري مشكلة بشرتك'
     : locale === 'ru' ? 'Выберите проблему кожи'
@@ -104,27 +117,22 @@ export default function SkinConcernsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>
-          {t('categories.skinConcern') || 'Skin Concern'}
-        </Text>
-        <View style={styles.headerSpacer} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('categories.skinConcern') || 'Skin Concern'}
+        scrollY={scrollY}
+        onBack={onBack}
+        isRTL={isRTL}
+      />
 
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight + 8 }]}
         showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
       >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
         {/* Title section */}
         <View style={styles.titleSection}>
           <Text style={[styles.pageTitle, isRTL && styles.textRTL]}>{title}</Text>
@@ -156,7 +164,7 @@ export default function SkinConcernsScreen() {
                   <Ionicons
                     name={isRTL ? 'arrow-back' : 'arrow-forward'}
                     size={14}
-                    color="#dc2626"
+                    color={colors.brand}
                   />
                 </View>
               </TouchableOpacity>
@@ -166,15 +174,16 @@ export default function SkinConcernsScreen() {
 
         {/* Bottom spacing */}
         <View style={{ height: 40 }} />
-      </ScrollView>
-    </SafeAreaView>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.groupedBg,
   },
   header: {
     flexDirection: 'row',
@@ -218,13 +227,13 @@ const styles = StyleSheet.create({
     ...T.pageTitle,
     fontSize: 22,
     letterSpacing: -0.3,
-    color: '#1D1D1F',
+    color: colors.label,
     textAlign: 'center',
   },
   pageSubtitle: {
     ...T.caption,
     fontSize: 14,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     textAlign: 'center',
     marginTop: 6,
     lineHeight: 20,
@@ -239,18 +248,11 @@ const styles = StyleSheet.create({
   },
   card: {
     width: CARD_WIDTH,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
+    ...surfaces.card,
+    ...shadow.card,
     padding: 16,
     marginBottom: CARD_GAP,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
   cardIcon: {
     fontSize: 32,
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     ...T.label,
     fontSize: 15,
-    color: '#1D1D1F',
+    color: colors.label,
     lineHeight: 20,
     marginBottom: 6,
     textAlign: 'center',
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
   },
   exploreText: {
     ...T.labelSmall,
-    color: '#dc2626',
+    color: colors.brand,
   },
   textRTL: {
     textAlign: 'right',

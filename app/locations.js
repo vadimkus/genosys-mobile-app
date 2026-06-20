@@ -3,35 +3,51 @@
  * Displays delivery locations across UAE with shipping costs and delivery times.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Linking,
-  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, shadow, surfaces } from '../utils/theme';
 
 export default function LocationsScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [selectedSlug, setSelectedSlug] = useState(null);
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
+
+  // Subtle entrance motion (matches order/about screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const handleSelectLocation = useCallback((slug) => {
     haptics.lightTap();
     setSelectedSlug((prev) => (prev === slug ? null : slug));
   }, []);
+
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); };
 
   const locations = [
     {
@@ -41,7 +57,7 @@ export default function LocationsScreen() {
       shipping: l('45 AED', '٤٥ د.إ', '45 AED'),
       delivery: l('1–2 hours', '١-٢ ساعة', '1–2 часа'),
       icon: 'business',
-      color: '#dc2626',
+      color: colors.brand,
     },
     {
       slug: 'abu-dhabi',
@@ -50,7 +66,7 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       icon: 'flag',
-      color: '#2563eb',
+      color: colors.blue,
     },
     {
       slug: 'sharjah',
@@ -59,7 +75,7 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       icon: 'location',
-      color: '#16a34a',
+      color: colors.greenDeep,
     },
     {
       slug: 'rak',
@@ -68,7 +84,7 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       icon: 'compass',
-      color: '#f59e0b',
+      color: colors.orange,
     },
     {
       slug: 'ajman',
@@ -77,16 +93,16 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       icon: 'navigate',
-      color: '#8b5cf6',
+      color: colors.purple,
     },
     {
       slug: 'fujairah',
       name: l('Fujairah', 'الفجيرة', 'Фуджейра'),
-      desc: l('Delivery across Fujairah emirate', 'التوصيل في إمارة الفجيرة', 'Доставка по эмирату Фуджейра'),
+      desc: l('Delivery across Fujairah emirate', 'التوصيل في إمارة الفجيرة', 'Доставка по эمирату Фуджейра'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       icon: 'earth',
-      color: '#06b6d4',
+      color: colors.teal,
     },
     {
       slug: 'uaq',
@@ -95,159 +111,174 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       icon: 'pin',
-      color: '#10b981',
+      color: colors.green,
     },
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {t('navigation.locations') || 'Locations'}
-        </Text>
-        <View style={styles.backBtn} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('navigation.locations') || 'Locations'}
+        scrollY={scrollY}
+        onBack={onBack}
+        isRTL={isRTL}
+      />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Hero */}
-        <View style={styles.heroSection}>
-          <Text style={styles.heroEmoji}>🇦🇪</Text>
-          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>
-            {l('We Deliver Across the UAE', 'نوصل في جميع أنحاء الإمارات', 'Доставляем по всем ОАЭ')}
-          </Text>
-          <Text style={[styles.heroSubtitle, isRTL && styles.textRTL]}>
-            {l('Premium skincare delivered to your door in all 7 emirates',
-               'العناية الفاخرة بالبشرة توصل إلى باب منزلك في الإمارات السبع',
-               'Премиальная косметика с доставкой до двери во все 7 эмиратов')}
-          </Text>
-        </View>
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          {/* Hero */}
+          <View style={styles.heroSection}>
+            <Text style={styles.heroEmoji}>🇦🇪</Text>
+            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
+              {l('We Deliver Across the UAE', 'نوصل في جميع أنحاء الإمارات', 'Доставляем по всем ОАЭ')}
+            </Text>
+            <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>
+              {l('Premium skincare delivered to your door in all 7 emirates',
+                 'العناية الفاخرة بالبشرة توصل إلى باب منزلك في الإمارات السبع',
+                 'Премиальная косметика с доставкой до двери во все 7 эмиратов')}
+            </Text>
+          </View>
 
-        {/* Free Shipping Note */}
-        <View style={styles.freeShipBanner}>
-          <Ionicons name="gift" size={20} color="#16a34a" />
-          <Text style={[styles.freeShipText, isRTL && styles.textRTL]}>
-            {l('FREE shipping on orders above 1,000 AED', 'شحن مجاني للطلبات فوق ١٬٠٠٠ د.إ', 'БЕСПЛАТНАЯ доставка при заказе от 1 000 AED')}
-          </Text>
-        </View>
+          {/* Free Shipping Note */}
+          <View style={[styles.freeShipBanner, isRTL && styles.rowRTL]}>
+            <Ionicons name="gift" size={18} color={colors.greenDeep} />
+            <Text style={[styles.freeShipText, isRTL && styles.textRTL]}>
+              {l('FREE shipping on orders above 1,000 AED', 'شحن مجاني للطلبات فوق ١٬٠٠٠ د.إ', 'БЕСПЛАТНАЯ доставка при заказе от 1 000 AED')}
+            </Text>
+          </View>
 
-        {/* Locations */}
-        <View style={styles.section}>
-          {locations.map((loc) => {
-            const isSelected = selectedSlug === loc.slug;
-            return (
-              <TouchableOpacity
-                key={loc.slug}
-                style={[
-                  styles.locationCard,
-                  isSelected && { borderColor: loc.color, borderWidth: 2, backgroundColor: `${loc.color}08` },
-                ]}
-                onPress={() => handleSelectLocation(loc.slug)}
-                activeOpacity={0.8}
-              >
-                <View style={[styles.locationHeader, isRTL && styles.locationHeaderRTL]}>
-                  <View style={[styles.locationIcon, { backgroundColor: isSelected ? `${loc.color}25` : `${loc.color}15` }]}>
-                    <Ionicons name={isSelected ? 'checkmark-circle' : loc.icon} size={22} color={loc.color} />
+          {/* Locations */}
+          <View style={styles.section}>
+            {locations.map((loc) => {
+              const isSelected = selectedSlug === loc.slug;
+              return (
+                <TouchableOpacity
+                  key={loc.slug}
+                  style={[styles.locationCard, shadow.card, isSelected && { borderColor: loc.color }]}
+                  onPress={() => handleSelectLocation(loc.slug)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.locationHeader, isRTL && styles.rowRTL]}>
+                    <View style={[surfaces.iconTile, styles.locationTile, { backgroundColor: loc.color }]}>
+                      <Ionicons name={isSelected ? 'checkmark' : loc.icon} size={18} color={colors.white} />
+                    </View>
+                    <View style={styles.locationInfo}>
+                      <Text style={[styles.locationName, isRTL && styles.textRTL, isSelected && { color: loc.color }]}>{loc.name}</Text>
+                      <Text style={[styles.locationDesc, isRTL && styles.textRTL]}>{loc.desc}</Text>
+                    </View>
                   </View>
-                  <View style={styles.locationInfo}>
-                    <Text style={[styles.locationName, isRTL && styles.textRTL, isSelected && { color: loc.color }]}>{loc.name}</Text>
-                    <Text style={[styles.locationDesc, isRTL && styles.textRTL]}>{loc.desc}</Text>
+                  <View style={styles.hairline} />
+                  <View style={[styles.locationMeta, isRTL && styles.locationMetaRTL]}>
+                    <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                      <Ionicons name="time-outline" size={14} color={colors.secondaryLabel} />
+                      <Text style={styles.metaText}>{loc.delivery}</Text>
+                    </View>
+                    <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                      <Ionicons name="card-outline" size={14} color={colors.secondaryLabel} />
+                      <Text style={styles.metaText}>{loc.shipping}</Text>
+                    </View>
                   </View>
-                </View>
-                <View style={[styles.locationMeta, isRTL && styles.locationMetaRTL]}>
-                  <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                    <Ionicons name="time" size={14} color={isSelected ? loc.color : '#6B7280'} />
-                    <Text style={[styles.metaText, isSelected && { color: loc.color, fontWeight: '700' }]}>{loc.delivery}</Text>
-                  </View>
-                  <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                    <Ionicons name="card" size={14} color={isSelected ? loc.color : '#6B7280'} />
-                    <Text style={[styles.metaText, isSelected && { color: loc.color, fontWeight: '700' }]}>{loc.shipping}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
 
-        {/* Office Location */}
-        <View style={styles.officeSection}>
-          <Text style={[styles.officeTitle, isRTL && styles.textRTL]}>
-            {l('Our Office', 'مكتبنا', 'Наш офис')}
-          </Text>
-          <TouchableOpacity
-            style={[styles.officeCard, isRTL && styles.officeCardRTL]}
-            onPress={() => Linking.openURL('https://maps.google.com/?q=Cordoba+Residence+E02+Dubai+UAE')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.officeIcon}>
-              <Ionicons name="map" size={24} color="#dc2626" />
+          {/* Office Location */}
+          <View style={styles.officeSection}>
+            <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
+                <Ionicons name="business" size={17} color={colors.white} />
+              </View>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+                {l('Our Office', 'مكتبنا', 'Наш офис')}
+              </Text>
             </View>
-            <View style={styles.officeInfo}>
-              <Text style={[styles.officeAddress, isRTL && styles.textRTL]}>Cordoba Residence, Villa E02</Text>
-              <Text style={[styles.officeCity, isRTL && styles.textRTL]}>Dubai, UAE</Text>
-            </View>
-            <Ionicons name="open-outline" size={18} color="#9CA3AF" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ height: 32 }} />
-      </ScrollView>
-    </SafeAreaView>
+            <TouchableOpacity
+              style={[styles.officeCard, shadow.card, isRTL && styles.rowRTL]}
+              onPress={() => Linking.openURL('https://maps.google.com/?q=Cordoba+Residence+E02+Dubai+UAE')}
+              activeOpacity={0.7}
+            >
+              <View style={[surfaces.iconTile, styles.officeTile, { backgroundColor: colors.teal }]}>
+                <Ionicons name="map" size={20} color={colors.white} />
+              </View>
+              <View style={styles.officeInfo}>
+                <Text style={[styles.officeAddress, isRTL && styles.textRTL]}>Cordoba Residence, Villa E02</Text>
+                <Text style={[styles.officeCity, isRTL && styles.textRTL]}>Dubai, UAE</Text>
+              </View>
+              <Ionicons name="open-outline" size={18} color={colors.tertiary} />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
 
   // Hero
-  heroSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FAFAFA' },
+  heroSection: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20, alignItems: 'center' },
   heroEmoji: { fontSize: 40, marginBottom: 8 },
-  heroTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', textAlign: 'center', marginBottom: 8 },
-  heroSubtitle: { ...T.caption, color: '#6B7280', textAlign: 'center', lineHeight: 20, fontSize: 14 },
+  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
+  heroSubtitle: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 21 },
 
-  // Free Ship Banner
-  freeShipBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginHorizontal: 20, marginTop: 16, backgroundColor: '#F0FDF4', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#BBF7D0' },
-  freeShipText: { ...T.caption, fontWeight: '600', color: '#16a34a' },
+  // Free Ship Banner (tinted inline highlight)
+  freeShipBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    backgroundColor: 'rgba(22, 163, 74, 0.10)',
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  freeShipText: { ...T.labelSmall, fontWeight: '700', color: colors.greenDeep, flexShrink: 1 },
 
   // Section
-  section: { paddingHorizontal: 20, paddingVertical: 20 },
+  section: { paddingHorizontal: 16, paddingTop: 18 },
 
   // Location Cards
-  locationCard: { backgroundColor: '#F9FAFB', borderRadius: 14, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#F3F4F6' },
-  locationHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
-  locationHeaderRTL: { flexDirection: 'row-reverse' },
-  locationIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  locationInfo: { flex: 1 },
-  locationName: { ...T.navTitle, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  locationDesc: { ...T.caption, color: '#6B7280', lineHeight: 18 },
-  locationMeta: { flexDirection: 'row', gap: 20, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB' },
+  locationCard: {
+    ...surfaces.card,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  locationHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  locationTile: { width: 40, height: 40, borderRadius: 11 },
+  locationInfo: { flex: 1, minWidth: 0 },
+  locationName: { ...T.label, fontSize: 16, fontWeight: '700', color: colors.label, marginBottom: 3 },
+  locationDesc: { ...T.caption, color: colors.secondaryLabel, lineHeight: 18 },
+  hairline: { ...surfaces.hairline, marginVertical: 12 },
+  locationMeta: { flexDirection: 'row', gap: 20 },
   locationMetaRTL: { flexDirection: 'row-reverse' },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   metaItemRTL: { flexDirection: 'row-reverse' },
-  metaText: { ...T.caption, fontWeight: '600', color: '#4B5563' },
+  metaText: { ...T.caption, fontWeight: '600', color: colors.label },
 
   // Office
-  officeSection: { paddingHorizontal: 20, paddingVertical: 20, backgroundColor: '#F9FAFB' },
-  officeTitle: { ...T.sectionTitle, color: '#000', marginBottom: 14 },
-  officeCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' },
-  officeCardRTL: { flexDirection: 'row-reverse' },
-  officeIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FEF2F2', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
-  officeInfo: { flex: 1 },
-  officeAddress: { ...T.bodySmall, fontWeight: '600', color: '#111827', lineHeight: undefined },
-  officeCity: { ...T.caption, color: '#6B7280', marginTop: 2 },
+  officeSection: { paddingHorizontal: 16, paddingTop: 14 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
+  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label },
+  officeCard: { ...surfaces.card, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
+  officeTile: { width: 44, height: 44, borderRadius: 12 },
+  officeInfo: { flex: 1, minWidth: 0 },
+  officeAddress: { ...T.label, fontSize: 15, fontWeight: '600', color: colors.label },
+  officeCity: { ...T.caption, color: colors.secondaryLabel, marginTop: 2 },
 
   // RTL
+  rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });

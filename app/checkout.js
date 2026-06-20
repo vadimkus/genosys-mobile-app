@@ -3,14 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Alert,
   ActivityIndicator,
   Linking,
   Platform,
+  Animated,
+  Easing,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,10 +22,9 @@ import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } fro
 import { useLocalization } from '../contexts/LocalizationContext';
 import { formatAddressForDisplay } from '../utils/addressUtils';
 import { normalizeUserProfile } from '../utils/userProfile';
-import CollapsibleFooter from '../components/CollapsibleFooter';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import * as haptics from '../utils/haptics';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
-import CheckoutSteps from '../components/checkout/CheckoutSteps';
 import OrderSuccessScreen from '../components/OrderSuccessScreen';
 import CheckoutAddressForm from '../components/checkout/CheckoutAddressForm';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
@@ -38,9 +37,9 @@ import {
   isValidUaeMobileNational,
   toE164UaePhone,
   getDeliveryEtaInfo,
-  computeSavingsAED,
 } from '../utils/checkoutFormUtils';
 import T from '../utils/typography';
+import { colors, shadow, surfaces, tint } from '../utils/theme';
 
 export default function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
@@ -48,6 +47,10 @@ export default function CheckoutScreen() {
   const { items, getTotalItems, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const { scrollY, onScroll, headerHeight, insets } = useCollapsibleHeader();
+  // Subtle entrance motion (matches OrderSuccessScreen / orders detail feel).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
   const scrollRef = useRef(null);
   const fieldLayoutsRef = useRef({});
   const sectionLayoutsRef = useRef({ delivery: 0, payment: 0, review: 0 });
@@ -82,14 +85,12 @@ export default function CheckoutScreen() {
     address: false,
   });
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const [activeStep, setActiveStep] = useState('delivery'); // delivery | payment | review
-  
+
   // UI states
   const [isProcessing, setIsProcessing] = useState(false);
   const submittingRef = useRef(false);
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
-  const [footerCollapsed, setFooterCollapsed] = useState(true);
   const [successOrder, setSuccessOrder] = useState(null);
 
   const totals = useMemo(() => calculateCartTotals(items, user, selectedEmirate, {
@@ -101,7 +102,6 @@ export default function CheckoutScreen() {
   const safeShipping = Number(totals.shipping) || 0;
   const safeVat = Number(totals.vatAmount) || 0;
   const safeTotal = Number(totals.total) || 0;
-  const savingsAED = computeSavingsAED(items, safeSubtotal);
   const waterfall = computeWaterfallBreakdown(items, user);
   const etaInfo = getDeliveryEtaInfo(selectedEmirate);
   const deliveryEtaText = etaInfo.isDubai
@@ -146,6 +146,14 @@ export default function CheckoutScreen() {
   useEffect(() => {
     reloadShippingRates?.();
   }, []);
+
+  // Subtle fade + lift on mount.
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   // Load default payment method preference. First-time users default to CARD
   // to match the web checkout; existing users keep whatever they last selected.
@@ -611,44 +619,29 @@ export default function CheckoutScreen() {
     );
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
+  const onBack = () => {
+    haptics.lightTap();
+    router.canGoBack() ? router.back() : router.replace('/(tabs)/bag');
+  };
 
-      {/* Header with Step Indicator */}
-      <CheckoutSteps
-        activeStep={activeStep}
-        onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/bag')}
-        styles={styles}
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('checkout.title')}
+        scrollY={scrollY}
+        onBack={onBack}
+        isRTL={isRTL}
       />
 
-      <ScrollView
+      <Animated.View style={[styles.motionWrap, { opacity: fade, transform: [{ translateY: lift }] }]}>
+      <Animated.ScrollView
         ref={scrollRef}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         scrollEventThrottle={16}
-        onScroll={(e) => {
-          const y = Number(e?.nativeEvent?.contentOffset?.y) || 0;
-          const viewportH = Number(e?.nativeEvent?.layoutMeasurement?.height) || 0;
-          const contentH = Number(e?.nativeEvent?.contentSize?.height) || 0;
-          const deliveryY = Number(sectionLayoutsRef.current.delivery) || 0;
-          const paymentY = Number(sectionLayoutsRef.current.payment) || 0;
-          const reviewY = Number(sectionLayoutsRef.current.review) || 0;
-
-          // Activate next step slightly before the section top (feels smoother)
-          const bias = 80;
-          const pos = y + bias;
-
-          let next = 'delivery';
-          // If user is near the bottom, always show Review (matches "order summary at the bottom").
-          const nearBottom = contentH > 0 && viewportH > 0 && (y + viewportH >= contentH - 120);
-          if (nearBottom) next = 'review';
-          else if (pos >= reviewY) next = 'review';
-          else if (pos >= paymentY) next = 'payment';
-          else if (pos >= deliveryY) next = 'delivery';
-
-          if (next !== activeStep) setActiveStep(next);
-        }}
+        onScroll={onScroll}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight + 8 }]}
       >
         <View style={styles.content}>
           
@@ -729,206 +722,72 @@ export default function CheckoutScreen() {
             styles={styles}
           />
 
-          {/* Review section layout anchor (for step indicator scroll detection) */}
+          {/* Review section layout anchor (kept for child onLayout API parity) */}
           <View onLayout={registerSectionLayout('review')} />
 
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
+      </Animated.View>
 
-      {/* Bottom Action */}
-      <CollapsibleFooter
-        collapsed={footerCollapsed}
-        onToggle={() => setFooterCollapsed((v) => !v)}
-        chevronCollapsedName="chevron-down"
-        chevronExpandedName="chevron-up"
-        chevronHitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        chevronSize={20}
-        chevronColor="#6B7280"
-        containerStyle={[styles.bottomContainer, footerCollapsed && styles.bottomContainerCollapsed]}
-        chevronButtonStyle={styles.footerChevronBtn}
-        contentStyle={[styles.footerContent, !footerCollapsed && styles.footerContentExpanded]}
-        details={
-          <View style={[styles.footerDetails, isRTL && styles.footerDetailsRTL]}>
-            <View style={styles.reviewRow}>
-              <Text style={[styles.reviewText, isRTL && styles.textRTL]} numberOfLines={2} ellipsizeMode="tail">
-                {t('checkout.reviewLine', {
-                  emirate: selectedEmirate,
-                  payment:
-                    selectedPaymentMethod === PAYMENT_METHODS.CARD
-                      ? t('checkout.cardPayment')
-                      : t('checkout.cashOnDelivery'),
-                  total: safeTotal.toFixed(2),
-                })}
-              </Text>
-            </View>
-
-            <View style={styles.stickySummaryRow}>
-              <View style={styles.stickySummaryLeft}>
-                <View style={[styles.etaPill, isRTL && styles.rowRTL]}>
-                  <Ionicons name="time-outline" size={14} color="#6B7280" />
-                  <Text style={[styles.etaPillText, isRTL && styles.textRTL]} numberOfLines={1} ellipsizeMode="tail">
-                    {deliveryEtaText}
-                  </Text>
-                </View>
-                {savingsAED > 0.5 ? (
-                  <View style={[styles.savingsPill, isRTL && styles.rowRTL]}>
-                    <Ionicons name="pricetag-outline" size={14} color="#16A34A" />
-                    <Text style={[styles.savingsPillText, isRTL && styles.textRTL]}>
-                      {t('checkout.youSave')} AED {savingsAED.toFixed(2)}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-            </View>
-          </View>
-        }
-        action={
-          <View>
-            {/* Order total summary above Place Order button */}
-            <View style={[styles.footerTotalRow, isRTL && { flexDirection: 'row-reverse' }]}>
-              <Text style={styles.footerTotalLabel}>
-                {(() => { const c = paidItems.reduce((s, i) => s + (Number(i.quantity) || 1), 0); return `${t('checkout.total') || 'Total'} (${c} ${c === 1 ? (t('checkout.item') || 'item') : (t('checkout.items') || 'items')})`; })()}
-              </Text>
-              <Text style={styles.footerTotalValue}>{safeTotal.toFixed(2)} AED</Text>
-            </View>
-            {safeShipping > 0 && (
-              <Text style={styles.footerShippingNote}>
-                {t('checkout.inclShipping') || 'Incl. shipping'} {safeShipping.toFixed(2)} AED
-              </Text>
-            )}
-            {safeShipping === 0 && safeTotal > 0 && (
-              <Text style={[styles.footerShippingNote, { color: '#16A34A' }]}>
-                {t('checkout.freeShipping') || 'Free shipping'}
-              </Text>
-            )}
-            <TouchableOpacity
-              style={[
-                styles.placeOrderButton,
-                footerCollapsed && styles.placeOrderButtonCollapsed,
-                isProcessing && styles.placeOrderButtonDisabled,
-                isRTL && styles.placeOrderButtonRTL,
-              ]}
-              onPress={handleSubmit}
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <ActivityIndicator color="#ffffff" size="small" />
-              ) : (
-                <Ionicons name="bag-check" size={20} color="#ffffff" />
-              )}
-              <Text style={[styles.placeOrderButtonText, isRTL && styles.placeOrderButtonTextRTL]}>
-                {isProcessing ? t('checkout.processing') : t('checkout.placeOrder')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        }
-      />
-    </SafeAreaView>
+      {/* Sticky pay bar — single primary action */}
+      <View style={[styles.payBar, { paddingBottom: (insets?.bottom || 0) + 12 }]}>
+        <TouchableOpacity
+          style={[
+            styles.placeOrderButton,
+            shadow.cta(colors.brand),
+            isProcessing && styles.placeOrderButtonDisabled,
+            isRTL && styles.placeOrderButtonRTL,
+          ]}
+          onPress={handleSubmit}
+          disabled={isProcessing}
+          activeOpacity={0.85}
+        >
+          {isProcessing ? (
+            <ActivityIndicator color="#ffffff" size="small" />
+          ) : (
+            <Ionicons name="bag-check" size={20} color="#ffffff" />
+          )}
+          <Text style={[styles.placeOrderButtonText, isRTL && styles.placeOrderButtonTextRTL]} numberOfLines={1}>
+            {isProcessing
+              ? t('checkout.processing')
+              : `${t('checkout.placeOrder')} • AED ${safeTotal.toFixed(2)}`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.groupedBg,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
-  },
-  headerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  backButtonRTL: {
-    alignItems: 'flex-end',
-  },
-  headerTitle: {
-    ...T.sectionTitleSmall,
-    color: '#000000',
-    textAlign: 'center',
-  },
-  headerCenter: {
+  motionWrap: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
-  },
-  headerSteps: {
-    ...T.captionSmall,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  stepsRow: {
-    marginTop: 4,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    gap: 14,
-  },
-  stepsRowRTL: {
-    flexDirection: 'row-reverse',
-  },
-  stepItem: {
-    alignItems: 'center',
-  },
-  stepText: {
-    ...T.captionSmall,
-    fontWeight: '700',
-    color: '#9CA3AF',
-  },
-  stepTextActive: {
-    color: '#111827',
-  },
-  stepUnderline: {
-    marginTop: 4,
-    height: 3,
-    width: 26,
-    borderRadius: 999,
-    backgroundColor: '#16A34A',
-  },
-  stepUnderlineSpacer: {
-    marginTop: 4,
-    height: 3,
-    width: 26,
-    borderRadius: 999,
-    backgroundColor: 'transparent',
-  },
-  headerSpacer: {
-    width: 40,
   },
   scrollView: {
     flex: 1,
   },
-  content: {
-    padding: 20,
+  scrollContent: {
+    paddingBottom: 28,
   },
-  
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+
   // Order Header
   orderHeaderCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    marginBottom: 20,
+    ...surfaces.card,
+    ...shadow.card,
+    marginBottom: 14,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
   },
   orderHeader: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    backgroundColor: colors.card,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -939,8 +798,8 @@ const styles = StyleSheet.create({
   orderHeaderIconWrap: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FEE2E2',
+    borderRadius: 10,
+    backgroundColor: tint(colors.brand),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -956,7 +815,7 @@ const styles = StyleSheet.create({
   },
   orderEyebrow: {
     ...T.captionTiny,
-    color: '#9CA3AF',
+    color: colors.secondaryLabel,
     fontWeight: '600',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
@@ -964,17 +823,13 @@ const styles = StyleSheet.create({
   orderHeaderTotal: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
     marginTop: 2,
     letterSpacing: -0.2,
   },
-  orderNumber: {
-    ...T.mono,
-    color: '#1D1D1F',
-  },
   itemCount: {
     ...T.captionSmall,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     marginTop: 1,
   },
   orderHeaderDiscountBadge: {
@@ -989,9 +844,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   orderSummaryBody: {
-    backgroundColor: '#F2F2F7',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
+    backgroundColor: colors.subtleBg,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.separator,
     padding: 14,
     paddingTop: 12,
   },
@@ -1076,25 +931,24 @@ const styles = StyleSheet.create({
 
   // Section
   section: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    ...surfaces.card,
+    ...shadow.card,
+    padding: 18,
+    marginBottom: 14,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    gap: 8,
+    gap: 10,
   },
   sectionHeaderRTL: {
     flexDirection: 'row-reverse',
   },
   sectionTitle: {
-    ...T.navTitle,
+    ...T.body,
     fontWeight: '700',
+    color: colors.label,
   },
 
   // Form
@@ -1115,7 +969,7 @@ const styles = StyleSheet.create({
   label: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     marginBottom: 6,
   },
   labelRow: {
@@ -1126,20 +980,20 @@ const styles = StyleSheet.create({
   },
   input: {
     ...T.input,
-    borderWidth: 1,
-    borderColor: '#D1D1D6',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
   },
   selectInput: {
-    borderWidth: 1,
-    borderColor: '#D1D1D6',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -1153,7 +1007,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   selectPlaceholder: {
-    color: '#9CA3AF',
+    color: colors.tertiary,
   },
   phoneRow: {
     flexDirection: 'row',
@@ -1167,9 +1021,9 @@ const styles = StyleSheet.create({
     height: 48,
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    backgroundColor: colors.subtleBg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     justifyContent: 'center',
   },
   phonePrefixText: {
@@ -1192,13 +1046,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputError: {
-    borderColor: '#dc2626',
-    backgroundColor: '#FFF5F5',
+    borderColor: colors.brand,
+    backgroundColor: tint(colors.brand, '0D'),
   },
   helperError: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#dc2626',
+    color: colors.brand,
     marginTop: 6,
   },
   helperErrorRTL: {
@@ -1285,8 +1139,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   modalAddressRowActive: {
-    borderColor: '#dc2626',
-    backgroundColor: '#FFF5F5',
+    borderColor: colors.brand,
+    backgroundColor: tint(colors.brand, '0D'),
   },
   modalAddressType: {
     ...T.captionSmall,
@@ -1380,23 +1234,23 @@ const styles = StyleSheet.create({
     width: '48%',
     minHeight: 56,
     padding: 12,
-    borderWidth: 1,
-    borderColor: '#D1D1D6',
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    borderRadius: 12,
+    backgroundColor: colors.subtleBg,
   },
   emirateOptionSelected: {
-    borderColor: '#dc2626',
-    backgroundColor: '#FFF5F5',
+    borderColor: colors.brand,
+    backgroundColor: tint(colors.brand, '0D'),
   },
   emirateText: {
     ...T.label,
     fontWeight: '500',
-    color: '#3C3C43',
+    color: colors.label,
     flexShrink: 1,
   },
   emirateTextSelected: {
-    color: '#dc2626',
+    color: colors.brand,
   },
   emirateBottomRow: {
     marginTop: 6,
@@ -1437,14 +1291,14 @@ const styles = StyleSheet.create({
   },
   paymentOption: {
     padding: 16,
-    borderWidth: 1,
-    borderColor: '#D1D1D6',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     borderRadius: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
   },
   paymentOptionSelected: {
-    borderColor: '#dc2626',
-    backgroundColor: '#FFF5F5',
+    borderColor: colors.brand,
+    backgroundColor: tint(colors.brand, '0D'),
   },
   paymentOptionDisabled: {
     opacity: 0.6,
@@ -1457,7 +1311,7 @@ const styles = StyleSheet.create({
   },
   paymentTitle: {
     ...T.button,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   paymentDescription: {
     ...T.label,
@@ -1633,155 +1487,37 @@ const styles = StyleSheet.create({
     color: '#15803D',
   },
 
-  // Bottom Action
-  bottomContainer: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
+  // Sticky pay bar
+  payBar: {
+    backgroundColor: colors.card,
+    paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 34, // Safe area
-    borderTopWidth: 0.5,
-    borderTopColor: '#E5E5EA',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.separator,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -6 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 12,
-    position: 'relative',
-  },
-  bottomContainerCollapsed: {
-    paddingTop: 8,
-  },
-  footerContent: {
-    // Default: no right padding when collapsed
-    paddingEnd: 0,
-    // Reserve vertical space for the absolutely-positioned chevron so it doesn't overlap the CTA.
-    // When collapsed, `details` is not rendered and the chevron is position:absolute, so without this
-    // the content area has ~0 height and the chevron sits on top of the Place Order button.
-    minHeight: 44,
-  },
-  footerContentExpanded: {
-    // When expanded: add whitespace for chevron on right
-    paddingEnd: 48, // Generous space for chevron (20px icon + 28px buffer)
-  },
-  footerDetails: {
-    position: 'relative',
-  },
-  footerChevronBtn: {
-    position: 'absolute',
-    end: 0, // Chevron on END side (auto-mirrors in RTL)
-    top: 0, // Align with top
-    padding: 8,
-    zIndex: 10,
-  },
-  placeOrderButtonCollapsed: {
-    // No extra margin when collapsed
-  },
-  footerTotalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-    marginBottom: 4,
-  },
-  footerTotalLabel: {
-    ...T.label,
-    color: '#374151',
-  },
-  footerTotalValue: {
-    ...T.sectionTitleSmall,
-    fontWeight: '800',
-    color: '#111827',
-    letterSpacing: 0,
-  },
-  footerShippingNote: {
-    ...T.captionTiny,
-    color: '#9CA3AF',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  reviewRow: {
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
-    marginBottom: 12,
-  },
-  reviewText: {
-    ...T.captionSmall,
-    fontWeight: '700',
-    color: '#6B7280',
-    lineHeight: 16,
-  },
-  stickySummaryRow: {
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  stickySummaryLeft: {
-    flex: 1,
-    gap: 8,
-    alignItems: 'center',
-  },
-  savingsPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: '#F0FDF4',
-    borderWidth: 1,
-    borderColor: '#DCFCE7',
-  },
-  savingsPillText: {
-    ...T.captionSmall,
-    fontWeight: '800',
-    color: '#16A34A',
-  },
-  etaPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-  },
-  etaPillText: {
-    ...T.captionSmall,
-    fontWeight: '700',
-    color: '#6B7280',
-    textAlign: 'right',
-    flexShrink: 1,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 8,
   },
   placeOrderButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 16,
+    minHeight: 52,
     borderRadius: 14,
-    gap: 8,
-    shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    gap: 10,
   },
   placeOrderButtonDisabled: {
-    backgroundColor: '#BDC3C7',
+    backgroundColor: colors.tertiary,
     shadowOpacity: 0,
     elevation: 0,
   },
   placeOrderButtonText: {
-    ...T.buttonLarge,
-  },
-  // RTL support (footer)
-  footerDetailsRTL: {
-    alignItems: 'flex-end',
+    ...T.button,
+    fontWeight: '700',
   },
   rowRTL: {
     flexDirection: 'row-reverse',
@@ -1796,86 +1532,5 @@ const styles = StyleSheet.create({
   placeOrderButtonTextRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
-  },
-
-  // Success Modal
-  successOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 28,
-  },
-  successCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 24,
-    paddingTop: 32,
-    paddingBottom: 24,
-    paddingHorizontal: 28,
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 340,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  successIconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#22c55e',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  successTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1D1D1F',
-    letterSpacing: -0.3,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  successBody: {
-    fontSize: 15,
-    fontWeight: '400',
-    lineHeight: 22,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 28,
-  },
-  successPrimaryBtn: {
-    flexDirection: 'row',
-    backgroundColor: '#dc2626',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 14,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  successPrimaryText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: -0.2,
-  },
-  successSecondaryBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 14,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  successSecondaryText: {
-    color: '#374151',
-    fontSize: 15,
-    fontWeight: '500',
   },
 });

@@ -157,8 +157,9 @@
     "paymentLinkMissingMessage": "Не удалось открыть ссылку на оплату. Попробуйте ещё раз.",
     "couldNotOpenPaymentTitle": "Не удалось открыть оплату",
     "pleaseTryAgain": "Попробуйте ещё раз.",
-    "securePaymentTitle": "Безопасная оплата",
-    "securePaymentSubtitle": "Оплатите картой, Apple Pay, Google Pay или Link — безопасно внутри приложения.",
+    "securePaymentTitle": "🔒 Безопасная оплата.",
+    "securePaymentSubtitle": "Лучшая покупка дня! Ваша кожа говорит «спасибо».",
+    "securePaymentTagline": "🪄 Нажмите «Оплатить» ниже, и мы отправим ваш заказ.",
     "preparingSecurePayment": "Подготовка безопасной оплаты…",
     "payNow": "Оплатить",
     "paymentNotCompletedNote": "Оплата не завершена. Заказ сохранён как «в ожидании» — нажмите «Оплатить», чтобы повторить.",
@@ -223,7 +224,7 @@
     "addressRequired": "Введите адрес доставки.",
     "validationInvalidEmail": "Введите корректный email.",
     "orderSubmittedTitle": "Спасибо за ваш заказ!",
-    "orderSubmittedMessageCOD": "Заказ #{orderNumber} подтверждён! Мы отправим вам письмо с подтверждением. Оплата при получении заказа.",
+    "orderSubmittedMessageCOD": "Заказ #{orderNumber} подтверждён! Мы отправили вам письмо с подтверждением. Оплата при получении заказа.",
     "orderNumberLine": "Заказ {orderNumber}",
     "paymentLinkUnavailableTitle": "Ссылка на оплату недоступна",
     "paymentLinkUnavailableMessage": "Не удалось запустить оплату. Попробуйте ещё раз или свяжитесь с поддержкой.",
@@ -740,6 +741,9 @@
     "noOrdersYet": "Заказов пока нет",
     "noOrdersHint": "После оформления заказ появится здесь.",
     "details": "Детали",
+    "support": "Поддержка",
+    "viewSummary": "Показать сводку",
+    "hideSummary": "Скрыть сводку",
     "orderLabel": "Заказ",
     "orderSummary": "Состав заказа",
     "subtotal": "Подытог",
@@ -1248,7 +1252,7 @@
   "privacy": {
     "title": "Политика конфиденциальности",
     "lastUpdated": "Обновлено: {date}",
-    "lastUpdatedDate": "13 декабря 2025",
+    "lastUpdatedDate": "20 июня 2026",
     "rightsTitle": "Ваши права на конфиденциальность",
     "rightsText": "Как зарегистрированный пользователь, вы имеете право получить доступ к своим персональным данным, обновить или удалить их. В этом разделе описано, как мы обрабатываем данные и какие у вас есть права в рамках политики конфиденциальности.",
     "sections": {
@@ -1294,7 +1298,7 @@
   "terms": {
     "title": "Условия и положения",
     "lastUpdated": "Обновлено: {date}",
-    "lastUpdatedDate": "17 апреля 2026",
+    "lastUpdatedDate": "20 июня 2026",
     "contact": {
       "emailLabel": "Email",
       "whatsappLabel": "WhatsApp",

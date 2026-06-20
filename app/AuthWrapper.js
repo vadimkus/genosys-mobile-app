@@ -159,14 +159,6 @@ export default function AuthWrapper() {
           }} 
         />
         <Stack.Screen 
-          name="profile/contact" 
-          options={{ 
-            headerShown: false,
-            presentation: 'card',
-            gestureEnabled: true
-          }} 
-        />
-        <Stack.Screen 
           name="profile/privacy" 
           options={{ 
             headerShown: false,
@@ -176,14 +168,6 @@ export default function AuthWrapper() {
         />
         <Stack.Screen 
           name="profile/terms" 
-          options={{ 
-            headerShown: false,
-            presentation: 'card',
-            gestureEnabled: true
-          }} 
-        />
-        <Stack.Screen 
-          name="profile/about" 
           options={{ 
             headerShown: false,
             presentation: 'card',

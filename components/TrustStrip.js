@@ -1,16 +1,17 @@
 /**
  * TrustStrip - Horizontal brand-promise strip for the shop/catalog screen.
  *
- * Mirrors the mobile web pattern on genosys.ae/products:
- *   [ 🚚 Free shipping over AED 1,000 ]  [ 🛡 Authentic Korean dermacosmetics ]  [ 💳 All prices VAT inclusive ]
+ * Mirrors the mobile web brand promises:
+ *   🚚 Free shipping over AED 1,000 · 🛡 Authentic Korean dermacosmetics · 💳 All prices VAT inclusive
  *
- * Single horizontal row with a thin top + bottom border; scrolls horizontally
- * on narrow screens so copy never truncates. Copy is inlined per locale to
- * avoid any i18n chunk-loading surprises on first paint.
+ * Rendered as a compact vertical stack (one promise per full-width row) so each
+ * line shows completely — no horizontal scroll, no truncation/clipping — and it
+ * sits cleanly inside the Apple-native card the Shop wraps it in. Copy is inlined
+ * per locale to avoid any i18n chunk-loading surprises on first paint.
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, I18nManager } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import T from '../utils/typography';
@@ -48,78 +49,58 @@ export default function TrustStrip() {
 
   return (
     <View style={styles.wrapper} accessibilityRole="summary">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[styles.content, isRTL && styles.contentRTL]}
-      >
-        {ITEMS.map((item, idx) => (
-          <View
-            key={item.key}
-            style={[
-              styles.item,
-              isRTL && styles.itemRTL,
-              idx < ITEMS.length - 1 && (isRTL ? styles.itemSpacerRTL : styles.itemSpacer),
-            ]}
-          >
-            <Ionicons
-              name={item.icon}
-              size={14}
-              color="#dc2626"
-              style={isRTL ? styles.iconRTL : styles.icon}
-            />
-            <Text style={[styles.text, isRTL && styles.textRTL]} numberOfLines={1}>
-              {copy[item.key]}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
+      {ITEMS.map((item, idx) => (
+        <View
+          key={item.key}
+          style={[
+            styles.row,
+            isRTL && styles.rowRTL,
+            idx > 0 && styles.rowDivider,
+          ]}
+        >
+          <Ionicons
+            name={item.icon}
+            size={16}
+            color="#dc2626"
+            style={isRTL ? styles.iconRTL : styles.icon}
+          />
+          <Text style={[styles.text, isRTL && styles.textRTL]} numberOfLines={1}>
+            {copy[item.key]}
+          </Text>
+        </View>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // Transparent — the Shop wraps this in a white Apple-native card.
   wrapper: {
-    backgroundColor: '#F9FAFB',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E5E7EB',
-    paddingVertical: 10,
-    marginBottom: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
   },
-  content: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    // center when content is narrower than viewport
-    flexGrow: 1,
     justifyContent: 'center',
+    paddingVertical: 9,
   },
-  contentRTL: {
+  rowRTL: {
     flexDirection: 'row-reverse',
   },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemRTL: {
-    flexDirection: 'row-reverse',
-  },
-  itemSpacer: {
-    marginRight: 18,
-  },
-  itemSpacerRTL: {
-    marginLeft: 18,
+  rowDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E5E5EA',
   },
   icon: {
-    marginRight: 6,
+    marginRight: 8,
   },
   iconRTL: {
-    marginLeft: 6,
+    marginLeft: 8,
   },
   text: {
     ...T.captionSmall,
-    fontSize: 11,
+    fontSize: 12.5,
     fontWeight: '600',
     color: '#374151',
   },

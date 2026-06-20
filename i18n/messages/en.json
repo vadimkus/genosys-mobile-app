@@ -157,8 +157,9 @@
     "paymentLinkMissingMessage": "We could not open the payment link. Please try again.",
     "couldNotOpenPaymentTitle": "Could not open payment",
     "pleaseTryAgain": "Please try again.",
-    "securePaymentTitle": "Secure payment",
-    "securePaymentSubtitle": "Pay with card, Apple Pay, Google Pay or Link — securely inside the app.",
+    "securePaymentTitle": "🔒 Safe checkout.",
+    "securePaymentSubtitle": "Best purchase of the day! Your skin is saying 'Thank you'.",
+    "securePaymentTagline": "🪄 Tap pay below, and let's get your order on the way.",
     "preparingSecurePayment": "Preparing secure payment…",
     "payNow": "Pay now",
     "paymentNotCompletedNote": "Payment was not completed. Your order is saved as pending — tap “Pay now” to try again.",
@@ -223,7 +224,7 @@
     "addressRequired": "Please enter your delivery address.",
     "validationInvalidEmail": "Please enter a valid email address.",
     "orderSubmittedTitle": "Thank You for Your Order!",
-    "orderSubmittedMessageCOD": "Order #{orderNumber} is confirmed! We'll send you a confirmation email shortly. Pay when your order arrives at your door.",
+    "orderSubmittedMessageCOD": "Order #{orderNumber} is confirmed! We've sent you a confirmation email. Pay when your order arrives at your door.",
     "orderNumberLine": "Order {orderNumber}",
     "paymentLinkUnavailableTitle": "Payment link unavailable",
     "paymentLinkUnavailableMessage": "We could not start the payment flow. Please try again or contact support.",
@@ -740,6 +741,9 @@
     "noOrdersYet": "No orders yet",
     "noOrdersHint": "Your orders will appear here after checkout.",
     "details": "Details",
+    "support": "Support",
+    "viewSummary": "View summary",
+    "hideSummary": "Hide summary",
     "orderLabel": "Order",
     "orderSummary": "Order Summary",
     "subtotal": "Subtotal",
@@ -1248,7 +1252,7 @@
   "privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: {date}",
-    "lastUpdatedDate": "December 13, 2025",
+    "lastUpdatedDate": "June 20, 2026",
     "rightsTitle": "Your Privacy Rights",
     "rightsText": "As a registered user, you have the right to access, update, or delete your personal information. This section outlines how we handle your data and your rights under our privacy policy.",
     "sections": {
@@ -1294,7 +1298,7 @@
   "terms": {
     "title": "Terms & Conditions",
     "lastUpdated": "Last updated: {date}",
-    "lastUpdatedDate": "April 17, 2026",
+    "lastUpdatedDate": "June 20, 2026",
     "contact": {
       "emailLabel": "Email",
       "whatsappLabel": "WhatsApp",

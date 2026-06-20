@@ -1,32 +1,53 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../../services/paymentPreferences';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling } from '../../services/databaseService';
-import { mediumTap } from '../../utils/haptics';
+import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
+
+/** iOS Settings–style filled glyph tile + bold section title. */
+function SectionHeader({ icon, tileColor, title, isRTL }) {
+  return (
+    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+        <Ionicons name={icon} size={16} color="#ffffff" />
+      </View>
+      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+    </View>
+  );
+}
 
 export default function PaymentScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const { user } = useAuth();
   const token = user?.token || '';
   const [defaultMethod, setDefaultMethodState] = useState(PAYMENT_METHODS.COD);
   const [billingAddress, setBillingAddress] = useState('');
   const [vatNumber, setVatNumber] = useState('');
+
+  // Subtle entrance motion (matches order details feel).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
 
   const loadBilling = useCallback(async () => {
     if (!token) return;
@@ -54,8 +75,15 @@ export default function PaymentScreen() {
     }, [loadBilling])
   );
 
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
+
   const selectDefault = async (method) => {
-    mediumTap();
+    haptics.mediumTap();
     try {
       const saved = await setDefaultPaymentMethod(method);
       setDefaultMethodState(saved);
@@ -64,310 +92,266 @@ export default function PaymentScreen() {
     }
   };
 
+  const onBack = () => {
+    haptics.lightTap();
+    router.canGoBack() ? router.back() : router.replace('/profile');
+  };
+
+  const goBilling = () => {
+    haptics.lightTap();
+    router.push('/profile/billing');
+  };
+
+  const MethodRow = ({ method, icon, tileColor, title, subtitle }) => {
+    const selected = defaultMethod === method;
+    return (
+      <TouchableOpacity
+        style={[styles.methodRow, isRTL && styles.rowRTL]}
+        onPress={() => selectDefault(method)}
+        activeOpacity={0.7}
+      >
+        <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+          <Ionicons name={icon} size={17} color="#ffffff" />
+        </View>
+        <View style={styles.methodText}>
+          <Text style={[styles.methodTitle, isRTL && styles.textRTL]}>{title}</Text>
+          <Text style={[styles.methodSubtitle, isRTL && styles.textRTL]}>{subtitle}</Text>
+        </View>
+        <Ionicons
+          name={selected ? 'radio-button-on' : 'radio-button-off'}
+          size={22}
+          color={selected ? colors.brand : colors.tertiary}
+        />
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/profile')} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('paymentSettings.title')}</Text>
-        <View style={styles.addButton} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('paymentSettings.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Payment Methods */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('paymentSettings.defaultMethod')}</Text>
-
-          <TouchableOpacity
-            style={[styles.methodRow, defaultMethod === PAYMENT_METHODS.COD && styles.methodRowSelected]}
-            onPress={() => selectDefault(PAYMENT_METHODS.COD)}
-            activeOpacity={0.85}
-          >
-            <View style={styles.methodLeft}>
-              <Ionicons name="cash-outline" size={22} color="#27AE60" />
-              <View style={styles.methodText}>
-                <Text style={styles.methodTitle}>{t('paymentSettings.cod')}</Text>
-                <Text style={styles.methodSubtitle}>{t('paymentSettings.codSubtitle')}</Text>
-              </View>
-            </View>
-            <Ionicons
-              name={defaultMethod === PAYMENT_METHODS.COD ? 'radio-button-on' : 'radio-button-off'}
-              size={22}
-              color={defaultMethod === PAYMENT_METHODS.COD ? '#dc2626' : '#C7C7CC'}
+      <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
+        <Animated.ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
+        >
+          {/* Payment Methods */}
+          <View style={[styles.section, shadow.card]}>
+            <SectionHeader icon="wallet" tileColor={colors.brand} title={t('paymentSettings.defaultMethod')} isRTL={isRTL} />
+            <MethodRow
+              method={PAYMENT_METHODS.COD}
+              icon="cash"
+              tileColor={colors.greenDeep}
+              title={t('paymentSettings.cod')}
+              subtitle={t('paymentSettings.codSubtitle')}
             />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.methodRow, defaultMethod === PAYMENT_METHODS.CARD && styles.methodRowSelected]}
-            onPress={() => selectDefault(PAYMENT_METHODS.CARD)}
-            activeOpacity={0.85}
-          >
-            <View style={styles.methodLeft}>
-              <Ionicons name="card-outline" size={22} color="#1D1D1F" />
-              <View style={styles.methodText}>
-                <Text style={styles.methodTitle}>{t('paymentSettings.card')}</Text>
-                <Text style={styles.methodSubtitle}>{t('paymentSettings.cardSubtitle')}</Text>
-              </View>
-            </View>
-            <Ionicons
-              name={defaultMethod === PAYMENT_METHODS.CARD ? 'radio-button-on' : 'radio-button-off'}
-              size={22}
-              color={defaultMethod === PAYMENT_METHODS.CARD ? '#dc2626' : '#C7C7CC'}
+            <View style={styles.hairline} />
+            <MethodRow
+              method={PAYMENT_METHODS.CARD}
+              icon="card"
+              tileColor={colors.blue}
+              title={t('paymentSettings.card')}
+              subtitle={t('paymentSettings.cardSubtitle')}
             />
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        <View style={styles.noteBox}>
-          <Ionicons name="lock-closed" size={18} color="#27AE60" />
-          <Text style={styles.noteText}>
-            {t('paymentSettings.note')}
-          </Text>
-        </View>
+          {/* Secure note */}
+          <View style={[styles.noteBox, isRTL && styles.rowRTL]}>
+            <Ionicons name="lock-closed" size={18} color={colors.greenDeep} />
+            <Text style={[styles.noteText, isRTL && styles.textRTL]}>{t('paymentSettings.note')}</Text>
+          </View>
 
-        {/* Billing Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('paymentSettings.billingInfo')}</Text>
-          <View style={styles.billingCard}>
-            <View style={styles.billingRow}>
-              <Text style={styles.billingLabel}>{t('paymentSettings.billingAddress')}</Text>
-              <TouchableOpacity onPress={() => router.push('/profile/billing')} activeOpacity={0.7}>
+          {/* Billing Information */}
+          <View style={[styles.section, shadow.card]}>
+            <SectionHeader icon="document-text" tileColor={colors.indigo} title={t('paymentSettings.billingInfo')} isRTL={isRTL} />
+
+            <View style={[styles.billingRow, isRTL && styles.rowRTL]}>
+              <Text style={[styles.billingLabel, isRTL && styles.textRTL]}>{t('paymentSettings.billingAddress')}</Text>
+              <TouchableOpacity onPress={goBilling} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Text style={styles.billingLink}>{t('paymentSettings.update')}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.billingAddress}>
+            <Text style={[styles.billingValue, isRTL && styles.textRTL]}>
               {billingAddress ? billingAddress : t('paymentSettings.sameAsShipping')}
             </Text>
-            
-            <View style={[styles.billingRow, { marginTop: 16 }]}>
-              <Text style={styles.billingLabel}>{t('paymentSettings.taxInfo')}</Text>
-              {/* single action only: keep "Update" above; tax info is view-only here */}
-              <View />
+
+            <View style={styles.hairline} />
+
+            <View style={[styles.billingRow, isRTL && styles.rowRTL]}>
+              <Text style={[styles.billingLabel, isRTL && styles.textRTL]}>{t('paymentSettings.taxInfo')}</Text>
             </View>
-            <Text style={styles.billingAddress}>
+            <Text style={[styles.billingValue, isRTL && styles.textRTL]}>
               {vatNumber ? t('paymentSettings.vatTrn', { vatNumber }) : t('paymentSettings.vatNumberMissing')}
             </Text>
           </View>
-        </View>
 
-        {/* Security Information */}
-        <View style={styles.securitySection}>
-          <Text style={styles.securityTitle}>{t('paymentSettings.securityPrivacy')}</Text>
-          <View style={styles.securityCard}>
-            <View style={styles.securityItem}>
-              <View style={styles.securityIcon}>
-                <Ionicons name="shield-checkmark" size={20} color="#27AE60" />
+          {/* Security Information */}
+          <View style={[styles.section, shadow.card]}>
+            <SectionHeader icon="shield-checkmark" tileColor={colors.greenDeep} title={t('paymentSettings.securityPrivacy')} isRTL={isRTL} />
+
+            <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.greenDeep }]}>
+                <Ionicons name="shield-checkmark" size={17} color="#ffffff" />
               </View>
               <View style={styles.securityInfo}>
-                <Text style={styles.securityItemTitle}>{t('paymentSettings.securePayments')}</Text>
-                <Text style={styles.securityItemText}>{t('paymentSettings.securePaymentsText')}</Text>
+                <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.securePayments')}</Text>
+                <Text style={[styles.securityItemText, isRTL && styles.textRTL]}>{t('paymentSettings.securePaymentsText')}</Text>
               </View>
             </View>
-            
-            <View style={styles.securityItem}>
-              <View style={styles.securityIcon}>
-                <Ionicons name="lock-closed" size={20} color="#27AE60" />
+
+            <View style={styles.hairline} />
+
+            <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                <Ionicons name="lock-closed" size={17} color="#ffffff" />
               </View>
               <View style={styles.securityInfo}>
-                <Text style={styles.securityItemTitle}>{t('paymentSettings.dataProtection')}</Text>
-                <Text style={styles.securityItemText}>{t('paymentSettings.dataProtectionText')}</Text>
+                <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.dataProtection')}</Text>
+                <Text style={[styles.securityItemText, isRTL && styles.textRTL]}>{t('paymentSettings.dataProtectionText')}</Text>
               </View>
             </View>
-            
-            <View style={styles.securityItem}>
-              <View style={styles.securityIcon}>
-                <Ionicons name="card" size={20} color="#27AE60" />
+
+            <View style={styles.hairline} />
+
+            <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.indigo }]}>
+                <Ionicons name="card" size={17} color="#ffffff" />
               </View>
               <View style={styles.securityInfo}>
-                <Text style={styles.securityItemTitle}>{t('paymentSettings.pci')}</Text>
-                <Text style={styles.securityItemText}>{t('paymentSettings.pciText')}</Text>
+                <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.pci')}</Text>
+                <Text style={[styles.securityItemText, isRTL && styles.textRTL]}>{t('paymentSettings.pciText')}</Text>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </Animated.ScrollView>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    ...T.sectionTitleSmall,
-    color: '#000000',
-  },
-  addButton: {
-    padding: 4,
+    backgroundColor: colors.groupedBg,
   },
   scrollView: {
     flex: 1,
   },
-
-  // Info Section
-  infoSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#F8F9FA',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
+  rowRTL: {
+    flexDirection: 'row-reverse',
   },
-  infoText: {
-    ...T.bodySmall,
-    color: '#8E8E93',
-    textAlign: 'center',
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
 
   // Sections
   section: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  sectionTitle: {
-    ...T.sectionTitle,
-    color: '#000000',
-    marginBottom: 16,
-  },
-
-  methodRow: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginTop: 14,
     padding: 16,
-    marginBottom: 12,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#F2F2F7',
+    gap: 10,
+    marginBottom: 14,
   },
-  methodRowSelected: {
-    borderColor: '#dc2626',
+  sectionTitle: {
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
   },
-  methodLeft: {
+  hairline: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+    marginVertical: 12,
+  },
+
+  // Method rows
+  methodRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    flex: 1,
-    paddingEnd: 12,
   },
   methodText: {
     flex: 1,
+    minWidth: 0,
   },
   methodTitle: {
-    ...T.body,
+    ...T.label,
     fontWeight: '600',
-    color: '#000000',
+    color: colors.label,
     marginBottom: 2,
   },
   methodSubtitle: {
     ...T.caption,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
   },
 
+  // Secure note
   noteBox: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 14,
     flexDirection: 'row',
-    gap: 10,
     alignItems: 'flex-start',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 14,
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    padding: 14,
   },
   noteText: {
     ...T.caption,
     flex: 1,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     lineHeight: 18,
   },
 
-  // Billing Information
-  billingCard: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 16,
-  },
+  // Billing
   billingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    gap: 12,
+    marginBottom: 6,
   },
   billingLabel: {
-    ...T.body,
-    fontWeight: '500',
-    color: '#000000',
+    ...T.label,
+    color: colors.label,
   },
   billingLink: {
-    ...T.bodySmall,
-    color: '#dc2626',
-    fontWeight: '500',
+    ...T.label,
+    color: colors.brand,
+    fontWeight: '600',
   },
-  billingAddress: {
+  billingValue: {
     ...T.bodySmall,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
   },
 
-  // Security Section
-  securitySection: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#F8F9FA',
-  },
-  securityTitle: {
-    ...T.sectionTitle,
-    color: '#000000',
-    marginBottom: 16,
-  },
-  securityCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-  },
+  // Security
   securityItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  securityIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#E8F5E8',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
+    gap: 12,
   },
   securityInfo: {
     flex: 1,
+    minWidth: 0,
   },
   securityItemTitle: {
-    ...T.body,
+    ...T.label,
     fontWeight: '600',
-    color: '#000000',
-    marginBottom: 4,
+    color: colors.label,
+    marginBottom: 3,
   },
   securityItemText: {
-    ...T.label,
-    fontWeight: '400',
-    color: '#8E8E93',
+    ...T.caption,
+    color: colors.secondaryLabel,
     lineHeight: 18,
   },
 });

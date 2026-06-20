@@ -9,7 +9,8 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
@@ -20,8 +21,8 @@ import {
   Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 // Lazy-safe import: react-native-render-html may crash on some RN versions
 let RenderHtml = null;
@@ -37,6 +38,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
 import { getJson, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
+import { colors, shadow, surfaces, tint } from '../../utils/theme';
 
 const log = createLogger('BlogPost');
 
@@ -51,6 +53,7 @@ export default function BlogPostScreen() {
   const token = user?.token;
   const isRTL = dir === 'rtl';
   const scrollRef = useRef(null);
+  const { scrollY, onScroll, headerHeight, insets } = useCollapsibleHeader();
 
   const l = (en, ar, ru) => (locale === 'ar' ? ar : locale === 'ru' ? ru : en);
 
@@ -63,6 +66,20 @@ export default function BlogPostScreen() {
   // Comment form
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Subtle entrance motion (matches order / promo screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    if (!loading && post) {
+      fade.setValue(0);
+      lift.setValue(12);
+      Animated.parallel([
+        Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }
+  }, [loading, post, fade, lift]);
 
   const fetchPost = useCallback(
     async (isRefresh = false) => {
@@ -209,333 +226,305 @@ export default function BlogPostScreen() {
     },
   };
 
-  // Loading state
-  if (loading && !refreshing) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>{l('Article', 'مقال', 'Статья')}</Text>
-          <View style={styles.backBtn} />
-        </View>
-        <View style={styles.loadingState}>
-          <ActivityIndicator size="large" color="#dc2626" />
-          <Text style={styles.loadingText}>{l('Loading article...', 'جاري التحميل...', 'Загрузка...')}</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/blog'); };
 
-  // Error state
-  if (error || !post) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>{l('Article', 'مقال', 'Статья')}</Text>
-          <View style={styles.backBtn} />
+  const featuredImageUrl = post?.featuredImage || null;
+
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('navigation.blog') || l('Blog', 'المدونة', 'Блог')}
+        scrollY={post && !loading && !error ? scrollY : null}
+        onBack={onBack}
+        onRefresh={() => fetchPost(true)}
+        isRTL={isRTL}
+      />
+
+      {loading && !refreshing ? (
+        <View style={[styles.centerState, { paddingTop: headerHeight }]}>
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text style={[styles.loadingText, isRTL && styles.textRTL]}>{l('Loading article...', 'جاري التحميل...', 'Загрузка...')}</Text>
         </View>
-        <View style={styles.errorState}>
-          <Ionicons name="cloud-offline" size={48} color="#D1D5DB" />
+      ) : error || !post ? (
+        <View style={[styles.centerState, { paddingTop: headerHeight }]}>
+          <Ionicons name="cloud-offline" size={48} color={colors.tertiary} />
           <Text style={styles.errorTitle}>{error || l('Article not found', 'المقال غير موجود', 'Статья не найдена')}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={() => fetchPost()} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => { haptics.lightTap(); fetchPost(); }} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>{l('Retry', 'إعادة المحاولة', 'Повторить')}</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    );
-  }
-
-  const featuredImageUrl = post.featuredImage || null;
-
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {l('Blog', 'المدونة', 'Блог')}
-        </Text>
-        <View style={styles.backBtn} />
-      </View>
-
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={0}
-      >
-        <ScrollView
-          ref={scrollRef}
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => fetchPost(true)} tintColor="#dc2626" />
-          }
+      ) : (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={0}
         >
-          {/* Featured Image */}
-          {featuredImageUrl && (
-            <Image source={{ uri: featuredImageUrl }} style={styles.featuredImage} resizeMode="cover" />
-          )}
+          <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
+            <Animated.ScrollView
+              ref={scrollRef}
+              style={styles.scrollView}
+              showsVerticalScrollIndicator={false}
+              onScroll={onScroll}
+              scrollEventThrottle={16}
+              contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={() => fetchPost(true)} tintColor={colors.brand} progressViewOffset={headerHeight} />
+              }
+            >
+              {/* Featured Image — hero cover */}
+              {featuredImageUrl ? (
+                <Image source={{ uri: featuredImageUrl }} style={styles.hero} contentFit="cover" transition={200} />
+              ) : null}
 
-          {/* Article Meta */}
-          <View style={styles.articleMeta}>
-            <Text style={[styles.articleTitle, isRTL && styles.textRTL]}>{post.title}</Text>
+              {/* Article sheet: title + meta + body */}
+              <View style={[styles.sheet, shadow.card, featuredImageUrl && styles.sheetOverlap]}>
+                <Text style={[styles.articleTitle, isRTL && styles.textRTL]}>{post.title}</Text>
 
-            <View style={[styles.metaRow, isRTL && styles.metaRowRTL]}>
-              {post.authorName && (
-                <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                  <Ionicons name="person-outline" size={14} color="#6B7280" />
-                  <Text style={styles.metaText}>{post.authorName}</Text>
-                </View>
-              )}
-              {post.publishedAt && (
-                <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                  <Ionicons name="calendar-outline" size={14} color="#6B7280" />
-                  <Text style={styles.metaText}>{formatDate(post.publishedAt)}</Text>
-                </View>
-              )}
-              {post.views > 0 && (
-                <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
-                  <Ionicons name="eye-outline" size={14} color="#6B7280" />
-                  <Text style={styles.metaText}>{post.views}</Text>
-                </View>
-              )}
-            </View>
-
-            {/* Tags */}
-            {post.tags?.length > 0 && (
-              <View style={[styles.tagsRow, isRTL && styles.tagsRowRTL]}>
-                {post.tags.map((tag, i) => (
-                  <View key={i} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {/* Article Content (HTML) */}
-          <View style={styles.contentContainer}>
-            {post.content && RenderHtml ? (
-              <RenderHtml
-                contentWidth={CONTENT_WIDTH}
-                source={{ html: post.content }}
-                tagsStyles={tagsStyles}
-                renderersProps={renderersProps}
-                enableExperimentalBRCollapsing
-                enableExperimentalGhostLinesPrevention
-                enableExperimentalMarginCollapsing
-                defaultTextProps={{ selectable: true }}
-              />
-            ) : post.content ? (
-              <Text style={styles.noContent} selectable>{post.content.replace(/<[^>]*>/g, '')}</Text>
-            ) : (
-              <Text style={styles.noContent}>{l('No content available', 'لا يوجد محتوى', 'Содержимое недоступно')}</Text>
-            )}
-          </View>
-
-          {/* Divider */}
-          <View style={styles.divider} />
-
-          {/* Comments Section */}
-          <View style={styles.commentsSection}>
-            <View style={[styles.commentsSectionHeader, isRTL && styles.commentsSectionHeaderRTL]}>
-              <Text style={[styles.commentsTitle, isRTL && styles.textRTL]}>
-                {l('Comments', 'التعليقات', 'Комментарии')}
-              </Text>
-              {comments.length > 0 && (
-                <View style={styles.commentCountBadge}>
-                  <Text style={styles.commentCountText}>{comments.length}</Text>
-                </View>
-              )}
-            </View>
-
-            {/* Comment Input */}
-            <View style={styles.commentInputContainer}>
-              {user ? (
-                <>
-                  <View style={[styles.commentInputRow, isRTL && styles.commentInputRowRTL]}>
-                    <View style={styles.commentAvatar}>
-                      <Text style={styles.commentAvatarText}>
-                        {(user.name || user.email || 'U').charAt(0).toUpperCase()}
-                      </Text>
+                <View style={[styles.metaRow, isRTL && styles.metaRowRTL]}>
+                  {post.authorName ? (
+                    <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                      <Ionicons name="person-outline" size={14} color={colors.secondaryLabel} />
+                      <Text style={styles.metaText}>{post.authorName}</Text>
                     </View>
-                    <TextInput
-                      style={[styles.commentInput, isRTL && styles.commentInputRTL]}
-                      value={commentText}
-                      onChangeText={setCommentText}
-                      placeholder={l('Write a comment...', 'اكتب تعليقاً...', 'Напишите комментарий...')}
-                      placeholderTextColor="#9CA3AF"
-                      multiline
-                      maxLength={1000}
-                      editable={!submitting}
-                      textAlign={isRTL ? 'right' : 'left'}
-                    />
+                  ) : null}
+                  {post.publishedAt ? (
+                    <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                      <Ionicons name="calendar-outline" size={14} color={colors.secondaryLabel} />
+                      <Text style={styles.metaText}>{formatDate(post.publishedAt)}</Text>
+                    </View>
+                  ) : null}
+                  {post.views > 0 ? (
+                    <View style={[styles.metaItem, isRTL && styles.metaItemRTL]}>
+                      <Ionicons name="eye-outline" size={14} color={colors.secondaryLabel} />
+                      <Text style={styles.metaText}>{post.views}</Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* Tags */}
+                {post.tags?.length > 0 ? (
+                  <View style={[styles.tagsRow, isRTL && styles.tagsRowRTL]}>
+                    {post.tags.map((tag, i) => (
+                      <View key={i} style={styles.tag}>
+                        <Text style={styles.tagText}>{tag}</Text>
+                      </View>
+                    ))}
                   </View>
-                  {commentText.trim().length > 0 && (
+                ) : null}
+
+                <View style={styles.bodyHairline} />
+
+                {/* Article Content (HTML) */}
+                {post.content && RenderHtml ? (
+                  <RenderHtml
+                    contentWidth={CONTENT_WIDTH}
+                    source={{ html: post.content }}
+                    tagsStyles={tagsStyles}
+                    renderersProps={renderersProps}
+                    enableExperimentalBRCollapsing
+                    enableExperimentalGhostLinesPrevention
+                    enableExperimentalMarginCollapsing
+                    defaultTextProps={{ selectable: true }}
+                  />
+                ) : post.content ? (
+                  <Text style={styles.noContent} selectable>{post.content.replace(/<[^>]*>/g, '')}</Text>
+                ) : (
+                  <Text style={styles.noContent}>{l('No content available', 'لا يوجد محتوى', 'Содержимое недоступно')}</Text>
+                )}
+              </View>
+
+              {/* Comments Section */}
+              <View style={styles.commentsSection}>
+                <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+                  <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                    <Ionicons name="chatbubbles" size={17} color={colors.white} />
+                  </View>
+                  <Text style={[styles.commentsTitle, isRTL && styles.textRTL]}>
+                    {l('Comments', 'التعليقات', 'Комментарии')}
+                  </Text>
+                  {comments.length > 0 ? (
+                    <View style={styles.commentCountBadge}>
+                      <Text style={styles.commentCountText}>{comments.length}</Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* Comment Input */}
+                <View style={styles.commentInputContainer}>
+                  {user ? (
+                    <View style={[styles.commentInputCard, shadow.card]}>
+                      <View style={[styles.commentInputRow, isRTL && styles.commentInputRowRTL]}>
+                        <View style={styles.commentAvatar}>
+                          <Text style={styles.commentAvatarText}>
+                            {(user.name || user.email || 'U').charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                        <TextInput
+                          style={[styles.commentInput, isRTL && styles.commentInputRTL]}
+                          value={commentText}
+                          onChangeText={setCommentText}
+                          placeholder={l('Write a comment...', 'اكتب تعليقاً...', 'Напишите комментарий...')}
+                          placeholderTextColor={colors.secondaryLabel}
+                          multiline
+                          maxLength={1000}
+                          editable={!submitting}
+                          textAlign={isRTL ? 'right' : 'left'}
+                        />
+                      </View>
+                      {commentText.trim().length > 0 ? (
+                        <TouchableOpacity
+                          style={[styles.submitBtn, submitting && styles.submitBtnDisabled]}
+                          onPress={handleSubmitComment}
+                          disabled={submitting}
+                          activeOpacity={0.85}
+                        >
+                          {submitting ? (
+                            <ActivityIndicator size="small" color={colors.white} />
+                          ) : (
+                            <>
+                              <Ionicons name="send" size={16} color={colors.white} />
+                              <Text style={styles.submitBtnText}>{l('Post', 'نشر', 'Отправить')}</Text>
+                            </>
+                          )}
+                        </TouchableOpacity>
+                      ) : null}
+                    </View>
+                  ) : (
                     <TouchableOpacity
-                      style={[styles.submitBtn, submitting && styles.submitBtnDisabled]}
-                      onPress={handleSubmitComment}
-                      disabled={submitting}
-                      activeOpacity={0.7}
+                      style={[styles.loginToComment, isRTL && styles.rowRTL]}
+                      onPress={() => { haptics.lightTap(); router.push('/auth/login'); }}
+                      activeOpacity={0.85}
                     >
-                      {submitting ? (
-                        <ActivityIndicator size="small" color="#fff" />
-                      ) : (
-                        <>
-                          <Ionicons name="send" size={16} color="#fff" />
-                          <Text style={styles.submitBtnText}>{l('Post', 'نشر', 'Отправить')}</Text>
-                        </>
-                      )}
+                      <Ionicons name="chatbubble-outline" size={18} color={colors.brand} />
+                      <Text style={styles.loginToCommentText}>
+                        {l('Log in to leave a comment', 'سجل دخولك لترك تعليق', 'Войдите, чтобы комментировать')}
+                      </Text>
                     </TouchableOpacity>
                   )}
-                </>
-              ) : (
-                <TouchableOpacity
-                  style={styles.loginToComment}
-                  onPress={() => router.push('/auth/login')}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="chatbubble-outline" size={18} color="#dc2626" />
-                  <Text style={styles.loginToCommentText}>
-                    {l('Log in to leave a comment', 'سجل دخولك لترك تعليق', 'Войдите, чтобы комментировать')}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {/* Comments List */}
-            {comments.length === 0 ? (
-              <View style={styles.noComments}>
-                <Ionicons name="chatbubbles-outline" size={36} color="#D1D5DB" />
-                <Text style={styles.noCommentsText}>
-                  {l('No comments yet. Be the first!', 'لا توجد تعليقات بعد. كن الأول!', 'Пока нет комментариев. Будьте первым!')}
-                </Text>
-              </View>
-            ) : (
-              comments.map((comment) => (
-                <View key={comment.id} style={styles.commentCard}>
-                  <View style={[styles.commentHeader, isRTL && styles.commentHeaderRTL]}>
-                    <View style={styles.commentAvatarSmall}>
-                      <Text style={styles.commentAvatarSmallText}>
-                        {(comment.userName || 'U').charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.commentUserName, isRTL && styles.textRTL]}>{comment.userName}</Text>
-                      <Text style={styles.commentTime}>{timeAgo(comment.createdAt)}</Text>
-                    </View>
-                  </View>
-                  <Text style={[styles.commentContent, isRTL && styles.textRTL]}>{comment.content}</Text>
                 </View>
-              ))
-            )}
-          </View>
 
-          <View style={{ height: 40 }} />
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+                {/* Comments List */}
+                {comments.length === 0 ? (
+                  <View style={styles.noComments}>
+                    <Ionicons name="chatbubbles-outline" size={36} color={colors.tertiary} />
+                    <Text style={styles.noCommentsText}>
+                      {l('No comments yet. Be the first!', 'لا توجد تعليقات بعد. كن الأول!', 'Пока нет комментариев. Будьте первым!')}
+                    </Text>
+                  </View>
+                ) : (
+                  comments.map((comment) => (
+                    <View key={comment.id} style={[styles.commentCard, shadow.card]}>
+                      <View style={[styles.commentHeader, isRTL && styles.commentHeaderRTL]}>
+                        <View style={styles.commentAvatarSmall}>
+                          <Text style={styles.commentAvatarSmallText}>
+                            {(comment.userName || 'U').charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.commentUserName, isRTL && styles.textRTL]}>{comment.userName}</Text>
+                          <Text style={[styles.commentTime, isRTL && styles.textRTL]}>{timeAgo(comment.createdAt)}</Text>
+                        </View>
+                      </View>
+                      <Text style={[styles.commentContent, isRTL && styles.textRTL]}>{comment.content}</Text>
+                    </View>
+                  ))
+                )}
+              </View>
+            </Animated.ScrollView>
+          </Animated.View>
+        </KeyboardAvoidingView>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
 
-  // Featured image
-  featuredImage: { width: '100%', height: 220, backgroundColor: '#F3F4F6' },
+  // Hero cover
+  hero: { width: '100%', height: 240, backgroundColor: colors.subtleBg },
+
+  // Article sheet (edge-to-edge so RenderHtml contentWidth stays exact)
+  sheet: {
+    backgroundColor: colors.card,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  sheetOverlap: { marginTop: -24 },
+  articleTitle: { ...T.pageTitleLarge, fontWeight: '800', color: colors.label, lineHeight: 32, fontSize: 24, marginBottom: 12 },
 
   // Article meta
-  articleMeta: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
-  articleTitle: { ...T.pageTitleLarge, fontWeight: '800', color: '#111827', lineHeight: 32, fontSize: 24, marginBottom: 12 },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, marginBottom: 12 },
+  metaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, marginBottom: 4 },
   metaRowRTL: { flexDirection: 'row-reverse' },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaItemRTL: { flexDirection: 'row-reverse' },
-  metaText: { ...T.caption, color: '#6B7280' },
-  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
+  metaText: { ...T.caption, color: colors.secondaryLabel },
+
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   tagsRowRTL: { flexDirection: 'row-reverse' },
-  tag: { backgroundColor: '#F3F4F6', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  tagText: { ...T.captionSmall, color: '#6B7280', fontWeight: '500' },
+  tag: { backgroundColor: colors.subtleBg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  tagText: { ...T.captionSmall, color: colors.secondaryLabel, fontWeight: '500' },
 
-  // Content
-  contentContainer: { paddingHorizontal: 20, paddingBottom: 20 },
-  noContent: { ...T.bodySmall, color: '#9CA3AF', textAlign: 'center', paddingVertical: 40 },
-
-  // Divider
-  divider: { height: 8, backgroundColor: '#F3F4F6', marginVertical: 8 },
+  bodyHairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginTop: 16, marginBottom: 8 },
+  noContent: { ...T.bodySmall, color: colors.secondaryLabel, textAlign: 'center', paddingVertical: 40 },
 
   // Comments section
-  commentsSection: { paddingHorizontal: 20, paddingTop: 16 },
-  commentsSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
-  commentsSectionHeaderRTL: { flexDirection: 'row-reverse' },
-  commentsTitle: { ...T.sectionTitle, color: '#111827' },
-  commentCountBadge: { backgroundColor: '#dc2626', borderRadius: 10, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  commentCountText: { ...T.badgeMedium, color: '#fff' },
+  commentsSection: { paddingHorizontal: 16, paddingTop: 24 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
+  rowRTL: { flexDirection: 'row-reverse' },
+  commentsTitle: { ...T.sectionTitleSmall, color: colors.label },
+  commentCountBadge: { backgroundColor: colors.brand, borderRadius: 11, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  commentCountText: { ...T.badgeMedium, color: colors.white },
 
   // Comment input
-  commentInputContainer: { marginBottom: 20 },
+  commentInputContainer: { marginBottom: 18 },
+  commentInputCard: { ...surfaces.card, padding: 12 },
   commentInputRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   commentInputRowRTL: { flexDirection: 'row-reverse' },
-  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center', marginTop: 2 },
-  commentAvatarText: { ...T.button, fontWeight: '700', color: '#fff' },
+  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  commentAvatarText: { ...T.button, fontWeight: '700', color: colors.white },
   commentInput: {
-    flex: 1, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12,
-    paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: '#374151',
-    maxHeight: 100, backgroundColor: '#F9FAFB',
+    flex: 1, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator, borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: colors.label,
+    maxHeight: 100, backgroundColor: colors.subtleBg,
   },
   commentInputRTL: { textAlign: 'right', writingDirection: 'rtl' },
   submitBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    backgroundColor: '#dc2626', paddingVertical: 10, paddingHorizontal: 20,
-    borderRadius: 10, marginTop: 10, alignSelf: 'flex-end',
+    backgroundColor: colors.brand, paddingVertical: 10, paddingHorizontal: 20,
+    borderRadius: 12, marginTop: 10, alignSelf: 'flex-end',
   },
   submitBtnDisabled: { opacity: 0.6 },
-  submitBtnText: { ...T.buttonSmall, color: '#fff' },
+  submitBtnText: { ...T.buttonSmall, color: colors.white },
 
   loginToComment: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: '#FEF2F2', paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: '#FECACA',
+    backgroundColor: tint(colors.brand, '14'), paddingVertical: 14, borderRadius: 14,
   },
-  loginToCommentText: { ...T.buttonSmall, color: '#dc2626' },
+  loginToCommentText: { ...T.buttonSmall, color: colors.brand },
 
   // Comments list
   noComments: { alignItems: 'center', paddingVertical: 32, gap: 8 },
-  noCommentsText: { ...T.caption, color: '#9CA3AF', fontSize: 14 },
-  commentCard: {
-    backgroundColor: '#F9FAFB', borderRadius: 12, padding: 14, marginBottom: 12,
-    borderWidth: 1, borderColor: '#F3F4F6',
-  },
+  noCommentsText: { ...T.caption, color: colors.secondaryLabel, fontSize: 14, textAlign: 'center' },
+  commentCard: { ...surfaces.card, padding: 14, marginBottom: 12 },
   commentHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   commentHeaderRTL: { flexDirection: 'row-reverse' },
-  commentAvatarSmall: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#E5E7EB', alignItems: 'center', justifyContent: 'center' },
-  commentAvatarSmallText: { ...T.caption, fontWeight: '700', color: '#6B7280' },
-  commentUserName: { ...T.label, color: '#374151' },
-  commentTime: { ...T.captionTiny, color: '#9CA3AF' },
-  commentContent: { ...T.faqAnswer, color: '#4B5563', lineHeight: 20 },
+  commentAvatarSmall: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.subtleBg, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator },
+  commentAvatarSmallText: { ...T.caption, fontWeight: '700', color: colors.secondaryLabel },
+  commentUserName: { ...T.label, color: colors.label },
+  commentTime: { ...T.captionTiny, color: colors.secondaryLabel },
+  commentContent: { ...T.faqAnswer, color: colors.label, lineHeight: 21 },
 
   // States
-  loadingState: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loadingText: { ...T.bodySmall, color: '#6B7280', lineHeight: undefined },
-  errorState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 },
-  errorTitle: { ...T.label, fontSize: 16, color: '#6B7280', textAlign: 'center' },
-  retryBtn: { backgroundColor: '#1F2937', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  retryBtnText: { ...T.buttonSmall, color: '#fff' },
+  centerState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 },
+  loadingText: { ...T.bodySmall, color: colors.secondaryLabel, lineHeight: undefined },
+  errorTitle: { ...T.label, fontSize: 16, fontWeight: '400', color: colors.secondaryLabel, textAlign: 'center' },
+  retryBtn: { backgroundColor: colors.label, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 14 },
+  retryBtnText: { ...T.buttonSmall, color: colors.white },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

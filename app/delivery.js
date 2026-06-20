@@ -3,29 +3,44 @@
  * Displays delivery information, shipping rates, and return policy.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { colors, shadow, surfaces, tint } from '../utils/theme';
 
 export default function DeliveryScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
 
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [selectedRate, setSelectedRate] = useState(null);
+
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const selectMethod = (index) => {
     haptics.lightTap();
@@ -42,16 +57,14 @@ export default function DeliveryScreen() {
   const deliveryMethods = [
     {
       icon: 'flash',
-      iconColor: '#dc2626',
-      bgColor: '#FEF2F2',
+      iconColor: colors.brand,
       title: l('Express Delivery — Dubai', 'التوصيل السريع — دبي', 'Экспресс-доставка — Дубай'),
       desc: l('Within 1–2 hours', 'خلال ١-٢ ساعة', 'В течение 1–2 часов'),
       partner: l('Via Careem / QuipQup', 'عبر كريم / كويب كوب', 'Через Careem / QuipQup'),
     },
     {
       icon: 'car',
-      iconColor: '#2563eb',
-      bgColor: '#EFF6FF',
+      iconColor: colors.blue,
       title: l('Standard Delivery — UAE', 'التوصيل القياسي — الإمارات', 'Стандартная доставка — ОАЭ'),
       desc: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
       partner: l('All Emirates', 'جميع الإمارات', 'Все эмираты'),
@@ -68,204 +81,264 @@ export default function DeliveryScreen() {
     { emirate: l('Umm Al Quwain', 'أم القيوين', 'Умм-эль-Кайвайн'), rate: l('70 AED', '٧٠ د.إ', '70 AED') },
   ];
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {t('navigation.delivery') || 'Delivery'}
-        </Text>
-        <View style={styles.backBtn} />
+  const policies = [
+    {
+      icon: 'calendar',
+      text: l('10-day return window from delivery date', 'نافذة إرجاع ١٠ أيام من تاريخ التسليم', '10 дней на возврат с даты доставки'),
+    },
+    {
+      icon: 'cube',
+      text: l('Products must be unopened and in original packaging', 'يجب أن تكون المنتجات مغلقة وفي عبوتها الأصلية', 'Продукты должны быть в оригинальной упаковке'),
+    },
+    {
+      icon: 'wallet',
+      text: l('Refund processed within 3–5 business days', 'يتم معالجة الاسترداد خلال ٣-٥ أيام عمل', 'Возврат средств в течение 3–5 рабочих дней'),
+    },
+  ];
+
+  const SectionHeader = ({ icon, tileColor, title }) => (
+    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
+      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+    </View>
+  );
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Delivery Methods */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            {l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')}
-          </Text>
-          {deliveryMethods.map((method, index) => {
-            const isSelected = selectedMethod === index;
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.methodCard,
-                  isRTL && styles.methodCardRTL,
-                  isSelected && styles.methodCardSelected,
-                ]}
-                onPress={() => selectMethod(index)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.methodIcon, { backgroundColor: isSelected ? method.iconColor + '20' : method.bgColor }]}>
-                  <Ionicons name={method.icon} size={24} color={method.iconColor} />
-                </View>
-                <View style={styles.methodContent}>
-                  <Text style={[styles.methodTitle, isRTL && styles.textRTL]}>{method.title}</Text>
-                  <Text style={[styles.methodDesc, isRTL && styles.textRTL]}>{method.desc}</Text>
-                  <Text style={[styles.methodPartner, isRTL && styles.textRTL]}>{method.partner}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
 
-        {/* Free Shipping Banner */}
-        <View style={styles.freeShippingBanner}>
-          <Ionicons name="gift" size={28} color="#16a34a" />
-          <Text style={[styles.freeShippingTitle, isRTL && styles.textRTL]}>
-            {l('Free Shipping', 'شحن مجاني', 'Бесплатная доставка')}
-          </Text>
-          <Text style={[styles.freeShippingDesc, isRTL && styles.textRTL]}>
-            {l('On orders above 1,000 AED', 'للطلبات فوق ١٬٠٠٠ د.إ', 'При заказе от 1 000 AED')}
-          </Text>
-        </View>
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('navigation.delivery') || 'Delivery'} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-        {/* Shipping Rates */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            {l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')}
-          </Text>
-          <View style={styles.ratesCard}>
-            {shippingRates.map((item, index) => {
-              const isSelected = selectedRate === index;
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 12 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          {/* Delivery Options */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="rocket" tileColor={colors.teal} title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} />
+            {deliveryMethods.map((method, index) => {
+              const isSelected = selectedMethod === index;
+              const isLast = index === deliveryMethods.length - 1;
               return (
                 <TouchableOpacity
                   key={index}
-                  style={[
-                    styles.rateRow,
-                    isRTL && styles.rateRowRTL,
-                    index < shippingRates.length - 1 && styles.rateRowBorder,
-                    isSelected && styles.rateRowSelected,
-                  ]}
+                  style={[styles.methodRow, isRTL && styles.rowRTL, !isLast && styles.methodRowBorder]}
+                  onPress={() => selectMethod(index)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.methodIcon, { backgroundColor: tint(method.iconColor) }]}>
+                    <Ionicons name={method.icon} size={20} color={method.iconColor} />
+                  </View>
+                  <View style={styles.methodContent}>
+                    <Text style={[styles.methodTitle, isRTL && styles.textRTL]}>{method.title}</Text>
+                    <Text style={[styles.methodDesc, { color: method.iconColor }, isRTL && styles.textRTL]}>{method.desc}</Text>
+                    <Text style={[styles.methodPartner, isRTL && styles.textRTL]}>{method.partner}</Text>
+                  </View>
+                  {isSelected ? (
+                    <Ionicons name="checkmark-circle" size={20} color={method.iconColor} />
+                  ) : null}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Free Shipping Banner */}
+          <View style={[styles.card, styles.freeShippingCard, shadow.card]}>
+            <View style={styles.freeShippingIcon}>
+              <Ionicons name="gift" size={24} color={colors.greenDeep} />
+            </View>
+            <Text style={[styles.freeShippingTitle, isRTL && styles.textRTLCenter]}>
+              {l('Free Shipping', 'شحن مجاني', 'Бесплатная доставка')}
+            </Text>
+            <Text style={[styles.freeShippingDesc, isRTL && styles.textRTLCenter]}>
+              {l('On orders above 1,000 AED', 'للطلبات فوق ١٬٠٠٠ د.إ', 'При заказе от 1 000 AED')}
+            </Text>
+          </View>
+
+          {/* Shipping Rates */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="pricetags" tileColor={colors.indigo} title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} />
+            {shippingRates.map((item, index) => {
+              const isSelected = selectedRate === index;
+              const isLast = index === shippingRates.length - 1;
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.rateRow, isRTL && styles.rowRTL, !isLast && styles.rateRowBorder]}
                   onPress={() => selectRate(index)}
                   activeOpacity={0.7}
                 >
-                  {isSelected && (
-                    <Ionicons name="location" size={16} color="#dc2626" style={{ marginRight: isRTL ? 0 : 6, marginLeft: isRTL ? 6 : 0 }} />
-                  )}
+                  {isSelected ? (
+                    <Ionicons name="location" size={15} color={colors.brand} style={isRTL ? styles.rateIconRTL : styles.rateIcon} />
+                  ) : null}
                   <Text style={[styles.rateEmirate, isRTL && styles.textRTL, isSelected && styles.rateEmirateSelected]}>{item.emirate}</Text>
                   <Text style={[styles.rateAmount, isSelected && styles.rateAmountSelected]}>{item.rate}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
-        </View>
 
-        {/* Return Policy */}
-        <View style={[styles.section, styles.sectionAlt]}>
-          <View style={styles.policyHeader}>
-            <Ionicons name="shield-checkmark" size={24} color="#2563eb" />
-            <Text style={[styles.sectionTitle, isRTL && styles.textRTL, { marginBottom: 0, marginLeft: isRTL ? 0 : 10, marginRight: isRTL ? 10 : 0 }]}>
-              {l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')}
-            </Text>
+          {/* Return Policy */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="shield-checkmark" tileColor={colors.blue} title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} />
+            {policies.map((policy, index) => {
+              const isLast = index === policies.length - 1;
+              return (
+                <View key={index} style={[styles.policyRow, isRTL && styles.rowRTL, !isLast && styles.policyRowBorder]}>
+                  <View style={styles.policyIcon}>
+                    <Ionicons name={policy.icon} size={16} color={colors.secondaryLabel} />
+                  </View>
+                  <Text style={[styles.policyText, isRTL && styles.textRTL]}>{policy.text}</Text>
+                </View>
+              );
+            })}
           </View>
-          <View style={styles.policyCard}>
-            <View style={[styles.policyItem, isRTL && styles.policyItemRTL]}>
-              <View style={styles.policyIcon}><Ionicons name="calendar" size={18} color="#6B7280" /></View>
-              <Text style={[styles.policyText, isRTL && styles.textRTL]}>
-                {l('10-day return window from delivery date', 'نافذة إرجاع ١٠ أيام من تاريخ التسليم', '10 дней на возврат с даты доставки')}
-              </Text>
-            </View>
-            <View style={[styles.policyItem, isRTL && styles.policyItemRTL]}>
-              <View style={styles.policyIcon}><Ionicons name="cube" size={18} color="#6B7280" /></View>
-              <Text style={[styles.policyText, isRTL && styles.textRTL]}>
-                {l('Products must be unopened and in original packaging', 'يجب أن تكون المنتجات مغلقة وفي عبوتها الأصلية', 'Продукты должны быть в оригинальной упаковке')}
-              </Text>
-            </View>
-            <View style={[styles.policyItem, isRTL && styles.policyItemRTL]}>
-              <View style={styles.policyIcon}><Ionicons name="wallet" size={18} color="#6B7280" /></View>
-              <Text style={[styles.policyText, isRTL && styles.textRTL]}>
-                {l('Refund processed within 3–5 business days', 'يتم معالجة الاسترداد خلال ٣-٥ أيام عمل', 'Возврат средств в течение 3–5 рабочих дней')}
-              </Text>
-            </View>
-          </View>
-        </View>
 
-        {/* Need Help? */}
-        <View style={styles.helpSection}>
-          <Text style={[styles.helpTitle, isRTL && styles.textRTL]}>
-            {l('Need Help?', 'تحتاج مساعدة؟', 'Нужна помощь?')}
-          </Text>
-          <TouchableOpacity
-            style={[styles.helpBtn, isRTL && styles.helpBtnRTL]}
-            onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665'); }}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="logo-whatsapp" size={20} color="#ffffff" />
-            <Text style={styles.helpBtnText}>
-              {l('Chat on WhatsApp', 'تواصل عبر واتساب', 'Написать в WhatsApp')}
+          {/* Need Help? */}
+          <View style={styles.helpSection}>
+            <Text style={[styles.helpTitle, isRTL && styles.textRTLCenter]}>
+              {l('Need Help?', 'تحتاج مساعدة؟', 'Нужна помощь?')}
             </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ height: 32 }} />
-      </ScrollView>
-    </SafeAreaView>
+            <TouchableOpacity
+              style={[styles.helpBtn, isRTL && styles.rowRTL]}
+              onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665'); }}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="logo-whatsapp" size={20} color={colors.whatsapp} />
+              <Text style={styles.helpBtnText}>
+                {l('Chat on WhatsApp', 'تواصل عبر واتساب', 'Написать в WhatsApp')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
 
-  // Sections
-  section: { paddingHorizontal: 20, paddingVertical: 24 },
-  sectionAlt: { backgroundColor: '#F9FAFB' },
-  sectionTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', marginBottom: 16, letterSpacing: -0.4 },
+  // Cards
+  card: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 18,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  rowRTL: { flexDirection: 'row-reverse' },
+  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
-  // Delivery Methods
-  methodCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, backgroundColor: '#F9FAFB', borderRadius: 14, padding: 16, borderWidth: 2, borderColor: '#F3F4F6' },
-  methodCardRTL: { flexDirection: 'row-reverse' },
-  methodCardSelected: { borderColor: '#dc2626', backgroundColor: '#FFF5F5' },
-  methodIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
-  methodContent: { flex: 1 },
-  methodTitle: { ...T.label, fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  methodDesc: { ...T.bodySmall, fontWeight: '600', color: '#dc2626', marginBottom: 2, lineHeight: undefined },
-  methodPartner: { ...T.caption, color: '#6B7280' },
+  // Delivery methods
+  methodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: 12,
+  },
+  methodRowBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  methodIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  methodContent: { flex: 1, minWidth: 0 },
+  methodTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 3 },
+  methodDesc: { ...T.bodySmall, fontWeight: '700', marginBottom: 2 },
+  methodPartner: { ...T.caption, color: colors.secondaryLabel },
 
-  // Free Shipping
-  freeShippingBanner: { marginHorizontal: 20, backgroundColor: '#F0FDF4', borderRadius: 16, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: '#BBF7D0' },
-  freeShippingTitle: { ...T.sectionTitle, color: '#16a34a', marginTop: 8 },
-  freeShippingDesc: { ...T.bodySmall, color: '#4B5563', marginTop: 4, lineHeight: undefined },
+  // Free shipping
+  freeShippingCard: { alignItems: 'center', paddingVertical: 22 },
+  freeShippingIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: tint(colors.greenDeep),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  freeShippingTitle: { ...T.sectionTitleSmall, color: colors.greenDeep, marginBottom: 4, textAlign: 'center' },
+  freeShippingDesc: { ...T.bodySmall, color: colors.secondaryLabel, textAlign: 'center' },
 
-  // Shipping Rates
-  ratesCard: { backgroundColor: '#F9FAFB', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F3F4F6' },
-  rateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 },
-  rateRowRTL: { flexDirection: 'row-reverse' },
-  rateRowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
-  rateRowSelected: { backgroundColor: '#FEF2F2' },
-  rateEmirate: { ...T.bodySmall, flex: 1, fontWeight: '500', color: '#374151', lineHeight: undefined },
-  rateEmirateSelected: { fontWeight: '700', color: '#111827' },
-  rateAmount: { ...T.bodySmall, fontWeight: '700', color: '#111827', lineHeight: undefined },
-  rateAmountSelected: { color: '#dc2626' },
+  // Shipping rates
+  rateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 13,
+  },
+  rateRowBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  rateIcon: { marginRight: 6 },
+  rateIconRTL: { marginLeft: 6 },
+  rateEmirate: { ...T.bodySmall, flex: 1, fontWeight: '500', color: colors.label },
+  rateEmirateSelected: { fontWeight: '700' },
+  rateAmount: { ...T.bodySmall, fontWeight: '700', color: colors.label },
+  rateAmountSelected: { color: colors.brand },
 
-  // Return Policy
-  policyHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  policyCard: { backgroundColor: '#EFF6FF', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#BFDBFE' },
-  policyItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
-  policyItemRTL: { flexDirection: 'row-reverse' },
-  policyIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  policyText: { ...T.faqAnswer, flex: 1, color: '#374151', lineHeight: 20 },
+  // Return policy
+  policyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 10,
+  },
+  policyRowBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  policyIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    backgroundColor: colors.subtleBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  policyText: { ...T.bodySmall, flex: 1, color: colors.label, lineHeight: 20 },
 
   // Help
-  helpSection: { paddingHorizontal: 20, paddingVertical: 24, alignItems: 'center' },
-  helpTitle: { ...T.sectionTitleSmall, color: '#000', marginBottom: 14 },
-  helpBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#25D366', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 14 },
-  helpBtnRTL: { flexDirection: 'row-reverse' },
-  helpBtnText: { ...T.button, color: '#ffffff' },
+  helpSection: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 28,
+    alignItems: 'center',
+  },
+  helpTitle: { ...T.sectionTitleSmall, marginBottom: 14, textAlign: 'center' },
+  helpBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: tint(colors.whatsapp, '1F'),
+    paddingVertical: 15,
+    paddingHorizontal: 24,
+    borderRadius: 14,
+    alignSelf: 'stretch',
+  },
+  helpBtnText: { ...T.button, fontWeight: '700', color: colors.whatsapp },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });

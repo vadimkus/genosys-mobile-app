@@ -4,34 +4,37 @@
  * When a new partner is added on the website, it appears here automatically.
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Linking,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, shadow, surfaces, tint } from '../utils/theme';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Partners');
 
 const THEME_COLORS = {
-  emerald: '#10b981',
+  emerald: colors.green,
   pink: '#ec4899',
-  blue: '#3b82f6',
-  purple: '#8b5cf6',
+  blue: colors.blue,
+  purple: colors.purple,
 };
 
 const TYPE_ICONS = {
@@ -85,6 +88,8 @@ export default function PartnersScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [expandedId, setExpandedId] = useState(null);
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +97,20 @@ export default function PartnersScreen() {
   const [error, setError] = useState(null);
 
   const l = (en, ar, ru) => (locale === 'ar' ? ar : locale === 'ru' ? ru : en);
+
+  // Subtle entrance motion (matches order/about screens) — runs once content is ready.
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    if (!loading && !error) {
+      fade.setValue(0);
+      lift.setValue(12);
+      Animated.parallel([
+        Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }
+  }, [loading, error, fade, lift]);
 
   const fetchPartners = useCallback(async (isRefresh = false) => {
     try {
@@ -137,33 +156,32 @@ export default function PartnersScreen() {
 
   const getIcon = (type) => TYPE_ICONS[type] || 'sparkles';
 
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); };
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {t('navigation.partners') || 'Partners'}
-        </Text>
-        <View style={styles.backBtn} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('navigation.partners') || 'Partners'}
+        scrollY={(!loading && !error) ? scrollY : null}
+        onBack={onBack}
+        onRefresh={() => fetchPartners(true)}
+        isRTL={isRTL}
+      />
 
       {/* Loading State */}
       {loading && (
-        <View style={styles.centerState}>
-          <ActivityIndicator size="large" color="#dc2626" />
+        <View style={[styles.centerState, { paddingTop: headerHeight }]}>
+          <ActivityIndicator size="large" color={colors.brand} />
           <Text style={styles.stateText}>{l('Loading partners...', 'جارٍ تحميل الشركاء...', 'Загрузка партнёров...')}</Text>
         </View>
       )}
 
       {/* Error State */}
       {!loading && error && (
-        <View style={styles.centerState}>
-          <Ionicons name="cloud-offline" size={48} color="#9CA3AF" />
+        <View style={[styles.centerState, { paddingTop: headerHeight }]}>
+          <Ionicons name="cloud-offline" size={48} color={colors.tertiary} />
           <Text style={styles.stateText}>{error}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={() => fetchPartners()} activeOpacity={0.7}>
+          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.brand)]} onPress={() => fetchPartners()} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>{l('Retry', 'إعادة المحاولة', 'Повторить')}</Text>
           </TouchableOpacity>
         </View>
@@ -171,217 +189,227 @@ export default function PartnersScreen() {
 
       {/* Content */}
       {!loading && !error && (
-        <ScrollView
+        <Animated.ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => fetchPartners(true)} tintColor="#dc2626" />
+            <RefreshControl refreshing={refreshing} onRefresh={() => fetchPartners(true)} tintColor={colors.brand} progressViewOffset={headerHeight} />
           }
         >
-          {/* Hero */}
-          <View style={styles.heroSection}>
-            <Ionicons name="business" size={48} color="#dc2626" />
-            <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>
-              {l('Our Partners', 'شركاؤنا', 'Наши партнёры')}
-            </Text>
-            <Text style={[styles.heroSubtitle, isRTL && styles.textRTL]}>
-              {l(
-                `${partners.length} premium salons, clinics and spas across the UAE offering GENOSYS treatments`,
-                `${partners.length} صالون ومركز تجميل وسبا فاخر في جميع أنحاء الإمارات يقدمون علاجات جينوسيس`,
-                `${partners.length} премиальных салонов, клиник и спа по всем ОАЭ, предлагающих процедуры GENOSYS`
-              )}
-            </Text>
-          </View>
-
-          {/* Partners List */}
-          <View style={styles.section}>
-            {partners.map((partner) => {
-              const color = THEME_COLORS[partner.theme] || '#dc2626';
-              const isExpanded = expandedId === partner.id;
-              const { displayName, branch } = parsePartnerName(partner.name);
-
-              return (
-                <TouchableOpacity
-                  key={partner.id}
-                  style={[
-                    styles.partnerCard,
-                    isExpanded && { borderColor: color, borderWidth: 1.5, backgroundColor: `${color}06` },
-                  ]}
-                  onPress={() => handleToggle(partner.id)}
-                  activeOpacity={0.7}
-                >
-                  {/* Main Row */}
-                  <View style={[styles.partnerRow, isRTL && styles.partnerRowRTL]}>
-                    <View style={[styles.partnerIcon, { backgroundColor: `${color}15` }]}>
-                      <Ionicons name={getIcon(partner.type)} size={22} color={color} />
-                    </View>
-                    <View style={styles.partnerContent}>
-                      <Text style={[styles.partnerName, isRTL && styles.textRTL, isExpanded && { color }]}>{displayName}</Text>
-                      {branch ? <Text style={[styles.partnerBranch, isRTL && styles.textRTL]}>{branch}</Text> : null}
-                      <Text style={[styles.partnerType, isRTL && styles.textRTL]}>{partner.type}</Text>
-                    </View>
-                    <Ionicons
-                      name={isExpanded ? 'chevron-up' : (isRTL ? 'chevron-back' : 'chevron-forward')}
-                      size={16}
-                      color={isExpanded ? color : '#D1D5DB'}
-                    />
-                  </View>
-
-                  {/* Expanded Details */}
-                  {isExpanded && (
-                    <View style={styles.expandedSection}>
-                      {/* Description */}
-                      {partner.description ? (
-                        <Text style={[styles.descriptionText, isRTL && styles.textRTL]}>{partner.description}</Text>
-                      ) : null}
-
-                      {/* Location */}
-                      <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
-                        <Ionicons name="location" size={16} color="#6B7280" />
-                        <Text style={[styles.detailText, isRTL && styles.textRTL]}>{partner.location}</Text>
-                      </View>
-
-                      {/* Phone */}
-                      {partner.phone && (
-                        <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
-                          <Ionicons name="call" size={16} color="#6B7280" />
-                          <Text style={[styles.detailText, { writingDirection: 'ltr', textAlign: 'left' }]}>{partner.phone}</Text>
-                        </View>
-                      )}
-
-                      {/* Action Buttons */}
-                      <View style={[styles.actionRow, isRTL && styles.actionRowRTL]}>
-                        {partner.phone && (
-                          <TouchableOpacity
-                            style={[styles.actionBtn, { backgroundColor: `${color}15` }]}
-                            onPress={() => handleCall(partner.phone)}
-                            activeOpacity={0.7}
-                          >
-                            <Ionicons name="call" size={16} color={color} />
-                            <Text style={[styles.actionBtnText, { color }]}>{l('Call', 'اتصل', 'Позвонить')}</Text>
-                          </TouchableOpacity>
-                        )}
-                        {partner.directions && (
-                          <TouchableOpacity
-                            style={[styles.actionBtn, { backgroundColor: '#dbeafe' }]}
-                            onPress={() => handleDirections(partner.directions)}
-                            activeOpacity={0.7}
-                          >
-                            <Ionicons name="navigate" size={16} color="#2563eb" />
-                            <Text style={[styles.actionBtnText, { color: '#2563eb' }]}>{l('Directions', 'الاتجاهات', 'Маршрут')}</Text>
-                          </TouchableOpacity>
-                        )}
-                        {partner.website && (
-                          <TouchableOpacity
-                            style={[styles.actionBtn, { backgroundColor: '#f3f4f6' }]}
-                            onPress={() => handleWebsite(partner.website)}
-                            activeOpacity={0.7}
-                          >
-                            <Ionicons name="globe" size={16} color="#4B5563" />
-                            <Text style={[styles.actionBtnText, { color: '#4B5563' }]}>{l('Website', 'الموقع', 'Сайт')}</Text>
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          {/* Become a Partner CTA */}
-          <View style={styles.ctaSection}>
-            <Text style={[styles.ctaTitle, isRTL && styles.textRTL]}>
-              {l('Interested in Becoming a Partner?', 'هل ترغب في أن تصبح شريكاً؟', 'Хотите стать партнёром?')}
-            </Text>
-            <Text style={[styles.ctaDesc, isRTL && styles.textRTL]}>
-              {l('Join our network of premium beauty professionals across the UAE',
-                 'انضم إلى شبكتنا من محترفي التجميل المميزين في الإمارات',
-                 'Присоединяйтесь к нашей сети премиальных специалистов красоты в ОАЭ')}
-            </Text>
-            <TouchableOpacity
-              style={[styles.ctaBtn, isRTL && styles.ctaBtnRTL]}
-              onPress={() => Linking.openURL('mailto:sales@genosys.ae?subject=Partnership%20Inquiry')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="mail" size={18} color="#ffffff" />
-              <Text style={styles.ctaBtnText}>
-                {l('Contact Us', 'تواصل معنا', 'Свяжитесь с нами')}
+          <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+            {/* Hero */}
+            <View style={styles.heroSection}>
+              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.brand }]}>
+                <Ionicons name="business" size={24} color={colors.white} />
+              </View>
+              <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
+                {l('Our Partners', 'شركاؤنا', 'Наши партнёры')}
               </Text>
-            </TouchableOpacity>
-          </View>
+              <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>
+                {l(
+                  `${partners.length} premium salons, clinics and spas across the UAE offering GENOSYS treatments`,
+                  `${partners.length} صالون ومركز تجميل وسبا فاخر في جميع أنحاء الإمارات يقدمون علاجات جينوسيس`,
+                  `${partners.length} премиальных салонов, клиник и спа по всем ОАЭ, предлагающих процедуры GENOSYS`
+                )}
+              </Text>
+            </View>
 
-          <View style={{ height: 32 }} />
-        </ScrollView>
+            {/* Partners List */}
+            <View style={styles.section}>
+              {partners.map((partner) => {
+                const color = THEME_COLORS[partner.theme] || colors.brand;
+                const isExpanded = expandedId === partner.id;
+                const { displayName, branch } = parsePartnerName(partner.name);
+
+                return (
+                  <TouchableOpacity
+                    key={partner.id}
+                    style={[styles.partnerCard, shadow.card, isExpanded && { borderColor: color }]}
+                    onPress={() => handleToggle(partner.id)}
+                    activeOpacity={0.7}
+                  >
+                    {/* Main Row */}
+                    <View style={[styles.partnerRow, isRTL && styles.rowRTL]}>
+                      <View style={[surfaces.iconTile, styles.partnerTile, { backgroundColor: color }]}>
+                        <Ionicons name={getIcon(partner.type)} size={20} color={colors.white} />
+                      </View>
+                      <View style={styles.partnerContent}>
+                        <Text style={[styles.partnerName, isRTL && styles.textRTL, isExpanded && { color }]}>{displayName}</Text>
+                        {branch ? <Text style={[styles.partnerBranch, isRTL && styles.textRTL]}>{branch}</Text> : null}
+                        <Text style={[styles.partnerType, isRTL && styles.textRTL]}>{partner.type}</Text>
+                      </View>
+                      <Ionicons
+                        name={isExpanded ? 'chevron-up' : (isRTL ? 'chevron-back' : 'chevron-forward')}
+                        size={16}
+                        color={isExpanded ? color : colors.tertiary}
+                      />
+                    </View>
+
+                    {/* Expanded Details */}
+                    {isExpanded && (
+                      <View style={styles.expandedSection}>
+                        {/* Description */}
+                        {partner.description ? (
+                          <Text style={[styles.descriptionText, isRTL && styles.textRTL]}>{partner.description}</Text>
+                        ) : null}
+
+                        {/* Location */}
+                        <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
+                          <Ionicons name="location-outline" size={16} color={colors.secondaryLabel} />
+                          <Text style={[styles.detailText, isRTL && styles.textRTL]}>{partner.location}</Text>
+                        </View>
+
+                        {/* Phone */}
+                        {partner.phone && (
+                          <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
+                            <Ionicons name="call-outline" size={16} color={colors.secondaryLabel} />
+                            <Text style={[styles.detailText, styles.valueLTR]}>{partner.phone}</Text>
+                          </View>
+                        )}
+
+                        {/* Action Buttons */}
+                        <View style={[styles.actionRow, isRTL && styles.actionRowRTL]}>
+                          {partner.phone && (
+                            <TouchableOpacity
+                              style={[styles.actionBtn, { backgroundColor: tint(color) }]}
+                              onPress={() => handleCall(partner.phone)}
+                              activeOpacity={0.7}
+                            >
+                              <Ionicons name="call" size={16} color={color} />
+                              <Text style={[styles.actionBtnText, { color }]}>{l('Call', 'اتصل', 'Позвонить')}</Text>
+                            </TouchableOpacity>
+                          )}
+                          {partner.directions && (
+                            <TouchableOpacity
+                              style={[styles.actionBtn, { backgroundColor: tint(colors.blue) }]}
+                              onPress={() => handleDirections(partner.directions)}
+                              activeOpacity={0.7}
+                            >
+                              <Ionicons name="navigate" size={16} color={colors.blue} />
+                              <Text style={[styles.actionBtnText, { color: colors.blue }]}>{l('Directions', 'الاتجاهات', 'Маршрут')}</Text>
+                            </TouchableOpacity>
+                          )}
+                          {partner.website && (
+                            <TouchableOpacity
+                              style={[styles.actionBtn, styles.actionBtnNeutral]}
+                              onPress={() => handleWebsite(partner.website)}
+                              activeOpacity={0.7}
+                            >
+                              <Ionicons name="globe" size={16} color={colors.secondaryLabel} />
+                              <Text style={[styles.actionBtnText, { color: colors.secondaryLabel }]}>{l('Website', 'الموقع', 'Сайт')}</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Become a Partner CTA */}
+            <View style={[styles.ctaCard, shadow.card]}>
+              <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.brand }]}>
+                  <Ionicons name="people" size={17} color={colors.white} />
+                </View>
+                <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+                  {l('Interested in Becoming a Partner?', 'هل ترغب في أن تصبح شريكاً؟', 'Хотите стать партнёром?')}
+                </Text>
+              </View>
+              <Text style={[styles.ctaDesc, isRTL && styles.textRTL]}>
+                {l('Join our network of premium beauty professionals across the UAE',
+                   'انضم إلى شبكتنا من محترفي التجميل المميزين في الإمارات',
+                   'Присоединяйтесь к нашей сети премиальных специалистов красоты в ОАЭ')}
+              </Text>
+              <TouchableOpacity
+                style={[styles.ctaBtn, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
+                onPress={() => Linking.openURL('mailto:sales@genosys.ae?subject=Partnership%20Inquiry')}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="mail" size={18} color={colors.white} />
+                <Text style={styles.ctaBtnText}>
+                  {l('Contact Us', 'تواصل معنا', 'Свяжитесь с нами')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Animated.ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
 
   // Loading / Error states
   centerState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
-  stateText: { ...T.bodySmall, color: '#6B7280', marginTop: 12, textAlign: 'center', lineHeight: undefined },
-  retryBtn: { marginTop: 16, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 },
-  retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
+  stateText: { ...T.bodySmall, color: colors.secondaryLabel, marginTop: 12, textAlign: 'center' },
+  retryBtn: { marginTop: 16, backgroundColor: colors.brand, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 14 },
+  retryBtnText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
 
   // Hero
-  heroSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FAFAFA' },
-  heroTitle: { ...T.pageTitle, color: '#000', textAlign: 'center', marginTop: 12, marginBottom: 8 },
-  heroSubtitle: { ...T.subtitle, textAlign: 'center', lineHeight: 22 },
+  heroSection: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20, alignItems: 'center' },
+  heroTile: { width: 56, height: 56, borderRadius: 16, marginBottom: 14 },
+  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
+  heroSubtitle: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 21 },
 
   // Section
-  section: { paddingHorizontal: 16, paddingVertical: 16 },
+  section: { paddingHorizontal: 16, paddingTop: 4 },
 
   // Partner Cards
   partnerCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 14,
+    ...surfaces.card,
     padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+    marginBottom: 12,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
   },
-  partnerRow: { flexDirection: 'row', alignItems: 'center' },
-  partnerRowRTL: { flexDirection: 'row-reverse' },
-  partnerIcon: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  partnerContent: { flex: 1 },
-  partnerName: { ...T.bodySmall, fontWeight: '700', color: '#111827', marginBottom: 1, lineHeight: undefined },
-  partnerBranch: { ...T.caption, fontWeight: '600', color: '#374151', marginBottom: 2 },
-  partnerType: { ...T.captionSmall, color: '#9CA3AF' },
+  partnerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  partnerTile: { width: 44, height: 44, borderRadius: 12 },
+  partnerContent: { flex: 1, minWidth: 0 },
+  partnerName: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 1 },
+  partnerBranch: { ...T.caption, fontWeight: '600', color: colors.label, marginBottom: 2 },
+  partnerType: { ...T.captionSmall, color: colors.secondaryLabel },
 
   // Expanded
-  expandedSection: { marginTop: 12, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB' },
-  descriptionText: { ...T.caption, color: '#4B5563', lineHeight: 19, marginBottom: 10 },
+  expandedSection: { marginTop: 12, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator },
+  descriptionText: { ...T.caption, color: colors.label, lineHeight: 19, marginBottom: 10 },
   detailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, gap: 8 },
   detailRowRTL: { flexDirection: 'row-reverse' },
-  detailText: { ...T.caption, flex: 1, color: '#4B5563', lineHeight: 18 },
+  detailText: { ...T.caption, flex: 1, color: colors.label, lineHeight: 18 },
 
   // Action buttons
   actionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   actionRowRTL: { flexDirection: 'row-reverse' },
-  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10 },
-  actionBtnText: { ...T.caption, fontWeight: '600' },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 10 },
+  actionBtnNeutral: { backgroundColor: colors.fillSecondary },
+  actionBtnText: { ...T.caption, fontWeight: '700' },
 
   // CTA
-  ctaSection: { paddingHorizontal: 20, paddingVertical: 28, alignItems: 'center', backgroundColor: '#FEF2F2', marginHorizontal: 16, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: '#FECACA' },
-  ctaTitle: { ...T.sectionTitleSmall, color: '#dc2626', marginBottom: 8, textAlign: 'center' },
-  ctaDesc: { ...T.caption, color: '#6B7280', textAlign: 'center', lineHeight: 20, marginBottom: 16, fontSize: 14 },
-  ctaBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#dc2626', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 14 },
-  ctaBtnRTL: { flexDirection: 'row-reverse' },
-  ctaBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
+  ctaCard: { ...surfaces.card, marginHorizontal: 16, marginTop: 6, padding: 18 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  sectionTitle: { ...T.body, flex: 1, fontWeight: '700', color: colors.label },
+  ctaDesc: { ...T.caption, color: colors.secondaryLabel, lineHeight: 20, marginBottom: 16 },
+  ctaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.brand,
+    paddingVertical: 15,
+    borderRadius: 14,
+  },
+  ctaBtnText: { ...T.button, fontWeight: '700' },
 
   // RTL
+  rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
+  valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
 });

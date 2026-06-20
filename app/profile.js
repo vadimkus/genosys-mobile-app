@@ -3,16 +3,18 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
   TouchableOpacity,
   Switch,
   Alert,
   Dimensions,
   ActivityIndicator,
   Image,
+  Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import Constants from 'expo-constants';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,17 +26,18 @@ import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTok
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, shadow, surfaces } from '../utils/theme';
 
 const log = createLogger('Profile');
 
 const { width } = Dimensions.get('window');
 
 // Keep Switch color props stable across renders (prevents iOS visual flicker on nearby switches).
-const SWITCH_TRACK_PUSH = { false: '#E5E5EA', true: '#dc2626' };
-const SWITCH_TRACK_BIOMETRIC = { false: '#E5E5EA', true: '#27AE60' };
-const SWITCH_TRACK_EMAIL = { false: '#E5E5EA', true: '#dc2626' };
-const SWITCH_THUMB = '#ffffff';
-const SWITCH_IOS_BG = '#E5E5EA';
+const SWITCH_TRACK_PUSH = { false: colors.separator, true: colors.brand };
+const SWITCH_TRACK_BIOMETRIC = { false: colors.separator, true: colors.green };
+const SWITCH_TRACK_EMAIL = { false: colors.separator, true: colors.brand };
+const SWITCH_THUMB = colors.white;
+const SWITCH_IOS_BG = colors.separator;
 const PUSH_PREF_KEY = '@genosys_push_enabled';
 const EMAIL_NOTIF_PREF_KEY = '@genosys_email_notif_enabled';
 
@@ -55,6 +58,8 @@ export default function ProfileScreen() {
   // Be defensive: some screens rely on `dir`, but if it's ever out of sync,
   // Arabic locale should still force RTL layout for key typography (like the name).
   const isRTL = dir === 'rtl' || locale === 'ar';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [pushToggleLoading, setPushToggleLoading] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -180,14 +185,9 @@ export default function ProfileScreen() {
     router.push('/profile/edit');
   };
 
-  const handleContactSupport = () => {
+  const onBack = () => {
     haptics.lightTap();
-    router.push('/profile/contact');
-  };
-
-  const handleAbout = () => {
-    haptics.lightTap();
-    router.push('/profile/about');
+    router.canGoBack() ? router.back() : router.replace('/(tabs)/shop');
   };
 
   const handleBiometricToggle = useCallback(async (value) => {
@@ -300,6 +300,7 @@ export default function ProfileScreen() {
   const ProfileSwitchItem = useMemo(() => {
     return React.memo(function ProfileSwitchItemInner({
       icon,
+      tint,
       title,
       subtitle,
       value,
@@ -310,44 +311,51 @@ export default function ProfileScreen() {
       rtl,
     }) {
       return (
-        <View style={[styles.profileItem, rtl && styles.profileItemRTL, isLast && styles.profileItemLast]}>
-          <View style={[styles.profileItemLeft, rtl && styles.profileItemLeftRTL]}>
-            {icon && (
-              <View style={styles.iconContainer}>
-                <Ionicons name={icon} size={22} color="#dc2626" />
+        <View>
+          <View style={[styles.row, rtl && styles.rowReverse]}>
+            <View style={[styles.rowLeft, rtl && styles.rowReverse]}>
+              {icon ? (
+                <View style={[surfaces.iconTile, { backgroundColor: tint || colors.brand }]}>
+                  <Ionicons name={icon} size={17} color={colors.white} />
+                </View>
+              ) : null}
+              <View style={[styles.rowText, rtl && styles.rowTextRTL]}>
+                <Text style={[styles.rowTitle, rtl && styles.textRTL]}>{title}</Text>
+                {subtitle ? <Text style={[styles.rowSubtitle, rtl && styles.textRTL]}>{subtitle}</Text> : null}
               </View>
-            )}
-            <View style={[styles.profileItemText, rtl && styles.profileItemTextRTL]}>
-              <Text style={[styles.profileItemTitle, rtl && styles.profileItemTitleRTL]}>{title}</Text>
-              {subtitle ? <Text style={[styles.profileItemSubtitle, rtl && styles.profileItemSubtitleRTL]}>{subtitle}</Text> : null}
+            </View>
+            <View style={styles.switchRight}>
+              <Switch
+                value={value}
+                onValueChange={onValueChange}
+                trackColor={trackColor}
+                thumbColor={SWITCH_THUMB}
+                ios_backgroundColor={SWITCH_IOS_BG}
+                disabled={!!disabled}
+              />
             </View>
           </View>
-          <View style={styles.profileItemRight}>
-            <Switch
-              value={value}
-              onValueChange={onValueChange}
-              trackColor={trackColor}
-              thumbColor={SWITCH_THUMB}
-              ios_backgroundColor={SWITCH_IOS_BG}
-              disabled={!!disabled}
-            />
-          </View>
+          {!isLast ? <View style={[styles.separator, rtl && styles.separatorRTL]} /> : null}
         </View>
       );
     });
   }, []);
 
-  // Quick Action Card Component (Genosys brand style)
+  // Quick Action Card Component (soft Apple-native card)
   const QuickActionCard = ({
     icon,
     title,
     subtitle,
     onPress,
-    color = "#dc2626",
+    color = colors.brand,
   }) => (
-    <TouchableOpacity style={[styles.quickActionCard, isRTL && styles.quickActionCardRTL]} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.quickActionCard, shadow.card, isRTL && styles.quickActionCardRTL]}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
-        <Ionicons name={icon} size={24} color="#ffffff" />
+        <Ionicons name={icon} size={22} color={colors.white} />
       </View>
       <Text style={[styles.quickActionTitle, isRTL && styles.quickActionTitleRTL]}>{title}</Text>
       <Text style={[styles.quickActionSubtitle, isRTL && styles.quickActionSubtitleRTL]}>{subtitle}</Text>
@@ -361,180 +369,170 @@ export default function ProfileScreen() {
   // Section List Item Component
   const ProfileSection = ({ title, children, style }) => (
     <View style={[styles.section, style]}>
-      {title && <Text style={styles.sectionTitle}>{title}</Text>}
+      {title ? <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{title}</Text> : null}
       {children}
     </View>
   );
 
-  const ProfileItem = ({ icon, title, subtitle, onPress, rightComponent, hasArrow = true, style, isLast = false }) => {
+  const ProfileItem = ({ icon, tint = colors.brand, title, subtitle, value, onPress, rightComponent, hasArrow = true, isLast = false }) => {
     const content = (
       <>
-        <View style={[styles.profileItemLeft, isRTL && styles.profileItemLeftRTL]}>
-          {icon && (
-            <View style={styles.iconContainer}>
-              <Ionicons name={icon} size={22} color="#dc2626" />
+        <View style={[styles.rowLeft, isRTL && styles.rowReverse]}>
+          {icon ? (
+            <View style={[surfaces.iconTile, { backgroundColor: tint }]}>
+              <Ionicons name={icon} size={17} color={colors.white} />
             </View>
-          )}
-          <View style={[styles.profileItemText, isRTL && styles.profileItemTextRTL]}>
-            <Text style={[styles.profileItemTitle, isRTL && styles.profileItemTitleRTL]}>{title}</Text>
-            {subtitle && <Text style={[styles.profileItemSubtitle, isRTL && styles.profileItemSubtitleRTL]}>{subtitle}</Text>}
+          ) : null}
+          <View style={[styles.rowText, isRTL && styles.rowTextRTL]}>
+            <Text style={[styles.rowTitle, isRTL && styles.textRTL]}>{title}</Text>
+            {subtitle ? <Text style={[styles.rowSubtitle, isRTL && styles.textRTL]}>{subtitle}</Text> : null}
           </View>
         </View>
-        <View style={[styles.profileItemRight, isRTL && styles.profileItemRightRTL]}>
-          {rightComponent || (hasArrow && <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={16} color="#C7C7CC" />)}
+        <View style={[styles.rowRight, isRTL && styles.rowReverse]}>
+          {value ? <Text style={[styles.rowValue, isRTL && styles.textRTL]} numberOfLines={1}>{value}</Text> : null}
+          {rightComponent || (hasArrow ? <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.tertiary} /> : null)}
         </View>
       </>
     );
 
-    const itemStyle = [
-      styles.profileItem,
-      isLast && styles.profileItemLast,
-      style,
-    ];
-
     // IMPORTANT: When there's no row onPress (e.g., rows with Switch controls),
     // don't wrap in a touchable. Touch responders can interfere with Switch gestures
     // and make other switches "react" on tap.
-    if (!onPress) {
-      return <View style={itemStyle}>{content}</View>;
-    }
-
     return (
-      <TouchableOpacity style={itemStyle} onPress={onPress} activeOpacity={0.6}>
-        {content}
-      </TouchableOpacity>
+      <View>
+        {onPress ? (
+          <TouchableOpacity style={[styles.row, isRTL && styles.rowReverse]} onPress={onPress} activeOpacity={0.6}>
+            {content}
+          </TouchableOpacity>
+        ) : (
+          <View style={[styles.row, isRTL && styles.rowReverse]}>{content}</View>
+        )}
+        {!isLast ? <View style={[styles.separator, isRTL && styles.separatorRTL]} /> : null}
+      </View>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Navigation Header */}
-      <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/shop')}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        
-        <Text style={[styles.navTitle, isRTL && styles.navTitleRTL]}>{t('profile.accountTitle')}</Text>
-        
-        <View style={styles.headerSpacer} />
-      </View>
-      
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Apple Store Style Header */}
-        <View style={styles.profileHeader}>
-          
-          <View style={[styles.profileCard, isRTL && styles.profileCardRTL]}>
-            <TouchableOpacity
-              style={[styles.promoAvatarButton, isRTL ? styles.promoAvatarButtonRTL : styles.promoAvatarButtonLTR]}
-              onPress={() => router.push('/profile/promo')}
-              activeOpacity={0.9}
-            >
-              <Ionicons name="megaphone-outline" size={16} color="#dc2626" />
-            </TouchableOpacity>
-            <View style={[styles.avatarWrap, isRTL && styles.avatarWrapRTL]}>
-              <View style={[styles.avatarContainer, isRTL && styles.avatarContainerRTL]}>
-                {profileImageUri ? (
-                  <Image 
-                    source={{ uri: profileImageUri }} 
-                    style={styles.avatarImage}
-                  />
-                ) : (
-                  <Text style={styles.avatarText}>
-                    {user?.name?.charAt(0)?.toUpperCase() || displayEmail?.charAt(0)?.toUpperCase() || 'G'}
-                  </Text>
-                )}
-                <View style={styles.onlineDot} />
-              </View>
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('profile.accountTitle')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-              {!!user?.discountType && Number.isFinite(Number(user?.discountPercentage)) && Number(user?.discountPercentage) > 0 && (
-                <View style={[styles.discountBadge, isRTL && styles.memberBadgeRTL, { marginTop: 8 }]}>
-                  <Ionicons name="pricetag-outline" size={12} color="#ffffff" />
-                  <Text
-                    style={[styles.discountBadgeText, isRTL && styles.memberBadgeTextRTL]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {t('profile.discountLabel')}: {Number(user.discountPercentage)}%
-                  </Text>
-                </View>
-              )}
-            </View>
-            <View style={[styles.userInfo, isRTL && styles.userInfoRTL]}>
-              <Text style={[styles.userName, isRTL && styles.userNameRTL]}>
-                {user?.name || t('common.loading')}
-              </Text>
-              <Text style={[styles.userEmail, isRTL && styles.userEmailRTL]}>
-                {displayEmail || t('profile.loadingUserData')}
-              </Text>
-              {user?.phone && (
-                <Text style={[styles.userPhone, isRTL && styles.userPhoneRTL]}>
-                  {user.phone}
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight + 8 }}
+      >
+        {/* Profile card */}
+        <View style={[styles.profileCard, shadow.card, isRTL && styles.profileCardRTL]}>
+          <TouchableOpacity
+            style={[styles.promoAvatarButton, isRTL ? styles.promoAvatarButtonRTL : styles.promoAvatarButtonLTR]}
+            onPress={() => router.push('/profile/promo')}
+            activeOpacity={0.9}
+          >
+            <Ionicons name="megaphone-outline" size={16} color={colors.brand} />
+          </TouchableOpacity>
+          <View style={[styles.avatarWrap, isRTL && styles.avatarWrapRTL]}>
+            <View style={styles.avatarContainer}>
+              {profileImageUri ? (
+                <Image
+                  source={{ uri: profileImageUri }}
+                  style={styles.avatarImage}
+                />
+              ) : (
+                <Text style={styles.avatarText}>
+                  {user?.name?.charAt(0)?.toUpperCase() || displayEmail?.charAt(0)?.toUpperCase() || 'G'}
                 </Text>
               )}
-              <TouchableOpacity onPress={handleEditProfile} style={[styles.editButton, isRTL && styles.editButtonRTL]}>
-                <Text style={[styles.editButtonText, isRTL && styles.editButtonTextRTL]}>{t('profile.viewAndEdit')}</Text>
-              </TouchableOpacity>
+              <View style={styles.onlineDot} />
             </View>
+
+            {!!user?.discountType && Number.isFinite(Number(user?.discountPercentage)) && Number(user?.discountPercentage) > 0 && (
+              <View style={[styles.discountBadge, isRTL && styles.memberBadgeRTL, { marginTop: 8 }]}>
+                <Ionicons name="pricetag-outline" size={12} color={colors.white} />
+                <Text
+                  style={[styles.discountBadgeText, isRTL && styles.memberBadgeTextRTL]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {t('profile.discountLabel')}: {Number(user.discountPercentage)}%
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={[styles.userInfo, isRTL && styles.userInfoRTL]}>
+            <Text style={[styles.userName, isRTL && styles.userNameRTL]}>
+              {user?.name || t('common.loading')}
+            </Text>
+            <Text style={[styles.userEmail, isRTL && styles.userEmailRTL]}>
+              {displayEmail || t('profile.loadingUserData')}
+            </Text>
+            {user?.phone && (
+              <Text style={[styles.userPhone, isRTL && styles.userPhoneRTL]}>
+                {user.phone}
+              </Text>
+            )}
+            <TouchableOpacity onPress={handleEditProfile} style={[styles.editButton, isRTL && styles.editButtonRTL]}>
+              <Text style={[styles.editButtonText, isRTL && styles.editButtonTextRTL]}>{t('profile.viewAndEdit')}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        {/* Quick Actions - Genosys brand style cards */}
-        <ProfileSection style={styles.quickActionsSection}>
-          <View style={styles.quickActionsGrid}>
-            <QuickActionCard
-              icon="receipt-outline"
-              title={t('profile.orders')}
-              subtitle={ordersSubtitle}
-              color="#dc2626"
-              onPress={async () => {
-                haptics.lightTap();
-                // Ensure Orders header can route back to Account when opened from here.
-                await AsyncStorage.setItem('@genosys_nav_orders_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
-                router.push('/profile/orders');
-              }}
-            />
-            <QuickActionCard
-              icon="bag-outline"
-              title={t('profile.bag')}
-              subtitle={cartCount > 0 ? t('profile.itemsCount', { count: cartCount }) : t('profile.empty')}
-              color="#27AE60"
-              onPress={async () => {
-                haptics.lightTap();
-                // Ensure Bag header can route back to Account when opened from here.
-                await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/profile' })).catch((e) => log.warn('Failed to save nav source', e?.message));
-                router.push('/(tabs)/bag');
-              }}
-            />
-          </View>
-        </ProfileSection>
+        {/* Quick Actions */}
+        <View style={styles.quickActionsRow}>
+          <QuickActionCard
+            icon="receipt-outline"
+            title={t('profile.orders')}
+            subtitle={ordersSubtitle}
+            color={colors.brand}
+            onPress={async () => {
+              haptics.lightTap();
+              // Ensure Orders header can route back to Account when opened from here.
+              await AsyncStorage.setItem('@genosys_nav_orders_source', 'profile').catch((e) => log.warn('Failed to save nav source', e?.message));
+              router.push('/profile/orders');
+            }}
+          />
+          <QuickActionCard
+            icon="bag-outline"
+            title={t('profile.bag')}
+            subtitle={cartCount > 0 ? t('profile.itemsCount', { count: cartCount }) : t('profile.empty')}
+            color={colors.green}
+            onPress={async () => {
+              haptics.lightTap();
+              // Ensure Bag header can route back to Account when opened from here.
+              await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/profile' })).catch((e) => log.warn('Failed to save nav source', e?.message));
+              router.push('/(tabs)/bag');
+            }}
+          />
+        </View>
 
         {/* Explore */}
         <ProfileSection title={t('navigation.explore') || 'Explore'}>
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="gift-outline"
+              tint={colors.brand}
               title={t('navigation.bundleBuilder') || 'Bundle Builder'}
               subtitle={t('profile.buildYourSet') || 'Build your skincare set'}
               onPress={() => { haptics.lightTap(); router.push('/bundle-builder'); }}
             />
             <ProfileItem
               icon="sparkles-outline"
+              tint={colors.purple}
               title={t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}
               subtitle={t('profile.aiSkinSubtitle') || 'Camera or quiz analysis'}
               onPress={() => { haptics.lightTap(); router.push('/skin-analysis'); }}
             />
             <ProfileItem
               icon="leaf-outline"
+              tint={colors.green}
               title={t('categories.skinConcern') || 'Skin Concern'}
               subtitle={t('profile.skinConcernSubtitle') || 'Browse by concern'}
               onPress={() => { haptics.lightTap(); router.push('/skin-concerns'); }}
             />
             <ProfileItem
               icon="newspaper-outline"
+              tint={colors.orange}
               title={t('navigation.blog') || 'Blog'}
               onPress={() => { haptics.lightTap(); router.push('/blog'); }}
               isLast={true}
@@ -547,18 +545,22 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="person-outline"
+              tint={colors.blue}
               title={t('profile.personalInformation')}
               onPress={handleEditProfile}
             />
             <ProfileItem
               icon="location-outline"
+              tint={colors.teal}
               title={t('profile.addresses')}
               onPress={() => { haptics.lightTap(); router.push('/profile/addresses'); }}
             />
             <ProfileItem
               icon="card-outline"
+              tint={colors.green}
               title={t('profile.paymentAndBilling')}
               onPress={() => { haptics.lightTap(); router.push('/profile/payment'); }}
+              isLast={true}
             />
           </View>
         </ProfileSection>
@@ -569,6 +571,7 @@ export default function ProfileScreen() {
             {biometricAvailable ? (
               <ProfileSwitchItem
                 icon={biometricType.includes('Face') ? 'scan-outline' : 'finger-print-outline'}
+                tint={colors.indigo}
                 title={biometricType}
                 value={biometricEnabled}
                 onValueChange={handleBiometricToggle}
@@ -579,6 +582,7 @@ export default function ProfileScreen() {
             ) : (
               <ProfileItem
                 icon="scan-outline"
+                tint={colors.indigo}
                 title={t('profile.biometricAuthentication')}
                 rightComponent={
                   <Text style={styles.unavailableText}>{t('profile.notAvailable')}</Text>
@@ -590,6 +594,7 @@ export default function ProfileScreen() {
             {/* Moved here from Edit Profile */}
             <ProfileSwitchItem
               icon="mail-outline"
+              tint={colors.blue}
               title={t('editProfile.emailNotifications')}
               subtitle={t('editProfile.emailNotificationsHint')}
               value={emailNotifications}
@@ -600,6 +605,7 @@ export default function ProfileScreen() {
             />
             <ProfileSwitchItem
               icon="notifications-outline"
+              tint={colors.orange}
               title={t('profile.pushNotifications')}
               value={notificationsEnabled}
               onValueChange={handlePushToggle}
@@ -609,11 +615,13 @@ export default function ProfileScreen() {
             />
             <ProfileItem
               icon="shield-outline"
+              tint={colors.blue}
               title={t('profile.privacyPolicy')}
               onPress={() => { haptics.lightTap(); router.push('/profile/privacy'); }}
             />
             <ProfileItem
               icon="document-text-outline"
+              tint={colors.secondaryLabel}
               title={t('profile.termsAndConditions')}
               onPress={() => { haptics.lightTap(); router.push('/profile/terms'); }}
               isLast={true}
@@ -626,29 +634,16 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="language-outline"
+              tint={colors.blue}
               title={t('profile.language')}
-              subtitle={locale === 'ru' ? t('profile.russian') : locale === 'ar' ? t('profile.arabic') : t('profile.english')}
+              value={locale === 'ru' ? t('profile.russian') : locale === 'ar' ? t('profile.arabic') : t('profile.english')}
               onPress={() => { haptics.lightTap(); router.push('/profile/language'); }}
             />
             <ProfileItem
               icon="help-circle-outline"
+              tint={colors.teal}
               title={t('profile.helpAndSupport')}
               onPress={() => { haptics.lightTap(); router.push('/profile/help'); }}
-            />
-            <ProfileItem
-              icon="mail-outline"
-              title={t('profile.contactUs')}
-              onPress={handleContactSupport}
-            />
-            <ProfileItem
-              icon="download-outline"
-              title={t('profile.trainingMaterials') || 'Training Materials'}
-              onPress={() => { haptics.lightTap(); router.push('/training'); }}
-            />
-            <ProfileItem
-              icon="information-circle-outline"
-              title={t('profile.aboutGenosys')}
-              onPress={handleAbout}
               isLast={true}
             />
           </View>
@@ -658,34 +653,52 @@ export default function ProfileScreen() {
         <ProfileSection title={t('navigation.information') || 'Information'}>
           <View style={styles.sectionContent}>
             <ProfileItem
+              icon="information-circle-outline"
+              tint={colors.secondaryLabel}
+              title={t('profile.aboutGenosys')}
+              onPress={() => { haptics.lightTap(); router.push('/about'); }}
+            />
+            <ProfileItem
               icon="business-outline"
+              tint={colors.brand}
               title={t('navigation.brand') || 'Brand'}
               onPress={() => { haptics.lightTap(); router.push('/brand'); }}
             />
             <ProfileItem
+              icon="people-outline"
+              tint={colors.indigo}
+              title={t('navigation.partners') || 'Partners'}
+              onPress={() => { haptics.lightTap(); router.push('/partners'); }}
+            />
+            <ProfileItem
+              icon="download-outline"
+              tint={colors.purple}
+              title={t('profile.trainingMaterials') || 'Training Materials'}
+              onPress={() => { haptics.lightTap(); router.push('/training'); }}
+            />
+            <ProfileItem
               icon="car-outline"
+              tint={colors.blue}
               title={t('navigation.delivery') || 'Delivery'}
               onPress={() => { haptics.lightTap(); router.push('/delivery'); }}
             />
             <ProfileItem
               icon="navigate-outline"
+              tint={colors.teal}
               title={t('navigation.locations') || 'Locations'}
               onPress={() => { haptics.lightTap(); router.push('/locations'); }}
             />
             <ProfileItem
-              icon="chatbubble-ellipses-outline"
-              title={t('navigation.contact') || 'Contact'}
-              onPress={() => { haptics.lightTap(); router.push('/contact'); }}
-            />
-            <ProfileItem
               icon="help-buoy-outline"
+              tint={colors.orange}
               title={t('navigation.faq') || 'FAQ'}
               onPress={() => { haptics.lightTap(); router.push('/faq'); }}
             />
             <ProfileItem
-              icon="people-outline"
-              title={t('navigation.partners') || 'Partners'}
-              onPress={() => { haptics.lightTap(); router.push('/partners'); }}
+              icon="chatbubble-ellipses-outline"
+              tint={colors.green}
+              title={t('navigation.contact') || 'Contact'}
+              onPress={() => { haptics.lightTap(); router.push('/contact'); }}
               isLast={true}
             />
           </View>
@@ -699,147 +712,130 @@ export default function ProfileScreen() {
             disabled={isLoggingOut}
           >
             {isLoggingOut ? (
-              <ActivityIndicator color="#dc2626" size="small" />
+              <ActivityIndicator color={colors.brand} size="small" />
             ) : (
               <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
             )}
           </TouchableOpacity>
         </ProfileSection>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>{t('profile.appName')}</Text>
+        {/* Footer — consistent with the About screen */}
+        <View style={[styles.footer, { paddingBottom: (insets?.bottom || 0) + 90 }]}>
+          <Text style={styles.footerBrand}>GENOSYS</Text>
+          <Text style={styles.footerSub}>
+            {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
+          </Text>
+          <TouchableOpacity
+            onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae'); }}
+            activeOpacity={0.7}
+            style={styles.footerLinkWrap}
+          >
+            <Text style={styles.footerLink}>www.genosys.ae</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
           <Text style={styles.footerVersion}>{t('profile.version', { version: Constants.expoConfig?.version || '1.5.0' })}</Text>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.groupedBg,
   },
   scrollView: {
     flex: 1,
   },
-  
-  // Navigation Header
-  navHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
-  },
-  backButton: {
-    minWidth: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    maxWidth: 130,
-  },
-  backButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    minWidth: 0,
-  },
-  backButtonContentRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backText: {
-    ...T.label,
-    color: '#dc2626',
-    flexShrink: 1,
-  },
-  backTextRTL: {
-    writingDirection: 'rtl',
-    textAlign: 'right',
-  },
-  navTitle: {
-    ...T.sectionTitleSmall,
-    fontWeight: '600',
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 130,
-  },
-  
-  // Apple Store Style Profile Header
-  profileHeader: {
-    backgroundColor: '#ffffff',
-    paddingTop: 20,
-    paddingBottom: 32,
-  },
+
+  // Profile card
   profileCard: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 20,
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 18,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+  },
+  profileCardRTL: {
+    flexDirection: 'row-reverse',
   },
   avatarWrap: {
     alignItems: 'center',
     marginEnd: 16,
   },
+  avatarWrapRTL: {
+    marginEnd: 0,
+    marginStart: 16,
+  },
   avatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#dc2626',
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: colors.brand,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   avatarText: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '600',
-    color: '#ffffff',
+    color: colors.white,
   },
   avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 76,
+    height: 76,
+    borderRadius: 38,
   },
   onlineDot: {
     position: 'absolute',
     bottom: 2,
     end: 2,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#34C759',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.green,
     borderWidth: 3,
-    borderColor: '#ffffff',
+    borderColor: colors.card,
   },
   userInfo: {
     flex: 1,
     minWidth: 0,
   },
+  userInfoRTL: {
+    alignItems: 'flex-end',
+    marginEnd: 0,
+    marginStart: 16,
+  },
   userName: {
     ...T.pageTitle,
     fontSize: 22,
-    color: '#000000',
+    color: colors.label,
     marginBottom: 2,
+  },
+  userNameRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   userEmail: {
     ...T.body,
     lineHeight: undefined,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     marginBottom: 4,
     flexShrink: 1,
+  },
+  userEmailRTL: {
+    textAlign: 'right',
+  },
+  userPhone: {
+    ...T.caption,
+    color: colors.secondaryLabel,
+    marginBottom: 12,
+    flexShrink: 1,
+  },
+  userPhoneRTL: {
+    textAlign: 'right',
   },
   discountBadge: {
     flexDirection: 'row',
@@ -847,7 +843,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    backgroundColor: '#27AE60',
+    backgroundColor: colors.green,
     borderRadius: 999,
     maxWidth: '100%',
   },
@@ -858,47 +854,26 @@ const styles = StyleSheet.create({
     writingDirection: 'ltr',
     textAlign: 'left',
   },
-  userPhone: {
-    ...T.caption,
-    color: '#999999',
-    marginBottom: 12,
-    flexShrink: 1,
+  memberBadgeRTL: {
+    flexDirection: 'row-reverse',
+  },
+  memberBadgeTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   editButton: {
     alignSelf: 'flex-start',
   },
+  editButtonRTL: {
+    alignSelf: 'flex-end',
+  },
   editButtonText: {
     ...T.navTitle,
     fontWeight: '400',
-    color: '#007AFF',
+    color: colors.blue,
   },
-
-  // Quick Actions
-  quickActionsSection: {
-    marginTop: 0,
-    paddingBottom: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-  },
-  quickActionCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    width: (width - 60) / 2,
-    alignItems: 'center',
-  },
-  quickActionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
+  editButtonTextRTL: {
+    textAlign: 'center',
   },
   promoAvatarButton: {
     position: 'absolute',
@@ -919,98 +894,154 @@ const styles = StyleSheet.create({
   promoAvatarButtonRTL: {
     left: 12,
   },
+
+  // Quick Actions
+  quickActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 16,
+    marginBottom: 18,
+  },
+  quickActionCard: {
+    ...surfaces.card,
+    padding: 16,
+    width: (width - 44) / 2,
+    alignItems: 'center',
+  },
+  quickActionCardRTL: {
+    alignItems: 'center',
+  },
+  quickActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   quickActionTitle: {
     ...T.navTitle,
-    color: '#000000',
+    color: colors.label,
     marginBottom: 2,
     textAlign: 'center',
+  },
+  quickActionTitleRTL: {
+    writingDirection: 'rtl',
   },
   quickActionSubtitle: {
     ...T.bodySmall,
     lineHeight: undefined,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     textAlign: 'center',
+  },
+  quickActionSubtitleRTL: {
+    writingDirection: 'rtl',
   },
 
   // Sections
   section: {
-    paddingVertical: 16,
+    marginBottom: 18,
   },
   sectionTitle: {
-    ...T.pageTitle,
-    fontSize: 22,
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
     marginBottom: 8,
-    marginHorizontal: 20,
+    marginHorizontal: 28,
+    letterSpacing: -0.1,
+  },
+  sectionTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   sectionContent: {
-    marginHorizontal: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
+    marginHorizontal: 16,
     overflow: 'hidden',
   },
-  
-  // Profile Items
-  profileItem: {
-    backgroundColor: '#ffffff',
+
+  // Settings-style rows
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 56,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
+    paddingVertical: 10,
+    minHeight: 52,
   },
-  profileItemLast: {
-    borderBottomWidth: 0,
+  rowReverse: {
+    flexDirection: 'row-reverse',
   },
-  profileItemLeft: {
+  rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0,
+    gap: 12,
   },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginEnd: 12,
-  },
-  profileItemText: {
+  rowText: {
     flex: 1,
+    minWidth: 0,
   },
-  profileItemTitle: {
-    ...T.navTitle,
-    fontWeight: '400',
-    color: '#000000',
-    marginBottom: 1,
+  rowTextRTL: {
+    alignItems: 'flex-end',
   },
-  profileItemSubtitle: {
+  rowTitle: {
+    ...T.label,
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.label,
+  },
+  rowSubtitle: {
+    ...T.captionSmall,
+    color: colors.secondaryLabel,
+    marginTop: 2,
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  rowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginStart: 8,
+  },
+  rowValue: {
     ...T.bodySmall,
     lineHeight: undefined,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
+    maxWidth: 160,
   },
-  profileItemRight: {
-    marginLeft: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
+  switchRight: {
+    marginStart: 8,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+    marginStart: 56,
+  },
+  separatorRTL: {
+    marginStart: 0,
+    marginEnd: 56,
   },
 
   // Sign Out
   signOutButton: {
-    backgroundColor: '#F2F2F7',
-    marginHorizontal: 20,
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: colors.fillSecondary,
+    marginHorizontal: 16,
+    borderRadius: 14,
+    paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 56,
+    minHeight: 52,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
   signOutText: {
     ...T.navTitle,
-    fontWeight: '400',
-    color: '#dc2626',
+    fontWeight: '600',
+    color: colors.brand,
   },
   signOutButtonDisabled: {
     opacity: 0.6,
@@ -1018,101 +1049,27 @@ const styles = StyleSheet.create({
   unavailableText: {
     ...T.caption,
     fontStyle: 'italic',
+    color: colors.secondaryLabel,
   },
 
-  // Footer
+  // Footer (matches app/about.js)
   footer: {
     alignItems: 'center',
-    paddingVertical: 32,
-    paddingBottom: 100, // Space for tab bar
+    paddingTop: 8,
   },
+  footerBrand: { ...T.bodySmall, fontWeight: '700', color: colors.secondaryLabel, letterSpacing: 0.5 },
+  footerSub: { ...T.caption, color: colors.tertiary, marginTop: 4, textAlign: 'center' },
+  footerLinkWrap: { marginTop: 8 },
+  footerLink: { ...T.link, color: colors.brand },
+  footerCopyright: { ...T.captionSmall, color: colors.tertiary, marginTop: 12, textAlign: 'center' },
   footerText: {
     ...T.bodySmall,
     lineHeight: undefined,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
   },
   footerVersion: {
     ...T.caption,
-    color: '#C7C7CC',
+    color: colors.tertiary,
     marginTop: 4,
-  },
-
-  // RTL Support Styles
-  navHeaderRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backButtonRTL: {
-    marginLeft: 0,
-    marginRight: 16,
-  },
-  navTitleRTL: {
-    textAlign: 'center',
-    writingDirection: 'rtl',
-  },
-  profileCardRTL: {
-    flexDirection: 'row-reverse',
-  },
-  avatarContainerRTL: {
-    // Avatar spacing handled by avatarWrapRTL
-  },
-  avatarWrapRTL: {
-    marginEnd: 0,
-    marginStart: 16,
-  },
-  userInfoRTL: {
-    alignItems: 'flex-end',
-    marginEnd: 0,
-    marginStart: 16,
-  },
-  userNameRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  userEmailRTL: {
-    textAlign: 'right',
-  },
-  memberBadgeRTL: {
-    flexDirection: 'row-reverse',
-  },
-  memberBadgeTextRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  userPhoneRTL: {
-    textAlign: 'right',
-  },
-  editButtonTextRTL: {
-    textAlign: 'center',
-  },
-  editButtonRTL: {
-    alignSelf: 'flex-end',
-  },
-  quickActionCardRTL: {
-    alignItems: 'flex-end',
-  },
-  quickActionTitleRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  quickActionSubtitleRTL: {
-    textAlign: 'right',
-  },
-  profileItemLeftRTL: {
-    flexDirection: 'row-reverse',
-  },
-  profileItemTextRTL: {
-    alignItems: 'flex-end',
-    marginLeft: 0,
-    marginRight: 12,
-  },
-  profileItemTitleRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  profileItemSubtitleRTL: {
-    textAlign: 'right',
-  },
-  profileItemRightRTL: {
-    flexDirection: 'row-reverse',
   },
 });

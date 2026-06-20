@@ -58,9 +58,7 @@ import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
-import TrustStrip from '../../components/TrustStrip';
-import NavigationDrawer from '../../components/NavigationDrawer';
-
+import { colors, tint, shadow, surfaces } from '../../utils/theme';
 
 const log = createLogger('Shop');
 
@@ -121,7 +119,6 @@ export default function ShopScreen() {
   const [categoryBadges, setCategoryBadges] = useState({}); // { "Cream": "new", "Beauty Boxes": "new" }
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [addingProducts, setAddingProducts] = useState(new Set()); // Track which products are being added
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -143,6 +140,8 @@ export default function ShopScreen() {
   const [isListening, setIsListening] = useState(false);
   const [voicePartial, setVoicePartial] = useState('');
   const pulseAnim = useRef(new RNAnimated.Value(1)).current;
+  // Subtle fade-in for the grid once products are ready (presentation only).
+  const contentFade = useRef(new RNAnimated.Value(0)).current;
 
   // Map app locale to BCP-47 for speech recognizer
   const speechLocale = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-US';
@@ -190,6 +189,17 @@ export default function ShopScreen() {
       pulseAnim.setValue(1);
     }
   }, [isListening]);
+
+  // Gentle fade-in when the catalog finishes loading.
+  useEffect(() => {
+    if (!loading) {
+      RNAnimated.timing(contentFade, {
+        toValue: 1,
+        duration: 280,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading]);
 
   const startVoiceSearch = useCallback(async () => {
     if (!ExpoSpeechRecognitionModule) return;
@@ -255,14 +265,18 @@ export default function ShopScreen() {
 
             return (
               <View style={[styles.badgeContainer, isRTL && styles.badgeContainerRTL]}>
-                {badges.map((badge, badgeIndex) => (
-                  <View
-                    key={`${badge.text || 'badge'}-${badgeIndex}`}
-                    style={[styles.badge, { backgroundColor: badge.color || '#007AFF' }]}
-                  >
-                    <Text style={styles.badgeText}>{badge.text}</Text>
-                  </View>
-                ))}
+                {badges.map((badge, badgeIndex) => {
+                  const badgeColor = badge.color || colors.blue;
+                  return (
+                    <View
+                      key={`${badge.text || 'badge'}-${badgeIndex}`}
+                      style={[styles.badge, { backgroundColor: tint(badgeColor) }]}
+                    >
+                      <View style={[styles.badgeDot, { backgroundColor: badgeColor }]} />
+                      <Text style={[styles.badgeText, { color: badgeColor }]}>{badge.text}</Text>
+                    </View>
+                  );
+                })}
               </View>
             );
           })()}
@@ -280,7 +294,7 @@ export default function ShopScreen() {
               <Ionicons
                 name={isFav ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isFav ? '#dc2626' : '#ffffff'}
+                color={isFav ? colors.brand : colors.white}
               />
             </View>
           </TouchableOpacity>
@@ -288,7 +302,10 @@ export default function ShopScreen() {
           {/* Stock Status */}
           {(product.status === 'out_of_stock' || product.stock === false) && (
             <View style={styles.stockOverlay}>
-              <Text style={styles.stockOverlayText}>{t('stock.outOfStock')}</Text>
+              <View style={styles.stockBadge}>
+                <View style={styles.stockDot} />
+                <Text style={styles.stockOverlayText}>{t('stock.outOfStock')}</Text>
+              </View>
             </View>
           )}
         </View>
@@ -790,15 +807,6 @@ export default function ShopScreen() {
         {/* Left: Language selector */}
         <View style={[styles.headerLeft, isRTL && styles.headerLeftRtl]}>
           <TouchableOpacity
-            onPress={() => { haptics.lightTap(); setDrawerOpen(true); }}
-            activeOpacity={0.85}
-            style={styles.menuButton}
-            accessibilityRole="button"
-            accessibilityLabel={t('shop.a11y.openMenu')}
-          >
-            <Ionicons name="menu-outline" size={22} color="#1D1D1F" />
-          </TouchableOpacity>
-          <TouchableOpacity
             onPress={() => setLangOpen((v) => !v)}
             disabled={langSwitching}
             activeOpacity={0.85}
@@ -807,7 +815,7 @@ export default function ShopScreen() {
             accessibilityLabel={t('common.switchLanguage')}
           >
             <Text style={styles.langButtonText}>{currentLangCode}</Text>
-            <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color="#16A34A" />
+            <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color={colors.greenDeep} />
           </TouchableOpacity>
         </View>
         
@@ -830,7 +838,7 @@ export default function ShopScreen() {
                 <Ionicons 
                   name={getFavoritesCount() > 0 ? "heart" : "heart-outline"} 
                   size={24} 
-                  color="#dc2626"
+                  color={colors.brand}
                 />
               </View>
               {getFavoritesCount() > 0 && (
@@ -866,18 +874,12 @@ export default function ShopScreen() {
               </View>
             ) : (
               <View style={styles.guestAvatar}>
-                <Ionicons name="person-outline" size={18} color="#86868B" />
+                <Ionicons name="person-outline" size={18} color={colors.secondaryLabel} />
               </View>
             )}
           </TouchableOpacity>
         </View>
       </View>
-
-      <NavigationDrawer
-        visible={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        headerHeight={(insets?.top || 0) + (headerHeight || 56)}
-      />
 
       {/* Language dropdown menu (modal overlay) */}
       <Modal
@@ -925,6 +927,7 @@ export default function ShopScreen() {
         </Pressable>
       </Modal>
       
+      <RNAnimated.View style={[styles.gridFade, { opacity: contentFade }]}>
       <FlatList
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -952,14 +955,14 @@ export default function ShopScreen() {
             <View style={styles.searchContainer}>
               <View style={[styles.searchInputContainer, isRTL && styles.searchInputContainerRTL]}>
                 <View style={[styles.searchIcon, isRTL && styles.searchIconRTL]}>
-                  <Ionicons name="search" size={18} color="#86868B" />
+                  <Ionicons name="search" size={18} color={colors.secondaryLabel} />
                 </View>
                 <TextInput
                   style={[styles.searchInput, isRTL && styles.searchInputRTL]}
                   placeholder={t('shop.searchPlaceholder')}
                   value={searchQuery}
                   onChangeText={setSearchQuery}
-                  placeholderTextColor="#86868B"
+                  placeholderTextColor={colors.secondaryLabel}
                   autoCapitalize="none"
                   autoCorrect={false}
                   textAlign={isRTL ? 'right' : 'left'}
@@ -986,7 +989,7 @@ export default function ShopScreen() {
                       <Ionicons
                         name={isListening ? 'mic' : 'mic-outline'}
                         size={20}
-                        color={isListening ? '#dc2626' : '#86868B'}
+                        color={isListening ? colors.brand : colors.secondaryLabel}
                       />
                     </RNAnimated.View>
                   </TouchableOpacity>
@@ -1015,9 +1018,6 @@ export default function ShopScreen() {
                 </Pressable>
               </Modal>
             )}
-
-            {/* Trust strip — brand promise, one horizontal row (matches web mobile) */}
-            <TrustStrip />
 
             {/* Categories Filter — single horizontal scrollable row (no wrapping).
                 Ordering: "All" first, then NEW-flagged categories, then the rest. */}
@@ -1156,6 +1156,7 @@ export default function ShopScreen() {
           ) : null
         }
       />
+      </RNAnimated.View>
 
     </SafeAreaView>
   );
@@ -1164,21 +1165,25 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.groupedBg,
   },
   loadingText: {
     ...T.body,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     marginTop: 16,
+  },
+  gridFade: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
+    backgroundColor: colors.groupedBg,
   },
   scrollContent: {
     paddingBottom: 32,
@@ -1193,9 +1198,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
+    backgroundColor: colors.card,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
     zIndex: 10,
   },
   headerRtl: {
@@ -1253,7 +1258,7 @@ const styles = StyleSheet.create({
   langButtonText: {
     ...T.captionSmall,
     fontWeight: '800',
-    color: '#16A34A', // matches website (green)
+    color: colors.greenDeep, // matches website (green)
   },
   aiLinkBtn: {
     paddingHorizontal: 6,
@@ -1273,9 +1278,9 @@ const styles = StyleSheet.create({
   },
   langMenu: {
     position: 'absolute',
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     borderRadius: 12,
     overflow: 'hidden',
     minWidth: 130,
@@ -1290,7 +1295,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   langMenuItemActive: {
-    backgroundColor: '#fef2f2', // primary-50
+    backgroundColor: tint(colors.brand), // primary-50
   },
   langMenuItemText: {
     ...T.label,
@@ -1300,7 +1305,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   langMenuItemTextActive: {
-    color: '#dc2626', // primary-600
+    color: colors.brand, // primary-600
     fontWeight: '800',
   },
   logo: {
@@ -1311,7 +1316,7 @@ const styles = StyleSheet.create({
     ...T.captionSmall,
     fontWeight: '500',
     letterSpacing: 0.2,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     textAlign: 'center',
   },
   subtitleWrap: {
@@ -1335,14 +1340,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     end: -4,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderRadius: 8,
     minWidth: 16,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#ffffff',
+    borderColor: colors.white,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -1352,7 +1357,7 @@ const styles = StyleSheet.create({
   favoritesBadgeText: {
     ...T.badge,
     fontWeight: '600',
-    color: '#ffffff',
+    color: colors.white,
     textAlign: 'center',
   },
   
@@ -1368,7 +1373,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -1380,7 +1385,7 @@ const styles = StyleSheet.create({
   },
   userInitials: {
     ...T.label,
-    color: '#ffffff',
+    color: colors.white,
   },
   onlineDot: {
     position: 'absolute',
@@ -1389,24 +1394,24 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#34C759',
+    backgroundColor: colors.green,
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: colors.white,
   },
   guestAvatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 0.5,
-    borderColor: '#E5E5EA',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
   productCount: {
     ...T.caption,
     fontWeight: '500',
-    color: '#dc2626',
+    color: colors.secondaryLabel,
     marginTop: 8,
     paddingHorizontal: 20,
     textAlign: 'left',
@@ -1432,23 +1437,20 @@ const styles = StyleSheet.create({
   },
   gridCard: {
     width: GRID_CARD_WIDTH,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...surfaces.card,
+    ...shadow.card,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
-    // Remove overflow: 'hidden' to allow badges to show
+    // Soft elevation only — no hard border. overflow stays visible so the
+    // image rounds itself (its own container clips) while card stays open.
   },
   gridImageContainer: {
     width: '100%',
     height: 140,
     position: 'relative',
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.subtleBg,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden',
   },
   gridImage: {
     width: '100%',
@@ -1457,14 +1459,14 @@ const styles = StyleSheet.create({
   gridImagePlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.subtleBg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   gridPlaceholderText: {
     fontSize: 32,
     fontWeight: '600',
-    color: '#dc2626',
+    color: colors.brand,
   },
   gridContent: {
     padding: 12,
@@ -1473,7 +1475,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   gridName: {
-    ...T.productName,
+    ...T.label,
     marginBottom: 4,
     lineHeight: 18,
   },
@@ -1483,6 +1485,7 @@ const styles = StyleSheet.create({
   },
   gridCategory: {
     ...T.productCategory,
+    color: colors.secondaryLabel,
     marginBottom: 4,
   },
   gridCategoryRTL: {
@@ -1500,6 +1503,7 @@ const styles = StyleSheet.create({
   },
   gridPrice: {
     ...T.priceSmall,
+    color: colors.brand,
   },
 
   // Search Styles
@@ -1507,15 +1511,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 8,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'transparent',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F2F7',
+    ...surfaces.card,
+    ...shadow.card,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -1542,7 +1545,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#86868B',
+    backgroundColor: colors.secondaryLabel,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1632,7 +1635,7 @@ const styles = StyleSheet.create({
   },
   noResultsText: {
     ...T.body,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -1643,7 +1646,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   clearSearchButton: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1663,7 +1666,7 @@ const styles = StyleSheet.create({
   // Categories Styles — single horizontal scroll row (matches web mobile)
   categoriesContainer: {
     paddingBottom: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'transparent',
   },
   categoriesScroll: {
     flexDirection: 'row',
@@ -1688,9 +1691,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 18,
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 36,
@@ -1702,8 +1705,8 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   activeCategoryButton: {
-    backgroundColor: '#dc2626',
-    borderColor: '#dc2626',
+    backgroundColor: tint(colors.brand),
+    borderColor: colors.brand,
   },
   // Transparent positioner that spans the pill's horizontal extent and
   // centers the badge above it. Using a wrapper (instead of a hard-coded
@@ -1723,12 +1726,12 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   categoryNewBadge: {
-    backgroundColor: '#22C55E',
+    backgroundColor: colors.green,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ffffff',
+    borderColor: colors.white,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.15,
@@ -1736,7 +1739,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   categoryNewBadgeActive: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.white,
   },
   categoryNewBadgeText: {
     fontSize: 9,
@@ -1747,15 +1750,16 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   categoryNewBadgeTextActive: {
-    color: '#dc2626',
+    color: colors.brand,
   },
   categoryButtonText: {
     ...T.label,
+    color: colors.label,
     fontWeight: '500',
     fontSize: 13,
   },
   activeCategoryButtonText: {
-    color: '#ffffff',
+    color: colors.brand,
     fontWeight: '600',
   },
   
@@ -1772,19 +1776,28 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 4,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  badgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   badgeText: {
-    ...T.badge,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
   
@@ -1806,20 +1819,41 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   
-  // Stock Overlay
+  // Stock Overlay — frosted capsule (legible over any product image)
   stockOverlay: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 8,
     start: 0,
     end: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingVertical: 6,
     alignItems: 'center',
   },
+  stockBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  stockDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.red,
+  },
   stockOverlayText: {
-    ...T.captionSmall,
-    fontWeight: '600',
-    color: '#ffffff',
+    ...T.captionTiny,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+    color: colors.red,
   },
   
   
@@ -1852,13 +1886,13 @@ const styles = StyleSheet.create({
   },
   vatText: {
     fontSize: 9,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     fontStyle: 'italic',
     marginTop: 2,
   },
   userDiscount: {
     fontSize: 10,
-    color: '#27AE60',
+    color: colors.greenDeep,
     fontWeight: '600',
     marginBottom: 2,
   },
@@ -1868,10 +1902,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginTop: 8,
     minHeight: 36,
   },
@@ -1879,26 +1913,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#25D366',
+    backgroundColor: colors.whatsapp,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginTop: 8,
     minHeight: 36,
   },
   priceOnRequestText: {
     ...T.label,
     letterSpacing: 0.3,
-    color: '#dc2626',
+    color: colors.brand,
   },
   loginToSeePriceText: {
     ...T.labelSmall,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     fontWeight: '700',
     marginBottom: 4,
   },
   addToCartButtonDisabled: {
-    backgroundColor: '#95A5A6',
+    backgroundColor: colors.tertiary,
     opacity: 0.6,
   },
   addToCartIcon: {
@@ -1925,7 +1959,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
     justifyContent: 'space-between',
-    backgroundColor: '#16A34A',
+    backgroundColor: colors.greenDeep,
     borderRadius: 8,
     paddingHorizontal: 4,
     paddingVertical: 4,
@@ -2007,10 +2041,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 4,
     marginBottom: 12,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: tint(colors.brand),
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#FECACA',
     overflow: 'hidden',
   },
   buildSetContent: {
@@ -2034,17 +2066,17 @@ const styles = StyleSheet.create({
   },
   buildSetSubtitle: {
     ...T.captionSmall,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     lineHeight: 16,
   },
   buildSetBadge: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
   },
   buildSetBadgeText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 11,
     fontWeight: '700',
     textAlign: 'center',

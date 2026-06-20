@@ -6,6 +6,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription } from '../../utils/productLocalization';
 import { asText } from '../../utils/productDetailUtils';
 import { parseBeautyBoxDescription } from '../../utils/beautyBoxDescription';
+import { colors } from '../../utils/theme';
 
 /**
  * Map of normalised product-name fragments → product IDs.
@@ -127,7 +128,7 @@ export default function BeautyBoxDetails({ product, styles: parentStyles }) {
                       <Ionicons
                         name={isRTL ? 'chevron-back' : 'chevron-forward'}
                         size={16}
-                        color="#dc2626"
+                        color={colors.brand}
                         style={localStyles.kitHeaderChevron}
                       />
                     </TouchableOpacity>
@@ -154,7 +155,7 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   kitHeaderLinkText: {
-    color: '#dc2626',
+    color: colors.brand,
     flex: 1,
   },
   kitHeaderChevron: {

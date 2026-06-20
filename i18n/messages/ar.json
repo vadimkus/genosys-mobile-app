@@ -157,8 +157,9 @@
     "paymentLinkMissingMessage": "تعذر فتح رابط الدفع. يرجى المحاولة مرة أخرى.",
     "couldNotOpenPaymentTitle": "تعذر فتح الدفع",
     "pleaseTryAgain": "يرجى المحاولة مرة أخرى.",
-    "securePaymentTitle": "دفع آمن",
-    "securePaymentSubtitle": "ادفع بالبطاقة أو Apple Pay أو Google Pay أو Link — بأمان داخل التطبيق.",
+    "securePaymentTitle": "🔒 دفع آمن.",
+    "securePaymentSubtitle": "أفضل عملية شراء اليوم! بشرتك تقول 'شكراً'.",
+    "securePaymentTagline": "🪄 اضغطي على زر الدفع بالأسفل، ولنبدأ بتجهيز طلبك.",
     "preparingSecurePayment": "جارٍ تجهيز الدفع الآمن…",
     "payNow": "ادفع الآن",
     "paymentNotCompletedNote": "لم تكتمل عملية الدفع. تم حفظ طلبك كمعلق — اضغط «ادفع الآن» للمحاولة مرة أخرى.",
@@ -223,7 +224,7 @@
     "addressRequired": "يرجى إدخال عنوان التوصيل.",
     "validationInvalidEmail": "يرجى إدخال بريد إلكتروني صالح.",
     "orderSubmittedTitle": "شكراً لطلبك!",
-    "orderSubmittedMessageCOD": "تم تأكيد الطلب #{orderNumber}! سنرسل لك رسالة تأكيد قريباً. ادفع عند وصول طلبك إلى باب منزلك.",
+    "orderSubmittedMessageCOD": "تم تأكيد الطلب #{orderNumber}! لقد أرسلنا لك رسالة تأكيد بالبريد الإلكتروني. ادفع عند وصول طلبك إلى باب منزلك.",
     "orderNumberLine": "الطلب {orderNumber}",
     "paymentLinkUnavailableTitle": "رابط الدفع غير متوفر",
     "paymentLinkUnavailableMessage": "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.",
@@ -740,6 +741,9 @@
     "noOrdersYet": "لا توجد طلبات بعد",
     "noOrdersHint": "ستظهر طلباتك هنا بعد إتمام الدفع.",
     "details": "التفاصيل",
+    "support": "الدعم",
+    "viewSummary": "عرض الملخص",
+    "hideSummary": "إخفاء الملخص",
     "orderLabel": "الطلب",
     "orderSummary": "ملخص الطلب",
     "subtotal": "المجموع الفرعي",
@@ -1248,7 +1252,7 @@
   "privacy": {
     "title": "سياسة الخصوصية",
     "lastUpdated": "آخر تحديث: {date}",
-    "lastUpdatedDate": "13 ديسمبر 2025",
+    "lastUpdatedDate": "20 يونيو 2026",
     "rightsTitle": "حقوقك في الخصوصية",
     "rightsText": "كمستخدم مسجّل، لديك الحق في الوصول إلى معلوماتك الشخصية أو تحديثها أو حذفها. يوضح هذا القسم كيفية تعاملنا مع بياناتك وحقوقك بموجب سياسة الخصوصية.",
     "sections": {
@@ -1294,7 +1298,7 @@
   "terms": {
     "title": "الشروط والأحكام",
     "lastUpdated": "آخر تحديث: {date}",
-    "lastUpdatedDate": "17 أبريل 2026",
+    "lastUpdatedDate": "20 يونيو 2026",
     "contact": {
       "emailLabel": "البريد الإلكتروني",
       "whatsappLabel": "واتساب",

@@ -10,11 +10,11 @@ import {
   View,
   Text,
   StyleSheet,
+  Animated,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
   Platform,
-  ScrollView,
   Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -28,6 +28,8 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SkinAnalysisResults from '../components/SkinAnalysisResults';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
 import AUTH_CONFIG from '../config/auth';
 import { getJson, sendJson } from '../services/httpClient';
@@ -58,6 +60,7 @@ export default function SkinAnalysisCameraScreen() {
   const cameraHeaderTop = Math.max(insets.top + 8, Platform.OS === 'ios' ? 50 : 10);
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const [capturing, setCapturing] = useState(false);
   const [localResult, setLocalResult] = useState(null);
   const [aiResult, setAiResult] = useState(null);
@@ -199,33 +202,28 @@ export default function SkinAnalysisCameraScreen() {
   // Permission loading
   if (!permission) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <CollapsibleHeader title={t('skinAnalysis.title')} scrollY={null} onBack={() => router.back()} isRTL={isRTL} />
         <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color="#dc2626" />
+          <ActivityIndicator size="large" color={colors.brand} />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // Permission denied
   if (!permission.granted) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('skinAnalysis.title')}</Text>
-          <View style={styles.backBtn} />
-        </View>
+      <View style={styles.container}>
+        <CollapsibleHeader title={t('skinAnalysis.title')} scrollY={null} onBack={() => router.back()} isRTL={isRTL} />
         <View style={styles.centerContent}>
-          <Ionicons name="camera-outline" size={64} color="#D1D5DB" />
+          <Ionicons name="camera-outline" size={64} color={colors.tertiary} />
           <Text style={styles.permissionText}>{t('skinAnalysis.cameraPermission')}</Text>
           <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission} activeOpacity={0.85}>
             <Text style={styles.permissionBtnText}>{t('skinCamera.grantPermission')}</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -243,16 +241,15 @@ export default function SkinAnalysisCameraScreen() {
   // Show AI Expert Analysis results
   if (aiResult) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('skinAnalysis.yourResults')}</Text>
-          <View style={styles.backBtn} />
-        </View>
+      <View style={styles.container}>
+        <CollapsibleHeader title={t('skinAnalysis.yourResults')} scrollY={scrollY} onBack={() => router.back()} isRTL={isRTL} />
 
-        <ScrollView contentContainerStyle={styles.aiContent} showsVerticalScrollIndicator={false}>
+        <Animated.ScrollView
+          contentContainerStyle={[styles.aiContent, { paddingTop: headerHeight + 8, paddingBottom: insets.bottom + 48 }]}
+          showsVerticalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+        >
           {/* Health Score Circle */}
           <View style={styles.aiScoreCard}>
             <View style={[styles.aiScoreCircle, { borderColor: scoreColor(aiResult.healthScore) }]}>
@@ -433,8 +430,8 @@ export default function SkinAnalysisCameraScreen() {
               <Text style={styles.quizBtnText}>{t('skinCamera.takeQuizInstead')}</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </SafeAreaView>
+        </Animated.ScrollView>
+      </View>
     );
   }
 
@@ -510,13 +507,12 @@ function capitalize(s) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   cameraContainer: { flex: 1, backgroundColor: '#000000' },
   centerContent: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
     gap: 16,
     padding: 32,
   },
@@ -642,17 +638,16 @@ const styles = StyleSheet.create({
   aiScoreMax: { ...T.labelSmall, color: '#9CA3AF', marginTop: -4 },
   aiScoreLabel: { ...T.label, fontWeight: '700', color: '#374151', marginBottom: 8 },
   aiSkinTypeBadge: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: tint(colors.brand, '14'),
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#FECACA',
   },
-  aiSkinTypeText: { ...T.labelSmall, fontWeight: '700', color: '#dc2626' },
+  aiSkinTypeText: { ...T.labelSmall, fontWeight: '700', color: colors.brand },
 
   aiSection: {
-    backgroundColor: '#F9FAFB',
+    ...surfaces.card,
+    ...shadow.card,
     borderRadius: 14,
     padding: 16,
     marginBottom: 14,
@@ -672,27 +667,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#ffffff',
+    backgroundColor: tint(colors.brand, '14'),
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#FECACA',
   },
-  concernChipText: { ...T.labelSmall, color: '#991B1B' },
+  concernChipText: { ...T.labelSmall, color: colors.brand },
 
   // AI Recommendations
   aiRecCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E5E7EB',
-    ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 },
-      android: { elevation: 1 },
-    }),
   },
   aiRecRow: {
     flexDirection: 'row',

@@ -111,22 +111,25 @@ export function ProductDetailSkeleton() {
   );
 }
 
-/** Orders list skeleton */
+/** Orders list skeleton — mirrors the Apple-native order card */
 export function OrdersSkeleton() {
   return (
-    <View style={styles.container}>
+    <View style={styles.ordersContainer}>
       {[0, 1, 2].map((i) => (
         <View key={i} style={styles.orderCard}>
-          <View style={styles.orderHeader}>
-            <ShimmerBar width="45%" height={16} />
-            <ShimmerBar width={70} height={24} borderRadius={12} />
+          <View style={styles.orderHeaderRow}>
+            <ShimmerBar width={52} height={52} borderRadius={12} />
+            <View style={{ flex: 1 }}>
+              <ShimmerBar width="55%" height={15} />
+              <ShimmerBar width="40%" height={11} style={{ marginTop: 7 }} />
+            </View>
+            <ShimmerBar width={72} height={22} borderRadius={11} />
           </View>
-          <ShimmerBar width="60%" height={12} style={{ marginTop: 8 }} />
-          <ShimmerBar width="35%" height={12} style={{ marginTop: 6 }} />
           <View style={styles.orderFooter}>
-            <ShimmerBar width="30%" height={14} />
-            <ShimmerBar width="25%" height={14} />
+            <ShimmerBar width="35%" height={12} />
+            <ShimmerBar width="28%" height={16} />
           </View>
+          <ShimmerBar width="100%" height={44} borderRadius={14} style={{ marginTop: 14 }} />
         </View>
       ))}
     </View>
@@ -176,23 +179,29 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   // Orders
+  ordersContainer: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+    paddingTop: 16,
+  },
   orderCard: {
     marginHorizontal: 16,
-    marginTop: 12,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 14,
-    padding: 16,
+    marginBottom: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
   },
-  orderHeader: {
+  orderHeaderRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
   orderFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 12,
-    paddingTop: 10,
+    alignItems: 'center',
+    marginTop: 14,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
   },

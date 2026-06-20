@@ -5,6 +5,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../../utils/productLocalization';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
+import { colors } from '../../utils/theme';
 
 export default function CheckoutOrderHeaderCard({
   styles,
@@ -37,8 +38,8 @@ export default function CheckoutOrderHeaderCard({
         accessibilityState={{ expanded: !!orderSummaryExpanded }}
         accessibilityLabel={t('checkout.orderSummary')}
       >
-        <View style={[styles.orderHeaderIconWrap, isRTL && styles.orderHeaderIconWrapRTL]}>
-          <Ionicons name="bag-handle" size={18} color="#dc2626" />
+        <View style={[styles.orderHeaderIconWrap, isRTL && styles.orderHeaderIconWrapRTL, { backgroundColor: colors.brand }]}>
+          <Ionicons name="bag-handle" size={18} color="#ffffff" />
         </View>
         <View style={[styles.orderHeaderLeft, isRTL && styles.orderHeaderLeftRTL]}>
           <Text style={[styles.orderEyebrow, isRTL && styles.textRTL]}>
@@ -62,7 +63,7 @@ export default function CheckoutOrderHeaderCard({
         <Ionicons
           name={orderSummaryExpanded ? 'chevron-up' : 'chevron-down'}
           size={20}
-          color="#6B7280"
+          color={colors.secondaryLabel}
         />
       </TouchableOpacity>
 

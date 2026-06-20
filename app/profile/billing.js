@@ -1,19 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Easing,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling, updateUserBilling } from '../../services/databaseService';
+import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
+
+/** iOS Settings–style filled glyph tile + bold section title. */
+function SectionHeader({ icon, tileColor, title, isRTL }) {
+  return (
+    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+        <Ionicons name={icon} size={16} color="#ffffff" />
+      </View>
+      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+    </View>
+  );
+}
 
 export default function BillingScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const { user } = useAuth();
   const token = user?.token || '';
 
@@ -21,6 +48,10 @@ export default function BillingScreen() {
   const [saving, setSaving] = useState(false);
   const [billingAddress, setBillingAddress] = useState('');
   const [vatNumber, setVatNumber] = useState('');
+
+  // Subtle entrance motion (matches order details feel).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
 
   useEffect(() => {
     let cancelled = false;
@@ -47,7 +78,19 @@ export default function BillingScreen() {
     };
   }, [token]);
 
+  useEffect(() => {
+    if (!loading) {
+      fade.setValue(0);
+      lift.setValue(12);
+      Animated.parallel([
+        Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }
+  }, [loading, fade, lift]);
+
   const handleSave = async () => {
+    haptics.mediumTap();
     if (!token) return;
     if (saving) return;
     setSaving(true);
@@ -68,91 +111,184 @@ export default function BillingScreen() {
     }
   };
 
+  const onBack = () => {
+    haptics.lightTap();
+    router.canGoBack() ? router.back() : router.replace('/profile');
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/profile')} style={styles.backButton}>
-          <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('billing.title')}</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+    <View style={styles.container}>
+      <CollapsibleHeader
+        title={t('billing.title')}
+        scrollY={loading ? null : scrollY}
+        onBack={onBack}
+        isRTL={isRTL}
+      />
 
       {loading ? (
-        <View style={styles.loading}>
-          <ActivityIndicator color="#dc2626" />
+        <View style={[styles.loading, { paddingTop: headerHeight }]}>
+          <ActivityIndicator color={colors.brand} />
         </View>
       ) : (
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={[styles.content, { paddingBottom: (insets?.bottom || 0) + 24 }]}
-          keyboardShouldPersistTaps="handled"
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoid}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 96 : 0}
         >
-          <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.addressLabel')}</Text>
-          <TextInput
-            style={[styles.input, styles.textarea, isRTL && styles.inputRTL]}
-            value={billingAddress}
-            onChangeText={setBillingAddress}
-            placeholder={t('billing.addressPlaceholder')}
-            multiline
-          />
+          <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
+            <Animated.ScrollView
+              style={styles.scroll}
+              onScroll={onScroll}
+              scrollEventThrottle={16}
+              contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+            >
+              <View style={[styles.section, shadow.card]}>
+                <SectionHeader icon="document-text" tileColor={colors.indigo} title={t('billing.title')} isRTL={isRTL} />
 
-          <Text style={[styles.label, { marginTop: 16 }, isRTL && styles.textRTL]}>{t('billing.vatLabel')}</Text>
-          <TextInput
-            style={[styles.input, isRTL && styles.inputRTL, isRTL && styles.inputValueLTR]}
-            value={vatNumber}
-            onChangeText={setVatNumber}
-            placeholder={t('billing.vatPlaceholder')}
-            autoCapitalize="characters"
-          />
+                <View style={styles.fieldContainer}>
+                  <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.addressLabel')}</Text>
+                  <TextInput
+                    style={[styles.input, styles.textarea, isRTL && styles.inputRTL]}
+                    value={billingAddress}
+                    onChangeText={setBillingAddress}
+                    placeholder={t('billing.addressPlaceholder')}
+                    placeholderTextColor={colors.tertiary}
+                    multiline
+                  />
+                </View>
 
-          <TouchableOpacity style={[styles.saveBtn, saving && styles.saveBtnDisabled]} onPress={handleSave} disabled={saving}>
-            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>{t('common.save')}</Text>}
-          </TouchableOpacity>
-        </ScrollView>
+                <View style={[styles.fieldContainer, styles.fieldContainerLast]}>
+                  <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.vatLabel')}</Text>
+                  <TextInput
+                    style={[styles.input, isRTL && styles.inputRTL, isRTL && styles.inputValueLTR]}
+                    value={vatNumber}
+                    onChangeText={setVatNumber}
+                    placeholder={t('billing.vatPlaceholder')}
+                    placeholderTextColor={colors.tertiary}
+                    autoCapitalize="characters"
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.saveBtn, shadow.cta(colors.brand), saving && styles.saveBtnDisabled]}
+                onPress={handleSave}
+                disabled={saving}
+                activeOpacity={0.85}
+              >
+                {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>{t('common.save')}</Text>}
+              </TouchableOpacity>
+            </Animated.ScrollView>
+          </Animated.View>
+        </KeyboardAvoidingView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: {
+  container: {
+    flex: 1,
+    backgroundColor: colors.groupedBg,
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scroll: {
+    flex: 1,
+  },
+  rowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  textRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+
+  // Section
+  section: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 16,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
+    gap: 10,
+    marginBottom: 16,
   },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backButton: { padding: 4 },
-  headerTitle: { ...T.sectionTitleSmall, flex: 1, textAlign: 'center', color: '#000' },
-  headerSpacer: { width: 32 },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { flex: 1 },
-  content: { padding: 20, paddingBottom: 32 },
-  label: { ...T.label, fontWeight: '700', color: '#111827', marginBottom: 8 },
+  sectionTitle: {
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
+  },
+
+  // Fields
+  fieldContainer: {
+    paddingBottom: 14,
+    marginBottom: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  fieldContainerLast: {
+    paddingBottom: 0,
+    marginBottom: 0,
+    borderBottomWidth: 0,
+  },
+  label: {
+    ...T.label,
+    color: colors.label,
+    marginBottom: 8,
+  },
   input: {
     ...T.input,
-    backgroundColor: '#F2F2F7',
-    borderRadius: 12,
-    padding: 14,
-    color: '#111827',
+    backgroundColor: colors.subtleBg,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    color: colors.label,
+    minHeight: 44,
   },
-  textarea: { minHeight: 96, textAlignVertical: 'top' },
-  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  inputRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  inputValueLTR: { writingDirection: 'ltr' },
+  textarea: {
+    minHeight: 96,
+    textAlignVertical: 'top',
+    paddingTop: 12,
+  },
+  inputRTL: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  inputValueLTR: {
+    writingDirection: 'ltr',
+  },
+
+  // Save — primary
   saveBtn: {
-    marginTop: 24,
-    backgroundColor: '#dc2626',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.brand,
     borderRadius: 14,
     paddingVertical: 16,
-    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 4,
   },
-  saveBtnDisabled: { opacity: 0.7 },
-  saveText: { ...T.button, fontWeight: '700' },
+  saveBtnDisabled: {
+    opacity: 0.6,
+  },
+  saveText: {
+    ...T.button,
+    fontWeight: '700',
+  },
 });
-
-

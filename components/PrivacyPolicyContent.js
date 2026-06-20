@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { AUTH_CONFIG } from '../config/auth';
@@ -9,9 +9,20 @@ import T from '../utils/typography';
 
 const log = createLogger('PrivacyPolicy');
 
-export default function PrivacyPolicyContent({ showLastUpdated = true }) {
+/**
+ * Shared privacy-policy body.
+ *
+ * Optional scroll-aware props (used by the full-screen `app/profile/privacy.js`
+ * so the CollapsibleHeader fades in on scroll). When omitted (e.g. the modal),
+ * the component renders exactly as before.
+ *   - scrollY: Animated.Value the parent header reads (we just need onScroll wired)
+ *   - onScroll: Animated.event handler from useCollapsibleHeader()
+ *   - contentTopInset: top padding so content starts below the floating header
+ */
+export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll = null, contentTopInset = 0 }) {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const topInsetStyle = contentTopInset ? { paddingTop: contentTopInset } : null;
   const [policy, setPolicy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -41,7 +52,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={[styles.centered, topInsetStyle]}>
         <ActivityIndicator size="large" color="#dc2626" />
       </View>
     );
@@ -50,7 +61,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
   if (error || !policy) {
     const fallbackUrl = `https://genosys.ae/${locale === 'en' ? '' : locale + '/'}privacy-policy`;
     return (
-      <View style={styles.centered}>
+      <View style={[styles.centered, topInsetStyle]}>
         <Ionicons name="shield-outline" size={48} color="#ccc" />
         <Text style={[styles.errorText, isRTL && styles.textRTL]}>
           {locale === 'ar' ? 'لم نتمكن من تحميل سياسة الخصوصية.' : locale === 'ru' ? 'Не удалось загрузить политику конфиденциальности.' : 'Could not load privacy policy.'}
@@ -170,10 +181,12 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
   };
 
   return (
-    <ScrollView
+    <Animated.ScrollView
       style={styles.scrollView}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={[styles.contentContainer, topInsetStyle]}
+      onScroll={onScroll || undefined}
+      scrollEventThrottle={16}
     >
       {showLastUpdated && (
         <View style={[styles.updateInfo, isRTL && styles.updateInfoRTL]}>
@@ -187,7 +200,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true }) {
       {policy.sections.map(renderSection)}
 
       <View style={styles.footerSpace} />
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 

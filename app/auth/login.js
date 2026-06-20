@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import {
   Dimensions,
   Modal,
   Pressable,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -26,6 +28,7 @@ import * as haptics from '../../utils/haptics';
 import AUTH_CONFIG from '../../config/auth';
 import Constants from 'expo-constants';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces, tint } from '../../utils/theme';
 
 // expo-apple-authentication is iOS-only; safe-load to prevent Android build/runtime issues
 let AppleAuthentication = null;
@@ -86,6 +89,16 @@ export default function LoginScreen() {
     biometricEnabled,
     biometricType
   } = useAuth();
+
+  // Subtle entrance motion (native driver) — matches the rest of the app.
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(10)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const handleGoogleLogin = async () => {
     haptics.lightTap();
@@ -374,318 +387,322 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardContainer}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          {/* Top controls (language) */}
-          <View style={[styles.topControls, isRTL && styles.topControlsRtl]}>
-            <TouchableOpacity
-              onPress={() => setLangOpen(true)}
-              disabled={langSwitching}
-              activeOpacity={0.85}
-              style={styles.langButton}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.switchLanguage')}
-            >
-              <Text style={styles.langButtonText}>{currentLangCode}</Text>
-              <Ionicons name="chevron-down" size={14} color="#16A34A" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Header with Logo */}
-          <View style={styles.header}>
-            <Image 
-              source={{ uri: AUTH_CONFIG.LOGO_URL }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <View style={styles.uaeRow}>
-              <Text style={styles.uaeFlag}>🇦🇪</Text>
-              <Text style={styles.title}>{t('authScreen.uaeLine')}</Text>
-              <Ionicons name="heart" size={12} color="#dc2626" style={styles.uaeHeart} />
-            </View>
-          </View>
-
-          {/* Privacy Policy Notice */}
-          {!privacyConsent && (
-            <View style={styles.privacyNotice}>
-              <Text style={styles.privacyNoticeText}>
-                {t('authScreen.privacyNotice')}
-              </Text>
-            </View>
-          )}
-
-          {/* Biometric Login Button */}
-          {biometricAvailable && biometricEnabled && (
-            <TouchableOpacity
-              style={[
-                styles.biometricButton,
-                !privacyConsent && styles.biometricButtonDisabled
-              ]}
-              onPress={handleBiometricLogin}
-              disabled={loading || !privacyConsent}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.biometricButtonContent, isRTL && styles.biometricButtonContentRTL]}>
-                <Ionicons 
-                  name={biometricType.includes('Face') ? 'scan' : 'finger-print'} 
-                  size={20} 
-                  color="#ffffff" 
-                />
-                <Text style={[styles.biometricButtonText, isRTL && styles.biometricButtonTextRTL]}>
-                  {t('authScreen.loginWithBiometrics', { biometricType })}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {/* Social Login Buttons (compact) */}
-          <View style={[styles.socialRow, isRTL && styles.socialRowRTL]}>
-            <TouchableOpacity
-              style={[
-                styles.googleButton,
-                !privacyConsent && styles.googleButtonDisabled
-              ]}
-              onPress={handleGoogleLogin}
-              disabled={loading || !privacyConsent}
-              activeOpacity={0.85}
-              accessibilityLabel={t('authScreen.continueWithGoogle')}
-            >
-              <View style={[styles.googleButtonContent, isRTL && styles.googleButtonContentRTL]}>
-                <View style={[styles.googleIcon, isRTL ? styles.googleIconRTL : styles.googleIconLTR]}>
-                  <Text style={styles.googleIconText}>G</Text>
-                </View>
-                <Text style={[styles.googleButtonText, isRTL && styles.googleButtonTextRTL]}>
-                  {t('authScreen.googleShort')}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            {Platform.OS === 'ios' && (
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+            {/* Top controls (language) */}
+            <View style={[styles.topControls, isRTL && styles.topControlsRtl]}>
               <TouchableOpacity
-                style={[styles.appleButton, !privacyConsent && styles.appleButtonDisabled]}
-                onPress={handleAppleLogin}
+                onPress={() => setLangOpen(true)}
+                disabled={langSwitching}
+                activeOpacity={0.85}
+                style={styles.langButton}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.switchLanguage')}
+              >
+                <Text style={styles.langButtonText}>{currentLangCode}</Text>
+                <Ionicons name="chevron-down" size={14} color={colors.greenDeep} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Header with Logo */}
+            <View style={styles.header}>
+              <Image 
+                source={require('../../assets/genosys-logo-gray.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <View style={styles.uaeRow}>
+                <Text style={styles.uaeFlag}>🇦🇪</Text>
+                <Text style={styles.title}>{t('authScreen.uaeLine')}</Text>
+                <Ionicons name="heart" size={12} color={colors.brand} style={styles.uaeHeart} />
+              </View>
+            </View>
+
+            {/* Privacy Policy Notice */}
+            {!privacyConsent && (
+              <View style={styles.privacyNotice}>
+                <Ionicons name="information-circle" size={16} color={colors.orange} />
+                <Text style={[styles.privacyNoticeText, isRTL && styles.textRTL]}>
+                  {t('authScreen.privacyNotice')}
+                </Text>
+              </View>
+            )}
+
+            {/* Biometric Login Button */}
+            {biometricAvailable && biometricEnabled && (
+              <TouchableOpacity
+                style={[
+                  styles.biometricButton,
+                  !privacyConsent && styles.buttonDisabledOpacity
+                ]}
+                onPress={handleBiometricLogin}
                 disabled={loading || !privacyConsent}
                 activeOpacity={0.85}
-                accessibilityLabel={t('authScreen.continueWithApple')}
               >
-                <View style={[styles.appleButtonContent, isRTL && styles.appleButtonContentRTL]}>
-                  <Ionicons name="logo-apple" size={18} color="#ffffff" style={styles.appleIcon} />
-                  <Text style={[styles.appleButtonText, isRTL && styles.appleButtonTextRTL]}>
-                    {t('authScreen.appleShort')}
+                <View style={[styles.biometricButtonContent, isRTL && styles.rowReverse]}>
+                  <Ionicons 
+                    name={biometricType.includes('Face') ? 'scan' : 'finger-print'} 
+                    size={20} 
+                    color={colors.brand} 
+                  />
+                  <Text style={[styles.biometricButtonText, isRTL && styles.biometricButtonTextRTL]}>
+                    {t('authScreen.loginWithBiometrics', { biometricType })}
                   </Text>
                 </View>
               </TouchableOpacity>
             )}
-          </View>
 
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('authScreen.or')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
+            {/* Social Login Buttons (compact) */}
+            <View style={[styles.socialRow, isRTL && styles.socialRowRTL]}>
+              <TouchableOpacity
+                style={[
+                  styles.googleButton,
+                  shadow.card,
+                  !privacyConsent && styles.buttonDisabledOpacity
+                ]}
+                onPress={handleGoogleLogin}
+                disabled={loading || !privacyConsent}
+                activeOpacity={0.85}
+                accessibilityLabel={t('authScreen.continueWithGoogle')}
+              >
+                <View style={[styles.socialButtonContent, isRTL && styles.rowReverse]}>
+                  <View style={[styles.googleIcon, isRTL ? styles.socialIconRTL : styles.socialIconLTR]}>
+                    <Text style={styles.googleIconText}>G</Text>
+                  </View>
+                  <Text style={[styles.googleButtonText, isRTL && styles.textRTL]}>
+                    {t('authScreen.googleShort')}
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-          {/* Email/Password Form */}
-          <View style={styles.form}>
-            {!isLogin && (
-              <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-                <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>{t('authScreen.fullNameLabel')}</Text>
-                <TextInput
-                  style={[styles.textInput, isRTL && styles.textInputRTL]}
-                  placeholder={t('authScreen.fullNamePlaceholder')}
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
-                  autoComplete="name"
-                  placeholderTextColor="#86868B"
-                  textAlign={isRTL ? 'right' : 'left'}
-                />
-              </View>
-            )}
-            
-            <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-              <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>{t('authScreen.emailLabel')}</Text>
-              <TextInput
-                style={[styles.textInput, isRTL && styles.textInputRTL]}
-                placeholder={t('authScreen.emailPlaceholder')}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-                placeholderTextColor="#86868B"
-                textAlign={isRTL ? 'right' : 'left'}
-              />
-            </View>
-
-            <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-              <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>{t('authScreen.passwordLabel')}</Text>
-              <View style={[styles.passwordContainer, isRTL && styles.passwordContainerRTL]}>
-                <TextInput
-                  style={[styles.passwordInput, isRTL && styles.passwordInputRTL]}
-                  placeholder={t('authScreen.passwordPlaceholder')}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  autoComplete={isLogin ? 'current-password' : 'new-password'}
-                  placeholderTextColor="#86868B"
-                  textAlign={isRTL ? 'right' : 'left'}
-                />
+              {Platform.OS === 'ios' && (
                 <TouchableOpacity
-                  style={[styles.passwordToggle, isRTL && styles.passwordToggleRTL]}
-                  onPress={() => setShowPassword(!showPassword)}
+                  style={[styles.appleButton, shadow.card, !privacyConsent && styles.buttonDisabledOpacity]}
+                  onPress={handleAppleLogin}
+                  disabled={loading || !privacyConsent}
+                  activeOpacity={0.85}
+                  accessibilityLabel={t('authScreen.continueWithApple')}
                 >
-                  <Ionicons
-                    name={showPassword ? 'eye-off' : 'eye'}
-                    size={20}
-                    color="#86868B"
-                  />
+                  <View style={[styles.socialButtonContent, isRTL && styles.rowReverse]}>
+                    <Ionicons name="logo-apple" size={18} color={colors.white} style={isRTL ? styles.socialIconRTL : styles.socialIconLTR} />
+                    <Text style={[styles.appleButtonText, isRTL && styles.textRTL]}>
+                      {t('authScreen.appleShort')}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
-              </View>
+              )}
             </View>
 
-            {/* Registration-only fields */}
-            {!isLogin && (
-              <>
-                {/* Phone */}
-                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
-                    {t('authScreen.phoneLabel')} <Text style={styles.requiredStar}>*</Text>
-                  </Text>
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>{t('authScreen.or')}</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Email/Password Form (grouped card) */}
+            <View style={[styles.formCard, shadow.card]}>
+              {!isLogin && (
+                <View style={styles.fieldContainer}>
+                  <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('authScreen.fullNameLabel')}</Text>
                   <TextInput
-                    style={[styles.textInput, isRTL && styles.textInputRTL]}
-                    placeholder={t('authScreen.phonePlaceholder')}
-                    value={phone}
-                    onChangeText={setPhone}
-                    keyboardType="phone-pad"
-                    autoComplete="tel"
-                    placeholderTextColor="#86868B"
-                    textAlign="left"
+                    style={[styles.textInput, isRTL && styles.inputRTL]}
+                    placeholder={t('authScreen.fullNamePlaceholder')}
+                    value={name}
+                    onChangeText={setName}
+                    autoCapitalize="words"
+                    autoComplete="name"
+                    placeholderTextColor={colors.tertiary}
                   />
                 </View>
+              )}
 
-                {/* Address */}
-                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
-                    {t('authScreen.addressLabel')} <Text style={styles.requiredStar}>*</Text>
-                  </Text>
+              <View style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('authScreen.emailLabel')}</Text>
+                <TextInput
+                  style={[styles.textInput, isRTL && styles.inputValueLTR]}
+                  placeholder={t('authScreen.emailPlaceholder')}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  placeholderTextColor={colors.tertiary}
+                />
+              </View>
+
+              <View style={[styles.fieldContainer, isLogin && styles.fieldContainerLast]}>
+                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('authScreen.passwordLabel')}</Text>
+                <View style={[styles.passwordRow, isRTL && styles.rowReverse]}>
                   <TextInput
-                    style={[styles.textInput, isRTL && styles.textInputRTL]}
-                    placeholder={t('authScreen.addressPlaceholder')}
-                    value={address}
-                    onChangeText={setAddress}
-                    autoComplete="street-address"
-                    placeholderTextColor="#86868B"
-                    textAlign={isRTL ? 'right' : 'left'}
+                    style={[styles.passwordInput, isRTL && styles.inputValueLTR]}
+                    placeholder={t('authScreen.passwordPlaceholder')}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
+                    placeholderTextColor={colors.tertiary}
                   />
-                </View>
-
-                {/* Emirate */}
-                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
-                    {t('authScreen.emirateLabel')} <Text style={styles.requiredStar}>*</Text>
-                  </Text>
                   <TouchableOpacity
-                    style={[styles.selectButton, isRTL && styles.selectButtonRTL]}
-                    onPress={() => setShowEmiratePicker(true)}
-                    activeOpacity={0.7}
+                    style={styles.passwordToggle}
+                    onPress={() => setShowPassword(!showPassword)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
-                    <Text style={[
-                      styles.selectButtonText,
-                      !emirate && styles.selectButtonPlaceholder,
-                      isRTL && styles.selectButtonTextRTL,
-                    ]}>
-                      {emirate || t('authScreen.selectEmirate')}
-                    </Text>
-                    <Ionicons name="chevron-down" size={18} color="#86868B" />
+                    <Ionicons
+                      name={showPassword ? 'eye-off' : 'eye'}
+                      size={20}
+                      color={colors.secondaryLabel}
+                    />
                   </TouchableOpacity>
                 </View>
-
-                {/* Birthday (optional) */}
-                <View style={[styles.inputContainer, isRTL && styles.inputContainerRTL]}>
-                  <Text style={[styles.inputLabel, isRTL && styles.inputLabelRTL]}>
-                    {t('authScreen.birthdayLabel')}
-                  </Text>
-                  <TextInput
-                    style={[styles.textInput, isRTL && styles.textInputRTL]}
-                    placeholder={t('authScreen.birthdayPlaceholder')}
-                    value={birthday}
-                    onChangeText={setBirthday}
-                    placeholderTextColor="#86868B"
-                    textAlign={isRTL ? 'right' : 'left'}
-                    keyboardType="numbers-and-punctuation"
-                  />
-                  <Text style={[styles.birthdayHint, isRTL && styles.birthdayHintRTL]}>
-                    {t('authScreen.birthdayHint')}
-                  </Text>
-                </View>
-              </>
-            )}
-          </View>
-
-          {/* Privacy Policy Consent */}
-          <View style={[styles.privacySection, isRTL && styles.privacySectionRTL]}>
-            <TouchableOpacity
-              style={[styles.checkboxContainer, isRTL && styles.checkboxContainerRTL]}
-              onPress={() => { haptics.selectionTick(); setPrivacyConsent(!privacyConsent); }}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked, isRTL && styles.checkboxRTL]}>
-                {privacyConsent && (
-                  <Ionicons name="checkmark" size={16} color="#ffffff" />
-                )}
               </View>
-              <Text style={[styles.privacyText, isRTL && styles.privacyTextRTL]}>
-                {t('authScreen.privacyConsentPrefix')}{' '}
-                <Text style={styles.privacyLink} onPress={handlePrivacyPolicyPress}>
-                  {t('authScreen.privacyPolicyLink')}
-                </Text>{' '}
-                {t('authScreen.privacyConsentSuffix')}
-              </Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* Login/Register Button */}
-          <TouchableOpacity
-            style={[
-              styles.authButton, 
-              loading && styles.authButtonDisabled,
-              !privacyConsent && styles.authButtonDisabled
-            ]}
-            onPress={handleEmailAuth}
-            disabled={loading || !privacyConsent}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" size="small" />
-            ) : (
-              <Text style={styles.authButtonText}>
-                {isLogin ? t('authScreen.signIn') : t('authScreen.createAccount')}
-              </Text>
-            )}
-          </TouchableOpacity>
+              {/* Registration-only fields */}
+              {!isLogin && (
+                <>
+                  {/* Phone */}
+                  <View style={styles.fieldContainer}>
+                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                      {t('authScreen.phoneLabel')} <Text style={styles.requiredStar}>*</Text>
+                    </Text>
+                    <TextInput
+                      style={[styles.textInput, styles.inputValueLTR]}
+                      placeholder={t('authScreen.phonePlaceholder')}
+                      value={phone}
+                      onChangeText={setPhone}
+                      keyboardType="phone-pad"
+                      autoComplete="tel"
+                      placeholderTextColor={colors.tertiary}
+                    />
+                  </View>
 
-          {/* Forgot Password (Login only) */}
-          {isLogin && (
+                  {/* Address */}
+                  <View style={styles.fieldContainer}>
+                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                      {t('authScreen.addressLabel')} <Text style={styles.requiredStar}>*</Text>
+                    </Text>
+                    <TextInput
+                      style={[styles.textInput, isRTL && styles.inputRTL]}
+                      placeholder={t('authScreen.addressPlaceholder')}
+                      value={address}
+                      onChangeText={setAddress}
+                      autoComplete="street-address"
+                      placeholderTextColor={colors.tertiary}
+                    />
+                  </View>
+
+                  {/* Emirate */}
+                  <View style={styles.fieldContainer}>
+                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                      {t('authScreen.emirateLabel')} <Text style={styles.requiredStar}>*</Text>
+                    </Text>
+                    <TouchableOpacity
+                      style={[styles.selectField, isRTL && styles.selectFieldRTL]}
+                      onPress={() => setShowEmiratePicker(true)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.selectFieldText,
+                        !emirate && styles.selectFieldPlaceholder,
+                        isRTL && styles.textRTL,
+                      ]}>
+                        {emirate || t('authScreen.selectEmirate')}
+                      </Text>
+                      <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.tertiary} />
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Birthday (optional) */}
+                  <View style={[styles.fieldContainer, styles.fieldContainerLast]}>
+                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                      {t('authScreen.birthdayLabel')}
+                    </Text>
+                    <TextInput
+                      style={[styles.textInput, isRTL && styles.inputRTL]}
+                      placeholder={t('authScreen.birthdayPlaceholder')}
+                      value={birthday}
+                      onChangeText={setBirthday}
+                      placeholderTextColor={colors.tertiary}
+                      keyboardType="numbers-and-punctuation"
+                    />
+                    <Text style={[styles.birthdayHint, isRTL && styles.textRTL]}>
+                      {t('authScreen.birthdayHint')}
+                    </Text>
+                  </View>
+                </>
+              )}
+            </View>
+
+            {/* Privacy Policy Consent */}
+            <View style={[styles.privacySection, isRTL && styles.privacySectionRTL]}>
+              <TouchableOpacity
+                style={[styles.checkboxContainer, isRTL && styles.rowReverse]}
+                onPress={() => { haptics.selectionTick(); setPrivacyConsent(!privacyConsent); }}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked, isRTL && styles.checkboxRTL]}>
+                  {privacyConsent && (
+                    <Ionicons name="checkmark" size={14} color={colors.white} />
+                  )}
+                </View>
+                <Text style={[styles.privacyText, isRTL && styles.textRTL]}>
+                  {t('authScreen.privacyConsentPrefix')}{' '}
+                  <Text style={styles.privacyLink} onPress={handlePrivacyPolicyPress}>
+                    {t('authScreen.privacyPolicyLink')}
+                  </Text>{' '}
+                  {t('authScreen.privacyConsentSuffix')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Login/Register Button */}
             <TouchableOpacity
-              style={styles.forgotPassword}
-              activeOpacity={0.7}
-              onPress={() => router.push('/auth/forgot-password')}
+              style={[
+                styles.authButton,
+                shadow.cta(colors.brand),
+                (loading || !privacyConsent) && styles.buttonDisabledOpacity
+              ]}
+              onPress={handleEmailAuth}
+              disabled={loading || !privacyConsent}
+              activeOpacity={0.85}
             >
-              <Text style={styles.forgotPasswordText}>{t('authScreen.forgotPassword')}</Text>
+              {loading ? (
+                <ActivityIndicator color={colors.white} size="small" />
+              ) : (
+                <Text style={styles.authButtonText}>
+                  {isLogin ? t('authScreen.signIn') : t('authScreen.createAccount')}
+                </Text>
+              )}
             </TouchableOpacity>
-          )}
 
-          {/* Switch Mode */}
-          <View style={styles.switchMode}>
-            <Text style={[styles.switchModeText, isRTL && styles.switchModeTextRTL]}>
-              {isLogin ? t('authScreen.dontHaveAccount') : t('authScreen.alreadyHaveAccount')}
-            </Text>
-            <TouchableOpacity onPress={toggleMode} activeOpacity={0.7} style={styles.switchModeButtonWrap}>
-              <Text style={styles.switchModeButton}>
-                {isLogin ? t('authScreen.signUp') : t('authScreen.signIn')}
+            {/* Forgot Password (Login only) */}
+            {isLogin && (
+              <TouchableOpacity
+                style={styles.forgotPassword}
+                activeOpacity={0.7}
+                onPress={() => router.push('/auth/forgot-password')}
+              >
+                <Text style={styles.forgotPasswordText}>{t('authScreen.forgotPassword')}</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Switch Mode */}
+            <View style={styles.switchMode}>
+              <Text style={[styles.switchModeText, isRTL && styles.textRTL]}>
+                {isLogin ? t('authScreen.dontHaveAccount') : t('authScreen.alreadyHaveAccount')}
               </Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity onPress={toggleMode} activeOpacity={0.7} style={styles.switchModeButtonWrap}>
+                <Text style={styles.switchModeButton}>
+                  {isLogin ? t('authScreen.signUp') : t('authScreen.signIn')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -708,12 +725,12 @@ export default function LoginScreen() {
               >
                 <Text style={[
                   styles.emirateMenuItemText,
-                  isRTL && styles.emirateMenuItemTextRtl,
+                  isRTL && styles.textRTL,
                   emirate === em && styles.emirateMenuItemTextActive,
                 ]}>
                   {em}
                 </Text>
-                {emirate === em && <Ionicons name="checkmark" size={18} color="#dc2626" />}
+                {emirate === em && <Ionicons name="checkmark" size={18} color={colors.brand} />}
               </TouchableOpacity>
             ))}
           </View>
@@ -740,7 +757,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
               style={[styles.langMenuItem, locale === 'en' && styles.langMenuItemActive]}
             >
-              <Text style={[styles.langMenuItemText, isRTL && styles.langMenuItemTextRtl, locale === 'en' && styles.langMenuItemTextActive]}>
+              <Text style={[styles.langMenuItemText, isRTL && styles.textRTL, locale === 'en' && styles.langMenuItemTextActive]}>
                 English
               </Text>
             </TouchableOpacity>
@@ -749,7 +766,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
               style={[styles.langMenuItem, locale === 'ru' && styles.langMenuItemActive]}
             >
-              <Text style={[styles.langMenuItemText, isRTL && styles.langMenuItemTextRtl, locale === 'ru' && styles.langMenuItemTextActive]}>
+              <Text style={[styles.langMenuItemText, isRTL && styles.textRTL, locale === 'ru' && styles.langMenuItemTextActive]}>
                 Русский
               </Text>
             </TouchableOpacity>
@@ -758,7 +775,7 @@ export default function LoginScreen() {
               activeOpacity={0.85}
               style={[styles.langMenuItem, locale === 'ar' && styles.langMenuItemActive]}
             >
-              <Text style={[styles.langMenuItemText, isRTL && styles.langMenuItemTextRtl, locale === 'ar' && styles.langMenuItemTextActive]}>
+              <Text style={[styles.langMenuItemText, isRTL && styles.textRTL, locale === 'ar' && styles.langMenuItemTextActive]}>
                 العربية
               </Text>
             </TouchableOpacity>
@@ -772,17 +789,40 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.groupedBg,
   },
   keyboardContainer: {
     flex: 1,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingVertical: 20,
     justifyContent: 'center',
   },
+
+  // Shared row/text helpers
+  rowReverse: {
+    flexDirection: 'row-reverse',
+  },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  inputRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  // Keep latin values (email/phone) LTR even in RTL UI
+  inputValueLTR: {
+    textAlign: 'left',
+    writingDirection: 'ltr',
+  },
+  buttonDisabledOpacity: {
+    opacity: 0.5,
+  },
+
+  // Language switcher
   topControls: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -802,7 +842,7 @@ const styles = StyleSheet.create({
   langButtonText: {
     ...T.captionSmall,
     fontWeight: '800',
-    color: '#16A34A',
+    color: colors.greenDeep,
   },
   langOverlay: {
     flex: 1,
@@ -812,42 +852,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   langMenu: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    borderRadius: 14,
     overflow: 'hidden',
     minWidth: 160,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 6,
+    ...shadow.card,
   },
   langMenuRtl: {
     alignSelf: 'flex-end',
   },
   langMenuItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
   },
   langMenuItemActive: {
-    backgroundColor: '#fef2f2',
+    backgroundColor: tint(colors.brand, '12'),
   },
   langMenuItemText: {
     ...T.label,
-    color: '#111827',
-  },
-  langMenuItemTextRtl: {
-    textAlign: 'right',
+    color: colors.label,
   },
   langMenuItemTextActive: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '800',
   },
+
+  // Branded hero
   header: {
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 22,
+    marginTop: 4,
   },
   logo: {
     width: 150,
@@ -857,7 +893,6 @@ const styles = StyleSheet.create({
   title: {
     ...T.label,
     fontWeight: '400',
-    marginBottom: 0,
     textAlign: 'center',
   },
   uaeRow: {
@@ -875,102 +910,37 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     marginTop: -1,
   },
-  subtitle: {
-    ...T.body,
-    color: '#86868B',
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 20,
-  },
-  googleButton: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1.5,
-    borderColor: '#E5E5EA',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    flex: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  googleButtonContent: {
+
+  // Privacy notice (soft tinted card)
+  privacyNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  googleIcon: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#EA4335',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  googleIconRTL: {
-    marginLeft: 10,
-    marginRight: 0,
-  },
-  googleIconLTR: {
-    marginRight: 10,
-    marginLeft: 0,
-  },
-  googleIconText: {
-    ...T.captionSmall,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  googleButtonText: {
-    ...T.bodySmall,
-    fontWeight: '700',
-    color: '#1D1D1F',
-    lineHeight: undefined,
-  },
-  googleButtonDisabled: {
-    opacity: 0.5,
-  },
-  appleButton: {
-    backgroundColor: '#000000',
+    gap: 8,
+    backgroundColor: tint(colors.orange, '14'),
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: tint(colors.orange, '40'),
     borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  privacyNoticeText: {
+    ...T.caption,
+    fontWeight: '500',
+    color: colors.label,
     flex: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  appleIcon: {
-    marginEnd: 10,
-  },
-  appleButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  appleButtonText: {
-    ...T.bodySmall,
-    fontWeight: '700',
-    color: '#ffffff',
-    lineHeight: undefined,
-  },
-  appleButtonDisabled: {
-    opacity: 0.5,
-  },
+
+  // Biometric (tinted brand — keeps the single filled primary clean)
   biometricButton: {
-    backgroundColor: '#dc2626',
-    borderRadius: 12,
-    paddingVertical: 12,
+    backgroundColor: tint(colors.brand, '14'),
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: tint(colors.brand, '40'),
+    borderRadius: 14,
+    minHeight: 52,
+    justifyContent: 'center',
     paddingHorizontal: 16,
     marginBottom: 12,
-    shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
   },
   biometricButtonContent: {
     flexDirection: 'row',
@@ -980,10 +950,16 @@ const styles = StyleSheet.create({
   biometricButtonText: {
     ...T.bodySmall,
     fontWeight: '700',
-    color: '#ffffff',
+    color: colors.brand,
     lineHeight: undefined,
-    marginLeft: 12,
+    marginLeft: 10,
   },
+  biometricButtonTextRTL: {
+    marginLeft: 0,
+    marginRight: 10,
+  },
+
+  // Social buttons (equal height, rounded 14)
   socialRow: {
     flexDirection: 'row',
     gap: 12,
@@ -992,158 +968,154 @@ const styles = StyleSheet.create({
   socialRowRTL: {
     flexDirection: 'row-reverse',
   },
-  biometricButtonDisabled: {
-    opacity: 0.5,
-  },
-  divider: {
+  socialButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    justifyContent: 'center',
   },
-  dividerLine: {
+  socialIconLTR: {
+    marginRight: 10,
+  },
+  socialIconRTL: {
+    marginLeft: 10,
+  },
+  googleButton: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: colors.white,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    borderRadius: 14,
+    minHeight: 52,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
   },
-  dividerText: {
-    ...T.label,
-    fontWeight: '500',
-    color: '#86868B',
-    marginHorizontal: 16,
-  },
-  form: {
-    marginBottom: 24,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    ...T.button,
-    color: '#1D1D1F',
-    marginBottom: 8,
-  },
-  textInput: {
-    ...T.body,
-    color: '#1D1D1F',
-    lineHeight: undefined,
-    fontWeight: undefined,
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  passwordContainer: {
-    flexDirection: 'row',
+  googleIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#EA4335',
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    borderRadius: 12,
   },
-  passwordInput: {
-    ...T.body,
-    color: '#1D1D1F',
-    lineHeight: undefined,
-    fontWeight: undefined,
-    flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+  googleIconText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: colors.white,
   },
-  passwordToggle: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  authButton: {
-    backgroundColor: '#dc2626',
-    borderRadius: 12,
-    paddingVertical: 18,
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  authButtonDisabled: {
-    opacity: 0.6,
-  },
-  authButtonText: {
-    ...T.button,
-    fontWeight: '700',
-  },
-  forgotPassword: {
-    alignItems: 'center',
-    marginBottom: 0,
-  },
-  forgotPasswordText: {
-    ...T.label,
-    fontWeight: '500',
-    color: '#dc2626',
-  },
-  switchMode: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  switchModeText: {
-    ...T.label,
-    fontWeight: '400',
-    color: '#86868B',
-    textAlign: 'center',
-  },
-  switchModeButtonWrap: {
-    marginTop: 6,
-  },
-  switchModeButton: {
+  googleButtonText: {
     ...T.bodySmall,
     fontWeight: '700',
-    color: '#dc2626',
+    color: colors.label,
+    lineHeight: undefined,
+  },
+  appleButton: {
+    flex: 1,
+    backgroundColor: colors.label,
+    borderRadius: 14,
+    minHeight: 52,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+  },
+  appleButtonText: {
+    ...T.bodySmall,
+    fontWeight: '700',
+    color: colors.white,
     lineHeight: undefined,
   },
 
-  // Required field star
-  requiredStar: {
-    color: '#dc2626',
-    fontWeight: '700',
-  },
-  // Select button (emirate picker)
-  selectButton: {
+  // Divider
+  divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F2F2F7',
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    marginVertical: 18,
   },
-  selectButtonRTL: {
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+  },
+  dividerText: {
+    ...T.caption,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+    marginHorizontal: 16,
+  },
+
+  // Form card (grouped inset rows + hairlines)
+  formCard: {
+    ...surfaces.card,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  fieldContainer: {
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  fieldContainerLast: {
+    borderBottomWidth: 0,
+  },
+  fieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+    marginBottom: 6,
+  },
+  textInput: {
+    ...T.input,
+    fontSize: 16,
+    color: colors.label,
+    paddingVertical: 6,
+    paddingHorizontal: 0,
+    backgroundColor: 'transparent',
+    minHeight: 36,
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passwordInput: {
+    ...T.input,
+    fontSize: 16,
+    color: colors.label,
+    flex: 1,
+    paddingVertical: 6,
+    paddingHorizontal: 0,
+    backgroundColor: 'transparent',
+    minHeight: 36,
+  },
+  passwordToggle: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  selectField: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 6,
+    minHeight: 36,
+  },
+  selectFieldRTL: {
     flexDirection: 'row-reverse',
   },
-  selectButtonText: {
-    ...T.body,
-    color: '#1D1D1F',
-    lineHeight: undefined,
-    fontWeight: undefined,
+  selectFieldText: {
+    ...T.input,
+    fontSize: 16,
+    color: colors.label,
   },
-  selectButtonTextRTL: {
-    textAlign: 'right',
+  selectFieldPlaceholder: {
+    color: colors.tertiary,
   },
-  selectButtonPlaceholder: {
-    color: '#86868B',
+  requiredStar: {
+    color: colors.brand,
+    fontWeight: '700',
   },
-  // Birthday hint
   birthdayHint: {
     ...T.captionSmall,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     marginTop: 6,
   },
-  birthdayHintRTL: {
-    textAlign: 'right',
-  },
+
   // Emirate picker modal
   emirateOverlay: {
     flex: 1,
@@ -1152,22 +1124,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   emirateMenu: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
+    ...shadow.card,
   },
   emirateMenuTitle: {
     ...T.price,
-    color: '#1D1D1F',
+    color: colors.label,
     textAlign: 'center',
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
   },
   emirateMenuItem: {
     flexDirection: 'row',
@@ -1176,137 +1144,107 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: colors.separator,
   },
   emirateMenuItemActive: {
-    backgroundColor: '#fef2f2',
+    backgroundColor: tint(colors.brand, '12'),
   },
   emirateMenuItemText: {
     ...T.body,
-    color: '#1D1D1F',
+    color: colors.label,
     fontWeight: '500',
     lineHeight: undefined,
   },
-  emirateMenuItemTextRtl: {
-    textAlign: 'right',
-  },
   emirateMenuItemTextActive: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '700',
   },
 
-  // Privacy Policy Consent
+  // Privacy consent
   privacySection: {
-    marginBottom: 24,
+    marginBottom: 20,
     paddingHorizontal: 4,
+  },
+  privacySectionRTL: {
+    alignItems: 'flex-end',
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: '#C7C7CC',
-    backgroundColor: '#ffffff',
+    borderColor: colors.tertiary,
+    backgroundColor: colors.card,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-    marginTop: 2,
-  },
-  checkboxChecked: {
-    backgroundColor: '#dc2626',
-    borderColor: '#dc2626',
-  },
-  privacyText: {
-    ...T.label,
-    fontWeight: '400',
-    color: '#3C3C43',
-    lineHeight: 20,
-    flex: 1,
-  },
-  privacyLink: {
-    ...T.link,
-    textDecorationLine: 'underline',
-  },
-  
-  // Privacy Notice
-  privacyNotice: {
-    backgroundColor: '#FFF3CD',
-    borderWidth: 1,
-    borderColor: '#FFEAA7',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 16,
-  },
-  privacyNoticeText: {
-    ...T.caption,
-    fontWeight: '500',
-    color: '#856404',
-    textAlign: 'center',
-  },
-
-  // RTL-specific styles for Arabic
-  inputContainerRTL: {
-    alignItems: 'flex-end',
-  },
-  inputLabelRTL: {
-    textAlign: 'right',
-  },
-  textInputRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  passwordContainerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  passwordInputRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  passwordToggleRTL: {
-    paddingLeft: 16,
-    paddingRight: 16,
-  },
-  privacySectionRTL: {
-    alignItems: 'flex-end',
-  },
-  checkboxContainerRTL: {
-    flexDirection: 'row-reverse',
+    marginTop: 1,
   },
   checkboxRTL: {
     marginRight: 0,
     marginLeft: 12,
   },
-  privacyTextRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
+  checkboxChecked: {
+    backgroundColor: colors.brand,
+    borderColor: colors.brand,
   },
-  switchModeTextRTL: {
+  privacyText: {
+    ...T.caption,
+    color: colors.secondaryLabel,
+    lineHeight: 18,
+    flex: 1,
+  },
+  privacyLink: {
+    ...T.caption,
+    color: colors.brand,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
+
+  // Primary CTA
+  authButton: {
+    backgroundColor: colors.brand,
+    borderRadius: 14,
+    minHeight: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  authButtonText: {
+    ...T.button,
+    fontWeight: '700',
+    color: colors.white,
+  },
+
+  // Secondary links
+  forgotPassword: {
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  forgotPasswordText: {
+    ...T.label,
+    fontWeight: '600',
+    color: colors.brand,
+  },
+  switchMode: {
+    alignItems: 'center',
+    marginTop: 18,
+  },
+  switchModeText: {
+    ...T.caption,
+    color: colors.secondaryLabel,
     textAlign: 'center',
   },
-  
-  // Button RTL styles
-  biometricButtonContentRTL: {
-    flexDirection: 'row-reverse',
+  switchModeButtonWrap: {
+    marginTop: 6,
   },
-  biometricButtonTextRTL: {
-    marginLeft: 0,
-    marginRight: 12,
-  },
-  googleButtonContentRTL: {
-    flexDirection: 'row-reverse',
-  },
-  googleButtonTextRTL: {
-    textAlign: 'right',
-  },
-  appleButtonContentRTL: {
-    flexDirection: 'row-reverse',
-  },
-  appleButtonTextRTL: {
-    textAlign: 'right',
+  switchModeButton: {
+    ...T.label,
+    fontWeight: '700',
+    color: colors.brand,
   },
 });

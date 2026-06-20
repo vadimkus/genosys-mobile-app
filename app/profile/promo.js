@@ -1,23 +1,37 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, useWindowDimensions, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Animated, Easing, TouchableOpacity, ActivityIndicator, useWindowDimensions, RefreshControl } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { fetchPromo } from '../../services/api';
 import RenderHTML from 'react-native-render-html';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 export default function PromoScreen() {
   const router = useRouter();
   const { locale, t, dir } = useLocalization();
   const isRTL = dir === 'rtl' || locale === 'ar';
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [promo, setPromo] = useState(null);
+
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const loadPromo = async ({ showLoading, isCancelled } = { showLoading: true, isCancelled: undefined }) => {
     if (showLoading) setLoading(true);
@@ -55,29 +69,23 @@ export default function PromoScreen() {
     }
   }, [promo?.date, locale]);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.navHeader, isRTL && styles.navHeaderRTL]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); }}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={[styles.navTitle, isRTL && styles.navTitleRTL]}>{t('promo.title')}</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
 
-      <ScrollView
-        contentContainerStyle={styles.content}
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('promo.title')} scrollY={scrollY} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
+
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingHorizontal: 16, paddingBottom: (insets?.bottom || 0) + 40 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} progressViewOffset={headerHeight} />}
       >
-        <View style={[styles.card, isRTL && styles.cardRTL]}>
+        <Animated.View style={[styles.card, shadow.card, { opacity: fade, transform: [{ translateY: lift }] }]}>
           <View style={[styles.cardHeader, isRTL && styles.rowRTL]}>
-            <View style={styles.iconWrap}>
-              <Ionicons name="megaphone-outline" size={20} color="#dc2626" />
+            <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.brand }]}>
+              <Ionicons name="megaphone" size={18} color={colors.white} />
             </View>
             <View style={styles.titleWrap}>
               <Text style={[styles.title, isRTL && styles.textRTL]}>{t('promo.infoTitle')}</Text>
@@ -87,32 +95,31 @@ export default function PromoScreen() {
 
           {loading ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator />
+              <ActivityIndicator color={colors.brand} />
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           ) : promo?.text ? (
             <>
+              <View style={styles.hairline} />
               {dateLine ? (
-                <Text style={[styles.date, isRTL && styles.dateRTL]}>
-                  {t('promo.dateLabel')}: {dateLine}
-                </Text>
+                <View style={[styles.datePill, isRTL && styles.datePillRTL]}>
+                  <Ionicons name="time-outline" size={13} color={colors.secondaryLabel} />
+                  <Text style={styles.dateText}>{t('promo.dateLabel')}: {dateLine}</Text>
+                </View>
               ) : null}
               <RenderHTML
                 contentWidth={width - 64}
                 source={{ html: promo.text }}
                 baseStyle={{
                   fontSize: 15,
-                  lineHeight: 22,
-                  color: '#111827',
+                  lineHeight: 23,
+                  color: colors.label,
                   textAlign: isRTL ? 'right' : 'left',
                 }}
                 tagsStyles={{
-                  // Default text blocks
                   p: { marginBottom: 8, fontWeight: '400' },
-                  // Headings
                   h2: { fontSize: 18, fontWeight: '700', marginTop: 12, marginBottom: 8 },
                   h3: { fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 6 },
-                  // Explicit bold
                   strong: { fontWeight: '700' },
                   b: { fontWeight: '700' },
                   em: { fontStyle: 'italic' },
@@ -124,80 +131,56 @@ export default function PromoScreen() {
                 defaultTextProps={{
                   style: {
                     fontSize: 15,
-                    lineHeight: 22,
-                    color: '#111827',
+                    lineHeight: 23,
+                    color: colors.label,
                     textAlign: isRTL ? 'right' : 'left',
                   },
                 }}
               />
             </>
           ) : (
-            <Text style={[styles.empty, isRTL && styles.textRTL]}>{t('promo.empty')}</Text>
+            <>
+              <View style={styles.hairline} />
+              <Text style={[styles.empty, isRTL && styles.textRTL]}>{t('promo.empty')}</Text>
+            </>
           )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  navHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  container: { flex: 1, backgroundColor: colors.groupedBg },
+  card: {
+    ...surfaces.card,
+    padding: 16,
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  rowRTL: { flexDirection: 'row-reverse' },
+  heroTile: { width: 36, height: 36, borderRadius: 10 },
+  titleWrap: { flex: 1, minWidth: 0 },
+  title: { ...T.label, fontSize: 16, fontWeight: '800', color: colors.label },
+  subtitle: { ...T.caption, marginTop: 2, color: colors.secondaryLabel },
+  hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginVertical: 14 },
+
+  loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: 16 },
+  loadingText: { ...T.label, fontWeight: '400', color: colors.secondaryLabel },
+
+  datePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
+    gap: 6,
+    alignSelf: 'flex-start',
+    backgroundColor: colors.subtleBg,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 12,
   },
-  navHeaderRTL: { flexDirection: 'row-reverse' },
-  backButton: { width: 130 },
-  backButtonRTL: { alignItems: 'flex-end' },
-  backButtonContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backButtonContentRTL: { flexDirection: 'row-reverse' },
-  backText: { ...T.link, color: '#dc2626' },
-  backTextRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  navTitle: { ...T.sectionTitleSmall, flex: 1, textAlign: 'center', color: '#000' },
-  navTitleRTL: { writingDirection: 'rtl' },
-  headerSpacer: { width: 130 },
+  datePillRTL: { alignSelf: 'flex-end' },
+  dateText: { ...T.captionSmall, color: colors.secondaryLabel, fontWeight: '500', writingDirection: 'ltr' },
 
-  content: { padding: 16, paddingBottom: 40 },
-  card: {
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
-  cardRTL: {},
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
-  rowRTL: { flexDirection: 'row-reverse' },
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#FFF5F5',
-    borderWidth: 1,
-    borderColor: '#FECACA',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  titleWrap: { flex: 1, minWidth: 0 },
-  title: { ...T.body, fontWeight: '800', color: '#111827' },
-  subtitle: { ...T.caption, marginTop: 2, color: '#6B7280' },
-
-  loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  loadingText: { ...T.label, fontWeight: '400', color: '#6B7280' },
-  date: { ...T.captionSmall, color: '#6B7280', marginBottom: 10, writingDirection: 'ltr', textAlign: 'left' },
-  dateRTL: { textAlign: 'right' },
-  empty: { ...T.label, fontWeight: '400', color: '#6B7280' },
-
+  empty: { ...T.label, fontWeight: '400', color: colors.secondaryLabel },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });
-
-

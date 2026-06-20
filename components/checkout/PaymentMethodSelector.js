@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { PAYMENT_METHODS } from '../../services/paymentPreferences';
+import { colors, surfaces, tint } from '../../utils/theme';
+import T from '../../utils/typography';
 
 /**
  * PaymentMethodSelector
@@ -19,10 +21,39 @@ export default function PaymentMethodSelector({
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
 
+  const renderMethod = ({ method, icon, tileColor, title, description }) => {
+    const selected = selectedMethod === method;
+    return (
+      <TouchableOpacity
+        style={[ls.methodRow, isRTL && ls.methodRowRTL, selected && ls.methodRowSelected]}
+        onPress={() => onMethodChange(method)}
+        activeOpacity={0.85}
+        accessibilityRole="radio"
+        accessibilityState={{ selected }}
+        accessibilityLabel={title}
+      >
+        <View style={[surfaces.iconTile, ls.methodTile, { backgroundColor: tileColor }]}>
+          <Ionicons name={icon} size={17} color="#ffffff" />
+        </View>
+        <View style={ls.methodBody}>
+          <Text style={[ls.methodTitle, isRTL && styles.textRTL]} numberOfLines={1}>{title}</Text>
+          <Text style={[ls.methodDesc, isRTL && styles.textRTL]} numberOfLines={2}>{description}</Text>
+        </View>
+        <Ionicons
+          name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+          size={22}
+          color={selected ? colors.brand : colors.tertiary}
+        />
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.section}>
       <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-        <Ionicons name="card" size={20} color="#27AE60" />
+        <View style={[surfaces.iconTile, { backgroundColor: colors.green }]}>
+          <Ionicons name="card" size={17} color="#ffffff" />
+        </View>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.paymentMethod')}</Text>
       </View>
 
@@ -36,44 +67,24 @@ export default function PaymentMethodSelector({
         {' '}• {t('checkout.tapToChange')}
       </Text>
 
-      <View style={styles.paymentOptions}>
+      <View style={ls.methods}>
         {/* Cash on Delivery */}
-        <TouchableOpacity
-          style={[
-            styles.paymentOption,
-            selectedMethod === PAYMENT_METHODS.COD && styles.paymentOptionSelected
-          ]}
-          onPress={() => onMethodChange(PAYMENT_METHODS.COD)}
-        >
-          <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
-            <Ionicons
-              name={selectedMethod === PAYMENT_METHODS.COD ? "radio-button-on" : "radio-button-off"}
-              size={20}
-              color={selectedMethod === PAYMENT_METHODS.COD ? "#dc2626" : "#C7C7CC"}
-            />
-            <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('checkout.cashOnDelivery')}</Text>
-          </View>
-          <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>{t('checkout.payWhenDelivered')}</Text>
-        </TouchableOpacity>
+        {renderMethod({
+          method: PAYMENT_METHODS.COD,
+          icon: 'cash',
+          tileColor: colors.green,
+          title: t('checkout.cashOnDelivery'),
+          description: t('checkout.payWhenDelivered'),
+        })}
 
         {/* Card Payment (Stripe) */}
-        <TouchableOpacity
-          style={[
-            styles.paymentOption,
-            selectedMethod === PAYMENT_METHODS.CARD && styles.paymentOptionSelected
-          ]}
-          onPress={() => onMethodChange(PAYMENT_METHODS.CARD)}
-        >
-          <View style={[styles.paymentOptionHeader, isRTL && styles.rowRTL]}>
-            <Ionicons
-              name={selectedMethod === PAYMENT_METHODS.CARD ? "radio-button-on" : "radio-button-off"}
-              size={20}
-              color={selectedMethod === PAYMENT_METHODS.CARD ? "#dc2626" : "#C7C7CC"}
-            />
-            <Text style={[styles.paymentTitle, isRTL && styles.textRTL]}>{t('checkout.cardPayment')}</Text>
-          </View>
-          <Text style={[styles.paymentDescription, isRTL && styles.paymentDescriptionRTL]}>{t('checkout.paySecurelyStripe')}</Text>
-        </TouchableOpacity>
+        {renderMethod({
+          method: PAYMENT_METHODS.CARD,
+          icon: 'card',
+          tileColor: colors.blue,
+          title: t('checkout.cardPayment'),
+          description: t('checkout.paySecurelyStripe'),
+        })}
       </View>
 
       {/* Trust badges */}
@@ -85,3 +96,45 @@ export default function PaymentMethodSelector({
     </View>
   );
 }
+
+const ls = StyleSheet.create({
+  methods: {
+    gap: 10,
+  },
+  methodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: colors.subtleBg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+  },
+  methodRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  methodRowSelected: {
+    backgroundColor: tint(colors.brand, '0D'),
+    borderColor: colors.brand,
+  },
+  methodTile: {
+    width: 30,
+    height: 30,
+  },
+  methodBody: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  methodTitle: {
+    ...T.label,
+    fontWeight: '600',
+    color: colors.label,
+  },
+  methodDesc: {
+    ...T.captionSmall,
+    color: colors.secondaryLabel,
+  },
+});

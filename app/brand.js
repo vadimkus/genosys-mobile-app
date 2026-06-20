@@ -3,32 +3,45 @@
  * Displays GENOSYS brand information with videos and product images.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  Animated,
+  Easing,
   TouchableOpacity,
   Image,
   Linking,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import { colors, shadow, surfaces, tint } from '../utils/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const VIDEO_WIDTH = SCREEN_WIDTH - 68; // 20 section padding + 14 card padding each side
-const VIDEO_HEIGHT = VIDEO_WIDTH * (9 / 16);
 
 export default function BrandScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  const insets = useSafeAreaInsets();
+  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+
+  // Subtle entrance motion (matches order screens).
+  const fade = useRef(new Animated.Value(0)).current;
+  const lift = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, [fade, lift]);
 
   const brandTitle = locale === 'ar' ? 'GENOSYS — نظام إعادة ولادة الجينات'
     : locale === 'ru' ? 'GENOSYS — Система генетического возрождения'
@@ -85,105 +98,119 @@ export default function BrandScreen() {
     Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`);
   }, []);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {t('navigation.brand') || 'Brand'}
-        </Text>
-        <View style={styles.backBtn} />
+  const SectionHeader = ({ icon, tileColor, title }) => (
+    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
+      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
+      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
+    </View>
+  );
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <Image
-            source={require('../assets/splash-logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>{brandTitle}</Text>
-          <View style={styles.badgeRow}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{sectionLabels.madeInKorea}</Text>
-            </View>
-            <View style={[styles.badge, styles.badgeGreen]}>
-              <Text style={[styles.badgeText, styles.badgeGreenText]}>{sectionLabels.certifiedUAE}</Text>
-            </View>
-          </View>
-        </View>
+  const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
 
-        {/* About Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{sectionLabels.about}</Text>
-          <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{brandDescription}</Text>
-        </View>
+  return (
+    <View style={styles.container}>
+      <CollapsibleHeader title={t('navigation.brand') || 'Brand'} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
-        {/* Mission Section */}
-        <View style={[styles.section, styles.sectionAlt]}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{sectionLabels.mission}</Text>
-          <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{brandMission}</Text>
-        </View>
-
-        {/* Key Technologies */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{sectionLabels.technologies}</Text>
-          {keyTechnologies.map((tech, index) => (
-            <View key={index} style={[styles.techCard, isRTL && styles.techCardRTL]}>
-              <View style={styles.techIcon}>
-                <Ionicons name="flask" size={22} color="#dc2626" />
-              </View>
-              <View style={styles.techContent}>
-                <Text style={[styles.techTitle, isRTL && styles.textRTL]}>{tech.title}</Text>
-                <Text style={[styles.techDesc, isRTL && styles.textRTL]}>{tech.desc}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {/* Brand Videos */}
-        <View style={[styles.section, styles.sectionAlt]}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{sectionLabels.videos}</Text>
-          
-          {videos.map((video) => (
-            <TouchableOpacity
-              key={video.id}
-              style={styles.videoCard}
-              onPress={() => openVideo(video.youtubeId)}
-              activeOpacity={0.85}
-            >
-              <Text style={[styles.videoTitle, isRTL && styles.textRTL]}>{video.title}</Text>
-              <View style={styles.videoWrapper}>
-                <Image
-                  source={{ uri: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` }}
-                  style={styles.videoThumbnail}
-                  resizeMode="cover"
-                />
-                <View style={styles.playOverlay}>
-                  <View style={styles.playButton}>
-                    <Ionicons name="play" size={32} color="#ffffff" style={{ marginLeft: 3 }} />
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Product Showcase */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            {locale === 'ar' ? 'مجموعة المنتجات المهنية' : locale === 'ru' ? 'Профессиональная линейка продуктов' : 'Professional Product Line'}
-          </Text>
-          <View style={styles.productImageCard}>
+      <Animated.ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 12 }}
+      >
+        <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+          {/* Hero Section */}
+          <View style={styles.heroSection}>
             <Image
-              source={{ uri: 'https://genosys.ae/images/genosys-products.jpg' }}
-              style={styles.productImage}
+              source={require('../assets/genosys-logo-gray.png')}
+              style={styles.logo}
               resizeMode="contain"
             />
+            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{brandTitle}</Text>
+            <View style={styles.badgeRow}>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{sectionLabels.madeInKorea}</Text>
+              </View>
+              <View style={[styles.badge, styles.badgeGreen]}>
+                <Text style={[styles.badgeText, styles.badgeGreenText]}>{sectionLabels.certifiedUAE}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* About Section */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="information-circle" tileColor={colors.blue} title={sectionLabels.about} />
+            <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandDescription}</Text>
+          </View>
+
+          {/* Mission Section */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="flag" tileColor={colors.brand} title={sectionLabels.mission} />
+            <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandMission}</Text>
+          </View>
+
+          {/* Key Technologies */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="flask" tileColor={colors.purple} title={sectionLabels.technologies} />
+            {keyTechnologies.map((tech, index) => (
+              <View
+                key={index}
+                style={[styles.techRow, isRTL && styles.rowRTL, index === keyTechnologies.length - 1 && styles.techRowLast]}
+              >
+                <View style={styles.techIcon}>
+                  <Ionicons name="flask" size={18} color={colors.purple} />
+                </View>
+                <View style={styles.techContent}>
+                  <Text style={[styles.techTitle, isRTL && styles.textRTL]}>{tech.title}</Text>
+                  <Text style={[styles.techDesc, isRTL && styles.textRTL]}>{tech.desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Brand Videos */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader icon="videocam" tileColor={colors.indigo} title={sectionLabels.videos} />
+            {videos.map((video) => (
+              <TouchableOpacity
+                key={video.id}
+                style={styles.videoItem}
+                onPress={() => openVideo(video.youtubeId)}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.videoTitle, isRTL && styles.textRTL]}>{video.title}</Text>
+                <View style={styles.videoWrapper}>
+                  <Image
+                    source={{ uri: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` }}
+                    style={styles.videoThumbnail}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.playOverlay}>
+                    <View style={styles.playButton}>
+                      <Ionicons name="play" size={30} color="#ffffff" style={{ marginLeft: 3 }} />
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Product Showcase */}
+          <View style={[styles.card, shadow.card]}>
+            <SectionHeader
+              icon="cube"
+              tileColor={colors.teal}
+              title={locale === 'ar' ? 'مجموعة المنتجات المهنية' : locale === 'ru' ? 'Профессиональная линейка продуктов' : 'Professional Product Line'}
+            />
+            <View style={styles.productImageWrap}>
+              <Image
+                source={{ uri: 'https://genosys.ae/images/genosys-products.jpg' }}
+                style={styles.productImage}
+                resizeMode="contain"
+              />
+            </View>
             <Text style={[styles.productCaption, isRTL && styles.textRTL]}>
               {locale === 'ar'
                 ? 'مجموعة منتجات جينوسيس المهنية للعناية بالبشرة — منتجات مختبرة طبيًا'
@@ -192,82 +219,139 @@ export default function BrandScreen() {
                 : 'GENOSYS Professional Skincare Line — Dermatologically Tested Products'}
             </Text>
           </View>
-        </View>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, isRTL && styles.textRTL]}>
-            GENOSYS
-          </Text>
-          <Text style={[styles.footerSub, isRTL && styles.textRTL]}>
-            {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
-          </Text>
-          <TouchableOpacity onPress={() => Linking.openURL('https://www.genosys.ae')} activeOpacity={0.7} style={{ marginTop: 8 }}>
-            <Text style={styles.footerLink}>www.genosys.ae</Text>
-          </TouchableOpacity>
-          <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={[styles.footerBrand, isRTL && styles.textRTLCenter]}>GENOSYS</Text>
+            <Text style={[styles.footerSub, isRTL && styles.textRTLCenter]}>
+              {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
+            </Text>
+            <TouchableOpacity onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae'); }} activeOpacity={0.7} style={styles.footerLinkWrap}>
+              <Text style={styles.footerLink}>www.genosys.ae</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
+          </View>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB',
-  },
-  headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { ...T.navTitle, flex: 1, color: '#1F2937', textAlign: 'center', marginHorizontal: 8 },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
 
   // Hero
-  heroSection: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#FAFAFA' },
+  heroSection: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
   logo: { width: 240, height: 72, marginBottom: 16 },
-  heroTitle: { ...T.sectionTitle, color: '#000', textAlign: 'center', marginBottom: 16 },
+  heroTitle: { ...T.sectionTitle, textAlign: 'center', marginBottom: 16 },
   badgeRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
-  badge: { backgroundColor: '#FEF2F2', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#FECACA' },
-  badgeText: { ...T.caption, fontWeight: '600', color: '#dc2626' },
-  badgeGreen: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
-  badgeGreenText: { color: '#16a34a' },
+  badge: {
+    backgroundColor: tint(colors.brand),
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  badgeText: { ...T.caption, fontWeight: '700', color: colors.brand },
+  badgeGreen: { backgroundColor: tint(colors.greenDeep) },
+  badgeGreenText: { color: colors.greenDeep },
 
-  // Sections
-  section: { paddingHorizontal: 20, paddingVertical: 24 },
-  sectionAlt: { backgroundColor: '#FAFAFA' },
-  sectionTitle: { ...T.sectionTitle, fontSize: 22, color: '#000', marginBottom: 14, letterSpacing: -0.4 },
-  paragraph: { ...T.body, color: '#374151' },
+  // Cards
+  card: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    padding: 18,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  rowRTL: { flexDirection: 'row-reverse' },
+  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
-  // Technology Cards
-  techCard: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16, backgroundColor: '#F9FAFB', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#F3F4F6' },
-  techCardRTL: { flexDirection: 'row-reverse' },
-  techIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FEF2F2', alignItems: 'center', justifyContent: 'center', marginRight: 14 },
-  techContent: { flex: 1 },
-  techTitle: { ...T.label, fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  techDesc: { ...T.caption, color: '#6B7280', lineHeight: 20 },
+  paragraph: { ...T.body, marginBottom: 12, lineHeight: 23 },
+  paragraphLast: { marginBottom: 0 },
+
+  // Technology rows
+  techRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
+  },
+  techRowLast: { borderBottomWidth: 0, paddingBottom: 0 },
+  techIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: tint(colors.purple),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  techContent: { flex: 1, minWidth: 0 },
+  techTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 3 },
+  techDesc: { ...T.bodySmall, color: colors.secondaryLabel, lineHeight: 20 },
 
   // Videos
-  videoCard: { marginBottom: 20, backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#E5E7EB' },
-  videoTitle: { ...T.label, fontSize: 16, color: '#111827', padding: 14, paddingBottom: 0 },
-  videoWrapper: { height: VIDEO_HEIGHT, margin: 14, borderRadius: 10, overflow: 'hidden', backgroundColor: '#000', position: 'relative' },
+  videoItem: {
+    backgroundColor: colors.subtleBg,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+  },
+  videoTitle: { ...T.label, fontSize: 15, color: colors.label, marginBottom: 10 },
+  videoWrapper: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    position: 'relative',
+  },
   videoThumbnail: { width: '100%', height: '100%' },
   playOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' },
-  playButton: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(220,38,38,0.9)', justifyContent: 'center', alignItems: 'center' },
+  playButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: tint(colors.brand, 'E6'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
-  // Product Showcase
-  productImageCard: { backgroundColor: '#F9FAFB', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#F3F4F6' },
-  productImage: { width: '100%', height: SCREEN_WIDTH * 0.65, backgroundColor: '#ffffff' },
-  productCaption: { ...T.caption, color: '#6B7280', textAlign: 'center', paddingHorizontal: 16, paddingVertical: 12, lineHeight: 18 },
+  // Product showcase
+  productImageWrap: {
+    backgroundColor: colors.subtleBg,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  productImage: { width: '100%', height: SCREEN_WIDTH * 0.6, backgroundColor: '#ffffff' },
+  productCaption: { ...T.caption, color: colors.secondaryLabel, textAlign: 'center', paddingTop: 12, lineHeight: 18 },
 
   // Footer
-  footer: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center', backgroundColor: '#F8F9FA' },
-  footerText: { ...T.bodySmall, fontWeight: '600', color: '#6B7280', lineHeight: undefined },
-  footerSub: { ...T.caption, color: '#9CA3AF', marginTop: 4 },
-  footerLink: { ...T.link, color: '#dc2626' },
-  footerCopyright: { ...T.captionSmall, color: '#C7C7CC', marginTop: 12 },
+  footer: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 28,
+    alignItems: 'center',
+  },
+  footerBrand: { ...T.bodySmall, fontWeight: '700', color: colors.secondaryLabel, letterSpacing: 0.5 },
+  footerSub: { ...T.caption, color: colors.tertiary, marginTop: 4, textAlign: 'center' },
+  footerLinkWrap: { marginTop: 8 },
+  footerLink: { ...T.link, color: colors.brand },
+  footerCopyright: { ...T.captionSmall, color: colors.tertiary, marginTop: 12, textAlign: 'center' },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });
