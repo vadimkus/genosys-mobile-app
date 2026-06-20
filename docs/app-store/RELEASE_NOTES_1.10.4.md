@@ -1,32 +1,53 @@
-# Release Notes — Version 1.10.4 (Build 92)
+# Release Notes — Version 1.10.4 (Build 93)
 
 **App Name:** Genosys UAE
 **Bundle ID:** ae.genosys.app
 **Version:** 1.10.4
-**iOS Build:** 92
+**iOS Build:** 93
 **Platform:** iOS (also shipped to Android — versionCode 88)
 **Runtime Version:** 1.10.4
-**Submission focus:** Native in-app payment experience + smoother launch & unified order confirmation
+**Submission focus:** Full Apple-native UI redesign (whole app) + native in-app payments
 
 ---
 
 ## App Store "What's New" Text
 
 ```
-This update brings a faster, fully native checkout and a smoother start.
+We gave Genosys UAE a clean, modern redesign — top to bottom.
 
-Card, Apple Pay, Google Pay and Link payments now happen right inside the app
-with a native payment sheet — no more switching to the browser. You confirm in
-one tap and see an instant, animated order confirmation.
+• A refreshed, Apple-style look across every screen — Shop, Product, Bag,
+  Checkout, Orders, Favorites and Profile — with soft cards, clearer layouts
+  and smoother, scroll-aware navigation.
+• Faster, fully native checkout: card, Apple Pay, Google Pay and Link are
+  processed right inside the app with a one-tap payment sheet and an instant,
+  animated order confirmation.
+• A simpler menu — everything now lives neatly in your Profile.
+• Polished empty states, a smoother app launch, and many small refinements.
 
-We also fixed a brief flicker on app launch, and unified the order-success
-screen so every checkout (card, Apple Pay and Cash on Delivery) ends the same
-clean way. Apple Pay is available for one-tap checkout on supported devices.
+Beautifully localized in English, العربية and Русский.
 ```
 
 ---
 
 ## What's New in Version 1.10.4
+
+### Full Apple-native UI redesign (entire app)
+- A cohesive, first-party iOS look rolled across **every** screen: grouped
+  backgrounds, soft floating cards, scroll-aware navigation headers, Settings-style
+  rows with icon tiles, tinted status capsules, and a consistent button hierarchy.
+- **Redesigned screens:** Shop, Product, Bag, Checkout, Orders (list + detail),
+  Favorites, Profile (and all sub-pages), Sign in / Sign up, the company/info pages
+  (About, Brand, Delivery, Contact, FAQ, Locations, Partners, Training, Blog), the
+  AI Skin-Analysis flow (concerns, quiz, results, camera results), Bundle Builder,
+  the Genie AI chat, and the in-app payment screen.
+- **Simpler navigation:** the hamburger menu was removed; all of its destinations
+  now live, logically grouped, inside the **Profile** tab (Explore + Information).
+- **Polished details:** branded empty states that blend into the background, a
+  consistent gray GENOSYS logo on light screens, refined order-success and payment
+  screens, and clearer copy (e.g. Cash-on-Delivery confirmation now states the
+  confirmation email has already been sent).
+- **Fully localized** in English, Arabic (RTL) and Russian — complete translation
+  parity across all three languages.
 
 ### Native Payment Sheet (Card · Apple Pay · Google Pay · Link)
 - **In-app payment** — Card, Apple Pay, Google Pay and Link are processed inside
@@ -63,7 +84,7 @@ clean way. Apple Pay is available for one-tap checkout on supported devices.
 | Field | Value |
 |-------|-------|
 | Version | 1.10.4 |
-| iOS Build | 92 |
+| iOS Build | 93 |
 | Android Version Code | 88 |
 | Runtime Version | 1.10.4 |
 | Category | Shopping |
@@ -79,10 +100,11 @@ clean way. Apple Pay is available for one-tap checkout on supported devices.
 ## Review Notes for Apple
 
 ```
-This release replaces the previous browser-based card checkout with the native
-Stripe Payment Sheet (card, Apple Pay, Google Pay, Link), unifies the order
-confirmation screen across all payment types, and fixes a brief splash flicker
-on launch. Apple Pay is enabled in this build.
+This release ships a full Apple-native UI redesign across the entire app
+(presentation only — no change to data handling) and the native Stripe Payment
+Sheet (card, Apple Pay, Google Pay, Link) with a unified order confirmation.
+The hamburger menu was removed and its items consolidated into the Profile tab.
+Apple Pay is enabled in this build.
 
 IMPORTANT — PHYSICAL GOODS / NO IAP:
 This app sells physical cosmetic products shipped to a UAE delivery address.
@@ -219,10 +241,11 @@ entitlement (merchant ID), not a runtime permission prompt.
 
 ---
 
-## TestFlight Test Matrix (build 92 / 1.10.4)
+## TestFlight Test Matrix (build 93 / 1.10.4)
 
 | # | Test | Expected |
 |---|------|----------|
+| 0 | Browse all tabs (Shop/Orders/Profile) | Redesigned Apple-native UI; menu items live under Profile (no hamburger) |
 | 1 | Cold launch | Splash logo holds steady, no flicker; crossfades into app |
 | 2 | New checkout → Pay | Native sheet appears in-app (no Safari) |
 | 3 | Pay with **card** (`4242…`) | Success → animated confirmation → CONFIRMED + emails |
@@ -261,6 +284,7 @@ entitlement (merchant ID), not a runtime permission prompt.
 
 | Version | Build | Key Changes |
 |---------|-------|-------------|
+| 1.10.4 | 93 | Full Apple-native UI redesign across the app; hamburger menu consolidated into Profile; gray logo/empty-state polish; en/ar/ru parity |
 | 1.10.4 | 92 | Unified animated order-success (card/Apple Pay/COD), launch flicker fix (expo-splash-screen), native payment sheet polish |
 | 1.10.3 | 91 | Native Stripe Payment Sheet (card/Apple Pay/Google Pay/Link), Apple Pay enabled, instant in-app confirmation |
 | 1.10.2 | 88 | iOS Universal Links (associated domains + AASA), camera usage description, perf/stability |
