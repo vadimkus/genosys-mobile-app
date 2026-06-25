@@ -654,11 +654,8 @@ export default function BagScreen() {
           chevronButtonStyle={styles.footerChevronBtn}
           details={
             <>
-              {/* Summary header (indigo tile, matches order details) */}
+              {/* Summary header */}
               <View style={[styles.summaryHeader, isRTL && styles.summaryRowRTL]}>
-                <View style={[surfaces.iconTile, { backgroundColor: colors.indigo }]}>
-                  <Ionicons name="calculator" size={16} color={colors.white} />
-                </View>
                 <Text style={[styles.summaryHeaderTitle, isRTL && styles.summaryLabelRTL]}>{t('checkout.orderSummary')}</Text>
               </View>
 
