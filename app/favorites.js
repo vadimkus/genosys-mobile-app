@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 14,
-    backgroundColor: colors.subtleBg,
+    backgroundColor: colors.white,
   },
   thumbPlaceholder: {
     alignItems: 'center',

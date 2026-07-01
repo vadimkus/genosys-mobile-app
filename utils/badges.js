@@ -23,18 +23,17 @@ export function computeProductBadges(product, labels = {}) {
     const text = (badge.text || '').toLowerCase().trim();
     if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
     if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
-    if (text === 'professional' && (isEyeZoneKit || isBioFermentMask)) return false;
+    if (text === 'professional') return false;
     if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
     return true;
   });
 
   const computedBadges = [];
-  if (!isOutOfStock) {
-    if (isMesopeciaKit) {
-      computedBadges.push({ text: labels.order || 'Order', color: '#FF9500', priority: 0 });
-    } else if (!isHolidayKit) {
-      computedBadges.push({ text: labels.inStock || 'In Stock', color: '#34C759', priority: 0 });
-    }
+  // "In Stock" is the default and was cluttering every card, so it's no longer
+  // shown. Only the "Order" badge (Mesopecia kit) is computed here; NEW /
+  // out-of-stock and other meaningful badges still come through below.
+  if (!isOutOfStock && isMesopeciaKit) {
+    computedBadges.push({ text: labels.order || 'Order', color: '#FF9500', priority: 0 });
   }
 
   const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');

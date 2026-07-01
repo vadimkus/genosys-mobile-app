@@ -243,7 +243,7 @@ export default function ShopScreen() {
             <Image
               source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
               style={styles.gridImage}
-              contentFit="cover"
+              contentFit="contain"
               transition={200}
               cachePolicy="memory-disk"
             />
@@ -1447,7 +1447,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 140,
     position: 'relative',
-    backgroundColor: colors.subtleBg,
+    backgroundColor: colors.white,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     overflow: 'hidden',
@@ -1455,6 +1455,7 @@ const styles = StyleSheet.create({
   gridImage: {
     width: '100%',
     height: '100%',
+    padding: 12,
   },
   gridImagePlaceholder: {
     width: '100%',

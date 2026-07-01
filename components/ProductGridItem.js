@@ -120,7 +120,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
           <Image
             source={{ uri: imageUrl }}
             style={[styles.image, isOutOfStock && styles.imageOutOfStock]}
-            resizeMode="cover"
+            resizeMode="contain"
           />
         ) : (
           <View style={styles.imagePlaceholder}>
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: '100%',
     height: CARD_WIDTH * 0.8, // Maintain aspect ratio
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#FFFFFF',
     position: 'relative',
     overflow: 'visible', // Make sure badges aren't clipped
   },
