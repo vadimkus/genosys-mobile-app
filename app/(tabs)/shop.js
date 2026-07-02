@@ -1455,7 +1455,6 @@ const styles = StyleSheet.create({
   gridImage: {
     width: '100%',
     height: '100%',
-    padding: 12,
   },
   gridImagePlaceholder: {
     width: '100%',
