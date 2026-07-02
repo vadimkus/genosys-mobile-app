@@ -244,6 +244,7 @@ export default function ShopScreen() {
               source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
               style={styles.gridImage}
               contentFit="contain"
+              contentPosition="top"
               transition={200}
               cachePolicy="memory-disk"
             />
