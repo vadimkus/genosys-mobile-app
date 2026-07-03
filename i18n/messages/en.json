@@ -1577,6 +1577,7 @@
   "webview": {
     "noUrlProvided": "No URL provided",
     "errorTitle": "Error",
+    "loading": "Loading...",
     "tryAgain": "Try Again",
     "goBack": "Go Back",
     "downloadError": "Download Error",

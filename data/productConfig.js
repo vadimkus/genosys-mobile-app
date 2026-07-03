@@ -85,7 +85,7 @@ export const PRODUCT_CONFIG = {
     images: ['/images/EZE.jpg', '/images/Second/ez.jpg', '/images/Second/ez1.jpg'],
   },
   '51': {
-    images: ['/images/BFAD.png', '/images/Second/ferment_big.jpg'],
+    images: ['/images/BFAD.png', '/images/Second/ferment_big.jpg', '/images/Third/Ferment_3.jpeg', '/images/Third/ferment_high.jpeg'],
   },
   '52': {
     images: ['/images/PDRN.png', '/images/Second/pdrnnn.jpg'],

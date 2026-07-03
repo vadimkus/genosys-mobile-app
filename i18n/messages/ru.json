@@ -1577,6 +1577,7 @@
   "webview": {
     "noUrlProvided": "URL не указан",
     "errorTitle": "Ошибка",
+    "loading": "Загрузка...",
     "tryAgain": "Повторить",
     "goBack": "Назад",
     "downloadError": "Ошибка загрузки",

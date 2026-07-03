@@ -5,8 +5,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform, Linking, Share, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Linking, Alert } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -14,6 +13,8 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
+import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import { colors, shadow } from '../utils/theme';
 
 const log = createLogger('WebView');
 
@@ -26,6 +27,8 @@ export default function WebViewScreen() {
   const [httpError, setHttpError] = useState(null);
   const [loadError, setLoadError] = useState(null);
   const webViewRef = useRef(null);
+  // WebView owns its own scrolling, so the nav bar stays solid (scrollY={null}).
+  const { headerHeight } = useCollapsibleHeader();
 
   // Handle HTTP errors (4xx, 5xx)
   const handleHttpError = useCallback((syntheticEvent) => {
@@ -225,52 +228,44 @@ export default function WebViewScreen() {
 
   if (!displayUrl) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="chevron-back" size={24} color="#1D1D1F" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('webview.errorTitle')}</Text>
-          <View style={styles.backBtn} />
-        </View>
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#9CA3AF" />
+      <View style={styles.container}>
+        <CollapsibleHeader
+          title={t('webview.errorTitle')}
+          scrollY={null}
+          onBack={() => { haptics.lightTap(); router.back(); }}
+          isRTL={isRTL}
+        />
+        <View style={[styles.errorContainer, { paddingTop: headerHeight }]}>
+          <Ionicons name="alert-circle-outline" size={48} color={colors.tertiary} />
           <Text style={styles.errorText}>{t('webview.noUrlProvided')}</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={[styles.header, isRTL && styles.headerRTL]}>
-<TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
-        <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {pageTitle || 'Loading...'}
-        </Text>
-        <TouchableOpacity
-          onPress={() => { haptics.lightTap(); webViewRef.current?.reload(); }}
-          style={styles.backBtn}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="reload" size={20} color="#6B7280" />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.container}>
+      {/* Solid nav bar (WebView scrolls internally, so no fade tracking) */}
+      <CollapsibleHeader
+        title={pageTitle || t('webview.loading')}
+        scrollY={null}
+        onBack={() => { haptics.lightTap(); router.back(); }}
+        onRefresh={() => { haptics.lightTap(); webViewRef.current?.reload(); }}
+        rightIcon="reload"
+        isRTL={isRTL}
+      />
+      <View style={[styles.body, { paddingTop: headerHeight }]}>
       {/* Loading bar */}
       {loading && (
         <View style={styles.loadingBar}>
-          <ActivityIndicator size="small" color="#dc2626" />
+          <ActivityIndicator size="small" color={colors.brand} />
         </View>
       )}
 
       {/* Error State */}
       {(httpError || loadError) ? (
         <View style={styles.errorContainer}>
-          <Ionicons name="cloud-offline-outline" size={48} color="#9CA3AF" />
+          <Ionicons name="cloud-offline-outline" size={48} color={colors.tertiary} />
           <Text style={styles.errorTitle}>
             {httpError ? `Error ${httpError.statusCode}` : 'Connection Error'}
           </Text>
@@ -337,48 +332,24 @@ export default function WebViewScreen() {
         allowsInlineMediaPlayback
       />
       )}
-    </SafeAreaView>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
-    backgroundColor: '#ffffff',
-  },
-  headerRTL: {
-    flexDirection: 'row-reverse',
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-  },
-  headerTitle: {
-    ...T.navTitle,
-    fontSize: 16,
-    color: '#1F2937',
+  body: {
     flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 8,
   },
   loadingBar: {
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.subtleBg,
   },
   webview: {
     flex: 1,
@@ -392,18 +363,18 @@ const styles = StyleSheet.create({
   },
   errorText: {
     ...T.body,
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     lineHeight: undefined,
   },
   errorTitle: {
     ...T.sectionTitleSmall,
-    color: '#1F2937',
+    color: colors.label,
     marginTop: 8,
   },
   errorDescription: {
     ...T.label,
     fontWeight: '400',
-    color: '#6B7280',
+    color: colors.secondaryLabel,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 8,
@@ -411,7 +382,7 @@ const styles = StyleSheet.create({
   errorUrl: {
     ...T.badge,
     fontWeight: '400',
-    color: '#9CA3AF',
+    color: colors.tertiary,
     textAlign: 'center',
     marginBottom: 16,
     paddingHorizontal: 8,
@@ -421,12 +392,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1F2937',
+    backgroundColor: colors.brand,
     paddingHorizontal: 24,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 14,
     width: '100%',
     maxWidth: 260,
+    ...shadow.cta(colors.brand),
   },
   retryButtonText: {
     ...T.buttonSmall,
@@ -439,6 +411,6 @@ const styles = StyleSheet.create({
   backButtonText: {
     ...T.label,
     fontWeight: '500',
-    color: '#6B7280',
+    color: colors.secondaryLabel,
   },
 });

@@ -5,8 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import PrivacyPolicyContent from './PrivacyPolicyContent';
@@ -15,14 +16,28 @@ import T from '../utils/typography';
 export default function PrivacyPolicyModal({ visible, onClose, showCloseButton = true }) {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
+  // Insets from context, not SafeAreaView: native measurement inside a Modal
+  // is unreliable on first open (same race as the image lightbox close button).
+  // iOS pageSheet already sits below the status bar → no top inset needed;
+  // Android renders modals full-screen/edge-to-edge → pad by the real inset.
+  const insets = useSafeAreaInsets();
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      onRequestClose={onClose}
     >
-      <SafeAreaView style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Platform.OS === 'ios' ? 0 : insets.top,
+            paddingBottom: insets.bottom,
+          },
+        ]}
+      >
         {/* Header */}
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('privacy.title')}</Text>
@@ -33,7 +48,7 @@ export default function PrivacyPolicyModal({ visible, onClose, showCloseButton =
           )}
         </View>
         <PrivacyPolicyContent showLastUpdated={false} />
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

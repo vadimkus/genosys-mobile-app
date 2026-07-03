@@ -1577,6 +1577,7 @@
   "webview": {
     "noUrlProvided": "لم يتم توفير رابط",
     "errorTitle": "خطأ",
+    "loading": "جارٍ التحميل...",
     "tryAgain": "حاول مرة أخرى",
     "goBack": "رجوع",
     "downloadError": "خطأ في التنزيل",
