@@ -21,7 +21,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 
@@ -34,6 +34,10 @@ export default function ImageLightbox({
   onClose,
 }) {
   const { t } = useLocalization();
+  // Read insets from context (stable & correct on first open). SafeAreaView's
+  // native measurement is unreliable inside a Modal, which caused the close
+  // button to sit under the status bar the first time the viewer opened.
+  const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(initialIndex);
   const listRef = useRef(null);
 
@@ -68,7 +72,12 @@ export default function ImageLightbox({
     >
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       <View style={styles.root}>
-        <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <View
+          style={[
+            styles.safeArea,
+            { paddingTop: insets.top || 12, paddingBottom: insets.bottom },
+          ]}
+        >
           <View style={styles.topBar}>
             <Text style={styles.counter}>
               {index + 1} / {images.length}
@@ -122,7 +131,7 @@ export default function ImageLightbox({
               ))}
             </View>
           )}
-        </SafeAreaView>
+        </View>
       </View>
     </Modal>
   );
