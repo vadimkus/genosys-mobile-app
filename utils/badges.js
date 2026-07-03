@@ -14,7 +14,6 @@ export function computeProductBadges(product, labels = {}) {
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
   const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
-  const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
   const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
   const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
   const isBeautyBox = isBeautyBoxProduct(product);
@@ -24,7 +23,7 @@ export function computeProductBadges(product, labels = {}) {
     if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
     if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
     if (text === 'professional') return false;
-    if (text === 'new' && !(isPdrnMask || isBioFermentMask || isRevitaGlow)) return false;
+    if (text === 'new' && !(isPdrnMask || isRevitaGlow)) return false;
     return true;
   });
 
@@ -37,7 +36,7 @@ export function computeProductBadges(product, labels = {}) {
   }
 
   const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
-  if ((isBioFermentMask || isRevitaGlow) && !hasNewBadge) {
+  if (isRevitaGlow && !hasNewBadge) {
     computedBadges.push({ text: labels.new || 'New', color: '#007AFF', priority: 1 });
   }
 

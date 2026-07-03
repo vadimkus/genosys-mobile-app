@@ -86,7 +86,6 @@ export const PRODUCT_CONFIG = {
   },
   '51': {
     images: ['/images/BFAD.png', '/images/Second/ferment_big.jpg'],
-    videoUrl: '/videos/ferment.mp4',
   },
   '52': {
     images: ['/images/PDRN.png', '/images/Second/pdrnnn.jpg'],
