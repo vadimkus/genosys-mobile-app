@@ -8,6 +8,7 @@ const packageLockPath = path.join(root, 'package-lock.json')
 const expoPlistPath = path.join(root, 'ios', 'GenosysUAE', 'Supporting', 'Expo.plist')
 const infoPlistPath = path.join(root, 'ios', 'GenosysUAE', 'Info.plist')
 const androidBuildGradlePath = path.join(root, 'android', 'app', 'build.gradle')
+const androidStringsPath = path.join(root, 'android', 'app', 'src', 'main', 'res', 'values', 'strings.xml')
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'))
@@ -124,6 +125,27 @@ if (fs.existsSync(androidBuildGradlePath)) {
   }
 
   fs.writeFileSync(androidBuildGradlePath, gradle)
+}
+
+// Android OTA runtime lives in strings.xml (AndroidManifest references
+// @string/expo_runtime_version). Without this sync, Android builds embed a
+// stale runtime and silently stop receiving EAS Updates for the new one.
+if (fs.existsSync(androidStringsPath)) {
+  const strings = fs.readFileSync(androidStringsPath, 'utf8')
+  let foundAndroidRuntime = false
+  const updatedStrings = strings.replace(
+    /(<string name="expo_runtime_version">)([^<]+)(<\/string>)/,
+    (_match, before, _currentVersion, after) => {
+      foundAndroidRuntime = true
+      return `${before}${appVersion}${after}`
+    }
+  )
+
+  if (!foundAndroidRuntime) {
+    throw new Error('Could not find expo_runtime_version in android strings.xml')
+  }
+
+  fs.writeFileSync(androidStringsPath, updatedStrings)
 }
 
 console.log(`Synced Expo runtime/native versions to app version ${appVersion}`)
