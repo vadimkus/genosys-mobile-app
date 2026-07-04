@@ -14,6 +14,7 @@ export function computeProductBadges(product, labels = {}) {
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
   const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
+  const isCerabarrier = nameLower.includes('cerabarrier');
   const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
   const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
   const isBeautyBox = isBeautyBoxProduct(product);
@@ -23,7 +24,7 @@ export function computeProductBadges(product, labels = {}) {
     if (text === 'best seller' || text === 'limited edition' || text === '50% off') return false;
     if (isBeautyBox && text.includes('bundle') && text.includes('offer')) return false;
     if (text === 'professional') return false;
-    if (text === 'new' && !(isPdrnMask || isRevitaGlow)) return false;
+    if (text === 'new' && !(isPdrnMask || isRevitaGlow || isCerabarrier)) return false;
     return true;
   });
 
