@@ -317,6 +317,7 @@ export default function ShopScreen() {
           </Text>
           <Text style={[styles.gridCategory, isRTL && styles.gridCategoryRTL]}>
             {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+            {product.size ? ` · ${product.size}` : ''}
           </Text>
 
           {(getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description) && (
