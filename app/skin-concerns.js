@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import ConcernFaceMap from '../components/ConcernFaceMap';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
@@ -133,6 +134,14 @@ export default function SkinConcernsScreen() {
         scrollEventThrottle={16}
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
+        {/* Interactive face map — tap a zone to jump to its concern */}
+        <ConcernFaceMap
+          concerns={CONCERNS}
+          locale={locale}
+          isRTL={isRTL}
+          onSelectConcern={handleConcernPress}
+        />
+
         {/* Title section */}
         <View style={styles.titleSection}>
           <Text style={[styles.pageTitle, isRTL && styles.textRTL]}>{title}</Text>
