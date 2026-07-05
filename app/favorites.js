@@ -205,7 +205,7 @@ export default function FavoritesScreen() {
                           <Image
                             source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
                             style={styles.thumb}
-                            contentFit="cover"
+                            contentFit="contain"
                             transition={200}
                             cachePolicy="memory-disk"
                           />

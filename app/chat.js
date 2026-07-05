@@ -224,7 +224,7 @@ export default function ChatScreen() {
     return (
       <View style={styles.productCard} key={`prod-${productId}`}>
         {imageUri ? (
-          <Image source={imageUri} style={styles.productImage} contentFit="cover" transition={200} cachePolicy="memory-disk" />
+          <Image source={imageUri} style={styles.productImage} contentFit="contain" transition={200} cachePolicy="memory-disk" />
         ) : (
           <View style={styles.productImagePlaceholder}>
             <Ionicons name="bag-outline" size={24} color="#D1D5DB" />
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
   },
   productImagePlaceholder: {
     width: 60,

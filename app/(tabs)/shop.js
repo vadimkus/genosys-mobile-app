@@ -244,7 +244,6 @@ export default function ShopScreen() {
               source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
               style={styles.gridImage}
               contentFit="contain"
-              contentPosition="top"
               transition={200}
               cachePolicy="memory-disk"
             />
@@ -1446,8 +1445,10 @@ const styles = StyleSheet.create({
     // image rounds itself (its own container clips) while card stays open.
   },
   gridImageContainer: {
+    // Square tile (matches the website's aspect-square frames): square
+    // studio photos fill edge-to-edge, wide photos letterbox on white.
     width: '100%',
-    height: 140,
+    height: GRID_CARD_WIDTH,
     position: 'relative',
     backgroundColor: colors.white,
     borderTopLeftRadius: 16,

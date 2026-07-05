@@ -295,7 +295,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
           <TouchableOpacity onPress={handleOpenRecommended} activeOpacity={0.9}>
           <View style={styles.pcImageWrap}>
             {imageUri ? (
-              <Image source={imageUri} style={styles.pcImage} contentFit="cover" transition={200} cachePolicy="memory-disk" />
+              <Image source={imageUri} style={styles.pcImage} contentFit="contain" transition={200} cachePolicy="memory-disk" />
             ) : (
               <View style={styles.pcImageFallback} />
             )}

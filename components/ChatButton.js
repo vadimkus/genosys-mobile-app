@@ -218,7 +218,7 @@ export default function ChatButton({ visible = true }) {
     return (
       <View style={s.productCard} key={`prod-${productId}`}>
         {imageUri ? (
-          <Image source={imageUri} style={s.productImage} contentFit="cover" transition={200} cachePolicy="memory-disk" />
+          <Image source={imageUri} style={s.productImage} contentFit="contain" transition={200} cachePolicy="memory-disk" />
         ) : (
           <View style={s.productImagePlaceholder}>
             <Ionicons name="bag-outline" size={20} color="#D1D5DB" />
@@ -597,7 +597,7 @@ const s = StyleSheet.create({
     marginVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: '#E5E7EB',
   },
   productCardLoading: { height: 50, alignItems: 'center', justifyContent: 'center', marginVertical: 4 },
-  productImage: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#F3F4F6' },
+  productImage: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#FFFFFF' },
   productImagePlaceholder: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
   productInfo: { flex: 1, marginStart: 8 },
   productName: { ...T.captionSmall, fontWeight: '600', color: '#1F2937', lineHeight: 16 },

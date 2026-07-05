@@ -44,7 +44,8 @@ function ShimmerBar({ width = '100%', height = 16, borderRadius = 8, style }) {
 function ProductCardSkeleton() {
   return (
     <View style={styles.productCard}>
-      <ShimmerBar width="100%" height={140} borderRadius={12} />
+      {/* Square image tile — mirrors shop grid's square photo frame */}
+      <ShimmerBar width="100%" height={(SCREEN_WIDTH - 36) / 2} borderRadius={12} />
       <View style={styles.productCardBody}>
         <ShimmerBar width="60%" height={10} />
         <ShimmerBar width="90%" height={14} style={{ marginTop: 8 }} />

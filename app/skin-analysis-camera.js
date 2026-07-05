@@ -311,7 +311,7 @@ export default function SkinAnalysisCameraScreen() {
                     <View style={styles.aiRecRow}>
                       {details?.image ? (
                         <View style={styles.aiRecImageWrap}>
-                          <Image source={{ uri: details.image }} style={styles.aiRecImage} resizeMode="cover" />
+                          <Image source={{ uri: details.image }} style={styles.aiRecImage} contentFit="contain" />
                           {details.size ? <Text style={styles.aiRecSize}>{details.size}</Text> : null}
                         </View>
                       ) : (
@@ -692,11 +692,12 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 10,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
   },
   aiRecImagePlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
   },
   aiRecSize: {
     ...T.badge,

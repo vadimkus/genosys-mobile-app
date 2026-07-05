@@ -422,7 +422,7 @@ export default function OrdersScreen() {
                         <Image
                           source={{ uri: firstImage }}
                           style={styles.thumb}
-                          contentFit="cover"
+                          contentFit="contain"
                           transition={200}
                           cachePolicy="memory-disk"
                           recyclingKey={`order-thumb-${keyId}`}

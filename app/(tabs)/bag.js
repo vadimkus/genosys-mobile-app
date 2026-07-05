@@ -200,7 +200,7 @@ export default function BagScreen() {
             disabled={promo}
           >
             {imageUrl ? (
-              <Image source={{ uri: imageUrl }} style={styles.itemImage} resizeMode="cover" />
+              <Image source={{ uri: imageUrl }} style={styles.itemImage} contentFit="contain" />
             ) : (
               <View style={styles.itemImagePlaceholder}>
                 <Text style={styles.placeholderText}>{item.product.name?.charAt(0) || 'G'}</Text>

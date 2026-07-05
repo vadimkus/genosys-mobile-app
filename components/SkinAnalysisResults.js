@@ -221,7 +221,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
               return (
                 <View style={styles.recCard} key={`rec-${product.id || idx}`}>
                   {imageUri ? (
-                    <Image source={{ uri: imageUri }} style={styles.recImage} resizeMode="cover" />
+                    <Image source={{ uri: imageUri }} style={styles.recImage} contentFit="contain" />
                   ) : (
                     <View style={[styles.recImage, styles.recImagePlaceholder]}>
                       <Ionicons name="leaf-outline" size={24} color={colors.tertiary} />
@@ -400,8 +400,8 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
-  recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#F3F4F6' },
-  recImagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
+  recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#FFFFFF' },
+  recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
   recInfo: { flex: 1, marginStart: 12 },
   recName: { ...T.label, color: '#1F2937', lineHeight: 20 },
   recPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginTop: 4 },

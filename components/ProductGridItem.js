@@ -120,7 +120,9 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
           <Image
             source={{ uri: imageUrl }}
             style={[styles.image, isOutOfStock && styles.imageOutOfStock]}
-            resizeMode="contain"
+            contentFit="contain"
+            transition={200}
+            cachePolicy="memory-disk"
           />
         ) : (
           <View style={styles.imagePlaceholder}>
@@ -348,8 +350,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   imageContainer: {
+    // Square tile (matches website): square studio photos fill edge-to-edge,
+    // wide photos letterbox invisibly on the white background.
     width: '100%',
-    height: CARD_WIDTH * 0.8, // Maintain aspect ratio
+    height: CARD_WIDTH,
     backgroundColor: '#FFFFFF',
     position: 'relative',
     overflow: 'visible', // Make sure badges aren't clipped
