@@ -88,7 +88,7 @@ export const PRODUCT_CONFIG = {
     images: ['/images/BFAD.png', '/images/Second/ferment_big.jpg', '/images/Third/Ferment_3.jpeg', '/images/Third/ferment_high.jpeg'],
   },
   '52': {
-    images: ['/images/PDRN.png', '/images/Second/pdrnnn.jpg'],
+    images: ['/images/pdrn_mask/main.jpeg', '/images/Second/pdrn_big2.jpg'],
     videoUrl: '/videos/pdrn.mp4',
   },
   '35': {
