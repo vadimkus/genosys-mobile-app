@@ -776,11 +776,9 @@ const styles = StyleSheet.create({
     width: 24, height: 24, borderRadius: 12, backgroundColor: '#dc2626',
     alignItems: 'center', justifyContent: 'center',
   },
-  // Square tile presented like the WEB bundle builder: photo inset on a light
-  // grey tile (Tailwind gray-50). Studio photos with grey backdrops (e.g.
-  // Cerabarrier main2.jpeg) blend into the tile instead of reading as a grey
-  // rectangle floating on a white card — no asset editing needed.
-  productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F9FAFB', padding: 12 },
+  // Square tile, photo edge-to-edge (user-chosen presentation, 2026-07-06):
+  // square studio photos fill the tile fully; wide photos letterbox on white.
+  productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
   productName: { ...T.captionSmall, fontWeight: '600', color: '#374151', lineHeight: 16, minHeight: 32 },
