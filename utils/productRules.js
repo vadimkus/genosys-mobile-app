@@ -18,11 +18,19 @@ export const isCushionBB = (product) => {
   return name.includes('blemish balm') && name.includes('cushion');
 };
 
+// Matches backend mobileDiscountRules.ts BEAUTY_BOX_PRODUCT_NUMBERS —
+// keep in sync so display exclusions equal what checkout actually charges.
+const BEAUTY_BOX_PRODUCT_NUMBERS = new Set(['55', '56', '57', '58', '59', '62']);
+
 export const isBeautyBoxProduct = (product) => {
+  const productNumber = String(product?.productNumber || '').trim();
   const catRaw = String(product?.category || '').trim().toLowerCase();
   const name = normalizeProductName(product);
   // Normalize category by removing non-alphanumerics to catch "Beauty Boxes", "Beauty box", "beauty-boxes", etc.
   const catCompact = catRaw.replace(/[^a-z0-9]/g, '');
+
+  // Product-number detection (server-authoritative set)
+  if (BEAUTY_BOX_PRODUCT_NUMBERS.has(productNumber)) return true;
 
   // Category-based detection (most reliable when present)
   if (catRaw === 'beauty boxes' || catRaw === 'beauty box') return true;
