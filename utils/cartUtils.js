@@ -238,16 +238,20 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
     const itemPrice = !useContract && forceCanonicalPrice
       ? getCanonicalUnitPrice(item.product)
       : (() => {
-          // Bundle items ("Build Your Set"): bundle discount ONLY on retail price — NO VIP/user discount.
+          // Bundle items ("Build Your Set"): bundle and VIP discounts do not
+          // stack — the BEST one wins, matching the server (cartPricing.ts
+          // contractBeatsBundle) and the per-line badges in the bag UI.
           if (isBundleItem) {
             const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;
             const retailBase =
               (Number.isFinite(productOriginal) && productOriginal > 0 ? productOriginal : 0) ||
               (useContract && Number.isFinite(pricing.basePrice) && pricing.basePrice > 0 ? pricing.basePrice : 0) ||
               Number(item.product?.price ?? 0);
-            // Only apply bundle discount (no VIP)
-            if (bundlePct > 0 && bundlePct < 100) {
-              return Math.round(retailBase * (1 - bundlePct / 100) * 100) / 100;
+            const safeBundlePct = bundlePct > 0 && bundlePct < 100 ? bundlePct : 0;
+            const vipEligible = hasUserDiscount && !excludedFromUserDiscount;
+            const effectivePct = Math.max(safeBundlePct, vipEligible ? discountPct : 0);
+            if (effectivePct > 0) {
+              return Math.round(retailBase * (1 - effectivePct / 100) * 100) / 100;
             }
             return retailBase;
           }
@@ -406,8 +410,7 @@ export function computeWaterfallBreakdown(items, user) {
     const forceCanonicalPrice =
       isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
     const isBundleItem = item?.fromBundle === true || product?.fromBundle === true;
-    // Bundle items: NO VIP discount — bundle discount only. Non-bundle excluded products still skip VIP.
-    const excludedFromUserDiscount = isBundleItem || isUserDiscountExcludedProduct(product);
+    const excludedFromUserDiscount = isUserDiscountExcludedProduct(product);
     const beautyBox = isBeautyBoxProduct(product);
     const useContract = hasUsableCartContract(pricing, hasUserDiscountPct);
 
@@ -442,9 +445,8 @@ export function computeWaterfallBreakdown(items, user) {
 
     _retailTotal += retailUnitPrice * qty;
 
-    // --- User (VIP) discount ---
-    // Bundle items are excluded from VIP discount (excludedFromUserDiscount is true for them)
-    if (!excludedFromUserDiscount && hasUserDiscountPct) {
+    // --- User (VIP) discount (non-bundle lines; bundle lines resolve below) ---
+    if (!isBundleItem && !excludedFromUserDiscount && hasUserDiscountPct) {
       const discountAmount = retailUnitPrice * (discountPct / 100);
       _userDiscountTotal += discountAmount * qty;
       _userDiscountPct = discountPct;
@@ -465,14 +467,21 @@ export function computeWaterfallBreakdown(items, user) {
         if (pct > 0) _bundleDiscountPct = pct;
       }
     }
-    // Handle "Build Your Set" bundle items — bundle discount on RETAIL price (no VIP)
+    // "Build Your Set" bundle items — bundle vs VIP: best discount wins
+    // (matches server cartPricing.ts contractBeatsBundle and bag line badges).
     const bundlePct = Number(item?.bundleDiscountPercent || product?.bundleDiscountPercent) || 0;
     if (isBundleItem && bundlePct > 0) {
-      // Bundle discount applied directly on retail price (no VIP discount involved)
-      const bundleDiscountAmount = retailUnitPrice * (bundlePct / 100);
-      if (Number.isFinite(bundleDiscountAmount) && bundleDiscountAmount > 0) {
-        _bundleDiscountTotal += bundleDiscountAmount * qty;
-        _bundleDiscountPct = bundlePct;
+      const vipEligible = hasUserDiscountPct && !excludedFromUserDiscount;
+      if (vipEligible && discountPct > bundlePct) {
+        const discountAmount = retailUnitPrice * (discountPct / 100);
+        _userDiscountTotal += discountAmount * qty;
+        _userDiscountPct = discountPct;
+      } else {
+        const bundleDiscountAmount = retailUnitPrice * (bundlePct / 100);
+        if (Number.isFinite(bundleDiscountAmount) && bundleDiscountAmount > 0) {
+          _bundleDiscountTotal += bundleDiscountAmount * qty;
+          _bundleDiscountPct = bundlePct;
+        }
       }
     }
   });

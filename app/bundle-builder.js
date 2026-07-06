@@ -33,6 +33,7 @@ import { getJson } from '../services/httpClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from '../utils/logger';
 import { formatAed } from '../utils/pricingDisplay';
+import { isUserDiscountExcludedProduct } from '../utils/productRules';
 
 const log = createLogger('BundleBuilder');
 
@@ -184,11 +185,40 @@ export default function BundleBuilderScreen() {
   const discountPercent = getDiscountForCount(itemCount);
   const nextTier = getNextTier(itemCount);
 
-  // Bundle pricing: bundle discount ONLY on retail price — NO VIP/user discount stacking
-  const retailTotal = selectedArray.reduce((sum, item) => sum + getBundleRetailPrice(item.product), 0);
-  const discountAmount = Math.round((retailTotal * discountPercent) / 100 * 100) / 100;
-  const total = Math.round((retailTotal - discountAmount) * 100) / 100;
+  // Bundle pricing: bundle and VIP discounts do NOT stack — the best one wins
+  // per line (matches server cartPricing contractBeatsBundle + bag display).
+  const vipPctRaw = Number(user?.discountPercentage);
+  const vipPct = user?.discountType && Number.isFinite(vipPctRaw) && vipPctRaw > 0 && vipPctRaw < 100 ? vipPctRaw : 0;
+
+  let retailTotalAcc = 0;
+  let totalAcc = 0;
+  let vipWinLines = 0;
+  let bundleWinLines = 0;
+  for (const { product } of selectedArray) {
+    const retail = getBundleRetailPrice(product);
+    const vipEligible = vipPct > 0 && !isUserDiscountExcludedProduct(product);
+    const effectivePct = Math.max(discountPercent, vipEligible ? vipPct : 0);
+    retailTotalAcc += retail;
+    totalAcc += retail * (1 - effectivePct / 100);
+    if (effectivePct > 0) {
+      if (vipEligible && vipPct > discountPercent) vipWinLines += 1;
+      else bundleWinLines += 1;
+    }
+  }
+  const retailTotal = Math.round(retailTotalAcc * 100) / 100;
+  const total = Math.round(totalAcc * 100) / 100;
+  const discountAmount = Math.round((retailTotal - total) * 100) / 100;
   const totalSaved = discountAmount;
+  // 'vip' when the personal discount beats the tier on every line, 'mixed'
+  // when some lines keep the tier (e.g. VIP-excluded products), else 'bundle'.
+  const appliedDiscountType = vipWinLines > 0 ? (bundleWinLines > 0 ? 'mixed' : 'vip') : 'bundle';
+  const headlinePct = appliedDiscountType === 'vip' ? vipPct : discountPercent;
+  const discountRowLabel = appliedDiscountType === 'vip'
+    ? l('VIP Discount', 'خصم VIP', 'VIP-скидка')
+    : appliedDiscountType === 'mixed'
+      ? l('Discount', 'خصم', 'Скидка')
+      : l('Bundle Discount', 'خصم المجموعة', 'Скидка набора');
+  const discountRowPctText = appliedDiscountType === 'mixed' ? '' : ` (${headlinePct}%)`;
 
   const toggleProduct = (product, stepId) => {
     haptics.lightTap();
@@ -472,7 +502,7 @@ export default function BundleBuilderScreen() {
               <Text style={[styles.stepHeaderTitle, isRTL && styles.textRTL]}>{currentStepData.name}</Text>
               {currentStepData.required && (
                 <View style={styles.requiredBadge}>
-                  <Text style={styles.requiredBadgeText}>{l('Required', 'مطلوب', 'Обязательно')}</Text>
+                  <Text style={styles.requiredBadgeText}>{l('Recommended', 'موصى به', 'Рекомендуется')}</Text>
                 </View>
               )}
             </View>
@@ -513,32 +543,32 @@ export default function BundleBuilderScreen() {
           <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
         </TouchableOpacity>
 
-        {/* Expanded pricing breakdown — bundle discount only */}
+        {/* Expanded pricing breakdown — best discount wins (bundle vs VIP) */}
         {footerExpanded && user && itemCount > 0 && (
           <View style={styles.footerPricing}>
-            {/* Retail Price (before bundle discount) */}
-            {discountPercent > 0 && (
+            {/* Retail Price (before discount) */}
+            {discountAmount > 0 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
-                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{retailTotal.toFixed(2)} AED</Text>
+                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{formatAed(retailTotal)}</Text>
               </View>
             )}
-            {/* Bundle Discount */}
-            {discountPercent > 0 && (
+            {/* Discount row — labelled by the discount that actually won */}
+            {discountAmount > 0 && (
               <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabelGreen}>{l('Bundle Discount', 'خصم المجموعة', 'Скидка набора')} ({discountPercent}%)</Text>
-                <Text style={styles.pricingValueGreen}>-{discountAmount.toFixed(2)} AED</Text>
+                <Text style={styles.pricingLabelGreen}>{discountRowLabel}{discountRowPctText}</Text>
+                <Text style={styles.pricingValueGreen}>-{formatAed(discountAmount)}</Text>
               </View>
             )}
             <View style={[styles.pricingRow, styles.pricingRowTotal]}>
               <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
-              <Text style={styles.pricingTotalValue}>{total.toFixed(2)} AED</Text>
+              <Text style={styles.pricingTotalValue}>{formatAed(total)}</Text>
             </View>
             {/* You Save badge */}
             {totalSaved > 0.5 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabelGreen}>{l('You Save', 'توفر', 'Вы экономите')}</Text>
-                <Text style={styles.pricingValueGreen}>{totalSaved.toFixed(2)} AED</Text>
+                <Text style={styles.pricingValueGreen}>{formatAed(totalSaved)}</Text>
               </View>
             )}
           </View>
@@ -560,8 +590,8 @@ export default function BundleBuilderScreen() {
           <TouchableOpacity style={styles.navCenter} onPress={() => itemCount > 0 ? openSummary() : null} activeOpacity={0.7}>
             {user && itemCount > 0 ? (
               <>
-                {discountPercent > 0 && (
-                  <Text style={styles.navDiscount}>-{discountPercent}%</Text>
+                {discountAmount > 0 && headlinePct > 0 && (
+                  <Text style={styles.navDiscount}>-{headlinePct}%</Text>
                 )}
                 <Text style={styles.navTotal}>{Math.round(total)} AED</Text>
               </>
@@ -636,31 +666,31 @@ export default function BundleBuilderScreen() {
               })}
             </ScrollView>
 
-            {/* Pricing breakdown — bundle discount only */}
+            {/* Pricing breakdown — best discount wins (bundle vs VIP) */}
             {user && (
               <View style={styles.summaryPricing}>
                 {/* Retail Price */}
-                {discountPercent > 0 && (
+                {discountAmount > 0 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
-                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{retailTotal.toFixed(2)} AED</Text>
+                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{formatAed(retailTotal)}</Text>
                   </View>
                 )}
-                {/* Bundle Discount */}
-                {discountPercent > 0 && (
+                {/* Discount row — labelled by the discount that actually won */}
+                {discountAmount > 0 && (
                   <View style={styles.pricingRow}>
-                    <Text style={styles.pricingLabelGreen}>{l('Bundle Discount', 'خصم المجموعة', 'Скидка набора')} ({discountPercent}%)</Text>
-                    <Text style={styles.pricingValueGreen}>-{discountAmount.toFixed(2)} AED</Text>
+                    <Text style={styles.pricingLabelGreen}>{discountRowLabel}{discountRowPctText}</Text>
+                    <Text style={styles.pricingValueGreen}>-{formatAed(discountAmount)}</Text>
                   </View>
                 )}
                 <View style={[styles.pricingRow, styles.pricingRowTotal]}>
                   <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
-                  <Text style={styles.pricingTotalValue}>{total.toFixed(2)} AED</Text>
+                  <Text style={styles.pricingTotalValue}>{formatAed(total)}</Text>
                 </View>
                 {totalSaved > 0.5 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabelGreen}>{l('You Save', 'توفر', 'Вы экономите')}</Text>
-                    <Text style={styles.pricingValueGreen}>{totalSaved.toFixed(2)} AED</Text>
+                    <Text style={styles.pricingValueGreen}>{formatAed(totalSaved)}</Text>
                   </View>
                 )}
               </View>
@@ -720,7 +750,7 @@ const styles = StyleSheet.create({
   stepEmoji: { fontSize: 14 },
   stepPillText: { ...T.captionTiny, fontWeight: '600', color: '#6B7280' },
   stepPillTextActive: { color: '#dc2626' },
-  requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#dc2626' },
+  requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#F59E0B' },
   stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
   stepCountText: { ...T.badge, color: '#fff' },
 
@@ -730,8 +760,8 @@ const styles = StyleSheet.create({
   stepHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   stepHeaderTitle: { ...T.sectionTitleSmall, color: '#111827' },
   stepHeaderDesc: { ...T.caption, color: '#6B7280', marginTop: 2 },
-  requiredBadge: { backgroundColor: '#FEF2F2', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  requiredBadgeText: { ...T.captionTiny, fontWeight: '600', color: '#dc2626' },
+  requiredBadge: { backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
+  requiredBadgeText: { ...T.captionTiny, fontWeight: '600', color: '#92400E' },
 
   // Product grid
   productGrid: { paddingHorizontal: 12, paddingVertical: 12, paddingBottom: 200 },
