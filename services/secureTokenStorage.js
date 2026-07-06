@@ -92,9 +92,13 @@ export async function storeUserSession(userData) {
  */
 export async function getUserSession() {
   try {
-    // Try secure storage first
-    const token = await SecureStore.getItemAsync(SECURE_TOKEN_KEY);
-    const profileRaw = await AsyncStorage.getItem(USER_DATA_KEY);
+    // Independent reads — run in parallel. SecureStore (encrypted) is slower
+    // than AsyncStorage, so serializing them added ~50-150ms to cold-start
+    // auth restore for no reason.
+    const [token, profileRaw] = await Promise.all([
+      SecureStore.getItemAsync(SECURE_TOKEN_KEY),
+      AsyncStorage.getItem(USER_DATA_KEY),
+    ]);
     
     if (token && profileRaw) {
       const profileData = JSON.parse(profileRaw);

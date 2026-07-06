@@ -59,12 +59,21 @@ export const checkBiometricSupport = async () => {
 };
 
 /**
+ * Derive the display name from an already-fetched support object.
+ * Lets callers avoid a second checkBiometricSupport() round-trip.
+ * @param {Object} support - result of checkBiometricSupport()
+ * @returns {string} Biometric type name
+ */
+export const biometricTypeNameFromSupport = (support) =>
+  support?.primaryType || 'Biometric Authentication';
+
+/**
  * Get the biometric type name for UI display
  * @returns {Promise<string>} Biometric type name
  */
 export const getBiometricTypeName = async () => {
   const support = await checkBiometricSupport();
-  return support.primaryType || 'Biometric Authentication';
+  return biometricTypeNameFromSupport(support);
 };
 
 /**

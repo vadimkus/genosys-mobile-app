@@ -143,6 +143,16 @@
             {
               "scheme": "https",
               "host": "genosys.ae",
+              "pathPrefix": "/reset-password"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
+              "pathPrefix": "/forgot-password"
+            },
+            {
+              "scheme": "https",
+              "host": "genosys.ae",
               "pathPrefix": "/locations"
             },
             {

@@ -110,6 +110,14 @@ export function redirectSystemPath({ path }) {
     // Orders tab.
     if (cleanPath === 'orders') return '/(tabs)/orders';
 
+    // Specific order: web /orders/<id> → native order detail. Must come before
+    // the KNOWN_ROUTE_SEGMENTS check (which would send it to a WebView).
+    if (cleanPath.startsWith('orders/')) {
+      const orderId = cleanPath.split('/')[1];
+      if (orderId) return `/profile/orders/${encodeURIComponent(orderId)}`;
+      return '/(tabs)/orders';
+    }
+
     // Order tracking: track/<orderNumber>.
     if (cleanPath.startsWith('track/')) {
       const orderNumber = cleanPath.replace('track/', '').split('/')[0];

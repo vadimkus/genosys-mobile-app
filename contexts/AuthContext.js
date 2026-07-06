@@ -21,7 +21,7 @@ import {
 } from '../services/databaseService';
 import {
   checkBiometricSupport,
-  getBiometricTypeName,
+  biometricTypeNameFromSupport,
   isBiometricEnabled,
   enableBiometricAuth,
   disableBiometricAuth,
@@ -84,9 +84,14 @@ export const AuthProvider = ({ children }) => {
 
   const checkBiometricAvailability = async () => {
     try {
-      const support = await checkBiometricSupport();
-      const enabled = await isBiometricEnabled();
-      const typeName = await getBiometricTypeName();
+      // Run the independent reads in parallel. getBiometricTypeName() derives
+      // from the same hardware support, so compute the name from `support`
+      // instead of calling checkBiometricSupport() a second time.
+      const [support, enabled] = await Promise.all([
+        checkBiometricSupport(),
+        isBiometricEnabled(),
+      ]);
+      const typeName = biometricTypeNameFromSupport(support);
       
       setBiometricAvailable(support.isAvailable && support.isEnrolled);
       setBiometricEnabled(enabled);
@@ -130,7 +135,9 @@ export const AuthProvider = ({ children }) => {
             const sanitizedUser = sanitizeUserSession(mergedUser);
             setUser(sanitizedUser);
             await storeUserSession(sanitizedUser);
-            await checkBiometricAvailability();
+            // Note: biometric availability was already resolved in
+            // initializeAuth() → checkBiometricAvailability() before this ran.
+            // Hardware capability can't change mid-session, so we don't re-run it.
           } else if (validation.success && validation.valid === false) {
             // Session expired, clear stored data
             await clearUserSession();
