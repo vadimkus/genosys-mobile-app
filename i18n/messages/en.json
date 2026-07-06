@@ -1220,7 +1220,7 @@
     "biometricAuthFailed": "Biometric authentication failed. Please try again.",
     "fillAllFields": "Please fill in all fields",
     "invalidEmail": "Please enter a valid email address",
-    "passwordMinLength": "Password must be at least 6 characters long",
+    "passwordMinLength": "Password must be at least 8 characters long",
     "accountCreatedTitle": "Success",
     "accountCreatedMessage": "Account created successfully!",
     "loginFailed": "Login failed",

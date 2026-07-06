@@ -1220,7 +1220,7 @@
     "biometricAuthFailed": "فشلت المصادقة البيومترية. يرجى المحاولة مرة أخرى.",
     "fillAllFields": "يرجى تعبئة جميع الحقول",
     "invalidEmail": "يرجى إدخال بريد إلكتروني صالح",
-    "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+    "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
     "accountCreatedTitle": "تم بنجاح",
     "accountCreatedMessage": "تم إنشاء الحساب بنجاح!",
     "loginFailed": "فشل تسجيل الدخول",

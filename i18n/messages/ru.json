@@ -1220,7 +1220,7 @@
     "biometricAuthFailed": "Биометрическая аутентификация не удалась. Попробуйте ещё раз.",
     "fillAllFields": "Заполните все поля",
     "invalidEmail": "Введите корректный email",
-    "passwordMinLength": "Пароль должен быть не короче 6 символов",
+    "passwordMinLength": "Пароль должен быть не короче 8 символов",
     "accountCreatedTitle": "Успешно",
     "accountCreatedMessage": "Аккаунт успешно создан!",
     "loginFailed": "Не удалось войти",

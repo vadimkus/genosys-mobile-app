@@ -27,6 +27,7 @@ import {
   disableBiometricAuth,
   authenticateWithBiometrics,
   setupBiometricAuth,
+  upgradeBiometricPayloadToToken,
   debugBiometricStatus,
   testBiometricAuth
 } from '../services/biometricService';
@@ -343,6 +344,11 @@ export const AuthProvider = ({ children }) => {
             const sanitizedUser = sanitizeUserSession(loginResult.user);
             await storeUserSession(sanitizedUser);
             setUser(sanitizedUser);
+            // Upgrade v1 payload to v2 {email, token} and purge the stored
+            // plaintext password (user just passed Face ID — no re-prompt).
+            if (sanitizedUser?.token) {
+              upgradeBiometricPayloadToToken(creds.email, sanitizedUser.token).catch(() => {});
+            }
             return { success: true };
           }
 

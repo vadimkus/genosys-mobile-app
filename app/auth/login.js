@@ -294,7 +294,10 @@ export default function LoginScreen() {
       return;
     }
 
-    if (password.length < 6) {
+    // Register-only: min 8, aligned with the server + reset-password policy.
+    // Login is not length-checked so legacy accounts with shorter passwords
+    // can still sign in (server validates credentials anyway).
+    if (!isLogin && password.length < 8) {
       haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.passwordMinLength'));
       return;
@@ -532,6 +535,7 @@ export default function LoginScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
+                  textContentType={isLogin ? 'username' : 'emailAddress'}
                   placeholderTextColor={colors.tertiary}
                 />
               </View>
@@ -546,6 +550,7 @@ export default function LoginScreen() {
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
                     autoComplete={isLogin ? 'current-password' : 'new-password'}
+                    textContentType={isLogin ? 'password' : 'newPassword'}
                     placeholderTextColor={colors.tertiary}
                   />
                   <TouchableOpacity

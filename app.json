@@ -18,11 +18,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "93",
+      "buildNumber": "94",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
-        "applinks:genosys.ae"
+        "applinks:genosys.ae",
+        "webcredentials:genosys.ae"
       ],
       "splash": {
         "image": "./assets/splash.png",
@@ -49,7 +50,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 88,
+      "versionCode": 89,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
