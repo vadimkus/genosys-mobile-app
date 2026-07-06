@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>GENOSYS UAE — App Review Notes (v1.10.5)</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #1a1a1a; font-size: 11.5px; line-height: 1.5; margin: 0;
+  }
+  h1 { font-size: 22px; margin: 0 0 2px; color: #b91c1c; letter-spacing: -0.3px; }
+  h2 { font-size: 14px; margin: 20px 0 6px; padding-bottom: 4px; border-bottom: 2px solid #eee; color: #111; }
+  h3 { font-size: 12px; margin: 12px 0 4px; color: #b91c1c; }
+  .sub { color: #666; font-size: 11px; margin: 0 0 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 10px; }
+  td, th { border: 1px solid #e2e2e2; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #f7f7f7; font-weight: 600; width: 34%; }
+  .cred { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+  .cred b { color: #b45309; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-family: "SF Mono", Menlo, monospace; font-size: 10.5px; }
+  ul { margin: 4px 0 10px; padding-left: 18px; }
+  li { margin: 2px 0; }
+  ol { margin: 4px 0 10px; padding-left: 20px; }
+  ol li { margin: 4px 0; }
+  .muted { color: #666; }
+  .step { font-weight: 600; }
+  hr { border: none; border-top: 1px solid #eee; margin: 16px 0; }
+  .footer { margin-top: 18px; color: #666; font-size: 10.5px; }
+</style>
+</head>
+<body>
+
+  <h1>GENOSYS UAE — App Review Notes</h1>
+  <p class="sub">Version 1.10.5 · Bundle ID <code>ae.genosys.app</code> · Platform iOS · Prepared July 6, 2026</p>
+
+  <h2>Test / Demo Account (Sign-in required)</h2>
+  <div class="cred">
+    <div><b>Email:</b> <code>appreview@genosys.ae</code></div>
+    <div><b>Password:</b> <code>GenosysReview2026!</code></div>
+    <div class="muted" style="margin-top:6px;">Pre-created and verified on production. No email verification required. This account has a 50% VIP discount, so discounted prices and "-50%" badges appear on regular (non-bundle) products. Prices in the app are only visible after signing in.</div>
+  </div>
+
+  <h2>App Overview</h2>
+  <p>GENOSYS UAE is the official e-commerce app of GENOSYS Middle East, the exclusive UAE distributor of GENOSYS professional Korean dermacosmetics. Customers browse and purchase authentic, Dubai Municipality–certified skincare, with AI skin analysis, an in-app assistant, product guides, order tracking, and full English / Arabic / Russian support (Arabic is right-to-left).</p>
+
+  <h2>What's New in This Version</h2>
+  <ul>
+    <li><b>Smarter search</b> — finds products regardless of word order, now including Arabic and Russian search.</li>
+    <li><b>Favorites sync</b> — saved products now sync securely to the signed-in account across devices.</li>
+    <li><b>Faster, cleaner product pages</b> with sharper images.</li>
+    <li><b>Account security</b> — improved sign-in and session protection; in-app account deletion available (Profile → Edit → Delete account).</li>
+    <li><b>Bug fixes and performance improvements.</b></li>
+  </ul>
+
+  <h2>Reviewer Test Flow (approx. 8–10 minutes)</h2>
+  <ol>
+    <li><span class="step">Sign in</span> — Open the app → Sign In → enter the demo email and password above → Sign In.</li>
+    <li><span class="step">Browse</span> — Shop tab: products load with images and VIP-discounted prices. Try the search bar (e.g. "serum hyaluron" in any word order).</li>
+    <li><span class="step">Product page</span> — Tap a product, swipe the image gallery, watch a product video where available, select a size/color variant, tap Add to Bag.</li>
+    <li><span class="step">Favorites</span> — Tap the heart on any product; open the Favorites tab to confirm it appears (syncs to the account).</li>
+    <li><span class="step">Checkout</span> — Bag → Proceed to Checkout → fill delivery details:
+      <br><span class="muted">Name: App Review · Phone: +971 50 123 4567 · Address: Test Address, Dubai · Emirate: Dubai</span>
+      <ul>
+        <li><b>Cash on Delivery:</b> tap Place Order (no payment collected in-app; COD is standard in the UAE).</li>
+        <li><b>Card (Stripe test mode):</b> use test card <code>4242 4242 4242 4242</code>, any future expiry, any CVC. No real charge.</li>
+      </ul>
+    </li>
+    <li><span class="step">AI Skin Analysis</span> — Menu → AI Skin Analysis → either AI Camera (allow camera, capture a selfie, get results) or the 4-question Quiz.</li>
+    <li><span class="step">Languages / RTL</span> — Profile → Language → switch English / Arabic / Russian. Arabic mirrors the layout right-to-left.</li>
+  </ol>
+
+  <h2>Payments</h2>
+  <table>
+    <tr><th>Cash on Delivery</th><td>No payment collected in-app; paid on physical delivery in the UAE.</td></tr>
+    <tr><th>Card (Stripe)</th><td>Stripe test mode for review — card <code>4242 4242 4242 4242</code>, any future date/CVC. No real charges.</td></tr>
+    <tr><th>Apple Pay / IAP</th><td>Not used. All items are physical cosmetic goods shipped within the UAE. No digital goods or in-app purchases.</td></tr>
+  </table>
+
+  <h2>Permissions</h2>
+  <table>
+    <tr><th>Camera</th><td>AI skin analysis and profile photo — only when the user initiates it.</td></tr>
+    <tr><th>Photo Library</th><td>Selecting a photo for profile or skin analysis — only the chosen photo is accessed.</td></tr>
+    <tr><th>Face ID / Touch ID</th><td>Optional biometric sign-in after the first password login; biometric data stays on device.</td></tr>
+    <tr><th>Notifications</th><td>Order status updates only (no marketing without consent).</td></tr>
+    <tr><th>Microphone</th><td>Optional voice search; processed for the search query only.</td></tr>
+  </table>
+
+  <h2>Notes for the Reviewer</h2>
+  <ul>
+    <li>Requires an internet connection; all data comes from the live API at <code>https://genosys.ae/api/mobile/</code>.</li>
+    <li>Physical products only, shipped within the UAE (all 7 emirates). Free delivery over 1,000 AED.</li>
+    <li>Orders placed during review can be identified and cancelled by our team.</li>
+    <li>Privacy Policy: in-app (Profile → Privacy Policy) and at <code>https://genosys.ae/privacy</code>. Terms available in-app.</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <table>
+    <tr><th>Reviewer contact</th><td>Vadim Sagatdinov · +971 55 915 2985 · f.this.that@gmail.com</td></tr>
+    <tr><th>Business support</th><td>sales@genosys.ae · WhatsApp +971 58 548 76 65</td></tr>
+    <tr><th>Website</th><td>https://genosys.ae</td></tr>
+  </table>
+
+  <p class="footer">Thank you for reviewing GENOSYS UAE. For any questions during review, please contact f.this.that@gmail.com or sales@genosys.ae.</p>
+
+</body>
+</html>
