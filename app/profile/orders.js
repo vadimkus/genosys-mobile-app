@@ -95,6 +95,7 @@ const statusLabelKey = (status) => {
     completed: 'ordersDetail.statusCompleted',
     shipped: 'ordersDetail.statusShipped',
     shipping: 'ordersDetail.statusShipped',
+    out_for_delivery: 'ordersDetail.statusOutForDelivery',
     delivered: 'ordersDetail.statusDelivered',
     cancelled: 'ordersDetail.statusCancelled',
     canceled: 'ordersDetail.statusCancelled',

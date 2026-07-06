@@ -899,6 +899,7 @@
     "statusPaid": "Оплачен",
     "statusCompleted": "Завершён",
     "statusShipped": "Отправлен",
+    "statusOutForDelivery": "В доставке",
     "statusDelivered": "Доставлен",
     "statusCancelled": "Отменён",
     "statusRefunded": "Возврат",

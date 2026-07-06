@@ -899,6 +899,7 @@
     "statusPaid": "Paid",
     "statusCompleted": "Completed",
     "statusShipped": "Shipped",
+    "statusOutForDelivery": "Out for Delivery",
     "statusDelivered": "Delivered",
     "statusCancelled": "Cancelled",
     "statusRefunded": "Refunded",

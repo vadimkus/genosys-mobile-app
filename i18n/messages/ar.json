@@ -899,6 +899,7 @@
     "statusPaid": "تم الدفع",
     "statusCompleted": "مكتمل",
     "statusShipped": "تم الشحن",
+    "statusOutForDelivery": "قيد التوصيل",
     "statusDelivered": "تم التوصيل",
     "statusCancelled": "تم الإلغاء",
     "statusRefunded": "تم الاسترداد",

@@ -88,6 +88,7 @@ export const statusStyle = (status) => {
   let color = colors.secondaryLabel;
   if (s === 'pending') color = colors.orange;
   else if (s === 'processing' || s === 'shipped' || s === 'shipping') color = colors.blue;
+  else if (s === 'out_for_delivery') color = colors.orange;
   else if (s === 'confirmed' || s === 'paid' || s === 'completed' || s === 'delivered') color = colors.greenDeep;
   else if (s === 'cancelled' || s === 'canceled' || s === 'failed' || s === 'refunded' || s === 'deleted') color = colors.red;
   return { color, bg: tint(color, '1A') };
