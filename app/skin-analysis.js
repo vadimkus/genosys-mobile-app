@@ -26,6 +26,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { getLocalizedProductName } from '../utils/productLocalization';
+import { CONCERN_TO_CANONICAL, AGE_TO_CANONICAL, USAGE_TO_CANONICAL, toCanonicalConcerns } from '../utils/skinAnalysisMapping';
 import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
@@ -74,38 +75,46 @@ export default function SkinAnalysisScreen() {
     return false;
   };
 
+  const fetchRecommendations = async () => {
+    setLoading(true);
+    setApiError(null);
+    try {
+      // The API scores against canonical keys (lowercase skin type, kebab-case
+      // concerns, web age groups) — display labels would score zero and fall
+      // back to a generic top-rated list.
+      const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
+      const params = new URLSearchParams({
+        skinType: skinType.toLowerCase(),
+        ageGroup: AGE_TO_CANONICAL[ageGroup] || ageGroup,
+        targetConcerns: toCanonicalConcerns(concerns).join(','),
+        usage: USAGE_TO_CANONICAL[usage] || 'both',
+      });
+      const data = await getJson(`${baseUrl}/api/skin-recommendations?${params.toString()}`, {
+        headers: { apiKey: false },
+      });
+      // API returns an array of product objects directly
+      const mapped = (Array.isArray(data) ? data : []).map((p) => ({
+        product: p,
+        score: p.matchScore || 0,
+        matchedConcerns: Array.isArray(p.matchedConcerns) ? p.matchedConcerns : [],
+      }));
+      setResults(mapped);
+    } catch (err) {
+      log.warn('Skin recommendations API failed, using empty results:', err.message);
+      setApiError(t('skinAnalysis.recommendationsFailed'));
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     haptics.lightTap();
     if (step < TOTAL_STEPS) {
       setStep(step + 1);
     } else if (step === TOTAL_STEPS) {
-      setLoading(true);
-      setApiError(null);
       setStep(5);
-      try {
-        // Call the website API for recommendations
-        const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
-        const params = new URLSearchParams({
-          skinType,
-          ageGroup,
-          targetConcerns: concerns.join(','),
-        });
-        const data = await getJson(`${baseUrl}/api/skin-recommendations?${params.toString()}`, {
-          headers: { apiKey: false },
-        });
-        // API returns an array of product objects directly
-        const mapped = (Array.isArray(data) ? data : []).map((p) => ({
-          product: p,
-          score: p.score || 0,
-        }));
-        setResults(mapped);
-      } catch (err) {
-        log.warn('Skin recommendations API failed, using empty results:', err.message);
-        setApiError(t('skinAnalysis.recommendationsFailed'));
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
+      fetchRecommendations();
     }
   };
 
@@ -257,7 +266,8 @@ export default function SkinAnalysisScreen() {
               <View style={styles.errorBox}>
                 <Ionicons name="cloud-offline-outline" size={28} color={colors.brand} />
                 <Text style={styles.errorText}>{t('skinAnalysis.recommendationsFailedFull')}</Text>
-                <TouchableOpacity style={styles.retryBtn} onPress={handleReset} activeOpacity={0.85}>
+                {/* Retry the request — answers are kept, no need to redo the quiz */}
+                <TouchableOpacity style={styles.retryBtn} onPress={fetchRecommendations} activeOpacity={0.85}>
                   <Ionicons name="refresh" size={16} color="#fff" />
                   <Text style={styles.retryBtnText}>{t('skinAnalysis.tryAgain')}</Text>
                 </TouchableOpacity>
@@ -265,7 +275,7 @@ export default function SkinAnalysisScreen() {
             ) : results.length === 0 ? (
               <Text style={styles.noResults}>{t('skinAnalysis.noResults')}</Text>
             ) : (
-              results.map(({ product, score }, idx) => {
+              results.map(({ product, score, matchedConcerns: matched = [] }, idx) => {
                 const name = getLocalizedProductName(product, locale) || product.name || '';
                 const price = product.displayPrice ?? product.price ?? 0;
                 const rawImg = product.image || '';
@@ -273,6 +283,8 @@ export default function SkinAnalysisScreen() {
                   ? (rawImg.startsWith('http') ? rawImg : `${ASSET_ORIGIN}${rawImg}`)
                   : null;
                 const isAdded = addedProducts.has(product.id);
+                // "Why this product": user-chosen concerns this product actually matched
+                const matchedLabels = concerns.filter((c) => matched.includes(CONCERN_TO_CANONICAL[c]));
 
                 return (
                   <View style={styles.recCard} key={`rec-${product.id || idx}`}>
@@ -285,6 +297,16 @@ export default function SkinAnalysisScreen() {
                     )}
                     <View style={styles.recInfo}>
                       <Text style={[styles.recName, isRTL && styles.textRTL]} numberOfLines={2}>{name}</Text>
+                      {matchedLabels.length > 0 && (
+                        <View style={[styles.matchChipsRow, isRTL && { flexDirection: 'row-reverse' }]}>
+                          {matchedLabels.slice(0, 3).map((c) => (
+                            <View key={c} style={styles.matchChip}>
+                              <Ionicons name="checkmark" size={10} color="#16A34A" />
+                              <Text style={styles.matchChipText}>{t(`skinAnalysis.${getConcernKey(c)}`)}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
                       {!user ? (
                         <Text style={styles.recPriceOnRequest}>{t('product.loginToSeePrice')}</Text>
                       ) : product.isPriceOnRequest ? (
@@ -692,6 +714,17 @@ const styles = StyleSheet.create({
   recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
   recInfo: { flex: 1, marginStart: 12 },
   recName: { ...T.label, color: '#1F2937', lineHeight: 20 },
+  matchChipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  matchChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#F0FDF4',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  matchChipText: { ...T.badge, fontWeight: '600', color: '#16A34A' },
   recPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {

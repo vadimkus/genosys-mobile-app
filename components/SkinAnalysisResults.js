@@ -32,25 +32,28 @@ import { colors, tint, shadow, surfaces } from '../utils/theme';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
-// Map concern names to skin profile fields
+// Map detected concern names to the canonical vocabulary used by product
+// targetConcerns fields ("acne-blemishes", "anti-aging", ...). Display-cased
+// labels ("Acne") never matched the product data and scored zero.
 function buildProfileFromConcerns(concerns) {
   const profile = {
     skinType: '',
     ageGroup: '',
     concerns: [],
-    usage: 'Both',
+    usage: '',
   };
 
+  const push = (key) => { if (!profile.concerns.includes(key)) profile.concerns.push(key); };
   for (const c of concerns) {
     const lower = c.toLowerCase();
-    if (lower.includes('acne')) profile.concerns.push('Acne');
-    else if (lower.includes('wrinkle')) profile.concerns.push('Wrinkles');
-    else if (lower.includes('dark spot')) profile.concerns.push('Dark Spots');
-    else if (lower.includes('dry')) profile.concerns.push('Dryness');
-    else if (lower.includes('red')) profile.concerns.push('Redness');
-    else if (lower.includes('pore')) profile.concerns.push('Pores');
-    else if (lower.includes('sensit')) profile.concerns.push('Sensitivity');
-    else if (lower.includes('dull')) profile.concerns.push('Dullness');
+    if (lower.includes('acne')) push('acne-blemishes');
+    else if (lower.includes('wrinkle')) push('anti-aging');
+    else if (lower.includes('dark spot')) push('brightening');
+    else if (lower.includes('dry')) push('hydration');
+    else if (lower.includes('red')) push('sensitivity');
+    else if (lower.includes('pore')) push('pore-care');
+    else if (lower.includes('sensit')) push('sensitivity');
+    else if (lower.includes('dull')) push('brightening');
   }
 
   return profile;

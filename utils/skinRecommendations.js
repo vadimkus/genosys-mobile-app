@@ -62,12 +62,22 @@ function scoreProduct(product, profile) {
 }
 
 /**
- * Parse a comma-separated or array field into a normalized array.
+ * Parse a JSON-array string, comma-separated string, or array field into a
+ * normalized array. Product fields from the API (e.g. targetConcerns) are
+ * JSON strings like '["anti-aging","hydration"]' — naive comma-splitting
+ * left brackets/quotes on the values and every match failed.
  */
 function parseField(value) {
   if (!value) return [];
   if (Array.isArray(value)) return value.map((v) => String(v).trim()).filter(Boolean);
-  return String(value)
+  const str = String(value).trim();
+  if (str.startsWith('[')) {
+    try {
+      const arr = JSON.parse(str);
+      if (Array.isArray(arr)) return arr.map((v) => String(v).trim()).filter(Boolean);
+    } catch { /* fall through to comma split */ }
+  }
+  return str
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
