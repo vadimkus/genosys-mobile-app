@@ -21,6 +21,19 @@ import { resetPasswordWithToken } from '../../services/authService';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces } from '../../utils/theme';
 
+/**
+ * Extract the reset token from whatever the user pastes:
+ * - a full reset link (https://genosys.ae/reset-password/<64-hex>)
+ * - or the raw 64-char hex token itself.
+ */
+function extractResetToken(input) {
+  const raw = String(input || '').trim();
+  if (!raw) return '';
+  const hexMatch = raw.match(/[a-f0-9]{64}/i);
+  if (hexMatch) return hexMatch[0];
+  return raw;
+}
+
 export default function ResetPasswordScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -29,18 +42,22 @@ export default function ResetPasswordScreen() {
   const params = useLocalSearchParams();
   const email = typeof params?.email === 'string' ? params.email : '';
 
-  const [token, setToken] = useState('');
+  // Prefill when opened from a deep link (reset-password/<token> → ?token=)
+  const initialToken = typeof params?.token === 'string' ? params.token : '';
+  const [token, setToken] = useState(initialToken);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const effectiveToken = useMemo(() => extractResetToken(token), [token]);
+
   const canSubmit = useMemo(() => {
     if (loading) return false;
-    if (!token || token.trim().length < 10) return false;
+    if (!effectiveToken || effectiveToken.length < 10) return false;
     if (!newPassword || newPassword.length < 8) return false;
     if (newPassword !== confirmPassword) return false;
     return true;
-  }, [token, newPassword, confirmPassword, loading]);
+  }, [effectiveToken, newPassword, confirmPassword, loading]);
 
   // Subtle entrance motion (native driver).
   const fade = useRef(new Animated.Value(0)).current;
@@ -69,7 +86,7 @@ export default function ResetPasswordScreen() {
       Alert.alert(t('common.error'), t('authScreen.passwordsDontMatch'));
       return;
     }
-    if (!token || token.trim().length < 10) {
+    if (!effectiveToken || effectiveToken.length < 10) {
       haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.resetTokenInvalid'));
       return;
@@ -77,7 +94,7 @@ export default function ResetPasswordScreen() {
 
     try {
       setLoading(true);
-      const result = await resetPasswordWithToken(token.trim(), newPassword);
+      const result = await resetPasswordWithToken(effectiveToken, newPassword);
 
       if (!result.success) {
         haptics.warning();

@@ -120,6 +120,17 @@ export function redirectSystemPath({ path }) {
     // Skin analysis / recommendation aliases.
     if (cleanPath === 'skin-recommendation') return '/skin-analysis';
 
+    // Password reset: web link is /reset-password/<token>; native screen
+    // expects /auth/reset-password?token=<token>. Prefill so the user does
+    // not have to copy the token manually.
+    if (cleanPath.startsWith('reset-password')) {
+      const resetToken = cleanPath.split('/')[1] || '';
+      return resetToken
+        ? `/auth/reset-password?token=${encodeURIComponent(resetToken)}`
+        : '/auth/reset-password';
+    }
+    if (cleanPath === 'forgot-password') return '/auth/forgot-password';
+
     // Paths that already map 1:1 to a native route.
     const firstSegment = cleanPath.split('/')[0];
     if (KNOWN_ROUTE_SEGMENTS.has(firstSegment)) {
