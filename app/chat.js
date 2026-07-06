@@ -173,14 +173,14 @@ export default function ChatScreen() {
   const prefetchProducts = async (text) => {
     const segments = segmentChatResponse(text);
     for (const seg of segments) {
-      if (seg.type === 'product' && !productCache[seg.content]) {
+      if (seg.type === 'product' && productCache[seg.content] === undefined) {
         try {
           const product = await fetchProductById(seg.content, user);
-          if (product) {
-            setProductCache((prev) => ({ ...prev, [seg.content]: product }));
-          }
+          // null marks "fetch failed / product gone" so the card renders
+          // nothing instead of an infinite loading spinner.
+          setProductCache((prev) => ({ ...prev, [seg.content]: product || null }));
         } catch {
-          // skip
+          setProductCache((prev) => ({ ...prev, [seg.content]: null }));
         }
       }
     }
@@ -207,6 +207,8 @@ export default function ChatScreen() {
   /* ─── Product card renderer ─── */
   const renderProductCard = (productId) => {
     const product = productCache[productId];
+    // null = fetch failed (product removed from catalog) → render nothing
+    if (product === null) return null;
     if (!product) {
       return (
         <View style={styles.productCardLoading} key={`prod-${productId}`}>
