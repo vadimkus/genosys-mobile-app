@@ -59,6 +59,10 @@ export const AUTH_CONFIG = {
   // Keep a fallback so OTA exports cannot accidentally ship an auth-broken bundle.
   API_KEY: env('EXPO_PUBLIC_API_KEY', 'genosys_secure_mobile_2025_v1'),
 
+  // Canonical support WhatsApp number (digits only, for wa.me links).
+  // Single source of truth so contact/help screens don't hardcode it.
+  WHATSAPP_NUMBER: env('EXPO_PUBLIC_WHATSAPP_NUMBER', '971585487665'),
+
   // Canonical web origins used across the app for image/link building.
   WEB_ORIGIN,
   ASSET_ORIGIN,

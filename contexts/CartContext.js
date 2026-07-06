@@ -369,7 +369,13 @@ export const CartProvider = ({ children }) => {
 
       if (shippingRatesData) {
         const parsed = JSON.parse(shippingRatesData);
-        if (parsed?.emirates && Array.isArray(parsed.emirates)) {
+        // Only trust cached rates for 24h — otherwise a rate change on the
+        // server could show stale shipping until the app is force-quit.
+        // loadShippingRates() re-fetches on mount regardless; this just avoids
+        // rendering a week-old cached value first.
+        const cachedAt = Number(parsed?._cachedAt) || 0;
+        const isFresh = cachedAt > 0 && Date.now() - cachedAt < 24 * 60 * 60 * 1000;
+        if (parsed?.emirates && Array.isArray(parsed.emirates) && isFresh) {
           setShippingRates(parsed);
           setEmirates(parsed.emirates);
         }
@@ -401,7 +407,7 @@ export const CartProvider = ({ children }) => {
         if (Array.isArray(rates.emirates) && rates.emirates.length) {
           setEmirates(rates.emirates);
         }
-        await AsyncStorage.setItem(SHIPPING_RATES_STORAGE_KEY, JSON.stringify(rates));
+        await AsyncStorage.setItem(SHIPPING_RATES_STORAGE_KEY, JSON.stringify({ ...rates, _cachedAt: Date.now() }));
         log.debug('Shipping rates loaded', { source: rates?._source || 'unknown' });
         shippingRatesFetchRef.current.lastAt = Date.now();
       })();

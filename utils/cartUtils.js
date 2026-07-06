@@ -296,7 +296,11 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
   const list = (Array.isArray(emiratesOverride) && emiratesOverride.length) ? emiratesOverride : UAE_EMIRATES;
   const targetKey = String(selectedEmirate || '').trim().toLowerCase();
   const emirate = list.find(e => String(e.name || '').trim().toLowerCase() === targetKey);
-  const baseShipping = emirate ? Number(emirate.shippingCost) || 0 : 0;
+  // Fail closed on an unknown emirate (mirror the server): show the highest
+  // configured rate rather than 0, so the display never implies free shipping.
+  // (CartContext already validates the selection, so this only guards edge cases.)
+  const maxShipping = list.reduce((m, e) => Math.max(m, Number(e.shippingCost) || 0), 0);
+  const baseShipping = emirate ? (Number(emirate.shippingCost) || 0) : maxShipping;
 
   // Free delivery rule: all emirates are FREE for subtotal >= 1000 AED.
   // Prefer server-provided threshold if present; fallback to 1000.
