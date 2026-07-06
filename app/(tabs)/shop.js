@@ -669,35 +669,48 @@ export default function ShopScreen() {
       );
     }
 
-    // Apply search filter
+    // Apply search filter (tokenized: every query word must match somewhere,
+    // so word order doesn't matter — "serum hyaluron" finds "HYALURON SERUM")
     if (searchQuery.trim()) {
-      const norm = (s) => String(s || '').toLowerCase().normalize('NFKD');
-      const q = norm(searchQuery).trim();
-      filtered = filtered.filter((product) => {
-        const canonical = normalizeCategoryCanonical(product?.category) || '';
-        const canonicalKey = canonical ? getCategoryTranslationKey(canonical) : null;
-        const canonicalLabel = canonicalKey ? t(canonicalKey) : canonical;
+      const norm = (s) =>
+        String(s || '')
+          .toLowerCase()
+          .normalize('NFKD')
+          // strip Latin combining diacritics + Arabic harakat
+          .replace(/[\u0300-\u036f\u064B-\u0652]/g, '');
+      const tokens = norm(searchQuery).split(/\s+/).filter(Boolean);
+      if (tokens.length > 0) {
+        filtered = filtered.filter((product) => {
+          const canonical = normalizeCategoryCanonical(product?.category) || '';
+          const canonicalKey = canonical ? getCategoryTranslationKey(canonical) : null;
+          const canonicalLabel = canonicalKey ? t(canonicalKey) : canonical;
 
-        const tagLabels = getCategoryTagsForProduct(product).map((tag) => {
-          const k = getCategoryTranslationKey(tag);
-          return k ? t(k) : tag;
+          const tagLabels = getCategoryTagsForProduct(product).map((tag) => {
+            const k = getCategoryTranslationKey(tag);
+            return k ? t(k) : tag;
+          });
+
+          // All locales searchable regardless of the active app language
+          const haystack = [
+            getLocalizedProductName(product, locale),
+            product?.name,
+            product?.nameRu || product?.name_ru,
+            product?.nameAr || product?.name_ar,
+            getLocalizedProductDescription(product, locale),
+            product?.description,
+            product?.descriptionRu || product?.description_ru,
+            product?.descriptionAr || product?.description_ar,
+            product?.category,
+            canonical,
+            canonicalLabel,
+            ...tagLabels,
+          ]
+            .map(norm)
+            .join(' ');
+
+          return tokens.every((token) => haystack.includes(token));
         });
-
-        const haystack = [
-          getLocalizedProductName(product, locale),
-          product?.name,
-          getLocalizedProductDescription(product, locale),
-          product?.description,
-          product?.category,
-          canonical,
-          canonicalLabel,
-          ...tagLabels,
-        ]
-          .map(norm)
-          .join(' ');
-
-        return haystack.includes(q);
-      });
+      }
     }
 
     setFilteredProducts(filtered);
