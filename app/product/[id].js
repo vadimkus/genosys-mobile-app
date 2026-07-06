@@ -883,7 +883,7 @@ export default function ProductDetailScreen() {
           {entries.map(([k, v], idx) => (
             <View key={k + idx} style={[styles.specItem, isRTL && styles.specItemRTL]}>
               <Text style={[styles.specLabel, isRTL && styles.specLabelRTL]}>{asText(k)}</Text>
-              <Text style={[styles.specValue, isRTL && styles.specValueRTL]}>{asText(v)}</Text>
+              <Text style={[styles.specValueText, isRTL && styles.specValueRTL]}>{asText(v)}</Text>
             </View>
           ))}
         </View>
