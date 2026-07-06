@@ -459,8 +459,10 @@ export const addToWishlist = async (token, productData) => {
  */
 export const removeFromWishlist = async (token, productId) => {
   log.debug('Removing from wishlist', { productId: String(productId) });
-  
-  return await apiRequest(`/user/wishlist/${encodeURIComponent(productId)}`, {
+
+  // Server expects a query param (there is no /user/wishlist/[id] route) —
+  // the old path-param URL 404'd on every remove.
+  return await apiRequest(`/user/wishlist?productId=${encodeURIComponent(productId)}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,

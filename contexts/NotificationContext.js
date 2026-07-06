@@ -92,11 +92,12 @@ export function NotificationProvider({ children }) {
           
           const data = response.notification.request.content.data;
           
-          // Handle navigation based on notification type
+          // Handle navigation based on notification type — deep-link straight
+          // to the order detail screen (the push payload carries orderId)
           if (data?.type === 'order_status' && data?.orderId) {
-            log.debug('Navigating to orders for order:', data.orderId);
+            log.debug('Navigating to order detail:', data.orderId);
             setTimeout(() => {
-              router.push('/profile/orders');
+              router.push(`/profile/orders/${data.orderId}`);
             }, 100);
           }
         } catch (e) {
@@ -114,7 +115,7 @@ export function NotificationProvider({ children }) {
             const data = response.notification.request.content.data;
             if (data?.type === 'order_status' && data?.orderId) {
               setTimeout(() => {
-                router.push('/profile/orders');
+                router.push(`/profile/orders/${data.orderId}`);
               }, 500);
             }
           }

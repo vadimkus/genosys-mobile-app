@@ -104,7 +104,32 @@ export const FavoritesProvider = ({ children }) => {
         // - `{ success: true, data: [{...}] }`
         // - `{ data: [{...}] }`
         const dbFavorites = extractWishlistArray(result.data);
-        
+
+        // MERGE, don't overwrite: push guest/local-only favorites to the
+        // server first so logging in never silently discards them.
+        const serverIds = new Set(
+          dbFavorites
+            .map((item) => item?.product_id ?? item?.productId ?? item?.id ?? item?.product?.id)
+            .filter((id) => id != null)
+            .map(String)
+        );
+        const localOnly = favoritesRef.current.filter(
+          (fav) => fav?.id != null && !serverIds.has(String(fav.id))
+        );
+        for (const fav of localOnly) {
+          try {
+            await addToWishlist(user.token, {
+              productId: fav.id,
+              productName: fav.name,
+              productImage: fav.image,
+              productPrice: fav.price,
+            });
+            dbFavorites.push({ productId: fav.id, productName: fav.name, productImage: fav.image, productPrice: fav.price, addedAt: fav.addedAt });
+          } catch (mergeError) {
+            log.warn('Failed to push local favorite to server', mergeError?.message || mergeError);
+          }
+        }
+
         // Convert database format to local format
         const convertedFavorites = dbFavorites
           .map((item) => {

@@ -141,8 +141,10 @@ export default function AddressesScreen() {
             haptics.heavyTap();
             const result = await removeAddress(addressId);
             if (result.success) {
-              // Backend currently supports a single primary address; deleting clears it.
-              setAddresses([]);
+              // Remove only the deleted address — the backend stores multiple
+              // addresses (the old "single address" comment was outdated and
+              // emptied the whole list on any delete).
+              setAddresses(prev => prev.filter(addr => addr.id !== addressId));
             } else {
               Alert.alert(t('common.error'), result.error || t('addresses.deleteFailed'));
             }

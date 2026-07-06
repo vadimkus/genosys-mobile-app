@@ -34,6 +34,7 @@ import {
 import { loginWithGoogleDirect } from '../services/googleAuthService';
 import { createLogger } from '../utils/logger';
 import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
+import { clearPushTokenOnBackend } from '../services/pushNotificationsService';
 import { storeUserSession, getUserSession, clearUserSession, sanitizeUserSession } from '../services/secureTokenStorage';
 import { setSentryUser } from '../config/sentry';
 
@@ -422,8 +423,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Logout from server if we have a token
       if (user?.token) {
+        // Clear the push token server-side FIRST — otherwise the next user
+        // on this device could receive the previous user's order pushes.
+        await clearPushTokenOnBackend(user.token).catch((e) =>
+          log.warn('Push token clear on logout failed', e?.message || e)
+        );
+        // Logout from server
         await apiLogoutUser(user.token);
       }
       

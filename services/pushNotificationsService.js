@@ -22,11 +22,21 @@ try {
 }
 
 export async function registerForPushNotificationsAsync() {
-  // Android channel (required for proper behavior) - create first before requesting token
+  // Android channels (required for proper behavior) - create BOTH before
+  // requesting the token: the server sends order pushes on channelId 'orders',
+  // so it must exist with the right importance before any push arrives.
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.DEFAULT,
+    });
+    await Notifications.setNotificationChannelAsync('orders', {
+      name: 'Order Updates',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#dc2626',
+      sound: 'default',
+      description: 'Notifications about your order status',
     });
   }
 
