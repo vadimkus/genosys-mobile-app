@@ -286,7 +286,13 @@ export default function BundleBuilderScreen() {
         {/* Product image */}
         <View style={styles.productImageWrap}>
           {product.image ? (
-            <Image source={{ uri: product.image }} style={styles.productImage} resizeMode="contain" />
+            <Image
+              source={{ uri: product.image }}
+              style={styles.productImage}
+              contentFit="contain"
+              transition={200}
+              cachePolicy="memory-disk"
+            />
           ) : (
             <Ionicons name="image-outline" size={32} color="#D1D5DB" />
           )}
@@ -614,7 +620,7 @@ export default function BundleBuilderScreen() {
                 return (
                   <View key={product.id} style={styles.summaryItem}>
                     <View style={styles.summaryImageWrap}>
-                      <Image source={{ uri: product.image }} style={styles.summaryItemImage} resizeMode="contain" />
+                      <Image source={{ uri: product.image }} style={styles.summaryItemImage} contentFit="contain" cachePolicy="memory-disk" />
                       {product.size ? <Text style={styles.summaryImageSize}>{product.size}</Text> : null}
                     </View>
                     <View style={{ flex: 1 }}>
@@ -740,7 +746,9 @@ const styles = StyleSheet.create({
     width: 24, height: 24, borderRadius: 12, backgroundColor: '#dc2626',
     alignItems: 'center', justifyContent: 'center',
   },
-  productImageWrap: { height: 130, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FAFAFA', padding: 8 },
+  // Square tile (matches product cards): square studio photos fill edge-to-edge,
+  // wide photos letterbox invisibly on the white background.
+  productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
   productName: { ...T.captionSmall, fontWeight: '600', color: '#374151', lineHeight: 16, minHeight: 32 },

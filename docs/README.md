@@ -11,6 +11,7 @@
 | Doc | Description |
 |-----|-------------|
 | [Main README](../README.md) | Project overview, install, and run |
+| [Bundle Builder — No Cropping (2026-07-06)](./SESSION_CHANGES_2026-07-06_bundle-builder-image-no-crop.md) | **Build Your Set cards get the same square photo tiles** — 130px strip → square `CARD_WIDTH` tile on white; deprecated `resizeMode` → `contentFit="contain"` (expo-image was ignoring the old prop). Summary thumbnails too. OTA runtime 1.10.4 (group `11c68542`). |
 | [Product Images — No Cropping (2026-07-05)](./SESSION_CHANGES_2026-07-05_product-image-no-crop.md) | **Shop grid + concern grids get square photo tiles; every product thumbnail switched `cover` → `contain`** (bag, favorites, orders, chat, skin-analysis, Perfect Combination). Gray thumb backgrounds → white so letterboxing is invisible. Shipped via OTA runtime 1.10.4 (group `9c50d1b3`). |
 | [Skin Concerns — Living-Diagnostic Face Map (2026-07-05)](./SESSION_CHANGES_2026-07-05_face-map-diagnostic-redesign.md) | **Face-map redesign** — scan-sweep intro, staggered dot reveal, breathing pulses with phase offsets, frosted-glass dots + active reticle, leader-line callout, "quick chips" cloud replacing the duplicated concern grid. OTA runtime 1.10.4. |
 | [Apple-Native Redesign (2026-06-20)](./SESSION_CHANGES_2026-06-20_apple-native-redesign.md) | **App-wide Apple-native redesign** — surfaces, shadows, typography, tab bar, cards shipped via OTA runtime 1.10.4. |
