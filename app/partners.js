@@ -141,17 +141,17 @@ export default function PartnersScreen() {
 
   const handleCall = useCallback((phone) => {
     haptics.mediumTap();
-    Linking.openURL(`tel:${phone.replace(/\s/g, '')}`);
+    Linking.openURL(`tel:${phone.replace(/\s/g, '')}`).catch(() => {});
   }, []);
 
   const handleDirections = useCallback((url) => {
     haptics.lightTap();
-    Linking.openURL(url);
+    Linking.openURL(url).catch(() => {});
   }, []);
 
   const handleWebsite = useCallback((url) => {
     haptics.lightTap();
-    Linking.openURL(url);
+    Linking.openURL(url).catch(() => {});
   }, []);
 
   const getIcon = (type) => TYPE_ICONS[type] || 'sparkles';
@@ -327,7 +327,7 @@ export default function PartnersScreen() {
               </Text>
               <TouchableOpacity
                 style={[styles.ctaBtn, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
-                onPress={() => Linking.openURL('mailto:sales@genosys.ae?subject=Partnership%20Inquiry')}
+                onPress={() => Linking.openURL('mailto:sales@genosys.ae?subject=Partnership%20Inquiry').catch(() => {})}
                 activeOpacity={0.85}
               >
                 <Ionicons name="mail" size={18} color={colors.white} />

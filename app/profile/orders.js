@@ -30,6 +30,7 @@ import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, statusStyle } from '../../utils/theme';
 import AUTH_CONFIG from '../../config/auth';
+import { withErrorBoundary } from '../../components/ErrorBoundary';
 
 const log = createLogger('Orders');
 
@@ -145,7 +146,7 @@ function StatusCapsule({ status, label, isRTL }) {
   );
 }
 
-export default function OrdersScreen() {
+function OrdersScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { orders: contextOrders, refreshOrdersCount } = useOrders();
@@ -913,3 +914,7 @@ const styles = StyleSheet.create({
   buttonRTL: { flexDirection: 'row-reverse' },
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
 });
+
+// Screen-level error boundary: a render crash here shows a recoverable
+// error screen instead of taking down the whole navigation stack.
+export default withErrorBoundary(OrdersScreen, { screenName: 'Orders' });

@@ -249,7 +249,7 @@ export default function ChatScreen() {
                   const msg = encodeURIComponent(
                     t('product.requestQuoteMessage', { name })
                   );
-                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
                 }}
                 activeOpacity={0.8}
               >
@@ -317,7 +317,7 @@ export default function ChatScreen() {
       }
     } else {
       // External URL — open in browser
-      Linking.openURL(url);
+      Linking.openURL(url).catch(() => {});
     }
   }, []);
 

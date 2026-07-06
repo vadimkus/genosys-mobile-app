@@ -27,8 +27,9 @@ import { getPricingDisplay } from '../../utils/pricingDisplay';
 import { mediumTap, lightTap } from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces } from '../../utils/theme';
+import { withErrorBoundary } from '../../components/ErrorBoundary';
 
-export default function BagScreen() {
+function BagScreen() {
   const { user } = useAuth();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -1419,3 +1420,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 });
+
+// Screen-level error boundary: a render crash here shows a recoverable
+// error screen instead of taking down the whole navigation stack.
+export default withErrorBoundary(BagScreen, { screenName: 'Bag' });

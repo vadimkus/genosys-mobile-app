@@ -1514,7 +1514,10 @@
     "promoItem": "Promo item",
     "new": "New",
     "itemWithNumber": "Item {number}",
-    "freeItemWithNumber": "Free Item {number}"
+    "freeItemWithNumber": "Free Item {number}",
+    "connectionErrorTitle": "Connection problem",
+    "connectionErrorText": "We couldn't load products. Check your internet connection and try again.",
+    "tryAgain": "Try Again"
   },
   "reviews": {
     "title": "Customer Reviews",

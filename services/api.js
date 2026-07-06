@@ -13,6 +13,7 @@ import { createLogger } from '../utils/logger';
 import AUTH_CONFIG from '../config/auth';
 import { authenticatedFetch } from './authFetch';
 import { getJson, HttpClientError } from './httpClient';
+import { captureException } from '../config/sentry';
 
 const log = createLogger('api');
 
@@ -139,6 +140,9 @@ export const fetchProducts = async (user = null, options = {}) => {
     
   } catch (error) {
     log.error('Failed to fetch products', error?.message || error);
+    // Surface API failures to Sentry — previously only render crashes were
+    // captured, so production API error rates were invisible.
+    captureException(error, { tags: { area: 'api', op: 'fetchProducts' } });
     
     // Don't return fake data - let the UI handle the error gracefully
     throw error;

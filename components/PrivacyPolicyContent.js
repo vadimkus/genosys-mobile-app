@@ -66,7 +66,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
         <Text style={[styles.errorText, isRTL && styles.textRTL]}>
           {locale === 'ar' ? 'لم نتمكن من تحميل سياسة الخصوصية.' : locale === 'ru' ? 'Не удалось загрузить политику конфиденциальности.' : 'Could not load privacy policy.'}
         </Text>
-        <TouchableOpacity style={styles.fallbackButton} onPress={() => Linking.openURL(fallbackUrl)}>
+        <TouchableOpacity style={styles.fallbackButton} onPress={() => Linking.openURL(fallbackUrl).catch(() => {})}>
           <Text style={styles.fallbackButtonText}>
             {locale === 'ar' ? 'عرض على الموقع' : locale === 'ru' ? 'Открыть на сайте' : 'View on Website'}
           </Text>
@@ -112,7 +112,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
               ))}
             </View>
             {section.links?.map((link, i) => (
-              <TouchableOpacity key={i} onPress={() => Linking.openURL(link.url)} style={[styles.linkRow, isRTL && styles.linkRowRTL]}>
+              <TouchableOpacity key={i} onPress={() => Linking.openURL(link.url).catch(() => {})} style={[styles.linkRow, isRTL && styles.linkRowRTL]}>
                 <Ionicons name="open-outline" size={14} color="#dc2626" />
                 <Text style={styles.link}>{link.label}</Text>
               </TouchableOpacity>
@@ -159,7 +159,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
             <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
             <View style={styles.contactInfo}>
               <Text style={styles.contactCompany}>{section.contact.company}</Text>
-              <TouchableOpacity onPress={() => Linking.openURL(`mailto:${section.contact.email}`)} style={[styles.contactItem, isRTL && styles.rowRTL]}>
+              <TouchableOpacity onPress={() => Linking.openURL(`mailto:${section.contact.email}`).catch(() => {})} style={[styles.contactItem, isRTL && styles.rowRTL]}>
                 <Ionicons name="mail-outline" size={16} color="#dc2626" />
                 <Text style={styles.contactLink}>{section.contact.email}</Text>
               </TouchableOpacity>

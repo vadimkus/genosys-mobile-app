@@ -57,7 +57,7 @@ export default function ContactScreen() {
       icon: 'logo-whatsapp',
       tileColor: colors.whatsapp,
       description: t('contact.methodWhatsappDesc'),
-      action: () => Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`),
+      action: () => Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() => {}),
     },
     {
       id: 'phone',
@@ -66,7 +66,7 @@ export default function ContactScreen() {
       icon: 'call',
       tileColor: colors.green,
       description: t('contact.methodPhoneDesc'),
-      action: () => Linking.openURL(`tel:+${WHATSAPP_NUMBER}`),
+      action: () => Linking.openURL(`tel:+${WHATSAPP_NUMBER}`).catch(() => {}),
     },
     {
       id: 'email',
@@ -75,7 +75,7 @@ export default function ContactScreen() {
       icon: 'mail',
       tileColor: colors.blue,
       description: t('contact.methodEmailDesc'),
-      action: () => Linking.openURL(`mailto:${EMAIL}`),
+      action: () => Linking.openURL(`mailto:${EMAIL}`).catch(() => {}),
     },
     {
       id: 'website',
@@ -84,7 +84,7 @@ export default function ContactScreen() {
       icon: 'globe',
       tileColor: colors.teal,
       description: t('contact.methodWebsiteDesc'),
-      action: () => Linking.openURL(WEBSITE),
+      action: () => Linking.openURL(WEBSITE).catch(() => {}),
     },
     {
       id: 'instagram',
@@ -93,7 +93,7 @@ export default function ContactScreen() {
       icon: 'logo-instagram',
       tileColor: colors.purple,
       description: t('contact.methodInstagramDesc'),
-      action: () => Linking.openURL(INSTAGRAM),
+      action: () => Linking.openURL(INSTAGRAM).catch(() => {}),
     },
     {
       id: 'facebook',
@@ -102,7 +102,7 @@ export default function ContactScreen() {
       icon: 'logo-facebook',
       tileColor: colors.blue,
       description: t('contact.methodFacebookDesc'),
-      action: () => Linking.openURL(FACEBOOK),
+      action: () => Linking.openURL(FACEBOOK).catch(() => {}),
     },
     {
       id: 'location',
@@ -111,7 +111,7 @@ export default function ContactScreen() {
       icon: 'location',
       tileColor: colors.indigo,
       description: t('contact.methodVisitDesc'),
-      action: () => Linking.openURL(MAP_URL),
+      action: () => Linking.openURL(MAP_URL).catch(() => {}),
     },
   ];
 

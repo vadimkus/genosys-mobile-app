@@ -726,7 +726,7 @@ export default function ProfileScreen() {
             {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
           </Text>
           <TouchableOpacity
-            onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae'); }}
+            onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae').catch(() => {}); }}
             activeOpacity={0.7}
             style={styles.footerLinkWrap}
           >

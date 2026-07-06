@@ -59,6 +59,7 @@ import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
 import { colors, tint, shadow, surfaces } from '../../utils/theme';
+import { withErrorBoundary } from '../../components/ErrorBoundary';
 
 const log = createLogger('Shop');
 
@@ -103,7 +104,7 @@ const buildAllowedCategoryList = (foundCategories = []) => {
   return list;
 };
 
-export default function ShopScreen() {
+function ShopScreen() {
   const { user } = useAuth();
   const { t, locale, setLocale, dir } = useLocalization();
   // Animations disabled (kept only for header in bag.js)
@@ -111,6 +112,9 @@ export default function ShopScreen() {
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
   const [products, setProducts] = useState([]);
+  // True when the API failed AND the offline cache had nothing — the grid
+  // would otherwise render silently blank with no retry affordance.
+  const [loadFailed, setLoadFailed] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -561,6 +565,7 @@ export default function ShopScreen() {
       
       if (enhancedProducts && enhancedProducts.length > 0) {
         applyProducts(enhancedProducts);
+        setLoadFailed(false);
         log.debug('Products loaded from API', { count: enhancedProducts.length });
         
         if (user?.discountType && user?.discountPercentage) {
@@ -578,14 +583,24 @@ export default function ShopScreen() {
         const cached = await getCachedProducts(true); // ignoreExpiry for offline
         if (cached && cached.length > 0) {
           applyProducts(cached);
+          setLoadFailed(false);
           log.debug('Using cached products (offline)', { count: cached.length });
+        } else {
+          setLoadFailed(true);
         }
       } catch (cacheErr) {
         log.warn('Cache fallback also failed', cacheErr?.message);
+        setLoadFailed(true);
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const retryLoadProducts = () => {
+    setLoadFailed(false);
+    setLoading(true);
+    loadProducts();
   };
 
   const loadCategories = async () => {
@@ -1166,6 +1181,25 @@ export default function ShopScreen() {
                   </TouchableOpacity>
                 )}
               </View>
+            </View>
+          ) : (loadFailed && !loading) ? (
+            /* API + cache both failed: show retry instead of a silent blank grid */
+            <View style={styles.noResultsContainer}>
+              <Ionicons name="cloud-offline-outline" size={44} color="#9CA3AF" style={{ marginBottom: 12 }} />
+              <Text style={[styles.noResultsTitle, isRTL && styles.noResultsTitleRTL]}>
+                {t('common.connectionErrorTitle')}
+              </Text>
+              <Text style={[styles.noResultsText, isRTL && styles.noResultsTextRTL]}>
+                {t('common.connectionErrorText')}
+              </Text>
+              <TouchableOpacity
+                style={[styles.clearSearchButton, styles.noResultsActionButton, { marginTop: 12 }]}
+                onPress={retryLoadProducts}
+              >
+                <Text style={[styles.clearSearchText, isRTL && styles.clearSearchTextRTL]}>
+                  {t('common.tryAgain')}
+                </Text>
+              </TouchableOpacity>
             </View>
           ) : null
         }
@@ -2098,3 +2132,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+// Screen-level error boundary: a render crash here shows a recoverable
+// error screen instead of taking down the whole navigation stack.
+export default withErrorBoundary(ShopScreen, { screenName: 'Shop' });

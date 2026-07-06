@@ -11,6 +11,11 @@ const log = createLogger('databaseService');
 
 const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
 
+// Mutations (address CRUD, wishlist, profile, order save) previously used a
+// bare fetch with no timeout, so a dropped connection could hang the UI
+// forever. Matches httpClient's DEFAULT_TIMEOUT_MS.
+const REQUEST_TIMEOUT_MS = 15000;
+
 /**
  * Generic API request handler
  * Uses authenticatedFetch for token-bearing requests to automatically
@@ -21,6 +26,8 @@ const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
  * @returns {Promise<Object>} Response data
  */
 const apiRequest = async (endpoint, options = {}) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     log.debug('API request', { endpoint });
 
@@ -36,7 +43,7 @@ const apiRequest = async (endpoint, options = {}) => {
     };
 
     const url = `${API_BASE_URL}${endpoint}`;
-    const fetchOptions = { ...restOptions, headers: mergedHeaders };
+    const fetchOptions = { ...restOptions, headers: mergedHeaders, signal: controller.signal };
 
     // Use authenticatedFetch for requests that include an Authorization header
     // so that 401 responses trigger automatic token refresh + retry.
@@ -85,8 +92,14 @@ const apiRequest = async (endpoint, options = {}) => {
       return { success: false, error: data.error || `HTTP ${response.status}: ${response.statusText}` };
     }
   } catch (error) {
+    if (error?.name === 'AbortError') {
+      log.error(`Request timeout (${endpoint}) after ${REQUEST_TIMEOUT_MS}ms`);
+      return { success: false, error: 'Request timed out - please try again' };
+    }
     log.error(`Network error (${endpoint})`, error?.message || error);
     return { success: false, error: 'Network error - please check your connection' };
+  } finally {
+    clearTimeout(timeoutId);
   }
 };
 

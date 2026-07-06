@@ -45,6 +45,11 @@ async function refreshToken(expiredToken) {
   }
 
   _refreshPromise = (async () => {
+    // 10s timeout — shorter than the main 15s request limit so a hung refresh
+    // fails fast (and triggers logout) instead of stalling every queued
+    // authenticated request behind it.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
       log.info('Attempting token refresh...');
 
@@ -55,6 +60,7 @@ async function refreshToken(expiredToken) {
           'x-api-key': API_KEY,
           'Authorization': `Bearer ${expiredToken}`,
         },
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -75,6 +81,8 @@ async function refreshToken(expiredToken) {
     } catch (error) {
       log.error('Token refresh network error', error?.message || error);
       return null;
+    } finally {
+      clearTimeout(timeoutId);
     }
   })();
 

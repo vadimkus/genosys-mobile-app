@@ -196,7 +196,7 @@ export default function ChatButton({ visible = true }) {
       const handled = handleDeepLink(url);
       if (!handled) router.push({ pathname: '/webview', params: { url, title: '' } });
     } else {
-      Linking.openURL(url);
+      Linking.openURL(url).catch(() => {});
     }
   };
 
@@ -238,7 +238,7 @@ export default function ChatButton({ visible = true }) {
                 onPress={() => {
                   haptics.mediumTap();
                   const msg = encodeURIComponent((t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name));
-                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
                 }}
                 activeOpacity={0.8}
               >

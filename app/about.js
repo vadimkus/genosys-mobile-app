@@ -134,7 +134,7 @@ export default function AboutScreen() {
             <Text style={[styles.footerSub, isRTL && styles.textRTLCenter]}>
               {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
             </Text>
-            <TouchableOpacity onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae'); }} activeOpacity={0.7} style={styles.footerLinkWrap}>
+            <TouchableOpacity onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae').catch(() => {}); }} activeOpacity={0.7} style={styles.footerLinkWrap}>
               <Text style={styles.footerLink}>www.genosys.ae</Text>
             </TouchableOpacity>
             <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>

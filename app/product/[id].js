@@ -62,6 +62,7 @@ import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../uti
 import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
+import { withErrorBoundary } from '../../components/ErrorBoundary';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Product detail hero image height
@@ -299,7 +300,7 @@ function PdpSectionHeader({ icon, tileColor, title, isRTL }) {
   );
 }
 
-export default function ProductDetailScreen() {
+function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -456,13 +457,15 @@ export default function ProductDetailScreen() {
           log.debug('User discount applied server-side');
         }
           } else {
-            Alert.alert(t('product.error'), t('product.productNotFound'));
-            router.back();
+            // Fall through to the null-product screen (has its own Go Back
+            // button) instead of alert + forced back-nav.
+            log.warn('Product not found', { id });
       }
     } catch (error) {
+      // Don't router.back() here: the !product render branch shows a
+      // "not found" screen with a Go Back button, and staying on the screen
+      // lets the user retry via pull-back navigation instead of losing context.
       log.error('Error loading product', error?.message || error);
-      Alert.alert(t('product.error'), t('product.failedToLoad'));
-      router.back();
     } finally {
       setLoading(false);
     }
@@ -1452,7 +1455,7 @@ export default function ProductDetailScreen() {
                   <TouchableOpacity
                     key={`doc-${index}`}
                     style={[styles.docLink, isRTL && { flexDirection: 'row-reverse' }]}
-                    onPress={() => Linking.openURL(doc.url)}
+                    onPress={() => Linking.openURL(doc.url).catch(() => {})}
                   >
                     <Ionicons name="document-text-outline" size={20} color={colors.blue} />
                     <Text style={[styles.docLinkText, isRTL && { textAlign: 'right' }]} numberOfLines={2}>
@@ -1598,7 +1601,7 @@ export default function ProductDetailScreen() {
               const message = encodeURIComponent(
                 (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
               );
-              Linking.openURL(`https://wa.me/971585487665?text=${message}`);
+              Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
             }}
             activeOpacity={0.7}
           >
@@ -2562,3 +2565,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
+
+// Screen-level error boundary: a render crash here shows a recoverable
+// error screen instead of taking down the whole navigation stack.
+export default withErrorBoundary(ProductDetailScreen, { screenName: 'ProductDetail' });

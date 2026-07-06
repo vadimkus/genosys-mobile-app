@@ -19,6 +19,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils';
 import { submitCODOrder, createCardPaymentSheetIntent, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
+import { captureException } from '../config/sentry';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { formatAddressForDisplay } from '../utils/addressUtils';
 import { normalizeUserProfile } from '../utils/userProfile';
@@ -40,8 +41,9 @@ import {
 } from '../utils/checkoutFormUtils';
 import T from '../utils/typography';
 import { colors, shadow, surfaces, tint } from '../utils/theme';
+import { withErrorBoundary } from '../components/ErrorBoundary';
 
-export default function CheckoutScreen() {
+function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
   const { user, getAddresses } = useAuth();
   const { items, getTotalItems, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
@@ -568,6 +570,11 @@ export default function CheckoutScreen() {
             : '';
 
       log.error('Order processing error', errMsg || error);
+      // Order-submission failures are the most business-critical error class —
+      // make sure they reach Sentry, not just the local log.
+      captureException(error instanceof Error ? error : new Error(errMsg || 'Order processing error'), {
+        tags: { area: 'checkout', op: 'submitOrder' },
+      });
       Alert.alert(
         t('checkout.orderProcessingErrorTitle'),
         errMsg
@@ -1380,7 +1387,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   summaryValueRTL: {
-    textAlign: 'left',
+    textAlign: 'right',
   },
   freeShippingBanner: {
     flexDirection: 'row',
@@ -1534,3 +1541,7 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
 });
+
+// Screen-level error boundary: a render crash here shows a recoverable
+// error screen instead of taking down the whole navigation stack.
+export default withErrorBoundary(CheckoutScreen, { screenName: 'Checkout' });

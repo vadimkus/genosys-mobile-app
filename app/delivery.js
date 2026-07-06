@@ -207,7 +207,7 @@ export default function DeliveryScreen() {
             </Text>
             <TouchableOpacity
               style={[styles.helpBtn, isRTL && styles.rowRTL]}
-              onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665'); }}
+              onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
               activeOpacity={0.85}
             >
               <Ionicons name="logo-whatsapp" size={20} color={colors.whatsapp} />

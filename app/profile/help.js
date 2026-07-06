@@ -88,7 +88,9 @@ export default function HelpSupportScreen() {
       Alert.alert(t('common.error'), t('help.couldNotOpenEmail'));
       return;
     }
-    await Linking.openURL(url);
+    await Linking.openURL(url).catch(() => {
+      Alert.alert(t('common.error'), t('help.couldNotOpenEmail'));
+    });
   };
 
   const supportOptions = [
@@ -99,7 +101,7 @@ export default function HelpSupportScreen() {
       description: 'sales@genosys.ae',
       icon: 'mail',
       tileColor: colors.blue,
-      action: () => Linking.openURL('mailto:sales@genosys.ae'),
+      action: () => Linking.openURL('mailto:sales@genosys.ae').catch(() => {}),
     },
     {
       id: 'phone',
@@ -108,7 +110,7 @@ export default function HelpSupportScreen() {
       description: '+971 58 548 76 65',
       icon: 'call',
       tileColor: colors.green,
-      action: () => Linking.openURL('tel:+971585487665'),
+      action: () => Linking.openURL('tel:+971585487665').catch(() => {}),
     },
     {
       id: 'whatsapp',
@@ -117,7 +119,7 @@ export default function HelpSupportScreen() {
       description: '+971 58 548 76 65',
       icon: 'logo-whatsapp',
       tileColor: colors.whatsapp,
-      action: () => Linking.openURL('https://wa.me/971585487665'),
+      action: () => Linking.openURL('https://wa.me/971585487665').catch(() => {}),
     },
   ];
 
@@ -307,7 +309,7 @@ export default function HelpSupportScreen() {
 
             <TouchableOpacity
               style={[styles.quickActionCard, shadow.card]}
-              onPress={() => { haptics.lightTap(); Linking.openURL('https://wa.me/971585487665'); }}
+              onPress={() => { haptics.lightTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
               activeOpacity={0.7}
             >
               <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.whatsapp }]}>

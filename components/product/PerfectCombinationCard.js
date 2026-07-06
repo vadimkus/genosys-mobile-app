@@ -332,7 +332,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
                 const msg = encodeURIComponent(
                   t('product.requestQuoteMessage', { name: recName })
                 );
-                Linking.openURL(`https://wa.me/971585487665?text=${msg}`);
+                Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
               }}
               activeOpacity={0.9}
             >

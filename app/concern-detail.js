@@ -116,7 +116,7 @@ export default function ConcernDetailScreen() {
     if (!data?.protocolPdf?.url) return;
     haptics.lightTap();
     const baseUrl = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
-    Linking.openURL(`${baseUrl}${data.protocolPdf.url}`);
+    Linking.openURL(`${baseUrl}${data.protocolPdf.url}`).catch(() => {});
   };
 
   const handleProductPress = (productId) => {

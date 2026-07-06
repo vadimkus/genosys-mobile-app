@@ -345,7 +345,7 @@ export default function FAQScreen() {
             <View style={[styles.ctaButtons, isRTL && styles.ctaButtonsRTL]}>
               <TouchableOpacity
                 style={[styles.ctaBtn, { backgroundColor: tint(colors.whatsapp) }]}
-                onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665'); }}
+                onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
                 activeOpacity={0.7}
               >
                 <Ionicons name="logo-whatsapp" size={18} color={colors.whatsapp} />
@@ -353,7 +353,7 @@ export default function FAQScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.ctaBtn, { backgroundColor: tint(colors.brand) }]}
-                onPress={() => { haptics.mediumTap(); Linking.openURL('mailto:sales@genosys.ae'); }}
+                onPress={() => { haptics.mediumTap(); Linking.openURL('mailto:sales@genosys.ae').catch(() => {}); }}
                 activeOpacity={0.7}
               >
                 <Ionicons name="mail" size={18} color={colors.brand} />

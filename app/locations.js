@@ -201,7 +201,7 @@ export default function LocationsScreen() {
             </View>
             <TouchableOpacity
               style={[styles.officeCard, shadow.card, isRTL && styles.rowRTL]}
-              onPress={() => Linking.openURL('https://maps.google.com/?q=Cordoba+Residence+E02+Dubai+UAE')}
+              onPress={() => Linking.openURL('https://maps.google.com/?q=Cordoba+Residence+E02+Dubai+UAE').catch(() => {})}
               activeOpacity={0.7}
             >
               <View style={[surfaces.iconTile, styles.officeTile, { backgroundColor: colors.teal }]}>

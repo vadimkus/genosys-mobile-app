@@ -1514,7 +1514,10 @@
     "promoItem": "عنصر ترويجي",
     "new": "جديد",
     "itemWithNumber": "عنصر {number}",
-    "freeItemWithNumber": "عنصر مجاني {number}"
+    "freeItemWithNumber": "عنصر مجاني {number}",
+    "connectionErrorTitle": "مشكلة في الاتصال",
+    "connectionErrorText": "تعذر تحميل المنتجات. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+    "tryAgain": "حاول مرة أخرى"
   },
   "reviews": {
     "title": "تقييمات العملاء",

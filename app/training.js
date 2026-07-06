@@ -118,7 +118,7 @@ export default function TrainingScreen() {
         await Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`);
       }
     } catch {
-      await Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`);
+      Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`).catch(() => {});
     }
   };
 
@@ -348,7 +348,7 @@ export default function TrainingScreen() {
               <Text style={[styles.footerSub, isRTL && styles.textRTLCenter]}>
                 {l('Professional Training Resources', 'موارد التدريب المهني', 'Профессиональные учебные ресурсы')}
               </Text>
-              <TouchableOpacity onPress={() => Linking.openURL('https://www.genosys.ae')} activeOpacity={0.7} style={{ marginTop: 8 }}>
+              <TouchableOpacity onPress={() => Linking.openURL('https://www.genosys.ae').catch(() => {})} activeOpacity={0.7} style={{ marginTop: 8 }}>
                 <Text style={styles.footerLink}>www.genosys.ae</Text>
               </TouchableOpacity>
               <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
