@@ -284,6 +284,26 @@ export const fetchUserProfile = async (token) => {
 };
 
 /**
+ * Fetch GENOSYS Rewards membership status (tier, points, progress).
+ * Returns null on failure — the profile card hides itself gracefully.
+ * @param {string} token - User authentication token
+ * @returns {Promise<Object|null>} Membership payload or null
+ */
+export const fetchMembership = async (token) => {
+  try {
+    const result = await getJson(`${API_BASE_URL}/membership`, {
+      authenticated: true,
+      token,
+      headers: { token },
+    });
+    return result?.success ? result : null;
+  } catch (error) {
+    log.error('Error fetching membership', error?.message || error);
+    return null;
+  }
+};
+
+/**
  * Fetch user's orders (order tracking)
  * @param {string} token - User authentication token
  * @returns {Promise<Array>} Array of orders

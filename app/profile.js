@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import AppFooter from '../components/AppFooter';
+import MembershipCard from '../components/MembershipCard';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
@@ -479,6 +480,9 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* GENOSYS Rewards membership card */}
+        <MembershipCard isRTL={isRTL} />
 
         {/* Quick Actions */}
         <View style={styles.quickActionsRow}>

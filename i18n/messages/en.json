@@ -635,6 +635,19 @@
     "pc9Benefit4Title": "Complete Treatment System:",
     "pc9Benefit4Text": "Addresses anti-aging, wrinkle reduction, and skin firmness for comprehensive professional skincare"
   },
+  "rewards": {
+    "title": "GENOSYS Rewards",
+    "points": "pts",
+    "inValue": "in rewards value",
+    "earnRate": "earn rate",
+    "topTier": "You've reached the top tier — 2x points on every order",
+    "professionalPartner": "GENOSYS Professional Partner",
+    "partnerPricing": "partner pricing on all orders",
+    "tierMember": "Member",
+    "tierSilver": "Silver",
+    "tierGold": "Gold",
+    "tierPlatinum": "Platinum"
+  },
   "profile": {
     "general": "General",
     "language": "Language",
