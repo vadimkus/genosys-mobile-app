@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import AppFooter from '../components/AppFooter';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
@@ -214,6 +215,9 @@ export default function LocationsScreen() {
               <Ionicons name="open-outline" size={18} color={colors.tertiary} />
             </TouchableOpacity>
           </View>
+
+          {/* Footer — shared brand block */}
+          <AppFooter style={{ paddingBottom: 8 }} />
         </Animated.View>
       </Animated.ScrollView>
     </View>

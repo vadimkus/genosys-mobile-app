@@ -18,6 +18,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import AppFooter from '../components/AppFooter';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
@@ -220,17 +221,8 @@ export default function BrandScreen() {
             </Text>
           </View>
 
-          {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={[styles.footerBrand, isRTL && styles.textRTLCenter]}>GENOSYS</Text>
-            <Text style={[styles.footerSub, isRTL && styles.textRTLCenter]}>
-              {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
-            </Text>
-            <TouchableOpacity onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae').catch(() => {}); }} activeOpacity={0.7} style={styles.footerLinkWrap}>
-              <Text style={styles.footerLink}>www.genosys.ae</Text>
-            </TouchableOpacity>
-            <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
-          </View>
+          {/* Footer — shared brand block */}
+          <AppFooter style={{ paddingBottom: 16 }} />
         </Animated.View>
       </Animated.ScrollView>
     </View>
@@ -337,19 +329,6 @@ const styles = StyleSheet.create({
   },
   productImage: { width: '100%', height: SCREEN_WIDTH * 0.6, backgroundColor: '#ffffff' },
   productCaption: { ...T.caption, color: colors.secondaryLabel, textAlign: 'center', paddingTop: 12, lineHeight: 18 },
-
-  // Footer
-  footer: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 28,
-    alignItems: 'center',
-  },
-  footerBrand: { ...T.bodySmall, fontWeight: '700', color: colors.secondaryLabel, letterSpacing: 0.5 },
-  footerSub: { ...T.caption, color: colors.tertiary, marginTop: 4, textAlign: 'center' },
-  footerLinkWrap: { marginTop: 8 },
-  footerLink: { ...T.link, color: colors.brand },
-  footerCopyright: { ...T.captionSmall, color: colors.tertiary, marginTop: 12, textAlign: 'center' },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import AppFooter from '../components/AppFooter';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces, tint } from '../utils/theme';
@@ -340,19 +341,11 @@ export default function TrainingScreen() {
               </View>
             )}
 
-            {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={[styles.footerText, isRTL && styles.textRTLCenter]}>
-                GENOSYS
-              </Text>
-              <Text style={[styles.footerSub, isRTL && styles.textRTLCenter]}>
-                {l('Professional Training Resources', 'موارد التدريب المهني', 'Профессиональные учебные ресурсы')}
-              </Text>
-              <TouchableOpacity onPress={() => Linking.openURL('https://www.genosys.ae').catch(() => {})} activeOpacity={0.7} style={{ marginTop: 8 }}>
-                <Text style={styles.footerLink}>www.genosys.ae</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
-            </View>
+            {/* Footer — shared brand block */}
+            <AppFooter
+              tagline={l('Professional Training Resources', 'موارد التدريب المهني', 'Профессиональные учебные ресурсы')}
+              style={{ paddingBottom: 16 }}
+            />
           </Animated.View>
         </Animated.ScrollView>
       )}
@@ -438,13 +431,6 @@ const styles = StyleSheet.create({
   levelBadge: { backgroundColor: tint(colors.purple), paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
   levelText: { ...T.captionTiny, fontWeight: '700', color: colors.purple },
   videoCategory: { ...T.captionSmall, color: colors.secondaryLabel },
-
-  // Footer
-  footer: { alignItems: 'center', paddingVertical: 24, paddingHorizontal: 20, marginTop: 4 },
-  footerText: { ...T.label, color: colors.label },
-  footerSub: { ...T.captionSmall, color: colors.secondaryLabel, marginTop: 4 },
-  footerLink: { ...T.link, color: colors.brand, textDecorationLine: 'underline' },
-  footerCopyright: { ...T.captionTiny, color: colors.tertiary, marginTop: 8 },
 
   // Empty State / Error
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },

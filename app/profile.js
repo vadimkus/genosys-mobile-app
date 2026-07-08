@@ -10,12 +10,11 @@ import {
   Dimensions,
   ActivityIndicator,
   Image,
-  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
-import Constants from 'expo-constants';
+import AppFooter from '../components/AppFooter';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
@@ -719,22 +718,8 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </ProfileSection>
 
-        {/* Footer — consistent with the About screen */}
-        <View style={[styles.footer, { paddingBottom: (insets?.bottom || 0) + 90 }]}>
-          <Text style={styles.footerBrand}>GENOSYS</Text>
-          <Text style={styles.footerSub}>
-            {locale === 'ar' ? 'الموزع الرسمي في الإمارات' : locale === 'ru' ? 'Официальный дистрибьютор в ОАЭ' : 'Official Distributor in the UAE'}
-          </Text>
-          <TouchableOpacity
-            onPress={() => { haptics.lightTap(); Linking.openURL('https://www.genosys.ae').catch(() => {}); }}
-            activeOpacity={0.7}
-            style={styles.footerLinkWrap}
-          >
-            <Text style={styles.footerLink}>www.genosys.ae</Text>
-          </TouchableOpacity>
-          <Text style={styles.footerCopyright}>© {new Date().getFullYear()} GENOSYS. All rights reserved.</Text>
-          <Text style={styles.footerVersion}>{t('profile.version', { version: Constants.expoConfig?.version || '1.5.0' })}</Text>
-        </View>
+        {/* Footer — shared brand block */}
+        <AppFooter style={{ paddingBottom: (insets?.bottom || 0) + 90 }} />
       </Animated.ScrollView>
     </View>
   );
@@ -1050,26 +1035,5 @@ const styles = StyleSheet.create({
     ...T.caption,
     fontStyle: 'italic',
     color: colors.secondaryLabel,
-  },
-
-  // Footer (matches app/about.js)
-  footer: {
-    alignItems: 'center',
-    paddingTop: 8,
-  },
-  footerBrand: { ...T.bodySmall, fontWeight: '700', color: colors.secondaryLabel, letterSpacing: 0.5 },
-  footerSub: { ...T.caption, color: colors.tertiary, marginTop: 4, textAlign: 'center' },
-  footerLinkWrap: { marginTop: 8 },
-  footerLink: { ...T.link, color: colors.brand },
-  footerCopyright: { ...T.captionSmall, color: colors.tertiary, marginTop: 12, textAlign: 'center' },
-  footerText: {
-    ...T.bodySmall,
-    lineHeight: undefined,
-    color: colors.secondaryLabel,
-  },
-  footerVersion: {
-    ...T.caption,
-    color: colors.tertiary,
-    marginTop: 4,
   },
 });

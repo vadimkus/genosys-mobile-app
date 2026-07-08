@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import AppFooter from '../components/AppFooter';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
@@ -336,6 +337,9 @@ export default function PartnersScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/* Footer — shared brand block */}
+            <AppFooter style={{ paddingBottom: 8 }} />
           </Animated.View>
         </Animated.ScrollView>
       )}

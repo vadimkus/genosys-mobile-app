@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import AppFooter from '../components/AppFooter';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
@@ -216,6 +217,9 @@ export default function DeliveryScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+
+          {/* Footer — shared brand block */}
+          <AppFooter style={{ paddingBottom: 8 }} />
         </Animated.View>
       </Animated.ScrollView>
     </View>

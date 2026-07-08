@@ -23,6 +23,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
+import AppFooter from '../components/AppFooter';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import AUTH_CONFIG from '../config/auth';
@@ -361,6 +362,9 @@ export default function FAQScreen() {
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Footer — shared brand block */}
+          <AppFooter style={{ paddingBottom: 8 }} />
         </Animated.View>
       </Animated.ScrollView>
     </View>
