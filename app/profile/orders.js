@@ -486,6 +486,16 @@ function OrdersScreen() {
                     </View>
                   </View>
 
+                  {/* GENOSYS Rewards — points earned by this order */}
+                  {Number(o?.loyaltyPointsEarned) > 0 ? (
+                    <View style={[styles.pointsEarnedRow, isRTL && styles.rowRTL]}>
+                      <Ionicons name="ribbon-outline" size={13} color={colors.brand} />
+                      <Text style={[styles.pointsEarnedText, isRTL && styles.textRTLRight]}>
+                        {t('rewards.orderEarned', { points: Number(o.loyaltyPointsEarned).toLocaleString() })}
+                      </Text>
+                    </View>
+                  ) : null}
+
                   {/* Quiet actions row: summary toggle + delete */}
                   <View style={[styles.quietRow, isRTL && styles.rowRTL]}>
                     <TouchableOpacity
@@ -819,6 +829,8 @@ const styles = StyleSheet.create({
   // Meta footer
   hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginTop: 12, marginBottom: 10 },
   metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  pointsEarnedRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
+  pointsEarnedText: { ...T.captionSmall, fontWeight: '600', color: colors.secondaryLabel },
   metaLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, minWidth: 0 },
   appleLogo: { marginEnd: 5 },
   metaText: { ...T.captionSmall, color: colors.secondaryLabel, flexShrink: 1 },

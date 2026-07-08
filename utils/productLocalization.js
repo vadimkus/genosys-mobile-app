@@ -109,34 +109,19 @@ export const getCategoryTagsForProduct = (product) => {
 };
 
 export const getLocalizedProductName = (product, locale) => {
-  const l = normLocale(locale);
   if (!product) return '';
 
-  if (l === 'ar') {
-    return (
-      pickFirstNonEmpty(
-        product.localizedName,
-        product.nameAr,
-        product.name_ar,
-        product.arName,
-        product.ar_name
-      ) || pickFirstNonEmpty(product.name)
-    );
-  }
-
-  if (l === 'ru') {
-    return (
-      pickFirstNonEmpty(
-        product.localizedName,
-        product.nameRu,
-        product.name_ru,
-        product.ruName,
-        product.ru_name
-      ) || pickFirstNonEmpty(product.name)
-    );
-  }
-
-  return pickFirstNonEmpty(product.localizedName, product.name);
+  // Brand decision (2026-07-08): product names are NEVER translated — the
+  // English name is the product's identity across EN/AR/RU (labels, invoices,
+  // support all reference the same name). Descriptions remain localized.
+  return pickFirstNonEmpty(
+    product.name,
+    product.localizedName,
+    product.nameRu,
+    product.name_ru,
+    product.nameAr,
+    product.name_ar
+  );
 };
 
 export const getLocalizedProductDescription = (product, locale) => {

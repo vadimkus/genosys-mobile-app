@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   card: {
-    backgroundColor: '#1D1D1F',
+    // Soft graphite — corporate but not harsh black
+    backgroundColor: '#3C4043',
     borderRadius: 16,
     paddingVertical: 22,
     paddingHorizontal: 20,
