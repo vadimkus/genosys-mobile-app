@@ -7,13 +7,17 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "98",
+      "buildNumber": "101",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
