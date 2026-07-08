@@ -19,6 +19,7 @@ import CollapsibleHeader, { useCollapsibleHeader } from '../../components/Collap
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
+import { Asset } from 'expo-asset';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { isValidEmailValue, normalizeUserProfile } from '../../utils/userProfile';
@@ -199,7 +200,12 @@ export default function EditProfileScreen() {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: [t('common.cancel'), t('editProfile.takePhoto'), t('editProfile.chooseFromLibrary')],
+          options: [
+            t('common.cancel'),
+            t('editProfile.takePhoto'),
+            t('editProfile.chooseFromLibrary'),
+            t('editProfile.useCatAvatar'),
+          ],
           cancelButtonIndex: 0,
         },
         (buttonIndex) => {
@@ -207,6 +213,8 @@ export default function EditProfileScreen() {
             takePhoto();
           } else if (buttonIndex === 2) {
             pickImage();
+          } else if (buttonIndex === 3) {
+            useCatAvatar();
           }
         }
       );
@@ -215,7 +223,25 @@ export default function EditProfileScreen() {
         { text: t('editProfile.cancel'), style: 'cancel' },
         { text: t('editProfile.takePhoto'), onPress: takePhoto },
         { text: t('editProfile.chooseFromLibrary'), onPress: pickImage },
+        { text: t('editProfile.useCatAvatar'), onPress: useCatAvatar },
       ]);
+    }
+  };
+
+  // Bundled she-cat avatar — resolves to a local file:// URI so it rides the
+  // same upload pipeline as camera/library photos (AuthContext.updateProfile).
+  const useCatAvatar = async () => {
+    try {
+      const asset = Asset.fromModule(require('../../assets/avatar-cat.png'));
+      await asset.downloadAsync();
+      const uri = asset.localUri || asset.uri;
+      if (uri) {
+        haptics.selectionTick();
+        updateField('profilePicture', uri);
+      }
+    } catch (err) {
+      log.error('useCatAvatar failed:', err);
+      Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not set avatar. Please try again.');
     }
   };
 
