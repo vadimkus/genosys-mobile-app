@@ -30,6 +30,7 @@ import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderC
 import OrderSuccessScreen from '../components/OrderSuccessScreen';
 import CheckoutAddressForm from '../components/checkout/CheckoutAddressForm';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
+import RewardsRedemptionCard from '../components/checkout/RewardsRedemptionCard';
 import OrderSummaryCard from '../components/checkout/OrderSummaryCard';
 import { createLogger } from '../utils/logger';
 import {
@@ -113,6 +114,7 @@ function CheckoutScreen() {
   // Mirrors server rules (lib/loyalty.ts): blocks of 100 pts = AED 5, capped
   // at 20% of the product subtotal, not combinable with a personal discount.
   const [loyaltyBalance, setLoyaltyBalance] = useState(0);
+  const [loyaltyMultiplier, setLoyaltyMultiplier] = useState(0);
   const [usePoints, setUsePoints] = useState(false);
 
   useEffect(() => {
@@ -123,6 +125,7 @@ function CheckoutScreen() {
       const membership = await fetchMembership(token);
       if (!cancelled && membership?.track === 'REWARDS') {
         setLoyaltyBalance(Number(membership?.points?.balance || 0));
+        setLoyaltyMultiplier(Number(membership?.multiplier || 1));
       }
     })();
     return () => { cancelled = true; };
@@ -798,6 +801,16 @@ function CheckoutScreen() {
               styles={styles}
             />
           </View>
+
+          {/* GENOSYS Rewards — always-visible redemption control */}
+          <RewardsRedemptionCard
+            balance={loyaltyBalance}
+            quote={redeemQuote}
+            enabled={usePoints}
+            onToggle={() => { haptics.lightTap(); setUsePoints((v) => !v); }}
+            earnPreview={loyaltyMultiplier > 0 ? Math.floor(safeTotal * loyaltyMultiplier) : 0}
+            isRTL={isRTL}
+          />
 
           {/* Order Notes */}
           <OrderSummaryCard
