@@ -355,6 +355,7 @@
     "share": "Share product",
     "shareError": "Could not open share sheet. Please try again.",
     "documentation": "Documentation",
+    "brochure": "Product Brochure (PDF)",
     "video": "Video",
     "sizesAvailable": "{count} sizes available",
     "multipleSizesAvailable": "Multiple sizes available",

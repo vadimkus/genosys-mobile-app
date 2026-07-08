@@ -355,6 +355,7 @@
     "share": "Поделиться",
     "shareError": "Не удалось открыть окно «Поделиться». Попробуйте ещё раз.",
     "documentation": "Документация",
+    "brochure": "Брошюра продукта (PDF)",
     "video": "Видео",
     "sizesAvailable": "Доступно размеров: {count}",
     "multipleSizesAvailable": "Доступно несколько размеров",

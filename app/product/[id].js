@@ -760,6 +760,13 @@ function ProductDetailScreen() {
         if (!nk || usedKeys.has(nk)) continue;
         const tv = asText(v).trim();
         if (!tv) continue;
+        // File links (PDF brochures etc.) are rendered as Documentation
+        // buttons, not raw paths in the specs table.
+        const isFileLink =
+          nk.includes('brochure') ||
+          /\.(pdf|pptx?|docx?)(\?|$)/i.test(tv) ||
+          tv.startsWith('/documents/');
+        if (isFileLink) continue;
         extraRows.push({ label: asText(k).trim(), value: tv });
       }
     }
@@ -1474,7 +1481,7 @@ function ProductDetailScreen() {
                   >
                     <Ionicons name="document-text-outline" size={20} color={colors.blue} />
                     <Text style={[styles.docLinkText, isRTL && { textAlign: 'right' }]} numberOfLines={2}>
-                      {doc.title}
+                      {doc.isBrochure ? (t('product.brochure') || doc.title) : doc.title}
                     </Text>
                     <Ionicons name="open-outline" size={16} color={colors.secondaryLabel} />
                   </TouchableOpacity>
