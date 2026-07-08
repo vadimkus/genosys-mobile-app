@@ -42,7 +42,13 @@ export default function PrivacyPolicyModal({ visible, onClose, showCloseButton =
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>{t('privacy.title')}</Text>
           {showCloseButton && (
-            <TouchableOpacity onPress={onClose} style={[styles.closeButton, isRTL && styles.closeButtonRTL]}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={[styles.closeButton, isRTL && styles.closeButtonRTL]}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+            >
               <Ionicons name="close" size={24} color="#86868B" />
             </TouchableOpacity>
           )}

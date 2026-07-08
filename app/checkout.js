@@ -92,6 +92,10 @@ function CheckoutScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const submittingRef = useRef(false);
   const [orderNumber] = useState(() => generateOrderNumber()); // provisional; use API-returned orderNumber for confirmations
+  // Server-issued canonical order number from the first (failed or successful)
+  // card-intent attempt. Re-sending it on retry makes the server update the
+  // same PENDING order + reuse its PaymentIntent instead of creating duplicates.
+  const serverOrderNumberRef = useRef('');
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [successOrder, setSuccessOrder] = useState(null);
 
@@ -448,6 +452,18 @@ function CheckoutScreen() {
       });
       const finalWaterfall = computeWaterfallBreakdown(items, user);
 
+      // Guard: never submit an order with no paid items or a non-positive total
+      // (e.g. a cart holding only promo items after a startup race).
+      if (paidItems.length === 0 || !(Number(finalTotals.total) > 0)) {
+        haptics.warning();
+        Alert.alert(
+          t('checkout.orderSubmissionFailedTitle'),
+          t('checkout.orderProcessingErrorMessage'),
+          [{ text: t('checkout.goToBag'), onPress: () => router.replace('/(tabs)/bag') }]
+        );
+        return;
+      }
+
       // Prepare order data. Backend remains the pricing authority; these totals are client hints
       // and must match the cart snapshot being submitted.
       const rawUserDiscountPct = Number(user?.discountPercentage);
@@ -456,7 +472,9 @@ function CheckoutScreen() {
           ? rawUserDiscountPct
           : 0;
       const orderData = {
-        orderNumber,
+        // Reuse the server-issued number on retries (idempotent card flow);
+        // first attempt sends the provisional one, which the server replaces.
+        orderNumber: serverOrderNumberRef.current || orderNumber,
         customerName: `${firstName.trim()} ${lastName.trim()}`,
         customerEmail: email.trim(),
         customerPhone: toE164UaePhone(phoneNational),
@@ -510,6 +528,11 @@ function CheckoutScreen() {
 
       if (result.success) {
         const finalOrderNumber = String(result.orderNumber || orderNumber);
+        // Remember the canonical server order number so any retry updates the
+        // same PENDING order instead of creating a duplicate.
+        if (selectedPaymentMethod !== PAYMENT_METHODS.COD && result.orderNumber) {
+          serverOrderNumberRef.current = String(result.orderNumber);
+        }
         log.debug('Checkout step success', { success: true, hasClientSecret: !!result.clientSecret });
 
         // COD: submit immediately (no payment step). The shared success screen

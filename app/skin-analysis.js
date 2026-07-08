@@ -26,7 +26,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import { getLocalizedProductName } from '../utils/productLocalization';
-import { CONCERN_TO_CANONICAL, AGE_TO_CANONICAL, USAGE_TO_CANONICAL, toCanonicalConcerns } from '../utils/skinAnalysisMapping';
+import { SKIN_TYPE_TO_CANONICAL, CONCERN_TO_CANONICAL, AGE_TO_CANONICAL, USAGE_TO_CANONICAL, toCanonicalConcerns } from '../utils/skinAnalysisMapping';
 import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
@@ -84,7 +84,7 @@ export default function SkinAnalysisScreen() {
       // back to a generic top-rated list.
       const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
       const params = new URLSearchParams({
-        skinType: skinType.toLowerCase(),
+        skinType: SKIN_TYPE_TO_CANONICAL[skinType] || skinType.toLowerCase(),
         ageGroup: AGE_TO_CANONICAL[ageGroup] || ageGroup,
         targetConcerns: toCanonicalConcerns(concerns).join(','),
         usage: USAGE_TO_CANONICAL[usage] || 'both',

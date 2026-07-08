@@ -800,7 +800,12 @@ export default function EditProfileScreen() {
           <View style={styles.modalContainer}>
             <View style={[styles.modalHeader, isRTL && styles.rowRTL]}>
               <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('editProfile.selectGender')}</Text>
-              <TouchableOpacity onPress={() => setShowGenderModal(false)}>
+              <TouchableOpacity
+                onPress={() => setShowGenderModal(false)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.close')}
+              >
                 <Ionicons name="close" size={24} color={colors.label} />
               </TouchableOpacity>
             </View>

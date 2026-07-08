@@ -180,6 +180,7 @@
     "emptyText": "عند إضافة المنتجات ستظهر هنا",
     "startShopping": "ابدأ التسوق",
     "clear": "مسح",
+    "removeItem": "إزالة المنتج",
     "clearBagTitle": "مسح السلة",
     "clearBagMessage": "هل تريد إزالة جميع العناصر من السلة؟",
     "header": "السلة: {count} {label}",
@@ -1109,7 +1110,9 @@
     "addToBag": "أضف إلى السلة",
     "loginToBuy": "سجّل الدخول للشراء",
     "requestQuote": "طلب عرض سعر",
-    "priceOnRequest": "السعر عند الطلب"
+    "priceOnRequest": "السعر عند الطلب",
+    "addToFavorites": "أضف إلى المفضلة",
+    "removeFromFavorites": "إزالة من المفضلة"
   },
   "voiceSearch": {
     "label": "البحث الصوتي",
@@ -1216,6 +1219,8 @@
     "appleAuthFailed": "فشل تسجيل الدخول عبر Apple. يرجى المحاولة مرة أخرى.",
     "appleSetupNotComplete": "لم يتم إعداد تسجيل الدخول عبر Apple لهذه النسخة بعد.\n\nتحقق من التالي:\n- أوقف وضع الطيران / يلزم وجود إنترنت\n- تأكد من تسجيل الدخول إلى iCloud على الجهاز\n- Apple Developer: تم تفعيل “Sign In with Apple” لهذا الـ Bundle ID\n\nBundle ID: {bundleId}",
     "appleNoToken": "تعذر بدء Apple Sign‑In. يرجى المحاولة مرة أخرى.",
+    "appleIosOnly": "تسجيل الدخول عبر Apple متاح فقط على iOS.",
+    "appleUnavailableDevice": "تسجيل الدخول عبر Apple غير متاح على هذا الجهاز. يرجى التأكد من تسجيل الدخول إلى iCloud والمحاولة مرة أخرى.",
     "authFailedTitle": "فشل التحقق",
     "biometricLoginFailed": "فشل تسجيل الدخول بالبصمة",
     "biometricAuthFailed": "فشلت المصادقة البيومترية. يرجى المحاولة مرة أخرى.",
@@ -1243,6 +1248,8 @@
     "birthdayHint": "احصل على هدية خاصة في عيد ميلادك! 🎁",
     "passwordLabel": "كلمة المرور",
     "passwordPlaceholder": "أدخل كلمة المرور",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
     "privacyConsentPrefix": "أوافق على",
     "privacyPolicyLink": "سياسة الخصوصية",
     "privacyConsentSuffix": "وأوافق على جمع واستخدام معلوماتي الشخصية كما هو موضح.",
@@ -1496,6 +1503,9 @@
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "close": "إغلاق",
+    "refresh": "تحديث",
+    "showDetails": "إظهار التفاصيل",
+    "hideDetails": "إخفاء التفاصيل",
     "switchLanguage": "تغيير اللغة",
     "save": "حفظ",
     "done": "تم",
@@ -1517,7 +1527,8 @@
     "freeItemWithNumber": "عنصر مجاني {number}",
     "connectionErrorTitle": "مشكلة في الاتصال",
     "connectionErrorText": "تعذر تحميل المنتجات. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
-    "tryAgain": "حاول مرة أخرى"
+    "tryAgain": "حاول مرة أخرى",
+    "addToBagFailed": "تعذرت الإضافة إلى الحقيبة. يرجى التحقق من اتصالك والمحاولة مرة أخرى."
   },
   "reviews": {
     "title": "تقييمات العملاء",
@@ -1576,7 +1587,9 @@
     "aiExpertAnalysis": "تحليل خبير الذكاء الاصطناعي",
     "errorAnalysisFailed": "فشل التحليل. يرجى المحاولة مرة أخرى.",
     "errorCaptureFailed": "فشل في التقاط الصورة. يرجى المحاولة مرة أخرى.",
-    "errorTitle": "خطأ"
+    "errorTitle": "خطأ",
+    "openSettings": "فتح الإعدادات",
+    "permissionDeniedHint": "الوصول إلى الكاميرا معطل لهذا التطبيق. فعّله من الإعدادات لاستخدام تحليل البشرة."
   },
   "webview": {
     "noUrlProvided": "لم يتم توفير رابط",
@@ -1590,6 +1603,34 @@
   },
   "error": {
     "somethingWentWrong": "حدث خطأ ما",
-    "tryAgain": "حاول مرة أخرى"
+    "tryAgain": "حاول مرة أخرى",
+    "unexpectedError": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+  },
+  "bundleBuilder": {
+    "title": "ابنِ مجموعتك",
+    "loadFailed": "فشل تحميل المنتجات",
+    "loadingProducts": "جاري تحميل المنتجات...",
+    "tryAgain": "حاول مجدداً",
+    "vipDiscount": "خصم VIP",
+    "discount": "خصم",
+    "bundleDiscount": "خصم المجموعة",
+    "min2Title": "الحد الأدنى ٢ منتجات",
+    "min2Message": "أضف منتجين على الأقل للحصول على خصم.",
+    "added": "تم الإضافة",
+    "add": "أضف",
+    "nextTierHint": "أضف {count} منتج لخصم {percent}%!",
+    "recommended": "موصى به",
+    "emptyStep": "لا منتجات في هذه الفئة",
+    "retailPrice": "السعر الأصلي",
+    "total": "الإجمالي",
+    "youSave": "توفر",
+    "previous": "السابق",
+    "items": "منتجات",
+    "skip": "تخطّ",
+    "next": "التالي",
+    "addBundleToCart": "أضف المجموعة للسلة",
+    "yourBundle": "مجموعتك",
+    "clearAll": "مسح الكل",
+    "addFailed": "تعذر إضافة المجموعة إلى السلة. يرجى المحاولة مرة أخرى."
   }
 }

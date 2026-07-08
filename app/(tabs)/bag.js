@@ -118,10 +118,13 @@ function BagScreen() {
   // Waterfall breakdown for order summary
   const waterfall = computeWaterfallBreakdown(items, user);
 
-  // Refresh DB-driven shipping rates when opening bag
+  // Refresh DB-driven shipping rates when opening bag, and again after
+  // login/logout (M6) — the previous empty dep array meant a user who signed
+  // in from the bag kept whatever rates were fetched pre-auth.
   useEffect(() => {
     reloadShippingRates?.();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.token]);
 
   const handleQuantityChange = useCallback((item, change) => {
     const newQuantity = item.quantity + change;
@@ -465,18 +468,34 @@ function BagScreen() {
                   style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
                   onPress={() => handleQuantityChange(item, -1)}
                   disabled={item.quantity <= 1}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('shop.decreaseQuantity')}
+                  accessibilityState={{ disabled: item.quantity <= 1 }}
                 >
                   <Ionicons name="remove" size={16} color="#000000" />
                 </TouchableOpacity>
 
                 <Text style={[styles.quantityText, isRTL && styles.quantityTextRTL]}>{item.quantity}</Text>
 
-                <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 1)}>
+                <TouchableOpacity
+                  style={styles.quantityButton}
+                  onPress={() => handleQuantityChange(item, 1)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('shop.increaseQuantity')}
+                >
                   <Ionicons name="add" size={16} color="#000000" />
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveItem(item)}>
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => handleRemoveItem(item)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel={`${t('bag.removeItem')} — ${item?.product?.name || ''}`}
+              >
                 <Ionicons name="trash-outline" size={20} color="#dc2626" />
               </TouchableOpacity>
             </View>
@@ -537,6 +556,8 @@ function BagScreen() {
             onPress={handleClearBag}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             activeOpacity={0.6}
+            accessibilityRole="button"
+            accessibilityLabel={t('bag.clearBagTitle')}
           >
             <Ionicons name="trash-outline" size={20} color={colors.brand} />
           </TouchableOpacity>

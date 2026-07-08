@@ -149,7 +149,7 @@ export default function LoginScreen() {
     if (!AppleAuthentication) {
       haptics.warning();
       // Should never happen since the button is only shown on iOS, but guard anyway
-      Alert.alert(t('authScreen.authFailedTitle'), 'Apple Sign-In is only available on iOS.');
+      Alert.alert(t('authScreen.authFailedTitle'), t('authScreen.appleIosOnly'));
       return;
     }
     try {
@@ -160,7 +160,7 @@ export default function LoginScreen() {
         haptics.warning();
         Alert.alert(
           t('authScreen.authFailedTitle'),
-          'Apple Sign‑In is not available on this device. Please ensure you are signed into iCloud and try again.'
+          t('authScreen.appleUnavailableDevice')
         );
         return;
       }
@@ -557,6 +557,8 @@ export default function LoginScreen() {
                     style={styles.passwordToggle}
                     onPress={() => setShowPassword(!showPassword)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={showPassword ? t('authScreen.hidePassword') : t('authScreen.showPassword')}
                   >
                     <Ionicons
                       name={showPassword ? 'eye-off' : 'eye'}

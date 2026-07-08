@@ -172,6 +172,9 @@ export default function ProductReviews({ productId }) {
           onPress={() => interactive && onSelect?.(i)}
           activeOpacity={interactive ? 0.6 : 1}
           style={interactive ? styles.starTouchable : null}
+          accessibilityRole={interactive ? 'button' : 'image'}
+          accessibilityLabel={`${i}/5`}
+          accessibilityState={interactive ? { selected: i <= rating } : undefined}
         >
           <Ionicons
             name={i <= rating ? 'star' : 'star-outline'}
@@ -301,10 +304,22 @@ export default function ProductReviews({ productId }) {
                 </View>
                 {user?.id === review.userId && (
                   <View style={[styles.reviewActions, isRTL && styles.reviewActionsRTL]}>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => handleEdit(review)}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleEdit(review)}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('common.edit')}
+                    >
                       <Ionicons name="create-outline" size={18} color={colors.secondaryLabel} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => handleDelete(review.id)}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleDelete(review.id)}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('common.delete')}
+                    >
                       <Ionicons name="trash-outline" size={18} color={colors.red} />
                     </TouchableOpacity>
                   </View>

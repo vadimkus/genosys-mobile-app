@@ -208,6 +208,8 @@ export default function AddressesScreen() {
             style={styles.moreButton}
             onPress={() => openOptions(address)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel={`${t('addresses.optionsTitle')} — ${address.name || typeMeta.label}`}
           >
             <Ionicons name="ellipsis-horizontal" size={20} color={colors.secondaryLabel} />
           </TouchableOpacity>
@@ -227,7 +229,12 @@ export default function AddressesScreen() {
   };
 
   const addButton = (
-    <TouchableOpacity onPress={handleAddAddress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+    <TouchableOpacity
+      onPress={handleAddAddress}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      accessibilityRole="button"
+      accessibilityLabel={t('addresses.addNew')}
+    >
       <Ionicons name="add" size={26} color={colors.brand} />
     </TouchableOpacity>
   );

@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Platform,
   Linking,
+  Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -116,7 +117,9 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
       setTimeout(() => {
         setAddedProducts((prev) => { const n = new Set(prev); n.delete(product.id); return n; });
       }, 2000);
-    } catch { /* silent */ }
+    } catch {
+      Alert.alert(t('common.error'), t('common.addToBagFailed'));
+    }
   };
 
   const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : '#dc2626';

@@ -458,6 +458,9 @@ export default function ChatButton({ visible = true }) {
                 onPress={() => { haptics.lightTap(); handleSend(); }}
                 disabled={!input.trim() || loading}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={t('chat.send')}
+                accessibilityState={{ disabled: !input.trim() || loading }}
               >
                 <Ionicons name="send" size={18} color="#ffffff" />
               </TouchableOpacity>

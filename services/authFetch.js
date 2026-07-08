@@ -133,6 +133,12 @@ export async function authenticatedFetch(url, options = {}, currentToken = null)
     return response;
   }
 
+  // The caller aborted (timeout/unmount) — don't start a refresh + retry
+  // cycle whose result nobody will consume.
+  if (options.signal?.aborted) {
+    return response;
+  }
+
   // 401 received - attempt token refresh
   if (!currentToken) {
     // Try to extract token from the Authorization header
@@ -156,8 +162,14 @@ export async function authenticatedFetch(url, options = {}, currentToken = null)
     return response;
   }
 
-  // Persist the new token
-  const updatedUser = await persistRefreshedToken(refreshResult);
+  // Persist the new token (also keeps storage fresh for the next caller even
+  // if this particular request was aborted while refreshing).
+  await persistRefreshedToken(refreshResult);
+
+  // Caller aborted while the token was refreshing — skip the retry.
+  if (options.signal?.aborted) {
+    return response;
+  }
 
   // Retry the original request with the new token
   const retryHeaders = { ...options.headers };

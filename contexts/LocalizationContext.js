@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { I18nManager } from 'react-native';
 
@@ -41,21 +41,22 @@ function translate(messages, key, params) {
   }, value);
 }
 
+// Module-level locale mirror for code that can't use hooks (class components
+// like ErrorBoundary). Kept in sync by the provider below.
+let _currentLocale = 'en';
+
+/** Current locale for non-hook consumers. */
+export function getCurrentLocale() {
+  return _currentLocale;
+}
+
+/** Translate outside React (class components, services). */
+export function tStatic(key, params) {
+  return translate(getMessages(_currentLocale), key, params);
+}
+
 export function LocalizationProvider({ children }) {
   const [locale, setLocaleState] = useState('en');
-  const didHydrateRef = useRef(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        const next = stored && SUPPORTED.includes(stored) ? stored : 'en';
-        setLocaleState(next);
-      } catch {
-        setLocaleState('en');
-      }
-    })();
-  }, []);
 
   const reloadApp = useCallback(async () => {
     // Prefer expo-updates reload if available; fall back to no-op (we also show a prompt in UI).
@@ -105,15 +106,29 @@ export function LocalizationProvider({ children }) {
     await applyRTLIfNeeded(safe);
   }, [applyRTLIfNeeded]);
 
-  // On first hydration, ensure RTL matches stored locale.
+  // Hydrate the stored locale, then ensure the native RTL flag matches it.
+  // The RTL check must run AFTER the storage read resolves — the previous
+  // guard ran on the initial 'en' render and never re-checked, so Arabic
+  // cold starts could stay LTR.
   useEffect(() => {
-    if (didHydrateRef.current) return;
-    didHydrateRef.current = true;
-    // Fire and forget; if it triggers reload, app will restart.
-    applyRTLIfNeeded(locale);
-  }, [locale, applyRTLIfNeeded]);
+    (async () => {
+      let next = 'en';
+      try {
+        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        next = stored && SUPPORTED.includes(stored) ? stored : 'en';
+      } catch {
+        next = 'en';
+      }
+      setLocaleState(next);
+      // Fire and forget; if it triggers reload, app will restart.
+      applyRTLIfNeeded(next);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const messages = useMemo(() => getMessages(locale), [locale]);
+  // Keep the module-level mirror in sync for non-hook consumers (tStatic).
+  _currentLocale = locale;
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   const t = useCallback((key, params) => translate(messages, key, params), [messages]);
 

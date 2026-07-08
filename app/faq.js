@@ -35,8 +35,9 @@ import { colors, shadow, surfaces, tint } from '../utils/theme';
 
 const log = createLogger('FAQ');
 
-// Enable LayoutAnimation on Android for smooth expand/collapse.
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+// Enable LayoutAnimation on old-arch Android for smooth expand/collapse.
+// On Fabric (new arch) the call is a no-op that logs a deprecation warning.
+if (Platform.OS === 'android' && !global?.nativeFabricUIManager && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -268,7 +269,12 @@ export default function FAQScreen() {
                 clearButtonMode="while-editing"
               />
               {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <TouchableOpacity
+                  onPress={() => setSearchQuery('')}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('shop.clearSearch')}
+                >
                   <Ionicons name="close-circle" size={18} color={colors.tertiary} />
                 </TouchableOpacity>
               )}

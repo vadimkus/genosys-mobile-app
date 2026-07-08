@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { saveOrder } from '../services/databaseService';
 import { useAuth } from './AuthContext';
 import { calculateCartTotals, reconcileBuildSetBundleDiscounts, UAE_EMIRATES } from '../utils/cartUtils';
 import { fetchShippingRates } from '../services/api';
@@ -8,6 +7,9 @@ import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUn
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Cart');
+
+// Max units per cart line — matches the web quantity cap (M5).
+const MAX_LINE_QTY = 99;
 
 const CartContext = createContext();
 
@@ -277,7 +279,7 @@ export const CartProvider = ({ children }) => {
       return nextItems;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [promoTick, user, selectedEmirate, emirates, isLoading]);
+  }, [promoTick, user, selectedEmirate, emirates, isLoading, shippingRates]);
 
   const loadCartFromStorage = async () => {
     try {
@@ -495,10 +497,10 @@ export const CartProvider = ({ children }) => {
       );
       if (existingIdx >= 0) {
         return reconcileBuildSetBundleDiscounts(prev.map((item, i) =>
-          i === existingIdx ? { ...item, quantity: item.quantity + quantity } : item
+          i === existingIdx ? { ...item, quantity: Math.min(item.quantity + quantity, MAX_LINE_QTY) } : item
         ));
       }
-      return reconcileBuildSetBundleDiscounts([...prev, newItem]);
+      return reconcileBuildSetBundleDiscounts([...prev, { ...newItem, quantity: Math.min(newItem.quantity, MAX_LINE_QTY) }]);
     });
 
     bumpPromoTick();
@@ -628,6 +630,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
+    const cappedQuantity = Math.min(quantity, MAX_LINE_QTY);
     const normalizedColor = selectedColor || '';
     const normalizedSize = selectedSize || '';
     
@@ -636,7 +639,7 @@ export const CartProvider = ({ children }) => {
       item.selectedColor === normalizedColor && 
       item.selectedSize === normalizedSize &&
       lineMetaMatches(item, itemMeta)
-        ? (isPromotionItem(item) ? item : { ...item, quantity })
+        ? (isPromotionItem(item) ? item : { ...item, quantity: cappedQuantity })
         : item
     )));
 
@@ -796,71 +799,6 @@ export const CartProvider = ({ children }) => {
     log.debug('Cart cleared');
   };
 
-  // Save order to database
-  const saveOrderToDatabase = async (orderData, userToken) => {
-    try {
-      log.debug('Saving order to database');
-      
-      // Generate order number if not provided
-      const orderNumber = orderData.orderNumber || `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
-      
-      const orderToSave = {
-        orderNumber,
-        status: 'pending',
-        paymentMethod: orderData.paymentMethod || 'cod',
-        paymentStatus: 'pending',
-        customerName: orderData.customerName,
-        customerEmail: orderData.customerEmail,
-        customerPhone: orderData.customerPhone,
-        deliveryAddressId: orderData.deliveryAddressId,
-        shippingAddress: orderData.shippingAddress,
-        subtotal: orderData.subtotal,
-        shippingCost: orderData.shippingCost || 0,
-        vatAmount: orderData.vatAmount || 0,
-        discountAmount: orderData.discountAmount || 0,
-        totalAmount: orderData.totalAmount,
-        items: items.map(item => ({
-          id: item.product.id,
-          name: item.product.name,
-          price: (() => {
-            const selectedSize = String(item?.selectedSize || '').trim();
-            const v = selectedSize && Array.isArray(item?.product?.variants)
-              ? item.product.variants.find((vv) => String(vv?.size || '').trim() === selectedSize)
-              : null;
-            const vp = Number(v?.price);
-            if (Number.isFinite(vp) && vp > 0) return vp;
-            return item.product.price;
-          })(),
-          quantity: item.quantity,
-          image: item.product.image,
-          selectedColor: item.selectedColor || null,
-          selectedSize: isPromotionItem(item) ? null : (item.selectedSize || null),
-          discount: item.product.discount || 0,
-          isPromotionItem: isPromotionItem(item),
-          promotionKey: item.promotionKey || null,
-          fromBundle: item.fromBundle || item.product?.fromBundle || false,
-          bundleDiscountPercent: item.bundleDiscountPercent || item.product?.bundleDiscountPercent || 0,
-          originalPrice: item.product?.originalPrice || null,
-        }))
-      };
-      
-      const result = await saveOrder(userToken, orderToSave);
-      
-      if (result.success) {
-        log.debug('Order saved successfully');
-        // Clear cart after successful order
-        clearCart();
-        return { success: true, order: result.data, orderNumber };
-      } else {
-        log.error('Failed to save order', result?.error);
-        return { success: false, error: result.error };
-      }
-    } catch (error) {
-      log.error('Save order error', error?.message || error);
-      return { success: false, error: 'Failed to save order' };
-    }
-  };
-
   const getTotalItems = useCallback(() => {
     return items.filter((it) => !isPromotionItem(it)).reduce((total, item) => total + (Number(item.quantity) || 0), 0);
   }, [items]);
@@ -959,7 +897,6 @@ export const CartProvider = ({ children }) => {
     updateSize,
     clearCart,
     setSelectedEmirate,
-    saveOrderToDatabase,
     getTotalItems,
     isInCart,
     getItemQuantity,

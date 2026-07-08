@@ -94,7 +94,10 @@ export default function StripePaymentScreen() {
       if (!isPaidLikeOrder(match)) {
         const sessionId = extractStripeSessionIdFromUrl(paymentUrl);
         // PaymentIntent id is the part of the client secret before "_secret_".
-        const paymentIntentId = clientSecret ? String(clientSecret).split('_secret_')[0] : '';
+        // Only forward it when it is actually a PaymentIntent id — other intent
+        // formats (e.g. seti_) would silently fail the status refresh.
+        const rawIntentId = clientSecret ? String(clientSecret).split('_secret_')[0] : '';
+        const paymentIntentId = rawIntentId.startsWith('pi_') ? rawIntentId : '';
         try {
           const apiRoot = String(AUTH_CONFIG.API_BASE_URL || '').replace(/\/mobile\/?$/, '');
           let statusUrl = '';
@@ -169,6 +172,9 @@ export default function StripePaymentScreen() {
         // User dismissed the sheet — let them retry, no error banner.
         if (presentError.code === 'Canceled') return;
         log.warn('presentPaymentSheet error', presentError.code, presentError.message);
+        // Force a fresh initPaymentSheet on the next attempt — re-presenting a
+        // failed sheet with the same client secret can error with a stale state.
+        sheetReadyRef.current = false;
         setErrorText(presentError.message || t('payment.checkStatusFailed'));
         return;
       }
@@ -177,14 +183,19 @@ export default function StripePaymentScreen() {
       // the order + emails server-side; sync status in the background but show
       // success immediately (no waiting on webhook lag).
       checkPayment(true).catch(() => {});
+      // Clear the cart right away — waiting for a nav button tap left paid
+      // items in the cart if the user dismissed the screen with a gesture.
+      // Skip when retrying an older pending order (cart holds unrelated items).
+      if (!fromOrders) clearCart();
       setPaid(true);
     } catch (e) {
       log.warn('Payment Sheet flow failed', e?.message || e);
+      sheetReadyRef.current = false;
       setErrorText(t('payment.pleaseTryAgain'));
     } finally {
       setBusy(false);
     }
-  }, [clientSecret, initPaymentSheet, presentPaymentSheet, checkPayment, user, t]);
+  }, [clientSecret, initPaymentSheet, presentPaymentSheet, checkPayment, user, t, fromOrders, clearCart]);
 
   // --- Hosted browser fallback (retry of older pending orders) --------------
   const openHosted = useCallback(async () => {
@@ -201,14 +212,17 @@ export default function StripePaymentScreen() {
         }),
         showTitle: true,
       });
-      if (canCheck) await checkPayment();
+      if (canCheck) {
+        const isPaid = await checkPayment();
+        if (isPaid && !fromOrders) clearCart();
+      }
     } catch (e) {
       log.warn('Failed to open hosted payment link', e?.message || e);
       Alert.alert(t('payment.couldNotOpenPaymentTitle'), t('payment.pleaseTryAgain'));
     } finally {
       setBusy(false);
     }
-  }, [paymentUrl, canCheck, checkPayment, t]);
+  }, [paymentUrl, canCheck, checkPayment, t, fromOrders, clearCart]);
 
   // Auto-start the appropriate flow once on mount.
   useEffect(() => {
@@ -221,15 +235,17 @@ export default function StripePaymentScreen() {
     })();
   }, [useNativeSheet, paymentUrl, payWithSheet, openHosted, t]);
 
+  // Cart is already cleared on payment success; keep these as a safety net for
+  // the fresh-checkout flow only (never wipe the cart when paying an old order).
   const onViewOrder = useCallback(() => {
-    clearCart();
+    if (!fromOrders) clearCart();
     router.replace('/(tabs)/orders');
-  }, [clearCart]);
+  }, [clearCart, fromOrders]);
 
   const onContinueShopping = useCallback(() => {
-    clearCart();
+    if (!fromOrders) clearCart();
     router.replace('/(tabs)/shop');
-  }, [clearCart]);
+  }, [clearCart, fromOrders]);
 
   const title = useMemo(() => {
     if (orderNumber) return t('payment.payForOrderTitle', { orderNumber });

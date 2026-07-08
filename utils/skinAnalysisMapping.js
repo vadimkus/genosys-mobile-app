@@ -9,6 +9,14 @@
  * always send canonical values.
  */
 
+export const SKIN_TYPE_TO_CANONICAL = {
+  Normal: 'normal',
+  Dry: 'dry',
+  Oily: 'oily',
+  Combination: 'combination',
+  Sensitive: 'sensitive',
+};
+
 export const CONCERN_TO_CANONICAL = {
   Acne: 'acne-blemishes',
   Wrinkles: 'anti-aging',

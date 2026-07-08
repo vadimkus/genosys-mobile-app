@@ -19,6 +19,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getLocalizedProductName, getLocalizedProductSize, getLocalizedProductDescription, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
+import { isProductOutOfStock } from '../utils/stock';
 import T from '../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -44,7 +45,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
     (product.image
       ? (product.image.startsWith('http') ? product.image : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`)
       : null);
-  const isOutOfStock = product.status === 'out_of_stock' || product.stock === false;
+  const isOutOfStock = isProductOutOfStock(product);
   const nameLower = (product?.name || '').trim().toLowerCase();
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');

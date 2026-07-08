@@ -428,6 +428,9 @@ export default function ProfileScreen() {
             style={[styles.promoAvatarButton, isRTL ? styles.promoAvatarButtonRTL : styles.promoAvatarButtonLTR]}
             onPress={() => router.push('/profile/promo')}
             activeOpacity={0.9}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel={t('promo.infoTitle')}
           >
             <Ionicons name="megaphone-outline" size={16} color={colors.brand} />
           </TouchableOpacity>

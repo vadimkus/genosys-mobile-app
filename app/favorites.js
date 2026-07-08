@@ -309,6 +309,8 @@ export default function FavoritesScreen() {
                       onPress={() => handleRemoveFromFavorites(product)}
                       activeOpacity={0.6}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('favorites.removeFromFavorites')} — ${product?.name || ''}`}
                     >
                       <Ionicons name="heart" size={22} color={colors.brand} />
                     </TouchableOpacity>

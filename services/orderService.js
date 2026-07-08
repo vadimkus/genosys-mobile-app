@@ -348,8 +348,11 @@ export async function createCardPaymentSheetIntent(orderData) {
       locale: orderData.locale || 'en',
     };
 
+    // Canonical Payment Sheet route (handles card / Apple Pay / Google Pay /
+    // Link). The backend also keeps the legacy /payments/applepay/intent
+    // alias for app versions shipped before the rename.
     const result = await postMobileJson(
-      `${API_BASE_URL}/payments/applepay/intent`,
+      `${API_BASE_URL}/payments/sheet/intent`,
       intentPayload,
       orderData,
       'card'

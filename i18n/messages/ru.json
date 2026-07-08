@@ -180,6 +180,7 @@
     "emptyText": "Добавьте товары — и они появятся здесь",
     "startShopping": "Начать покупки",
     "clear": "Очистить",
+    "removeItem": "Удалить товар",
     "clearBagTitle": "Очистить корзину",
     "clearBagMessage": "Удалить все товары из корзины?",
     "header": "Корзина: {count} {label}",
@@ -1109,7 +1110,9 @@
     "addToBag": "В корзину",
     "loginToBuy": "Войти для покупки",
     "requestQuote": "Запросить цену",
-    "priceOnRequest": "Цена по запросу"
+    "priceOnRequest": "Цена по запросу",
+    "addToFavorites": "Добавить в избранное",
+    "removeFromFavorites": "Убрать из избранного"
   },
   "voiceSearch": {
     "label": "Голосовой поиск",
@@ -1216,6 +1219,8 @@
     "appleAuthFailed": "Не удалось войти через Apple. Попробуйте ещё раз.",
     "appleSetupNotComplete": "Apple Sign‑In не настроен для этой сборки.\n\nПроверьте:\n- Выключите авиарежим / нужен интернет\n- На устройстве выполнен вход в iCloud\n- Apple Developer: для этого Bundle ID включена опция “Sign In with Apple”\n\nBundle ID: {bundleId}",
     "appleNoToken": "Не удалось запустить Apple Sign‑In. Попробуйте ещё раз.",
+    "appleIosOnly": "Вход через Apple доступен только на iOS.",
+    "appleUnavailableDevice": "Вход через Apple недоступен на этом устройстве. Убедитесь, что вы вошли в iCloud, и попробуйте ещё раз.",
     "authFailedTitle": "Ошибка аутентификации",
     "biometricLoginFailed": "Не удалось войти по биометрии",
     "biometricAuthFailed": "Биометрическая аутентификация не удалась. Попробуйте ещё раз.",
@@ -1243,6 +1248,8 @@
     "birthdayHint": "Получите подарок в день рождения! 🎁",
     "passwordLabel": "Пароль",
     "passwordPlaceholder": "Введите пароль",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
     "privacyConsentPrefix": "Я соглашаюсь с",
     "privacyPolicyLink": "Политикой конфиденциальности",
     "privacyConsentSuffix": "и даю согласие на сбор и использование моих персональных данных, как описано выше.",
@@ -1496,6 +1503,9 @@
     "login": "Войти",
     "logout": "Выйти",
     "close": "Закрыть",
+    "refresh": "Обновить",
+    "showDetails": "Показать детали",
+    "hideDetails": "Скрыть детали",
     "switchLanguage": "Сменить язык",
     "save": "Сохранить",
     "done": "Готово",
@@ -1517,7 +1527,8 @@
     "freeItemWithNumber": "Подарок {number}",
     "connectionErrorTitle": "Проблема с подключением",
     "connectionErrorText": "Не удалось загрузить товары. Проверьте подключение к интернету и попробуйте снова.",
-    "tryAgain": "Повторить"
+    "tryAgain": "Повторить",
+    "addToBagFailed": "Не удалось добавить в корзину. Проверьте подключение и попробуйте снова."
   },
   "reviews": {
     "title": "Отзывы покупателей",
@@ -1576,7 +1587,9 @@
     "aiExpertAnalysis": "AI Экспертный анализ",
     "errorAnalysisFailed": "Анализ не удался. Попробуйте ещё раз.",
     "errorCaptureFailed": "Не удалось сделать снимок. Попробуйте ещё раз.",
-    "errorTitle": "Ошибка"
+    "errorTitle": "Ошибка",
+    "openSettings": "Открыть настройки",
+    "permissionDeniedHint": "Доступ к камере для приложения отключён. Включите его в настройках, чтобы использовать анализ кожи."
   },
   "webview": {
     "noUrlProvided": "URL не указан",
@@ -1590,6 +1603,34 @@
   },
   "error": {
     "somethingWentWrong": "Что-то пошло не так",
-    "tryAgain": "Повторить"
+    "tryAgain": "Повторить",
+    "unexpectedError": "Произошла непредвиденная ошибка. Попробуйте ещё раз."
+  },
+  "bundleBuilder": {
+    "title": "Собери свой набор",
+    "loadFailed": "Не удалось загрузить товары",
+    "loadingProducts": "Загрузка товаров...",
+    "tryAgain": "Повторить",
+    "vipDiscount": "VIP-скидка",
+    "discount": "Скидка",
+    "bundleDiscount": "Скидка набора",
+    "min2Title": "Минимум 2 товара",
+    "min2Message": "Добавьте минимум 2 товара для скидки.",
+    "added": "Добавлено",
+    "add": "Добавить",
+    "nextTierHint": "Ещё {count} для скидки {percent}%!",
+    "recommended": "Рекомендуется",
+    "emptyStep": "Нет товаров в этой категории",
+    "retailPrice": "Розничная цена",
+    "total": "Итого",
+    "youSave": "Вы экономите",
+    "previous": "Назад",
+    "items": "товаров",
+    "skip": "Пропустить",
+    "next": "Далее",
+    "addBundleToCart": "Добавить набор в корзину",
+    "yourBundle": "Ваш набор",
+    "clearAll": "Очистить всё",
+    "addFailed": "Не удалось добавить набор в корзину. Попробуйте ещё раз."
   }
 }

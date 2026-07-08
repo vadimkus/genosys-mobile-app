@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { tStatic } from '../contexts/LocalizationContext';
 
 /**
  * Shared footer pattern used across Bag + Checkout:
@@ -31,7 +32,10 @@ export default function CollapsibleFooter({
           style={[styles.chevronBtn, chevronButtonStyle]}
           onPress={onToggle}
           activeOpacity={0.8}
-          hitSlop={chevronHitSlop}
+          hitSlop={chevronHitSlop || { top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityRole="button"
+          accessibilityLabel={collapsed ? tStatic('common.showDetails') : tStatic('common.hideDetails')}
+          accessibilityState={{ expanded: !collapsed }}
         >
           <Ionicons
             name={collapsed ? chevronCollapsedName : chevronExpandedName}

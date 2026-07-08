@@ -345,7 +345,13 @@ export default function CheckoutAddressForm({
           <View style={[styles.modalCard, isRTL && styles.modalCardRTL]}>
             <View style={[styles.modalHeader, isRTL && styles.modalHeaderRTL]}>
               <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('checkout.savedAddress')}</Text>
-              <TouchableOpacity onPress={() => setSavedAddressPickerOpen(false)} style={styles.modalCloseButton}>
+              <TouchableOpacity
+                onPress={() => setSavedAddressPickerOpen(false)}
+                style={styles.modalCloseButton}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.close')}
+              >
                 <Ionicons name="close" size={22} color="#111827" />
               </TouchableOpacity>
             </View>

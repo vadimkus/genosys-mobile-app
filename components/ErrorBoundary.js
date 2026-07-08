@@ -14,6 +14,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { createLogger } from '../utils/logger';
 import { captureException } from '../config/sentry';
+import { tStatic } from '../contexts/LocalizationContext';
 import T from '../utils/typography';
 
 const log = createLogger('ErrorBoundary');
@@ -68,9 +69,9 @@ export class ErrorBoundary extends React.Component {
         <View style={styles.container}>
           <View style={styles.content}>
             <Text style={styles.emoji}>⚠️</Text>
-            <Text style={styles.title}>Something went wrong</Text>
+            <Text style={styles.title}>{tStatic('error.somethingWentWrong')}</Text>
             <Text style={styles.message}>
-              {this.props.fallbackMessage || 'An unexpected error occurred. Please try again.'}
+              {this.props.fallbackMessage || tStatic('error.unexpectedError')}
             </Text>
             {__DEV__ && this.state.error && (
               <ScrollView style={styles.debugContainer}>
@@ -84,8 +85,13 @@ export class ErrorBoundary extends React.Component {
                 )}
               </ScrollView>
             )}
-            <TouchableOpacity style={styles.retryButton} onPress={this.handleRetry}>
-              <Text style={styles.retryButtonText}>Try Again</Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={this.handleRetry}
+              accessibilityRole="button"
+              accessibilityLabel={tStatic('error.tryAgain')}
+            >
+              <Text style={styles.retryButtonText}>{tStatic('error.tryAgain')}</Text>
             </TouchableOpacity>
           </View>
         </View>

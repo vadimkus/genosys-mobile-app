@@ -90,8 +90,6 @@ export default function BundleBuilderScreen() {
   const stepsScrollRef = useRef(null);
   const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-  const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
-
   // State
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -169,7 +167,7 @@ export default function BundleBuilderScreen() {
       setSteps(data.steps || []);
     } catch (err) {
       log.warn('Failed to fetch bundle data:', err.message);
-      setError(l('Failed to load products', 'فشل تحميل المنتجات', 'Не удалось загрузить товары'));
+      setError(t('bundleBuilder.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -214,10 +212,10 @@ export default function BundleBuilderScreen() {
   const appliedDiscountType = vipWinLines > 0 ? (bundleWinLines > 0 ? 'mixed' : 'vip') : 'bundle';
   const headlinePct = appliedDiscountType === 'vip' ? vipPct : discountPercent;
   const discountRowLabel = appliedDiscountType === 'vip'
-    ? l('VIP Discount', 'خصم VIP', 'VIP-скидка')
+    ? t('bundleBuilder.vipDiscount')
     : appliedDiscountType === 'mixed'
-      ? l('Discount', 'خصم', 'Скидка')
-      : l('Bundle Discount', 'خصم المجموعة', 'Скидка набора');
+      ? t('bundleBuilder.discount')
+      : t('bundleBuilder.bundleDiscount');
   const discountRowPctText = appliedDiscountType === 'mixed' ? '' : ` (${headlinePct}%)`;
 
   const toggleProduct = (product, stepId) => {
@@ -249,13 +247,11 @@ export default function BundleBuilderScreen() {
   const handleAddToCart = async () => {
     if (itemCount < 2) {
       Alert.alert(
-        l('Minimum 2 Products', 'الحد الأدنى ٢ منتجات', 'Минимум 2 товара'),
-        l('Add at least 2 products to get a bundle discount.', 'أضف منتجين على الأقل للحصول على خصم.', 'Добавьте минимум 2 товара для скидки.'),
+        t('bundleBuilder.min2Title'),
+        t('bundleBuilder.min2Message'),
       );
       return;
     }
-
-    haptics.success();
 
     // Add selected products as one batch so the bundle tier is reconciled after
     // all items are present. Adding one-by-one can temporarily strip bundle flags.
@@ -283,7 +279,18 @@ export default function BundleBuilderScreen() {
         bundleDiscountPercent: discountPercent,
       };
     });
-    addBundleItems(bundleProducts, discountPercent);
+    // Only clear the selection and navigate if the cart actually accepted the
+    // bundle — a silent failure here left a phantom "added" state (M7/M8 class).
+    try {
+      addBundleItems(bundleProducts, discountPercent);
+    } catch (err) {
+      log.warn('addBundleItems failed', err?.message || err);
+      haptics.warning();
+      Alert.alert(t('common.error'), t('bundleBuilder.addFailed'));
+      return;
+    }
+
+    haptics.success();
 
     // Clear selection
     setSelectedItems({});
@@ -356,7 +363,7 @@ export default function BundleBuilderScreen() {
         >
           <Ionicons name={selected ? 'checkmark' : 'add'} size={18} color={selected ? '#fff' : '#dc2626'} />
           <Text style={[styles.addBtnText, selected && styles.addBtnTextSelected]}>
-            {selected ? l('Added', 'تم الإضافة', 'Добавлено') : l('Add', 'أضف', 'Добавить')}
+            {selected ? t('bundleBuilder.added') : t('bundleBuilder.add')}
           </Text>
         </TouchableOpacity>
       </TouchableOpacity>
@@ -369,15 +376,15 @@ export default function BundleBuilderScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('common.back')}>
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{l('Build Your Set', 'ابنِ مجموعتك', 'Собери свой набор')}</Text>
+          <Text style={styles.headerTitle}>{t('bundleBuilder.title')}</Text>
           <View style={styles.backBtn} />
         </View>
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color="#dc2626" />
-          <Text style={styles.loadingText}>{l('Loading products...', 'جاري تحميل المنتجات...', 'Загрузка товаров...')}</Text>
+          <Text style={styles.loadingText}>{t('bundleBuilder.loadingProducts')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -387,17 +394,17 @@ export default function BundleBuilderScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('common.back')}>
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{l('Build Your Set', 'ابنِ مجموعتك', 'Собери свой набор')}</Text>
+          <Text style={styles.headerTitle}>{t('bundleBuilder.title')}</Text>
           <View style={styles.backBtn} />
         </View>
         <View style={styles.loadingWrap}>
           <Ionicons name="alert-circle" size={48} color="#EF4444" />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={fetchBundleData} activeOpacity={0.7}>
-            <Text style={styles.retryBtnText}>{l('Try Again', 'حاول مجدداً', 'Повторить')}</Text>
+            <Text style={styles.retryBtnText}>{t('bundleBuilder.tryAgain')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -408,12 +415,19 @@ export default function BundleBuilderScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.headerBar}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('common.back')}>
           <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{l('Build Your Set', 'ابنِ مجموعتك', 'Собери свой набор')}</Text>
+        <Text style={styles.headerTitle}>{t('bundleBuilder.title')}</Text>
         {itemCount > 0 ? (
-          <TouchableOpacity onPress={() => showSummary ? closeSummary() : openSummary()} style={styles.cartBadgeBtn} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={() => showSummary ? closeSummary() : openSummary()}
+            style={styles.cartBadgeBtn}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`${t('bundleBuilder.yourBundle')} (${itemCount})`}
+            accessibilityState={{ expanded: showSummary }}
+          >
             <Ionicons name="bag-outline" size={22} color="#dc2626" />
             <View style={styles.cartBadge}><Text style={styles.cartBadgeText}>{itemCount}</Text></View>
           </TouchableOpacity>
@@ -443,17 +457,13 @@ export default function BundleBuilderScreen() {
         </View>
         {nextTier && itemCount > 0 && (
           <Text style={styles.nextTierHint}>
-            {l(
-              `Add ${nextTier.minItems - itemCount} more for ${nextTier.discount}% off!`,
-              `أضف ${nextTier.minItems - itemCount} منتج لخصم ${nextTier.discount}%!`,
-              `Ещё ${nextTier.minItems - itemCount} для скидки ${nextTier.discount}%!`
-            )}
+            {t('bundleBuilder.nextTierHint', { count: nextTier.minItems - itemCount, percent: nextTier.discount })}
           </Text>
         )}
         {discountPercent > 0 && (
           <View style={styles.discountActiveBadge}>
             <Ionicons name="pricetag" size={14} color="#16a34a" />
-            <Text style={styles.discountActiveText}>{discountPercent}% {l('Bundle Discount', 'خصم المجموعة', 'Скидка набора')}</Text>
+            <Text style={styles.discountActiveText}>{discountPercent}% {t('bundleBuilder.bundleDiscount')}</Text>
           </View>
         )}
       </View>
@@ -502,7 +512,7 @@ export default function BundleBuilderScreen() {
               <Text style={[styles.stepHeaderTitle, isRTL && styles.textRTL]}>{currentStepData.name}</Text>
               {currentStepData.required && (
                 <View style={styles.requiredBadge}>
-                  <Text style={styles.requiredBadgeText}>{l('Recommended', 'موصى به', 'Рекомендуется')}</Text>
+                  <Text style={styles.requiredBadgeText}>{t('bundleBuilder.recommended')}</Text>
                 </View>
               )}
             </View>
@@ -524,7 +534,7 @@ export default function BundleBuilderScreen() {
           ListEmptyComponent={
             <View style={styles.emptyStep}>
               <Ionicons name="cube-outline" size={40} color="#D1D5DB" />
-              <Text style={styles.emptyStepText}>{l('No products in this category', 'لا منتجات في هذه الفئة', 'Нет товаров в этой категории')}</Text>
+              <Text style={styles.emptyStepText}>{t('bundleBuilder.emptyStep')}</Text>
             </View>
           }
         />
@@ -538,6 +548,9 @@ export default function BundleBuilderScreen() {
           onPress={() => { haptics.lightTap(); setFooterExpanded(v => !v); }}
           activeOpacity={0.7}
           hitSlop={{ top: 12, bottom: 12, left: 20, right: 20 }}
+          accessibilityRole="button"
+          accessibilityLabel={footerExpanded ? t('common.hideDetails') : t('common.showDetails')}
+          accessibilityState={{ expanded: footerExpanded }}
         >
           <View style={styles.footerHandle} />
           <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
@@ -549,7 +562,7 @@ export default function BundleBuilderScreen() {
             {/* Retail Price (before discount) */}
             {discountAmount > 0 && (
               <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
+                <Text style={styles.pricingLabel}>{t('bundleBuilder.retailPrice')}</Text>
                 <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{formatAed(retailTotal)}</Text>
               </View>
             )}
@@ -561,13 +574,13 @@ export default function BundleBuilderScreen() {
               </View>
             )}
             <View style={[styles.pricingRow, styles.pricingRowTotal]}>
-              <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
+              <Text style={styles.pricingTotalLabel}>{t('bundleBuilder.total')}</Text>
               <Text style={styles.pricingTotalValue}>{formatAed(total)}</Text>
             </View>
             {/* You Save badge */}
             {totalSaved > 0.5 && (
               <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabelGreen}>{l('You Save', 'توفر', 'Вы экономите')}</Text>
+                <Text style={styles.pricingLabelGreen}>{t('bundleBuilder.youSave')}</Text>
                 <Text style={styles.pricingValueGreen}>{formatAed(totalSaved)}</Text>
               </View>
             )}
@@ -583,7 +596,7 @@ export default function BundleBuilderScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color={currentStep === 0 ? '#D1D5DB' : '#374151'} />
-            <Text style={[styles.navBtnText, currentStep === 0 && styles.navBtnTextDisabled]}>{l('Previous', 'السابق', 'Назад')}</Text>
+            <Text style={[styles.navBtnText, currentStep === 0 && styles.navBtnTextDisabled]}>{t('bundleBuilder.previous')}</Text>
           </TouchableOpacity>
 
           {/* Center: total */}
@@ -596,7 +609,7 @@ export default function BundleBuilderScreen() {
                 <Text style={styles.navTotal}>{Math.round(total)} AED</Text>
               </>
             ) : (
-              <Text style={styles.navItems}>{itemCount} {l('items', 'منتجات', 'товаров')}</Text>
+              <Text style={styles.navItems}>{itemCount} {t('bundleBuilder.items')}</Text>
             )}
           </TouchableOpacity>
 
@@ -608,8 +621,8 @@ export default function BundleBuilderScreen() {
             >
               <Text style={styles.navBtnText}>
                 {currentStepData?.required && getStepSelectionCount(currentStepData.id) === 0
-                  ? l('Skip', 'تخطّ', 'Пропустить')
-                  : l('Next', 'التالي', 'Далее')}
+                  ? t('bundleBuilder.skip')
+                  : t('bundleBuilder.next')}
               </Text>
               <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color="#374151" />
             </TouchableOpacity>
@@ -623,7 +636,7 @@ export default function BundleBuilderScreen() {
           <TouchableOpacity style={styles.addToCartBtn} onPress={handleAddToCart} activeOpacity={0.8}>
             <Ionicons name="bag-add" size={20} color="#fff" />
             <Text style={styles.addToCartText}>
-              {l('Add Bundle to Cart', 'أضف المجموعة للسلة', 'Добавить набор в корзину')}
+              {t('bundleBuilder.addBundleToCart')}
               {discountPercent > 0 ? ` (${t('product.discountPercent', { percent: discountPercent })})` : ''}
             </Text>
           </TouchableOpacity>
@@ -640,7 +653,7 @@ export default function BundleBuilderScreen() {
           >
             <View style={styles.summaryHandle} />
             <View style={styles.summaryHeader}>
-              <Text style={styles.summaryTitle}>{l('Your Bundle', 'مجموعتك', 'Ваш набор')} ({itemCount})</Text>
+              <Text style={styles.summaryTitle}>{t('bundleBuilder.yourBundle')} ({itemCount})</Text>
               <TouchableOpacity onPress={closeSummary}><Ionicons name="close" size={24} color="#374151" /></TouchableOpacity>
             </View>
 
@@ -658,7 +671,13 @@ export default function BundleBuilderScreen() {
                       <Text style={styles.summaryItemStep}>{step?.icon} {step?.name}</Text>
                     </View>
                     <Text style={styles.summaryItemPrice}>{formatAed(getBundleRetailPrice(product))}</Text>
-                    <TouchableOpacity onPress={() => toggleProduct(product, stepId)} style={styles.summaryRemoveBtn}>
+                    <TouchableOpacity
+                      onPress={() => toggleProduct(product, stepId)}
+                      style={styles.summaryRemoveBtn}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('bag.removeItem')} — ${product.name}`}
+                    >
                       <Ionicons name="close-circle" size={22} color="#EF4444" />
                     </TouchableOpacity>
                   </View>
@@ -672,7 +691,7 @@ export default function BundleBuilderScreen() {
                 {/* Retail Price */}
                 {discountAmount > 0 && (
                   <View style={styles.pricingRow}>
-                    <Text style={styles.pricingLabel}>{l('Retail Price', 'السعر الأصلي', 'Розничная цена')}</Text>
+                    <Text style={styles.pricingLabel}>{t('bundleBuilder.retailPrice')}</Text>
                     <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{formatAed(retailTotal)}</Text>
                   </View>
                 )}
@@ -684,12 +703,12 @@ export default function BundleBuilderScreen() {
                   </View>
                 )}
                 <View style={[styles.pricingRow, styles.pricingRowTotal]}>
-                  <Text style={styles.pricingTotalLabel}>{l('Total', 'الإجمالي', 'Итого')}</Text>
+                  <Text style={styles.pricingTotalLabel}>{t('bundleBuilder.total')}</Text>
                   <Text style={styles.pricingTotalValue}>{formatAed(total)}</Text>
                 </View>
                 {totalSaved > 0.5 && (
                   <View style={styles.pricingRow}>
-                    <Text style={styles.pricingLabelGreen}>{l('You Save', 'توفر', 'Вы экономите')}</Text>
+                    <Text style={styles.pricingLabelGreen}>{t('bundleBuilder.youSave')}</Text>
                     <Text style={styles.pricingValueGreen}>{formatAed(totalSaved)}</Text>
                   </View>
                 )}
@@ -703,7 +722,7 @@ export default function BundleBuilderScreen() {
               activeOpacity={0.7}
             >
               <Ionicons name="trash-outline" size={16} color="#EF4444" />
-              <Text style={styles.clearAllText}>{l('Clear All', 'مسح الكل', 'Очистить всё')}</Text>
+              <Text style={styles.clearAllText}>{t('bundleBuilder.clearAll')}</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>

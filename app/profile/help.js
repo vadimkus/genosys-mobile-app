@@ -347,7 +347,13 @@ export default function HelpSupportScreen() {
                 </View>
                 <Text style={[styles.returnModalTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
               </View>
-              <TouchableOpacity onPress={() => setReturnModalVisible(false)} style={styles.modalCloseBtn}>
+              <TouchableOpacity
+                onPress={() => setReturnModalVisible(false)}
+                style={styles.modalCloseBtn}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.close')}
+              >
                 <Ionicons name="close" size={20} color={colors.secondaryLabel} />
               </TouchableOpacity>
             </View>

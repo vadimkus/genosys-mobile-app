@@ -29,7 +29,7 @@ import { getJson } from '../../services/httpClient';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isUserDiscountExcludedProduct } from '../../utils/productRules';
 import { isBeautyBoxProduct } from '../../utils/productRules';
-import { useLocalization } from '../../contexts/LocalizationContext';
+import { useLocalization, tStatic } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedProductSize } from '../../utils/productLocalization';
 import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
 import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
@@ -60,6 +60,7 @@ import {
 } from '../../utils/productDetailUtils';
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
+import { isProductOutOfStock } from '../../utils/stock';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
@@ -169,6 +170,8 @@ function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
             style={videoStyles.thumbnailWrapper}
             activeOpacity={0.8}
             onPress={handlePlay}
+            accessibilityRole="button"
+            accessibilityLabel={tStatic('product.video')}
           >
             {thumbnailUrl ? (
               <Image
@@ -324,12 +327,8 @@ function ProductDetailScreen() {
 
   // Conservative OOS detection: only treat as out-of-stock when an explicit
   // signal exists. Missing/undefined stock info should not block checkout.
-  const isOutOfStock = !!product && (
-    product.status === 'out_of_stock'
-    || product.outOfStock === true
-    || product.available === false
-    || product.stock === 0
-  );
+  // Shared with the shop grid (utils/stock.js) so both surfaces agree (M1).
+  const isOutOfStock = isProductOutOfStock(product);
 
   // Hoisted so the inline gallery and the full-screen Lightbox share the same
   // image array (avoids re-computing or getting out of sync).
@@ -363,9 +362,12 @@ function ProductDetailScreen() {
   );
   const condensedHeaderRef = useRef(false);
 
+  // Re-fetch when the auth token changes too (M4): logging in while the PDP
+  // is mounted must replace guest pricing with the user's server pricing.
   useEffect(() => {
     loadProduct();
-  }, [id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, user?.token, locale]);
 
   // Fade + lift the content in once the product is ready.
   useEffect(() => {
@@ -1001,16 +1003,29 @@ function ProductDetailScreen() {
               haptics.lightTap();
               router.back();
             }}
+            accessibilityRole="button"
+            accessibilityLabel={t('productScreen.goBack')}
           >
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color={colors.label} />
           </TouchableOpacity>
 
           <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
-            <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={handleShare}
+              accessibilityRole="button"
+              accessibilityLabel={t('product.share')}
+            >
               <Ionicons name="share-outline" size={20} color={colors.label} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.headerButton} onPress={handleWishlistToggle}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={handleWishlistToggle}
+              accessibilityRole="button"
+              accessibilityLabel={isWishlisted ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
+              accessibilityState={{ selected: isWishlisted }}
+            >
               <Ionicons
                 name={isWishlisted ? 'heart' : 'heart-outline'}
                 size={20}

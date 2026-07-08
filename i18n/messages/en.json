@@ -180,6 +180,7 @@
     "emptyText": "When you add products, they'll appear here",
     "startShopping": "Start Shopping",
     "clear": "Clear",
+    "removeItem": "Remove item",
     "clearBagTitle": "Clear Bag",
     "clearBagMessage": "Remove all items from your bag?",
     "header": "Bag: {count} {label}",
@@ -1109,7 +1110,9 @@
     "addToBag": "Add to Bag",
     "loginToBuy": "Login to Buy",
     "requestQuote": "Request Quote",
-    "priceOnRequest": "Price on Request"
+    "priceOnRequest": "Price on Request",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites"
   },
   "voiceSearch": {
     "label": "Voice search",
@@ -1216,6 +1219,8 @@
     "appleAuthFailed": "Apple authentication failed. Please try again.",
     "appleSetupNotComplete": "Apple Sign‑In isn’t set up for this build yet.\n\nChecklist:\n- Disable Airplane Mode / ensure internet\n- Sign in to iCloud on the device\n- Apple Developer: App ID has “Sign In with Apple” enabled for this bundle\n\nBundle ID: {bundleId}",
     "appleNoToken": "Could not start Apple Sign-In. Please try again.",
+    "appleIosOnly": "Apple Sign-In is only available on iOS.",
+    "appleUnavailableDevice": "Apple Sign-In is not available on this device. Please ensure you are signed into iCloud and try again.",
     "authFailedTitle": "Authentication Failed",
     "biometricLoginFailed": "Biometric login failed",
     "biometricAuthFailed": "Biometric authentication failed. Please try again.",
@@ -1231,6 +1236,8 @@
     "emailPlaceholder": "Enter your email",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Enter your password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "privacyConsentPrefix": "I agree to the",
     "privacyPolicyLink": "Privacy Policy",
     "privacyConsentSuffix": "and consent to the collection and use of my personal information as described.",
@@ -1496,6 +1503,9 @@
     "login": "Login",
     "logout": "Sign Out",
     "close": "Close",
+    "refresh": "Refresh",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
     "switchLanguage": "Switch language",
     "save": "Save",
     "done": "Done",
@@ -1517,7 +1527,8 @@
     "freeItemWithNumber": "Free Item {number}",
     "connectionErrorTitle": "Connection problem",
     "connectionErrorText": "We couldn't load products. Check your internet connection and try again.",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "addToBagFailed": "Couldn't add to bag. Please check your connection and try again."
   },
   "reviews": {
     "title": "Customer Reviews",
@@ -1576,7 +1587,9 @@
     "aiExpertAnalysis": "AI Expert Analysis",
     "errorAnalysisFailed": "Analysis failed. Please try again.",
     "errorCaptureFailed": "Failed to capture photo. Please try again.",
-    "errorTitle": "Error"
+    "errorTitle": "Error",
+    "openSettings": "Open Settings",
+    "permissionDeniedHint": "Camera access is turned off for this app. Enable it in Settings to use skin analysis."
   },
   "webview": {
     "noUrlProvided": "No URL provided",
@@ -1590,6 +1603,34 @@
   },
   "error": {
     "somethingWentWrong": "Something went wrong",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "unexpectedError": "An unexpected error occurred. Please try again."
+  },
+  "bundleBuilder": {
+    "title": "Build Your Set",
+    "loadFailed": "Failed to load products",
+    "loadingProducts": "Loading products...",
+    "tryAgain": "Try Again",
+    "vipDiscount": "VIP Discount",
+    "discount": "Discount",
+    "bundleDiscount": "Bundle Discount",
+    "min2Title": "Minimum 2 Products",
+    "min2Message": "Add at least 2 products to get a bundle discount.",
+    "added": "Added",
+    "add": "Add",
+    "nextTierHint": "Add {count} more for {percent}% off!",
+    "recommended": "Recommended",
+    "emptyStep": "No products in this category",
+    "retailPrice": "Retail Price",
+    "total": "Total",
+    "youSave": "You Save",
+    "previous": "Previous",
+    "items": "items",
+    "skip": "Skip",
+    "next": "Next",
+    "addBundleToCart": "Add Bundle to Cart",
+    "yourBundle": "Your Bundle",
+    "clearAll": "Clear All",
+    "addFailed": "Couldn't add the bundle to your bag. Please try again."
   }
 }

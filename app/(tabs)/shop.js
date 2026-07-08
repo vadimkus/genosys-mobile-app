@@ -46,6 +46,7 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../../utils/productRules';
 import { getPricingDisplay, hasServerPricing, formatAed } from '../../utils/pricingDisplay';
 import { computeProductBadges } from '../../utils/badges';
+import { isProductOutOfStock } from '../../utils/stock';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import {
   getLocalizedProductName,
@@ -103,6 +104,317 @@ const buildAllowedCategoryList = (foundCategories = []) => {
   });
   return list;
 };
+
+// Memoized grid card (M3): re-renders only when its own props change, so a
+// search keystroke or unrelated state change no longer re-renders the whole
+// grid. All handlers are passed as stable callbacks from ShopScreen.
+const ShopGridCard = React.memo(function ShopGridCard({
+  product,
+  isFav,
+  isAdding,
+  qtyInBag,
+  user,
+  locale,
+  isRTL,
+  t,
+  onPress,
+  onToggleFavorite,
+  onAddToCart,
+  onDecrement,
+  localizeDiscountLabel,
+}) {
+  return (
+    <View style={styles.gridCard}>
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={() => onPress(product)}
+        activeOpacity={0.95}
+      >
+        <View style={styles.gridImageContainer}>
+          {product.image ? (
+            <Image
+              source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
+              style={styles.gridImage}
+              contentFit="contain"
+              transition={200}
+              cachePolicy="memory-disk"
+            />
+          ) : (
+            <View style={styles.gridImagePlaceholder}>
+              <Text style={styles.gridPlaceholderText}>{product.name?.charAt(0) || 'G'}</Text>
+            </View>
+          )}
+
+          {/* Badges */}
+          {(() => {
+            const badges = computeProductBadges(product, {
+              order: t('common.order'),
+              inStock: t('stock.inStock'),
+              new: t('common.new'),
+            });
+
+            if (!badges.length) return null;
+
+            return (
+              <View style={[styles.badgeContainer, isRTL && styles.badgeContainerRTL]}>
+                {badges.map((badge, badgeIndex) => {
+                  const badgeColor = badge.color || colors.blue;
+                  return (
+                    <View
+                      key={`${badge.text || 'badge'}-${badgeIndex}`}
+                      style={[styles.badge, { backgroundColor: tint(badgeColor) }]}
+                    >
+                      <View style={[styles.badgeDot, { backgroundColor: badgeColor }]} />
+                      <Text style={[styles.badgeText, { color: badgeColor }]}>{badge.text}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
+
+          {/* Favorite Heart Button */}
+          <TouchableOpacity
+            style={styles.favoriteHeart}
+            onPress={(e) => {
+              e.stopPropagation(); // Prevent product card press
+              onToggleFavorite(product);
+            }}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={isFav ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
+            accessibilityState={{ selected: isFav }}
+          >
+            <View>
+              <Ionicons
+                name={isFav ? 'heart' : 'heart-outline'}
+                size={20}
+                color={isFav ? colors.brand : colors.white}
+              />
+            </View>
+          </TouchableOpacity>
+
+          {/* Stock Status */}
+          {isProductOutOfStock(product) && (
+            <View style={styles.stockOverlay}>
+              <View style={styles.stockBadge}>
+                <View style={styles.stockDot} />
+                <Text style={styles.stockOverlayText}>{t('stock.outOfStock')}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        <View style={[styles.gridContent, isRTL && styles.gridContentRTL]}>
+          <Text style={[styles.gridName, isRTL && styles.gridNameRTL]} numberOfLines={2}>
+            {getLocalizedProductName(product, locale) || product.name}
+          </Text>
+          <Text style={[styles.gridCategory, isRTL && styles.gridCategoryRTL]}>
+            {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+            {product.size ? ` · ${product.size}` : ''}
+          </Text>
+
+          {(getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description) && (
+            <Text style={[styles.gridDescription, isRTL && styles.gridDescriptionRTL]} numberOfLines={2}>
+              {getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description}
+            </Text>
+          )}
+
+          {/* Pricing Display */}
+          {(() => {
+            const pricing = getPricingDisplay(product);
+            const contractPrice = hasServerPricing(product);
+            const displayPrice = contractPrice ? pricing.displayPrice : Number(product.displayPrice || product.price || 0);
+            const originalPrice = contractPrice ? pricing.originalPrice : Number(product.originalPrice);
+
+            if (!user) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.loginToSeePriceText}>{t('product.loginToSeePrice')}</Text>
+                </View>
+              );
+            }
+
+            if (pricing.isPriceOnRequest) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest')}</Text>
+                </View>
+              );
+            }
+
+            const category = product.category;
+            const nm = getLocalizedProductName(product, locale) || product.name || '';
+            const hasBeautyBoxInName = nm.toUpperCase().includes('BEAUTY BOX');
+            const isCategoryBeautyBoxes = category === 'Beauty Boxes';
+            const isBeautyBox = isCategoryBeautyBoxes || hasBeautyBoxInName;
+
+            if (isBeautyBox) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  {Number(originalPrice) > Number(displayPrice || 0) && (
+                    <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
+                  )}
+                  <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
+                  <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
+                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                </View>
+              );
+            }
+
+            if (!contractPrice && (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product))) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.gridPrice}>{formatAed(getCanonicalUnitPrice(product))}</Text>
+                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                </View>
+              );
+            }
+
+            if (originalPrice && Number(originalPrice) > Number(displayPrice || 0)) {
+              return (
+                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                  <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
+                  <Text style={styles.discountedPrice}>{formatAed(displayPrice)}</Text>
+                  {pricing.discountLabel && <Text style={styles.userDiscount}>{localizeDiscountLabel(pricing.discountLabel)}</Text>}
+                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+                </View>
+              );
+            }
+
+            return (
+              <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
+                <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
+                <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
+              </View>
+            );
+          })()}
+
+          {/* Add to Cart / Request Quote Button */}
+          {product.isPriceOnRequest ? (
+            <TouchableOpacity
+              style={[styles.requestQuoteButton, isRTL && styles.addToCartButtonRTL]}
+              onPress={() => {
+                const productName = getLocalizedProductName(product, locale) || product.name || '';
+                const message = encodeURIComponent(
+                  t('product.requestQuoteMessage', { name: productName })
+                );
+                Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
+              }}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={t('shop.requestQuote')}
+            >
+              <Ionicons
+                name="logo-whatsapp"
+                size={16}
+                color="#ffffff"
+                style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
+              />
+              <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
+                {t('shop.requestQuote')}
+              </Text>
+            </TouchableOpacity>
+          ) : (() => {
+            const outOfStock = isProductOutOfStock(product);
+            const isInBag = qtyInBag > 0 && !outOfStock;
+
+            // In-bag state: show a [-] [N in Bag] [+] stepper so the user
+            // can adjust quantity from the grid without opening the bag.
+            if (isInBag) {
+              const decLabel = t('shop.decreaseQuantity');
+              const incLabel = t('shop.increaseQuantity');
+              return (
+                <View
+                  style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
+                  accessibilityRole="adjustable"
+                  accessibilityLabel={`${t('shop.inBag')} (${qtyInBag}) — ${product?.name || ''}`}
+                >
+                  <TouchableOpacity
+                    style={styles.qtyStepperBtn}
+                    onPress={() => {
+                      haptics.lightTap();
+                      onDecrement(product.id);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={decLabel}
+                    disabled={isAdding}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="remove" size={18} color="#ffffff" />
+                  </TouchableOpacity>
+
+                  <View style={styles.qtyStepperLabelWrap} pointerEvents="none">
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={14}
+                      color="#ffffff"
+                      style={styles.qtyStepperCheck}
+                    />
+                    <Text
+                      style={styles.qtyStepperLabel}
+                      numberOfLines={1}
+                      allowFontScaling={false}
+                    >
+                      {`${t('shop.inBag')} (${qtyInBag})`}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.qtyStepperBtn}
+                    onPress={() => onAddToCart(product)}
+                    accessibilityRole="button"
+                    accessibilityLabel={incLabel}
+                    disabled={isAdding}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="add" size={18} color="#ffffff" />
+                  </TouchableOpacity>
+                </View>
+              );
+            }
+
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.addToCartButton,
+                  isRTL && styles.addToCartButtonRTL,
+                  (outOfStock || isAdding) && styles.addToCartButtonDisabled,
+                ]}
+                onPress={() => onAddToCart(product)}
+                disabled={outOfStock || isAdding}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  outOfStock
+                    ? t('stock.outOfStock')
+                    : `${t('shop.addToBag')} — ${product?.name || ''}`
+                }
+                accessibilityState={{ disabled: outOfStock || isAdding }}
+              >
+                <Ionicons
+                  name={isAdding ? 'checkmark' : 'bag-add'}
+                  size={16}
+                  color="#ffffff"
+                  style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
+                />
+                <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
+                  {isAdding
+                    ? t('shop.added')
+                    : outOfStock
+                      ? t('stock.outOfStock')
+                      : !user
+                        ? t('shop.loginToBuy')
+                        : t('shop.addToBag')}
+                </Text>
+              </TouchableOpacity>
+            );
+          })()}
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+});
 
 function ShopScreen() {
   const { user } = useAuth();
@@ -237,290 +549,6 @@ function ShopScreen() {
 
   // Animations disabled — static values only
 
-
-  const renderProductCardInner = (product) => {
-    const isFav = !!isFavorite(product?.id);
-    return (
-      <>
-        <View style={styles.gridImageContainer}>
-          {product.image ? (
-            <Image
-              source={`${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`}
-              style={styles.gridImage}
-              contentFit="contain"
-              transition={200}
-              cachePolicy="memory-disk"
-            />
-          ) : (
-            <View style={styles.gridImagePlaceholder}>
-              <Text style={styles.gridPlaceholderText}>{product.name?.charAt(0) || 'G'}</Text>
-            </View>
-          )}
-
-          {/* Badges */}
-          {(() => {
-            const badges = computeProductBadges(product, {
-              order: t('common.order'),
-              inStock: t('stock.inStock'),
-              new: t('common.new'),
-            });
-
-            if (!badges.length) return null;
-
-            return (
-              <View style={[styles.badgeContainer, isRTL && styles.badgeContainerRTL]}>
-                {badges.map((badge, badgeIndex) => {
-                  const badgeColor = badge.color || colors.blue;
-                  return (
-                    <View
-                      key={`${badge.text || 'badge'}-${badgeIndex}`}
-                      style={[styles.badge, { backgroundColor: tint(badgeColor) }]}
-                    >
-                      <View style={[styles.badgeDot, { backgroundColor: badgeColor }]} />
-                      <Text style={[styles.badgeText, { color: badgeColor }]}>{badge.text}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })()}
-
-          {/* Favorite Heart Button */}
-          <TouchableOpacity
-            style={styles.favoriteHeart}
-            onPress={(e) => {
-              e.stopPropagation(); // Prevent product card press
-              handleToggleFavorite(product);
-            }}
-            activeOpacity={0.8}
-          >
-            <View>
-              <Ionicons
-                name={isFav ? 'heart' : 'heart-outline'}
-                size={20}
-                color={isFav ? colors.brand : colors.white}
-              />
-            </View>
-          </TouchableOpacity>
-
-          {/* Stock Status */}
-          {(product.status === 'out_of_stock' || product.stock === false) && (
-            <View style={styles.stockOverlay}>
-              <View style={styles.stockBadge}>
-                <View style={styles.stockDot} />
-                <Text style={styles.stockOverlayText}>{t('stock.outOfStock')}</Text>
-              </View>
-            </View>
-          )}
-        </View>
-
-        <View style={[styles.gridContent, isRTL && styles.gridContentRTL]}>
-          <Text style={[styles.gridName, isRTL && styles.gridNameRTL]} numberOfLines={2}>
-            {getLocalizedProductName(product, locale) || product.name}
-          </Text>
-          <Text style={[styles.gridCategory, isRTL && styles.gridCategoryRTL]}>
-            {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
-            {product.size ? ` · ${product.size}` : ''}
-          </Text>
-
-          {(getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description) && (
-            <Text style={[styles.gridDescription, isRTL && styles.gridDescriptionRTL]} numberOfLines={2}>
-              {getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description}
-            </Text>
-          )}
-
-          {/* Pricing Display */}
-          {(() => {
-            const pricing = getPricingDisplay(product);
-            const contractPrice = hasServerPricing(product);
-            const displayPrice = contractPrice ? pricing.displayPrice : Number(product.displayPrice || product.price || 0);
-            const originalPrice = contractPrice ? pricing.originalPrice : Number(product.originalPrice);
-
-            if (!user) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.loginToSeePriceText}>{t('product.loginToSeePrice')}</Text>
-                </View>
-              );
-            }
-
-            if (pricing.isPriceOnRequest) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest')}</Text>
-                </View>
-              );
-            }
-
-            const category = product.category;
-            const nm = getLocalizedProductName(product, locale) || product.name || '';
-            const hasBeautyBoxInName = nm.toUpperCase().includes('BEAUTY BOX');
-            const isCategoryBeautyBoxes = category === 'Beauty Boxes';
-            const isBeautyBox = isCategoryBeautyBoxes || hasBeautyBoxInName;
-
-            if (isBeautyBox) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  {Number(originalPrice) > Number(displayPrice || 0) && (
-                    <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
-                  )}
-                  <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
-                  <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
-                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                </View>
-              );
-            }
-
-            if (!contractPrice && (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product))) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.gridPrice}>{formatAed(getCanonicalUnitPrice(product))}</Text>
-                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                </View>
-              );
-            }
-
-            if (originalPrice && Number(originalPrice) > Number(displayPrice || 0)) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
-                  <Text style={styles.discountedPrice}>{formatAed(displayPrice)}</Text>
-                  {pricing.discountLabel && <Text style={styles.userDiscount}>{localizeDiscountLabel(pricing.discountLabel)}</Text>}
-                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                </View>
-              );
-            }
-
-            return (
-              <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
-                <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-              </View>
-            );
-          })()}
-
-          {/* Add to Cart / Request Quote Button */}
-          {product.isPriceOnRequest ? (
-            <TouchableOpacity
-              style={[styles.requestQuoteButton, isRTL && styles.addToCartButtonRTL]}
-              onPress={() => {
-                const productName = getLocalizedProductName(product, locale) || product.name || '';
-                const message = encodeURIComponent(
-                  t('product.requestQuoteMessage', { name: productName })
-                );
-                Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="logo-whatsapp"
-                size={16}
-                color="#ffffff"
-                style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
-              />
-              <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
-                {t('shop.requestQuote')}
-              </Text>
-            </TouchableOpacity>
-          ) : (() => {
-            const isAdding = addingProducts.has(product.id);
-            const outOfStock = product.status === 'out_of_stock' || product.stock === false;
-            // Sum across ALL variants of this product so multi-size items
-            // (e.g. Snow O2 Cleanser 180ml / 500ml) also reflect the real
-            // in-bag count — the previous `getItemQuantity(id, '', '')`
-            // only matched the empty-size line and always returned 0 for
-            // variant products, leaving the button red.
-            const qtyInBag = user ? (getProductTotalQuantity?.(product?.id) || 0) : 0;
-            const isInBag = qtyInBag > 0 && !outOfStock;
-
-            // In-bag state: show a [-] [N in Bag] [+] stepper so the user
-            // can adjust quantity from the grid without opening the bag.
-            if (isInBag) {
-              const decLabel = t('shop.decreaseQuantity');
-              const incLabel = t('shop.increaseQuantity');
-              return (
-                <View
-                  style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
-                  accessibilityRole="adjustable"
-                  accessibilityLabel={`${t('shop.inBag')} (${qtyInBag}) — ${product?.name || ''}`}
-                >
-                  <TouchableOpacity
-                    style={styles.qtyStepperBtn}
-                    onPress={() => {
-                      haptics.lightTap();
-                      decrementProductFromCart?.(product.id);
-                    }}
-                    accessibilityRole="button"
-                    accessibilityLabel={decLabel}
-                    disabled={isAdding}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons name="remove" size={18} color="#ffffff" />
-                  </TouchableOpacity>
-
-                  <View style={styles.qtyStepperLabelWrap} pointerEvents="none">
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={14}
-                      color="#ffffff"
-                      style={styles.qtyStepperCheck}
-                    />
-                    <Text
-                      style={styles.qtyStepperLabel}
-                      numberOfLines={1}
-                      allowFontScaling={false}
-                    >
-                      {`${t('shop.inBag')} (${qtyInBag})`}
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.qtyStepperBtn}
-                    onPress={() => handleAddToCart(product)}
-                    accessibilityRole="button"
-                    accessibilityLabel={incLabel}
-                    disabled={isAdding}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons name="add" size={18} color="#ffffff" />
-                  </TouchableOpacity>
-                </View>
-              );
-            }
-
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.addToCartButton,
-                  isRTL && styles.addToCartButtonRTL,
-                  (outOfStock || isAdding) && styles.addToCartButtonDisabled,
-                ]}
-                onPress={() => handleAddToCart(product)}
-                disabled={outOfStock || isAdding}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name={isAdding ? 'checkmark' : 'bag-add'}
-                  size={16}
-                  color="#ffffff"
-                  style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
-                />
-                <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
-                  {isAdding
-                    ? t('shop.added')
-                    : outOfStock
-                      ? t('stock.outOfStock')
-                      : !user
-                        ? t('shop.loginToBuy')
-                        : t('shop.addToBag')}
-                </Text>
-              </TouchableOpacity>
-            );
-          })()}
-        </View>
-      </>
-    );
-  };
 
   const currentLangCode = langSwitching
     ? '...'
@@ -731,12 +759,12 @@ function ShopScreen() {
     setFilteredProducts(filtered);
   }, [searchQuery, selectedCategory, products, locale, t]);
 
-  const handleProductPress = (product) => {
+  const handleProductPress = useCallback((product) => {
     router.push({
       pathname: '/product/[id]',
       params: { id: product.id }
     });
-  };
+  }, []);
 
   const handleCategoryPress = (category) => {
     haptics.selectionTick();
@@ -751,7 +779,7 @@ function ShopScreen() {
   };
 
   // Handle add to cart functionality
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = useCallback(async (product) => {
     if (product?.isPriceOnRequest) return; // price-on-request products cannot be added
     if (!user) {
       Alert.alert(
@@ -771,7 +799,7 @@ function ShopScreen() {
       return;
     }
 
-    if (product.status === 'out_of_stock' || product.stock === false) {
+    if (isProductOutOfStock(product)) {
       Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
       return;
     }
@@ -796,9 +824,9 @@ function ShopScreen() {
         });
       }, 500);
     }
-  };
+  }, [user, t, addItem]);
 
-  const handleToggleFavorite = async (product) => {
+  const handleToggleFavorite = useCallback(async (product) => {
     haptics.lightTap();
     try {
       const result = await toggleFavorite(product);
@@ -810,7 +838,45 @@ function ShopScreen() {
     } catch (err) {
       log.warn('toggleFavorite failed', err?.message || err);
     }
-  };
+  }, [toggleFavorite]);
+
+  const handleDecrementFromCart = useCallback((productId) => {
+    decrementProductFromCart?.(productId);
+  }, [decrementProductFromCart]);
+
+  // Stable renderers so the memoized ShopGridCard actually skips re-renders (M3).
+  const renderGridItem = useCallback(({ item: product }) => (
+    <ShopGridCard
+      product={product}
+      isFav={!!isFavorite(product?.id)}
+      isAdding={addingProducts.has(product.id)}
+      qtyInBag={user ? (getProductTotalQuantity?.(product?.id) || 0) : 0}
+      user={user}
+      locale={locale}
+      isRTL={isRTL}
+      t={t}
+      onPress={handleProductPress}
+      onToggleFavorite={handleToggleFavorite}
+      onAddToCart={handleAddToCart}
+      onDecrement={handleDecrementFromCart}
+      localizeDiscountLabel={localizeDiscountLabel}
+    />
+  ), [
+    isFavorite,
+    addingProducts,
+    user,
+    getProductTotalQuantity,
+    locale,
+    isRTL,
+    t,
+    handleProductPress,
+    handleToggleFavorite,
+    handleAddToCart,
+    handleDecrementFromCart,
+    localizeDiscountLabel,
+  ]);
+
+  const keyExtractor = useCallback((item) => String(item.id), []);
 
 
   // Use all filtered products for the grid
@@ -862,6 +928,8 @@ function ShopScreen() {
               style={styles.favoritesButton}
               onPress={() => router.push('/favorites')}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={`${t('favorites.title')} (${getFavoritesCount()})`}
             >
               <View>
                 <Ionicons 
@@ -965,19 +1033,12 @@ function ShopScreen() {
         onRefresh={handleRefresh}
         data={filteredProducts}
         numColumns={2}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
+        keyExtractor={keyExtractor}
         columnWrapperStyle={styles.gridRow}
-        renderItem={({ item: product }) => (
-          <View style={styles.gridCard}>
-            <TouchableOpacity
-              style={{ flex: 1 }}
-              onPress={() => handleProductPress(product)}
-              activeOpacity={0.95}
-            >
-              {renderProductCardInner(product)}
-            </TouchableOpacity>
-          </View>
-        )}
+        renderItem={renderGridItem}
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
+        windowSize={7}
         ListHeaderComponent={
           <View style={styles.contentContainer}>
             {/* Search Field */}
@@ -1000,6 +1061,9 @@ function ShopScreen() {
                   <TouchableOpacity 
                     style={[styles.searchClearIconButton, isRTL && styles.searchClearIconButtonRTL]}
                     onPress={() => setSearchQuery('')}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('shop.clearSearch')}
                   >
                     <Ionicons name="close" size={14} color="#ffffff" />
                   </TouchableOpacity>

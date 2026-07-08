@@ -25,6 +25,10 @@ export const FavoritesProvider = ({ children }) => {
   const { user } = useAuth();
   const favoritesRef = useRef(favorites);
   favoritesRef.current = favorites;
+  // Guards: only one server sync at a time, and never let the (slower) local
+  // storage load overwrite favorites that a completed sync already set.
+  const syncInFlightRef = useRef(false);
+  const syncCompletedRef = useRef(false);
 
   const extractWishlistArray = (payload) => {
     if (!payload) return [];
@@ -45,7 +49,9 @@ export const FavoritesProvider = ({ children }) => {
     loadFavorites();
   }, []);
 
-  // Sync favorites with database when user changes (optional - app works offline)
+  // Sync favorites with database when the session changes (optional - app
+  // works offline). Keyed on the token string — not the user object — so a
+  // profile update or token-preserving refresh doesn't kick off extra syncs.
   useEffect(() => {
     if (user?.token) {
       // Delay sync to avoid overwhelming the server on app start
@@ -55,7 +61,8 @@ export const FavoritesProvider = ({ children }) => {
       
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.token]);
 
   /**
    * Load favorites from local storage
@@ -63,7 +70,9 @@ export const FavoritesProvider = ({ children }) => {
   const loadFavorites = async () => {
     try {
       const storedFavorites = await AsyncStorage.getItem(FAVORITES_STORAGE_KEY);
-      if (storedFavorites) {
+      // If a server sync already completed while we were reading storage,
+      // the synced list is fresher — don't clobber it with the stale cache.
+      if (storedFavorites && !syncCompletedRef.current) {
         const parsed = JSON.parse(storedFavorites);
         setFavorites(parsed);
         log.debug('Loaded favorites from storage', { count: parsed.length });
@@ -90,6 +99,11 @@ export const FavoritesProvider = ({ children }) => {
    */
   const syncWithDatabase = async () => {
     if (!user?.token) return;
+    if (syncInFlightRef.current) {
+      log.debug('Favorites sync already in flight - skipping');
+      return;
+    }
+    syncInFlightRef.current = true;
     
     try {
       setIsLoading(true);
@@ -172,6 +186,7 @@ export const FavoritesProvider = ({ children }) => {
         
         setFavorites(convertedFavorites);
         await saveFavorites(convertedFavorites);
+        syncCompletedRef.current = true;
         
         log.debug('Favorites synced with database', { count: convertedFavorites.length });
       } else {
@@ -188,6 +203,7 @@ export const FavoritesProvider = ({ children }) => {
       log.debug('App will work offline with local favorites');
       // Don't throw error - let app continue with local favorites
     } finally {
+      syncInFlightRef.current = false;
       setIsLoading(false);
     }
   };

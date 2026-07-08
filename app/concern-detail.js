@@ -525,6 +525,9 @@ export default function ConcernDetailScreen() {
               onPress={() => { haptics.lightTap(); setStickyExpanded(v => !v); }}
               activeOpacity={0.7}
               hitSlop={{ top: 12, bottom: 12, left: 20, right: 20 }}
+              accessibilityRole="button"
+              accessibilityLabel={stickyExpanded ? t('common.hideDetails') : t('common.showDetails')}
+              accessibilityState={{ expanded: stickyExpanded }}
             >
               <View style={styles.stickyHandle} />
               <Ionicons name={stickyExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
@@ -557,6 +560,8 @@ export default function ConcernDetailScreen() {
                       onPress={() => { haptics.lightTap(); removeItem(pid, item.selectedColor || '', item.selectedSize || ''); showToast(locale === 'ar' ? 'تمت الإزالة' : locale === 'ru' ? 'Удалено' : 'Removed'); }}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       style={styles.stickyRemoveBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('bag.removeItem')} — ${name}`}
                     >
                       <Ionicons name="close-circle" size={16} color="#D1D5DB" />
                     </TouchableOpacity>

@@ -7,6 +7,7 @@ import ChatButton from '../components/ChatButton';
 // Screens where the chat button should be hidden
 // Hides on: all standalone info pages, checkout flow, auth, webview, camera
 const CHAT_HIDDEN_ROUTES = [
+  '/chat',                 // full-screen chat route (button would overlap itself)
   '/profile',              // profile page and sub-pages
   '/bag',                  // bag/cart tab
   '/orders',               // orders tab

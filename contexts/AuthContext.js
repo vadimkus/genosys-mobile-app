@@ -385,7 +385,12 @@ export const AuthProvider = ({ children }) => {
 
   const enableBiometric = async (email, password) => {
     try {
-      const result = await enableBiometricAuth(email, password);
+      // Prefer the live session token so we never store a plaintext password.
+      const sessionToken = user?.token || '';
+      const payload = sessionToken
+        ? { email: email || user?.email || '', token: sessionToken }
+        : { email, password };
+      const result = await enableBiometricAuth(payload);
       if (result.success) {
         setBiometricEnabled(true);
       }
@@ -413,9 +418,14 @@ export const AuthProvider = ({ children }) => {
     try {
       // Only offer setup if biometrics are available but not enabled
       if (biometricAvailable && !biometricEnabled) {
-        // Prefer token-based storage; keep password only as a legacy fallback.
-        const payload = token ? { email, token } : { email, password };
-        const result = await setupBiometricAuth(payload, password);
+        // Token-based storage only — never persist a plaintext password.
+        // (Every successful login returns a token; if it's somehow missing,
+        // skip setup rather than fall back to storing the password.)
+        if (!token) {
+          log.warn('Biometric setup skipped: no auth token available');
+          return { success: false, error: 'Biometric setup not available' };
+        }
+        const result = await setupBiometricAuth({ email, token });
         if (result.success) {
           setBiometricEnabled(true);
         }
@@ -492,21 +502,19 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Please log in to update your profile' };
       }
       
-      if (!user.token) {
+      // Resolve the auth token into a local variable — `setUser` does not update
+      // the `user` value captured by this closure, so relying on `user.token`
+      // after a storage-restore meant the API calls below fired with no token.
+      let authToken = user.token || '';
+      if (!authToken) {
         log.error('User token is missing - re-authentication required');
         // Try to get token from storage as fallback
         try {
           const storedData = await getUserSession();
-          if (storedData) {
-            if (storedData.token) {
-              log.debug('Found token in storage, attempting to restore session...');
-              // Update user with token and retry
-              const userWithToken = sanitizeUserSession({ ...user, token: storedData.token });
-              setUser(userWithToken);
-              // Continue with the profile update
-            } else {
-              return { success: false, error: 'Authentication session expired. Please log in again.' };
-            }
+          if (storedData?.token) {
+            log.debug('Found token in storage, attempting to restore session...');
+            authToken = storedData.token;
+            setUser(sanitizeUserSession({ ...user, token: authToken }));
           } else {
             return { success: false, error: 'Authentication session expired. Please log in again.' };
           }
@@ -520,7 +528,7 @@ export const AuthProvider = ({ children }) => {
       let imageUrl = profileData.profilePicture;
       if (profileData.profilePicture && profileData.profilePicture.startsWith('file://')) {
         log.debug('Uploading profile picture...');
-        const uploadResult = await uploadProfilePicture(user.token, profileData.profilePicture);
+        const uploadResult = await uploadProfilePicture(authToken, profileData.profilePicture);
         if (uploadResult.success) {
           imageUrl = uploadResult.imageUrl;
         } else {
@@ -536,7 +544,7 @@ export const AuthProvider = ({ children }) => {
       };
 
       // Update profile in database
-      const result = await dbUpdateUserProfile(user.token, updatedProfileData);
+      const result = await dbUpdateUserProfile(authToken, updatedProfileData);
       
       if (result.success) {
         // dbUpdateUserProfile -> apiRequest() returns:
@@ -552,7 +560,7 @@ export const AuthProvider = ({ children }) => {
         const updatedUser = sanitizeUserSession({ 
           ...user, 
           ...(serverUser || {}),
-          token: user.token  // Always preserve the token
+          token: authToken  // Always preserve the token
         });
         setUser(updatedUser);
         await storeUserSession(updatedUser);

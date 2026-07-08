@@ -38,7 +38,9 @@ const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
 
 // Enable LayoutAnimation on Android for the inline summary expand/collapse.
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+// Old-arch Android needs the opt-in; on Fabric (new arch) it's a no-op that
+// logs a deprecation warning, so skip it there.
+if (Platform.OS === 'android' && !global?.nativeFabricUIManager && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -503,6 +505,8 @@ function OrdersScreen() {
                       activeOpacity={0.6}
                       style={styles.deleteBtn}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('ordersScreen.holdToDeleteTitle')}
                     >
                       <Ionicons name="trash-outline" size={17} color={colors.secondaryLabel} />
                     </TouchableOpacity>

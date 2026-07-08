@@ -441,7 +441,13 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* ─── Header (red, matches web) ─── */}
       <View style={[styles.header, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={() => { haptics.lightTap(); router.back(); }}
+          style={styles.backBtn}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+        >
           <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#ffffff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
@@ -504,6 +510,9 @@ export default function ChatScreen() {
             onPress={() => handleSend()}
             disabled={!input.trim() || loading}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={t('chat.send')}
+            accessibilityState={{ disabled: !input.trim() || loading }}
           >
             <Ionicons name="send" size={20} color="#ffffff" />
           </TouchableOpacity>

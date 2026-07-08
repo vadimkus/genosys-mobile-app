@@ -196,8 +196,12 @@ export default function SkinAnalysisCameraScreen() {
       setTimeout(() => {
         setAddedProducts((prev) => { const n = new Set(prev); n.delete(productId); return n; });
       }, 2000);
-    } catch { /* silent */ }
-  }, [addItem, addedProducts, user]);
+    } catch (err) {
+      log.warn('Add to bag failed', err?.message || err);
+      haptics.warning();
+      Alert.alert(t('skinCamera.errorTitle'), t('common.addToBagFailed'));
+    }
+  }, [addItem, addedProducts, user, t]);
 
   // Permission loading
   if (!permission) {
@@ -211,16 +215,33 @@ export default function SkinAnalysisCameraScreen() {
     );
   }
 
-  // Permission denied
+  // Permission denied. When the OS won't show the prompt again
+  // (canAskAgain === false), the only way out is the system Settings —
+  // otherwise the "Grant Permission" button silently does nothing.
   if (!permission.granted) {
+    const permanentlyDenied = permission.canAskAgain === false;
     return (
       <View style={styles.container}>
         <CollapsibleHeader title={t('skinAnalysis.title')} scrollY={null} onBack={() => router.back()} isRTL={isRTL} />
         <View style={styles.centerContent}>
           <Ionicons name="camera-outline" size={64} color={colors.tertiary} />
-          <Text style={styles.permissionText}>{t('skinAnalysis.cameraPermission')}</Text>
-          <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission} activeOpacity={0.85}>
-            <Text style={styles.permissionBtnText}>{t('skinCamera.grantPermission')}</Text>
+          <Text style={styles.permissionText}>
+            {permanentlyDenied ? t('skinCamera.permissionDeniedHint') : t('skinAnalysis.cameraPermission')}
+          </Text>
+          <TouchableOpacity
+            style={styles.permissionBtn}
+            onPress={() => {
+              if (permanentlyDenied) {
+                Linking.openSettings().catch(() => {});
+              } else {
+                requestPermission();
+              }
+            }}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.permissionBtnText}>
+              {permanentlyDenied ? t('skinCamera.openSettings') : t('skinCamera.grantPermission')}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -439,7 +460,13 @@ export default function SkinAnalysisCameraScreen() {
   return (
     <SafeAreaView style={styles.cameraContainer} edges={['top']}>
       <View style={[styles.header, styles.headerOverCamera, { top: cameraHeaderTop }, isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backBtn}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+        >
           <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#ffffff" />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: '#ffffff' }]}>{t('skinAnalysis.title')}</Text>
@@ -480,6 +507,9 @@ export default function SkinAnalysisCameraScreen() {
               onPress={handleCapture}
               disabled={capturing}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={t('profile.takePhoto')}
+              accessibilityState={{ disabled: capturing }}
             >
               <View style={styles.captureInner}>
                 <Ionicons name="camera" size={32} color="#dc2626" />

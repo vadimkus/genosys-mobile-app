@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import T from '../utils/typography';
 import { colors } from '../utils/theme';
+import { tStatic } from '../contexts/LocalizationContext';
 
 /**
  * Scroll-aware navigation header — the stock-iOS effect.
@@ -59,19 +60,31 @@ export default function CollapsibleHeader({
 
       <View style={[styles.bar, isRTL && styles.barRTL]}>
         {onBack ? (
-          <TouchableOpacity onPress={onBack} style={styles.side} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity
+            onPress={onBack}
+            style={styles.side}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityRole="button"
+            accessibilityLabel={tStatic('common.back')}
+          >
             <Ionicons name={chevron} size={24} color={colors.label} />
           </TouchableOpacity>
         ) : (
           <View style={styles.side} />
         )}
 
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1} accessibilityRole="header">{title}</Text>
 
         {right ? (
           <View style={[styles.side, styles.sideAuto, isRTL && styles.sideAutoRTL]}>{right}</View>
         ) : onRefresh ? (
-          <TouchableOpacity onPress={onRefresh} style={styles.side} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity
+            onPress={onRefresh}
+            style={styles.side}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityRole="button"
+            accessibilityLabel={tStatic('common.refresh')}
+          >
             <Ionicons name={rightIcon} size={20} color={colors.secondaryLabel} />
           </TouchableOpacity>
         ) : (

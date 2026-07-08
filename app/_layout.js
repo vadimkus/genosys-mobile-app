@@ -13,7 +13,6 @@ import { OrdersProvider } from '../contexts/OrdersContext';
 import { AnimationProvider } from '../contexts/AnimationContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import AuthWrapper from './AuthWrapper';
-import BrandedLaunchScreen from '../components/BrandedLaunchScreen';
 import ForceUpdateScreen from '../components/ForceUpdateScreen';
 import VideoLaunchScreen from '../components/VideoLaunchScreen';
 import UpdateBanner from '../components/UpdateBanner';
@@ -72,7 +71,6 @@ function setSplashConfigIfChanged(setter, next) {
 }
 
 export default function RootLayout() {
-  const [showLaunch, setShowLaunch] = useState(true);
   const [forceUpdate, setForceUpdate] = useState(null);
   const [softUpdate, setSoftUpdate] = useState(null);
   const [splashVideo, setSplashVideo] = useState(DEFAULT_SPLASH_CONFIG);
@@ -177,12 +175,6 @@ export default function RootLayout() {
 
     return () => { cancelled = true; };
   }, []);
-
-  const isExpoGo = Constants.appOwnership === 'expo';
-
-  if (isExpoGo && showLaunch && splashVideo === false) {
-    return <BrandedLaunchScreen onDone={() => setShowLaunch(false)} />;
-  }
 
   // Block the entire app if a force update is required
   if (forceUpdate && typeof forceUpdate === 'object') {
