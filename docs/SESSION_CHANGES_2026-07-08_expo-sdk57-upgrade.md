@@ -25,6 +25,24 @@ Companion to `cosmetics-website/docs/SESSION_CHANGES_2026-07-08_DEPENDENCY_UPGRA
 - iOS + Android JS bundle exports succeed
 - No usages found of removed APIs (router history, expo-av, expo-permissions, expo-keep-awake)
 
+## Post-release crash + fix (build 100 → 101)
+
+Build 100 **crashed at launch** on device (TestFlight, iPhone 17 Pro Max). Crash log
+(`GenosysUAE-2026-07-08-134236.ips`): DYLD termination `Library not loaded:
+@rpath/RNWorklets.framework/RNWorklets`, referenced by RNReanimated — the process
+died before any JS ran. expo-router 57 pulls reanimated 4 transitively, and iOS
+autolinking embedded RNReanimated but not its RNWorklets dependency while both
+were only nested deps. (Apple's ITMS-90863 email had flagged the same framework.)
+
+**Fix:** declare `react-native-worklets` (0.10.0) and `react-native-reanimated`
+(4.5.0) as direct dependencies → autolinking embeds both frameworks. iOS build 101
+rebuilt + auto-submitted to TestFlight; Android AAB rebuilt (worklets libs verified
+inside the bundle) — versionCode stays 90 since the broken AAB was never uploaded.
+
+**Also discovered:** `EXPO_PUBLIC_SENTRY_DSN` is not set in the EAS production
+environment, so in-app Sentry crash reporting is a silent no-op. Add it to EAS env
+to get crash reports without manual .ips pulls.
+
 ## Release (store binaries required — NOT OTA-able)
 
 - Version **1.11.0**, iOS buildNumber 98 (EAS auto-increments), Android versionCode **90**, runtimeVersion **1.11.0**
