@@ -726,7 +726,7 @@ export default function ProfileScreen() {
         </ProfileSection>
 
         {/* Footer — shared brand block */}
-        <AppFooter style={{ paddingBottom: (insets?.bottom || 0) + 90 }} />
+        <AppFooter style={{ paddingBottom: (insets?.bottom || 0) + 24 }} />
       </Animated.ScrollView>
     </View>
   );

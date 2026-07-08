@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
 import * as haptics from '../utils/haptics';
-import T from '../utils/typography';
 import { colors } from '../utils/theme';
 import { useLocalization } from '../contexts/LocalizationContext';
 
@@ -10,12 +10,15 @@ import { useLocalization } from '../contexts/LocalizationContext';
  * Shared app footer — single source of truth for the brand block shown
  * at the bottom of Account, About, Brand, Training and similar screens.
  *
- * Layout (all centered, consistent vertical rhythm):
- *   ── hairline divider ──
- *   G E N O S Y S            (spaced wordmark)
- *   Official Distributor in the UAE
- *   www.genosys.ae           (tappable, brand red)
- *   © 2026 GENOSYS · All rights reserved · v1.10.5
+ * Corporate dark card:
+ *   ┌────────────────────────────────┐
+ *   │        G E N O S Y S           │
+ *   │  Official Distributor in the UAE │
+ *   │  ─────────── divider ────────── │
+ *   │   🌐 genosys.ae   ✉ sales@…    │
+ *   │ © 2026 Genosys Middle East FZ-LLC │
+ *   │      All rights reserved · v…  │
+ *   └────────────────────────────────┘
  */
 export default function AppFooter({ tagline, showVersion = true, style }) {
   const { locale } = useLocalization();
@@ -36,69 +39,117 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
 
   const version = Constants.expoConfig?.version;
   const year = new Date().getFullYear();
-  const metaParts = [`© ${year} GENOSYS`, rightsText];
-  if (showVersion && version) metaParts.push(`v${version}`);
+  const legalParts = [rightsText];
+  if (showVersion && version) legalParts.push(`v${version}`);
+
+  const open = (url) => {
+    haptics.lightTap();
+    Linking.openURL(url).catch(() => {});
+  };
 
   return (
-    <View style={[styles.footer, style]}>
-      <View style={styles.divider} />
-      <Text style={styles.wordmark}>GENOSYS</Text>
-      <Text style={styles.tagline}>{tagline || defaultTagline}</Text>
-      <TouchableOpacity
-        onPress={() => {
-          haptics.lightTap();
-          Linking.openURL('https://www.genosys.ae').catch(() => {});
-        }}
-        activeOpacity={0.7}
-        style={styles.linkWrap}
-        accessibilityRole="link"
-        accessibilityLabel="www.genosys.ae"
-      >
-        <Text style={styles.link}>www.genosys.ae</Text>
-      </TouchableOpacity>
-      <Text style={styles.meta}>{metaParts.join('  ·  ')}</Text>
+    <View style={[styles.wrap, style]}>
+      <View style={styles.card}>
+        <Text style={styles.wordmark}>GENOSYS</Text>
+        <Text style={styles.tagline}>{tagline || defaultTagline}</Text>
+
+        <View style={styles.divider} />
+
+        <View style={styles.linksRow}>
+          <TouchableOpacity
+            onPress={() => open('https://www.genosys.ae')}
+            activeOpacity={0.7}
+            style={styles.linkItem}
+            accessibilityRole="link"
+            accessibilityLabel="www.genosys.ae"
+          >
+            <Ionicons name="globe-outline" size={13} color="rgba(255,255,255,0.85)" />
+            <Text style={styles.linkText}>genosys.ae</Text>
+          </TouchableOpacity>
+          <View style={styles.linkSeparator} />
+          <TouchableOpacity
+            onPress={() => open('mailto:sales@genosys.ae')}
+            activeOpacity={0.7}
+            style={styles.linkItem}
+            accessibilityRole="link"
+            accessibilityLabel="sales@genosys.ae"
+          >
+            <Ionicons name="mail-outline" size={13} color="rgba(255,255,255,0.85)" />
+            <Text style={styles.linkText}>sales@genosys.ae</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.legal}>© {year} Genosys Middle East FZ-LLC</Text>
+        <Text style={styles.legalSub}>{legalParts.join('  ·  ')}</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  footer: {
-    alignItems: 'center',
-    paddingTop: 28,
-    paddingHorizontal: 24,
+  wrap: {
+    paddingTop: 20,
+    paddingHorizontal: 16,
   },
-  divider: {
-    width: 40,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.separator,
-    marginBottom: 20,
+  card: {
+    backgroundColor: '#1D1D1F',
+    borderRadius: 16,
+    paddingVertical: 22,
+    paddingHorizontal: 20,
+    alignItems: 'center',
   },
   wordmark: {
-    ...T.captionSmall,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 3,
-    color: colors.secondaryLabel,
+    letterSpacing: 5,
+    color: colors.white,
   },
   tagline: {
-    ...T.captionSmall,
-    color: colors.secondaryLabel,
-    marginTop: 6,
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.55)',
+    marginTop: 5,
     textAlign: 'center',
   },
-  linkWrap: {
-    marginTop: 12,
+  divider: {
+    alignSelf: 'stretch',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    marginVertical: 14,
+  },
+  linksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  linkItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
   },
-  link: {
-    ...T.captionSmall,
+  linkText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: colors.brand,
+    color: 'rgba(255,255,255,0.85)',
   },
-  meta: {
-    ...T.captionTiny,
-    color: '#AEAEB2', // systemGray2 — legible but subdued on grouped background
-    marginTop: 12,
+  linkSeparator: {
+    width: StyleSheet.hairlineWidth,
+    height: 14,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    marginHorizontal: 10,
+  },
+  legal: {
+    fontSize: 10.5,
+    color: 'rgba(255,255,255,0.45)',
+    marginTop: 14,
     textAlign: 'center',
+  },
+  legalSub: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.35)',
+    marginTop: 3,
+    textAlign: 'center',
+    letterSpacing: 0.3,
   },
 });
