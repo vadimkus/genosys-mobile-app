@@ -22,7 +22,8 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
 import AUTH_CONFIG from '../../config/auth';
-import { computeWaterfallBreakdown } from '../../utils/cartUtils';
+import { computeWaterfallBreakdown, calculateCartTotals } from '../../utils/cartUtils';
+import { fetchMembership } from '../../services/api';
 import { getPricingDisplay } from '../../utils/pricingDisplay';
 import { mediumTap, lightTap } from '../../utils/haptics';
 import T from '../../utils/typography';
@@ -117,6 +118,30 @@ function BagScreen() {
 
   // Waterfall breakdown for order summary
   const waterfall = computeWaterfallBreakdown(items, user);
+
+  // GENOSYS Rewards earn preview (rewards track only; partners get 0)
+  const [loyaltyMultiplier, setLoyaltyMultiplier] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const token = user?.token || user?.accessToken;
+      if (!token) { setLoyaltyMultiplier(0); return; }
+      const membership = await fetchMembership(token);
+      if (!cancelled) {
+        setLoyaltyMultiplier(membership?.track === 'REWARDS' ? Number(membership?.multiplier || 1) : 0);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.token, user?.accessToken]);
+
+  // Per-line earn estimate: reuse the cart pricing engine on a single-item cart
+  const itemEarnPoints = useCallback((item) => {
+    if (!(loyaltyMultiplier > 0)) return 0;
+    const line = Number(calculateCartTotals([item], user, null)?.subtotal) || 0;
+    return Math.floor(line * loyaltyMultiplier);
+  }, [loyaltyMultiplier, user]);
+
+  const orderEarnPoints = loyaltyMultiplier > 0 ? Math.floor(safeTotal * loyaltyMultiplier) : 0;
 
   // Refresh DB-driven shipping rates when opening bag, and again after
   // login/logout (M6) — the previous empty dep array meant a user who signed
@@ -453,6 +478,20 @@ function BagScreen() {
                 return <Text style={styles.itemPrice}>{(Number.isFinite(base) ? base : 0).toFixed(2)} AED</Text>;
               })()
             )}
+
+            {/* GENOSYS Rewards — per-line earn estimate */}
+            {!promo && (() => {
+              const pts = itemEarnPoints(item);
+              if (pts <= 0) return null;
+              return (
+                <View style={[styles.earnPointsRow, isRTL && styles.earnPointsRowRTL]}>
+                  <Ionicons name="sparkles-outline" size={11} color={colors.brand} />
+                  <Text style={[styles.earnPointsText, isRTL && styles.earnPointsTextRTL]}>
+                    {t('rewards.earnItem', { points: pts.toLocaleString() })}
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
 
           {promo ? (
@@ -503,7 +542,7 @@ function BagScreen() {
         </View>
       );
     },
-    [handleQuantityChange, handleRemoveItem, updateColor, updateSize, locale, t, user, isRTL]
+    [handleQuantityChange, handleRemoveItem, updateColor, updateSize, locale, t, user, isRTL, itemEarnPoints]
   );
 
   if (isLoading) {
@@ -651,6 +690,23 @@ function BagScreen() {
                 <Text style={styles.deliveryHintText}>{t('bag.freeDeliveryHint', { amount: freeShippingThreshold })}</Text>
               </ProgressCard>
             </View>
+
+            {/* GENOSYS Rewards — order earn preview */}
+            {orderEarnPoints > 0 ? (
+              <View style={[styles.rewardsEarnCard, shadow.card, isRTL && styles.rewardsEarnCardRTL]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.brand }]}>
+                  <Ionicons name="ribbon-outline" size={16} color={colors.white} />
+                </View>
+                <View style={[styles.rewardsEarnTextWrap, isRTL && styles.rewardsEarnTextWrapRTL]}>
+                  <Text style={[styles.rewardsEarnTitle, isRTL && styles.rewardsEarnTitleRTL]}>
+                    {t('rewards.earnPreview', { points: orderEarnPoints.toLocaleString() })}
+                  </Text>
+                  <Text style={[styles.rewardsEarnSub, isRTL && styles.rewardsEarnSubRTL]}>
+                    {t('rewards.earnSub')}
+                  </Text>
+                </View>
+              </View>
+            ) : null}
           </>
         }
       />
@@ -818,6 +874,63 @@ function BagScreen() {
 }
 
 const styles = StyleSheet.create({
+  // GENOSYS Rewards earn hints
+  earnPointsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 5,
+  },
+  earnPointsRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  earnPointsText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.secondaryLabel,
+  },
+  earnPointsTextRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  rewardsEarnCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginHorizontal: 16,
+    marginTop: 12,
+  },
+  rewardsEarnCardRTL: {
+    flexDirection: 'row-reverse',
+  },
+  rewardsEarnTextWrap: {
+    flex: 1,
+  },
+  rewardsEarnTextWrapRTL: {
+    alignItems: 'flex-end',
+  },
+  rewardsEarnTitle: {
+    fontSize: 13.5,
+    fontWeight: '600',
+    color: colors.label,
+  },
+  rewardsEarnTitleRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  rewardsEarnSub: {
+    fontSize: 11,
+    color: colors.secondaryLabel,
+    marginTop: 2,
+  },
+  rewardsEarnSubRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
   container: {
     flex: 1,
     backgroundColor: colors.groupedBg,
