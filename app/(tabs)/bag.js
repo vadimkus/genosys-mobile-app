@@ -141,7 +141,9 @@ function BagScreen() {
     return Math.floor(line * loyaltyMultiplier);
   }, [loyaltyMultiplier, user]);
 
-  const orderEarnPoints = loyaltyMultiplier > 0 ? Math.floor(safeTotal * loyaltyMultiplier) : 0;
+  // Earn basis is products-only (shipping never earns points) — matches
+  // awardPointsForDeliveredOrder on the backend.
+  const orderEarnPoints = loyaltyMultiplier > 0 ? Math.floor(safeSubtotal * loyaltyMultiplier) : 0;
 
   // Refresh DB-driven shipping rates when opening bag, and again after
   // login/logout (M6) — the previous empty dep array meant a user who signed
