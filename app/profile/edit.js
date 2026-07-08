@@ -135,6 +135,7 @@ export default function EditProfileScreen() {
   const [isEditing, setIsEditing] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
+  const [showCatModal, setShowCatModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [tempDate, setTempDate] = useState(new Date());
   const [initialSnapshot, setInitialSnapshot] = useState(null);
@@ -228,19 +229,23 @@ export default function EditProfileScreen() {
     }
   };
 
-  // Bundled she-cat avatar — resolves to a local file:// URI so it rides the
+  // Bundled she-cat avatars — resolve to a local file:// URI so they ride the
   // same upload pipeline as camera/library photos (AuthContext.updateProfile).
-  const useCatAvatar = async () => {
+  const useCatAvatar = () => setShowCatModal(true);
+
+  const selectCatAvatar = async (source) => {
     try {
-      const asset = Asset.fromModule(require('../../assets/avatar-cat.png'));
+      const asset = Asset.fromModule(source);
       await asset.downloadAsync();
       const uri = asset.localUri || asset.uri;
       if (uri) {
         haptics.selectionTick();
         updateField('profilePicture', uri);
       }
+      setShowCatModal(false);
     } catch (err) {
-      log.error('useCatAvatar failed:', err);
+      log.error('selectCatAvatar failed:', err);
+      setShowCatModal(false);
       Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not set avatar. Please try again.');
     }
   };
@@ -862,14 +867,88 @@ export default function EditProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Cat Avatar Picker Modal */}
+      <Modal
+        visible={showCatModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowCatModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={[styles.modalHeader, isRTL && styles.rowRTL]}>
+              <Text style={[styles.modalTitle, isRTL && styles.textRTL]}>{t('editProfile.chooseCatTitle')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowCatModal(false)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.close')}
+              >
+                <Ionicons name="close" size={24} color={colors.label} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.catGrid}>
+              {CAT_AVATARS.map((cat) => (
+                <TouchableOpacity
+                  key={cat.key}
+                  style={styles.catOption}
+                  onPress={() => selectCatAvatar(cat.source)}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t(`editProfile.cat_${cat.key}`)}
+                >
+                  <Image source={cat.source} style={styles.catImage} />
+                  <Text style={styles.catLabel}>{t(`editProfile.cat_${cat.key}`)}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
+// Bundled she-cat avatar set — different fur colors and moods.
+const CAT_AVATARS = [
+  { key: 'rose', source: require('../../assets/avatar-cat.png') },
+  { key: 'grey', source: require('../../assets/avatar-cat-grey.png') },
+  { key: 'ginger', source: require('../../assets/avatar-cat-ginger.png') },
+  { key: 'white', source: require('../../assets/avatar-cat-white.png') },
+];
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.groupedBg,
+  },
+  // Cat avatar picker
+  catGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 28,
+    gap: 14,
+  },
+  catOption: {
+    width: '46%',
+    alignItems: 'center',
+    backgroundColor: colors.subtleBg,
+    borderRadius: 16,
+    paddingVertical: 14,
+  },
+  catImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+  },
+  catLabel: {
+    marginTop: 8,
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: colors.label,
   },
   scrollView: {
     flex: 1,
