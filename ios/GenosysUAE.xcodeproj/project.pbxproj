@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1B2C3D4E5F60718GENOSYS1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		A1B2C3D4E5F60718GENOSYS1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		1BF5900C113248DAABEBC0A0 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752C4B8701514605AC2CE28A /* noop-file.swift */; };
+		CD104BE9A2024F7B8D0AC85B /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18E3570F366477FA9B7B700 /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,7 +24,7 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GenosysUAE/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* GenosysUAE-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "GenosysUAE-Bridging-Header.h"; path = "GenosysUAE/GenosysUAE-Bridging-Header.h"; sourceTree = "<group>"; };
-		752C4B8701514605AC2CE28A /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		E18E3570F366477FA9B7B700 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AppIcon.icon; path = GenosysUAE/AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,7 +49,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				752C4B8701514605AC2CE28A /* noop-file.swift */,
+				E18E3570F366477FA9B7B700 /* noop-file.swift */,
 			);
 			name = GenosysUAE;
 			sourceTree = "<group>";
@@ -112,7 +112,7 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				08CAA2DBCB6E488E9A2C7573 /* Upload Debug Symbols to Sentry */,
+				E6512E40ABF247249E6611D6 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -230,7 +230,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GenosysUAE/Pods-GenosysUAE-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		08CAA2DBCB6E488E9A2C7573 /* Upload Debug Symbols to Sentry */ = {
+		E6512E40ABF247249E6611D6 /* Upload Debug Symbols to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -252,7 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				1BF5900C113248DAABEBC0A0 /* noop-file.swift in Sources */,
+				CD104BE9A2024F7B8D0AC85B /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

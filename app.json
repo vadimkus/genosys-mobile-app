@@ -194,7 +194,9 @@
         {
           "image": "./assets/splash.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#ffffff",
+          "enableFullScreenImage_legacy": true,
+          "imageWidth": 200
         }
       ],
       "expo-secure-store",
