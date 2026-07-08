@@ -657,6 +657,8 @@
     "applied": "AED {aed} discount applied to your total",
     "notEnough": "Collect 100+ points to start redeeming — every 100 points takes AED 5 off your order.",
     "earnPreview": "You'll earn ~{points} points with this order",
+    "earnItem": "Earn ~{points} pts",
+    "earnSub": "100 points = AED 5 off your next order",
     "tierMember": "Member",
     "tierSilver": "Silver",
     "tierGold": "Gold",
