@@ -808,7 +808,9 @@ function CheckoutScreen() {
             quote={redeemQuote}
             enabled={usePoints}
             onToggle={() => { haptics.lightTap(); setUsePoints((v) => !v); }}
-            earnPreview={loyaltyMultiplier > 0 ? Math.floor(safeTotal * loyaltyMultiplier) : 0}
+            earnPreview={loyaltyMultiplier > 0
+              ? Math.floor(Math.max(0, safeSubtotal - loyaltyDiscount) * loyaltyMultiplier)
+              : 0}
             isRTL={isRTL}
           />
 
