@@ -239,6 +239,21 @@ export function getProductDocs(productId, product) {
     ...normalizeDocs(product?.documentationLinks),
   ];
 
+  // PDF brochure can also arrive inside the productDetails key/value blob
+  // (e.g. { pdfBrochure: '/documents/ppt/...pdf' }) — surface it as a proper
+  // Documentation entry instead of leaking a raw path in the specs table.
+  const details = parseMaybeJson(product?.productDetails);
+  const brochureRaw =
+    (details && typeof details === 'object'
+      ? details.pdfBrochure || details.PdfBrochure || details.pdf_brochure || details.brochure
+      : null) ||
+    product?.pdfBrochure ||
+    product?.brochure;
+  const brochureUrl = toAssetUrl(typeof brochureRaw === 'string' ? brochureRaw.trim() : null);
+  if (brochureUrl && !apiDocs.some((d) => d.url === brochureUrl)) {
+    apiDocs.push({ title: 'Product Brochure (PDF)', url: brochureUrl, isBrochure: true });
+  }
+
   if (apiDocs.length > 0) {
     return apiDocs;
   }
