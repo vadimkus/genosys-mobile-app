@@ -637,6 +637,7 @@
   },
   "rewards": {
     "title": "GENOSYS Rewards",
+    "useMyPoints": "Use my points",
     "points": "pts",
     "inValue": "in rewards value",
     "earnRate": "earn rate",

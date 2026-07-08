@@ -21,6 +21,7 @@ export default function CheckoutOrderHeaderCard({
   safeTotal,
   selectedEmirate,
   waterfall,
+  loyalty,
 }) {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -242,6 +243,32 @@ export default function CheckoutOrderHeaderCard({
               </Text>
             </View>
           )}
+
+          {/* GENOSYS Rewards redemption toggle */}
+          {loyalty ? (
+            <TouchableOpacity
+              style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}
+              onPress={loyalty.onToggle}
+              activeOpacity={0.7}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: !!loyalty.enabled }}
+              accessibilityLabel={t('rewards.useMyPoints')}
+            >
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, flex: 1 }}>
+                <Ionicons
+                  name={loyalty.enabled ? 'checkbox' : 'square-outline'}
+                  size={18}
+                  color={loyalty.enabled ? colors.blue : colors.tertiary}
+                />
+                <Text style={[styles.orderTotalsLabel, { color: colors.blue }, isRTL && styles.textRTL]}>
+                  ★ {t('rewards.useMyPoints')} ({Number(loyalty.points).toLocaleString()} {t('rewards.points')})
+                </Text>
+              </View>
+              <Text style={[styles.orderTotalsValue, { color: loyalty.enabled ? colors.blue : colors.tertiary }, isRTL && styles.summaryValueRTL]}>
+                -AED {Number(loyalty.aed).toFixed(2)}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
 
           {/* VAT */}
           <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>

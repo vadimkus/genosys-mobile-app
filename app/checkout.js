@@ -17,6 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils';
+import { fetchMembership } from '../services/api';
 import { submitCODOrder, createCardPaymentSheetIntent, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { captureException } from '../config/sentry';
@@ -106,9 +107,48 @@ function CheckoutScreen() {
   }), [items, user, selectedEmirate, getAvailableEmirates, shippingRates]);
   const safeSubtotal = Number(totals.subtotal) || 0;
   const safeShipping = Number(totals.shipping) || 0;
-  const safeVat = Number(totals.vatAmount) || 0;
-  const safeTotal = Number(totals.total) || 0;
   const waterfall = computeWaterfallBreakdown(items, user);
+
+  // ─── GENOSYS Rewards redemption ───────────────────────────────────────
+  // Mirrors server rules (lib/loyalty.ts): blocks of 100 pts = AED 5, capped
+  // at 20% of the product subtotal, not combinable with a personal discount.
+  const [loyaltyBalance, setLoyaltyBalance] = useState(0);
+  const [usePoints, setUsePoints] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const token = user?.token || user?.accessToken;
+      if (!token) return;
+      const membership = await fetchMembership(token);
+      if (!cancelled && membership?.track === 'REWARDS') {
+        setLoyaltyBalance(Number(membership?.points?.balance || 0));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.token, user?.accessToken]);
+
+  const computeRedeemQuote = useCallback((productSubtotal) => {
+    const canUse = !(Number(user?.discountPercentage || 0) > 0);
+    if (!canUse) return { points: 0, aed: 0 };
+    const blocks = Math.max(0, Math.min(
+      Math.floor(loyaltyBalance / 100),
+      Math.floor((Number(productSubtotal) * 0.2) / 5),
+    ));
+    return { points: blocks * 100, aed: blocks * 5 };
+  }, [user?.discountPercentage, loyaltyBalance]);
+
+  const redeemQuote = computeRedeemQuote(safeSubtotal);
+  const loyaltyDiscount = usePoints && redeemQuote.points > 0 ? redeemQuote.aed : 0;
+
+  // Display totals: redemption reduces the final total; VAT is the included portion.
+  const displayVatRate = (Number.isFinite(Number(shippingRates?.vatRate)) && Number(shippingRates?.vatRate) >= 0)
+    ? Number(shippingRates.vatRate)
+    : 0.05;
+  const safeTotal = Math.max(0, Math.round(((Number(totals.total) || 0) - loyaltyDiscount) * 100) / 100);
+  const safeVat = loyaltyDiscount > 0
+    ? Math.round(((safeTotal * displayVatRate) / (1 + displayVatRate)) * 100) / 100
+    : (Number(totals.vatAmount) || 0);
   const etaInfo = getDeliveryEtaInfo(selectedEmirate);
   const deliveryEtaText = etaInfo.isDubai
     ? t('checkout.deliveryEtaDubai')
@@ -471,6 +511,11 @@ function CheckoutScreen() {
         user?.discountType && Number.isFinite(rawUserDiscountPct) && rawUserDiscountPct > 0 && rawUserDiscountPct < 100
           ? rawUserDiscountPct
           : 0;
+      // Redemption quote against the just-recomputed subtotal (server re-validates)
+      const finalRedeemQuote = usePoints
+        ? computeRedeemQuote(Number(finalTotals.subtotal) || 0)
+        : { points: 0, aed: 0 };
+
       const orderData = {
         // Reuse the server-issued number on retries (idempotent card flow);
         // first attempt sends the provisional one, which the server replaces.
@@ -486,7 +531,9 @@ function CheckoutScreen() {
         subtotal: Number(finalTotals.subtotal) || 0,
         shippingCost: Number(finalTotals.shipping) || 0,
         vatAmount: Number(finalTotals.vatAmount) || 0,
-        total: Number(finalTotals.total) || 0,
+        total: Math.max(0, Math.round(((Number(finalTotals.total) || 0) - finalRedeemQuote.aed) * 100) / 100),
+        // GENOSYS Rewards points to redeem (server validates and clamps)
+        ...(finalRedeemQuote.points > 0 ? { redeemPoints: finalRedeemQuote.points } : {}),
         paymentMethod: selectedPaymentMethod,
         orderNotes: orderNotes.trim(),
         locale: locale || 'en',
@@ -690,6 +737,12 @@ function CheckoutScreen() {
             safeTotal={safeTotal}
             selectedEmirate={selectedEmirate}
             waterfall={waterfall}
+            loyalty={redeemQuote.points > 0 ? {
+              points: redeemQuote.points,
+              aed: redeemQuote.aed,
+              enabled: usePoints,
+              onToggle: () => { haptics.lightTap(); setUsePoints((v) => !v); },
+            } : null}
           />
 
           {/* Shipping / Address Form */}

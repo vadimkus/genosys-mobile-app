@@ -205,6 +205,8 @@ export async function submitCODOrder(orderData) {
       discountAmount: orderData.discountAmount || 0,
       bundleDiscountPercentage: orderData.bundleDiscountPercentage || 0,
       bundleDiscountAmount: orderData.bundleDiscountAmount || 0,
+      // GENOSYS Rewards points to redeem (server validates and clamps)
+      ...(orderData.redeemPoints > 0 ? { redeemPoints: orderData.redeemPoints } : {}),
       clientPricingSnapshot: orderData.clientPricingSnapshot || null,
       // Email/notification hints (backend may use these)
       sendEmails: true,
@@ -346,6 +348,8 @@ export async function createCardPaymentSheetIntent(orderData) {
       items: orderData.items.map(buildMobileOrderItemPayload),
       orderNotes: orderData.orderNotes || '',
       locale: orderData.locale || 'en',
+      // GENOSYS Rewards points to redeem (server validates and clamps)
+      ...(orderData.redeemPoints > 0 ? { redeemPoints: orderData.redeemPoints } : {}),
     };
 
     // Canonical Payment Sheet route (handles card / Apple Pay / Google Pay /

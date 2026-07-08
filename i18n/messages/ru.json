@@ -637,6 +637,7 @@
   },
   "rewards": {
     "title": "GENOSYS Rewards",
+    "useMyPoints": "Использовать баллы",
     "points": "балл.",
     "inValue": "в виде бонусов",
     "earnRate": "ставка начисления",
