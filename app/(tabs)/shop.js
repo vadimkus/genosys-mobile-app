@@ -123,6 +123,16 @@ const ShopGridCard = React.memo(function ShopGridCard({
   onDecrement,
   localizeDiscountLabel,
 }) {
+  // NEW is shown as a black pill next to the category (like the website
+  // rail cards); other badges (e.g. Order) stay as an image overlay.
+  const allBadges = computeProductBadges(product, {
+    order: t('common.order'),
+    inStock: t('stock.inStock'),
+    new: t('common.new'),
+  });
+  const isNewProduct = allBadges.some((b) => String(b?.text || '').toLowerCase().trim() === (t('common.new') || 'new').toLowerCase() || String(b?.text || '').toLowerCase().trim() === 'new');
+  const overlayBadges = allBadges.filter((b) => !(String(b?.text || '').toLowerCase().trim() === (t('common.new') || 'new').toLowerCase() || String(b?.text || '').toLowerCase().trim() === 'new'));
+
   return (
     <View style={styles.gridCard}>
       <TouchableOpacity
@@ -145,33 +155,23 @@ const ShopGridCard = React.memo(function ShopGridCard({
             </View>
           )}
 
-          {/* Badges */}
-          {(() => {
-            const badges = computeProductBadges(product, {
-              order: t('common.order'),
-              inStock: t('stock.inStock'),
-              new: t('common.new'),
-            });
-
-            if (!badges.length) return null;
-
-            return (
-              <View style={[styles.badgeContainer, isRTL && styles.badgeContainerRTL]}>
-                {badges.map((badge, badgeIndex) => {
-                  const badgeColor = badge.color || colors.blue;
-                  return (
-                    <View
-                      key={`${badge.text || 'badge'}-${badgeIndex}`}
-                      style={[styles.badge, { backgroundColor: tint(badgeColor) }]}
-                    >
-                      <View style={[styles.badgeDot, { backgroundColor: badgeColor }]} />
-                      <Text style={[styles.badgeText, { color: badgeColor }]}>{badge.text}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })()}
+          {/* Badges (NEW moved to the meta row below the image) */}
+          {overlayBadges.length > 0 && (
+            <View style={[styles.badgeContainer, isRTL && styles.badgeContainerRTL]}>
+              {overlayBadges.map((badge, badgeIndex) => {
+                const badgeColor = badge.color || colors.blue;
+                return (
+                  <View
+                    key={`${badge.text || 'badge'}-${badgeIndex}`}
+                    style={[styles.badge, { backgroundColor: tint(badgeColor) }]}
+                  >
+                    <View style={[styles.badgeDot, { backgroundColor: badgeColor }]} />
+                    <Text style={[styles.badgeText, { color: badgeColor }]}>{badge.text}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
 
           {/* Favorite Heart Button */}
           <TouchableOpacity
@@ -209,10 +209,17 @@ const ShopGridCard = React.memo(function ShopGridCard({
           <Text style={[styles.gridName, isRTL && styles.gridNameRTL]} numberOfLines={2}>
             {getLocalizedProductName(product, locale) || product.name}
           </Text>
-          <Text style={[styles.gridCategory, isRTL && styles.gridCategoryRTL]}>
-            {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
-            {product.size ? ` · ${product.size}` : ''}
-          </Text>
+          <View style={[styles.gridMetaRow, isRTL && styles.gridMetaRowRTL]}>
+            {isNewProduct ? (
+              <View style={styles.newPill}>
+                <Text style={styles.newPillText}>{t('common.new')}</Text>
+              </View>
+            ) : null}
+            <Text style={[styles.gridCategory, { flexShrink: 1 }, isRTL && styles.gridCategoryRTL]} numberOfLines={1}>
+              {getCategoryTranslationKey(product.category) ? t(getCategoryTranslationKey(product.category)) : product.category}
+              {product.size ? ` · ${product.size}` : ''}
+            </Text>
+          </View>
 
           {(getLocalizedProductDescription(product, locale) || product.localizedDescription || product.description) && (
             <Text style={[styles.gridDescription, isRTL && styles.gridDescriptionRTL]} numberOfLines={2}>
@@ -1885,6 +1892,28 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     zIndex: 10,
+  },
+  // NEW pill in the meta row (matches the website rail cards)
+  gridMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  gridMetaRowRTL: {
+    flexDirection: 'row-reverse',
+  },
+  newPill: {
+    backgroundColor: '#1D1D1F',
+    borderRadius: 980,
+    paddingHorizontal: 8,
+    paddingVertical: 2.5,
+  },
+  newPillText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   badgeContainerRTL: {
     alignItems: 'flex-end',
