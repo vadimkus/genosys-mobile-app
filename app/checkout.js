@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from 'expo-router';
 import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils';
 import { fetchMembership } from '../services/api';
 import { submitCODOrder, createCardPaymentSheetIntent, generateOrderNumber } from '../services/orderService';

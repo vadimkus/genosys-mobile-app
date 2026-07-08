@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { StyleSheet, StatusBar, Animated, Pressable, Image, Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+// SDK 54+ moved the classic FileSystem API (cacheDirectory, getInfoAsync,
+// downloadAsync, ...) to the /legacy entry point; the main entry is the new
+// File/Directory class API. This module uses the classic API.
+import * as FileSystem from 'expo-file-system/legacy';
 import Constants from 'expo-constants';
 import { WebView } from 'react-native-webview';
 

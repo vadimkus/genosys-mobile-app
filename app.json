@@ -3,33 +3,23 @@
     "name": "Genosys UAE",
     "owner": "vadimkus",
     "slug": "genosys-mobile-app",
-    "version": "1.10.5",
+    "version": "1.11.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "97",
+      "buildNumber": "98",
       "usesAppleSignIn": true,
       "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
       "associatedDomains": [
         "applinks:genosys.ae",
         "webcredentials:genosys.ae"
       ],
-      "splash": {
-        "image": "./assets/splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#ffffff"
-      },
       "infoPlist": {
         "CFBundleDisplayName": "Genosys UAE",
         "NSFaceIDUsageDescription": "This app uses Face ID for secure and convenient authentication to access your Genosys account.",
@@ -50,7 +40,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 89,
+      "versionCode": 90,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -191,15 +181,18 @@
             "DEFAULT"
           ]
         }
-      ],
-      "splash": {
-        "image": "./assets/splash.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#ffffff"
-      }
+      ]
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
       "expo-secure-store",
       "expo-font",
       "expo-apple-authentication",
@@ -241,7 +234,10 @@
           "merchantIdentifier": "merchant.ae.genosys.app",
           "enableGooglePay": true
         }
-      ]
+      ],
+      "expo-image",
+      "expo-splash-screen",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true
@@ -255,8 +251,7 @@
         "projectId": "b874a5c1-c47e-4c4e-9286-42e431978d51"
       }
     },
-    "sdkVersion": "54.0.0",
-    "runtimeVersion": "1.10.5",
+    "runtimeVersion": "1.11.0",
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
