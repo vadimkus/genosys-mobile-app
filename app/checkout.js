@@ -129,14 +129,15 @@ function CheckoutScreen() {
   }, [user?.token, user?.accessToken]);
 
   const computeRedeemQuote = useCallback((productSubtotal) => {
-    const canUse = !(Number(user?.discountPercentage || 0) > 0);
+    // Mirrors server rule: only an ACTIVE discount (type + percentage) blocks redemption
+    const canUse = !(user?.discountType && Number(user?.discountPercentage || 0) > 0);
     if (!canUse) return { points: 0, aed: 0 };
     const blocks = Math.max(0, Math.min(
       Math.floor(loyaltyBalance / 100),
       Math.floor((Number(productSubtotal) * 0.2) / 5),
     ));
     return { points: blocks * 100, aed: blocks * 5 };
-  }, [user?.discountPercentage, loyaltyBalance]);
+  }, [user?.discountType, user?.discountPercentage, loyaltyBalance]);
 
   const redeemQuote = computeRedeemQuote(safeSubtotal);
   const loyaltyDiscount = usePoints && redeemQuote.points > 0 ? redeemQuote.aed : 0;
