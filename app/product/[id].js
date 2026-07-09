@@ -119,7 +119,7 @@ const log = createLogger('ProductDetail');
  *     with the renamed `playsInSilentMode` key.
  *   • onError → statusChange event listener (`status === 'error'`).
  */
-function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
+function ProductVideo({ videoUrl }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
@@ -162,41 +162,37 @@ function ProductVideo({ videoUrl, thumbnailUrl, isRTL }) {
     return null;
   }
 
+  // Before play: a compact grey play button (same pattern as the website
+  // PDP) instead of a full-width 16:9 black box — keeps the page tight and
+  // defers all video loading until the user actually taps.
+  if (!isPlaying) {
+    return (
+      <View style={videoStyles.section}>
+        <TouchableOpacity
+          style={videoStyles.compactWrapper}
+          activeOpacity={0.7}
+          onPress={handlePlay}
+          accessibilityRole="button"
+          accessibilityLabel={tStatic('product.watchVideo')}
+        >
+          <View style={videoStyles.compactPlayButton}>
+            <Ionicons name="play" size={28} color="#374151" style={{ marginLeft: 3 }} />
+          </View>
+          <Text style={videoStyles.compactLabel}>{tStatic('product.watchVideo')}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={videoStyles.section}>
       <View style={videoStyles.container}>
-        {!isPlaying ? (
-          <TouchableOpacity
-            style={videoStyles.thumbnailWrapper}
-            activeOpacity={0.8}
-            onPress={handlePlay}
-            accessibilityRole="button"
-            accessibilityLabel={tStatic('product.video')}
-          >
-            {thumbnailUrl ? (
-              <Image
-                source={thumbnailUrl}
-                style={videoStyles.thumbnail}
-                contentFit="cover"
-                cachePolicy="memory-disk"
-              />
-            ) : (
-              <View style={videoStyles.thumbnailPlaceholder} />
-            )}
-            <View style={videoStyles.playOverlay}>
-              <View style={videoStyles.playButton}>
-                <Ionicons name="play" size={32} color="#ffffff" style={{ marginLeft: 3 }} />
-              </View>
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <VideoView
-            player={player}
-            style={videoStyles.player}
-            contentFit="contain"
-            nativeControls
-          />
-        )}
+        <VideoView
+          player={player}
+          style={videoStyles.player}
+          contentFit="contain"
+          nativeControls
+        />
       </View>
     </View>
   );
@@ -219,32 +215,28 @@ const videoStyles = StyleSheet.create({
     backgroundColor: '#000',
     height: VIDEO_HEIGHT,
   },
-  thumbnailWrapper: {
-    width: '100%',
-    height: '100%',
-  },
-  thumbnail: {
-    width: '100%',
-    height: '100%',
-  },
-  thumbnailPlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#1a1a1a',
-  },
-  playOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
+  compactWrapper: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    paddingVertical: 8,
   },
-  playButton: {
+  compactPlayButton: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(220, 38, 38, 0.9)',
+    backgroundColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  compactLabel: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#6B7280',
   },
   player: {
     width: '100%',
@@ -1453,16 +1445,7 @@ function ProductDetailScreen() {
             const productId = String(product.productNumber || product.id || id);
             const videoUrl = getProductVideoUrl(productId, product);
             if (!videoUrl) return null;
-            const thumbnailUrl = product.image
-              ? `https://genosys.ae${product.image}`
-              : null;
-            return (
-              <ProductVideo
-                videoUrl={videoUrl}
-                thumbnailUrl={thumbnailUrl}
-                isRTL={isRTL}
-              />
-            );
+            return <ProductVideo videoUrl={videoUrl} />;
           })()}
 
           {/* Product Documentation */}

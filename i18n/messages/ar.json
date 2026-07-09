@@ -357,6 +357,7 @@
     "documentation": "المستندات",
     "brochure": "كتيب المنتج (PDF)",
     "video": "فيديو",
+    "watchVideo": "مشاهدة فيديو المنتج",
     "sizesAvailable": "يتوفر {count} أحجام",
     "multipleSizesAvailable": "تتوفر عدة أحجام",
     "sizesCountShort": "{count} أحجام",

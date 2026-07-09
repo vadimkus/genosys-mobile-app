@@ -357,6 +357,7 @@
     "documentation": "Documentation",
     "brochure": "Product Brochure (PDF)",
     "video": "Video",
+    "watchVideo": "Watch product video",
     "sizesAvailable": "{count} sizes available",
     "multipleSizesAvailable": "Multiple sizes available",
     "sizesCountShort": "{count} sizes",
