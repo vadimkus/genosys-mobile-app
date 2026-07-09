@@ -740,6 +740,14 @@ function ShopScreen() {
             return k ? t(k) : tag;
           });
 
+          // Variant colors/sizes make shade and size queries work
+          // ("beige cushion", "0.25mm roller") — those values never appear
+          // in the product name or description.
+          const variantTerms = (product?.variants || []).flatMap((v) => [
+            v?.color,
+            v?.size,
+          ]);
+
           // All locales searchable regardless of the active app language
           const haystack = [
             getLocalizedProductName(product, locale),
@@ -751,9 +759,11 @@ function ShopScreen() {
             product?.descriptionRu || product?.description_ru,
             product?.descriptionAr || product?.description_ar,
             product?.category,
+            product?.size,
             canonical,
             canonicalLabel,
             ...tagLabels,
+            ...variantTerms,
           ]
             .map(norm)
             .join(' ');
