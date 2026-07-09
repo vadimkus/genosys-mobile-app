@@ -34,7 +34,7 @@ const PRODUCT_NAME_MAP = [
   { pattern: /nd\s*cell|anti.wrinkle\s*cream/i, id: 23 },
   { pattern: /eye.*contour\s*cream|eyecell.*cream/i, id: 24 },
   { pattern: /postcream|soothing\s*repair\s*post/i, id: 25 },
-  { pattern: /oxymask|egf\s*repair/i, id: 26 },
+  // EGF Repair Oxymask (id 26) discontinued Jul 2026 — kit line renders unlinked
   { pattern: /barrier\s*protect.*cream|skin\s*barrier/i, id: 27 },
   { pattern: /hydro\s*soothing\s*cream|intensive\s*hydro/i, id: 28 },
   { pattern: /hyaluron\s*cream|moisture.*hyaluron.*cream/i, id: 29 },
