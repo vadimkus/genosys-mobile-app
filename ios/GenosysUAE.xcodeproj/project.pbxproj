@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1B2C3D4E5F60718GENOSYS1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		CD104BE9A2024F7B8D0AC85B /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18E3570F366477FA9B7B700 /* noop-file.swift */; };
+		5FCCB202A1DF4165BB396C0D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = BF1310AED9894DC98133E9D7 /* AppIcon.icon */; };
+		B857CA478FD840ADA2D6224B /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CA5BF671984F699EC5E7CA /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,8 +24,8 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GenosysUAE/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* GenosysUAE-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "GenosysUAE-Bridging-Header.h"; path = "GenosysUAE/GenosysUAE-Bridging-Header.h"; sourceTree = "<group>"; };
-		E18E3570F366477FA9B7B700 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
-		A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AppIcon.icon; path = GenosysUAE/AppIcon.icon; sourceTree = "<group>"; };
+		BF1310AED9894DC98133E9D7 /* AppIcon.icon */ = {isa = PBXFileReference; name = "AppIcon.icon"; path = "GenosysUAE/AppIcon.icon"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B7CA5BF671984F699EC5E7CA /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,11 +45,11 @@
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
 				F11748442D0722820044C1D9 /* GenosysUAE-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
-				A1B2C3D4E5F60718GENOSYS0 /* AppIcon.icon */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				E18E3570F366477FA9B7B700 /* noop-file.swift */,
+				BF1310AED9894DC98133E9D7 /* AppIcon.icon */,
+				B7CA5BF671984F699EC5E7CA /* noop-file.swift */,
 			);
 			name = GenosysUAE;
 			sourceTree = "<group>";
@@ -112,7 +112,7 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				E6512E40ABF247249E6611D6 /* Upload Debug Symbols to Sentry */,
+				5A45F6B9BE0D4095B0B45852 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -161,8 +161,8 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				A1B2C3D4E5F60718GENOSYS1 /* AppIcon.icon in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
+				5FCCB202A1DF4165BB396C0D /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,7 +230,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GenosysUAE/Pods-GenosysUAE-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E6512E40ABF247249E6611D6 /* Upload Debug Symbols to Sentry */ = {
+		5A45F6B9BE0D4095B0B45852 /* Upload Debug Symbols to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -252,7 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				CD104BE9A2024F7B8D0AC85B /* noop-file.swift in Sources */,
+				B857CA478FD840ADA2D6224B /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

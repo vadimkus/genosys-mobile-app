@@ -6,7 +6,7 @@
     "version": "1.11.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+    "icon": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
     "platforms": [
       "ios",
       "android"
@@ -19,7 +19,7 @@
       "bundleIdentifier": "ae.genosys.app",
       "buildNumber": "102",
       "usesAppleSignIn": true,
-      "icon": "./assets/app-icon-1024-ios26-safe-no-alpha.png",
+      "icon": "./assets/AppIcon.icon",
       "associatedDomains": [
         "applinks:genosys.ae",
         "webcredentials:genosys.ae"
