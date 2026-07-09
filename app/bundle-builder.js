@@ -326,7 +326,7 @@ export default function BundleBuilderScreen() {
             <Image
               source={{ uri: product.image }}
               style={styles.productImage}
-              contentFit="contain"
+              contentFit="cover"
               transition={200}
               cachePolicy="memory-disk"
             />
@@ -663,7 +663,7 @@ export default function BundleBuilderScreen() {
                 return (
                   <View key={product.id} style={styles.summaryItem}>
                     <View style={styles.summaryImageWrap}>
-                      <Image source={{ uri: product.image }} style={styles.summaryItemImage} contentFit="contain" cachePolicy="memory-disk" />
+                      <Image source={{ uri: product.image }} style={styles.summaryItemImage} contentFit="cover" cachePolicy="memory-disk" />
                       {product.size ? <Text style={styles.summaryImageSize}>{product.size}</Text> : null}
                     </View>
                     <View style={{ flex: 1 }}>
@@ -795,8 +795,9 @@ const styles = StyleSheet.create({
     width: 24, height: 24, borderRadius: 12, backgroundColor: '#dc2626',
     alignItems: 'center', justifyContent: 'center',
   },
-  // Square tile, photo edge-to-edge (user-chosen presentation, 2026-07-06):
-  // square studio photos fill the tile fully; wide photos letterbox on white.
+  // Square tile, photo edge-to-edge. contentFit="cover" center-crops the
+  // 956×662 landscape studio shots to fill the square (products are centered,
+  // verified safe) — kills the white letterbox bands ("white endings").
   productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
