@@ -77,10 +77,6 @@ export const PRODUCT_CONFIG = {
     images: ['/images/ASE.jpg', '/images/Second/allserum_big.jpg'],
     videoUrl: '/videos/allserum.mp4',
   },
-  '26': {
-    images: ['/images/EGF.jpg', '/images/Second/egf_big.jpg'],
-    videoUrl: '/videos/egf.mp4',
-  },
   '38': {
     images: ['/images/EZE.jpg', '/images/Second/ez.jpg', '/images/Second/ez1.jpg'],
   },
