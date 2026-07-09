@@ -357,6 +357,7 @@
     "documentation": "Документация",
     "brochure": "Брошюра продукта (PDF)",
     "video": "Видео",
+    "watchVideo": "Смотреть видео о продукте",
     "sizesAvailable": "Доступно размеров: {count}",
     "multipleSizesAvailable": "Доступно несколько размеров",
     "sizesCountShort": "{count} размера(ов)",
