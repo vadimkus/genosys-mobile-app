@@ -63,8 +63,10 @@ const isUserDiscountExcludedOrderItemName = (nameRaw) => {
   if (name.includes('beauty box') || name.includes('beautybox')) return true;
   // Hydro Cool Modelling Mask
   if (name.includes('hydro') && name.includes('cool') && name.includes('mask')) return true;
-  // Devices (fallback by name)
-  if (name.includes('genoled') || name.includes('gentron') || name.includes('hairgen')) return true;
+  // Devices (fallback by name) — compact to alphanumerics so hyphenated
+  // names match too: "GENO-LED IR II" -> genoledirii, "Hair-GENTRON" -> hairgentron.
+  const compact = name.replace(/[^a-z0-9]/g, '');
+  if (compact.includes('genoled') || compact.includes('gentron') || compact.includes('hairgen')) return true;
   return false;
 };
 

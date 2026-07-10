@@ -57,12 +57,14 @@ export const isDeviceProduct = (product) => {
   // Use an inclusive check to handle potential "Devices" or composite categories.
   if (cat === 'device' || cat.includes('device')) return true;
 
-  // Fallback by name (covers datasets where category is missing or different)
-  const name = normalizeProductName(product);
+  // Fallback by name (covers datasets where category is missing or different).
+  // Compact to alphanumerics so hyphenated names match too:
+  // "GENO-LED IR II" -> "genoledirii", "Hair-GENTRON" -> "hairgentron".
+  const nameCompact = normalizeProductName(product).replace(/[^a-z0-9]/g, '');
   return (
-    name.includes('genoled') ||
-    name.includes('gentron') ||
-    name.includes('hairgen')
+    nameCompact.includes('genoled') ||
+    nameCompact.includes('gentron') ||
+    nameCompact.includes('hairgen')
   );
 };
 
