@@ -29,6 +29,7 @@ const CHAT_HIDDEN_ROUTES = [
   '/about',                // about page
   '/skin-concerns',        // skin concerns listing
   '/concern-detail',       // skin concern detail pages
+  '/partner-portal',       // partner (clinic) ordering portal
 ];
 
 const PROTECTED_ROUTE_PREFIXES = [
@@ -40,6 +41,7 @@ const PROTECTED_ROUTE_PREFIXES = [
   '/checkout',
   '/payment',
   '/chat',
+  '/partner-portal',
 ];
 
 const isProtectedRoute = (pathname) => {

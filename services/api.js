@@ -12,7 +12,7 @@
 import { createLogger } from '../utils/logger';
 import AUTH_CONFIG from '../config/auth';
 import { authenticatedFetch } from './authFetch';
-import { getJson, HttpClientError } from './httpClient';
+import { getJson, sendJson, HttpClientError } from './httpClient';
 import { captureException } from '../config/sentry';
 
 const log = createLogger('api');
@@ -356,6 +356,37 @@ export const fetchUserOrderById = async (token, orderId) => {
   });
   // Support common response shapes
   return body?.data || body?.order || body;
+};
+
+/**
+ * Place a partner (clinic/salon) replenishment order at the −50% partner price.
+ * Pricing is enforced server-side; the client only sends product ids + quantities.
+ * POST /api/mobile/partner/order
+ * @param {string} token - User auth token (must be a CLINIC/VIP account)
+ * @param {Array<{id:string, quantity:number, size?:string, color?:string}>} items
+ * @param {{orderNotes?:string, emirate?:string, locale?:string}} [opts]
+ * @returns {Promise<{success:boolean, orderNumber?:string, total?:number, error?:string}>}
+ */
+export const submitPartnerOrder = async (token, items, opts = {}) => {
+  const body = {
+    items: (items || []).map((i) => ({
+      id: String(i.id),
+      quantity: Math.max(1, Math.floor(Number(i.quantity) || 0)),
+      ...(i.size ? { size: String(i.size) } : {}),
+      ...(i.color ? { color: String(i.color) } : {}),
+    })),
+    ...(opts.orderNotes ? { orderNotes: String(opts.orderNotes) } : {}),
+    ...(opts.emirate ? { emirate: String(opts.emirate) } : {}),
+    locale: opts.locale || 'en',
+  };
+
+  const result = await sendJson(`${API_BASE_URL}/partner/order`, body, {
+    authenticated: true,
+    token,
+    headers: { token, locale: opts.locale },
+    safeMessage: 'Could not place your order. Please try again.',
+  });
+  return result;
 };
 
 /**

@@ -655,6 +655,22 @@ export default function ProfileScreen() {
           </View>
         </ProfileSection>
 
+        {/* Partner Portal — only for clinic / wholesale accounts */}
+        {['CLINIC', 'VIP'].includes(String(user?.discountType || '').toUpperCase()) && (
+          <ProfileSection title={locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}>
+            <View style={styles.sectionContent}>
+              <ProfileItem
+                icon="cube-outline"
+                tint={colors.brand}
+                title={locale === 'ru' ? 'Заказать товар' : locale === 'ar' ? 'اطلب المنتجات' : 'Order products'}
+                value={Number(user?.discountPercentage) > 0 ? `−${Math.round(Number(user.discountPercentage))}%` : undefined}
+                onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
+                isLast={true}
+              />
+            </View>
+          </ProfileSection>
+        )}
+
         {/* Information */}
         <ProfileSection title={t('navigation.information') || 'Information'}>
           <View style={styles.sectionContent}>
