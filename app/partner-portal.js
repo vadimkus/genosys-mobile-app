@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { fetchProducts, submitPartnerOrder } from '../services/api';
+import { fetchProducts, submitPartnerOrder, fetchUserOrders } from '../services/api';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { isProductOutOfStock } from '../utils/stock';
@@ -53,6 +53,8 @@ export default function PartnerPortalScreen() {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState(null);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [reorderMsg, setReorderMsg] = useState(0);
 
   const tr = (en, ru, ar) => (locale === 'ru' ? ru : locale === 'ar' ? ar : en);
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
@@ -73,6 +75,44 @@ export default function PartnerPortalScreen() {
       mounted = false;
     };
   }, [user]);
+
+  // Load the partner's recent orders for one-tap reorder.
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!user?.token) return;
+      try {
+        const list = await fetchUserOrders(user.token, { page: 1, limit: 5 });
+        if (mounted) setRecentOrders(Array.isArray(list) ? list.slice(0, 4) : []);
+      } catch (e) {
+        log.warn('Failed to load recent orders', e?.message || e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [user]);
+
+  // Reorder: prefill quantities from a past order (in-stock products only).
+  const reorderFrom = useCallback((order) => {
+    const byId = new Map(products.map((p) => [String(p.id), p]));
+    const next = {};
+    let loaded = 0;
+    for (const it of (order?.items || [])) {
+      const id = String(it?.productId || it?.id || '');
+      const q = Math.floor(Number(it?.quantity) || 0);
+      const p = byId.get(id);
+      if (id && p && !isProductOutOfStock(p) && q > 0) {
+        next[id] = (next[id] || 0) + q;
+        loaded += 1;
+      }
+    }
+    if (loaded > 0) {
+      haptics.lightTap();
+      setQty(next);
+      setReorderMsg(loaded);
+    } else {
+      Alert.alert(tr('Nothing to reorder', 'Нечего повторить', 'لا شيء لإعادة الطلب'), tr('Those products are no longer available.', 'Эти товары больше недоступны.', 'هذه المنتجات لم تعد متوفرة.'));
+    }
+  }, [products, tr]);
 
   const priceOf = useCallback((product) => {
     const pricing = getPricingDisplay(product);
@@ -285,6 +325,38 @@ export default function PartnerPortalScreen() {
           renderItem={renderItem}
           contentContainerStyle={{ padding: 16, paddingBottom: itemCount > 0 ? 200 : 40 }}
           keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={
+            (!search && recentOrders.length > 0) || reorderMsg > 0 ? (
+              <View style={{ marginBottom: 12 }}>
+                {reorderMsg > 0 ? (
+                  <View style={[styles.reorderBanner, isRTL && styles.rowRTL]}>
+                    <Ionicons name="refresh" size={16} color="#FFFFFF" />
+                    <Text style={[styles.reorderBannerText, isRTL && styles.rtlText]}>
+                      {tr(`Loaded ${reorderMsg} item${reorderMsg === 1 ? '' : 's'} — adjust & place`, `Загружено ${reorderMsg} — измените и оформите`, `تم تحميل ${reorderMsg} — عدّل ثم قدّم`)}
+                    </Text>
+                  </View>
+                ) : null}
+                {!search && recentOrders.length > 0 ? (
+                  <>
+                    <Text style={[styles.reorderTitle, isRTL && styles.rtlText]}>{tr('Reorder', 'Повторить заказ', 'إعادة الطلب')}</Text>
+                    {recentOrders.map((o) => (
+                      <View key={String(o.id || o.orderNumber)} style={[styles.reorderRow, isRTL && styles.rowRTL]}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.reorderNo, isRTL && styles.rtlText]} numberOfLines={1}>{o.orderNumber}</Text>
+                          <Text style={[styles.reorderMeta, isRTL && styles.rtlText]}>{(o.items?.length || 0)} {tr('items', 'товаров', 'منتجات')} · {formatAed(o.total)}</Text>
+                        </View>
+                        <TouchableOpacity style={styles.reorderBtn} onPress={() => reorderFrom(o)}>
+                          <Ionicons name="refresh" size={14} color={colors.brand} />
+                          <Text style={styles.reorderBtnText}>{tr('Reorder', 'Повторить', 'إعادة')}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                    <Text style={[styles.reorderHint, isRTL && styles.rtlText]}>{tr('Or add products below', 'Или добавьте товары ниже', 'أو أضف المنتجات أدناه')}</Text>
+                  </>
+                ) : null}
+              </View>
+            ) : null
+          }
           ListEmptyComponent={<Text style={styles.empty}>{tr('No products found', 'Товары не найдены', 'لا توجد منتجات')}</Text>}
           ListFooterComponent={
             itemCount > 0 ? (
@@ -371,6 +443,16 @@ const styles = StyleSheet.create({
   notesLabel: { fontSize: 12, fontWeight: '700', color: colors.secondaryLabel, marginBottom: 6 },
   notesInput: { backgroundColor: '#FFFFFF', borderRadius: 12, borderWidth: 1, borderColor: colors.separator, padding: 12, fontSize: 14, color: colors.label, minHeight: 60, textAlignVertical: 'top' },
   empty: { textAlign: 'center', color: colors.secondaryLabel, marginTop: 40, fontSize: 14 },
+  // Reorder strip
+  reorderBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#0B0B0C', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12 },
+  reorderBannerText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', flex: 1 },
+  reorderTitle: { fontSize: 13, fontWeight: '800', color: colors.secondaryLabel, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
+  reorderRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: colors.separator, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 8 },
+  reorderNo: { fontSize: 14, fontWeight: '700', color: colors.label },
+  reorderMeta: { fontSize: 12, color: colors.secondaryLabel, marginTop: 2 },
+  reorderBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
+  reorderBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
+  reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   footerCount: { fontSize: 12, color: colors.secondaryLabel },
