@@ -378,7 +378,7 @@ export default function PartnerPortalScreen() {
           data={filtered}
           keyExtractor={(p) => String(p.id)}
           renderItem={renderItem}
-          contentContainerStyle={{ padding: 16, paddingBottom: itemCount > 0 ? 200 : 40 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: itemCount > 0 ? 250 : 40 }}
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             (!search && recentOrders.length > 0) || reorderMsg > 0 ? (
@@ -429,73 +429,71 @@ export default function PartnerPortalScreen() {
                   />
                 </View>
 
-                {/* Payment / settlement */}
-                <View style={styles.payWrap}>
-                  <Text style={[styles.notesLabel, isRTL && styles.rtlText]}>{tr('Settlement', 'Оплата', 'الدفع')}</Text>
-                  {hasConsignment ? (
-                    <TouchableOpacity
-                      style={[styles.payRow, payOption === 'consignment' && styles.payRowConsign, isRTL && styles.rowRTL]}
-                      onPress={() => { haptics.lightTap(); setPayOption('consignment'); }}
-                    >
-                      <View style={[styles.payRadio, payOption === 'consignment' && styles.payRadioConsign]} />
-                      <View style={{ flex: 1 }}>
-                        <Text style={[styles.payTitle, isRTL && styles.rtlText]}>{tr('Add to consignment stock', 'На консигнационный склад', 'إضافة إلى مخزون الأمانة')}</Text>
-                        <Text style={[styles.paySub, isRTL && styles.rtlText]}>{tr('Settle via monthly sales report', 'Расчёт по ежемесячному отчёту', 'التسوية عبر التقرير الشهري')}</Text>
-                      </View>
-                      <View style={styles.payTag}>
-                        <Text style={styles.payTagText}>{tr('AGREEMENT', 'ДОГОВОР', 'اتفاقية')}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ) : null}
-                  <TouchableOpacity
-                    style={[styles.payRow, payOption === 'online' && styles.payRowActive, isRTL && styles.rowRTL]}
-                    onPress={() => { haptics.lightTap(); setPayOption('online'); }}
-                  >
-                    <View style={[styles.payRadio, payOption === 'online' && styles.payRadioActive]} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.payTitle, isRTL && styles.rtlText]}>{tr('Pay online now', 'Оплатить онлайн', 'الدفع عبر الإنترنت')}</Text>
-                      <Text style={[styles.paySub, isRTL && styles.rtlText]}>{tr('Card / Apple Pay — secure checkout', 'Карта / Apple Pay — безопасная оплата', 'بطاقة / Apple Pay — دفع آمن')}</Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.payRow, payOption === 'cod' && styles.payRowActive, isRTL && styles.rowRTL]}
-                    onPress={() => { haptics.lightTap(); setPayOption('cod'); }}
-                  >
-                    <View style={[styles.payRadio, payOption === 'cod' && styles.payRadioActive]} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.payTitle, isRTL && styles.rtlText]}>{tr('Cash on delivery', 'Оплата при получении', 'الدفع عند الاستلام')}</Text>
-                      <Text style={[styles.paySub, isRTL && styles.rtlText]}>{tr('Pay when your order arrives', 'Оплатите при доставке', 'ادفع عند وصول الطلب')}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
               </View>
             ) : null
           }
         />
       )}
 
-      {/* Sticky submit bar */}
+      {/* Sticky submit bar (settlement pills always visible) */}
       {itemCount > 0 && (
         <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
-          <View style={isRTL ? { alignItems: 'flex-end' } : null}>
-            <Text style={styles.footerCount}>
-              {itemCount} {itemCount === 1 ? tr('item', 'товар', 'منتج') : tr('items', 'товаров', 'منتجات')}
-            </Text>
-            <Text style={styles.footerTotal}>{formatAed(total)}</Text>
-          </View>
-          <TouchableOpacity style={styles.submitBtn} onPress={submit} disabled={submitting}>
-            {submitting ? (
-              <ActivityIndicator color={colors.white} />
-            ) : (
-              <Text style={styles.submitText}>
-                {payOption === 'online'
-                  ? tr('Continue to payment', 'К оплате', 'المتابعة إلى الدفع')
-                  : payOption === 'consignment'
-                    ? tr('Add to consignment', 'На консигнацию', 'إضافة إلى الأمانة')
-                    : tr('Place order', 'Оформить заказ', 'تقديم الطلب')}
+          <View style={[styles.footerPills, isRTL && styles.rowRTL]}>
+            {hasConsignment ? (
+              <TouchableOpacity
+                style={[styles.pill, payOption === 'consignment' && styles.pillConsign]}
+                onPress={() => { haptics.lightTap(); setPayOption('consignment'); }}
+              >
+                <Text style={[styles.pillText, payOption === 'consignment' && styles.pillTextActive]}>
+                  {tr('Consignment', 'Консигнация', 'أمانة')}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+            <TouchableOpacity
+              style={[styles.pill, payOption === 'online' && styles.pillActive]}
+              onPress={() => { haptics.lightTap(); setPayOption('online'); }}
+            >
+              <Text style={[styles.pillText, payOption === 'online' && styles.pillTextActive]}>
+                {tr('Pay online', 'Онлайн', 'دفع أونلاين')}
               </Text>
-            )}
-          </TouchableOpacity>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.pill, payOption === 'cod' && styles.pillActive]}
+              onPress={() => { haptics.lightTap(); setPayOption('cod'); }}
+            >
+              <Text style={[styles.pillText, payOption === 'cod' && styles.pillTextActive]}>
+                {tr('Cash on delivery', 'При получении', 'عند الاستلام')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.footerHint, isRTL && styles.rtlText]}>
+            {payOption === 'consignment'
+              ? tr('Settle via monthly sales report — no payment now', 'Расчёт по ежемесячному отчёту — без оплаты сейчас', 'التسوية عبر التقرير الشهري — بدون دفع الآن')
+              : payOption === 'online'
+                ? tr('Card / Apple Pay — secure checkout', 'Карта / Apple Pay — безопасная оплата', 'بطاقة / Apple Pay — دفع آمن')
+                : tr('Pay when your order arrives', 'Оплатите при доставке', 'ادفع عند وصول الطلب')}
+          </Text>
+          <View style={[styles.footerRow, isRTL && styles.rowRTL]}>
+            <View style={isRTL ? { alignItems: 'flex-end' } : null}>
+              <Text style={styles.footerCount}>
+                {itemCount} {itemCount === 1 ? tr('item', 'товар', 'منتج') : tr('items', 'товаров', 'منتجات')}
+              </Text>
+              <Text style={styles.footerTotal}>{formatAed(total)}</Text>
+            </View>
+            <TouchableOpacity style={styles.submitBtn} onPress={submit} disabled={submitting}>
+              {submitting ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <Text style={styles.submitText}>
+                  {payOption === 'online'
+                    ? tr('Continue to payment', 'К оплате', 'المتابعة إلى الدفع')
+                    : payOption === 'consignment'
+                      ? tr('Add to consignment', 'На консигнацию', 'إضافة إلى الأمانة')
+                      : tr('Place order', 'Оформить заказ', 'تقديم الطلب')}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -557,7 +555,15 @@ const styles = StyleSheet.create({
   reorderBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
+  footerPills: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+  pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: '#FFFFFF' },
+  pillActive: { backgroundColor: '#0B0B0C', borderColor: '#0B0B0C' },
+  pillConsign: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
+  pillText: { fontSize: 12, fontWeight: '700', color: colors.secondaryLabel },
+  pillTextActive: { color: '#FFFFFF' },
+  footerHint: { fontSize: 11, color: colors.secondaryLabel, marginBottom: 8 },
+  footerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   footerCount: { fontSize: 12, color: colors.secondaryLabel },
   footerTotal: { fontSize: 18, fontWeight: '800', color: colors.label },
   submitBtn: { flex: 1, backgroundColor: colors.brand, borderRadius: 14, paddingVertical: 15, alignItems: 'center', justifyContent: 'center' },
@@ -576,16 +582,4 @@ const styles = StyleSheet.create({
   consignPillText: { color: '#92400E', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
   consignHeaderPill: { backgroundColor: 'rgba(245,158,11,0.25)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
   consignHeaderPillText: { color: '#FCD34D', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
-  // Payment selector
-  payWrap: { marginTop: 16 },
-  payRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1.5, borderColor: colors.separator, padding: 13, marginBottom: 8 },
-  payRowActive: { borderColor: colors.brand, backgroundColor: '#FEF5F5' },
-  payRowConsign: { borderColor: '#F59E0B', backgroundColor: '#FFFBEB' },
-  payRadio: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: colors.separator },
-  payRadioActive: { borderColor: colors.brand, backgroundColor: colors.brand },
-  payRadioConsign: { borderColor: '#F59E0B', backgroundColor: '#F59E0B' },
-  payTitle: { fontSize: 14, fontWeight: '700', color: colors.label },
-  paySub: { fontSize: 12, color: colors.secondaryLabel, marginTop: 1 },
-  payTag: { backgroundColor: '#FEF3C7', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-  payTagText: { color: '#92400E', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
 });
