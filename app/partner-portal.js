@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { fetchProducts, submitPartnerOrder, fetchUserOrders } from '../services/api';
+import { fetchProducts, submitPartnerOrder, fetchUserOrders, fetchUserProfile } from '../services/api';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { isProductOutOfStock } from '../utils/stock';
@@ -58,6 +58,30 @@ export default function PartnerPortalScreen() {
 
   const tr = (en, ru, ar) => (locale === 'ru' ? ru : locale === 'ar' ? ar : en);
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
+
+  // Consignment flag: stored user may be stale (set at login), so refresh from
+  // the server on mount — the flag is toggled by admin / the MoySklad matcher.
+  const [freshConsign, setFreshConsign] = useState(null);
+  useEffect(() => {
+    let mounted = true;
+    if (!user?.token) return undefined;
+    fetchUserProfile(user.token)
+      .then((fresh) => {
+        if (mounted && fresh && typeof fresh.consignmentActive === 'boolean') {
+          setFreshConsign(fresh.consignmentActive);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [user?.token]);
+  const hasConsignment = freshConsign === null ? user?.consignmentActive === true : freshConsign === true;
+
+  const [payOption, setPayOption] = useState('cod');
+  useEffect(() => {
+    if (hasConsignment) setPayOption('consignment');
+  }, [hasConsignment]);
 
   useEffect(() => {
     let mounted = true;
@@ -166,11 +190,24 @@ export default function PartnerPortalScreen() {
       const items = Object.entries(qty)
         .filter(([, q]) => q > 0)
         .map(([id, q]) => ({ id, quantity: q }));
-      const res = await submitPartnerOrder(user?.token, items, { orderNotes: notes, locale });
+      const res = await submitPartnerOrder(user?.token, items, { orderNotes: notes, locale, paymentOption: payOption });
       if (res?.success) {
-        setPlaced({ orderNumber: res.orderNumber, total: res.total });
         setQty({});
         setNotes('');
+        if (res.paymentUrl) {
+          // Online payment: hand over to the in-app Stripe payment screen.
+          router.push({
+            pathname: '/payment/stripe',
+            params: {
+              orderId: String(res.orderId || ''),
+              orderNumber: String(res.orderNumber || ''),
+              paymentUrl: String(res.paymentUrl),
+              fromOrders: '1',
+            },
+          });
+          return;
+        }
+        setPlaced({ orderNumber: res.orderNumber, total: res.total, paymentOption: res.paymentOption || payOption });
       } else {
         Alert.alert(tr('Order failed', 'Ошибка заказа', 'فشل الطلب'), res?.error || tr('Please try again.', 'Попробуйте снова.', 'حاول مرة أخرى.'));
       }
@@ -212,8 +249,19 @@ export default function PartnerPortalScreen() {
         <Text style={styles.guardTitle}>{tr('Order sent', 'Заказ отправлен', 'تم إرسال الطلب')}</Text>
         <Text style={styles.successOrder}>{placed.orderNumber}</Text>
         <Text style={styles.successTotal}>{formatAed(placed.total)}</Text>
+        {placed.paymentOption === 'consignment' ? (
+          <View style={styles.consignPill}>
+            <Text style={styles.consignPillText}>{tr('CONSIGNMENT STOCK', 'КОНСИГНАЦИЯ', 'بضاعة أمانة')}</Text>
+          </View>
+        ) : null}
         <Text style={styles.guardText}>
-          {tr('Priority partner order — we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ — доставим в тот же день.', 'طلب شريك ذو أولوية — توصيل بنفس اليوم.')}
+          {placed.paymentOption === 'consignment'
+            ? tr(
+                'Added to your consignment stock — same-day delivery. Settlement via your monthly sales report.',
+                'Добавлено на консигнационный склад — доставка в тот же день. Расчёт по ежемесячному отчёту.',
+                'أُضيف إلى مخزون الأمانة — توصيل في نفس اليوم. التسوية عبر التقرير الشهري.'
+              )
+            : tr('Priority partner order — we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ — доставим в тот же день.', 'طلب شريك ذو أولوية — توصيل بنفس اليوم.')}
         </Text>
         <TouchableOpacity style={styles.guardBtn} onPress={() => router.replace('/(tabs)/orders')}>
           <Text style={styles.guardBtnText}>{tr('View orders', 'Мои заказы', 'طلباتي')}</Text>
@@ -298,8 +346,15 @@ export default function PartnerPortalScreen() {
             <Text style={styles.headerBrand}>GENOSYS</Text>
             <Text style={styles.headerLabel}>{tr('PARTNER', 'ПАРТНЁР', 'شريك')}</Text>
           </View>
-          <View style={styles.offPill}>
-            <Text style={styles.offPillText}>{discountPct > 0 ? `−${discountPct}%` : tr('Partner', 'Партнёр', 'شريك')}</Text>
+          <View style={{ alignItems: 'flex-end', gap: 4 }}>
+            <View style={styles.offPill}>
+              <Text style={styles.offPillText}>{discountPct > 0 ? `−${discountPct}%` : tr('Partner', 'Партнёр', 'شريك')}</Text>
+            </View>
+            {hasConsignment ? (
+              <View style={styles.consignHeaderPill}>
+                <Text style={styles.consignHeaderPillText}>{tr('CONSIGNMENT', 'КОНСИГНАЦИЯ', 'أمانة')}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
         <View style={[styles.searchBox, isRTL && styles.rowRTL]}>
@@ -360,17 +415,59 @@ export default function PartnerPortalScreen() {
           ListEmptyComponent={<Text style={styles.empty}>{tr('No products found', 'Товары не найдены', 'لا توجد منتجات')}</Text>}
           ListFooterComponent={
             itemCount > 0 ? (
-              <View style={styles.notesWrap}>
-                <Text style={[styles.notesLabel, isRTL && styles.rtlText]}>{tr('Notes (optional)', 'Примечание', 'ملاحظات')}</Text>
-                <TextInput
-                  value={notes}
-                  onChangeText={setNotes}
-                  placeholder={tr('Delivery date, requests…', 'Дата доставки, пожелания…', 'تاريخ التسليم، طلبات…')}
-                  placeholderTextColor={colors.secondaryLabel}
-                  style={[styles.notesInput, isRTL && styles.rtlText]}
-                  multiline
-                  maxLength={1000}
-                />
+              <View>
+                <View style={styles.notesWrap}>
+                  <Text style={[styles.notesLabel, isRTL && styles.rtlText]}>{tr('Notes (optional)', 'Примечание', 'ملاحظات')}</Text>
+                  <TextInput
+                    value={notes}
+                    onChangeText={setNotes}
+                    placeholder={tr('Delivery date, requests…', 'Дата доставки, пожелания…', 'تاريخ التسليم، طلبات…')}
+                    placeholderTextColor={colors.secondaryLabel}
+                    style={[styles.notesInput, isRTL && styles.rtlText]}
+                    multiline
+                    maxLength={1000}
+                  />
+                </View>
+
+                {/* Payment / settlement */}
+                <View style={styles.payWrap}>
+                  <Text style={[styles.notesLabel, isRTL && styles.rtlText]}>{tr('Settlement', 'Оплата', 'الدفع')}</Text>
+                  {hasConsignment ? (
+                    <TouchableOpacity
+                      style={[styles.payRow, payOption === 'consignment' && styles.payRowConsign, isRTL && styles.rowRTL]}
+                      onPress={() => { haptics.lightTap(); setPayOption('consignment'); }}
+                    >
+                      <View style={[styles.payRadio, payOption === 'consignment' && styles.payRadioConsign]} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.payTitle, isRTL && styles.rtlText]}>{tr('Add to consignment stock', 'На консигнационный склад', 'إضافة إلى مخزون الأمانة')}</Text>
+                        <Text style={[styles.paySub, isRTL && styles.rtlText]}>{tr('Settle via monthly sales report', 'Расчёт по ежемесячному отчёту', 'التسوية عبر التقرير الشهري')}</Text>
+                      </View>
+                      <View style={styles.payTag}>
+                        <Text style={styles.payTagText}>{tr('AGREEMENT', 'ДОГОВОР', 'اتفاقية')}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ) : null}
+                  <TouchableOpacity
+                    style={[styles.payRow, payOption === 'online' && styles.payRowActive, isRTL && styles.rowRTL]}
+                    onPress={() => { haptics.lightTap(); setPayOption('online'); }}
+                  >
+                    <View style={[styles.payRadio, payOption === 'online' && styles.payRadioActive]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.payTitle, isRTL && styles.rtlText]}>{tr('Pay online now', 'Оплатить онлайн', 'الدفع عبر الإنترنت')}</Text>
+                      <Text style={[styles.paySub, isRTL && styles.rtlText]}>{tr('Card / Apple Pay — secure checkout', 'Карта / Apple Pay — безопасная оплата', 'بطاقة / Apple Pay — دفع آمن')}</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.payRow, payOption === 'cod' && styles.payRowActive, isRTL && styles.rowRTL]}
+                    onPress={() => { haptics.lightTap(); setPayOption('cod'); }}
+                  >
+                    <View style={[styles.payRadio, payOption === 'cod' && styles.payRadioActive]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.payTitle, isRTL && styles.rtlText]}>{tr('Cash on delivery', 'Оплата при получении', 'الدفع عند الاستلام')}</Text>
+                      <Text style={[styles.paySub, isRTL && styles.rtlText]}>{tr('Pay when your order arrives', 'Оплатите при доставке', 'ادفع عند وصول الطلب')}</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : null
           }
@@ -390,7 +487,13 @@ export default function PartnerPortalScreen() {
             {submitting ? (
               <ActivityIndicator color={colors.white} />
             ) : (
-              <Text style={styles.submitText}>{tr('Place order', 'Оформить заказ', 'تقديم الطلب')}</Text>
+              <Text style={styles.submitText}>
+                {payOption === 'online'
+                  ? tr('Continue to payment', 'К оплате', 'المتابعة إلى الدفع')
+                  : payOption === 'consignment'
+                    ? tr('Add to consignment', 'На консигнацию', 'إضافة إلى الأمانة')
+                    : tr('Place order', 'Оформить заказ', 'تقديم الطلب')}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
@@ -468,4 +571,21 @@ const styles = StyleSheet.create({
   successIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.green, alignItems: 'center', justifyContent: 'center' },
   successOrder: { fontSize: 15, fontWeight: '700', color: colors.label, marginTop: 8 },
   successTotal: { fontSize: 20, fontWeight: '800', color: colors.brand, marginTop: 4, marginBottom: 4 },
+  // Consignment chips
+  consignPill: { backgroundColor: '#FEF3C7', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
+  consignPillText: { color: '#92400E', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  consignHeaderPill: { backgroundColor: 'rgba(245,158,11,0.25)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  consignHeaderPillText: { color: '#FCD34D', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  // Payment selector
+  payWrap: { marginTop: 16 },
+  payRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1.5, borderColor: colors.separator, padding: 13, marginBottom: 8 },
+  payRowActive: { borderColor: colors.brand, backgroundColor: '#FEF5F5' },
+  payRowConsign: { borderColor: '#F59E0B', backgroundColor: '#FFFBEB' },
+  payRadio: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: colors.separator },
+  payRadioActive: { borderColor: colors.brand, backgroundColor: colors.brand },
+  payRadioConsign: { borderColor: '#F59E0B', backgroundColor: '#F59E0B' },
+  payTitle: { fontSize: 14, fontWeight: '700', color: colors.label },
+  paySub: { fontSize: 12, color: colors.secondaryLabel, marginTop: 1 },
+  payTag: { backgroundColor: '#FEF3C7', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  payTagText: { color: '#92400E', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
 });

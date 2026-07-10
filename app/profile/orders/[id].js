@@ -241,6 +241,15 @@ export default function OrderDetailScreen() {
     if (isCardLikeOrder(order)) return t('ordersDetail.paymentMethodCard');
     const pm = String(paymentMethod || '').trim();
     if (!pm) return t('ordersDetail.paymentMethodUnknown');
+    // Partner-portal settlement methods → human labels
+    const pmLower = pm.toLowerCase();
+    if (pmLower === 'partner_consignment') {
+      return locale === 'ru' ? 'Консигнация' : locale === 'ar' ? 'بضاعة أمانة' : 'Consignment stock';
+    }
+    if (pmLower === 'partner_cod') return t('ordersDetail.paymentMethodCod');
+    if (pmLower === 'partner') {
+      return locale === 'ru' ? 'Партнёрский заказ' : locale === 'ar' ? 'طلب شريك' : 'Partner order';
+    }
     return t('ordersDetail.paymentMethodOther', { method: pm.toUpperCase() });
   };
 
