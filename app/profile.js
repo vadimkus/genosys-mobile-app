@@ -512,6 +512,32 @@ export default function ProfileScreen() {
           />
         </View>
 
+        {/* Partner Portal — prominent, clinic/VIP only */}
+        {['CLINIC', 'VIP'].includes(String(user?.discountType || '').toUpperCase()) && (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
+            style={{ marginHorizontal: 16, marginBottom: 12, backgroundColor: '#0B0B0C', borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flex: 1 }}>
+              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginRight: isRTL ? 0 : 12, marginLeft: isRTL ? 12 : 0 }}>
+                <Ionicons name="cube-outline" size={22} color="#FFFFFF" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                  {locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}
+                </Text>
+                <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2, textAlign: isRTL ? 'right' : 'left' }}>
+                  {Number(user?.discountPercentage) > 0
+                    ? (locale === 'ru' ? `Заказ −${Math.round(Number(user.discountPercentage))}% · доставка в тот же день` : locale === 'ar' ? `اطلب −${Math.round(Number(user.discountPercentage))}٪ · توصيل بنفس اليوم` : `Order at −${Math.round(Number(user.discountPercentage))}% · same-day delivery`)
+                    : (locale === 'ru' ? 'Заказ по партнёрской цене' : locale === 'ar' ? 'اطلب بسعر الشريك' : 'Order at partner price · same-day')}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color="rgba(255,255,255,0.6)" />
+          </TouchableOpacity>
+        )}
+
         {/* Explore */}
         <ProfileSection title={t('navigation.explore') || 'Explore'}>
           <View style={styles.sectionContent}>
@@ -654,22 +680,6 @@ export default function ProfileScreen() {
             />
           </View>
         </ProfileSection>
-
-        {/* Partner Portal — only for clinic / wholesale accounts */}
-        {['CLINIC', 'VIP'].includes(String(user?.discountType || '').toUpperCase()) && (
-          <ProfileSection title={locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}>
-            <View style={styles.sectionContent}>
-              <ProfileItem
-                icon="cube-outline"
-                tint={colors.brand}
-                title={locale === 'ru' ? 'Заказать товар' : locale === 'ar' ? 'اطلب المنتجات' : 'Order products'}
-                value={Number(user?.discountPercentage) > 0 ? `−${Math.round(Number(user.discountPercentage))}%` : undefined}
-                onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
-                isLast={true}
-              />
-            </View>
-          </ProfileSection>
-        )}
 
         {/* Information */}
         <ProfileSection title={t('navigation.information') || 'Information'}>

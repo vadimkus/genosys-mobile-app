@@ -18,9 +18,19 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchProducts, submitPartnerOrder } from '../services/api';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { getLocalizedProductName } from '../utils/productLocalization';
+import { isProductOutOfStock } from '../utils/stock';
+import { AUTH_CONFIG } from '../config/auth';
 import * as haptics from '../utils/haptics';
 import { colors } from '../utils/theme';
 import { createLogger } from '../utils/logger';
+
+// Product images are stored as site-relative paths (e.g. /images/..). The app
+// must prefix the asset origin, same as the Shop screen.
+const imageUri = (product) => {
+  const img = product?.image;
+  if (!img) return null;
+  return String(img).startsWith('http') ? img : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${img}`;
+};
 
 const log = createLogger('PartnerPortal');
 
@@ -163,7 +173,7 @@ export default function PartnerPortalScreen() {
         <Text style={styles.successOrder}>{placed.orderNumber}</Text>
         <Text style={styles.successTotal}>{formatAed(placed.total)}</Text>
         <Text style={styles.guardText}>
-          {tr('We will confirm and arrange delivery shortly.', 'Мы подтвердим и организуем доставку.', 'سنؤكد ونرتب التسليم قريبًا.')}
+          {tr('Priority partner order — we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ — доставим в тот же день.', 'طلب شريك ذو أولوية — توصيل بنفس اليوم.')}
         </Text>
         <TouchableOpacity style={styles.guardBtn} onPress={() => router.replace('/(tabs)/orders')}>
           <Text style={styles.guardBtnText}>{tr('View orders', 'Мои заказы', 'طلباتي')}</Text>
@@ -179,14 +189,21 @@ export default function PartnerPortalScreen() {
     const q = qty[product.id] || 0;
     const { unit, retail, discounted, pct } = priceOf(product);
     const name = getLocalizedProductName?.(product, locale) || product.name;
+    const uri = imageUri(product);
+    const soldOut = isProductOutOfStock(product);
     return (
-      <View style={[styles.row, q > 0 && styles.rowActive, isRTL && styles.rowRTL]}>
+      <View style={[styles.row, q > 0 && styles.rowActive, soldOut && styles.rowSoldOut, isRTL && styles.rowRTL]}>
         <View style={styles.thumb}>
-          {product.image ? (
-            <Image source={{ uri: product.image }} style={styles.thumbImg} />
+          {uri ? (
+            <Image source={{ uri }} style={styles.thumbImg} resizeMode="cover" />
           ) : (
             <Ionicons name="cube-outline" size={20} color={colors.separator} />
           )}
+          {soldOut ? (
+            <View style={styles.soldOverlay}>
+              <Text style={styles.soldOverlayText}>{tr('Sold out', 'Нет', 'نفد')}</Text>
+            </View>
+          ) : null}
         </View>
         <View style={styles.rowInfo}>
           <Text style={[styles.rowName, isRTL && styles.rtlText]} numberOfLines={2}>{name}</Text>
@@ -204,7 +221,11 @@ export default function PartnerPortalScreen() {
             ) : null}
           </View>
         </View>
-        {q > 0 ? (
+        {soldOut ? (
+          <View style={styles.soldPill}>
+            <Text style={styles.soldPillText}>{tr('Sold out', 'Нет в наличии', 'نفدت')}</Text>
+          </View>
+        ) : q > 0 ? (
           <View style={[styles.stepper, isRTL && styles.rowRTL]}>
             <TouchableOpacity style={styles.stepBtn} onPress={() => setLine(product.id, q - 1)}>
               <Ionicons name="remove" size={18} color={colors.label} />
@@ -322,10 +343,15 @@ const styles = StyleSheet.create({
   // Rows
   row: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
   rowActive: { borderColor: colors.brand },
+  rowSoldOut: { opacity: 0.6 },
   rowRTL: { flexDirection: 'row-reverse' },
   rtlText: { textAlign: 'right', writingDirection: 'rtl' },
   thumb: { width: 52, height: 52, borderRadius: 12, backgroundColor: colors.groupedBackground || '#F2F2F7', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   thumbImg: { width: '100%', height: '100%' },
+  soldOverlay: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', paddingVertical: 2, alignItems: 'center' },
+  soldOverlayText: { color: '#FFFFFF', fontSize: 8, fontWeight: '800', textTransform: 'uppercase' },
+  soldPill: { backgroundColor: colors.groupedBackground || '#F2F2F7', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
+  soldPillText: { color: colors.secondaryLabel, fontSize: 12, fontWeight: '700' },
   rowInfo: { flex: 1, marginHorizontal: 12 },
   rowName: { fontSize: 14, fontWeight: '600', color: colors.label, lineHeight: 18 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
