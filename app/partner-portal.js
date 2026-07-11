@@ -32,6 +32,25 @@ const imageUri = (product) => {
   return String(img).startsWith('http') ? img : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${img}`;
 };
 
+const rawImageUri = (img) => {
+  if (!img) return null;
+  return String(img).startsWith('http') ? img : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${img}`;
+};
+
+// Order lines are keyed by product id, or `id||size` when a size variant is
+// selected — one product can have several lines (e.g. 200ml and 600ml).
+const keyOf = (id, size) => (size ? `${id}||${size}` : String(id));
+const parseKey = (key) => {
+  const i = String(key).indexOf('||');
+  return i === -1 ? { id: String(key) } : { id: String(key).slice(0, i), size: String(key).slice(i + 2) };
+};
+
+// Real size variants only (ignore size-less "default" price records).
+const sizesOf = (product) =>
+  (Array.isArray(product?.variants) ? product.variants : []).filter(
+    (v) => v?.size && v.size !== 'default'
+  );
+
 const log = createLogger('PartnerPortal');
 
 const isPartnerUser = (user) => {
@@ -55,6 +74,8 @@ export default function PartnerPortalScreen() {
   const [placed, setPlaced] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [reorderMsg, setReorderMsg] = useState(0);
+  const [expandedCards, setExpandedCards] = useState(() => new Set());
+  const [expandedOrders, setExpandedOrders] = useState(() => new Set());
 
   const tr = (en, ru, ar) => (locale === 'ru' ? ru : locale === 'ar' ? ar : en);
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
@@ -116,6 +137,7 @@ export default function PartnerPortalScreen() {
   }, [user]);
 
   // Reorder: prefill quantities from a past order (in-stock products only).
+  // Size variants are preserved (one line per product+size).
   const reorderFrom = useCallback((order) => {
     const byId = new Map(products.map((p) => [String(p.id), p]));
     const next = {};
@@ -125,7 +147,15 @@ export default function PartnerPortalScreen() {
       const q = Math.floor(Number(it?.quantity) || 0);
       const p = byId.get(id);
       if (id && p && !isProductOutOfStock(p) && q > 0) {
-        next[id] = (next[id] || 0) + q;
+        const productSizes = sizesOf(p);
+        let size = it?.size && productSizes.some((v) => v.size === it.size) ? String(it.size) : undefined;
+        // Multi-size product without a stored size (old order) → default size,
+        // so the line stays visible and editable in the size selector.
+        if (!size && productSizes.length >= 2) {
+          size = (productSizes.find((v) => v.isDefault) || productSizes[0]).size || undefined;
+        }
+        const k = keyOf(id, size);
+        next[k] = (next[k] || 0) + q;
         loaded += 1;
       }
     }
@@ -138,13 +168,22 @@ export default function PartnerPortalScreen() {
     }
   }, [products, tr]);
 
-  const priceOf = useCallback((product) => {
-    const pricing = getPricingDisplay(product);
+  const priceOf = useCallback((product, size) => {
+    const base = getPricingDisplay(product);
+    if (size) {
+      // Variant prices from the server already include the partner discount;
+      // derive the retail strike-through from the product-level discount %.
+      const variantPricing = getPricingDisplay(product, { selectedSize: size });
+      const unit = Number(variantPricing.displayPrice) || 0;
+      const pct = base.hasDiscount ? Math.round(Number(base.discountPercentage) || 0) : 0;
+      const retail = pct > 0 && pct < 100 ? Math.round((unit / (1 - pct / 100)) * 100) / 100 : null;
+      return { unit, retail, discounted: pct > 0, pct };
+    }
     return {
-      unit: Number(pricing.displayPrice) || 0,
-      retail: pricing.originalPrice ? Number(pricing.originalPrice) : null,
-      discounted: pricing.hasDiscount,
-      pct: Math.round(Number(pricing.discountPercentage) || 0),
+      unit: Number(base.displayPrice) || 0,
+      retail: base.originalPrice ? Number(base.originalPrice) : null,
+      discounted: base.hasDiscount,
+      pct: Math.round(Number(base.discountPercentage) || 0),
     };
   }, []);
 
@@ -159,28 +198,51 @@ export default function PartnerPortalScreen() {
     );
   }, [products, search]);
 
-  const setLine = (id, next) => {
+  const setLine = (key, next) => {
     haptics.lightTap();
     setQty((prev) => {
       const clone = { ...prev };
-      if (next <= 0) delete clone[id];
-      else clone[id] = next;
+      if (next <= 0) delete clone[key];
+      else clone[key] = next;
       return clone;
     });
   };
 
+  const toggleCard = (id) => {
+    haptics.lightTap();
+    setExpandedCards((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  };
+
+  const toggleOrder = (id) => {
+    haptics.lightTap();
+    setExpandedOrders((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  };
+
+  const productById = useMemo(() => new Map(products.map((p) => [String(p.id), p])), [products]);
+
   const { itemCount, total } = useMemo(() => {
     let count = 0;
     let sum = 0;
-    for (const p of products) {
-      const q = qty[p.id] || 0;
-      if (q > 0) {
-        count += q;
-        sum += priceOf(p).unit * q;
-      }
+    for (const [key, q] of Object.entries(qty)) {
+      if (q <= 0) continue;
+      const { id, size } = parseKey(key);
+      const p = productById.get(id);
+      if (!p) continue;
+      count += q;
+      sum += priceOf(p, size).unit * q;
     }
     return { itemCount: count, total: Math.round(sum * 100) / 100 };
-  }, [qty, products, priceOf]);
+  }, [qty, productById, priceOf]);
 
   const submit = async () => {
     if (itemCount === 0 || submitting) return;
@@ -189,7 +251,10 @@ export default function PartnerPortalScreen() {
     try {
       const items = Object.entries(qty)
         .filter(([, q]) => q > 0)
-        .map(([id, q]) => ({ id, quantity: q }));
+        .map(([key, q]) => {
+          const { id, size } = parseKey(key);
+          return { id, quantity: q, ...(size ? { size } : {}) };
+        });
       const res = await submitPartnerOrder(user?.token, items, { orderNotes: notes, locale, paymentOption: payOption });
       if (res?.success) {
         setQty({});
@@ -274,62 +339,160 @@ export default function PartnerPortalScreen() {
   }
 
   const renderItem = ({ item: product }) => {
-    const q = qty[product.id] || 0;
+    const id = String(product.id);
+    const productSizes = sizesOf(product);
+    const multiSize = productSizes.length >= 2;
+    const isOpen = expandedCards.has(id);
+    const baseKey = keyOf(id);
+    const q = qty[baseKey] || 0;
     const { unit, retail, discounted, pct } = priceOf(product);
     const name = getLocalizedProductName?.(product, locale) || product.name;
     const uri = imageUri(product);
     const soldOut = isProductOutOfStock(product);
+    const productQty = Object.entries(qty).reduce(
+      (s, [k, n]) => (parseKey(k).id === id ? s + n : s), 0
+    );
+    const description = String(product.localizedDescription || product.description || '').trim();
+    const minSizeUnit = multiSize
+      ? Math.min(...productSizes.map((v) => priceOf(product, v.size).unit))
+      : 0;
+
     return (
-      <View style={[styles.row, q > 0 && styles.rowActive, soldOut && styles.rowSoldOut, isRTL && styles.rowRTL]}>
-        <View style={styles.thumb}>
-          {uri ? (
-            <Image source={{ uri }} style={styles.thumbImg} resizeMode="cover" />
-          ) : (
-            <Ionicons name="cube-outline" size={20} color={colors.separator} />
-          )}
-          {soldOut ? (
-            <View style={styles.soldOverlay}>
-              <Text style={styles.soldOverlayText}>{tr('Sold out', 'Нет', 'نفد')}</Text>
+      <View style={[styles.card, productQty > 0 && styles.rowActive, soldOut && styles.rowSoldOut]}>
+        <View style={[styles.cardHeader, isRTL && styles.rowRTL]}>
+          {/* Tapping image/name expands the card (description + sizes) */}
+          <TouchableOpacity
+            style={[styles.cardMain, isRTL && styles.rowRTL]}
+            onPress={() => toggleCard(id)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.thumb}>
+              {uri ? (
+                <Image source={{ uri }} style={styles.thumbImg} resizeMode="cover" />
+              ) : (
+                <Ionicons name="cube-outline" size={20} color={colors.separator} />
+              )}
+              {soldOut ? (
+                <View style={styles.soldOverlay}>
+                  <Text style={styles.soldOverlayText}>{tr('Sold out', 'Нет', 'نفد')}</Text>
+                </View>
+              ) : null}
             </View>
-          ) : null}
-        </View>
-        <View style={styles.rowInfo}>
-          <Text style={[styles.rowName, isRTL && styles.rtlText]} numberOfLines={2}>{name}</Text>
-          <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
-            <Text style={styles.rowPrice}>{formatAed(unit)}</Text>
-            {discounted && retail ? (
-              <>
-                <Text style={styles.rowRetail}>{formatAed(retail)}</Text>
-                {pct > 0 ? (
-                  <View style={styles.offBadge}>
-                    <Text style={styles.offBadgeText}>−{pct}%</Text>
-                  </View>
-                ) : null}
-              </>
-            ) : null}
-          </View>
-        </View>
-        {soldOut ? (
-          <View style={styles.soldPill}>
-            <Text style={styles.soldPillText}>{tr('Sold out', 'Нет в наличии', 'نفدت')}</Text>
-          </View>
-        ) : q > 0 ? (
-          <View style={[styles.stepper, isRTL && styles.rowRTL]}>
-            <TouchableOpacity style={styles.stepBtn} onPress={() => setLine(product.id, q - 1)}>
-              <Ionicons name="remove" size={18} color={colors.label} />
-            </TouchableOpacity>
-            <Text style={styles.stepQty}>{q}</Text>
-            <TouchableOpacity style={[styles.stepBtn, styles.stepBtnAdd]} onPress={() => setLine(product.id, q + 1)}>
-              <Ionicons name="add" size={18} color={colors.white} />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity style={styles.addBtn} onPress={() => setLine(product.id, 1)} disabled={unit <= 0}>
-            <Text style={[styles.addBtnText, unit <= 0 && { color: colors.secondaryLabel }]}>
-              {unit <= 0 ? tr('N/A', 'Н/Д', 'غير متاح') : tr('Add', 'Добавить', 'إضافة')}
-            </Text>
+            <View style={styles.rowInfo}>
+              <Text style={[styles.rowName, isRTL && styles.rtlText]} numberOfLines={2}>{name}</Text>
+              <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
+                {multiSize ? (
+                  <>
+                    <Text style={styles.rowPrice}>{tr('from', 'от', 'من')} {formatAed(minSizeUnit)}</Text>
+                    <View style={styles.sizeCountBadge}>
+                      <Text style={styles.sizeCountBadgeText}>
+                        {productSizes.length} {tr('sizes', 'объёма', 'أحجام')}
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.rowPrice}>{formatAed(unit)}</Text>
+                    {discounted && retail ? (
+                      <>
+                        <Text style={styles.rowRetail}>{formatAed(retail)}</Text>
+                        {pct > 0 ? (
+                          <View style={styles.offBadge}>
+                            <Text style={styles.offBadgeText}>−{pct}%</Text>
+                          </View>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </>
+                )}
+                <Ionicons
+                  name={isOpen ? 'chevron-up' : 'chevron-down'}
+                  size={13}
+                  color={colors.separator}
+                />
+              </View>
+            </View>
           </TouchableOpacity>
-        )}
+          {/* Right-side control */}
+          {soldOut ? (
+            <View style={styles.soldPill}>
+              <Text style={styles.soldPillText}>{tr('Sold out', 'Нет в наличии', 'نفدت')}</Text>
+            </View>
+          ) : multiSize ? (
+            productQty > 0 ? (
+              <TouchableOpacity style={styles.qtyPill} onPress={() => toggleCard(id)}>
+                <Text style={styles.qtyPillText}>×{productQty}</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.addBtn} onPress={() => toggleCard(id)}>
+                <Text style={styles.addBtnText}>{tr('Sizes', 'Объём', 'الأحجام')}</Text>
+              </TouchableOpacity>
+            )
+          ) : q > 0 ? (
+            <View style={[styles.stepper, isRTL && styles.rowRTL]}>
+              <TouchableOpacity style={styles.stepBtn} onPress={() => setLine(baseKey, q - 1)}>
+                <Ionicons name="remove" size={18} color={colors.label} />
+              </TouchableOpacity>
+              <Text style={styles.stepQty}>{q}</Text>
+              <TouchableOpacity style={[styles.stepBtn, styles.stepBtnAdd]} onPress={() => setLine(baseKey, q + 1)}>
+                <Ionicons name="add" size={18} color={colors.white} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.addBtn} onPress={() => setLine(baseKey, 1)} disabled={unit <= 0}>
+              <Text style={[styles.addBtnText, unit <= 0 && { color: colors.secondaryLabel }]}>
+                {unit <= 0 ? tr('N/A', 'Н/Д', 'غير متاح') : tr('Add', 'Добавить', 'إضافة')}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Expanded: description + size lines */}
+        {isOpen ? (
+          <View style={styles.cardExpanded}>
+            {description ? (
+              <Text style={[styles.cardDescription, isRTL && styles.rtlText]} numberOfLines={4}>
+                {description}
+              </Text>
+            ) : null}
+            {productSizes.map((v) => {
+              const lineKey = keyOf(id, v.size);
+              const lq = qty[lineKey] || 0;
+              const vp = priceOf(product, v.size);
+              const unavailable = v.available === false;
+              return (
+                <View key={lineKey} style={[styles.sizeRow, unavailable && { opacity: 0.5 }, isRTL && styles.rowRTL]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.sizeLabel, isRTL && styles.rtlText]}>{v.size}</Text>
+                    <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
+                      <Text style={styles.rowPrice}>{formatAed(vp.unit)}</Text>
+                      {vp.discounted && vp.retail ? (
+                        <Text style={styles.rowRetail}>{formatAed(vp.retail)}</Text>
+                      ) : null}
+                    </View>
+                  </View>
+                  {unavailable ? (
+                    <Text style={styles.soldPillText}>{tr('Unavailable', 'Недоступно', 'غير متاح')}</Text>
+                  ) : lq > 0 ? (
+                    <View style={[styles.stepper, isRTL && styles.rowRTL]}>
+                      <TouchableOpacity style={styles.stepBtnSmall} onPress={() => setLine(lineKey, lq - 1)}>
+                        <Ionicons name="remove" size={16} color={colors.label} />
+                      </TouchableOpacity>
+                      <Text style={styles.stepQty}>{lq}</Text>
+                      <TouchableOpacity style={[styles.stepBtnSmall, styles.stepBtnAdd]} onPress={() => setLine(lineKey, lq + 1)}>
+                        <Ionicons name="add" size={16} color={colors.white} />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity style={styles.addBtnSmall} onPress={() => setLine(lineKey, 1)}>
+                      <Text style={styles.addBtnText}>{tr('Add', 'Добавить', 'إضافة')}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
       </View>
     );
   };
@@ -394,18 +557,66 @@ export default function PartnerPortalScreen() {
                 {!search && recentOrders.length > 0 ? (
                   <>
                     <Text style={[styles.reorderTitle, isRTL && styles.rtlText]}>{tr('Reorder', 'Повторить заказ', 'إعادة الطلب')}</Text>
-                    {recentOrders.map((o) => (
-                      <View key={String(o.id || o.orderNumber)} style={[styles.reorderRow, isRTL && styles.rowRTL]}>
-                        <View style={{ flex: 1 }}>
-                          <Text style={[styles.reorderNo, isRTL && styles.rtlText]} numberOfLines={1}>{o.orderNumber}</Text>
-                          <Text style={[styles.reorderMeta, isRTL && styles.rtlText]}>{(o.items?.length || 0)} {tr('items', 'товаров', 'منتجات')} · {formatAed(o.total)}</Text>
+                    {recentOrders.map((o) => {
+                      const oid = String(o.id || o.orderNumber);
+                      const orderOpen = expandedOrders.has(oid);
+                      const orderItems = Array.isArray(o.items) ? o.items : [];
+                      return (
+                        <View key={oid} style={styles.reorderCard}>
+                          {/* Tap the row to see what was ordered */}
+                          <TouchableOpacity
+                            style={[styles.reorderRow, isRTL && styles.rowRTL]}
+                            onPress={() => toggleOrder(oid)}
+                            activeOpacity={0.7}
+                          >
+                            <View style={{ flex: 1 }}>
+                              <Text style={[styles.reorderNo, isRTL && styles.rtlText]} numberOfLines={1}>{o.orderNumber}</Text>
+                              <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
+                                <Text style={[styles.reorderMeta, isRTL && styles.rtlText]}>
+                                  {orderItems.length} {tr('items', 'товаров', 'منتجات')} · {formatAed(o.total)}
+                                </Text>
+                                <Ionicons name={orderOpen ? 'chevron-up' : 'chevron-down'} size={12} color={colors.separator} />
+                              </View>
+                            </View>
+                            <TouchableOpacity style={styles.reorderBtn} onPress={() => reorderFrom(o)}>
+                              <Ionicons name="refresh" size={14} color={colors.brand} />
+                              <Text style={styles.reorderBtnText}>{tr('Reorder', 'Повторить', 'إعادة')}</Text>
+                            </TouchableOpacity>
+                          </TouchableOpacity>
+                          {orderOpen ? (
+                            <View style={styles.reorderItems}>
+                              {orderItems.map((it, idx) => {
+                                const itUri = rawImageUri(it?.image);
+                                const itName = String(it?.productName || it?.name || tr('Product', 'Товар', 'منتج'));
+                                const itQty = Math.floor(Number(it?.quantity) || 0) || 1;
+                                const itPrice = Number(it?.price) || 0;
+                                return (
+                                  <View key={`${oid}-${idx}`} style={[styles.reorderItemRow, isRTL && styles.rowRTL]}>
+                                    <View style={styles.reorderItemThumb}>
+                                      {itUri ? (
+                                        <Image source={{ uri: itUri }} style={styles.thumbImg} resizeMode="cover" />
+                                      ) : (
+                                        <Ionicons name="cube-outline" size={14} color={colors.separator} />
+                                      )}
+                                    </View>
+                                    <View style={{ flex: 1, marginHorizontal: 10 }}>
+                                      <Text style={[styles.reorderItemName, isRTL && styles.rtlText]} numberOfLines={2}>{itName}</Text>
+                                      <Text style={[styles.reorderItemMeta, isRTL && styles.rtlText]}>
+                                        ×{itQty}{it?.size ? ` · ${it.size}` : ''}
+                                      </Text>
+                                    </View>
+                                    <Text style={styles.reorderItemPrice}>{formatAed(itPrice * itQty)}</Text>
+                                  </View>
+                                );
+                              })}
+                              {orderItems.length === 0 ? (
+                                <Text style={styles.reorderMeta}>{tr('No item details', 'Нет данных о позициях', 'لا توجد تفاصيل')}</Text>
+                              ) : null}
+                            </View>
+                          ) : null}
                         </View>
-                        <TouchableOpacity style={styles.reorderBtn} onPress={() => reorderFrom(o)}>
-                          <Ionicons name="refresh" size={14} color={colors.brand} />
-                          <Text style={styles.reorderBtnText}>{tr('Reorder', 'Повторить', 'إعادة')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
+                      );
+                    })}
                     <Text style={[styles.reorderHint, isRTL && styles.rtlText]}>{tr('Or add products below', 'Или добавьте товары ниже', 'أو أضف المنتجات أدناه')}</Text>
                   </>
                 ) : null}
@@ -513,8 +724,19 @@ const styles = StyleSheet.create({
   offPillText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 14 },
   searchInput: { flex: 1, color: '#FFFFFF', fontSize: 15, padding: 0 },
-  // Rows
+  // Rows / cards
   row: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
+  card: { backgroundColor: '#FFFFFF', borderRadius: 16, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', padding: 12 },
+  cardMain: { flexDirection: 'row', alignItems: 'center', flex: 1, minWidth: 0 },
+  cardExpanded: { paddingHorizontal: 12, paddingBottom: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F2F2F4', gap: 8 },
+  cardDescription: { fontSize: 12, color: colors.secondaryLabel, lineHeight: 17 },
+  sizeRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.groupedBackground || '#F2F2F7', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
+  sizeLabel: { fontSize: 13, fontWeight: '700', color: colors.label },
+  sizeCountBadge: { backgroundColor: '#F2F2F4', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  sizeCountBadgeText: { color: colors.secondaryLabel, fontSize: 10, fontWeight: '700' },
+  qtyPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
+  qtyPillText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
   rowActive: { borderColor: colors.brand },
   rowSoldOut: { opacity: 0.6 },
   rowRTL: { flexDirection: 'row-reverse' },
@@ -537,7 +759,9 @@ const styles = StyleSheet.create({
   addBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stepBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.groupedBackground || '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  stepBtnAdd: { backgroundColor: colors.brand },
+  stepBtnSmall: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: colors.separator, alignItems: 'center', justifyContent: 'center' },
+  addBtnSmall: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  stepBtnAdd: { backgroundColor: colors.brand, borderColor: colors.brand },
   stepQty: { minWidth: 20, textAlign: 'center', fontSize: 15, fontWeight: '800', color: colors.label },
   // Notes
   notesWrap: { marginTop: 8 },
@@ -548,9 +772,16 @@ const styles = StyleSheet.create({
   reorderBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#0B0B0C', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12 },
   reorderBannerText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', flex: 1 },
   reorderTitle: { fontSize: 13, fontWeight: '800', color: colors.secondaryLabel, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
-  reorderRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: colors.separator, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 8 },
+  reorderCard: { backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: colors.separator, marginBottom: 8, overflow: 'hidden' },
+  reorderRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10 },
   reorderNo: { fontSize: 14, fontWeight: '700', color: colors.label },
   reorderMeta: { fontSize: 12, color: colors.secondaryLabel, marginTop: 2 },
+  reorderItems: { borderTopWidth: 1, borderTopColor: '#F2F2F4', paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
+  reorderItemRow: { flexDirection: 'row', alignItems: 'center' },
+  reorderItemThumb: { width: 34, height: 34, borderRadius: 8, backgroundColor: colors.groupedBackground || '#F2F2F7', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  reorderItemName: { fontSize: 12.5, color: colors.label, fontWeight: '600' },
+  reorderItemMeta: { fontSize: 11, color: colors.secondaryLabel, marginTop: 1 },
+  reorderItemPrice: { fontSize: 12.5, fontWeight: '700', color: colors.label },
   reorderBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   reorderBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
