@@ -34,7 +34,7 @@ const PROMO_PRODUCTS = {
     name: 'SOOTHING BOMB SEA ALGAE MASK',
     image: '/images/SEA.jpg',
     originalPrice: 36,
-    size: '1 sheet (23g)',
+    size: '1 sheet (25g)',
   },
 };
 const PROMO_THRESHOLDS = {
