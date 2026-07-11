@@ -32,7 +32,7 @@ const PROMO_PRODUCTS = {
   seaAlgae: {
     id: '36',
     name: 'SOOTHING BOMB SEA ALGAE MASK',
-    image: '/images/SEA.jpg',
+    image: '/images/sea_algae/Main.jpeg',
     originalPrice: 36,
     size: '1 sheet (25g)',
   },

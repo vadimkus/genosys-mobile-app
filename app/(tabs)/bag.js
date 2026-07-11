@@ -114,7 +114,7 @@ function BagScreen() {
   const freeDeliveryProgress = Math.max(0, Math.min(1, promoSubtotal / freeShippingThreshold));
 
   const promoCollagenImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/in.png`;
-  const promoSeaAlgaeImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/SEA.jpg`;
+  const promoSeaAlgaeImage = `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}/images/sea_algae/Main.jpeg`;
 
   // Waterfall breakdown for order summary
   const waterfall = computeWaterfallBreakdown(items, user);
