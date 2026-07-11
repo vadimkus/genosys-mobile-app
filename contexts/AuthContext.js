@@ -33,8 +33,9 @@ import {
 } from '../services/biometricService';
 import { loginWithGoogleDirect } from '../services/googleAuthService';
 import { createLogger } from '../utils/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
-import { clearPushTokenOnBackend } from '../services/pushNotificationsService';
+import { clearPushTokenOnBackend, registerForPushNotificationsAsync, savePushTokenToBackend } from '../services/pushNotificationsService';
 import { storeUserSession, getUserSession, clearUserSession, sanitizeUserSession } from '../services/secureTokenStorage';
 import { setSentryUser } from '../config/sentry';
 
@@ -76,6 +77,31 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     setSentryUser(user);
   }, [user]);
+
+  // Push notifications are ON by default: once a session exists, register the
+  // device token automatically unless the user explicitly opted out in Profile
+  // ('@genosys_push_enabled' === '0'). Re-runs on each launch, which also keeps
+  // the backend token fresh. The OS permission dialog still appears once.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!user?.token) return;
+      try {
+        const pref = await AsyncStorage.getItem('@genosys_push_enabled');
+        if (pref === '0') return; // user opted out — respect it
+        const reg = await registerForPushNotificationsAsync();
+        if (cancelled || !reg?.success || !reg?.token) return;
+        const saved = await savePushTokenToBackend(user.token, reg.token);
+        if (!cancelled && saved?.success !== false) {
+          await AsyncStorage.setItem('@genosys_push_enabled', '1');
+          log.debug('Push notifications auto-enabled');
+        }
+      } catch (e) {
+        log.warn('Push auto-enable failed', e?.message || e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.token]);
 
   const initializeAuth = async () => {
     await checkBiometricAvailability();

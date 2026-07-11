@@ -60,7 +60,7 @@ export default function ProfileScreen() {
   const isRTL = dir === 'rtl' || locale === 'ar';
   const insets = useSafeAreaInsets();
   const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [pushToggleLoading, setPushToggleLoading] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -72,7 +72,9 @@ export default function ProfileScreen() {
     (async () => {
       try {
         const v = await AsyncStorage.getItem(PUSH_PREF_KEY);
-        const enabled = v === '1';
+        // ON by default: only an explicit opt-out ('0') turns the toggle off.
+        // AuthContext auto-registers the push token on launch when not opted out.
+        const enabled = v !== '0';
         if (!cancelled) setNotificationsEnabled(enabled);
       } catch {
         // ignore
@@ -492,7 +494,7 @@ export default function ProfileScreen() {
             style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 4, backgroundColor: '#0B0B0C', borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flex: 1 }}>
-              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginRight: isRTL ? 0 : 12, marginLeft: isRTL ? 12 : 0 }}>
+              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', marginRight: isRTL ? 0 : 12, marginLeft: isRTL ? 12 : 0 }}>
                 <Ionicons name="cube-outline" size={22} color="#FFFFFF" />
               </View>
               <View style={{ flex: 1 }}>
