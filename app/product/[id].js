@@ -33,6 +33,7 @@ import { useLocalization, tStatic } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedProductSize } from '../../utils/productLocalization';
 import BeautyBoxDetails from '../../components/product/BeautyBoxDetails';
 import PerfectCombinationCard from '../../components/product/PerfectCombinationCard';
+import RecommendedRoutineCard from '../../components/product/RecommendedRoutineCard';
 import ProductReviews from '../../components/product/ProductReviews';
 import TrustBadges from '../../components/product/TrustBadges';
 import CollapsibleSection from '../../components/product/CollapsibleSection';
@@ -1518,6 +1519,13 @@ function ProductDetailScreen() {
               {renderSpecs()}
 
               <PerfectCombinationCard product={product} user={user} styles={styles} />
+
+              {/* Recommended Routine — API-driven, mirrors the website PDP block */}
+              <RecommendedRoutineCard
+                routine={product?.routine}
+                currentProductId={product?.productNumber || product?.id}
+                isRTL={isRTL}
+              />
 
               {(() => {
                 const benefits = dedupeList([
