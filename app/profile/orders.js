@@ -66,6 +66,8 @@ const isUserDiscountExcludedOrderItemName = (nameRaw) => {
   // Devices (fallback by name) — compact to alphanumerics so hyphenated
   // names match too: "GENO-LED IR II" -> genoledirii, "Hair-GENTRON" -> hairgentron.
   const compact = name.replace(/[^a-z0-9]/g, '');
+  // Hair Stamp is a consumable for the HairGen Booster, not a device — discounts apply.
+  if (compact.includes('hairstamp')) return false;
   if (compact.includes('genoled') || compact.includes('gentron') || compact.includes('hairgen')) return true;
   return false;
 };
