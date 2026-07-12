@@ -1,10 +1,20 @@
 import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { colors, shadow, surfaces } from '../../utils/theme';
 import * as haptics from '../../utils/haptics';
+import AUTH_CONFIG from '../../config/auth';
+
+// API sends relative image paths (/images/...) — prepend the web origin.
+function toImageUri(img) {
+  const s = String(img || '').trim();
+  if (!s) return null;
+  if (s.startsWith('http')) return s;
+  return `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${s.startsWith('/') ? '' : '/'}${s}`;
+}
 
 /**
  * "Recommended Routine" card on the product page — mirrors the website PDP
@@ -43,11 +53,26 @@ export default function RecommendedRoutineCard({ routine, currentProductId, isRT
           const stepProductId = step?.productId ? String(step.productId).trim() : '';
           const isSelf = !!stepProductId && stepProductId === currentId;
           const linkable = !!stepProductId && !isSelf;
+          const thumbUri = toImageUri(step?.image);
           const inner = (
             <View style={[s.stepRow, isRTL && s.rowReverse]}>
-              <View style={s.stepNum}>
-                <Text style={s.stepNumText}>{idx + 1}</Text>
-              </View>
+              {thumbUri ? (
+                <View style={s.thumbWrap}>
+                  <Image
+                    source={{ uri: thumbUri }}
+                    style={s.thumb}
+                    contentFit="cover"
+                    transition={150}
+                  />
+                  <View style={[s.thumbBadge, isRTL ? s.thumbBadgeRTL : s.thumbBadgeLTR]}>
+                    <Text style={s.thumbBadgeText}>{idx + 1}</Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={s.stepNum}>
+                  <Text style={s.stepNumText}>{idx + 1}</Text>
+                </View>
+              )}
               <View style={s.stepBody}>
                 <Text style={[s.stepTitle, isRTL && s.textRTL]}>{step.title}</Text>
                 <Text style={[s.stepDesc, isRTL && s.textRTL]}>{step.description}</Text>
@@ -126,6 +151,40 @@ const s = StyleSheet.create({
   stepNumText: {
     color: '#ffffff',
     fontSize: 13,
+    fontWeight: '700',
+  },
+  thumbWrap: {
+    width: 52,
+    height: 52,
+    marginTop: 1,
+  },
+  thumb: {
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+  },
+  thumbBadge: {
+    position: 'absolute',
+    top: -5,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.label,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  thumbBadgeLTR: {
+    left: -5,
+  },
+  thumbBadgeRTL: {
+    right: -5,
+  },
+  thumbBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
     fontWeight: '700',
   },
   stepBody: {
