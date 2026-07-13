@@ -44,6 +44,8 @@ function getRecommendedProductId(currentId) {
     '29': '18',
     '10': '16',
     '25': '38',
+    '34': '66',
+    '66': '34',
     '33': '17',
     '17': '24',
     '24': '17',
@@ -115,6 +117,9 @@ function getPerfectCombinationCopy(t, currentId, recId, currentName, recName) {
   if (c === '29' && r === '18') return make('pc29Intro', 'pc29');
   if (c === '10' && r === '16') return make('pc10Intro', 'pc10');
   if (c === '25' && r === '38') return make('pc25Intro', 'pc25');
+  if ((c === '34' && r === '66') || (c === '66' && r === '34')) {
+    return make('pc34Intro', 'pc34');
+  }
   if (c === '33' && r === '17') return make('pc33Intro', 'pc33');
 
   // Eye care serum + cream combination (17 + 24 or 24 + 17)
