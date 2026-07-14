@@ -25,7 +25,7 @@ const PROMO_PRODUCTS = {
   collagen: {
     id: 'cmgj9ifoi00008o07p4eqmfb7',
     name: 'INTENSIVE REPAIR COLLAGEN MASK',
-    image: '/images/in.png',
+    image: '/images/collagen_mask/Main.jpeg',
     originalPrice: 36,
     size: '1 Sheet (23g)',
   },
