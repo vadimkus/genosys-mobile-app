@@ -646,7 +646,11 @@ export default function PartnerPortalScreen() {
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.white} />
           </TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
-            <Text style={styles.headerBrand}>GENOSYS</Text>
+            <Image
+              source={require('../assets/genosys-logo-gray.png')}
+              style={styles.headerLogo}
+              resizeMode="contain"
+            />
             <Text style={styles.headerLabel}>{tr('PARTNER', 'ПАРТНЁР', 'شريك')}</Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
@@ -955,6 +959,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerBack: { width: 40 },
   headerBrand: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 3 },
+  headerLogo: { width: 110, height: 33, tintColor: '#FFFFFF' },
   headerLabel: { color: colors.brand, fontSize: 9, fontWeight: '700', letterSpacing: 3, marginTop: 1 },
   offPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, minWidth: 40, alignItems: 'center' },
   offPillText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
@@ -1023,7 +1028,7 @@ const styles = StyleSheet.create({
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
-  footerPills: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+  footerPills: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
   pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: '#FFFFFF' },
   pillActive: { backgroundColor: '#0B0B0C', borderColor: '#0B0B0C' },
   pillConsign: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
