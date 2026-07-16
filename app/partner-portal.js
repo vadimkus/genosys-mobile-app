@@ -88,6 +88,7 @@ export default function PartnerPortalScreen() {
   const [reorderMsg, setReorderMsg] = useState(0);
   const [expandedCards, setExpandedCards] = useState(() => new Set());
   const [expandedOrders, setExpandedOrders] = useState(() => new Set());
+  const [reorderOpen, setReorderOpen] = useState(false);
 
   const tr = (en, ru, ar) => (locale === 'ru' ? ru : locale === 'ar' ? ar : en);
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
@@ -648,22 +649,44 @@ export default function PartnerPortalScreen() {
             <Text style={styles.headerBrand}>GENOSYS</Text>
             <Text style={styles.headerLabel}>{tr('PARTNER', 'ПАРТНЁР', 'شريك')}</Text>
           </View>
-          <View style={{ alignItems: 'flex-end', gap: 4 }}>
+          <View style={{ alignItems: 'flex-end' }}>
             <View style={styles.offPill}>
               <Text style={styles.offPillText}>{discountPct > 0 ? `−${discountPct}%` : tr('Partner', 'Партнёр', 'شريك')}</Text>
             </View>
+          </View>
+        </View>
+
+        {/* Active trade agreements — clear cards instead of cramped pills */}
+        {(hasConsignment || hasCredit) ? (
+          <View style={styles.agreeWrap}>
             {hasConsignment ? (
-              <View style={styles.consignHeaderPill}>
-                <Text style={styles.consignHeaderPillText}>{tr('CONSIGNMENT', 'КОНСИГНАЦИЯ', 'أمانة')}</Text>
+              <View style={[styles.agreeCard, styles.agreeCardAmber, isRTL && styles.rowRTL]}>
+                <View style={[styles.agreeDot, { backgroundColor: '#FBBF24' }]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.agreeTitle, { color: '#FCD34D' }, isRTL && styles.rtlText]}>
+                    {tr('CONSIGNMENT AGREEMENT — ACTIVE', 'ДОГОВОР КОНСИГНАЦИИ — АКТИВЕН', 'اتفاقية الأمانة — مفعّلة')}
+                  </Text>
+                  <Text style={[styles.agreeDesc, isRTL && styles.rtlText]}>
+                    {tr('Retail products · settle via monthly sales report', 'Розничные продукты · расчёт по ежемесячному отчёту', 'منتجات التجزئة · تسوية عبر التقرير الشهري')}
+                  </Text>
+                </View>
               </View>
             ) : null}
             {hasCredit ? (
-              <View style={styles.creditHeaderPill}>
-                <Text style={styles.creditHeaderPillText}>{tr(`CREDIT ${creditDays}D`, `КРЕДИТ ${creditDays}Д`, `أجل ${creditDays} يومًا`)}</Text>
+              <View style={[styles.agreeCard, styles.agreeCardBlue, isRTL && styles.rowRTL]}>
+                <View style={[styles.agreeDot, { backgroundColor: '#60A5FA' }]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.agreeTitle, { color: '#93C5FD' }, isRTL && styles.rtlText]}>
+                    {tr(`CREDIT ${creditDays} DAYS — ACTIVE`, `КРЕДИТ ${creditDays} ДНЕЙ — АКТИВЕН`, `أجل ${creditDays} يومًا — مفعّل`)}
+                  </Text>
+                  <Text style={[styles.agreeDesc, isRTL && styles.rtlText]}>
+                    {tr(`Professional products · pay within ${creditDays} days of delivery`, `Профессиональные продукты · оплата в течение ${creditDays} дней`, `منتجات مهنية · الدفع خلال ${creditDays} يومًا من التسليم`)}
+                  </Text>
+                </View>
               </View>
             ) : null}
           </View>
-        </View>
+        ) : null}
         <View style={[styles.searchBox, isRTL && styles.rowRTL]}>
           <Ionicons name="search" size={16} color={colors.secondaryLabel} />
           <TextInput
@@ -724,8 +747,23 @@ export default function PartnerPortalScreen() {
                 ) : null}
                 {!search && recentOrders.length > 0 ? (
                   <>
-                    <Text style={[styles.reorderTitle, isRTL && styles.rtlText]}>{tr('Reorder', 'Повторить заказ', 'إعادة الطلب')}</Text>
-                    {recentOrders.map((o) => {
+                    {/* Collapsible reorder section — same visual language as
+                        the category headers below */}
+                    <TouchableOpacity
+                      style={[styles.groupHeader, isRTL && styles.rowRTL]}
+                      onPress={() => { haptics.lightTap(); setReorderOpen(v => !v); }}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[styles.groupHeaderLeft, isRTL && styles.rowRTL]}>
+                        <Ionicons name="refresh" size={14} color={colors.secondaryLabel} />
+                        <Text style={[styles.groupLabel, isRTL && styles.rtlText]}>{tr('Reorder', 'Повторить заказ', 'إعادة الطلب')}</Text>
+                        <View style={styles.groupCount}>
+                          <Text style={styles.groupCountText}>{recentOrders.length}</Text>
+                        </View>
+                      </View>
+                      <Ionicons name={reorderOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.secondaryLabel} />
+                    </TouchableOpacity>
+                    {reorderOpen ? recentOrders.map((o) => {
                       const oid = String(o.id || o.orderNumber);
                       const orderOpen = expandedOrders.has(oid);
                       const orderItems = Array.isArray(o.items) ? o.items : [];
@@ -784,8 +822,10 @@ export default function PartnerPortalScreen() {
                           ) : null}
                         </View>
                       );
-                    })}
-                    <Text style={[styles.reorderHint, isRTL && styles.rtlText]}>{tr('Or add products below', 'Или добавьте товары ниже', 'أو أضف المنتجات أدناه')}</Text>
+                    }) : null}
+                    {reorderOpen ? (
+                      <Text style={[styles.reorderHint, isRTL && styles.rtlText]}>{tr('Or add products below', 'Или добавьте товары ниже', 'أو أضف المنتجات أدناه')}</Text>
+                    ) : null}
                   </>
                 ) : null}
               </View>
@@ -1013,6 +1053,14 @@ const styles = StyleSheet.create({
   creditPill: { backgroundColor: '#DBEAFE', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
   creditHeaderPill: { backgroundColor: 'rgba(37,99,235,0.3)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
   creditHeaderPillText: { color: '#93C5FD', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  // Trade agreement cards in the dark header
+  agreeWrap: { gap: 8, marginTop: 12 },
+  agreeCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 10 },
+  agreeCardAmber: { backgroundColor: 'rgba(245,158,11,0.10)', borderColor: 'rgba(245,158,11,0.30)' },
+  agreeCardBlue: { backgroundColor: 'rgba(37,99,235,0.12)', borderColor: 'rgba(59,130,246,0.30)' },
+  agreeDot: { width: 7, height: 7, borderRadius: 4, marginTop: 4 },
+  agreeTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.6 },
+  agreeDesc: { fontSize: 10.5, color: '#9CA3AF', marginTop: 2, lineHeight: 15 },
   // Category section headers
   groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#F0F0F2', paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
   groupHeaderActive: { borderColor: '#FECACA' },
