@@ -19,6 +19,12 @@ import { fetchProducts, submitPartnerOrder, fetchUserOrders, fetchUserProfile } 
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { isProductOutOfStock } from '../utils/stock';
+import {
+  classifyPartnerLine,
+  isValidCreditDays,
+  partnerGroupKey,
+  PARTNER_CATEGORY_GROUPS,
+} from '../utils/partnerCatalog';
 import { AUTH_CONFIG } from '../config/auth';
 import * as haptics from '../utils/haptics';
 import { colors } from '../utils/theme';
@@ -53,7 +59,13 @@ const sizesOf = (product) =>
 
 const log = createLogger('PartnerPortal');
 
-const isPartnerUser = (user) => {
+// Partner Portal access is assigned manually by admin (partnerPortalAccess).
+// Legacy fallback: stored users from before the flag existed pass on their
+// discount type until the fresh profile arrives — the server enforces the
+// real gate on every order anyway.
+const isPartnerUser = (user, freshProfile) => {
+  if (freshProfile) return freshProfile.partnerPortalAccess === true;
+  if (user?.partnerPortalAccess === true) return true;
   const t = String(user?.discountType || '').toUpperCase();
   return t === 'CLINIC' || t === 'VIP';
 };
@@ -80,29 +92,45 @@ export default function PartnerPortalScreen() {
   const tr = (en, ru, ar) => (locale === 'ru' ? ru : locale === 'ar' ? ar : en);
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
 
-  // Consignment flag: stored user may be stale (set at login), so refresh from
-  // the server on mount — the flag is toggled by admin / the MoySklad matcher.
-  const [freshConsign, setFreshConsign] = useState(null);
+  // Trade flags (consignment / credit / portal access): the stored user may
+  // be stale (set at login), so refresh from the server on mount — they are
+  // toggled by admin.
+  const [freshProfile, setFreshProfile] = useState(null);
   useEffect(() => {
     let mounted = true;
     if (!user?.token) return undefined;
     fetchUserProfile(user.token)
       .then((fresh) => {
-        if (mounted && fresh && typeof fresh.consignmentActive === 'boolean') {
-          setFreshConsign(fresh.consignmentActive);
-        }
+        if (mounted && fresh) setFreshProfile(fresh);
       })
       .catch(() => {});
     return () => {
       mounted = false;
     };
   }, [user?.token]);
-  const hasConsignment = freshConsign === null ? user?.consignmentActive === true : freshConsign === true;
+  const hasConsignment = (freshProfile ? freshProfile.consignmentActive : user?.consignmentActive) === true;
+  const creditDays = Number(freshProfile ? freshProfile.creditDays : user?.creditDays) || 0;
+  const hasCredit =
+    (freshProfile ? freshProfile.creditActive : user?.creditActive) === true && isValidCreditDays(creditDays);
 
   const [payOption, setPayOption] = useState('cod');
   useEffect(() => {
     if (hasConsignment) setPayOption('consignment');
-  }, [hasConsignment]);
+    else if (hasCredit) setPayOption('credit');
+  }, [hasConsignment, hasCredit]);
+
+  // Collapsible category sections (Creams, Serums, Masks…) — flat list while
+  // searching. Same grouping as the website partner portal.
+  const [openGroups, setOpenGroups] = useState(() => new Set());
+  const toggleGroup = (key) => {
+    haptics.lightTap();
+    setOpenGroups((prev) => {
+      const n = new Set(prev);
+      if (n.has(key)) n.delete(key);
+      else n.add(key);
+      return n;
+    });
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -163,6 +191,13 @@ export default function PartnerPortalScreen() {
       haptics.lightTap();
       setQty(next);
       setReorderMsg(loaded);
+      // Open the sections that contain the prefilled items.
+      const groups = new Set();
+      for (const k of Object.keys(next)) {
+        const p = byId.get(parseKey(k).id);
+        if (p) groups.add(partnerGroupKey(p.category));
+      }
+      setOpenGroups(groups);
     } else {
       Alert.alert(tr('Nothing to reorder', 'Нечего повторить', 'لا شيء لإعادة الطلب'), tr('Those products are no longer available.', 'Эти товары больше недоступны.', 'هذه المنتجات لم تعد متوفرة.'));
     }
@@ -197,6 +232,36 @@ export default function PartnerPortalScreen() {
         (p.category || '').toLowerCase().includes(q)
     );
   }, [products, search]);
+
+  // Products bucketed into ordered category sections (empty groups hidden).
+  const groupedProducts = useMemo(() => {
+    const byKey = new Map();
+    for (const p of products) {
+      const k = partnerGroupKey(p.category);
+      const arr = byKey.get(k) || [];
+      arr.push(p);
+      byKey.set(k, arr);
+    }
+    return PARTNER_CATEGORY_GROUPS.map((group) => ({
+      group,
+      items: (byKey.get(group.key) || []).sort((a, b) => String(a.name).localeCompare(String(b.name))),
+    })).filter((g) => g.items.length > 0);
+  }, [products]);
+
+  // Cart lines that cannot go to consignment stock (professional/equipment).
+  const nonConsignableInCart = useMemo(() => {
+    const names = [];
+    for (const [key, q] of Object.entries(qty)) {
+      if (q <= 0) continue;
+      const { id, size } = parseKey(key);
+      const p = products.find((pp) => String(pp.id) === id);
+      if (!p) continue;
+      if (classifyPartnerLine(p, size) !== 'retail') {
+        names.push(size ? `${p.name} (${size})` : p.name);
+      }
+    }
+    return names;
+  }, [qty, products]);
 
   const setLine = (key, next) => {
     haptics.lightTap();
@@ -246,6 +311,17 @@ export default function PartnerPortalScreen() {
 
   const submit = async () => {
     if (itemCount === 0 || submitting) return;
+    if (payOption === 'consignment' && nonConsignableInCart.length > 0) {
+      Alert.alert(
+        tr('Not for consignment', 'Не для консигнации', 'ليس للأمانة'),
+        tr(
+          'These items are professional/equipment and cannot go to consignment stock:\n\n',
+          'Эти позиции — профессиональные/оборудование, их нельзя добавить на консигнацию:\n\n',
+          'هذه المنتجات مهنية/أجهزة ولا يمكن إضافتها إلى مخزون الأمانة:\n\n'
+        ) + nonConsignableInCart.join('\n')
+      );
+      return;
+    }
     setSubmitting(true);
     haptics.lightTap();
     try {
@@ -285,7 +361,7 @@ export default function PartnerPortalScreen() {
   };
 
   // ── Access guard ──
-  if (!isPartnerUser(user)) {
+  if (!isPartnerUser(user, freshProfile)) {
     return (
       <View style={[styles.center, { paddingTop: insets.top }]}>
         <Ionicons name="lock-closed-outline" size={40} color={colors.secondaryLabel} />
@@ -319,6 +395,11 @@ export default function PartnerPortalScreen() {
             <Text style={styles.consignPillText}>{tr('CONSIGNMENT STOCK', 'КОНСИГНАЦИЯ', 'بضاعة أمانة')}</Text>
           </View>
         ) : null}
+        {placed.paymentOption === 'credit' ? (
+          <View style={styles.creditPill}>
+            <Text style={styles.consignPillText}>{tr(`CREDIT ${creditDays} DAYS`, `КРЕДИТ ${creditDays} ДНЕЙ`, `أجل ${creditDays} يومًا`)}</Text>
+          </View>
+        ) : null}
         <Text style={styles.guardText}>
           {placed.paymentOption === 'consignment'
             ? tr(
@@ -326,7 +407,13 @@ export default function PartnerPortalScreen() {
                 'Добавлено на консигнационный склад — доставка в тот же день. Расчёт по ежемесячному отчёту.',
                 'أُضيف إلى مخزون الأمانة — توصيل في نفس اليوم. التسوية عبر التقرير الشهري.'
               )
-            : tr('Priority partner order — we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ — доставим в тот же день.', 'طلب شريك ذو أولوية — توصيل بنفس اليوم.')}
+            : placed.paymentOption === 'credit'
+              ? tr(
+                  `Professional order on ${creditDays}-day credit — payment due within ${creditDays} days of delivery.`,
+                  `Профессиональный заказ с отсрочкой ${creditDays} дней — оплата в течение ${creditDays} дней после доставки.`,
+                  `طلب مهني بأجل ${creditDays} يومًا — الدفع خلال ${creditDays} يومًا من التسليم.`
+                )
+              : tr('Priority partner order — we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ — доставим в тот же день.', 'طلب شريك ذو أولوية — توصيل بنفس اليوم.')}
         </Text>
         <TouchableOpacity style={styles.guardBtn} onPress={() => router.replace('/(tabs)/orders')}>
           <Text style={styles.guardBtnText}>{tr('View orders', 'Мои заказы', 'طلباتي')}</Text>
@@ -338,7 +425,32 @@ export default function PartnerPortalScreen() {
     );
   }
 
-  const renderItem = ({ item: product }) => {
+  const renderItem = ({ item }) => {
+    // Collapsible category section header
+    if (item.__group) {
+      return (
+        <TouchableOpacity
+          style={[styles.groupHeader, item.selected > 0 && styles.groupHeaderActive, isRTL && styles.rowRTL]}
+          onPress={() => toggleGroup(item.key)}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.groupHeaderLeft, isRTL && styles.rowRTL]}>
+            <Text style={[styles.groupLabel, isRTL && styles.rtlText]}>{item.label}</Text>
+            <View style={styles.groupCount}>
+              <Text style={styles.groupCountText}>{item.count}</Text>
+            </View>
+            {item.selected > 0 ? (
+              <View style={styles.groupSelected}>
+                <Text style={styles.groupSelectedText}>×{item.selected}</Text>
+              </View>
+            ) : null}
+          </View>
+          <Ionicons name={item.open ? 'chevron-up' : 'chevron-down'} size={16} color={colors.secondaryLabel} />
+        </TouchableOpacity>
+      );
+    }
+
+    const product = item;
     const id = String(product.id);
     const productSizes = sizesOf(product);
     const multiSize = productSizes.length >= 2;
@@ -349,6 +461,8 @@ export default function PartnerPortalScreen() {
     const name = getLocalizedProductName?.(product, locale) || product.name;
     const uri = imageUri(product);
     const soldOut = isProductOutOfStock(product);
+    const productClass = classifyPartnerLine(product);
+    const productBlocked = payOption === 'consignment' && productClass !== 'retail';
     const productQty = Object.entries(qty).reduce(
       (s, [k, n]) => (parseKey(k).id === id ? s + n : s), 0
     );
@@ -405,6 +519,16 @@ export default function PartnerPortalScreen() {
                     ) : null}
                   </>
                 )}
+                {productClass === 'professional' ? (
+                  <View style={styles.proBadge}>
+                    <Text style={styles.proBadgeText}>PRO</Text>
+                  </View>
+                ) : null}
+                {productClass === 'equipment' ? (
+                  <View style={styles.equipBadge}>
+                    <Text style={styles.proBadgeText}>{tr('EQUIPMENT', 'ОБОРУД.', 'أجهزة')}</Text>
+                  </View>
+                ) : null}
                 <Ionicons
                   name={isOpen ? 'chevron-up' : 'chevron-down'}
                   size={13}
@@ -438,6 +562,10 @@ export default function PartnerPortalScreen() {
                 <Ionicons name="add" size={18} color={colors.white} />
               </TouchableOpacity>
             </View>
+          ) : productBlocked ? (
+            <View style={styles.soldPill}>
+              <Text style={styles.soldPillText}>{tr('Not for consignment', 'Не для консигнации', 'ليس للأمانة')}</Text>
+            </View>
           ) : (
             <TouchableOpacity style={styles.addBtn} onPress={() => setLine(baseKey, 1)} disabled={unit <= 0}>
               <Text style={[styles.addBtnText, unit <= 0 && { color: colors.secondaryLabel }]}>
@@ -460,10 +588,19 @@ export default function PartnerPortalScreen() {
               const lq = qty[lineKey] || 0;
               const vp = priceOf(product, v.size);
               const unavailable = v.available === false;
+              const rowClass = classifyPartnerLine(product, v.size);
+              const rowBlocked = payOption === 'consignment' && rowClass !== 'retail';
               return (
                 <View key={lineKey} style={[styles.sizeRow, unavailable && { opacity: 0.5 }, isRTL && styles.rowRTL]}>
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.sizeLabel, isRTL && styles.rtlText]}>{v.size}</Text>
+                    <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
+                      <Text style={[styles.sizeLabel, isRTL && styles.rtlText]}>{v.size}</Text>
+                      {rowClass === 'professional' ? (
+                        <View style={styles.proBadge}>
+                          <Text style={styles.proBadgeText}>PRO</Text>
+                        </View>
+                      ) : null}
+                    </View>
                     <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
                       <Text style={styles.rowPrice}>{formatAed(vp.unit)}</Text>
                       {vp.discounted && vp.retail ? (
@@ -473,6 +610,8 @@ export default function PartnerPortalScreen() {
                   </View>
                   {unavailable ? (
                     <Text style={styles.soldPillText}>{tr('Unavailable', 'Недоступно', 'غير متاح')}</Text>
+                  ) : rowBlocked && lq === 0 ? (
+                    <Text style={styles.soldPillText}>{tr('Not for consignment', 'Не для консигнации', 'ليس للأمانة')}</Text>
                   ) : lq > 0 ? (
                     <View style={[styles.stepper, isRTL && styles.rowRTL]}>
                       <TouchableOpacity style={styles.stepBtnSmall} onPress={() => setLine(lineKey, lq - 1)}>
@@ -518,6 +657,11 @@ export default function PartnerPortalScreen() {
                 <Text style={styles.consignHeaderPillText}>{tr('CONSIGNMENT', 'КОНСИГНАЦИЯ', 'أمانة')}</Text>
               </View>
             ) : null}
+            {hasCredit ? (
+              <View style={styles.creditHeaderPill}>
+                <Text style={styles.creditHeaderPillText}>{tr(`CREDIT ${creditDays}D`, `КРЕДИТ ${creditDays}Д`, `أجل ${creditDays} يومًا`)}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
         <View style={[styles.searchBox, isRTL && styles.rowRTL]}>
@@ -538,8 +682,32 @@ export default function PartnerPortalScreen() {
         </View>
       ) : (
         <FlatList
-          data={filtered}
-          keyExtractor={(p) => String(p.id)}
+          data={
+            search.trim()
+              ? filtered
+              : groupedProducts.flatMap(({ group, items }) => {
+                  const open = openGroups.has(group.key);
+                  const selected = items.reduce(
+                    (sum, p) =>
+                      sum +
+                      Object.entries(qty).reduce(
+                        (s, [k, n]) => (parseKey(k).id === String(p.id) ? s + n : s),
+                        0
+                      ),
+                    0
+                  );
+                  const header = {
+                    __group: true,
+                    key: group.key,
+                    label: locale === 'ru' ? group.ru : locale === 'ar' ? group.ar : group.en,
+                    count: items.length,
+                    selected,
+                    open,
+                  };
+                  return open ? [header, ...items] : [header];
+                })
+          }
+          keyExtractor={(item) => (item.__group ? `group:${item.key}` : String(item.id))}
           renderItem={renderItem}
           contentContainerStyle={{ padding: 16, paddingBottom: itemCount > 0 ? 250 : 40 }}
           keyboardShouldPersistTaps="handled"
@@ -653,10 +821,34 @@ export default function PartnerPortalScreen() {
             {hasConsignment ? (
               <TouchableOpacity
                 style={[styles.pill, payOption === 'consignment' && styles.pillConsign]}
-                onPress={() => { haptics.lightTap(); setPayOption('consignment'); }}
+                onPress={() => {
+                  if (nonConsignableInCart.length > 0) {
+                    Alert.alert(
+                      tr('Retail products only', 'Только розничные продукты', 'منتجات التجزئة فقط'),
+                      tr(
+                        'Remove professional/equipment items first — consignment stock is retail products only:\n\n',
+                        'Сначала уберите профессиональные позиции — на консигнацию идут только розничные продукты:\n\n',
+                        'أزل المنتجات المهنية أولًا — مخزون الأمانة للتجزئة فقط:\n\n'
+                      ) + nonConsignableInCart.join('\n')
+                    );
+                    return;
+                  }
+                  haptics.lightTap();
+                  setPayOption('consignment');
+                }}
               >
                 <Text style={[styles.pillText, payOption === 'consignment' && styles.pillTextActive]}>
                   {tr('Consignment', 'Консигнация', 'أمانة')}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+            {hasCredit ? (
+              <TouchableOpacity
+                style={[styles.pill, payOption === 'credit' && styles.pillCredit]}
+                onPress={() => { haptics.lightTap(); setPayOption('credit'); }}
+              >
+                <Text style={[styles.pillText, payOption === 'credit' && styles.pillTextActive]}>
+                  {tr(`Credit ${creditDays}d`, `Кредит ${creditDays}д`, `أجل ${creditDays} يومًا`)}
                 </Text>
               </TouchableOpacity>
             ) : null}
@@ -679,7 +871,9 @@ export default function PartnerPortalScreen() {
           </View>
           <Text style={[styles.footerHint, isRTL && styles.rtlText]}>
             {payOption === 'consignment'
-              ? tr('Settle via monthly sales report — no payment now', 'Расчёт по ежемесячному отчёту — без оплаты сейчас', 'التسوية عبر التقرير الشهري — بدون دفع الآن')
+              ? tr('Retail products only — settle via monthly sales report', 'Только розничные продукты — расчёт по ежемесячному отчёту', 'منتجات التجزئة فقط — تسوية عبر التقرير الشهري')
+              : payOption === 'credit'
+                ? tr(`Professional order — pay within ${creditDays} days of delivery`, `Профессиональный заказ — оплата в течение ${creditDays} дней`, `طلب مهني — الدفع خلال ${creditDays} يومًا`)
               : payOption === 'online'
                 ? tr('Card / Apple Pay — secure checkout', 'Карта / Apple Pay — безопасная оплата', 'بطاقة / Apple Pay — دفع آمن')
                 : tr('Pay when your order arrives', 'Оплатите при доставке', 'ادفع عند وصول الطلب')}
@@ -700,7 +894,9 @@ export default function PartnerPortalScreen() {
                     ? tr('Continue to payment', 'К оплате', 'المتابعة إلى الدفع')
                     : payOption === 'consignment'
                       ? tr('Add to consignment', 'На консигнацию', 'إضافة إلى الأمانة')
-                      : tr('Place order', 'Оформить заказ', 'تقديم الطلب')}
+                      : payOption === 'credit'
+                        ? tr(`Place order — ${creditDays}d credit`, `Оформить — кредит ${creditDays}д`, `تقديم الطلب — أجل ${creditDays} يومًا`)
+                        : tr('Place order', 'Оформить заказ', 'تقديم الطلب')}
                 </Text>
               )}
             </TouchableOpacity>
@@ -791,6 +987,7 @@ const styles = StyleSheet.create({
   pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: '#FFFFFF' },
   pillActive: { backgroundColor: '#0B0B0C', borderColor: '#0B0B0C' },
   pillConsign: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
+  pillCredit: { backgroundColor: '#2563EB', borderColor: '#2563EB' },
   pillText: { fontSize: 12, fontWeight: '700', color: colors.secondaryLabel },
   pillTextActive: { color: '#FFFFFF' },
   footerHint: { fontSize: 11, color: colors.secondaryLabel, marginBottom: 8 },
@@ -813,4 +1010,20 @@ const styles = StyleSheet.create({
   consignPillText: { color: '#92400E', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
   consignHeaderPill: { backgroundColor: 'rgba(245,158,11,0.25)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
   consignHeaderPillText: { color: '#FCD34D', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  creditPill: { backgroundColor: '#DBEAFE', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
+  creditHeaderPill: { backgroundColor: 'rgba(37,99,235,0.3)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  creditHeaderPillText: { color: '#93C5FD', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  // Category section headers
+  groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#F0F0F2', paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
+  groupHeaderActive: { borderColor: '#FECACA' },
+  groupHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  groupLabel: { fontSize: 14, fontWeight: '800', color: colors.label },
+  groupCount: { backgroundColor: '#F2F2F4', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  groupCountText: { fontSize: 10, fontWeight: '700', color: colors.secondaryLabel },
+  groupSelected: { backgroundColor: '#DC2626', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  groupSelectedText: { fontSize: 10, fontWeight: '800', color: '#FFFFFF' },
+  // Professional / equipment badges
+  proBadge: { backgroundColor: '#2563EB', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
+  equipBadge: { backgroundColor: '#1F2937', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
+  proBadgeText: { color: '#FFFFFF', fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
 });
