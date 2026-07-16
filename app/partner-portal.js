@@ -647,7 +647,7 @@ export default function PartnerPortalScreen() {
           </TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
             <Image
-              source={require('../assets/genosys-logo-gray.png')}
+              source={require('../assets/genosys-logo-white.png')}
               style={styles.headerLogo}
               resizeMode="contain"
             />
@@ -959,7 +959,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerBack: { width: 40 },
   headerBrand: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 3 },
-  headerLogo: { width: 110, height: 33, tintColor: '#FFFFFF' },
+  headerLogo: { width: 118, height: 34 },
   headerLabel: { color: colors.brand, fontSize: 9, fontWeight: '700', letterSpacing: 3, marginTop: 1 },
   offPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, minWidth: 40, alignItems: 'center' },
   offPillText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
