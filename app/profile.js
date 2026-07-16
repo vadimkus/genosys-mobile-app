@@ -486,8 +486,8 @@ export default function ProfileScreen() {
         {/* GENOSYS Rewards membership card */}
         <MembershipCard isRTL={isRTL} />
 
-        {/* Partner Portal — prominent, right under the membership card (clinic/VIP only) */}
-        {['CLINIC', 'VIP'].includes(String(user?.discountType || '').toUpperCase()) && (
+        {/* Partner Portal — prominent, right under the membership card (partner accounts only) */}
+        {(user?.partnerPortalAccess === true || ['CLINIC', 'VIP'].includes(String(user?.discountType || '').toUpperCase())) && (
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
@@ -502,9 +502,20 @@ export default function ProfileScreen() {
                   {locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}
                 </Text>
                 <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2, textAlign: isRTL ? 'right' : 'left' }}>
-                  {Number(user?.discountPercentage) > 0
-                    ? (locale === 'ru' ? `Заказ −${Math.round(Number(user.discountPercentage))}% · доставка в тот же день` : locale === 'ar' ? `اطلب −${Math.round(Number(user.discountPercentage))}٪ · توصيل بنفس اليوم` : `Order at −${Math.round(Number(user.discountPercentage))}% · same-day delivery`)
-                    : (locale === 'ru' ? 'Заказ по партнёрской цене' : locale === 'ar' ? 'اطلب بسعر الشريك' : 'Order at partner price · same-day')}
+                  {(() => {
+                    // Trade terms instead of the −50% (already shown on the
+                    // Discount pill above): consignment agreement + credit.
+                    const parts = [];
+                    if (user?.consignmentActive) {
+                      parts.push(locale === 'ru' ? 'Договор консигнации' : locale === 'ar' ? 'اتفاقية الأمانة' : 'Consignment agreement');
+                    }
+                    if (user?.creditActive && Number(user?.creditDays) > 0) {
+                      const d = Number(user.creditDays);
+                      parts.push(locale === 'ru' ? `Кредит ${d} дней` : locale === 'ar' ? `أجل ${d} يومًا` : `Credit ${d} days`);
+                    }
+                    if (parts.length > 0) return parts.join(' · ');
+                    return locale === 'ru' ? 'Приоритетные заказы · доставка в тот же день' : locale === 'ar' ? 'طلبات ذات أولوية · توصيل بنفس اليوم' : 'Priority ordering · same-day delivery';
+                  })()}
                 </Text>
               </View>
             </View>
