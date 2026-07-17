@@ -1130,15 +1130,11 @@ function ShopScreen() {
             )}
 
             {/* Categories Filter — single horizontal scrollable row (no wrapping).
-                Ordering: "All" first, then NEW-flagged categories, then the rest. */}
+                New badges come only from API (lib/productBadges.ts on website). */}
             {categories.length > 0 && (() => {
-              const isNewCategory = (c) =>
-                c === 'Skin Concern' || categoryBadges[c] === 'new';
-              const head = categories.slice(0, 1); // "All"
-              const tail = categories.slice(1);
-              const newFirst = tail.filter(isNewCategory);
-              const rest = tail.filter((c) => !isNewCategory(c));
-              const ordered = [...head, ...newFirst, ...rest];
+              const isNewCategory = (c) => categoryBadges[c] === 'new';
+              // Keep API order; do not force "new" categories to the front.
+              const ordered = categories;
               return (
               <View style={styles.categoriesContainer}>
                 <ScrollView
