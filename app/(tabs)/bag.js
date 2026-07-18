@@ -506,13 +506,11 @@ function BagScreen() {
             <View style={[styles.itemRightActions, isRTL && styles.itemRightActionsRTL]}>
               <View style={[styles.quantityContainer, isRTL && styles.quantityContainerRTL]}>
                 <TouchableOpacity
-                  style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
+                  style={styles.quantityButton}
                   onPress={() => handleQuantityChange(item, -1)}
-                  disabled={item.quantity <= 1}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   accessibilityRole="button"
                   accessibilityLabel={t('shop.decreaseQuantity')}
-                  accessibilityState={{ disabled: item.quantity <= 1 }}
                 >
                   <Ionicons name="remove" size={16} color="#000000" />
                 </TouchableOpacity>
@@ -1228,9 +1226,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F7',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  quantityButtonDisabled: {
-    opacity: 0.5,
   },
   quantityText: {
     ...T.body,

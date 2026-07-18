@@ -330,7 +330,7 @@ function ProductDetailScreen() {
     const productId = String(product.productNumber || product.id || id);
     return getProductImages(productId, product) || [];
   }, [product, id]);
-  const { addItem, isInCart, getItemQuantity } = useCart();
+  const { addItem, decrementCartItem, isInCart, getItemQuantity } = useCart();
   const scrollY = useRef(new Animated.Value(0)).current;
   const galleryRef = useRef(null);
   const scrollRef = useRef(null);
@@ -505,6 +505,7 @@ function ProductDetailScreen() {
 
     const qty = Math.max(1, Number(quantity) || 1);
     addItem(productForCart, qty, selectedColor, selectedSize);
+    setQuantity(1);
     haptics.success();
 
     const safeName = getLocalizedProductName(product, locale) || product.name;
@@ -1648,20 +1649,36 @@ function ProductDetailScreen() {
                   accessibilityLabel={PDP_COPY.quantity}
                 >
                   <TouchableOpacity
-                    style={[styles.qtyBtn, quantity <= 1 && styles.qtyBtnDisabled]}
-                    onPress={decrementQty}
-                    disabled={quantity <= 1}
+                    style={[
+                      styles.qtyBtn,
+                      !inBagForSelection && quantity <= 1 && styles.qtyBtnDisabled,
+                    ]}
+                    onPress={() => {
+                      if (inBagForSelection) {
+                        haptics.selectionTick();
+                        decrementCartItem(product.id, selectedColor, selectedSize);
+                        return;
+                      }
+                      decrementQty();
+                    }}
+                    disabled={!inBagForSelection && quantity <= 1}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={t('shop.decreaseQuantity')}
                     hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                   >
-                    <Ionicons name="remove" size={18} color={quantity <= 1 ? colors.tertiary : colors.label} />
+                    <Ionicons
+                      name="remove"
+                      size={18}
+                      color={!inBagForSelection && quantity <= 1 ? colors.tertiary : colors.label}
+                    />
                   </TouchableOpacity>
-                  <Text style={styles.qtyValue}>{quantity}</Text>
+                  <Text style={styles.qtyValue}>
+                    {inBagForSelection ? qtyForSelection : quantity}
+                  </Text>
                   <TouchableOpacity
                     style={styles.qtyBtn}
-                    onPress={incrementQty}
+                    onPress={inBagForSelection ? handleAddToBag : incrementQty}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={t('shop.increaseQuantity')}
@@ -1680,7 +1697,7 @@ function ProductDetailScreen() {
                   inBagForSelection && !disabled && styles.inCartButton,
                   disabled && styles.addToBagButtonDisabled,
                 ]}
-                onPress={handleAddToBag}
+                onPress={inBagForSelection ? handleViewBagFromToast : handleAddToBag}
                 disabled={disabled}
                 activeOpacity={0.85}
                 accessibilityRole="button"

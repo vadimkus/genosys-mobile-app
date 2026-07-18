@@ -29,6 +29,7 @@ const CHAT_HIDDEN_ROUTES = [
   '/about',                // about page
   '/skin-concerns',        // skin concerns listing
   '/concern-detail',       // skin concern detail pages
+  '/product/',             // PDP has dense sticky bag controls; avoid overlap
   '/partner-portal',       // partner (clinic) ordering portal
 ];
 

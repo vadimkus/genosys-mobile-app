@@ -622,6 +622,40 @@ export const CartProvider = ({ children }) => {
   };
 
   /**
+   * Decrement one exact cart line from a PDP.
+   *
+   * Unlike `decrementProductFromCart` (used by the shop grid), this includes
+   * bundle lines because a PDP can represent an item that was added through
+   * Build Your Set. Quantity 1 removes the line completely.
+   */
+  const decrementCartItem = (productId, selectedColor = '', selectedSize = '') => {
+    if (!productId) return;
+    const normalizedColor = selectedColor || '';
+    const normalizedSize = selectedSize || '';
+
+    setItems((prev) => {
+      const targetIdx = prev.findIndex((item) =>
+        !isPromotionItem(item) &&
+        item?.product?.id === productId &&
+        item.selectedColor === normalizedColor &&
+        item.selectedSize === normalizedSize
+      );
+      if (targetIdx < 0) return prev;
+
+      const nextQty = (Number(prev[targetIdx]?.quantity) || 0) - 1;
+      if (nextQty <= 0) {
+        return reconcileBuildSetBundleDiscounts(prev.filter((_, i) => i !== targetIdx));
+      }
+      return reconcileBuildSetBundleDiscounts(
+        prev.map((item, i) => (i === targetIdx ? { ...item, quantity: nextQty } : item))
+      );
+    });
+
+    bumpPromoTick();
+    log.debug('Decremented exact cart line', { productId, selectedColor, selectedSize });
+  };
+
+  /**
    * Update item quantity
    */
   const updateQuantity = (productId, quantity, selectedColor = '', selectedSize = '', itemMeta = null) => {
@@ -892,6 +926,7 @@ export const CartProvider = ({ children }) => {
     addBundleItems,
     removeItem,
     decrementProductFromCart,
+    decrementCartItem,
     updateQuantity,
     updateColor,
     updateSize,
