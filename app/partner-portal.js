@@ -29,6 +29,7 @@ import { AUTH_CONFIG } from '../config/auth';
 import * as haptics from '../utils/haptics';
 import { colors } from '../utils/theme';
 import { createLogger } from '../utils/logger';
+import { fetchHomecareScripts } from '../services/homecareService';
 
 // Product images are stored as site-relative paths (e.g. /images/..). The app
 // must prefix the asset origin, same as the Shop screen.
@@ -89,6 +90,8 @@ export default function PartnerPortalScreen() {
   const [expandedCards, setExpandedCards] = useState(() => new Set());
   const [expandedOrders, setExpandedOrders] = useState(() => new Set());
   const [reorderOpen, setReorderOpen] = useState(false);
+  const [availableClinicPoints, setAvailableClinicPoints] = useState(0);
+  const [useClinicPoints, setUseClinicPoints] = useState(false);
 
   const tr = (en, ru, ar) => (locale === 'ru' ? ru : locale === 'ar' ? ar : en);
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
@@ -149,6 +152,17 @@ export default function PartnerPortalScreen() {
       mounted = false;
     };
   }, [user]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!user?.token) return undefined;
+    fetchHomecareScripts(user.token)
+      .then((data) => {
+        if (mounted) setAvailableClinicPoints(Math.max(0, Number(data?.points?.available) || 0));
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, [user?.token]);
 
   // Load the partner's recent orders for one-tap reorder.
   useEffect(() => {
@@ -309,6 +323,9 @@ export default function PartnerPortalScreen() {
     }
     return { itemCount: count, total: Math.round(sum * 100) / 100 };
   }, [qty, productById, priceOf]);
+  const clinicPointsToRedeem =
+    useClinicPoints && payOption !== 'consignment' ? Math.min(availableClinicPoints, total) : 0;
+  const payableTotal = Math.max(0, Math.round((total - clinicPointsToRedeem) * 100) / 100);
 
   const submit = async () => {
     if (itemCount === 0 || submitting) return;
@@ -332,10 +349,17 @@ export default function PartnerPortalScreen() {
           const { id, size } = parseKey(key);
           return { id, quantity: q, ...(size ? { size } : {}) };
         });
-      const res = await submitPartnerOrder(user?.token, items, { orderNotes: notes, locale, paymentOption: payOption });
+      const res = await submitPartnerOrder(user?.token, items, {
+        orderNotes: notes,
+        locale,
+        paymentOption: payOption,
+        redeemClinicPoints: clinicPointsToRedeem,
+      });
       if (res?.success) {
         setQty({});
         setNotes('');
+        setAvailableClinicPoints((points) => Math.max(0, points - (Number(res.clinicPointsRedeemed) || 0)));
+        setUseClinicPoints(false);
         if (res.paymentUrl) {
           // Online payment: hand over to the in-app Stripe payment screen.
           router.push({
@@ -691,6 +715,27 @@ export default function PartnerPortalScreen() {
             ) : null}
           </View>
         ) : null}
+        <TouchableOpacity
+          style={[styles.homecareShortcut, isRTL && styles.rowRTL]}
+          onPress={() => {
+            haptics.lightTap();
+            router.push('/homecare-scripts');
+          }}
+          activeOpacity={0.8}
+        >
+          <View style={styles.homecareShortcutIcon}>
+            <Ionicons name="paper-plane" size={16} color="#FFFFFF" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.homecareShortcutTitle, isRTL && styles.rtlText]}>
+              {tr('Homecare Scripts', 'Домашние рекомендации', 'توصيات العناية المنزلية')}
+            </Text>
+            <Text style={[styles.homecareShortcutText, isRTL && styles.rtlText]}>
+              {tr('Recommend products · earn Clinic Points', 'Рекомендуйте продукты · получайте баллы', 'أوصِ بالمنتجات · اكسب نقاط العيادة')}
+            </Text>
+          </View>
+          <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={17} color="#9CA3AF" />
+        </TouchableOpacity>
         <View style={[styles.searchBox, isRTL && styles.rowRTL]}>
           <Ionicons name="search" size={16} color={colors.secondaryLabel} />
           <TextInput
@@ -861,6 +906,30 @@ export default function PartnerPortalScreen() {
       {/* Sticky submit bar (settlement pills always visible) */}
       {itemCount > 0 && (
         <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
+          {availableClinicPoints > 0 ? (
+            <TouchableOpacity
+              style={[styles.pointsRow, payOption === 'consignment' && styles.pointsRowDisabled]}
+              disabled={payOption === 'consignment'}
+              onPress={() => {
+                haptics.lightTap();
+                setUseClinicPoints((value) => !value);
+              }}
+            >
+              <View>
+                <Text style={styles.pointsTitle}>
+                  {tr('Use Clinic Points', 'Использовать баллы клиники', 'استخدم نقاط العيادة')}
+                </Text>
+                <Text style={styles.pointsBalance}>
+                  {availableClinicPoints.toFixed(2)} {tr('available', 'доступно', 'متاحة')}
+                </Text>
+              </View>
+              <Ionicons
+                name={useClinicPoints && payOption !== 'consignment' ? 'checkbox' : 'square-outline'}
+                size={22}
+                color="#92400E"
+              />
+            </TouchableOpacity>
+          ) : null}
           <View style={[styles.footerPills, isRTL && styles.rowRTL]}>
             {hasConsignment ? (
               <TouchableOpacity
@@ -927,7 +996,10 @@ export default function PartnerPortalScreen() {
               <Text style={styles.footerCount}>
                 {itemCount} {itemCount === 1 ? tr('item', 'товар', 'منتج') : tr('items', 'товаров', 'منتجات')}
               </Text>
-              <Text style={styles.footerTotal}>{formatAed(total)}</Text>
+              {clinicPointsToRedeem > 0 ? (
+                <Text style={styles.pointsApplied}>−{clinicPointsToRedeem.toFixed(2)} Clinic Points</Text>
+              ) : null}
+              <Text style={styles.footerTotal}>{formatAed(payableTotal)}</Text>
             </View>
             <TouchableOpacity style={styles.submitBtn} onPress={submit} disabled={submitting}>
               {submitting ? (
@@ -1028,6 +1100,11 @@ const styles = StyleSheet.create({
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
+  pointsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFBEB', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 },
+  pointsRowDisabled: { opacity: 0.45 },
+  pointsTitle: { fontSize: 12, fontWeight: '700', color: '#78350F' },
+  pointsBalance: { fontSize: 11, color: '#92400E', marginTop: 1 },
+  pointsApplied: { fontSize: 11, color: '#92400E' },
   footerPills: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
   pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: '#FFFFFF' },
   pillActive: { backgroundColor: '#0B0B0C', borderColor: '#0B0B0C' },
@@ -1066,6 +1143,10 @@ const styles = StyleSheet.create({
   agreeDot: { width: 7, height: 7, borderRadius: 4, marginTop: 4 },
   agreeTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.6 },
   agreeDesc: { fontSize: 10.5, color: '#9CA3AF', marginTop: 2, lineHeight: 15 },
+  homecareShortcut: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 12 },
+  homecareShortcutIcon: { width: 32, height: 32, borderRadius: 9, backgroundColor: '#DC2626', alignItems: 'center', justifyContent: 'center' },
+  homecareShortcutTitle: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '800' },
+  homecareShortcutText: { color: '#9CA3AF', fontSize: 10.5, marginTop: 1 },
   // Category section headers
   groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#F0F0F2', paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
   groupHeaderActive: { borderColor: '#FECACA' },

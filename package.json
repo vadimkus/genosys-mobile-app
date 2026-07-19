@@ -37,6 +37,7 @@
     "smoke:order-payload-pricing-contract": "tsx scripts/smoke-order-payload-pricing-contract.js",
     "smoke:orders-repository": "tsx scripts/smoke-orders-repository.js",
     "verify:splash": "node scripts/verify-splash-sync.js",
+    "verify:homecare-links": "node scripts/verify-homecare-links.js",
     "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository"
   },
   "dependencies": {

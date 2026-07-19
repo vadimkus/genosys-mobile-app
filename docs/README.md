@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [Native Clinic Homecare Scripts (2026-07-19)](./SESSION_CHANGES_2026-07-19_homecare-scripts.md) | Native partner workflow for versioned retail recommendations, private-link sharing, revocation, and Clinic Points. iOS and Android bundles verified locally; no OTA published. |
 | [PDP and Bag Controls OTA (2026-07-18)](./SESSION_CHANGES_2026-07-18_pdp-bag-controls-ota.md) | Removes PDP chat overlap, makes native PDP quantity controls update the real bag, removes quantity-1 lines with minus, and opens the bag from the in-bag CTA. Runtime 1.11.0. |
 | [Main README](../README.md) | Project overview, install, and run |
 | [Skin Analysis — Logic Fixes (2026-07-06)](./SESSION_CHANGES_2026-07-06_skin-analysis-logic-fixes.md) | **Quiz scoring was dead** — display labels (Oily/Acne) never matched the server's canonical keys, so every user got the same fallback list. Server now normalizes aliases (fixes shipped binaries), quiz sends canonical + the previously-ignored usage answer (at-home hides PRO Solution), results show per-product match chips, retry keeps answers, on-device fallback engine's JSON parsing fixed. OTA runtime 1.10.4 (group `3992f6ec`). |

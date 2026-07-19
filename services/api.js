@@ -378,6 +378,9 @@ export const submitPartnerOrder = async (token, items, opts = {}) => {
     ...(opts.orderNotes ? { orderNotes: String(opts.orderNotes) } : {}),
     ...(opts.emirate ? { emirate: String(opts.emirate) } : {}),
     ...(opts.paymentOption ? { paymentOption: String(opts.paymentOption) } : {}),
+    ...(Number(opts.redeemClinicPoints) > 0
+      ? { redeemClinicPoints: Number(opts.redeemClinicPoints) }
+      : {}),
     locale: opts.locale || 'en',
   };
 

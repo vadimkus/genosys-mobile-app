@@ -18,6 +18,7 @@
  */
 
 import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 
 const WEB_DOMAIN = 'genosys.ae';
 const LOCALE_PREFIX = /^(en|ar|ru)\//;
@@ -106,6 +107,17 @@ export function redirectSystemPath({ path }) {
 
     // Cart / bag.
     if (cleanPath === 'cart' || cleanPath === 'bag') return '/(tabs)/bag';
+
+    // Patient recommendation links must use a browser context. The website
+    // owns their cart; loading it in the generic app WebView would isolate
+    // that web cart from both Safari/Chrome and the native cart.
+    if (cleanPath === 'r' || cleanPath.startsWith('r/')) {
+      const webUrl = String(path || '').startsWith('http')
+        ? path
+        : `https://${WEB_DOMAIN}/${cleanPath}`;
+      WebBrowser.openBrowserAsync(webUrl).catch(() => {});
+      return '/';
+    }
 
     // Orders tab.
     if (cleanPath === 'orders') return '/(tabs)/orders';
