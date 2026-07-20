@@ -104,7 +104,14 @@ export const PRODUCT_CONFIG = {
     videoUrl: '/videos/rserum.mp4',
   },
   '39': {
-    images: ['/images/SPF50.jpg', '/images/Second/50big.jpg'],
+    images: [
+      '/images/ultra/s1.jpeg',
+      '/images/ultra/s2.jpeg',
+      '/images/ultra/s3.jpeg',
+      '/images/ultra/s4.jpeg',
+      '/images/ultra/s5.jpeg',
+      '/images/ultra/s6.jpeg',
+    ],
   },
   '42': {
     images: ['/images/BLEM.jpg', '/images/Second/bbbig.jpg'],
@@ -113,7 +120,14 @@ export const PRODUCT_CONFIG = {
     images: ['/images/DEF.jpg', '/images/Second/def_big.jpg'],
   },
   '40': {
-    images: ['/images/SSUN.jpg', '/images/Second/40big.jpg'],
+    images: [
+      '/images/sun/s1.jpeg',
+      '/images/sun/s2.jpeg',
+      '/images/sun/s3.jpeg',
+      '/images/sun/s4.jpeg',
+      '/images/sun/s5.jpeg',
+      '/images/sun/s6.jpeg',
+    ],
   },
 };
 
