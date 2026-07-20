@@ -15,3 +15,11 @@ Date: 2026-07-20
 
 This is navigation only. It does not weaken access rules: `/partner-portal` remains a protected route, and the portal still requires server-backed `partnerPortalAccess`.
 
+## Release
+
+- Published via EAS Update to branch/channel `production`.
+- Runtime: `1.11.0`
+- Platforms: iOS and Android
+- Update group: `f4adcf0a-6ace-492f-8360-fb79d38bbd4a`
+- Source commit: `d4ce85a`
+
