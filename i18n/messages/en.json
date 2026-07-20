@@ -1310,7 +1310,11 @@
     "emirateRequired": "Please select your emirate",
     "birthdayLabel": "Birthday (optional)",
     "birthdayPlaceholder": "YYYY-MM-DD",
-    "birthdayHint": "Get a special gift on your birthday! 🎁"
+    "birthdayHint": "Get a special gift on your birthday! 🎁",
+    "partnerPortal": "Partner Portal",
+    "partnerPortalSelected": "Partner Portal selected",
+    "partnerPortalHint": "Clinic & salon partner ordering",
+    "signInToPartnerPortal": "Sign In to Partner Portal"
   },
   "privacy": {
     "title": "Privacy Policy",

@@ -1310,7 +1310,11 @@
     "privacyConsentSuffix": "и даю согласие на сбор и использование моих персональных данных, как описано выше.",
     "googleSignInIssueTitle": "Проблема входа через Google",
     "googleSignInIssueMessage": "Вход через Google сейчас настраивается. Пожалуйста, используйте вход по email и паролю или попробуйте Google позже.",
-    "useEmailLogin": "Войти по email"
+    "useEmailLogin": "Войти по email",
+    "partnerPortal": "Портал партнёра",
+    "partnerPortalSelected": "Портал партнёра выбран",
+    "partnerPortalHint": "Заказы для клиник и салонов",
+    "signInToPartnerPortal": "Войти в портал партнёра"
   },
   "privacy": {
     "title": "Политика конфиденциальности",

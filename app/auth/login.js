@@ -18,7 +18,7 @@ import {
   Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
@@ -57,7 +57,10 @@ const getNativeBundleId = () => {
 
 export default function LoginScreen() {
   const { t, locale, setLocale, dir } = useLocalization();
+  const params = useLocalSearchParams();
   const isRTL = dir === 'rtl';
+  const partnerIntent =
+    String(Array.isArray(params?.returnTo) ? params.returnTo[0] : params?.returnTo || '') === '/partner-portal';
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -351,6 +354,9 @@ export default function LoginScreen() {
 
   const toggleMode = () => {
     haptics.selectionTick();
+    if (isLogin && partnerIntent) {
+      router.setParams({ returnTo: '' });
+    }
     setIsLogin(!isLogin);
     setEmail('');
     setPassword('');
@@ -365,6 +371,11 @@ export default function LoginScreen() {
 
   const handlePrivacyPolicyPress = () => {
     setShowPrivacyModal(true);
+  };
+
+  const handlePartnerPortalPress = () => {
+    haptics.selectionTick();
+    router.setParams({ returnTo: '/partner-portal' });
   };
 
   const currentLangCode = langSwitching
@@ -682,10 +693,55 @@ export default function LoginScreen() {
                 <ActivityIndicator color={colors.white} size="small" />
               ) : (
                 <Text style={styles.authButtonText}>
-                  {isLogin ? t('authScreen.signIn') : t('authScreen.createAccount')}
+                  {isLogin
+                    ? partnerIntent
+                      ? t('authScreen.signInToPartnerPortal')
+                      : t('authScreen.signIn')
+                    : t('authScreen.createAccount')}
                 </Text>
               )}
             </TouchableOpacity>
+
+            {/* Partner Portal entry (login only). The returnTo param is consumed
+                by AuthWrapper after any successful authentication method. */}
+            {isLogin && (
+              <TouchableOpacity
+                style={[
+                  styles.partnerPortalButton,
+                  partnerIntent && styles.partnerPortalButtonSelected,
+                ]}
+                onPress={handlePartnerPortalPress}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={t('authScreen.partnerPortal')}
+                accessibilityState={{ selected: partnerIntent }}
+              >
+                <View style={[styles.partnerPortalContent, isRTL && styles.rowReverse]}>
+                  <View style={styles.partnerPortalIcon}>
+                    <Ionicons
+                      name={partnerIntent ? 'checkmark' : 'storefront-outline'}
+                      size={18}
+                      color={colors.white}
+                    />
+                  </View>
+                  <View style={styles.partnerPortalCopy}>
+                    <Text style={[styles.partnerPortalTitle, isRTL && styles.textRTL]}>
+                      {partnerIntent
+                        ? t('authScreen.partnerPortalSelected')
+                        : t('authScreen.partnerPortal')}
+                    </Text>
+                    <Text style={[styles.partnerPortalHint, isRTL && styles.textRTL]}>
+                      {t('authScreen.partnerPortalHint')}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                    size={17}
+                    color={colors.secondaryLabel}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
 
             {/* Forgot Password (Login only) */}
             {isLogin && (
@@ -1225,6 +1281,46 @@ const styles = StyleSheet.create({
     ...T.button,
     fontWeight: '700',
     color: colors.white,
+  },
+  partnerPortalButton: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.separator,
+    borderRadius: 14,
+    minHeight: 58,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  partnerPortalButtonSelected: {
+    borderColor: colors.label,
+    backgroundColor: tint(colors.label, '08'),
+  },
+  partnerPortalContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 11,
+  },
+  partnerPortalIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: colors.label,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  partnerPortalCopy: {
+    flex: 1,
+  },
+  partnerPortalTitle: {
+    ...T.label,
+    fontWeight: '800',
+    color: colors.label,
+  },
+  partnerPortalHint: {
+    ...T.captionSmall,
+    color: colors.secondaryLabel,
+    marginTop: 2,
   },
 
   // Secondary links

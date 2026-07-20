@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [Partner Portal Login Entry (2026-07-20)](./SESSION_CHANGES_2026-07-20_partner-portal-login-entry.md) | Adds a localized Partner Portal entry card to the native login screen and returns authenticated partner accounts directly to the protected portal. |
 | [Native Clinic Homecare Scripts (2026-07-19)](./SESSION_CHANGES_2026-07-19_homecare-scripts.md) | Native partner workflow for versioned retail recommendations, private-link sharing, revocation, and Clinic Points. iOS and Android bundles verified locally; no OTA published. |
 | [PDP and Bag Controls OTA (2026-07-18)](./SESSION_CHANGES_2026-07-18_pdp-bag-controls-ota.md) | Removes PDP chat overlap, makes native PDP quantity controls update the real bag, removes quantity-1 lines with minus, and opens the bag from the in-bag CTA. Runtime 1.11.0. |
 | [Main README](../README.md) | Project overview, install, and run |
