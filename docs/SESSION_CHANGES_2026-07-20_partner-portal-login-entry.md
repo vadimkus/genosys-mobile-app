@@ -30,4 +30,6 @@ This is navigation only. It does not weaken access rules: `/partner-portal` rema
 - A non-partner may still authenticate to the normal GENOSYS app, but cannot enter the portal.
 - The portal now waits for a fresh server profile and requires `partnerPortalAccess === true` before loading partner products, points, or orders. Discount type and stale local profile data no longer grant provisional portal entry.
 - Rejected users are sent safely to the shop instead of back into the partner-login return route.
+- Correction published to production runtime `1.11.0` for iOS and Android:
+  update group `b49ebbc5-f896-4b42-8fec-85bb9eccab0c`, source commit `5c90817`.
 
