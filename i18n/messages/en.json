@@ -1312,8 +1312,9 @@
     "birthdayPlaceholder": "YYYY-MM-DD",
     "birthdayHint": "Get a special gift on your birthday! 🎁",
     "partnerPortal": "Partner Portal",
-    "partnerPortalSelected": "Partner Portal selected",
-    "partnerPortalHint": "Clinic & salon partner ordering",
+    "partnerPortalHint": "Clinic & salon partners only",
+    "partnerPortalActiveHint": "Access verified after sign-in · Tap to cancel",
+    "cancelPartnerPortal": "Cancel Partner Portal sign-in",
     "signInToPartnerPortal": "Sign In to Partner Portal"
   },
   "privacy": {

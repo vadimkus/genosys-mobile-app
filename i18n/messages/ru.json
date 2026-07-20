@@ -1312,8 +1312,9 @@
     "googleSignInIssueMessage": "Вход через Google сейчас настраивается. Пожалуйста, используйте вход по email и паролю или попробуйте Google позже.",
     "useEmailLogin": "Войти по email",
     "partnerPortal": "Портал партнёра",
-    "partnerPortalSelected": "Портал партнёра выбран",
-    "partnerPortalHint": "Заказы для клиник и салонов",
+    "partnerPortalHint": "Только для клиник и салонов-партнёров",
+    "partnerPortalActiveHint": "Доступ проверим после входа · Нажмите для отмены",
+    "cancelPartnerPortal": "Отменить вход в портал партнёра",
     "signInToPartnerPortal": "Войти в портал партнёра"
   },
   "privacy": {

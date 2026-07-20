@@ -1312,8 +1312,9 @@
     "googleSignInIssueMessage": "يتم إعداد تسجيل الدخول عبر Google حاليًا. يرجى استخدام تسجيل الدخول بالبريد الإلكتروني وكلمة المرور الآن أو المحاولة لاحقًا.",
     "useEmailLogin": "استخدام تسجيل الدخول بالبريد",
     "partnerPortal": "بوابة الشركاء",
-    "partnerPortalSelected": "تم اختيار بوابة الشركاء",
-    "partnerPortalHint": "طلبات العيادات والصالونات الشريكة",
+    "partnerPortalHint": "للعيادات والصالونات الشريكة فقط",
+    "partnerPortalActiveHint": "يتم التحقق بعد تسجيل الدخول · اضغط للإلغاء",
+    "cancelPartnerPortal": "إلغاء تسجيل الدخول إلى بوابة الشركاء",
     "signInToPartnerPortal": "تسجيل الدخول إلى بوابة الشركاء"
   },
   "privacy": {

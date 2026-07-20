@@ -23,3 +23,11 @@ This is navigation only. It does not weaken access rules: `/partner-portal` rema
 - Update group: `f4adcf0a-6ace-492f-8360-fb79d38bbd4a`
 - Source commit: `d4ce85a`
 
+## Follow-up correction
+
+- Removed the approval-looking checkmark and “selected” wording.
+- The Partner Portal destination now toggles on and off; the active state says access will be verified after sign-in and can be cancelled with one tap.
+- A non-partner may still authenticate to the normal GENOSYS app, but cannot enter the portal.
+- The portal now waits for a fresh server profile and requires `partnerPortalAccess === true` before loading partner products, points, or orders. Discount type and stale local profile data no longer grant provisional portal entry.
+- Rejected users are sent safely to the shop instead of back into the partner-login return route.
+

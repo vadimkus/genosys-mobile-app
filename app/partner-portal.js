@@ -60,17 +60,6 @@ const sizesOf = (product) =>
 
 const log = createLogger('PartnerPortal');
 
-// Partner Portal access is assigned manually by admin (partnerPortalAccess).
-// Legacy fallback: stored users from before the flag existed pass on their
-// discount type until the fresh profile arrives — the server enforces the
-// real gate on every order anyway.
-const isPartnerUser = (user, freshProfile) => {
-  if (freshProfile) return freshProfile.partnerPortalAccess === true;
-  if (user?.partnerPortalAccess === true) return true;
-  const t = String(user?.discountType || '').toUpperCase();
-  return t === 'CLINIC' || t === 'VIP';
-};
-
 export default function PartnerPortalScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -100,18 +89,30 @@ export default function PartnerPortalScreen() {
   // be stale (set at login), so refresh from the server on mount — they are
   // toggled by admin.
   const [freshProfile, setFreshProfile] = useState(null);
+  const [profileAccessChecked, setProfileAccessChecked] = useState(false);
   useEffect(() => {
     let mounted = true;
-    if (!user?.token) return undefined;
+    if (!user?.token) {
+      setFreshProfile(null);
+      setProfileAccessChecked(true);
+      return undefined;
+    }
+    setFreshProfile(null);
+    setProfileAccessChecked(false);
     fetchUserProfile(user.token)
       .then((fresh) => {
         if (mounted && fresh) setFreshProfile(fresh);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setProfileAccessChecked(true);
+      });
     return () => {
       mounted = false;
     };
   }, [user?.token]);
+  const hasPartnerAccess =
+    profileAccessChecked && freshProfile?.partnerPortalAccess === true;
   const hasConsignment = (freshProfile ? freshProfile.consignmentActive : user?.consignmentActive) === true;
   const creditDays = Number(freshProfile ? freshProfile.creditDays : user?.creditDays) || 0;
   const hasCredit =
@@ -138,6 +139,11 @@ export default function PartnerPortalScreen() {
 
   useEffect(() => {
     let mounted = true;
+    if (!profileAccessChecked || !hasPartnerAccess) {
+      if (profileAccessChecked) setLoading(false);
+      return undefined;
+    }
+    setLoading(true);
     (async () => {
       try {
         const list = await fetchProducts(user);
@@ -151,24 +157,24 @@ export default function PartnerPortalScreen() {
     return () => {
       mounted = false;
     };
-  }, [user]);
+  }, [hasPartnerAccess, profileAccessChecked, user]);
 
   useEffect(() => {
     let mounted = true;
-    if (!user?.token) return undefined;
+    if (!user?.token || !hasPartnerAccess) return undefined;
     fetchHomecareScripts(user.token)
       .then((data) => {
         if (mounted) setAvailableClinicPoints(Math.max(0, Number(data?.points?.available) || 0));
       })
       .catch(() => {});
     return () => { mounted = false; };
-  }, [user?.token]);
+  }, [hasPartnerAccess, user?.token]);
 
   // Load the partner's recent orders for one-tap reorder.
   useEffect(() => {
     let mounted = true;
     (async () => {
-      if (!user?.token) return;
+      if (!user?.token || !hasPartnerAccess) return;
       try {
         const list = await fetchUserOrders(user.token, { page: 1, limit: 5 });
         if (mounted) setRecentOrders(Array.isArray(list) ? list.slice(0, 4) : []);
@@ -177,7 +183,7 @@ export default function PartnerPortalScreen() {
       }
     })();
     return () => { mounted = false; };
-  }, [user]);
+  }, [hasPartnerAccess, user]);
 
   // Reorder: prefill quantities from a past order (in-stock products only).
   // Size variants are preserved (one line per product+size).
@@ -386,7 +392,18 @@ export default function PartnerPortalScreen() {
   };
 
   // ── Access guard ──
-  if (!isPartnerUser(user, freshProfile)) {
+  if (!profileAccessChecked) {
+    return (
+      <View style={[styles.center, { paddingTop: insets.top }]}>
+        <ActivityIndicator color={colors.brand} />
+        <Text style={styles.guardText}>
+          {tr('Verifying partner access…', 'Проверяем доступ партнёра…', 'جارٍ التحقق من صلاحية الشريك…')}
+        </Text>
+      </View>
+    );
+  }
+
+  if (!hasPartnerAccess) {
     return (
       <View style={[styles.center, { paddingTop: insets.top }]}>
         <Ionicons name="lock-closed-outline" size={40} color={colors.secondaryLabel} />
@@ -398,8 +415,10 @@ export default function PartnerPortalScreen() {
             'هذا القسم لعيادات وصالونات شركاء GENOSYS.'
           )}
         </Text>
-        <TouchableOpacity style={styles.guardBtn} onPress={() => router.back()}>
-          <Text style={styles.guardBtnText}>{tr('Go back', 'Назад', 'رجوع')}</Text>
+        <TouchableOpacity style={styles.guardBtn} onPress={() => router.replace('/(tabs)/shop')}>
+          <Text style={styles.guardBtnText}>
+            {tr('Continue to shop', 'Перейти в магазин', 'الانتقال إلى المتجر')}
+          </Text>
         </TouchableOpacity>
       </View>
     );

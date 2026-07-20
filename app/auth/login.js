@@ -375,7 +375,7 @@ export default function LoginScreen() {
 
   const handlePartnerPortalPress = () => {
     haptics.selectionTick();
-    router.setParams({ returnTo: '/partner-portal' });
+    router.setParams({ returnTo: partnerIntent ? '' : '/partner-portal' });
   };
 
   const currentLangCode = langSwitching
@@ -702,8 +702,9 @@ export default function LoginScreen() {
               )}
             </TouchableOpacity>
 
-            {/* Partner Portal entry (login only). The returnTo param is consumed
-                by AuthWrapper after any successful authentication method. */}
+            {/* Partner Portal destination (login only). This is intentionally a
+                reversible route choice, not a partner-status checkbox. Actual
+                partner access is verified from the server after authentication. */}
             {isLogin && (
               <TouchableOpacity
                 style={[
@@ -713,31 +714,34 @@ export default function LoginScreen() {
                 onPress={handlePartnerPortalPress}
                 activeOpacity={0.8}
                 accessibilityRole="button"
-                accessibilityLabel={t('authScreen.partnerPortal')}
-                accessibilityState={{ selected: partnerIntent }}
+                accessibilityLabel={
+                  partnerIntent
+                    ? t('authScreen.cancelPartnerPortal')
+                    : t('authScreen.partnerPortal')
+                }
               >
                 <View style={[styles.partnerPortalContent, isRTL && styles.rowReverse]}>
                   <View style={styles.partnerPortalIcon}>
                     <Ionicons
-                      name={partnerIntent ? 'checkmark' : 'storefront-outline'}
+                      name="storefront-outline"
                       size={18}
                       color={colors.white}
                     />
                   </View>
                   <View style={styles.partnerPortalCopy}>
                     <Text style={[styles.partnerPortalTitle, isRTL && styles.textRTL]}>
-                      {partnerIntent
-                        ? t('authScreen.partnerPortalSelected')
-                        : t('authScreen.partnerPortal')}
+                      {t('authScreen.partnerPortal')}
                     </Text>
                     <Text style={[styles.partnerPortalHint, isRTL && styles.textRTL]}>
-                      {t('authScreen.partnerPortalHint')}
+                      {partnerIntent
+                        ? t('authScreen.partnerPortalActiveHint')
+                        : t('authScreen.partnerPortalHint')}
                     </Text>
                   </View>
                   <Ionicons
-                    name={isRTL ? 'chevron-back' : 'chevron-forward'}
-                    size={17}
-                    color={colors.secondaryLabel}
+                    name={partnerIntent ? 'close-circle' : isRTL ? 'chevron-back' : 'chevron-forward'}
+                    size={partnerIntent ? 21 : 17}
+                    color={partnerIntent ? colors.brand : colors.secondaryLabel}
                   />
                 </View>
               </TouchableOpacity>
