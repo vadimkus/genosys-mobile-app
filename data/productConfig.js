@@ -129,6 +129,15 @@ export const PRODUCT_CONFIG = {
       '/images/sun/s6.jpeg',
     ],
   },
+  '41': {
+    images: [
+      '/images/cushion/s1.jpeg',
+      '/images/cushion/s2.jpeg',
+      '/images/cushion/s4.jpeg',
+      '/images/cushion/s5.jpeg',
+      '/images/cushion/s6.jpeg',
+    ],
+  },
 };
 
 // Documentation links per product
