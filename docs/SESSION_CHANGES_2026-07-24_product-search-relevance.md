@@ -23,4 +23,11 @@ their descriptions could appear above the actual HYALURON products.
 - iOS Expo export passes.
 - Android Expo export passes.
 
-This is a JavaScript-only change and is OTA-compatible with runtime `1.11.0`.
+## Production OTA
+
+- Branch: `production`
+- Runtime: `1.11.0`
+- Platforms: iOS and Android
+- Update group: `3c3491c7-421d-4a58-b577-ec683df1234c`
+- Source commit: `136d1358bfb8dfc69c1d9018d91e6756f11d2e6c`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/3c3491c7-421d-4a58-b577-ec683df1234c
