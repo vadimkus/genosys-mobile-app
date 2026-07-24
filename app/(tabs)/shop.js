@@ -55,6 +55,7 @@ import {
   normalizeCategoryCanonical,
   getCategoryTagsForProduct,
 } from '../../utils/productLocalization';
+import { filterAndRankProductsForSearch } from '../../utils/productSearch';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
@@ -719,58 +720,13 @@ function ShopScreen() {
       );
     }
 
-    // Apply search filter (tokenized: every query word must match somewhere,
-    // so word order doesn't matter — "serum hyaluron" finds "HYALURON SERUM")
+    // Direct product-name matches rank above bundles or descriptions that only
+    // mention the term. Word order remains flexible.
     if (searchQuery.trim()) {
-      const norm = (s) =>
-        String(s || '')
-          .toLowerCase()
-          .normalize('NFKD')
-          // strip Latin combining diacritics + Arabic harakat
-          .replace(/[\u0300-\u036f\u064B-\u0652]/g, '');
-      const tokens = norm(searchQuery).split(/\s+/).filter(Boolean);
-      if (tokens.length > 0) {
-        filtered = filtered.filter((product) => {
-          const canonical = normalizeCategoryCanonical(product?.category) || '';
-          const canonicalKey = canonical ? getCategoryTranslationKey(canonical) : null;
-          const canonicalLabel = canonicalKey ? t(canonicalKey) : canonical;
-
-          const tagLabels = getCategoryTagsForProduct(product).map((tag) => {
-            const k = getCategoryTranslationKey(tag);
-            return k ? t(k) : tag;
-          });
-
-          // Variant colors/sizes make shade and size queries work
-          // ("beige cushion", "0.25mm roller") — those values never appear
-          // in the product name or description.
-          const variantTerms = (product?.variants || []).flatMap((v) => [
-            v?.color,
-            v?.size,
-          ]);
-
-          // All locales searchable regardless of the active app language
-          const haystack = [
-            getLocalizedProductName(product, locale),
-            product?.name,
-            product?.nameRu || product?.name_ru,
-            product?.nameAr || product?.name_ar,
-            getLocalizedProductDescription(product, locale),
-            product?.description,
-            product?.descriptionRu || product?.description_ru,
-            product?.descriptionAr || product?.description_ar,
-            product?.category,
-            product?.size,
-            canonical,
-            canonicalLabel,
-            ...tagLabels,
-            ...variantTerms,
-          ]
-            .map(norm)
-            .join(' ');
-
-          return tokens.every((token) => haystack.includes(token));
-        });
-      }
+      filtered = filterAndRankProductsForSearch(filtered, searchQuery, {
+        locale,
+        t,
+      });
     }
 
     setFilteredProducts(filtered);

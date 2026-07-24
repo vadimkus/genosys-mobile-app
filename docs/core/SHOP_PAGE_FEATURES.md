@@ -55,8 +55,9 @@ The fixed header contains three sections:
 
 ## Search
 
-- Real-time text filtering with `searchQuery` state
-- Filters product names (localized) against the query
+- Real-time tokenized filtering with `searchQuery` state
+- Direct product-name matches rank above category, variant and description matches
+- Searches EN/RU/AR product data regardless of active locale
 - Clear button appears when text is entered
 - RTL-aware text alignment
 
