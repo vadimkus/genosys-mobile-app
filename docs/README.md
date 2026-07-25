@@ -11,8 +11,6 @@
 | Doc | Description |
 |-----|-------------|
 | [Profile Partner Card Spacing OTA (2026-07-21)](./SESSION_CHANGES_2026-07-21_profile-partner-card-spacing-ota.md) | Prevents the Partner Portal card from visually overlapping the Orders/Bag row on partner account profiles. Republished to production runtime 1.11.0 (group `433a73c2`). |
-| [Native Email Domain Validation (2026-07-21)](./SESSION_CHANGES_2026-07-21_email-domain-validation.md) | Prevents unreachable signup accounts with syntax checks, explicit “Did you mean?” provider corrections, and shared server-side MX/domain validation in EN/RU/AR. |
-| [Native Checkout Progress OTA (2026-07-21)](./SESSION_CHANGES_2026-07-21_checkout-progress.md) | Adds a localized green `Cart → Details & payment → Confirmation` progress indicator across Bag, Checkout, and shared order-success screens. Published to iOS and Android on production runtime 1.11.0. |
 | [Partner Portal Login Entry (2026-07-20)](./SESSION_CHANGES_2026-07-20_partner-portal-login-entry.md) | Adds a localized Partner Portal entry card to the native login screen and returns authenticated partner accounts directly to the protected portal. |
 | [Native Clinic Homecare Scripts (2026-07-19)](./SESSION_CHANGES_2026-07-19_homecare-scripts.md) | Native partner workflow for versioned retail recommendations, private-link sharing, revocation, and Clinic Points. iOS and Android bundles verified locally; no OTA published. |
 | [PDP and Bag Controls OTA (2026-07-18)](./SESSION_CHANGES_2026-07-18_pdp-bag-controls-ota.md) | Removes PDP chat overlap, makes native PDP quantity controls update the real bag, removes quantity-1 lines with minus, and opens the bag from the in-bag CTA. Runtime 1.11.0. |
