@@ -29,6 +29,11 @@ import AUTH_CONFIG from '../../config/auth';
 import Constants from 'expo-constants';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
+import {
+  isEmailAddressSyntaxValid,
+  normalizeEmailAddress,
+  suggestEmailAddressCorrection,
+} from '../../utils/emailAddressValidation';
 
 // expo-apple-authentication is iOS-only; safe-load to prevent Android build/runtime issues
 let AppleAuthentication = null;
@@ -76,6 +81,7 @@ export default function LoginScreen() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
+  const [confirmedEmail, setConfirmedEmail] = useState(null);
 
   const UAE_EMIRATES = [
     'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman',
@@ -92,6 +98,7 @@ export default function LoginScreen() {
     biometricEnabled,
     biometricType
   } = useAuth();
+  const emailSuggestion = !isLogin ? suggestEmailAddressCorrection(email) : null;
 
   // Subtle entrance motion (native driver) — matches the rest of the app.
   const fade = useRef(new Animated.Value(0)).current;
@@ -291,9 +298,16 @@ export default function LoginScreen() {
       }
     }
 
-    if (!isValidEmail(email)) {
+    const normalizedEmail = normalizeEmailAddress(email);
+    if (!isEmailAddressSyntaxValid(normalizedEmail)) {
       haptics.warning();
       Alert.alert(t('common.error'), t('authScreen.invalidEmail'));
+      return;
+    }
+
+    if (emailSuggestion && confirmedEmail !== normalizedEmail) {
+      haptics.warning();
+      Alert.alert(t('authScreen.checkEmailTitle'), t('authScreen.emailSuggestionRequired'));
       return;
     }
 
@@ -318,13 +332,14 @@ export default function LoginScreen() {
       let result;
       
       if (isLogin) {
-        result = await loginWithEmail(email, password);
+        result = await loginWithEmail(normalizedEmail, password);
       } else {
-        result = await register(name, email, password, {
+        result = await register(name, normalizedEmail, password, {
           phone: phone.trim(),
           address: address.trim(),
           emirate,
           birthday: birthday.trim(),
+          emailSuggestionConfirmed: confirmedEmail === normalizedEmail,
         });
       }
 
@@ -347,11 +362,6 @@ export default function LoginScreen() {
     }
   };
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const toggleMode = () => {
     haptics.selectionTick();
     if (isLogin && partnerIntent) {
@@ -359,6 +369,7 @@ export default function LoginScreen() {
     }
     setIsLogin(!isLogin);
     setEmail('');
+    setConfirmedEmail(null);
     setPassword('');
     setName('');
     setPhone('');
@@ -542,13 +553,52 @@ export default function LoginScreen() {
                   style={[styles.textInput, isRTL && styles.inputValueLTR]}
                   placeholder={t('authScreen.emailPlaceholder')}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(value) => {
+                    setEmail(value);
+                    setConfirmedEmail(null);
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
                   textContentType={isLogin ? 'username' : 'emailAddress'}
                   placeholderTextColor={colors.tertiary}
                 />
+                {emailSuggestion && confirmedEmail !== normalizeEmailAddress(email) ? (
+                  <View style={styles.emailSuggestion} accessibilityRole="alert">
+                    <Text style={[styles.emailSuggestionText, isRTL && styles.textRTL]}>
+                      {t('authScreen.emailDidYouMean', {
+                        email: emailSuggestion,
+                      })}
+                    </Text>
+                    <View style={[styles.emailSuggestionActions, isRTL && styles.rowReverse]}>
+                      <TouchableOpacity
+                        style={styles.emailSuggestionPrimary}
+                        onPress={() => {
+                          setEmail(emailSuggestion);
+                          setConfirmedEmail(null);
+                          haptics.selectionTick();
+                        }}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.emailSuggestionPrimaryText}>
+                          {t('authScreen.useSuggestedEmail')}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.emailSuggestionSecondary}
+                        onPress={() => {
+                          setConfirmedEmail(normalizeEmailAddress(email));
+                          haptics.selectionTick();
+                        }}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.emailSuggestionSecondaryText}>
+                          {t('authScreen.keepEnteredEmail')}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : null}
               </View>
 
               <View style={[styles.fieldContainer, isLogin && styles.fieldContainerLast]}>
@@ -1136,6 +1186,52 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     backgroundColor: 'transparent',
     minHeight: 36,
+  },
+  emailSuggestion: {
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#F4C96B',
+    backgroundColor: '#FFF8E7',
+  },
+  emailSuggestionText: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: '#704B00',
+  },
+  emailSuggestionActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  emailSuggestionPrimary: {
+    minHeight: 44,
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: '#704B00',
+    paddingHorizontal: 14,
+  },
+  emailSuggestionPrimaryText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  emailSuggestionSecondary: {
+    minHeight: 44,
+    justifyContent: 'center',
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#D8A93E',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
+  },
+  emailSuggestionSecondaryText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#704B00',
   },
   passwordRow: {
     flexDirection: 'row',

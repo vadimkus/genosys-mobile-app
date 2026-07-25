@@ -27,6 +27,7 @@ import { normalizeUserProfile } from '../utils/userProfile';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import * as haptics from '../utils/haptics';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
+import CheckoutSteps from '../components/checkout/CheckoutSteps';
 import OrderSuccessScreen from '../components/OrderSuccessScreen';
 import CheckoutAddressForm from '../components/checkout/CheckoutAddressForm';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
@@ -725,6 +726,10 @@ function CheckoutScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight + 8 }]}
       >
         <View style={styles.content}>
+          <CheckoutSteps
+            currentStep="checkout"
+            onCartPress={() => router.replace('/(tabs)/bag')}
+          />
           
           {/* Order Summary Header */}
           <CheckoutOrderHeaderCard

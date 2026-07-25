@@ -81,6 +81,7 @@ export const loginWithEmail = async (email, password) => {
  * @param {string} [extra.address] - Delivery address
  * @param {string} [extra.emirate] - UAE emirate
  * @param {string} [extra.birthday] - Birthday (YYYY-MM-DD)
+ * @param {boolean} [extra.emailSuggestionConfirmed] - User explicitly kept a suggested-domain lookalike
  * @returns {Promise<Object>} Registration result
  */
 export const registerUser = async (name, email, password, extra = {}) => {
@@ -102,6 +103,7 @@ export const registerUser = async (name, email, password, extra = {}) => {
         address: extra.address || '',
         emirate: extra.emirate || '',
         birthday: extra.birthday || '',
+        emailSuggestionConfirmed: extra.emailSuggestionConfirmed === true,
       }),
     });
 
@@ -125,7 +127,12 @@ export const registerUser = async (name, email, password, extra = {}) => {
       log.warn('Registration failed', errorData || errorText);
       return {
         success: false,
-        error: 'Could not create account. Please check your details and try again.',
+        error:
+          errorData.error ||
+          errorData.message ||
+          'Could not create account. Please check your details and try again.',
+        code: errorData.code,
+        suggestedEmail: errorData.suggestedEmail,
       };
     }
   } catch (error) {

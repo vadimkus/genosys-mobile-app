@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import CollapsibleFooter from '../../components/CollapsibleFooter';
 import ProgressCard from '../../components/ProgressCard';
+import CheckoutSteps from '../../components/checkout/CheckoutSteps';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { router, useFocusEffect } from 'expo-router';
@@ -617,6 +618,7 @@ function BagScreen() {
           { paddingTop: navBarHeight + 12 },
           { paddingBottom: Math.max(footerHeight + 24, 240) },
         ]}
+        ListHeaderComponent={<CheckoutSteps currentStep="cart" />}
         ListFooterComponent={
           <>
             {/* Free Mask Promotion (Progress UI) */}

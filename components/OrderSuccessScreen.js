@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { success as successHaptic } from '../utils/haptics';
 import T from '../utils/typography';
+import CheckoutSteps from './checkout/CheckoutSteps';
 
 /**
  * Full-screen animated order-success confirmation.
@@ -36,20 +37,26 @@ export default function OrderSuccessScreen({
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.View style={[styles.circle, { transform: [{ scale: checkScale }] }]}>
-        <Ionicons name="checkmark-sharp" size={56} color="#ffffff" />
-      </Animated.View>
-      <Animated.View style={[styles.body, { opacity: fade, transform: [{ translateY: lift }] }]}>
-        <Text style={styles.title}>{title}</Text>
-        {message ? <Text style={styles.message}>{message}</Text> : null}
+      <View style={styles.progressWrap}>
+        <CheckoutSteps currentStep="confirmed" />
+      </View>
 
-        <TouchableOpacity style={styles.primary} onPress={onViewOrder} activeOpacity={0.85}>
-          <Text style={styles.primaryText}>{viewOrderLabel}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.secondary} onPress={onContinueShopping} activeOpacity={0.7}>
-          <Text style={styles.secondaryText}>{continueLabel}</Text>
-        </TouchableOpacity>
-      </Animated.View>
+      <View style={styles.successContent}>
+        <Animated.View style={[styles.circle, { transform: [{ scale: checkScale }] }]}>
+          <Ionicons name="checkmark-sharp" size={56} color="#ffffff" />
+        </Animated.View>
+        <Animated.View style={[styles.body, { opacity: fade, transform: [{ translateY: lift }] }]}>
+          <Text style={styles.title}>{title}</Text>
+          {message ? <Text style={styles.message}>{message}</Text> : null}
+
+          <TouchableOpacity style={styles.primary} onPress={onViewOrder} activeOpacity={0.85}>
+            <Text style={styles.primaryText}>{viewOrderLabel}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.secondary} onPress={onContinueShopping} activeOpacity={0.7}>
+            <Text style={styles.secondaryText}>{continueLabel}</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -58,9 +65,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
+    paddingHorizontal: 24,
+  },
+  progressWrap: {
+    paddingTop: 8,
+  },
+  successContent: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 8,
+    paddingBottom: 24,
   },
   circle: {
     width: 104,
