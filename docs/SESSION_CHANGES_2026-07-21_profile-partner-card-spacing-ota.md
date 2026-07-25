@@ -22,15 +22,11 @@ worked, but the change was never committed. Later OTAs (checkout progress, email
 validation, search relevance) were built from `main` with `marginBottom: 4` and
 overwrote the fix. Republished 2026-07-25 with the spacing change committed.
 
-## Verification
-
-- iOS and Android JavaScript bundles exported successfully (2026-07-21).
-- Committed to `main` and republished to production runtime `1.11.0` on 2026-07-25.
-
 ## Production OTA (2026-07-25 republish)
 
 - Branch: `production`
 - Runtime: `1.11.0`
 - Platforms: iOS and Android
-- Update group: _(filled after publish)_
-- Dashboard: _(filled after publish)_
+- Update group: `433a73c2-dc3e-44a6-85e6-2b995d31703a`
+- Source commit: `789c586e6bc66df60dfe31c9e8e0543af84207b0`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/433a73c2-dc3e-44a6-85e6-2b995d31703a
