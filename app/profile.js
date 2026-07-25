@@ -491,7 +491,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
-            style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 4, backgroundColor: '#0B0B0C', borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 16, backgroundColor: '#0B0B0C', borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flex: 1 }}>
               <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', marginRight: isRTL ? 0 : 12, marginLeft: isRTL ? 12 : 0 }}>
@@ -501,7 +501,10 @@ export default function ProfileScreen() {
                 <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
                   {locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}
                 </Text>
-                <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2, textAlign: isRTL ? 'right' : 'left' }}>
+                <Text
+                  numberOfLines={2}
+                  style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, lineHeight: 16, marginTop: 2, textAlign: isRTL ? 'right' : 'left' }}
+                >
                   {(() => {
                     // Trade terms instead of the −50% (already shown on the
                     // Discount pill above): consignment agreement + credit.
