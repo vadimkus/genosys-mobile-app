@@ -26,5 +26,6 @@ images but had no pinch / pan / double-tap zoom.
 - Branch: `production`
 - Runtime: `1.11.0`
 - Platforms: iOS and Android
-- Update group: _(filled after publish)_
-- Dashboard: _(filled after publish)_
+- Update group: `ee95574f-0103-4a5e-be0e-ecc26e665251`
+- Source commit: `562fe47d6bf3878d9ef14fa7bfed2e8b383db3ce`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/ee95574f-0103-4a5e-be0e-ecc26e665251
