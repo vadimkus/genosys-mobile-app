@@ -79,6 +79,11 @@ function ZoomableImage({ source, isActive, onZoomChange }) {
     .onUpdate((e) => {
       const next = Math.min(Math.max(savedScale.value * e.scale, MIN_SCALE), MAX_SCALE);
       scale.value = next;
+      // While pinching back to 1×, clear pan offset so the frame doesn't stick.
+      if (next <= 1.01) {
+        translateX.value = 0;
+        translateY.value = 0;
+      }
     })
     .onEnd(() => {
       if (scale.value <= 1.05) {
@@ -90,14 +95,29 @@ function ZoomableImage({ source, isActive, onZoomChange }) {
       }
     });
 
+  // Pan must FAIL when not zoomed — otherwise it steals the horizontal
+  // swipe from FlatList even if onUpdate is a no-op (scroll stays stuck).
   const pan = Gesture.Pan()
     .averageTouches(true)
+    .manualActivation(true)
+    .onTouchesMove((_, state) => {
+      if (scale.value > 1.05) {
+        state.activate();
+      } else {
+        state.fail();
+      }
+    })
     .onUpdate((e) => {
-      if (scale.value <= 1.01) return;
+      if (scale.value <= 1.05) return;
       translateX.value = savedTX.value + e.translationX;
       translateY.value = savedTY.value + e.translationY;
     })
     .onEnd(() => {
+      if (scale.value <= 1.05) {
+        savedTX.value = 0;
+        savedTY.value = 0;
+        return;
+      }
       savedTX.value = translateX.value;
       savedTY.value = translateY.value;
     });
