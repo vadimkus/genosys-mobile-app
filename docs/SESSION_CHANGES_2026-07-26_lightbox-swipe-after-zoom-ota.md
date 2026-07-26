@@ -23,4 +23,7 @@ again after zoom-out. Pinch-out clears translate offsets at 1×.
 
 - Branch: `production`
 - Runtime: `1.11.0`
-- (group filled after publish)
+- Platforms: iOS and Android
+- Update group: `d413042f-8bd5-4310-b30d-d3fd0d36e543`
+- Source commit: `e87e31c`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/d413042f-8bd5-4310-b30d-d3fd0d36e543
