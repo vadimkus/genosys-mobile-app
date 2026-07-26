@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [App Footer Pressable Haptic OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-pressable-haptic-ota.md) | Whole footer card opens genosys.ae with medium haptic; original white styling kept. Runtime 1.11.0 (group `6cb45b04`). |
 | [App Footer Restore Original OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-restore-original-ota.md) | Reverted footer to original white wordmark / white links on graphite card. Runtime 1.11.0 (group `8448ee5f`). |
 | [App Footer Gold Frame OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-gold-frame-ota.md) | Certificate-style gold double frame (superseded by restore). Runtime 1.11.0 (group `f82c54dd`). |
 | [App Footer Freeze Hotfix OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-freeze-hotfix-ota.md) | Removed continuous gold shimmer that froze Account scroll. Static gold footer kept. Runtime 1.11.0 (group `0b3cfd0b`). |

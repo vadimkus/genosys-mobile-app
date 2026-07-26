@@ -13,4 +13,7 @@ Press opacity feedback only (no gold frame / no continuous animation).
 
 - Branch: `production`
 - Runtime: `1.11.0`
-- (group filled after publish)
+- Platforms: iOS and Android
+- Update group: `6cb45b04-6f96-4dac-a8a3-0b3528b371d0`
+- Source commit: `8ce2f45`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/6cb45b04-6f96-4dac-a8a3-0b3528b371d0
