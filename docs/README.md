@@ -10,7 +10,8 @@
 
 | Doc | Description |
 |-----|-------------|
-| [App Footer Gold Frame OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-gold-frame-ota.md) | Certificate-style gold double frame, top bar, corners; pressable + haptic. No continuous animation. Runtime 1.11.0 (group `f82c54dd`). |
+| [App Footer Restore Original OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-restore-original-ota.md) | Reverted footer to original white wordmark / white links on graphite card. Runtime 1.11.0 (group `8448ee5f`). |
+| [App Footer Gold Frame OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-gold-frame-ota.md) | Certificate-style gold double frame (superseded by restore). Runtime 1.11.0 (group `f82c54dd`). |
 | [App Footer Freeze Hotfix OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-freeze-hotfix-ota.md) | Removed continuous gold shimmer that froze Account scroll. Static gold footer kept. Runtime 1.11.0 (group `0b3cfd0b`). |
 | [App Footer Gold Shimmer OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-gold-shimmer-ota.md) | Luxury gold shimmer + glow on the shared GENOSYS brand footer (web certificate pattern). Runtime 1.11.0 (group `3f146568`) — **superseded by freeze hotfix**. |
 | [Lightbox Swipe After Zoom OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_lightbox-swipe-after-zoom-ota.md) | Restores left/right image paging after zoom-out in the product lightbox. Runtime 1.11.0 (group `d413042f`). |

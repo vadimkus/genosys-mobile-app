@@ -12,4 +12,7 @@ and pressable-card wrapping.
 
 - Branch: `production`
 - Runtime: `1.11.0`
-- (group filled after publish)
+- Platforms: iOS and Android
+- Update group: `8448ee5f-74a0-4a81-b9ea-a14a5e8af8d4`
+- Source commit: `9d40588`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/8448ee5f-74a0-4a81-b9ea-a14a5e8af8d4
