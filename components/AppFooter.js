@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  TouchableOpacity,
-  Linking,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import * as haptics from '../utils/haptics';
@@ -14,10 +7,18 @@ import { colors } from '../utils/theme';
 import { useLocalization } from '../contexts/LocalizationContext';
 
 /**
- * Shared app footer — brand block for Account / About / Brand / Training.
+ * Shared app footer — single source of truth for the brand block shown
+ * at the bottom of Account, About, Brand, Training and similar screens.
  *
- * Corporate dark card with white type. Whole card is pressable (opens
- * genosys.ae + medium haptic); website / email links keep their own targets.
+ * Corporate dark card:
+ *   ┌────────────────────────────────┐
+ *   │        G E N O S Y S           │
+ *   │  Official Distributor in the UAE │
+ *   │  ─────────── divider ────────── │
+ *   │   🌐 genosys.ae   ✉ sales@…    │
+ *   │ © 2026 Genosys Middle East FZ-LLC │
+ *   │      All rights reserved · v…  │
+ *   └────────────────────────────────┘
  */
 export default function AppFooter({ tagline, showVersion = true, style }) {
   const { locale } = useLocalization();
@@ -42,20 +43,13 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
   if (showVersion && version) legalParts.push(`v${version}`);
 
   const open = (url) => {
-    haptics.mediumTap();
+    haptics.lightTap();
     Linking.openURL(url).catch(() => {});
   };
 
-  const openSite = () => open('https://www.genosys.ae');
-
   return (
     <View style={[styles.wrap, style]}>
-      <Pressable
-        onPress={openSite}
-        accessibilityRole="link"
-        accessibilityLabel="GENOSYS — www.genosys.ae"
-        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      >
+      <View style={styles.card}>
         <Text style={styles.wordmark}>GENOSYS</Text>
         <Text style={styles.tagline}>{tagline || defaultTagline}</Text>
 
@@ -87,7 +81,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
 
         <Text style={styles.legal}>© {year} Genosys Middle East FZ-LLC</Text>
         <Text style={styles.legalSub}>{legalParts.join('  ·  ')}</Text>
-      </Pressable>
+      </View>
     </View>
   );
 }
@@ -98,14 +92,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   card: {
+    // Soft graphite — corporate but not harsh black
     backgroundColor: '#3C4043',
     borderRadius: 16,
     paddingVertical: 22,
     paddingHorizontal: 20,
     alignItems: 'center',
-  },
-  cardPressed: {
-    opacity: 0.88,
   },
   wordmark: {
     fontSize: 15,
