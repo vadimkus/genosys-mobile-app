@@ -26,4 +26,7 @@ From `CertificateClient.tsx` gold treatment:
 
 - Branch: `production`
 - Runtime: `1.11.0`
-- (group filled after publish)
+- Platforms: iOS and Android
+- Update group: `f82c54dd-62b0-4ec4-981e-5084767cfd29`
+- Source commit: `a96d5b7`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/f82c54dd-62b0-4ec4-981e-5084767cfd29
