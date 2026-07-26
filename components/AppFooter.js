@@ -63,7 +63,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
             accessibilityRole="link"
             accessibilityLabel="www.genosys.ae"
           >
-            <Ionicons name="globe-outline" size={13} color="rgba(255,255,255,0.85)" />
+            <Ionicons name="globe-outline" size={13} color="#FFFFFF" />
             <Text style={styles.linkText}>genosys.ae</Text>
           </TouchableOpacity>
           <View style={styles.linkSeparator} />
@@ -74,7 +74,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
             accessibilityRole="link"
             accessibilityLabel="sales@genosys.ae"
           >
-            <Ionicons name="mail-outline" size={13} color="rgba(255,255,255,0.85)" />
+            <Ionicons name="mail-outline" size={13} color="#FFFFFF" />
             <Text style={styles.linkText}>sales@genosys.ae</Text>
           </TouchableOpacity>
         </View>
@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   card: {
-    // Soft graphite — corporate but not harsh black
-    backgroundColor: '#3C4043',
+    // Match Partner Portal card on Account (`#0B0B0C` + white type)
+    backgroundColor: '#0B0B0C',
     borderRadius: 16,
     paddingVertical: 22,
     paddingHorizontal: 20,
@@ -103,11 +103,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 5,
-    color: colors.white,
+    color: '#FFFFFF',
   },
   tagline: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.55)',
+    color: 'rgba(255,255,255,0.7)',
     marginTop: 5,
     textAlign: 'center',
   },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
+    color: '#FFFFFF',
   },
   linkSeparator: {
     width: StyleSheet.hairlineWidth,
@@ -142,13 +142,13 @@ const styles = StyleSheet.create({
   },
   legal: {
     fontSize: 10.5,
-    color: 'rgba(255,255,255,0.45)',
+    color: 'rgba(255,255,255,0.6)',
     marginTop: 14,
     textAlign: 'center',
   },
   legalSub: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.35)',
+    color: 'rgba(255,255,255,0.45)',
     marginTop: 3,
     textAlign: 'center',
     letterSpacing: 0.3,
