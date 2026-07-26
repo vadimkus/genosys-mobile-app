@@ -31,5 +31,6 @@ No new native dependencies — OTA-compatible on runtime `1.11.0`.
 - Branch: `production`
 - Runtime: `1.11.0`
 - Platforms: iOS and Android
-- Update group: _(filled after publish)_
-- Dashboard: _(filled after publish)_
+- Update group: `3f146568-e3df-43fe-b581-04cbdaef88ff`
+- Source commit: `c80ffe9`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/3f146568-e3df-43fe-b581-04cbdaef88ff
