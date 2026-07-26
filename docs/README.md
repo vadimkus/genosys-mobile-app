@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [App Footer Partner Portal Colors OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-partner-portal-colors-ota.md) | Footer `#0B0B0C` + bright white type to match Partner Portal card. Runtime 1.11.0 (group `6498a956`). |
 | [App Footer Revert Pressable OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-revert-pressable-ota.md) | Reverted whole-card pressable; original graphite card, links only. Runtime 1.11.0 (group `921c74ef`). |
 | [App Footer Pressable Haptic OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-pressable-haptic-ota.md) | Whole footer card opens genosys.ae with medium haptic (superseded). Runtime 1.11.0 (group `6cb45b04`). |
 | [App Footer Restore Original OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-restore-original-ota.md) | Reverted footer to original white wordmark / white links on graphite card. Runtime 1.11.0 (group `8448ee5f`). |

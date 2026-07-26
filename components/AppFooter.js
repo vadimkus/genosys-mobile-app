@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native'
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import * as haptics from '../utils/haptics';
-import { colors } from '../utils/theme';
 import { useLocalization } from '../contexts/LocalizationContext';
 
 /**
