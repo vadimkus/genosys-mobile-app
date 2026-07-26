@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [App Footer Gold Shimmer OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-gold-shimmer-ota.md) | Luxury gold shimmer + glow on the shared GENOSYS brand footer (web certificate pattern). Runtime 1.11.0. |
 | [PDP Lightbox Pinch Zoom OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_lightbox-pinch-zoom-ota.md) | Adds pinch / pan / double-tap zoom to the full-screen product image viewer. Runtime 1.11.0 (group `ee95574f`). |
 | [Profile Partner Card Spacing OTA (2026-07-21)](./SESSION_CHANGES_2026-07-21_profile-partner-card-spacing-ota.md) | Prevents the Partner Portal card from visually overlapping the Orders/Bag row on partner account profiles. Republished to production runtime 1.11.0 (group `433a73c2`). |
 | [Native Email Domain Validation (2026-07-21)](./SESSION_CHANGES_2026-07-21_email-domain-validation.md) | Prevents unreachable signup accounts with syntax checks, explicit “Did you mean?” provider corrections, and shared server-side MX/domain validation in EN/RU/AR. |
