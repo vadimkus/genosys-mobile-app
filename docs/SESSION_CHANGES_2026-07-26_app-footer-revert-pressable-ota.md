@@ -11,4 +11,7 @@ card again; only website / email links are tappable (light haptic).
 
 - Branch: `production`
 - Runtime: `1.11.0`
-- (group filled after publish)
+- Platforms: iOS and Android
+- Update group: `921c74ef-0a61-4480-8cbc-233c369a6be8`
+- Source commit: `fda6642`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/921c74ef-0a61-4480-8cbc-233c369a6be8
