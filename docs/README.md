@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [AFS PC19 Intertek Pairing OTA (2026-07-30)](./SESSION_CHANGES_2026-07-30_afs-pc19-intertek-pairing-ota.md) | Removes MultiEx BSASM from AFS+barrier cream pairing; Centella/Allantoin + NMF. Runtime 1.11.0 (group `c8f6679c`). |
 | [Bakuchiol AM/PM Pairing OTA (2026-07-28)](./SESSION_CHANGES_2026-07-28_bakuchiol-ampm-pairing-ota.md) | Serum/cream Perfect Combination copy is AM & PM layering, not day/night split. Runtime 1.11.0 (group `f7867606`). |
 | [App Footer Partner Portal Colors OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-partner-portal-colors-ota.md) | Footer `#0B0B0C` + bright white type to match Partner Portal card. Runtime 1.11.0 (group `6498a956`). |
 | [App Footer Revert Pressable OTA (2026-07-26)](./SESSION_CHANGES_2026-07-26_app-footer-revert-pressable-ota.md) | Reverted whole-card pressable; original graphite card, links only. Runtime 1.11.0 (group `921c74ef`). |
