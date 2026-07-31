@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [CI Splash Verification SDK 57 Fix (2026-07-31)](./SESSION_CHANGES_2026-07-31_ci-splash-verification-sdk57.md) | Updates the release smoke for the SDK 57 splash plugin and re-syncs tracked iOS launch assets. |
 | [Product Video Native Aspect Ratio (2026-07-31)](./SESSION_CHANGES_2026-07-31_product-video-native-aspect-ratio.md) | Removes dark letterbox corners by sizing the native PDP player from each video's actual track dimensions. |
 | [AFS PC19 Intertek Pairing OTA (2026-07-30)](./SESSION_CHANGES_2026-07-30_afs-pc19-intertek-pairing-ota.md) | Removes MultiEx BSASM from AFS+barrier cream pairing; Centella/Allantoin + NMF. Runtime 1.11.0 (group `c8f6679c`). |
 | [Bakuchiol AM/PM Pairing OTA (2026-07-28)](./SESSION_CHANGES_2026-07-28_bakuchiol-ampm-pairing-ota.md) | Serum/cream Perfect Combination copy is AM & PM layering, not day/night split. Runtime 1.11.0 (group `f7867606`). |

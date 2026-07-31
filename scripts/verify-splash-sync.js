@@ -88,21 +88,28 @@ function readJson(filePath) {
 
 const appConfig = readJson(appJsonPath)
 
-// 1. app.json must declare assets/splash.png as the splash image (root + iOS).
-//    If someone repoints to a different file, the iOS imageset will quietly
-//    drift on the next prebuild and we won't catch it without this check.
+// 1. app.json must declare assets/splash.png as the splash image.
+//    SDK 57 uses the expo-splash-screen plugin; older configs used root + iOS
+//    splash fields. Accept either shape so this guard survives Expo upgrades
+//    while still enforcing the same source asset.
+const splashPlugin = appConfig?.expo?.plugins?.find(
+  (plugin) => Array.isArray(plugin) && plugin[0] === 'expo-splash-screen',
+)
+const declaredPlugin = splashPlugin?.[1]?.image
 const declaredRoot = appConfig?.expo?.splash?.image
 const declaredIos = appConfig?.expo?.ios?.splash?.image
 const expectedDeclared = './assets/splash.png'
-if (declaredRoot !== expectedDeclared) {
+if (declaredPlugin) {
+  if (declaredPlugin !== expectedDeclared) {
+    fail(
+      `app.json expo-splash-screen image is "${declaredPlugin}", expected "${expectedDeclared}". ` +
+        `If you intentionally moved the splash image, also re-sync the iOS imageset (see this script's header) and update this check.`,
+    )
+  }
+} else if (declaredRoot !== expectedDeclared || declaredIos !== expectedDeclared) {
   fail(
-    `app.json expo.splash.image is "${declaredRoot}", expected "${expectedDeclared}". ` +
+    `app.json legacy splash images are root="${declaredRoot}", iOS="${declaredIos}", expected "${expectedDeclared}". ` +
       `If you intentionally moved the splash image, also re-sync the iOS imageset (see this script's header) and update this check.`,
-  )
-}
-if (declaredIos !== expectedDeclared) {
-  fail(
-    `app.json expo.ios.splash.image is "${declaredIos}", expected "${expectedDeclared}".`,
   )
 }
 
