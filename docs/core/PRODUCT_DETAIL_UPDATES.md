@@ -37,7 +37,8 @@ Major improvements to the product detail screen (`app/product/[id].js`) covering
 - Shows the product image as a thumbnail with a red play button overlay
 - On tap, replaces the thumbnail with a `VideoView` (expo-video) + `nativeControls`, and calls `player.play()`
 - Error handling: if video fails (`statusChange → 'error'`), the section is hidden gracefully
-- Uses 16:9 aspect ratio calculated from screen width
+- Uses each loaded video's native aspect ratio from `expo-video` track metadata
+  (9:16 fallback while loading), so portrait clips do not get black side bars
 - Added `product.video` translation key to EN, AR, RU (later removed the title text since "Video" label was unnecessary)
 
 **Files changed:**

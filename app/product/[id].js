@@ -123,6 +123,9 @@ const log = createLogger('ProductDetail');
 function ProductVideo({ videoUrl }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  // Most product clips are portrait. Replace this fallback with the source's
+  // real dimensions as soon as expo-video reports its tracks.
+  const [videoAspectRatio, setVideoAspectRatio] = useState(9 / 16);
 
   const player = useVideoPlayer({ uri: videoUrl }, (p) => {
     p.loop = false;
@@ -131,13 +134,31 @@ function ProductVideo({ videoUrl }) {
 
   useEffect(() => {
     if (!player) return undefined;
-    const sub = player.addListener('statusChange', ({ status, error }) => {
+    const adoptTrackAspectRatio = (tracks) => {
+      const track = tracks?.find(
+        ({ size }) => Number(size?.width) > 0 && Number(size?.height) > 0
+      );
+      if (track) {
+        setVideoAspectRatio(track.size.width / track.size.height);
+      }
+    };
+    const statusSub = player.addListener('statusChange', ({ status, error }) => {
       if (status === 'error') {
         log.error('Video playback error', error?.message || 'unknown');
         setVideoError(true);
+      } else if (status === 'readyToPlay') {
+        adoptTrackAspectRatio(
+          player.videoTrack ? [player.videoTrack] : player.availableVideoTracks
+        );
       }
     });
-    return () => sub.remove();
+    const sourceSub = player.addListener('sourceLoad', ({ availableVideoTracks }) => {
+      adoptTrackAspectRatio(availableVideoTracks);
+    });
+    return () => {
+      statusSub.remove();
+      sourceSub.remove();
+    };
   }, [player]);
 
   const handlePlay = async () => {
@@ -187,7 +208,7 @@ function ProductVideo({ videoUrl }) {
 
   return (
     <View style={videoStyles.section}>
-      <View style={videoStyles.container}>
+      <View style={[videoStyles.container, { aspectRatio: videoAspectRatio }]}>
         <VideoView
           player={player}
           style={videoStyles.player}
@@ -199,8 +220,6 @@ function ProductVideo({ videoUrl }) {
   );
 }
 
-const VIDEO_HEIGHT = Math.round((SCREEN_WIDTH - 40) * 9 / 16);
-
 const videoStyles = StyleSheet.create({
   section: {
     marginBottom: 32,
@@ -211,10 +230,10 @@ const videoStyles = StyleSheet.create({
     marginBottom: 16,
   },
   container: {
+    width: '100%',
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#000',
-    height: VIDEO_HEIGHT,
+    backgroundColor: '#fff',
   },
   compactWrapper: {
     alignItems: 'center',
