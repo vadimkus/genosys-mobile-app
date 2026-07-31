@@ -15,6 +15,8 @@ dark rounded corners.
   portrait.
 - Keep `contentFit="contain"` so no video content is cropped.
 - Use a white fallback background instead of black.
+- Restore the `playToEnd` listener: rewind to zero and collapse the completed
+  player back into the compact play button.
 
 This works for both portrait and landscape videos without maintaining a
 filename allowlist.

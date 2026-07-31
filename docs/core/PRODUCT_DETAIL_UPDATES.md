@@ -39,6 +39,7 @@ Major improvements to the product detail screen (`app/product/[id].js`) covering
 - Error handling: if video fails (`statusChange → 'error'`), the section is hidden gracefully
 - Uses each loaded video's native aspect ratio from `expo-video` track metadata
   (9:16 fallback while loading), so portrait clips do not get black side bars
+- On `playToEnd`, rewinds and collapses back to the compact play button
 - Added `product.video` translation key to EN, AR, RU (later removed the title text since "Video" label was unnecessary)
 
 **Files changed:**

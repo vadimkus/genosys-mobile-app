@@ -155,9 +155,16 @@ function ProductVideo({ videoUrl }) {
     const sourceSub = player.addListener('sourceLoad', ({ availableVideoTracks }) => {
       adoptTrackAspectRatio(availableVideoTracks);
     });
+    const endSub = player.addListener('playToEnd', () => {
+      // Restore the compact play button after playback, matching the website.
+      // Rewind so tapping the button again starts from the beginning.
+      player.currentTime = 0;
+      setIsPlaying(false);
+    });
     return () => {
       statusSub.remove();
       sourceSub.remove();
+      endSub.remove();
     };
   }, [player]);
 
