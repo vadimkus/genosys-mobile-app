@@ -31,3 +31,12 @@ filename allowlist.
 - iOS Expo export
 - Android Expo export
 
+## Production OTA
+
+- Branch/channel: `production`
+- Runtime: `1.11.0`
+- Platforms: iOS and Android
+- Update group: `faabfe4e-59d1-48ad-9d70-0342e0b9ca45`
+- Message: `Fix product video aspect ratio and remove dark corners`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/faabfe4e-59d1-48ad-9d70-0342e0b9ca45
+
