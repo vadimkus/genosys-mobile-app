@@ -114,4 +114,8 @@ an iframe. The loading overlay was not the cause because it explicitly used
 - Runtime: `1.11.0`
 - Platforms: iOS and Android
 - Message: `Fix iOS Product Guide PDF scrolling`
-- Update group: pending publication
+- Update group: `2248f860-ea03-4108-957a-631cb6d8d2b0`
+- Android update: `019fd64b-5be9-7173-9066-7e74ba9be351`
+- iOS update: `019fd64b-5be9-72b6-8cc7-474bfa4b7acd`
+- App commit: `6bcf907bcf8d5039547107f1b6496cfb112ff162`
+- Dashboard: <https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/2248f860-ea03-4108-957a-631cb6d8d2b0>
