@@ -15,6 +15,7 @@ const CHAT_HIDDEN_ROUTES = [
   '/payment/',             // payment screens
   '/auth/',                // login, register, forgot-password, reset-password
   '/webview',              // legacy webview screens
+  '/product-guide',        // dedicated PDF viewer with its own controls
   '/skin-analysis',        // skin analysis quiz
   '/skin-analysis-camera', // camera screen
   '/bundle-builder',       // build your set
@@ -129,6 +130,14 @@ export default function AuthWrapper() {
             presentation: 'card',
             gestureEnabled: true
           }} 
+        />
+        <Stack.Screen
+          name="product-guide"
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            gestureEnabled: true,
+          }}
         />
         <Stack.Screen 
           name="profile/edit" 

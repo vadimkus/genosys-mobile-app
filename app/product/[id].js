@@ -642,6 +642,21 @@ function ProductDetailScreen() {
     }
   };
 
+  const handleOpenProductGuide = useCallback((doc) => {
+    if (!doc?.url) return;
+    haptics.lightTap();
+    const localizedTitle = doc.isBrochure
+      ? (t('product.brochure') || doc.title)
+      : (doc.title || t('productGuide.title'));
+    router.push({
+      pathname: '/product-guide',
+      params: {
+        url: doc.url,
+        title: localizedTitle,
+      },
+    });
+  }, [t]);
+
   const formatDescription = (text) => {
     if (!text) return '';
     
@@ -1488,7 +1503,11 @@ function ProductDetailScreen() {
                   <TouchableOpacity
                     key={`doc-${index}`}
                     style={[styles.docLink, isRTL && { flexDirection: 'row-reverse' }]}
-                    onPress={() => Linking.openURL(doc.url).catch(() => {})}
+                    onPress={() => handleOpenProductGuide(doc)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('productGuide.openDocument', {
+                      title: doc.isBrochure ? (t('product.brochure') || doc.title) : doc.title,
+                    })}
                   >
                     <Ionicons name="document-text-outline" size={20} color={colors.blue} />
                     <Text style={[styles.docLinkText, isRTL && { textAlign: 'right' }]} numberOfLines={2}>
