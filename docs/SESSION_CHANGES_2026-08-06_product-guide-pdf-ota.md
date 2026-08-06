@@ -12,10 +12,12 @@ leaving GENOSYS through `Linking.openURL`.
   sections.
 - Native Download, Share, and Open Externally actions remain visible below the
   document.
-- The production `genosys.ae/pdf-viewer` is embedded through the existing
-  `react-native-webview` dependency. An iOS viewer user agent is used on both
-  platforms so the website selects its Google Docs rendering path instead of
-  relying on Android WebView to render a raw PDF.
+- iOS loads the canonical PDF as the top-level WKWebView document, using
+  WebKit's native multi-page PDF renderer for vertical scrolling and pinch zoom.
+- Android embeds the production `genosys.ae/pdf-viewer` through the existing
+  `react-native-webview` dependency and uses an iOS viewer user agent so the
+  website selects its Google Docs rendering path instead of relying on Android
+  WebView to render a raw PDF.
 - Website toolbar, navigation, footer, and chat controls are hidden so the
   document is framed only by native app chrome.
 - Loading percentage, progress bar, 30-second timeout, retry, HTTP/network error,
@@ -74,3 +76,42 @@ leaving GENOSYS through `Linking.openURL`.
 - iOS update: `019fd631-ac02-726c-a882-273000e8635e`
 - App commit: `f84387b8cfc1fef0adb106f114d51959e24f117c`
 - Dashboard: <https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/98dc00d6-5169-47d0-babe-9a5873515ec2>
+
+## iOS scrolling follow-up
+
+Production testing found that the original iOS implementation displayed page 1
+and the `1 / 27` page count, but vertical gestures did not move to later pages.
+
+### Root cause
+
+The native WebView loaded the GENOSYS HTML viewer as its top-level document. That
+viewer put Google Docs inside a fixed-height, cross-origin iframe whose parent
+was `overflow-hidden`. The injected cleanup expanded the iframe parent to
+`100vh`, but it could not remove the nested scroll boundary. iOS WKWebView does
+not reliably transfer touch scrolling into a PDF/document viewer nested inside
+an iframe. The loading overlay was not the cause because it explicitly used
+`pointerEvents="none"`.
+
+### Fix
+
+- iOS now loads the canonical HTTPS PDF directly as the top-level WKWebView
+  source. This removes the nested iframe and lets WKWebView's native PDF renderer
+  own vertical paging, horizontal interaction, and pinch zoom.
+- Android keeps the GENOSYS/Google viewer path because Android WebView does not
+  reliably render raw PDFs.
+- Scrolling, bounce, indicators, Android nested scrolling, and Android pinch
+  zoom are explicitly enabled.
+- Viewer cleanup injection and the forced iOS user agent now apply only to
+  Android; they cannot alter the iOS native PDF document.
+- Security remains unchanged: both the exact canonical PDF and exact viewer URL
+  were already allowlisted, while other top-level destinations remain blocked.
+- The product-guide smoke now fails if iOS is routed back through the iframe
+  viewer or if required scroll/zoom/touch properties disappear.
+
+### Replacement production OTA
+
+- Channel/branch: `production`
+- Runtime: `1.11.0`
+- Platforms: iOS and Android
+- Message: `Fix iOS Product Guide PDF scrolling`
+- Update group: pending publication

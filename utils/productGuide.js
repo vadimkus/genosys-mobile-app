@@ -25,6 +25,16 @@ export function buildProductGuideViewerUrl(pdfUrl) {
   return `${DEFAULT_ORIGIN}${VIEWER_PATH}?file=${encodeURIComponent(canonicalUrl)}`;
 }
 
+export function getProductGuideSourceUrl(pdfUrl, platform) {
+  const canonicalUrl = canonicalizeProductGuideUrl(pdfUrl);
+  if (!canonicalUrl) return null;
+
+  // WKWebView's top-level PDF renderer provides native multi-page scrolling
+  // and pinch zoom. Putting a document viewer inside the website iframe leaves
+  // iOS with nested scrolling, which WebKit does not reliably hand off.
+  return platform === 'ios' ? canonicalUrl : buildProductGuideViewerUrl(canonicalUrl);
+}
+
 export function isAllowedProductGuideNavigation(requestUrl, canonicalPdfUrl, options = {}) {
   if (!requestUrl || typeof requestUrl !== 'string') return false;
   if (requestUrl === 'about:blank') return true;

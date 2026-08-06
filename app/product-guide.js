@@ -23,9 +23,9 @@ import T from '../utils/typography';
 import * as haptics from '../utils/haptics';
 import { createLogger } from '../utils/logger';
 import {
-  buildProductGuideViewerUrl,
   canonicalizeProductGuideUrl,
   getProductGuideFilename,
+  getProductGuideSourceUrl,
   isAllowedProductGuideNavigation,
 } from '../utils/productGuide';
 
@@ -107,7 +107,10 @@ export default function ProductGuideScreen() {
   const downloadRef = useRef(null);
 
   const canonicalUrl = useMemo(() => canonicalizeProductGuideUrl(firstParam(params.url)), [params.url]);
-  const viewerUrl = useMemo(() => buildProductGuideViewerUrl(canonicalUrl), [canonicalUrl]);
+  const sourceUrl = useMemo(
+    () => getProductGuideSourceUrl(canonicalUrl, Platform.OS),
+    [canonicalUrl]
+  );
   const documentTitle = firstParam(params.title) || t('productGuide.title');
   const filename = useMemo(() => getProductGuideFilename(canonicalUrl), [canonicalUrl]);
 
@@ -132,10 +135,10 @@ export default function ProductGuideScreen() {
   }, [clearLoadTimeout]);
 
   useEffect(() => {
-    if (!viewerUrl) return undefined;
+    if (!sourceUrl) return undefined;
     armLoadTimeout();
     return clearLoadTimeout;
-  }, [viewerUrl, loadKey, armLoadTimeout, clearLoadTimeout]);
+  }, [sourceUrl, loadKey, armLoadTimeout, clearLoadTimeout]);
 
   const handleBack = useCallback(() => {
     haptics.lightTap();
@@ -303,9 +306,9 @@ export default function ProductGuideScreen() {
             <WebView
               key={loadKey}
               ref={webViewRef}
-              source={{ uri: viewerUrl }}
+              source={{ uri: sourceUrl }}
               style={styles.webview}
-              userAgent={IOS_VIEWER_USER_AGENT}
+              userAgent={Platform.OS === 'android' ? IOS_VIEWER_USER_AGENT : undefined}
               onLoadStart={() => {
                 setLoading(true);
                 setProgress(0);
@@ -313,11 +316,11 @@ export default function ProductGuideScreen() {
                 armLoadTimeout();
               }}
               onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress || 0)}
-                    onLoadEnd={() => {
-                      clearLoadTimeout();
-                      setLoading(false);
-                      setProgress(1);
-                    }}
+              onLoadEnd={() => {
+                clearLoadTimeout();
+                setLoading(false);
+                setProgress(1);
+              }}
               onError={({ nativeEvent }) => {
                 clearLoadTimeout();
                 setLoading(false);
@@ -325,7 +328,7 @@ export default function ProductGuideScreen() {
               }}
               onHttpError={({ nativeEvent }) => {
                 const failedMainDocument =
-                  nativeEvent.url === viewerUrl || nativeEvent.url === canonicalUrl;
+                  nativeEvent.url === sourceUrl || nativeEvent.url === canonicalUrl;
                 if (failedMainDocument && nativeEvent.statusCode >= 400) {
                   clearLoadTimeout();
                   setLoading(false);
@@ -345,9 +348,18 @@ export default function ProductGuideScreen() {
                 }
               }}
               onShouldStartLoadWithRequest={allowNavigation}
-              injectedJavaScript={injectedViewerCleanup}
+              injectedJavaScript={Platform.OS === 'android' ? injectedViewerCleanup : undefined}
               javaScriptEnabled
               domStorageEnabled
+              scrollEnabled
+              bounces
+              directionalLockEnabled={false}
+              nestedScrollEnabled
+              setBuiltInZoomControls
+              setDisplayZoomControls={false}
+              showsVerticalScrollIndicator
+              showsHorizontalScrollIndicator
+              contentMode="mobile"
               startInLoadingState={false}
               setSupportMultipleWindows={false}
               allowsBackForwardNavigationGestures={false}

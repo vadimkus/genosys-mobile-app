@@ -5,6 +5,7 @@ import path from 'node:path';
 import {
   buildProductGuideViewerUrl,
   canonicalizeProductGuideUrl,
+  getProductGuideSourceUrl,
   isAllowedProductGuideNavigation,
 } from '../utils/productGuide.js';
 
@@ -25,6 +26,16 @@ const withEncodedAmpersand =
   'https://genosys.ae/documents/PPT/GENOSYS%20SKIN%20DEFENDER%20LIP%20%26%20EYE.pdf';
 const ampViewer = buildProductGuideViewerUrl(withEncodedAmpersand);
 assert.match(ampViewer, /%2526/, 'encoded %26 must survive the viewer query encoding layer');
+assert.equal(
+  getProductGuideSourceUrl(withEncodedAmpersand, 'ios'),
+  withEncodedAmpersand,
+  'iOS must load the PDF as the top-level WKWebView document so native scrolling is available'
+);
+assert.equal(
+  getProductGuideSourceUrl(withEncodedAmpersand, 'android'),
+  ampViewer,
+  'Android must retain the HTML viewer because Android WebView cannot reliably render raw PDFs'
+);
 assert.ok(isAllowedProductGuideNavigation(ampViewer, withEncodedAmpersand));
 assert.ok(isAllowedProductGuideNavigation(withEncodedAmpersand, withEncodedAmpersand));
 assert.ok(
@@ -58,5 +69,23 @@ assert.doesNotMatch(
 const authWrapperSource = readFileSync(path.join(root, 'app/AuthWrapper.js'), 'utf8');
 assert.match(authWrapperSource, /name="product-guide"/);
 assert.match(authWrapperSource, /['"]\/product-guide['"]/);
+
+const guideSource = readFileSync(path.join(root, 'app/product-guide.js'), 'utf8');
+assert.match(guideSource, /getProductGuideSourceUrl\(canonicalUrl,\s*Platform\.OS\)/);
+assert.match(guideSource, /source=\{\{\s*uri:\s*sourceUrl\s*\}\}/);
+assert.doesNotMatch(
+  guideSource,
+  /source=\{\{\s*uri:\s*viewerUrl\s*\}\}/,
+  'regression: an iframe-backed viewer as the iOS top-level source gets stuck on page one'
+);
+assert.match(
+  guideSource,
+  /injectedJavaScript=\{Platform\.OS === ['"]android['"] \? injectedViewerCleanup : undefined\}/
+);
+assert.match(guideSource, /\bscrollEnabled\b/);
+assert.match(guideSource, /\bnestedScrollEnabled\b/);
+assert.match(guideSource, /\bsetBuiltInZoomControls\b/);
+assert.match(guideSource, /\bshowsVerticalScrollIndicator\b/);
+assert.match(guideSource, /loadingOverlay[\s\S]*pointerEvents="none"/);
 
 console.log('Product guide smoke checks passed');
