@@ -69,4 +69,8 @@ leaving GENOSYS through `Linking.openURL`.
 - Runtime: `1.11.0`
 - Platforms: iOS and Android
 - Message: `Add polished in-app product guide PDF viewer`
-- Update group: pending publication
+- Update group: `98dc00d6-5169-47d0-babe-9a5873515ec2`
+- Android update: `019fd631-ac02-77aa-942e-250b922c1a3e`
+- iOS update: `019fd631-ac02-726c-a882-273000e8635e`
+- App commit: `f84387b8cfc1fef0adb106f114d51959e24f117c`
+- Dashboard: <https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/98dc00d6-5169-47d0-babe-9a5873515ec2>
