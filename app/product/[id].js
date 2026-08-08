@@ -38,6 +38,7 @@ import ProductReviews from '../../components/product/ProductReviews';
 import TrustBadges from '../../components/product/TrustBadges';
 import CollapsibleSection from '../../components/product/CollapsibleSection';
 import ImageLightbox from '../../components/product/ImageLightbox';
+import ProductQuickFactsCard from '../../components/product/ProductQuickFactsCard';
 import Toast from '../../components/Toast';
 import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
 import * as haptics from '../../utils/haptics';
@@ -1479,6 +1480,10 @@ function ProductDetailScreen() {
               </Text>
             )}
           </View>
+
+          {/* API-driven Quick Facts. Content/localization lives on the website
+              backend, so future catalog edits require no app release. */}
+          <ProductQuickFactsCard facts={product?.quickFacts} />
 
             {/* Enhanced Product Variant Selector */}
             {((product.variants && product.variants.length > 0) || 
