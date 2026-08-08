@@ -530,7 +530,17 @@ function ProductDetailScreen() {
     };
 
     const qty = Math.max(1, Number(quantity) || 1);
-    addItem(productForCart, qty, selectedColor, selectedSize);
+    const added = addItem(productForCart, qty, selectedColor, selectedSize);
+    if (added === false) {
+      haptics.warning();
+      Alert.alert(
+        t('checkout.variantRequiredTitle'),
+        t('checkout.variantRequiredMessage', {
+          products: getLocalizedProductName(product, locale) || product.name,
+        })
+      );
+      return;
+    }
     setQuantity(1);
     haptics.success();
 

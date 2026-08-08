@@ -8,6 +8,7 @@ import {
   isOptionAvailable,
   isProductOptionSelectionRequired,
   isProductSelectionComplete,
+  loadCanonicalProductForQuickAdd,
 } from '../utils/productOptions.js';
 
 const sizeProduct = {
@@ -150,4 +151,29 @@ assert.equal(cart.size, 2);
 assert.equal(cart.get(beigeKey), 3);
 assert.equal(cart.get(ivoryKey), 1);
 
-console.log('Product option selection smoke tests passed.');
+const syncedFavoriteSummary = {
+  id: sizeProduct.id,
+  name: sizeProduct.name,
+  price: sizeProduct.price,
+};
+let requestedFavoriteId = '';
+
+loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async (productId) => {
+  requestedFavoriteId = productId;
+  return sizeProduct;
+})
+  .then(async (canonicalFavorite) => {
+    assert.equal(requestedFavoriteId, sizeProduct.id);
+    assert.equal(canonicalFavorite, sizeProduct);
+    assert.equal(isProductOptionSelectionRequired(canonicalFavorite), true);
+    assert.equal(isProductSelectionComplete(canonicalFavorite, {}), false);
+    await assert.rejects(
+      loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async () => null),
+      /PRODUCT_UNAVAILABLE/
+    );
+    console.log('Product option selection smoke tests passed (including stale favorite canonicalization).');
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });

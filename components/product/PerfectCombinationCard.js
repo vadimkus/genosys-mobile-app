@@ -11,6 +11,7 @@ import { isBeautyBoxProduct } from '../../utils/productRules';
 import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
 import { getLocalizedProductName } from '../../utils/productLocalization';
 import { asText } from '../../utils/productDetailUtils';
+import { isProductOptionSelectionRequired } from '../../utils/productOptions';
 import AUTH_CONFIG from '../../config/auth';
 import { colors } from '../../utils/theme';
 
@@ -202,11 +203,23 @@ export default function PerfectCombinationCard({ product, user, styles }) {
     if (!recommendedProduct) return '';
     return asText(getLocalizedProductName(recommendedProduct, locale) || recommendedProduct.name).trim();
   }, [recommendedProduct, locale]);
+  const requiresOptions = useMemo(
+    () => isProductOptionSelectionRequired(recommendedProduct),
+    [recommendedProduct]
+  );
 
   const handleOpenRecommended = useCallback(() => {
     if (!recommendedProductId) return;
     router.push({ pathname: '/product/[id]', params: { id: recommendedProductId } });
   }, [recommendedProductId]);
+
+  const handleLogin = useCallback(() => {
+    const returnId = getProductIdForCombo(product);
+    router.push({
+      pathname: '/auth/login',
+      params: { returnTo: returnId ? `/product/${returnId}` : '/(tabs)/shop' },
+    });
+  }, [product]);
 
   const defaultRecSize = useMemo(() => {
     const variants = recommendedProduct?.variants;
@@ -234,9 +247,20 @@ export default function PerfectCombinationCard({ product, user, styles }) {
 
   const handleAddRecommendedToBag = useCallback(() => {
     if (!recommendedProduct || recommendedProduct.isPriceOnRequest) return;
+    if (!user) {
+      handleLogin();
+      return;
+    }
+    if (requiresOptions) {
+      handleOpenRecommended();
+      return;
+    }
     try {
-      // If recommended product has variants, add the default variant to keep cart keys consistent.
-      addItem(recommendedProduct, 1, '', defaultRecSize || '');
+      const added = addItem(recommendedProduct, 1, '', defaultRecSize || '');
+      if (added === false) {
+        handleOpenRecommended();
+        return;
+      }
       Alert.alert(
         t('product.addedToBagTitle'),
         t('product.addedToBagMessage', { name: recommendedName || t('common.item') }),
@@ -248,7 +272,17 @@ export default function PerfectCombinationCard({ product, user, styles }) {
     } catch (e) {
       Alert.alert(t('common.error'), t('product.addToBagFailed'));
     }
-  }, [addItem, recommendedProduct, recommendedName, t, defaultRecSize]);
+  }, [
+    addItem,
+    defaultRecSize,
+    handleLogin,
+    handleOpenRecommended,
+    recommendedName,
+    recommendedProduct,
+    requiresOptions,
+    t,
+    user,
+  ]);
 
   if (!product || isBeautyBoxProduct(product)) return null;
   if (!recId) return null;
@@ -348,13 +382,44 @@ export default function PerfectCombinationCard({ product, user, styles }) {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={[styles.pcAddBtn, inBagForRec ? { backgroundColor: colors.greenDeep } : null]}
+              style={[
+                styles.pcAddBtn,
+                user && !requiresOptions && inBagForRec
+                  ? { backgroundColor: colors.greenDeep }
+                  : null,
+              ]}
               onPress={handleAddRecommendedToBag}
               activeOpacity={0.9}
+              accessibilityRole="button"
+              accessibilityLabel={
+                !user
+                  ? t('shop.loginToBuy')
+                  : requiresOptions
+                    ? `${t('variant.chooseOptions')} — ${recName}`
+                    : `${t('product.addToBag')} — ${recName}`
+              }
             >
-              <Ionicons name={inBagForRec ? 'checkmark' : 'bag-add'} size={16} color="#ffffff" />
+              <Ionicons
+                name={
+                  !user
+                    ? 'log-in-outline'
+                    : requiresOptions
+                      ? 'options-outline'
+                      : inBagForRec
+                        ? 'checkmark'
+                        : 'bag-add'
+                }
+                size={16}
+                color="#ffffff"
+              />
               <Text style={styles.pcAddBtnText}>
-                {inBagForRec ? t('product.inBag', { count: recQty || 1 }) : t('product.addToBag')}
+                {!user
+                  ? t('shop.loginToBuy')
+                  : requiresOptions
+                    ? t('variant.chooseOptions')
+                    : inBagForRec
+                      ? t('product.inBag', { count: recQty || 1 })
+                      : t('product.addToBag')}
               </Text>
             </TouchableOpacity>
           )}

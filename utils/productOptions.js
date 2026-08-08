@@ -114,6 +114,20 @@ export function isProductOptionSelectionRequired(product) {
   return extractProductOptions(product).requiresExplicitSelection;
 }
 
+export async function loadCanonicalProductForQuickAdd(product, loadProduct) {
+  const productId = normalizeValue(product?.id ?? product?.productNumber);
+  if (!productId || typeof loadProduct !== 'function') {
+    throw new Error('PRODUCT_UNAVAILABLE');
+  }
+
+  const canonicalProduct = await loadProduct(productId);
+  if (!canonicalProduct) {
+    throw new Error('PRODUCT_UNAVAILABLE');
+  }
+
+  return canonicalProduct;
+}
+
 export function isOptionAvailable(model, dimension, value, selection = {}) {
   const normalizedValue = normalizeValue(value);
   const options = dimension === 'size' ? model?.sizes : model?.colors;

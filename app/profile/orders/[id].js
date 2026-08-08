@@ -381,8 +381,14 @@ export default function OrderDetailScreen() {
           const product = await fetchProductById(productId, user, { locale });
           if (product) {
             // Add to cart with original size/color selection
-            await addItem(product, qty, color !== '__PROMO__' ? color : '', size !== '__PROMO__' ? size : '');
-            addedCount++;
+            const added = await addItem(
+              product,
+              qty,
+              color !== '__PROMO__' ? color : '',
+              size !== '__PROMO__' ? size : ''
+            );
+            if (added === false) failedCount++;
+            else addedCount++;
           } else {
             failedCount++;
           }

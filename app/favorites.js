@@ -18,7 +18,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../utils/productRules';
 import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
-import { isProductOptionSelectionRequired } from '../utils/productOptions';
+import {
+  isProductOptionSelectionRequired,
+  loadCanonicalProductForQuickAdd,
+} from '../utils/productOptions';
+import { isProductOutOfStock } from '../utils/stock';
+import { fetchProductById } from '../services/api';
 import { computeProductBadges } from '../utils/badges';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
@@ -67,7 +72,7 @@ export default function FavoritesScreen() {
 
   const handleAddToCart = async (product) => {
     haptics.mediumTap();
-    if (product.isPriceOnRequest) return; // price-on-request products cannot be added to cart
+    if (!product?.id || addingProducts.has(product.id) || product.isPriceOnRequest) return;
     if (!user) {
       Alert.alert(
         t('favorites.loginRequiredTitle'),
@@ -86,21 +91,29 @@ export default function FavoritesScreen() {
       return;
     }
 
-    if (product.status === 'out_of_stock' || product.stock === false) {
-      Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
-      return;
-    }
-    if (isProductOptionSelectionRequired(product)) {
-      router.push(`/product/${product.id}`);
-      return;
-    }
-
-    // Add to tracking set
+    // Server-synced favorites intentionally contain only summary fields. Always
+    // reload the canonical mobile contract before deciding whether quick-add is
+    // safe, otherwise a size/shade product can look like a simple product.
     setAddingProducts(prev => new Set([...prev, product.id]));
 
     try {
-      await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
-      log.debug('Added to bag from favorites', { productId: product?.id });
+      const canonicalProduct = await loadCanonicalProductForQuickAdd(
+        product,
+        (productId) => fetchProductById(productId, user, { locale })
+      );
+      if (canonicalProduct.isPriceOnRequest) return;
+      if (isProductOutOfStock(canonicalProduct)) {
+        Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
+        return;
+      }
+      if (isProductOptionSelectionRequired(canonicalProduct)) {
+        router.push(`/product/${canonicalProduct.id}`);
+        return;
+      }
+
+      const added = await addItem(canonicalProduct, 1, '', '');
+      if (added === false) throw new Error('PRODUCT_OPTIONS_REQUIRED');
+      log.debug('Added to bag from favorites', { productId: canonicalProduct.id });
     } catch (error) {
       log.error('Failed to add product to cart', error?.message || error);
       Alert.alert(t('common.error'), t('favorites.addToBagFailed'));
