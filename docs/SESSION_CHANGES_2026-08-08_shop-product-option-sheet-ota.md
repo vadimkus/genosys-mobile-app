@@ -162,8 +162,8 @@ option, price and availability data for all affected products.
 
 - Branch: `production`
 - Runtime: `1.11.0`
-- Commit: pending
-- Update group: pending
-- iOS update: pending
-- Android update: pending
-- Dashboard: pending
+- Commit: `bcb668cd48e9459533558aa265b9b3070bd1061e`
+- Update group: `92520eb8-513e-41ec-ace4-a1c4e00f78e7`
+- iOS update: `019fdfc0-70ae-7826-a5d9-a456f2034208`
+- Android update: `019fdfc0-70ae-742a-a43d-5922f66700df`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/92520eb8-513e-41ec-ace4-a1c4e00f78e7
