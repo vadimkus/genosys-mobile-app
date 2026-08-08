@@ -167,3 +167,55 @@ option, price and availability data for all affected products.
 - iOS update: `019fdfc0-70ae-7826-a5d9-a456f2034208`
 - Android update: `019fdfc0-70ae-742a-a43d-5922f66700df`
 - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/92520eb8-513e-41ec-ace4-a1c4e00f78e7
+
+## Adversarial post-release QA and replacement OTA
+
+The first production update was re-opened and audited against the live API rather
+than accepted from the initial release results. Two concrete secondary-entry
+defects were found:
+
+1. Server-synced Favorites contain summary product fields but no variants. The
+   Favorites quick-add guard could therefore misclassify a required-option
+   product as simple. Favorites now reload the canonical single-product mobile
+   contract before checking stock/options or adding. A failed/offline refresh
+   fails closed instead of adding stale data.
+2. The PDP Perfect Combination recommendation card explicitly chose the default
+   size when quick-adding and did not enforce the logged-out flow. It now shows
+   Login to Buy for guests, routes multi-option recommendations to their PDP,
+   and only quick-adds canonical single/no-option products. PDP add and Reorder
+   also respect a rejected cart add instead of reporting false success.
+
+Regression coverage now includes canonicalization of reduced/stale favorite
+records and fail-closed behavior when canonical data cannot be loaded.
+
+Post-fix verification:
+
+- Live catalog: `13/13` required-option products matched, `386` assertions.
+- CUID/product-number parity: Cerabarrier `66` ↔
+  `cmr6dajor031ygfnm6rsjkicf`; Revita Glow `63` ↔
+  `cmljaahes0017e9ex5yfv76en`.
+- Product 41: Beige, Ivory and Camel all AED 300; canonical image
+  `/images/cushion/main.jpeg`; shade labels/hex values matched.
+- Native `verify:release`: pass (all 7 release stages).
+- Website pricing/cart/mobile-order tests: `35/35` pass across 5 suites.
+- Live option/cart/order audit: required blank state, per-option prices,
+  20%-discount original/final price math, quantity/payload fields, same-option
+  merge and cross-option separation all passed.
+- TypeScript and `git diff --check`: pass.
+- EN/RU/AR option/login keys: `18/18` present.
+- Final iOS and Android Expo exports: pass.
+- Simulator/device UI run remains unavailable: this Mac has neither Xcode
+  `simctl` nor Android `adb`.
+- Expo Doctor remains `18/19` because of the pre-existing SDK 57 patch-version
+  drift; no native dependency/configuration change was made.
+
+Replacement production deployment:
+
+- Supersedes group: `92520eb8-513e-41ec-ace4-a1c4e00f78e7`
+- Branch: `production`
+- Runtime: `1.11.0`
+- Commit: `7de5c1fa4e31f2036e132df7376240c3e62b328e`
+- Update group: `1648d7f0-dd3f-4ee6-a50d-022dfd64d839`
+- iOS update: `019fdfe0-79d1-7c2e-9a0d-3d8f686826a1`
+- Android update: `019fdfe0-79d1-70ac-9981-1ea6a2c56e92`
+- Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/1648d7f0-dd3f-4ee6-a50d-022dfd64d839
