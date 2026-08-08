@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [Shop Product Option Sheet OTA (2026-08-08)](./SESSION_CHANGES_2026-08-08_shop-product-option-sheet-ota.md) | Native Shop cards require explicit size/shade selection in a localized bottom sheet; variant pricing, OOS, cart keys, checkout guard and runtime 1.11.0 OTA coverage. |
 | [In-app Product Guide PDF OTA (2026-08-06)](./SESSION_CHANGES_2026-08-06_product-guide-pdf-ota.md) | Dedicated native PDF guide screen with secure WebView rendering, download/cache progress, share/external controls, EN/RU/AR, and preserved PDP state. |
 | [CI Splash Verification SDK 57 Fix (2026-07-31)](./SESSION_CHANGES_2026-07-31_ci-splash-verification-sdk57.md) | Updates the release smoke for the SDK 57 splash plugin and re-syncs tracked iOS launch assets. |
 | [Product Video Native Aspect Ratio (2026-07-31)](./SESSION_CHANGES_2026-07-31_product-video-native-aspect-ratio.md) | Removes dark letterbox corners by sizing the native PDP player from each video's actual track dimensions. |

@@ -20,12 +20,13 @@ import { getLocalizedProductName, getLocalizedProductSize, getLocalizedProductDe
 import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
 import { isProductOutOfStock } from '../utils/stock';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
 
-export default function ProductGridItem({ product, onAddToCart, inCart, justAdded, inCartQty = 0 }) {
+export default function ProductGridItem({ product, onAddToCart, onChooseOptions, inCart, justAdded, inCartQty = 0 }) {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { t, locale } = useLocalization();
   const { user } = useAuth();
@@ -46,6 +47,7 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
       ? (product.image.startsWith('http') ? product.image : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`)
       : null);
   const isOutOfStock = isProductOutOfStock(product);
+  const requiresOptions = isProductOptionSelectionRequired(product);
   const nameLower = (product?.name || '').trim().toLowerCase();
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
@@ -306,6 +308,14 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
                 });
                 return;
               }
+              if (requiresOptions) {
+                if (inCart) {
+                  router.push('/(tabs)/bag');
+                  return;
+                }
+                (onChooseOptions || handlePress)();
+                return;
+              }
               onAddToCart();
             }}
             activeOpacity={0.8}
@@ -317,10 +327,14 @@ export default function ProductGridItem({ product, onAddToCart, inCart, justAdde
             />
             <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
               {inCart
-                ? `${locale === 'ar' ? 'في الحقيبة' : locale === 'ru' ? 'В корзине' : 'In Bag'}${inCartQty > 0 ? ` (${inCartQty})` : ' ✓'}`
+                ? requiresOptions
+                  ? t('product.viewBag')
+                  : `${locale === 'ar' ? 'في الحقيبة' : locale === 'ru' ? 'В корзине' : 'In Bag'}${inCartQty > 0 ? ` (${inCartQty})` : ' ✓'}`
                 : !user
                   ? t('shop.loginToBuy')
-                  : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
+                  : requiresOptions
+                    ? t('variant.chooseOptions')
+                    : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
             </Text>
           </TouchableOpacity>
         )}

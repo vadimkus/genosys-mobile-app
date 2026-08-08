@@ -1574,6 +1574,11 @@
     "size": "Size",
     "color": "Color",
     "unavailable": "Unavailable",
+    "chooseOptions": "Choose Options",
+    "required": "Required",
+    "refreshingOptions": "Checking current options…",
+    "refreshFailed": "Could not refresh options. Check your connection and try again.",
+    "optionsUnavailable": "Product options are temporarily unavailable. Please try again online.",
     "cushionBBSizeLabel": "15g (includes replacement refill)"
   },
   "stock": {

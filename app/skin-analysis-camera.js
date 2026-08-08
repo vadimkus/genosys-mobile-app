@@ -33,7 +33,9 @@ import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
 import AUTH_CONFIG from '../config/auth';
 import { getJson, sendJson } from '../services/httpClient';
+import { fetchProductById } from '../services/api';
 import { createLogger } from '../utils/logger';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
 
 const log = createLogger('SkinAnalysisCamera');
@@ -185,11 +187,14 @@ export default function SkinAnalysisCameraScreen() {
       return;
     }
     try {
-      // Fetch the real product data to add to cart properly
-      const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
-      const product = await getJson(`${baseUrl}/api/products/${productId}`, {
-        headers: { apiKey: false },
-      });
+      // Fetch the mobile contract so config-backed colors and variant prices
+      // are present before deciding whether a quick add is safe.
+      const product = await fetchProductById(productId, user, { locale });
+      if (!product) throw new Error('Product unavailable');
+      if (isProductOptionSelectionRequired(product)) {
+        router.push(`/product/${product.id || productId}`);
+        return;
+      }
       await addItem(product, 1, '', '');
       haptics.success();
       setAddedProducts((prev) => new Set([...prev, productId]));
@@ -201,7 +206,7 @@ export default function SkinAnalysisCameraScreen() {
       haptics.warning();
       Alert.alert(t('skinCamera.errorTitle'), t('common.addToBagFailed'));
     }
-  }, [addItem, addedProducts, user, t]);
+  }, [addItem, addedProducts, user, t, locale]);
 
   // Permission loading
   if (!permission) {

@@ -18,6 +18,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../utils/productRules';
 import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import { computeProductBadges } from '../utils/badges';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
@@ -87,6 +88,10 @@ export default function FavoritesScreen() {
 
     if (product.status === 'out_of_stock' || product.stock === false) {
       Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
+      return;
+    }
+    if (isProductOptionSelectionRequired(product)) {
+      router.push(`/product/${product.id}`);
       return;
     }
 

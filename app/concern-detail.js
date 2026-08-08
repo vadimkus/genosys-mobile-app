@@ -33,6 +33,7 @@ import T from '../utils/typography';
 import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { computeWaterfallBreakdown } from '../utils/cartUtils';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import { useAuth } from '../contexts/AuthContext';
 import AUTH_CONFIG from '../config/auth';
 import { CONCERNS } from './skin-concerns';
@@ -161,6 +162,10 @@ export default function ConcernDetailScreen() {
     const fullProduct = productLookup[routeId];
     if (!fullProduct || fullProduct.isPriceOnRequest) {
       router.push(`/product/${routeId}`);
+      return;
+    }
+    if (isProductOptionSelectionRequired(fullProduct)) {
+      router.push(`/product/${fullProduct.id}`);
       return;
     }
     const cartId = String(fullProduct.id);
@@ -411,6 +416,10 @@ export default function ConcernDetailScreen() {
                                 pathname: '/auth/login',
                                 params: { returnTo: `/concern-detail?slug=${encodeURIComponent(String(slug || ''))}` },
                               });
+                              return;
+                            }
+                            if (isProductOptionSelectionRequired(product)) {
+                              router.push(`/product/${product.id}`);
                               return;
                             }
                             addItem(product, 1, '', '');

@@ -23,6 +23,7 @@ import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } fro
 import { captureException } from '../config/sentry';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { formatAddressForDisplay } from '../utils/addressUtils';
+import { extractProductOptions, isProductSelectionComplete } from '../utils/productOptions';
 import { normalizeUserProfile } from '../utils/userProfile';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import * as haptics from '../utils/haptics';
@@ -422,31 +423,37 @@ function CheckoutScreen() {
       address: true,
     });
 
-    // Block checkout if any paid item has color variants but no color selected
+    // Block checkout if any paid item is missing a required canonical option.
     const itemsMissingColor = paidItems.filter(item => {
-      const cv = item?.product?.colorVariants;
-      return Array.isArray(cv) && cv.length > 0 && !item.selectedColor;
+      const model = extractProductOptions(item?.product);
+      return model.required.color && !item.selectedColor;
     });
-    // Block checkout if any paid item has multiple size variants but no size selected
     const itemsMissingSize = paidItems.filter(item => {
-      const variants = item?.product?.variants;
-      if (!Array.isArray(variants)) return false;
-      const sizes = variants.filter(v => v?.size && v.size !== 'default' && v.available !== false);
-      const uniqueSizes = [...new Set(sizes.map(v => v.size))];
-      return uniqueSizes.length > 1 && !item.selectedSize;
+      const model = extractProductOptions(item?.product);
+      return model.required.size && !item.selectedSize;
     });
-    if (itemsMissingColor.length > 0 || itemsMissingSize.length > 0) {
+    const itemsWithInvalidSelections = paidItems.filter(item =>
+      !isProductSelectionComplete(item?.product, {
+        selectedColor: item?.selectedColor,
+        selectedSize: item?.selectedSize,
+      })
+    );
+    if (itemsMissingColor.length > 0 || itemsMissingSize.length > 0 || itemsWithInvalidSelections.length > 0) {
       submittingRef.current = false;
       haptics.warning();
-      const allMissing = [...itemsMissingColor, ...itemsMissingSize];
+      const allMissing = [...itemsMissingColor, ...itemsMissingSize, ...itemsWithInvalidSelections];
       const uniqueNames = [...new Set(allMissing.map(i => i?.product?.name || i?.product?.title || 'Unknown'))];
       const names = uniqueNames.join(', ');
-      const title = itemsMissingColor.length > 0 && itemsMissingSize.length > 0
+      const hasGeneralInvalidSelection =
+        itemsWithInvalidSelections.length > 0 &&
+        itemsMissingColor.length === 0 &&
+        itemsMissingSize.length === 0;
+      const title = (itemsMissingColor.length > 0 && itemsMissingSize.length > 0) || hasGeneralInvalidSelection
         ? t('checkout.variantRequiredTitle')
         : itemsMissingColor.length > 0
           ? t('checkout.colorRequiredTitle')
           : t('checkout.sizeRequiredTitle');
-      const message = itemsMissingColor.length > 0 && itemsMissingSize.length > 0
+      const message = (itemsMissingColor.length > 0 && itemsMissingSize.length > 0) || hasGeneralInvalidSelection
         ? t('checkout.variantRequiredMessage', { products: names })
         : itemsMissingColor.length > 0
           ? t('checkout.colorRequiredMessage', { products: names })

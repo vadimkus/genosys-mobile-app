@@ -27,6 +27,7 @@ import { fetchProducts } from '../services/api';
 import { getRecommendations } from '../utils/skinRecommendations';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { colors, tint, shadow, surfaces } from '../utils/theme';
@@ -109,6 +110,10 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
         pathname: '/auth/login',
         params: { returnTo: '/skin-analysis-camera' },
       });
+      return;
+    }
+    if (isProductOptionSelectionRequired(product)) {
+      router.push(`/product/${product.id}`);
       return;
     }
     try {

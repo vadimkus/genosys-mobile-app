@@ -36,9 +36,10 @@ try {
 } catch {
   // native module not available – voice search will be hidden
 }
-import { fetchProductCategories, fetchProducts } from '../../services/api';
+import { fetchProductById, fetchProductCategories, fetchProducts } from '../../services/api';
 import { cacheProducts, getCachedProducts } from '../../services/productCache';
 import { ShopSkeleton } from '../../components/SkeletonLoader';
+import ProductOptionSheet from '../../components/ProductOptionSheet';
 import * as haptics from '../../utils/haptics';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -47,6 +48,12 @@ import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUn
 import { getPricingDisplay, hasServerPricing, formatAed } from '../../utils/pricingDisplay';
 import { computeProductBadges } from '../../utils/badges';
 import { isProductOutOfStock } from '../../utils/stock';
+import {
+  applyProductOptionPrice,
+  getInitialProductSelection,
+  isProductOptionSelectionRequired,
+  isProductSelectionComplete,
+} from '../../utils/productOptions';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import {
   getLocalizedProductName,
@@ -114,6 +121,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
   isFav,
   isAdding,
   qtyInBag,
+  requiresOptions,
   user,
   locale,
   isRTL,
@@ -396,12 +404,12 @@ const ShopGridCard = React.memo(function ShopGridCard({
                 accessibilityLabel={
                   outOfStock
                     ? t('stock.outOfStock')
-                    : `${t('shop.addToBag')} — ${product?.name || ''}`
+                    : `${requiresOptions ? t('variant.chooseOptions') : t('shop.addToBag')} — ${product?.name || ''}`
                 }
                 accessibilityState={{ disabled: outOfStock || isAdding }}
               >
                 <Ionicons
-                  name={isAdding ? 'checkmark' : 'bag-add'}
+                  name={isAdding ? 'checkmark' : requiresOptions ? 'options-outline' : 'bag-add'}
                   size={16}
                   color="#ffffff"
                   style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
@@ -413,7 +421,9 @@ const ShopGridCard = React.memo(function ShopGridCard({
                       ? t('stock.outOfStock')
                       : !user
                         ? t('shop.loginToBuy')
-                        : t('shop.addToBag')}
+                        : requiresOptions
+                          ? t('variant.chooseOptions')
+                          : t('shop.addToBag')}
                 </Text>
               </TouchableOpacity>
             );
@@ -443,6 +453,13 @@ function ShopScreen() {
   const [categoryBadges, setCategoryBadges] = useState({}); // { "Cream": "new", "Beauty Boxes": "new" }
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [addingProducts, setAddingProducts] = useState(new Set()); // Track which products are being added
+  const [optionProduct, setOptionProduct] = useState(null);
+  const [optionSheetVisible, setOptionSheetVisible] = useState(false);
+  const [optionRefreshing, setOptionRefreshing] = useState(false);
+  const [optionRefreshError, setOptionRefreshError] = useState('');
+  const [optionAdding, setOptionAdding] = useState(false);
+  const optionRequestRef = useRef(0);
+  const addLocksRef = useRef(new Set());
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -751,53 +768,148 @@ function ShopScreen() {
     }
   };
 
+  const requireLogin = useCallback(() => {
+    Alert.alert(
+      t('checkout.loginRequiredTitle'),
+      t('checkout.loginRequiredMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.login'),
+          onPress: () => router.push({
+            pathname: '/auth/login',
+            params: { returnTo: '/(tabs)/shop' },
+          }),
+        },
+      ]
+    );
+  }, [t]);
+
+  const closeOptionSheet = useCallback(() => {
+    if (optionAdding) return;
+    optionRequestRef.current += 1;
+    setOptionSheetVisible(false);
+    setOptionProduct(null);
+    setOptionRefreshError('');
+    setOptionRefreshing(false);
+  }, [optionAdding]);
+
+  const refreshOptionProduct = useCallback(async (fallbackProduct) => {
+    if (!fallbackProduct?.id) return;
+    const requestId = ++optionRequestRef.current;
+    setOptionRefreshing(true);
+    setOptionRefreshError('');
+    try {
+      const latest = await fetchProductById(fallbackProduct.id, user, { locale });
+      if (requestId !== optionRequestRef.current) return;
+      if (!latest) {
+        setOptionRefreshError(t('variant.refreshFailed'));
+        return;
+      }
+      if (isProductOutOfStock(latest)) {
+        setOptionProduct(latest);
+        setOptionRefreshError(t('stock.outOfStockMessage'));
+        return;
+      }
+      setOptionProduct(latest);
+    } catch (error) {
+      if (requestId !== optionRequestRef.current) return;
+      log.warn('Could not refresh product options', error?.message || error);
+      setOptionRefreshError(t('variant.refreshFailed'));
+    } finally {
+      if (requestId === optionRequestRef.current) setOptionRefreshing(false);
+    }
+  }, [locale, t, user]);
+
+  const openOptionSheet = useCallback((product) => {
+    setOptionProduct(product);
+    setOptionRefreshError('');
+    setOptionSheetVisible(true);
+    haptics.mediumTap();
+    refreshOptionProduct(product);
+  }, [refreshOptionProduct]);
+
+  const addProductSelection = useCallback(async (product, quantity, selection) => {
+    const productId = String(product?.id || '');
+    if (!productId || addLocksRef.current.has(productId)) return false;
+    addLocksRef.current.add(productId);
+    setAddingProducts((prev) => new Set([...prev, productId]));
+
+    try {
+      if (!isProductSelectionComplete(product, selection)) {
+        throw new Error('PRODUCT_OPTIONS_REQUIRED');
+      }
+      const productForCart = applyProductOptionPrice(product, selection);
+      const added = await addItem(
+        productForCart,
+        Math.max(1, Number(quantity) || 1),
+        selection.selectedColor || '',
+        selection.selectedSize || ''
+      );
+      if (added === false) throw new Error('PRODUCT_OPTIONS_REQUIRED');
+      haptics.success();
+      log.debug('Added product selection to cart', {
+        productId,
+        selectedColor: selection.selectedColor || null,
+        selectedSize: selection.selectedSize || null,
+        quantity,
+      });
+      return true;
+    } finally {
+      addLocksRef.current.delete(productId);
+      setTimeout(() => {
+        setAddingProducts((prev) => {
+          const next = new Set(prev);
+          next.delete(productId);
+          return next;
+        });
+      }, 500);
+    }
+  }, [addItem]);
+
   // Handle add to cart functionality
   const handleAddToCart = useCallback(async (product) => {
-    if (product?.isPriceOnRequest) return; // price-on-request products cannot be added
+    if (product?.isPriceOnRequest) return;
     if (!user) {
-      Alert.alert(
-        t('checkout.loginRequiredTitle'),
-        t('checkout.loginRequiredMessage'),
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          {
-            text: t('common.login'),
-            onPress: () => router.push({
-              pathname: '/auth/login',
-              params: { returnTo: '/(tabs)/shop' },
-            }),
-          }
-        ]
-      );
+      requireLogin();
       return;
     }
-
     if (isProductOutOfStock(product)) {
       Alert.alert(t('stock.outOfStock'), t('stock.outOfStockMessage'));
       return;
     }
-
-    // Add to tracking set
-    setAddingProducts(prev => new Set([...prev, product.id]));
+    if (isProductOptionSelectionRequired(product)) {
+      openOptionSheet(product);
+      return;
+    }
 
     try {
-      await addItem(product, 1, '', ''); // Add 1 quantity with no color/size variants
-      haptics.success();
-      log.debug('Added to cart', { productId: product?.id });
+      await addProductSelection(product, 1, getInitialProductSelection(product));
     } catch (error) {
       log.error('Failed to add product to cart', error?.message || error);
       Alert.alert(t('common.error'), t('shop.addToBagFailed'));
-    } finally {
-      // Remove from tracking set after delay
-      setTimeout(() => {
-        setAddingProducts(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(product.id);
-          return newSet;
-        });
-      }, 500);
     }
-  }, [user, t, addItem]);
+  }, [user, requireLogin, t, openOptionSheet, addProductSelection]);
+
+  const handleConfirmOptions = useCallback(async (selection, quantity, latestProduct) => {
+    if (optionAdding) return;
+    setOptionAdding(true);
+    try {
+      const added = await addProductSelection(latestProduct, quantity, selection);
+      if (added) {
+        optionRequestRef.current += 1;
+        setOptionSheetVisible(false);
+        setOptionProduct(null);
+        setOptionRefreshError('');
+      }
+    } catch (error) {
+      log.error('Failed to add selected product option', error?.message || error);
+      haptics.error();
+      Alert.alert(t('common.error'), t('shop.addToBagFailed'));
+    } finally {
+      setOptionAdding(false);
+    }
+  }, [addProductSelection, optionAdding, t]);
 
   const handleToggleFavorite = useCallback(async (product) => {
     haptics.lightTap();
@@ -824,6 +936,7 @@ function ShopScreen() {
       isFav={!!isFavorite(product?.id)}
       isAdding={addingProducts.has(product.id)}
       qtyInBag={user ? (getProductTotalQuantity?.(product?.id) || 0) : 0}
+      requiresOptions={isProductOptionSelectionRequired(product)}
       user={user}
       locale={locale}
       isRTL={isRTL}
@@ -1239,6 +1352,16 @@ function ShopScreen() {
       />
       </RNAnimated.View>
 
+      <ProductOptionSheet
+        visible={optionSheetVisible}
+        product={optionProduct}
+        isRefreshing={optionRefreshing}
+        refreshError={optionRefreshError}
+        isAdding={optionAdding}
+        onRetry={() => refreshOptionProduct(optionProduct)}
+        onClose={closeOptionSheet}
+        onConfirm={handleConfirmOptions}
+      />
     </SafeAreaView>
   );
 }

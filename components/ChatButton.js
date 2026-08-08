@@ -32,6 +32,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { handleDeepLink } from '../utils/deepLinking';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
@@ -174,6 +175,11 @@ export default function ChatButton({ visible = true }) {
 
   const handleAddToBag = async (product) => {
     if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
+    if (isProductOptionSelectionRequired(product)) {
+      setIsOpen(false);
+      router.push(`/product/${product.id}`);
+      return;
+    }
     haptics.mediumTap();
     try {
       await addItem(product, 1, '', '');

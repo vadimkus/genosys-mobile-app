@@ -4,6 +4,13 @@ import { useAuth } from './AuthContext';
 import { calculateCartTotals, reconcileBuildSetBundleDiscounts, UAE_EMIRATES } from '../utils/cartUtils';
 import { fetchShippingRates } from '../services/api';
 import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../utils/productRules';
+import {
+  applyProductOptionPrice,
+  getInitialProductSelection,
+  getProductOptionKey,
+  isProductOptionSelectionRequired,
+  isProductSelectionComplete,
+} from '../utils/productOptions';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('Cart');
@@ -449,11 +456,31 @@ export const CartProvider = ({ children }) => {
    */
   const addItem = (product, quantity = 1, selectedColor = '', selectedSize = '', itemMeta = null) => {
     // Prevent price-on-request products from being added to cart
-    if (product?.isPriceOnRequest) return;
+    if (product?.isPriceOnRequest) return false;
 
-    const normalizedColor = selectedColor || '';
     const isBundleAdd = itemMeta?.fromBundle === true;
-    const normalizedSize = isBundleAdd ? String(selectedSize || product?.size || '').trim() : normalizeSizeKey(product, selectedSize);
+    const automaticSelection = getInitialProductSelection(product);
+    const normalizedColor = isBundleAdd
+      ? String(selectedColor || '').trim()
+      : String(selectedColor || automaticSelection.selectedColor || '').trim();
+    const normalizedSize = isBundleAdd
+      ? String(selectedSize || product?.size || '').trim()
+      : String(selectedSize || automaticSelection.selectedSize || '').trim();
+
+    if (
+      !isBundleAdd &&
+      isProductOptionSelectionRequired(product) &&
+      !isProductSelectionComplete(product, {
+        selectedColor: normalizedColor,
+        selectedSize: normalizedSize,
+      })
+    ) {
+      log.warn('Blocked cart add with missing required product options', {
+        productId: product?.id,
+      });
+      return false;
+    }
+
     const normalizedProduct = (() => {
       // Bundle items already have correct pricing from the bundle builder —
       // skip variant/discount inference to avoid inflating originalPrice.
@@ -461,8 +488,15 @@ export const CartProvider = ({ children }) => {
 
       // If a size variant is selected and the product includes variant pricing, store the selected variant price
       // as the product unit price in the cart item.
-      if (normalizedSize && Array.isArray(product?.variants) && product.variants.length > 0) {
-        return applySelectedVariantPrice(product, normalizedSize, user);
+      if (
+        (normalizedSize || normalizedColor) &&
+        Array.isArray(product?.variants) &&
+        product.variants.length > 0
+      ) {
+        return applyProductOptionPrice(product, {
+          selectedSize: normalizedSize,
+          selectedColor: normalizedColor,
+        });
       }
 
       const needsCanonical = isHydroCoolMask(product) || isDeviceProduct(product) || hasFixedPriceOverride(product);
@@ -488,10 +522,15 @@ export const CartProvider = ({ children }) => {
     };
 
     setItems(prev => {
+      const targetKey = getProductOptionKey(normalizedProduct, {
+        selectedColor: normalizedColor,
+        selectedSize: normalizedSize,
+      });
       const existingIdx = prev.findIndex(item =>
-        item.product.id === normalizedProduct.id &&
-        item.selectedColor === normalizedColor &&
-        item.selectedSize === normalizedSize &&
+        getProductOptionKey(item.product, {
+          selectedColor: item.selectedColor,
+          selectedSize: item.selectedSize,
+        }) === targetKey &&
         !isPromotionItem(item) &&
         lineMetaMatches(item, itemMeta)
       );
@@ -505,6 +544,7 @@ export const CartProvider = ({ children }) => {
 
     bumpPromoTick();
     log.debug('Added to cart', { productId: normalizedProduct?.id, quantity });
+    return true;
   };
 
   const addBundleItems = (products, discountPercent) => {

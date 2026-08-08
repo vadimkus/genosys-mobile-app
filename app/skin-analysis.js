@@ -30,6 +30,7 @@ import { SKIN_TYPE_TO_CANONICAL, CONCERN_TO_CANONICAL, AGE_TO_CANONICAL, USAGE_T
 import AUTH_CONFIG from '../config/auth';
 import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
 import { colors, tint, shadow, surfaces } from '../utils/theme';
 
@@ -145,6 +146,10 @@ export default function SkinAnalysisScreen() {
         pathname: '/auth/login',
         params: { returnTo: '/skin-analysis' },
       });
+      return;
+    }
+    if (isProductOptionSelectionRequired(product)) {
+      router.push(`/product/${product.id}`);
       return;
     }
     try {

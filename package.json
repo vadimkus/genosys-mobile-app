@@ -38,9 +38,10 @@
     "smoke:orders-repository": "tsx scripts/smoke-orders-repository.js",
     "smoke:product-search": "tsx scripts/smoke-product-search.js",
     "smoke:product-guide": "tsx scripts/smoke-product-guide.js",
+    "smoke:product-options": "tsx scripts/smoke-product-options.js",
     "verify:splash": "node scripts/verify-splash-sync.js",
     "verify:homecare-links": "node scripts/verify-homecare-links.js",
-    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:product-guide"
+    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:product-guide && npm run smoke:product-options"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

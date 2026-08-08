@@ -30,6 +30,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
+import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import { handleDeepLink } from '../utils/deepLinking';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
@@ -189,6 +190,10 @@ export default function ChatScreen() {
   const handleAddToBag = async (product) => {
     haptics.mediumTap();
     if (!product || addedProducts.has(product.id) || product.isPriceOnRequest) return;
+    if (isProductOptionSelectionRequired(product)) {
+      router.push(`/product/${product.id}`);
+      return;
+    }
     try {
       await addItem(product, 1, '', '');
       setAddedProducts((prev) => new Set([...prev, product.id]));
