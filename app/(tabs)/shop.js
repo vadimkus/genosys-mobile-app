@@ -625,15 +625,17 @@ function ShopScreen() {
           log.debug('User discount applied', { discountPercentage: user.discountPercentage, discountType: user.discountType });
         }
         
-        // Cache for offline use (fire-and-forget)
-        cacheProducts(enhancedProducts);
+        // Cache for offline use (fire-and-forget), under the locale it was fetched in
+        cacheProducts(enhancedProducts, locale);
       }
     } catch (error) {
       log.error('Error loading products from API', error?.message || error);
       
       // Offline fallback: try cached products
       try {
-        const cached = await getCachedProducts(true); // ignoreExpiry for offline
+        // ignoreExpiry for offline. Reads this locale only: a cache written in another
+        // language would show the wrong names, descriptions and slides.
+        const cached = await getCachedProducts(true, locale);
         if (cached && cached.length > 0) {
           applyProducts(cached);
           setLoadFailed(false);
@@ -717,7 +719,7 @@ function ShopScreen() {
         const enhancedProducts = await fetchProducts(user, { locale });
         if (enhancedProducts && enhancedProducts.length > 0) {
           applyProducts(enhancedProducts);
-          cacheProducts(enhancedProducts);
+          cacheProducts(enhancedProducts, locale);
         }
       } catch (err) {
         log.warn('Re-fetch for user pricing failed', err?.message);
