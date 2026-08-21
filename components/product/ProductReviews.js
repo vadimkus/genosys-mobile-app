@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
-import { getJson, httpRequest, sendJson } from '../../services/httpClient';
+import { getJson, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces } from '../../utils/theme';
@@ -101,7 +101,9 @@ export default function ProductReviews({ productId }) {
         comment: formComment.trim(),
       }, {
         method,
-        headers: { apiKey: false },
+        authenticated: true,
+        token: user.token,
+        headers: { apiKey: true, token: user.token },
         safeMessage: t('reviews.submitFailed') || 'Failed to submit review',
       });
       if (data?.success === false) throw new Error('review-submit-failed');
@@ -126,11 +128,13 @@ export default function ProductReviews({ productId }) {
           style: 'destructive',
           onPress: async () => {
             try {
-              await httpRequest(
-                `${WEB_ORIGIN}/api/products/${productId}/reviews/${reviewId}?email=${encodeURIComponent(user?.email || '')}`,
-                { method: 'DELETE' },
-                { safeMessage: t('reviews.deleteFailed') || 'Failed to delete review' }
-              );
+              await sendJson(`${WEB_ORIGIN}/api/products/${productId}/reviews/${reviewId}`, {}, {
+                method: 'DELETE',
+                authenticated: true,
+                token: user?.token,
+                headers: { apiKey: true, token: user?.token },
+                safeMessage: t('reviews.deleteFailed') || 'Failed to delete review',
+              });
               await fetchReviews();
             } catch (error) {
               Alert.alert(t('common.error') || 'Error', t('reviews.deleteFailed') || 'Failed to delete review');
