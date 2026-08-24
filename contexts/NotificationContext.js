@@ -6,9 +6,9 @@
 
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import * as Notifications from 'expo-notifications';
-import { router } from 'expo-router';
 import { Platform, AppState, Vibration } from 'react-native';
 import { createLogger } from '../utils/logger';
+import { navigateFromNotification } from '../utils/notificationRouting';
 
 const log = createLogger('Notification');
 
@@ -91,15 +91,12 @@ export function NotificationProvider({ children }) {
           Notifications.setBadgeCountAsync(0);
           
           const data = response.notification.request.content.data;
-          
-          // Handle navigation based on notification type — deep-link straight
-          // to the order detail screen (the push payload carries orderId)
-          if (data?.type === 'order_status' && data?.orderId) {
-            log.debug('Navigating to order detail:', data.orderId);
-            setTimeout(() => {
-              router.push(`/profile/orders/${data.orderId}`);
-            }, 100);
-          }
+
+          // Resolve the destination generically: orders, blog posts, and any
+          // future type that ships a `url` in its payload.
+          setTimeout(() => {
+            navigateFromNotification(data);
+          }, 100);
         } catch (e) {
           log.warn('Error handling notification tap:', e.message);
         }
@@ -113,11 +110,10 @@ export function NotificationProvider({ children }) {
             // Clear badge on cold start from notification
             Notifications.setBadgeCountAsync(0);
             const data = response.notification.request.content.data;
-            if (data?.type === 'order_status' && data?.orderId) {
-              setTimeout(() => {
-                router.push(`/profile/orders/${data.orderId}`);
-              }, 500);
-            }
+            // Longer delay than the warm path: navigation has to mount first.
+            setTimeout(() => {
+              navigateFromNotification(data);
+            }, 500);
           }
         })
         .catch(e => {
