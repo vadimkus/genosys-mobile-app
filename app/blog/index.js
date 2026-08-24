@@ -17,6 +17,7 @@ import {
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
+import LocaleSwitchButton from '../../components/LocaleSwitchButton';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import AUTH_CONFIG from '../../config/auth';
@@ -104,7 +105,9 @@ export default function BlogScreen() {
         title={t('navigation.blog') || 'Blog'}
         scrollY={canScroll ? scrollY : null}
         onBack={onBack}
-        onRefresh={() => fetchPosts(true)}
+        // Pull-to-refresh already covers reloading, so the slot goes to the
+        // language control: titles and excerpts here are localized server-side.
+        right={<LocaleSwitchButton />}
         isRTL={isRTL}
       />
 

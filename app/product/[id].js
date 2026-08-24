@@ -42,6 +42,7 @@ import ProductQuickFactsCard from '../../components/product/ProductQuickFactsCar
 import Toast from '../../components/Toast';
 import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
 import * as haptics from '../../utils/haptics';
+import LocaleSwitchButton from '../../components/LocaleSwitchButton';
 import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { getProductImages, getProductVideoUrl, getProductDocs } from '../../data/productConfig';
@@ -1063,6 +1064,10 @@ function ProductDetailScreen() {
           </TouchableOpacity>
 
           <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
+            {/* This screen already refetches on `locale`, so English and Russian
+                swap in place without losing the reader's position. */}
+            <LocaleSwitchButton />
+
             <TouchableOpacity
               style={styles.headerButton}
               onPress={handleShare}

@@ -23,6 +23,7 @@ import {
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
+import LocaleSwitchButton from '../../components/LocaleSwitchButton';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 // Lazy-safe import: react-native-render-html may crash on some RN versions
 let RenderHtml = null;
@@ -236,7 +237,11 @@ export default function BlogPostScreen() {
         title={t('navigation.blog') || l('Blog', 'المدونة', 'Блог')}
         scrollY={post && !loading && !error ? scrollY : null}
         onBack={onBack}
-        onRefresh={() => fetchPost(true)}
+        // The refresh icon that sat here duplicated pull-to-refresh, which the
+        // article already supports. The slot is worth more to the language
+        // control: this screen fetches localized copy keyed on `locale`, so
+        // switching here reloads the article in the chosen language in place.
+        right={<LocaleSwitchButton />}
         isRTL={isRTL}
       />
 
