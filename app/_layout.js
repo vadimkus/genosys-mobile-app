@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LogBox, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartProvider } from '../contexts/CartContext';
@@ -74,6 +75,20 @@ export default function RootLayout() {
   const [forceUpdate, setForceUpdate] = useState(null);
   const [softUpdate, setSoftUpdate] = useState(null);
   const [splashVideo, setSplashVideo] = useState(DEFAULT_SPLASH_CONFIG);
+
+  // The website's display serif, so headings can be set in the same face.
+  // Loaded from `assets/fonts`, which means it ships in the OTA bundle rather
+  // than needing a store build.
+  //
+  // Deliberately not gating render on the result: nothing sets the face yet,
+  // and local files resolve in milliseconds behind the launch video anyway.
+  // The screens that adopt it should go through `serifFamily()` in
+  // `utils/typography.js`.
+  useFonts({
+    'CormorantGaramond-Regular': require('../assets/fonts/CormorantGaramond-Regular.ttf'),
+    'CormorantGaramond-Medium': require('../assets/fonts/CormorantGaramond-Medium.ttf'),
+    'CormorantGaramond-SemiBold': require('../assets/fonts/CormorantGaramond-SemiBold.ttf'),
+  });
 
   // Hide the native splash exactly once, after the JS launch layer is painted.
   const nativeSplashHiddenRef = useRef(false);

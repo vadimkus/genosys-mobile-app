@@ -38,6 +38,38 @@ export const colors = {
   white: '#FFFFFF',
 };
 
+// ─── Website design language ("cera") ─────────────────────────────────
+/**
+ * The palette the website uses on its product, brand and blog pages, copied
+ * from the `--cera-*` custom properties in
+ * `cosmetics-website/components/product/cerabarrier/cerabarrier.css`.
+ *
+ * Kept separate from `colors` above rather than replacing it, so introducing
+ * these tokens changes nothing on screen. Screens move over one at a time;
+ * when the last one has, `colors` can be repointed at these values and the
+ * duplication collapses.
+ *
+ * Rough mapping to the iOS tokens above:
+ *   groupedBg      → cream        page background
+ *   card           → white        cards stay white on cream
+ *   label          → ink          headings
+ *   secondaryLabel → muted        supporting text
+ *   separator      → line         hairlines
+ */
+export const cera = {
+  cream: '#faf7f5',       // page background
+  creamDeep: '#f3ece8',   // pressed states, inset rows
+  blush: '#f7ecec',       // tinted panels
+  blushDeep: '#efd9d9',
+  rose: '#c98b8b',        // decorative rules, quiet icons
+  roseInk: '#8f5a5a',     // links and controls on cream
+  ink: '#191716',         // headings
+  body: '#3d3734',        // running text
+  muted: '#665e59',       // captions, metadata
+  line: '#e8e0db',        // hairlines and borders
+  shot: '#eeeeee',        // packshot stage
+};
+
 // 10% alpha helper for tinted capsules / button backgrounds.
 export const tint = (hex, alpha = '1A') => `${hex}${alpha}`;
 
@@ -96,6 +128,7 @@ export const statusStyle = (status) => {
 
 export const theme = {
   colors,
+  cera,
   tint,
   shadow,
   surfaces,

@@ -18,8 +18,67 @@ const WEIGHTS = {
   heavy:    '800',
 };
 
+// ─── Display serif (the website's face) ──────────────────────────────
+/**
+ * Cormorant Garamond, the same display serif the website sets its headings
+ * in. Registered in `app/_layout.js`; the files live in `assets/fonts`.
+ *
+ * One family per weight, and the serif styles below deliberately omit
+ * `fontWeight`. Setting both a custom family and a weight makes iOS
+ * synthesise the weight instead of picking the file we shipped, which shows
+ * up as smeared strokes at display sizes.
+ *
+ * Cormorant carries Latin and Cyrillic but no Arabic, so Arabic headings fall
+ * back to the system face. Use `serifFamily(locale)` rather than the constants
+ * directly on any screen that renders all three languages: naming a family
+ * with no glyphs for the script leaves Android rendering tofu.
+ */
+export const SERIF = {
+  regular: 'CormorantGaramond-Regular',
+  medium: 'CormorantGaramond-Medium',
+  semibold: 'CormorantGaramond-SemiBold',
+};
+
+export const serifFamily = (locale, weight = 'regular') =>
+  String(locale || '').toLowerCase() === 'ar' ? undefined : SERIF[weight] || SERIF.regular;
+
 // ─── Reusable type styles ────────────────────────────────────────────
 export const T = {
+  // ── Website display serif ──────────────────────────────────────────
+  // Sizes track the site's headings: a hero line, a section title, and a
+  // card/subsection title.
+  serifDisplay: {
+    fontFamily: SERIF.regular,
+    fontSize: 34,
+    lineHeight: 39,
+    letterSpacing: -0.2,
+    color: '#191716',
+  },
+  serifTitle: {
+    fontFamily: SERIF.regular,
+    fontSize: 26,
+    lineHeight: 30,
+    letterSpacing: -0.2,
+    color: '#191716',
+  },
+  serifHeading: {
+    fontFamily: SERIF.medium,
+    fontSize: 21,
+    lineHeight: 26,
+    color: '#191716',
+  },
+
+  // ── Eyebrow ────────────────────────────────────────────────────────
+  // The small red uppercase label the site sets above headings ("BLOG",
+  // "CLEANSER", "LATEST ARTICLE"). Sans, not serif, on the site too.
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: '#dc2626',
+  },
+
   // ── Large headings (hero titles, page titles) ──────────────────────
   pageTitle: {
     fontSize: 24,
