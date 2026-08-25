@@ -38,6 +38,7 @@ import TrustBadges from '../../components/product/TrustBadges';
 import CollapsibleSection from '../../components/product/CollapsibleSection';
 import ImageLightbox from '../../components/product/ImageLightbox';
 import ProductQuickFactsCard from '../../components/product/ProductQuickFactsCard';
+import BespokeContent, { BespokeHero } from '../../components/product/BespokeContent';
 import Toast from '../../components/Toast';
 import { ProductDetailSkeleton } from '../../components/SkeletonLoader';
 import * as haptics from '../../utils/haptics';
@@ -1026,6 +1027,7 @@ function ProductDetailScreen() {
   }
 
   const isWishlisted = !!(product?.id && isFavorite(product.id));
+  const bespokeContent = product?.bespokeContent || null;
   const priceView = resolvePriceView(product, { user, selectedSize, selectedColor });
   const priceLabel = priceView.kind === 'discounted' ? discountLabelFor(priceView, t) : null;
 
@@ -1375,9 +1377,14 @@ function ProductDetailScreen() {
             )}
           </View>
 
-          {/* API-driven Quick Facts. Content/localization lives on the website
-              backend, so future catalog edits require no app release. */}
-          <ProductQuickFactsCard facts={product?.quickFacts} />
+          {/* The website's opening: headline, the promise in four lines, and the
+              figures behind it. Quick facts are the fallback for products with
+              no bespoke page, and would only repeat the hero beside one. */}
+          {bespokeContent ? (
+            <BespokeHero content={bespokeContent} isRTL={isRTL} />
+          ) : (
+            <ProductQuickFactsCard facts={product?.quickFacts} />
+          )}
 
             {/* Enhanced Product Variant Selector */}
             {((product.variants && product.variants.length > 0) || 
@@ -1429,8 +1436,14 @@ function ProductDetailScreen() {
             );
           })()}
 
-          {/* Product content sections from API */}
-          {isBeautyBoxProduct(product) ? (
+          {/* Product content. Where the website has written a bespoke page, the
+              API sends that copy and it is shown instead of the generic fields:
+              the two say the same things, but the bespoke version says them with
+              the checked figures and the sourcing. The generic path stays for
+              the handful of products without one. */}
+          {bespokeContent ? (
+            <BespokeContent content={bespokeContent} isRTL={isRTL} />
+          ) : isBeautyBoxProduct(product) ? (
             <BeautyBoxDetails product={product} styles={styles} />
           ) : (
             <>
