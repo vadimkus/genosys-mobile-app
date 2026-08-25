@@ -32,7 +32,7 @@ import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
-import { colors } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 import { ASSET_ORIGIN } from '../utils/assets';
 
 const log = createLogger('SkinAnalysis');

@@ -30,7 +30,7 @@ import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
-import { colors } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 import { ASSET_ORIGIN } from '../utils/assets';
 
 

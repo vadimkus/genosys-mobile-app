@@ -24,7 +24,7 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 import SectionHeader from '../components/SectionHeader';
 
 export default function AboutScreen() {

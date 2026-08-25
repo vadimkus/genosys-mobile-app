@@ -25,7 +25,7 @@ import { getJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
-import { colors, shadow } from '../../utils/theme';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const log = createLogger('Blog');
 

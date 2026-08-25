@@ -44,7 +44,7 @@ import {
   getDeliveryEtaInfo,
 } from '../utils/checkoutFormUtils';
 import T from '../utils/typography';
-import { colors, shadow } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 import { withErrorBoundary } from '../components/ErrorBoundary';
 
 function CheckoutScreen() {

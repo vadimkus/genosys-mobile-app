@@ -18,7 +18,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as WebBrowser from 'expo-web-browser';
 import { useLocalization } from '../contexts/LocalizationContext';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
-import { colors } from '../utils/theme';
+import { colors, shadow } from '../utils/theme';
 import T from '../utils/typography';
 import * as haptics from '../utils/haptics';
 import { createLogger } from '../utils/logger';

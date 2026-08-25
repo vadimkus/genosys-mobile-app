@@ -30,7 +30,7 @@ import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCa
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, tint } from '../utils/theme';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import AUTH_CONFIG from '../config/auth';
 import { EMPTY_UNI_IMAGE } from '../utils/assets';
 

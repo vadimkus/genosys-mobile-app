@@ -27,7 +27,7 @@ import { isProductOutOfStock } from '../utils/stock';
 import { formatAed, getPricingDisplay } from '../utils/pricingDisplay';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, tint } from '../utils/theme';
+import { colors, tint, shadow } from '../utils/theme';
 
 const MAX_QTY = 99;
 

@@ -24,7 +24,7 @@ import Svg, { Circle, Line, Defs, LinearGradient, Stop, Rect } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors } from '../utils/theme';
+import { colors, shadow } from '../utils/theme';
 
 const FACE_IMAGE = 'https://genosys.ae/images/face-map/face-front.jpg';
 

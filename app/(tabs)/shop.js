@@ -67,7 +67,7 @@ import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
-import { colors, tint } from '../../utils/theme';
+import { colors, tint, shadow, surfaces } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 
 const log = createLogger('Shop');

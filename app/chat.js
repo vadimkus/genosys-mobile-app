@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { sendChatMessage, segmentChatResponse } from '../services/chatService';

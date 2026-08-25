@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import T from '../../utils/typography';
-import { colors, shadow } from '../../utils/theme';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const COPY = {
   en: { title: 'Quick facts', eyebrow: 'Product snapshot' },

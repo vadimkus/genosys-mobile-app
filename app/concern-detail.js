@@ -30,7 +30,7 @@ import * as haptics from '../utils/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalizedProductName } from '../utils/productLocalization';
 import T from '../utils/typography';
-import { colors, tint } from '../utils/theme';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import { computeWaterfallBreakdown } from '../utils/cartUtils';
 import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';

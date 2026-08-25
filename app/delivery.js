@@ -21,7 +21,7 @@ import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { colors, shadow, tint } from '../utils/theme';
+import { colors, tint, shadow, surfaces } from '../utils/theme';
 import SectionCard from '../components/SectionCard';
 
 export default function DeliveryScreen() {
