@@ -17,7 +17,7 @@ export default function PromoScreen() {
   const isRTL = dir === 'rtl' || locale === 'ar';
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -73,7 +73,7 @@ export default function PromoScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('promo.title')} scrollY={scrollY} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
+      <CollapsibleHeader title={t('promo.title')} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
 
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}

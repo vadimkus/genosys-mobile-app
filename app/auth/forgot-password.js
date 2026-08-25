@@ -30,7 +30,7 @@ export default function ForgotPasswordScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -92,7 +92,6 @@ export default function ForgotPasswordScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={t('authScreen.forgotPasswordTitle')}
-        scrollY={scrollY}
         onBack={onBack}
         isRTL={isRTL}
       />

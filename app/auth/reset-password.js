@@ -38,7 +38,7 @@ export default function ResetPasswordScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
   const params = useLocalSearchParams();
   const email = typeof params?.email === 'string' ? params.email : '';
 
@@ -118,7 +118,6 @@ export default function ResetPasswordScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={t('authScreen.resetPasswordTitle')}
-        scrollY={scrollY}
         onBack={onBack}
         isRTL={isRTL}
       />

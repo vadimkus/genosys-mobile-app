@@ -85,7 +85,7 @@ export default function SkinConcernsScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
+  const { onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); };
 
   const fade = useRef(new Animated.Value(0)).current;
@@ -106,7 +106,6 @@ export default function SkinConcernsScreen() {
     <View style={styles.container}>
       <CollapsibleHeader translateY={headerTranslateY}
         title={t('categories.skinConcern')}
-        scrollY={scrollY}
         onBack={onBack}
         isRTL={isRTL}
       />

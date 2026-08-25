@@ -20,7 +20,7 @@ export default function LanguageScreen() {
   const { user } = useAuth();
   const token = user?.token || user?.accessToken || '';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
 
   const [saving, setSaving] = useState(false);
 
@@ -68,7 +68,7 @@ export default function LanguageScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('profile.language')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader title={t('profile.language')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

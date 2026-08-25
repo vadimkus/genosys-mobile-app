@@ -53,7 +53,7 @@ function CheckoutScreen() {
   const { items, getTotalItems, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const { scrollY, onScroll, headerHeight, insets } = useCollapsibleHeader();
+  const { onScroll, headerHeight, insets } = useCollapsibleHeader();
   // Subtle entrance motion (matches OrderSuccessScreen / orders detail feel).
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(12)).current;
@@ -717,7 +717,6 @@ function CheckoutScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={t('checkout.title')}
-        scrollY={scrollY}
         onBack={onBack}
         isRTL={isRTL}
       />

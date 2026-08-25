@@ -223,7 +223,6 @@ export default function SkinAnalysisScreen() {
       <View style={styles.container}>
         <CollapsibleHeader
           title={t('skinAnalysis.yourResults')}
-          scrollY={loading ? null : scrollY}
           onBack={handleReset}
           isRTL={isRTL}
         />
@@ -405,7 +404,6 @@ export default function SkinAnalysisScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={t('skinAnalysis.step', { current: step, total: TOTAL_STEPS })}
-        scrollY={scrollY}
         onBack={handleBack}
         isRTL={isRTL}
       />

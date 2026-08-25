@@ -31,7 +31,7 @@ export default function ContactScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
+  const { onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const WHATSAPP_NUMBER = String(AUTH_CONFIG.WHATSAPP_NUMBER || '971585487665').replace(/[^\d]/g, '');
   const PHONE_DISPLAY = t('contact.phoneDisplay');
   const EMAIL = 'sales@genosys.ae';
@@ -141,7 +141,7 @@ export default function ContactScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader translateY={headerTranslateY} title={t('contact.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('contact.title')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

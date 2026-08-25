@@ -28,7 +28,7 @@ export default function BillingScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
   const { user } = useAuth();
   const token = user?.token || '';
 
@@ -108,7 +108,6 @@ export default function BillingScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={t('billing.title')}
-        scrollY={loading ? null : scrollY}
         onBack={onBack}
         isRTL={isRTL}
       />

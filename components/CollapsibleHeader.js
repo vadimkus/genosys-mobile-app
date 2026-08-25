@@ -3,27 +3,30 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import T from '../utils/typography';
-import { colors } from '../utils/theme';
+import { colors, shadow } from '../utils/theme';
 import { tStatic } from '../contexts/LocalizationContext';
 
 /**
- * Scroll-aware navigation header — the stock-iOS effect.
+ * Scroll-aware navigation header.
  *
- * At the top of the scroll the bar is transparent so it blends into the page
- * background; as the user scrolls, a cream fill + hairline fade in (and
- * content scrolls *under* the bar). Reusable across every screen.
+ * A floating bar rather than a band across the top: inset from both edges,
+ * rounded, on its own hairline and shadow, so it reads as an element sitting on
+ * the page the way the search field does — not as a white rectangle the page
+ * happens to start below. Content scrolls underneath it.
  *
  * Usage:
- *   const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
- *   <CollapsibleHeader title={t('orders.title')} scrollY={scrollY}
+ *   const { onScroll, headerHeight } = useCollapsibleHeader();
+ *   <CollapsibleHeader title={t('orders.title')}
  *     onBack={...} onRefresh={...} isRTL={isRTL} />
  *   <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16}
  *     contentContainerStyle={{ paddingTop: headerHeight }} />
  */
 
-export const HEADER_BAR_HEIGHT = 52;
-// Distance (px) over which the bar fades from transparent to solid.
-const FADE_DISTANCE = 28;
+export const HEADER_BAR_HEIGHT = 48;
+// Breathing room under the floating bar, so page content does not begin flush
+// against it and lose the sense that the bar is a separate thing.
+export const HEADER_GAP = 10;
+const HEADER_INSET = 12;
 
 /**
  * Hide-on-scroll, the pattern Instagram and Safari use: the bar leaves when you
@@ -55,11 +58,18 @@ export function shouldHideHeader({ y, lastY, headerHeight, isHidden }) {
   return delta > 0;
 }
 
-/** Hook that wires an Animated scroll value + the padding the content needs. */
-export function useCollapsibleHeader({ hideOnScroll = false } = {}) {
+/**
+ * Hook that wires an Animated scroll value + the padding the content needs.
+ *
+ * `hideDistance` is for screens that bring their own header rather than this
+ * one — the shop's is taller, with a logo and a subtitle — so they can share the
+ * behaviour without inheriting this bar's dimensions.
+ */
+export function useCollapsibleHeader({ hideOnScroll = false, hideDistance } = {}) {
   const insets = useSafeAreaInsets();
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const headerHeight = HEADER_BAR_HEIGHT + insets.top;
+  const barHeight = HEADER_BAR_HEIGHT + HEADER_GAP + insets.top;
+  const headerHeight = hideDistance ?? barHeight;
 
   const hidden = React.useRef(new Animated.Value(0)).current;
   const isHidden = React.useRef(false);
@@ -111,7 +121,9 @@ export function useCollapsibleHeader({ hideOnScroll = false } = {}) {
   return {
     scrollY,
     onScroll,
-    headerHeight,
+    // Screens padding for this bar want its height; screens with their own
+    // header already know theirs and only borrowed the behaviour.
+    headerHeight: barHeight,
     insets,
     translateY: hideOnScroll ? headerTranslate : undefined,
     revealHeader,
@@ -120,7 +132,6 @@ export function useCollapsibleHeader({ hideOnScroll = false } = {}) {
 
 export default function CollapsibleHeader({
   title,
-  scrollY,
   translateY,
   onBack,
   onRefresh,
@@ -130,23 +141,17 @@ export default function CollapsibleHeader({
   backIcon,
 }) {
   const insets = useSafeAreaInsets();
-  const bgOpacity = scrollY
-    ? scrollY.interpolate({ inputRange: [0, FADE_DISTANCE], outputRange: [0, 1], extrapolate: 'clamp' })
-    : 1;
   const chevron = backIcon || (isRTL ? 'chevron-forward' : 'chevron-back');
 
   return (
     <Animated.View
       style={[
         styles.wrap,
-        { height: HEADER_BAR_HEIGHT + insets.top, paddingTop: insets.top },
+        { paddingTop: insets.top },
         translateY ? { transform: [{ translateY }] } : null,
       ]}
+      pointerEvents="box-none"
     >
-      {/* Fill + hairline fade in on scroll (opacity → native-driver friendly) */}
-      <Animated.View style={[StyleSheet.absoluteFill, styles.fill, { opacity: bgOpacity }]} />
-      <Animated.View style={[styles.hairline, { opacity: bgOpacity }]} />
-
       <View style={[styles.bar, isRTL && styles.barRTL]}>
         {onBack ? (
           <TouchableOpacity
@@ -193,32 +198,27 @@ const styles = StyleSheet.create({
     zIndex: 10,
     backgroundColor: 'transparent',
   },
-  // Cream, not white: the bar floats over the page, and a white fill would
-  // read as a separate panel sliding in rather than the page continuing under
-  // its own header.
-  fill: {
-    backgroundColor: colors.groupedBg,
-  },
-  hairline: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.separator,
-  },
+  // White, on its own hairline and shadow, the same treatment as the search
+  // field on the shop page. Solid rather than translucent because content
+  // passes underneath it.
   bar: {
     height: HEADER_BAR_HEIGHT,
+    marginHorizontal: HEADER_INSET,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 6,
+    backgroundColor: colors.card,
+    borderRadius: HEADER_BAR_HEIGHT / 2,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    ...shadow.card,
   },
   barRTL: {
     flexDirection: 'row-reverse',
   },
   side: {
-    width: 44,
+    width: 40,
     height: HEADER_BAR_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
@@ -226,8 +226,8 @@ const styles = StyleSheet.create({
   // For text actions (e.g. "Save") in the `right` slot — hug content, don't clip.
   sideAuto: {
     width: undefined,
-    minWidth: 44,
-    paddingHorizontal: 4,
+    minWidth: 40,
+    paddingHorizontal: 8,
     alignItems: 'flex-end',
   },
   sideAutoRTL: {

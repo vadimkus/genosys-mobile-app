@@ -159,7 +159,7 @@ function OrdersScreen() {
   const { t, dir, locale } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
 
   const [openedFromProfile, setOpenedFromProfile] = useState(false);
 
@@ -352,7 +352,7 @@ function OrdersScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('orders.title')} scrollY={scrollY} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
+      <CollapsibleHeader title={t('orders.title')} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

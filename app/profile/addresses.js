@@ -31,7 +31,7 @@ export default function AddressesScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -253,7 +253,7 @@ export default function AddressesScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('addresses.title')} scrollY={scrollY} onBack={onBack} right={addButton} isRTL={isRTL} />
+      <CollapsibleHeader title={t('addresses.title')} onBack={onBack} right={addButton} isRTL={isRTL} />
 
       <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
         <Animated.ScrollView

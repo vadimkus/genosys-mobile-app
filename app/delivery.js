@@ -29,7 +29,7 @@ export default function DeliveryScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
+  const { onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [selectedRate, setSelectedRate] = useState(null);
@@ -102,7 +102,7 @@ export default function DeliveryScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader translateY={headerTranslateY} title={t('navigation.delivery')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('navigation.delivery')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

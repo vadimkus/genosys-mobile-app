@@ -85,7 +85,7 @@ export default function EditProfileScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
   const { user, updateProfile, deleteAccount, isAuthenticated } = useAuth();
 
   // Check authentication immediately
@@ -531,7 +531,6 @@ export default function EditProfileScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={t('editProfile.headerTitle')}
-        scrollY={scrollY}
         onBack={onHeaderBack}
         right={headerRight}
         isRTL={isRTL}

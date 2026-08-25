@@ -32,7 +32,7 @@ export default function AddEditAddressScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight } = useCollapsibleHeader();
   const { user, addAddress, editAddress } = useAuth();
   const params = useLocalSearchParams();
 
@@ -176,7 +176,6 @@ export default function AddEditAddressScreen() {
     <View style={styles.container}>
       <CollapsibleHeader
         title={isEditing ? t('addAddress.editTitle') : t('addAddress.addTitle')}
-        scrollY={scrollY}
         onBack={handleCancel}
         isRTL={isRTL}
       />

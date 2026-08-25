@@ -32,7 +32,7 @@ export default function AboutScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
+  const { onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   // Subtle entrance motion (matches order screens).
   const fade = useRef(new Animated.Value(0)).current;
@@ -61,7 +61,7 @@ export default function AboutScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader translateY={headerTranslateY} title={t('about.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('about.title')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

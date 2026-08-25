@@ -67,6 +67,11 @@ import AUTH_CONFIG from '../../config/auth';
 import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
 import { colors, tint, shadow, surfaces } from '../../utils/theme';
+import { useCollapsibleHeader } from '../../components/CollapsibleHeader';
+
+// Logo, subtitle and the two side controls, plus padding. Only used for the
+// first frame; onLayout replaces it with the measured height immediately after.
+const ESTIMATED_HEADER_HEIGHT = 96;
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 
 const log = createLogger('Shop');
@@ -431,6 +436,16 @@ function ShopScreen() {
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
+  // The shop's header is its own (logo, subtitle, avatar), but it borrows the
+  // hide-on-scroll behaviour from the shared one so the catalogue behaves like
+  // the articles do.
+  // The safe-area padding is above the header, and nothing clips it, so the
+  // travel has to clear the status bar as well or the bar parks half-visible
+  // over it.
+  const { onScroll: onHeaderScroll, translateY: headerTranslateY } = useCollapsibleHeader({
+    hideOnScroll: true,
+    hideDistance: (headerHeight || ESTIMATED_HEADER_HEIGHT) + insets.top + 10,
+  });
   const isRTL = dir === 'rtl';
   // ─── Voice Search (only when native module is available) ───
   const speechAvailable = _speechAvailable;
@@ -933,9 +948,15 @@ function ShopScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed Header - Apple Store Style */}
-      <View
-        style={[styles.header, isRTL && styles.headerRtl]}
+      {/* The header floats over the grid — inset, rounded and on its own
+          shadow, the same treatment as the search field below it — and steps
+          out of the way on the way down the catalogue. */}
+      <RNAnimated.View
+        style={[
+          styles.header,
+          isRTL && styles.headerRtl,
+          { transform: [{ translateY: headerTranslateY }] },
+        ]}
         onLayout={(e) => {
           const h = e?.nativeEvent?.layout?.height;
           if (typeof h === 'number' && Number.isFinite(h) && h > 0) setHeaderHeight(h);
@@ -1018,7 +1039,7 @@ function ShopScreen() {
             )}
           </TouchableOpacity>
         </View>
-      </View>
+      </RNAnimated.View>
 
       {/* Language dropdown menu (modal overlay) */}
       <Modal
@@ -1031,7 +1052,7 @@ function ShopScreen() {
           <View
             style={[
               styles.langMenu,
-              { top: (insets?.top || 0) + (headerHeight || 56) + 6 },
+              { top: (insets?.top || 0) + (headerHeight || ESTIMATED_HEADER_HEIGHT) + 6 },
               { start: 16 },
             ]}
           >
@@ -1067,9 +1088,16 @@ function ShopScreen() {
       </Modal>
       
       <RNAnimated.View style={[styles.gridFade, { opacity: contentFade }]}>
-      <FlatList
+      <RNAnimated.FlatList
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          // The estimate covers the frame before onLayout reports, so the grid
+          // does not start under the header and jump down once it does.
+          { paddingTop: (headerHeight || ESTIMATED_HEADER_HEIGHT) + 10 },
+        ]}
+        onScroll={onHeaderScroll}
+        scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         refreshing={refreshing}
         onRefresh={handleRefresh}
@@ -1358,14 +1386,21 @@ const styles = StyleSheet.create({
     // like only 1 product exists because you can’t scroll to the rest.
   },
   header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    marginHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: colors.card,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.separator,
-    zIndex: 10,
+    borderRadius: 22,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    ...shadow.card,
   },
   headerRtl: {
     flexDirection: 'row-reverse',

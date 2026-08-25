@@ -54,7 +54,7 @@ export default function BlogPostScreen() {
   const token = user?.token;
   const isRTL = dir === 'rtl';
   const scrollRef = useRef(null);
-  const { scrollY, onScroll, headerHeight, insets, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
+  const { onScroll, headerHeight, insets, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   const l = (en, ar, ru) => (locale === 'ar' ? ar : locale === 'ru' ? ru : en);
 
@@ -235,7 +235,6 @@ export default function BlogPostScreen() {
     <View style={styles.container}>
       <CollapsibleHeader translateY={headerTranslateY}
         title={t('navigation.blog') || l('Blog', 'المدونة', 'Блог')}
-        scrollY={post && !loading && !error ? scrollY : null}
         onBack={onBack}
         // The refresh icon that sat here duplicated pull-to-refresh, which the
         // article already supports. The slot is worth more to the language

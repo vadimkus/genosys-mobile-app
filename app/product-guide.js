@@ -278,7 +278,7 @@ export default function ProductGuideScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader translateY={headerTranslateY} title={documentTitle} scrollY={null} onBack={handleBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={documentTitle} onBack={handleBack} isRTL={isRTL} />
 
       <View style={[styles.content, { paddingTop: headerHeight }]}>
         {showError ? (

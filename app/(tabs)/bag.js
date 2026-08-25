@@ -557,7 +557,7 @@ function BagScreen() {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={t('bag.title')} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader title={t('bag.title')} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.emptyContainer, { paddingTop: navBarHeight }]}>
           <View style={styles.iconContainer}>
             <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
@@ -570,7 +570,7 @@ function BagScreen() {
   if (items.length === 0) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={t('bag.title')} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader title={t('bag.title')} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.emptyContainer, styles.emptyContainerTop, { paddingTop: navBarHeight + 24 }]}>
           <View style={styles.iconContainer}>
             <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />

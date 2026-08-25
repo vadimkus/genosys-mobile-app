@@ -44,7 +44,7 @@ export default function FavoritesScreen() {
   const { favorites, toggleFavorite } = useFavorites();
   const [addingProducts, setAddingProducts] = useState(new Set());
 
-  const { scrollY, onScroll, headerHeight, insets } = useCollapsibleHeader();
+  const { onScroll, headerHeight, insets } = useCollapsibleHeader();
 
   // Subtle entrance motion (matches order details / OrderSuccessScreen feel).
   const fade = useRef(new Animated.Value(0)).current;
@@ -137,7 +137,7 @@ export default function FavoritesScreen() {
   if (favorites.length === 0) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={t('favorites.title')} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader title={t('favorites.title')} onBack={onBack} isRTL={isRTL} />
         <Animated.View
           style={[
             styles.emptyContainer,
@@ -188,7 +188,7 @@ export default function FavoritesScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('favorites.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader title={t('favorites.title')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.View style={[styles.flex, { opacity: fade, transform: [{ translateY: lift }] }]}>
         <Animated.ScrollView

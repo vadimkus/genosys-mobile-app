@@ -21,7 +21,7 @@ export default function TermsScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
+  const { onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   const lastUpdated = t('terms.lastUpdatedDate');
 
@@ -171,7 +171,7 @@ export default function TermsScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader translateY={headerTranslateY} title={t('terms.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('terms.title')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}
