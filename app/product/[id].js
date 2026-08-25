@@ -1615,6 +1615,11 @@ function ProductDetailScreen() {
                     accessibilityState={{ selected, disabled: option.disabled }}
                     accessibilityLabel={option.label}
                   >
+                    {selected && (
+                      <View style={styles.footerOptionCheck}>
+                        <Ionicons name="checkmark" size={10} color={colors.white} />
+                      </View>
+                    )}
                     {option.hex ? (
                       <View style={[styles.footerSwatch, { backgroundColor: option.hex }]} />
                     ) : null}
@@ -2429,7 +2434,9 @@ const styles = StyleSheet.create({
   footerOptions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
+    paddingTop: 5,
+    paddingEnd: 5,
   },
   footerOption: {
     flexDirection: 'row',
@@ -2441,6 +2448,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.fillSecondary,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separatorStrong,
+  },
+  footerOptionCheck: {
+    position: 'absolute',
+    top: -5,
+    end: -5,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.card,
+    zIndex: 2,
   },
   footerOptionSelected: {
     backgroundColor: colors.accentBg,

@@ -147,6 +147,14 @@ export default function ProductOptionSheet({
         accessibilityLabel={`${dimension === 'size' ? t('variant.size') : t('variant.color')}: ${label}`}
         accessibilityState={{ selected, disabled: !available || isAdding }}
       >
+        {/* A tick, not just a tinted edge. Blush on white differs by 1.16:1, so
+            the fill cannot carry the selected state and a rose border reads at
+            a glance like the grey one next to it. */}
+        {selected && (
+          <View style={styles.optionCheck}>
+            <Ionicons name="checkmark" size={11} color={colors.white} />
+          </View>
+        )}
         {dimension === 'color' && (
           <View
             style={[
@@ -572,7 +580,9 @@ const styles = StyleSheet.create({
   options: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 12,
+    paddingTop: 6,
+    paddingEnd: 6,
   },
   optionsRTL: {
     flexDirection: 'row-reverse',
@@ -582,7 +592,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: colors.separator,
     borderRadius: 12,
     backgroundColor: colors.card,
@@ -595,6 +605,21 @@ const styles = StyleSheet.create({
   optionSelected: {
     borderColor: colors.accent,
     backgroundColor: colors.accentBg,
+  },
+  // Sits over the top-right corner of the chosen option.
+  optionCheck: {
+    position: 'absolute',
+    top: -6,
+    end: -6,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.card,
+    zIndex: 2,
   },
   optionDisabled: {
     opacity: 0.48,

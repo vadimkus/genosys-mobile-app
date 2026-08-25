@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { isCushionBB } from '../utils/productRules';
@@ -77,6 +78,11 @@ export default function ProductVariantSelector({
                     selectedColor === color.value && styles.selectedColorOption
                   ]}
                 >
+                  {selectedColor === color.value && (
+                    <View style={styles.checkBadge}>
+                      <Ionicons name="checkmark" size={11} color={colors.white} />
+                    </View>
+                  )}
                   <View
                     style={[
                       styles.colorSwatch,
@@ -114,6 +120,11 @@ export default function ProductVariantSelector({
                   ]}
                   disabled={!variant.available}
                 >
+                  {selectedSize === variant.size && (
+                    <View style={styles.checkBadge}>
+                      <Ionicons name="checkmark" size={11} color={colors.white} />
+                    </View>
+                  )}
                   <Text style={[
                     styles.sizeLabel,
                     selectedSize === variant.size && styles.selectedSizeLabel,
@@ -188,7 +199,7 @@ const styles = StyleSheet.create({
   },
   selectedColorOption: {
     borderColor: colors.accent,
-    backgroundColor: colors.redBg,
+    backgroundColor: colors.accentBg,
   },
   colorSwatch: {
     width: 24,
@@ -226,6 +237,23 @@ const styles = StyleSheet.create({
     borderColor: colors.separator,
     backgroundColor: colors.card,
   },
+  // The chosen option wears a tick. A rose border and a blush fill are the
+  // right colours but too quiet on their own — blush differs from white by
+  // 1.16:1, so at a glance the selected chip looks like the others.
+  checkBadge: {
+    position: 'absolute',
+    top: -6,
+    end: -6,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.card,
+    zIndex: 2,
+  },
   sizeOption: {
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -238,7 +266,7 @@ const styles = StyleSheet.create({
   },
   selectedSizeOption: {
     borderColor: colors.accent,
-    backgroundColor: colors.redBg,
+    backgroundColor: colors.accentBg,
   },
   sizeLabel: {
     ...T.label,
