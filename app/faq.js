@@ -355,8 +355,8 @@ export default function FAQScreen() {
                 onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
                 activeOpacity={0.7}
               >
-                <Ionicons name="logo-whatsapp" size={18} color={colors.whatsapp} />
-                <Text style={[styles.ctaBtnText, { color: colors.whatsapp }]}>WhatsApp</Text>
+                <Ionicons name="logo-whatsapp" size={18} color={colors.whatsappDeep} />
+                <Text style={[styles.ctaBtnText, { color: colors.whatsappDeep }]}>WhatsApp</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.ctaBtn, { backgroundColor: colors.accentBg }]}

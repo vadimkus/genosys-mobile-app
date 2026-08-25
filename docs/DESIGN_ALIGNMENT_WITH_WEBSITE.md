@@ -421,3 +421,47 @@ diagram rather than head a section.
 Forty unused specifiers across twenty-four files, mostly predating this work.
 Removed, then checked in the other direction: every theme symbol still
 referenced anywhere is still imported.
+
+## Stage 7 — one accent instead of a rainbow
+
+Forty-eight icon tiles were filled from ten different colours: blue, indigo,
+teal, purple, green, orange, grey. That spread is the strongest remaining
+signal of an iOS Settings screen, and the website has exactly one accent.
+
+Sixty-one decorative fills are now rose. The colours were being set in three
+different shapes — a `tileColor` data field, a JSX prop, and painted straight
+onto `surfaces.iconTile` — so all three had to be caught. Ink stays on the six
+hero tiles, which reads as hierarchy rather than as a palette, and red still
+means danger.
+
+`SectionHeader` turns out to be declared inline in eight separate screens
+rather than shared. Not addressed here, but worth knowing.
+
+### The palette now passes on cream
+
+Having found in stage 5 that the iOS status colours were failing, the rest got
+the same treatment. Every colour that can carry text or an icon on the page:
+
+| Token | Contrast on cream |
+|---|---|
+| cta (ink) | 16.75 |
+| whatsappDeep | 7.19 |
+| greenDeep | 6.12 |
+| blue | 6.10 |
+| purple | 5.34 |
+| indigo | 5.30 |
+| accent (rose) | 5.21 |
+| teal | 5.17 |
+| orange | 5.13 |
+| red | 4.80 |
+| green | 4.73 |
+
+Teal was the last failure at 2.41 and is deepened.
+
+### WhatsApp green
+
+`#25D366` reaches 1.86:1 on cream, so the logo drawn on the page was close to
+invisible, but changing it would misrepresent someone else's mark. It is split
+instead: the bright green stays for the filled lockup, where white-on-green is
+the recognised badge, and the twelve places drawing the logo or its label on
+the page use WhatsApp's own darker `#075E54`, which reaches 7.19.

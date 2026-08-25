@@ -874,7 +874,7 @@ function ProductDetailScreen() {
 
     return (
       <View style={styles.section}>
-        <PdpSectionHeader icon="information-circle" tileColor={colors.indigo} title={t('product.productDetails')} isRTL={isRTL} />
+        <PdpSectionHeader icon="information-circle" tileColor={colors.accent} title={t('product.productDetails')} isRTL={isRTL} />
         <View style={styles.specList}>
           {rows.map((row, idx) => (
             <View
@@ -1518,7 +1518,7 @@ function ProductDetailScreen() {
             if (!docs.length) return null;
             return (
               <View style={styles.section}>
-                <PdpSectionHeader icon="document-attach" tileColor={colors.teal} title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
+                <PdpSectionHeader icon="document-attach" tileColor={colors.accent} title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
                 {docs.map((doc, index) => (
                   <TouchableOpacity
                     key={`doc-${index}`}
@@ -1556,7 +1556,7 @@ function ProductDetailScreen() {
                   : fullText;
                 return (
                   <View style={styles.section}>
-                    <PdpSectionHeader icon="document-text" tileColor={colors.blue} title={t('product.about')} isRTL={isRTL} />
+                    <PdpSectionHeader icon="document-text" tileColor={colors.accent} title={t('product.about')} isRTL={isRTL} />
                     <View style={styles.descriptionContainer}>
                       <Text style={[styles.description, isRTL && styles.textRTL]}>
                         {visible}
@@ -2350,7 +2350,7 @@ const styles = StyleSheet.create({
   pcPriceOnRequest: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.whatsapp,
+    color: colors.whatsappDeep,
     marginBottom: 6,
   },
   pcViewDetails: {

@@ -92,7 +92,7 @@ export default function LanguageScreen() {
                     disabled={saving}
                     activeOpacity={0.6}
                   >
-                    <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                    <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                       <Ionicons name="globe" size={17} color={colors.white} />
                     </View>
                     <Text style={[styles.rowLabel, isRTL && styles.textRTL]}>{o.label}</Text>

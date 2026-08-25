@@ -100,7 +100,7 @@ export default function HelpSupportScreen() {
       subtitle: t('help.support.emailSubtitle'),
       description: 'sales@genosys.ae',
       icon: 'mail',
-      tileColor: colors.blue,
+      tileColor: colors.accent,
       action: () => Linking.openURL('mailto:sales@genosys.ae').catch(() => {}),
     },
     {
@@ -109,7 +109,7 @@ export default function HelpSupportScreen() {
       subtitle: t('help.support.phoneSubtitle'),
       description: '+971 58 548 76 65',
       icon: 'call',
-      tileColor: colors.green,
+      tileColor: colors.accent,
       action: () => Linking.openURL('tel:+971585487665').catch(() => {}),
     },
     {
@@ -290,7 +290,7 @@ export default function HelpSupportScreen() {
               onPress={() => { haptics.lightTap(); router.push('/profile/orders'); }}
               activeOpacity={0.7}
             >
-              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.greenDeep }]}>
+              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="receipt" size={20} color={colors.white} />
               </View>
               <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.trackOrder')}</Text>
@@ -301,7 +301,7 @@ export default function HelpSupportScreen() {
               onPress={() => { haptics.lightTap(); setReturnModalVisible(true); }}
               activeOpacity={0.7}
             >
-              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.blue }]}>
+              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="refresh" size={20} color={colors.white} />
               </View>
               <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.returnItem')}</Text>
@@ -342,7 +342,7 @@ export default function HelpSupportScreen() {
           <View style={[styles.returnModalCard, shadow.card]}>
             <View style={[styles.returnModalHeader, isRTL && styles.returnModalHeaderRTL]}>
               <View style={[styles.returnModalHeaderLeft, isRTL && styles.returnModalHeaderLeftRTL]}>
-                <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                   <Ionicons name="refresh" size={17} color={colors.white} />
                 </View>
                 <Text style={[styles.returnModalTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>

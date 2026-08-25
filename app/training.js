@@ -210,7 +210,7 @@ export default function TrainingScreen() {
           <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
             {/* Hero */}
             <View style={styles.heroSection}>
-              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.greenDeep }]}>
+              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="school" size={24} color={colors.white} />
               </View>
               <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
@@ -240,7 +240,7 @@ export default function TrainingScreen() {
             {/* Training Documents */}
             {trainingDocs.length > 0 && (
               <View style={styles.section}>
-                <SectionHeader icon="document-text" tileColor={colors.greenDeep} title={l('Training Documents', 'وثائق التدريب', 'Учебные документы')} />
+                <SectionHeader icon="document-text" tileColor={colors.accent} title={l('Training Documents', 'وثائق التدريب', 'Учебные документы')} />
                 <View style={[styles.card, shadow.card]}>
                   {trainingDocs.map((doc, idx) => (
                     <TouchableOpacity
@@ -302,7 +302,7 @@ export default function TrainingScreen() {
             {/* Training Videos */}
             {videos.length > 0 && (
               <View style={styles.section}>
-                <SectionHeader icon="play-circle" tileColor={colors.purple} title={l('Video Lessons', 'دروس فيديو', 'Видеоуроки')} />
+                <SectionHeader icon="play-circle" tileColor={colors.accent} title={l('Video Lessons', 'دروس فيديو', 'Видеоуроки')} />
                 <View style={styles.videoGrid}>
                   {videos.map((video) => (
                     <TouchableOpacity

@@ -96,7 +96,7 @@ export default function AboutScreen() {
 
           {/* About Us */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="information-circle" tileColor={colors.blue} title={t('about.aboutUsTitle')} />
+            <SectionHeader icon="information-circle" tileColor={colors.accent} title={t('about.aboutUsTitle')} />
             <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{t('about.aboutUsLine1')}</Text>
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{t('about.aboutUsLine2')}</Text>
           </View>
@@ -109,7 +109,7 @@ export default function AboutScreen() {
 
           {/* Company Details */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="business" tileColor={colors.indigo} title={t('about.companyDetailsTitle')} />
+            <SectionHeader icon="business" tileColor={colors.accent} title={t('about.companyDetailsTitle')} />
             <InfoRow label={t('about.companyLabel')} value={t('about.companyName')} />
             <InfoRow label={t('about.yearLabel')} value={t('about.yearValue')} />
             <InfoRow label={t('about.licenseLabel')} value={t('about.licenseValue')} />
@@ -120,7 +120,7 @@ export default function AboutScreen() {
 
           {/* Business Info */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="briefcase" tileColor={colors.teal} title={t('about.businessInfoTitle')} />
+            <SectionHeader icon="briefcase" tileColor={colors.accent} title={t('about.businessInfoTitle')} />
             <InfoRow label={t('about.distributorLabel')} value={t('about.distributorValue')} />
             <InfoRow label={t('about.certificationLabel')} value={t('about.certificationValue')} />
             <InfoRow label={t('about.productsLabel')} value={t('about.productsValue')} />

@@ -51,7 +51,7 @@ export default function PaymentMethodSelector({
   return (
     <View style={styles.section}>
       <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-        <View style={[surfaces.iconTile, { backgroundColor: colors.green }]}>
+        <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
           <Ionicons name="card" size={17} color={colors.white} />
         </View>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.paymentMethod')}</Text>
@@ -72,7 +72,7 @@ export default function PaymentMethodSelector({
         {renderMethod({
           method: PAYMENT_METHODS.COD,
           icon: 'cash',
-          tileColor: colors.green,
+          tileColor: colors.accent,
           title: t('checkout.cashOnDelivery'),
           description: t('checkout.payWhenDelivered'),
         })}
@@ -81,7 +81,7 @@ export default function PaymentMethodSelector({
         {renderMethod({
           method: PAYMENT_METHODS.CARD,
           icon: 'card',
-          tileColor: colors.blue,
+          tileColor: colors.accent,
           title: t('checkout.cardPayment'),
           description: t('checkout.paySecurelyStripe'),
         })}

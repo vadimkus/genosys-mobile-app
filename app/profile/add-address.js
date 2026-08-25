@@ -209,7 +209,7 @@ export default function AddEditAddressScreen() {
           >
             {/* Address Type */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="home" tileColor={colors.teal} title={t('addAddress.addressType')} isRTL={isRTL} />
+              <SectionHeader icon="home" tileColor={colors.accent} title={t('addAddress.addressType')} isRTL={isRTL} />
               <View style={[styles.typeContainer, isRTL && styles.typeContainerRTL]}>
                 {addressTypes.map((type) => {
                   const active = formData.type === type;
@@ -236,7 +236,7 @@ export default function AddEditAddressScreen() {
 
             {/* Contact Information */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="person" tileColor={colors.blue} title={t('addAddress.contactInfo')} isRTL={isRTL} />
+              <SectionHeader icon="person" tileColor={colors.accent} title={t('addAddress.contactInfo')} isRTL={isRTL} />
               <View style={styles.fieldContainer}>
                 <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('addAddress.fullName')}
@@ -276,7 +276,7 @@ export default function AddEditAddressScreen() {
 
             {/* Address Details */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="location" tileColor={colors.teal} title={t('addAddress.addressDetails')} isRTL={isRTL} />
+              <SectionHeader icon="location" tileColor={colors.accent} title={t('addAddress.addressDetails')} isRTL={isRTL} />
               <View style={styles.fieldContainer}>
                 <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('addAddress.streetAddress')}
@@ -358,7 +358,7 @@ export default function AddEditAddressScreen() {
 
             {/* Preferences */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="star" tileColor={colors.indigo} title={t('addAddress.preferences')} isRTL={isRTL} />
+              <SectionHeader icon="star" tileColor={colors.accent} title={t('addAddress.preferences')} isRTL={isRTL} />
               <View style={[styles.switchContainer, isRTL && styles.switchContainerRTL]}>
                 <View style={[styles.switchLabel, isRTL && styles.switchLabelRTL]}>
                   <Text style={[styles.fieldLabel, styles.switchTitle, isRTL && styles.textRTL]}>{t('addAddress.setAsDefault')}</Text>

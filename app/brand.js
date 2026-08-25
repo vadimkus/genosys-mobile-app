@@ -142,7 +142,7 @@ export default function BrandScreen() {
 
           {/* About Section */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="information-circle" tileColor={colors.blue} title={sectionLabels.about} />
+            <SectionHeader icon="information-circle" tileColor={colors.accent} title={sectionLabels.about} />
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandDescription}</Text>
           </View>
 
@@ -154,7 +154,7 @@ export default function BrandScreen() {
 
           {/* Key Technologies */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="flask" tileColor={colors.purple} title={sectionLabels.technologies} />
+            <SectionHeader icon="flask" tileColor={colors.accent} title={sectionLabels.technologies} />
             {keyTechnologies.map((tech, index) => (
               <View
                 key={index}
@@ -173,7 +173,7 @@ export default function BrandScreen() {
 
           {/* Brand Videos */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="videocam" tileColor={colors.indigo} title={sectionLabels.videos} />
+            <SectionHeader icon="videocam" tileColor={colors.accent} title={sectionLabels.videos} />
             {videos.map((video) => (
               <TouchableOpacity
                 key={video.id}
@@ -202,7 +202,7 @@ export default function BrandScreen() {
           <View style={[styles.card, shadow.card]}>
             <SectionHeader
               icon="cube"
-              tileColor={colors.teal}
+              tileColor={colors.accent}
               title={locale === 'ar' ? 'مجموعة المنتجات المهنية' : locale === 'ru' ? 'Профессиональная линейка продуктов' : 'Professional Product Line'}
             />
             <View style={styles.productImageWrap}>

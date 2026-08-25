@@ -146,7 +146,7 @@ export default function BillingScreen() {
               keyboardDismissMode="on-drag"
             >
               <View style={[styles.section, shadow.card]}>
-                <SectionHeader icon="document-text" tileColor={colors.indigo} title={t('billing.title')} isRTL={isRTL} />
+                <SectionHeader icon="document-text" tileColor={colors.accent} title={t('billing.title')} isRTL={isRTL} />
 
                 <View style={styles.fieldContainer}>
                   <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.addressLabel')}</Text>

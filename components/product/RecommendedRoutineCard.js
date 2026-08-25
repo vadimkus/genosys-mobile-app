@@ -40,7 +40,7 @@ export default function RecommendedRoutineCard({ routine, currentProductId, isRT
   return (
     <View style={[s.card, shadow.card]}>
       <View style={[s.headerRow, isRTL && s.rowReverse]}>
-        <View style={[surfaces.iconTile, { backgroundColor: colors.purple }]}>
+        <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
           <Ionicons name="sparkles" size={16} color={colors.white} />
         </View>
         <Text style={[s.headerTitle, isRTL && s.textRTL]} numberOfLines={2}>

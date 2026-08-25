@@ -89,8 +89,12 @@ export const colors = {
   redLine: '#e0bdb7',
   indigo: '#5856D6',
   purple: '#7C3AED',
-  teal: '#30B0C7',
+  teal: '#1E7286',      // deepened from #30B0C7, which read 2.41:1 on cream
+  // WhatsApp's brand green, for the filled lockup where white-on-green is the
+  // recognised mark. It only reaches 1.86:1 on cream, so anywhere the logo sits
+  // on the page rather than on its own tile, use the darker official variant.
   whatsapp: '#25D366',
+  whatsappDeep: '#075E54',   // 7.19:1 on cream
   white: '#FFFFFF',
 };
 

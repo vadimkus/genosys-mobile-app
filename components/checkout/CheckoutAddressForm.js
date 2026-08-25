@@ -89,7 +89,7 @@ export default function CheckoutAddressForm({
     <>
       <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
         <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-          <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
+          <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
             <Ionicons name="location" size={17} color={colors.white} />
           </View>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>

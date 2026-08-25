@@ -719,7 +719,7 @@ function OrdersScreen() {
                     onPress={() => contactSupportWhatsApp(o)}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="logo-whatsapp" size={16} color={colors.whatsapp} />
+                    <Ionicons name="logo-whatsapp" size={16} color={colors.whatsappDeep} />
                     <Text style={[styles.supportButtonText, isRTL && styles.textRTLRight]}>{t('ordersScreen.support')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -930,7 +930,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
   },
-  supportButtonText: { ...T.buttonSmall, fontSize: 14, fontWeight: '700', color: colors.whatsapp },
+  supportButtonText: { ...T.buttonSmall, fontSize: 14, fontWeight: '700', color: colors.whatsappDeep },
   buttonRTL: { flexDirection: 'row-reverse' },
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
 });

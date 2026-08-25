@@ -122,7 +122,7 @@ export default function DeliveryScreen() {
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Delivery Options */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="rocket" tileColor={colors.teal} title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} />
+            <SectionHeader icon="rocket" tileColor={colors.accent} title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} />
             {deliveryMethods.map((method, index) => {
               const isSelected = selectedMethod === index;
               const isLast = index === deliveryMethods.length - 1;
@@ -164,7 +164,7 @@ export default function DeliveryScreen() {
 
           {/* Shipping Rates */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="pricetags" tileColor={colors.indigo} title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} />
+            <SectionHeader icon="pricetags" tileColor={colors.accent} title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} />
             {shippingRates.map((item, index) => {
               const isSelected = selectedRate === index;
               const isLast = index === shippingRates.length - 1;
@@ -187,7 +187,7 @@ export default function DeliveryScreen() {
 
           {/* Return Policy */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="shield-checkmark" tileColor={colors.blue} title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} />
+            <SectionHeader icon="shield-checkmark" tileColor={colors.accent} title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} />
             {policies.map((policy, index) => {
               const isLast = index === policies.length - 1;
               return (
@@ -211,7 +211,7 @@ export default function DeliveryScreen() {
               onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
               activeOpacity={0.85}
             >
-              <Ionicons name="logo-whatsapp" size={20} color={colors.whatsapp} />
+              <Ionicons name="logo-whatsapp" size={20} color={colors.whatsappDeep} />
               <Text style={styles.helpBtnText}>
                 {l('Chat on WhatsApp', 'تواصل عبر واتساب', 'Написать в WhatsApp')}
               </Text>
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignSelf: 'stretch',
   },
-  helpBtnText: { ...T.button, fontWeight: '700', color: colors.whatsapp },
+  helpBtnText: { ...T.button, fontWeight: '700', color: colors.whatsappDeep },
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

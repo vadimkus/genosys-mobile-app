@@ -28,7 +28,7 @@ export default function OrderSummaryCard({
   return (
     <View style={styles.section}>
       <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-        <View style={[surfaces.iconTile, { backgroundColor: colors.secondaryLabel }]}>
+        <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
           <Ionicons name="chatbubble-ellipses" size={17} color={colors.white} />
         </View>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.orderNotesOptional')}</Text>

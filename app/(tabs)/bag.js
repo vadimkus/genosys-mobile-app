@@ -669,7 +669,7 @@ function BagScreen() {
               <ProgressCard
                 headerLeft={
                   <View style={styles.sectionTitleLeft}>
-                    <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
+                    <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                       <Ionicons name="car" size={16} color={colors.white} />
                     </View>
                     <Text style={styles.sectionTitle}>{t('bag.freeDeliveryTitle')}</Text>

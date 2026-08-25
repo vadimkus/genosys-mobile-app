@@ -561,7 +561,7 @@ export default function EditProfileScreen() {
         contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
       >
         {/* Profile Picture Section */}
-        <FormSection title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline" tileColor={colors.indigo}>
+        <FormSection title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline" tileColor={colors.accent}>
           <View style={styles.formContent}>
             <TouchableOpacity
               style={[styles.profilePictureContainer, !isEditing && styles.readOnlyBlock]}
@@ -588,7 +588,7 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Personal Information */}
-        <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline" tileColor={colors.blue}>
+        <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline" tileColor={colors.accent}>
           <View style={styles.formContent}>
             {/* Required asterisks dropped: at 5/7 fields, they carried no
                 information (redundant noise). Optional fields are marked
@@ -715,7 +715,7 @@ export default function EditProfileScreen() {
         </FormSection>
 
         {/* Additional Information */}
-        <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline" tileColor={colors.teal}>
+        <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline" tileColor={colors.accent}>
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>

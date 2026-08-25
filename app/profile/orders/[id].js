@@ -477,7 +477,7 @@ export default function OrderDetailScreen() {
 
           {/* Payment Method Section */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="card" tileColor={colors.green} title={t('ordersDetail.paymentMethod')} isRTL={isRTL} />
+            <SectionHeader icon="card" tileColor={colors.accent} title={t('ordersDetail.paymentMethod')} isRTL={isRTL} />
             <View style={styles.paymentMethodCard}>
               <View style={styles.paymentMethodRow}>
                 {isApplePayLike(order) ? (
@@ -494,7 +494,7 @@ export default function OrderDetailScreen() {
           {/* Order Notes */}
           {orderNotes ? (
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="chatbubble-ellipses" tileColor={colors.secondaryLabel} title={t('ordersDetail.orderNotes')} isRTL={isRTL} />
+              <SectionHeader icon="chatbubble-ellipses" tileColor={colors.accent} title={t('ordersDetail.orderNotes')} isRTL={isRTL} />
               <View style={styles.notesCard}>
                 <Text style={[styles.notesText, isRTL && styles.textRTL]}>{orderNotes}</Text>
               </View>
@@ -775,7 +775,7 @@ export default function OrderDetailScreen() {
 
           {/* Shipping Details */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="location" tileColor={colors.teal} title={t('ordersDetail.shippingDetails')} isRTL={isRTL} />
+            <SectionHeader icon="location" tileColor={colors.accent} title={t('ordersDetail.shippingDetails')} isRTL={isRTL} />
             
             {customerName ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
@@ -820,7 +820,7 @@ export default function OrderDetailScreen() {
 
           {/* Order Summary — Waterfall Pricing Breakdown */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="calculator" tileColor={colors.indigo} title={t('ordersDetail.orderSummary')} isRTL={isRTL} />
+            <SectionHeader icon="calculator" tileColor={colors.accent} title={t('ordersDetail.orderSummary')} isRTL={isRTL} />
 
             {(() => {
               const orderDiscPct = Number(order?.discountPercentage);
@@ -997,7 +997,7 @@ export default function OrderDetailScreen() {
             )}
 
             <TouchableOpacity style={[styles.supportButton, isRTL && styles.buttonRTL]} onPress={onSupport} activeOpacity={0.7}>
-              <Ionicons name="logo-whatsapp" size={18} color={colors.whatsapp} />
+              <Ionicons name="logo-whatsapp" size={18} color={colors.whatsappDeep} />
               <Text style={[styles.supportButtonText, isRTL && styles.textRTL]}>{t('ordersDetail.supportWhatsapp')}</Text>
             </TouchableOpacity>
           </View>
@@ -1601,7 +1601,7 @@ const styles = StyleSheet.create({
   supportButtonText: {
     ...T.button,
     fontWeight: '700',
-    color: colors.whatsapp,
+    color: colors.whatsappDeep,
   },
   buttonDisabled: {
     opacity: 0.6,

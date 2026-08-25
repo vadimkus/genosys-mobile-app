@@ -341,7 +341,7 @@ export default function BlogPostScreen() {
               {/* Comments Section */}
               <View style={styles.commentsSection}>
                 <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-                  <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+                  <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                     <Ionicons name="chatbubbles" size={17} color={colors.white} />
                   </View>
                   <Text style={[styles.commentsTitle, isRTL && styles.textRTL]}>

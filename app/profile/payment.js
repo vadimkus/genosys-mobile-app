@@ -144,7 +144,7 @@ export default function PaymentScreen() {
             <MethodRow
               method={PAYMENT_METHODS.COD}
               icon="cash"
-              tileColor={colors.greenDeep}
+              tileColor={colors.accent}
               title={t('paymentSettings.cod')}
               subtitle={t('paymentSettings.codSubtitle')}
             />
@@ -152,7 +152,7 @@ export default function PaymentScreen() {
             <MethodRow
               method={PAYMENT_METHODS.CARD}
               icon="card"
-              tileColor={colors.blue}
+              tileColor={colors.accent}
               title={t('paymentSettings.card')}
               subtitle={t('paymentSettings.cardSubtitle')}
             />
@@ -166,7 +166,7 @@ export default function PaymentScreen() {
 
           {/* Billing Information */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="document-text" tileColor={colors.indigo} title={t('paymentSettings.billingInfo')} isRTL={isRTL} />
+            <SectionHeader icon="document-text" tileColor={colors.accent} title={t('paymentSettings.billingInfo')} isRTL={isRTL} />
 
             <View style={[styles.billingRow, isRTL && styles.rowRTL]}>
               <Text style={[styles.billingLabel, isRTL && styles.textRTL]}>{t('paymentSettings.billingAddress')}</Text>
@@ -190,10 +190,10 @@ export default function PaymentScreen() {
 
           {/* Security Information */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="shield-checkmark" tileColor={colors.greenDeep} title={t('paymentSettings.securityPrivacy')} isRTL={isRTL} />
+            <SectionHeader icon="shield-checkmark" tileColor={colors.accent} title={t('paymentSettings.securityPrivacy')} isRTL={isRTL} />
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.greenDeep }]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="shield-checkmark" size={17} color={colors.white} />
               </View>
               <View style={styles.securityInfo}>
@@ -205,7 +205,7 @@ export default function PaymentScreen() {
             <View style={styles.hairline} />
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="lock-closed" size={17} color={colors.white} />
               </View>
               <View style={styles.securityInfo}>
@@ -217,7 +217,7 @@ export default function PaymentScreen() {
             <View style={styles.hairline} />
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.indigo }]}>
+              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="card" size={17} color={colors.white} />
               </View>
               <View style={styles.securityInfo}>

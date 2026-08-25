@@ -158,7 +158,7 @@ export default function TermsScreen() {
   const SectionCard = ({ icon, title, children }) => (
     <View style={[styles.card, shadow.card]}>
       <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-        <View style={[surfaces.iconTile, { backgroundColor: colors.secondaryLabel }]}>
+        <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
           <Ionicons name={icon} size={16} color={colors.white} />
         </View>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>

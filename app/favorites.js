@@ -347,7 +347,7 @@ export default function FavoritesScreen() {
                       }}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name="logo-whatsapp" size={16} color={colors.whatsapp} />
+                      <Ionicons name="logo-whatsapp" size={16} color={colors.whatsappDeep} />
                       <Text style={styles.requestQuoteText}>{t('product.requestQuote')}</Text>
                     </TouchableOpacity>
                   ) : (
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   priceOnRequestText: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: colors.whatsapp,
+    color: colors.whatsappDeep,
   },
   loginToSeePriceText: {
     ...T.captionSmall,
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
   },
   requestQuoteText: {
     ...T.buttonSmall,
-    color: colors.whatsapp,
+    color: colors.whatsappDeep,
   },
 
   // ── Empty state ────────────────────────────────────────────────────
