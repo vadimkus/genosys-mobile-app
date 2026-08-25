@@ -202,8 +202,8 @@ export default function TrainingScreen() {
           <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
             {/* Hero */}
             <View style={styles.heroSection}>
-              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="school" size={24} color={colors.white} />
+              <View style={[surfaces.iconWell, styles.heroTile]}>
+                <Ionicons name="school" size={24} color={colors.accent} />
               </View>
               <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
                 {l('Training Materials', 'مواد التدريب', 'Учебные материалы')}

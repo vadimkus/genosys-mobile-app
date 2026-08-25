@@ -199,8 +199,8 @@ export default function ProductReviews({ productId }) {
       <View style={[styles.headerRow, isRTL && styles.headerRowRTL]}>
         <View style={{ flex: 1 }}>
           <View style={[styles.titleRow, isRTL && styles.titleRowRTL]}>
-            <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-              <Ionicons name="star" size={16} color={colors.white} />
+            <View style={surfaces.iconWell}>
+              <Ionicons name="star" size={16} color={colors.accent} />
             </View>
             <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
               {t('reviews.title')}

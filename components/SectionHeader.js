@@ -29,8 +29,11 @@ export default function SectionHeader({
 }) {
   return (
     <View style={[styles.row, isRTL && styles.rowRTL, style]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
+      {/* A pale well with the accent as the glyph — see `surfaces.iconWell`.
+          `tileColor` now tints the glyph rather than flooding the tile, so a
+          caller asking for red still reads as red without a solid block. */}
+      <View style={surfaces.iconWell}>
+        <Ionicons name={icon} size={16} color={tileColor} />
       </View>
       <Text style={[styles.title, isRTL && styles.titleRTL, titleStyle]}>{title}</Text>
     </View>

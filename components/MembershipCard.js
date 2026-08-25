@@ -88,7 +88,7 @@ export default function MembershipCard({ isRTL = false }) {
       >
         <View style={[styles.partnerRow, isRTL && styles.rowReverse]}>
           <View style={styles.partnerIcon}>
-            <Ionicons name="business-outline" size={18} color={colors.white} />
+            <Ionicons name="business-outline" size={18} color={colors.accent} />
           </View>
           <View style={[styles.partnerText, isRTL && styles.textAlignRight]}>
             <Text style={[styles.partnerTitle, isRTL && styles.textRTL]}>
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 12,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentBg,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -190,8 +190,8 @@ export default function AddressesScreen() {
     return (
       <View style={[styles.card, shadow.card]}>
         <View style={[styles.cardHead, isRTL && styles.rowRTL]}>
-          <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-            <Ionicons name={typeMeta.icon} size={17} color={colors.white} />
+          <View style={surfaces.iconWell}>
+            <Ionicons name={typeMeta.icon} size={17} color={colors.accent} />
           </View>
           <View style={styles.headMiddle}>
             <View style={[styles.typeRow, isRTL && styles.rowRTL]}>
@@ -282,8 +282,8 @@ export default function AddressesScreen() {
               ))
             ) : (
               <View style={[styles.emptyState, shadow.card]}>
-                <View style={[surfaces.iconTile, styles.emptyTile, { backgroundColor: colors.accent }]}>
-                  <Ionicons name="location" size={22} color={colors.white} />
+                <View style={[surfaces.iconWell, styles.emptyTile]}>
+                  <Ionicons name="location" size={22} color={colors.accent} />
                 </View>
                 <Text style={[styles.emptyTitle, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
                 <Text style={[styles.emptySubtitle, isRTL && styles.textRTL]}>{t('addresses.emptySubtitle')}</Text>

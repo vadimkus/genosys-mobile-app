@@ -177,8 +177,8 @@ export default function PaymentScreen() {
           {/* Security Information */}
           <SectionCard style={styles.sectionSpacing} icon="shield-checkmark" title={t('paymentSettings.securityPrivacy')} isRTL={isRTL}>
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="shield-checkmark" size={17} color={colors.white} />
+              <View style={surfaces.iconWell}>
+                <Ionicons name="shield-checkmark" size={17} color={colors.accent} />
               </View>
               <View style={styles.securityInfo}>
                 <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.securePayments')}</Text>
@@ -189,8 +189,8 @@ export default function PaymentScreen() {
             <View style={styles.hairline} />
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="lock-closed" size={17} color={colors.white} />
+              <View style={surfaces.iconWell}>
+                <Ionicons name="lock-closed" size={17} color={colors.accent} />
               </View>
               <View style={styles.securityInfo}>
                 <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.dataProtection')}</Text>
@@ -201,8 +201,8 @@ export default function PaymentScreen() {
             <View style={styles.hairline} />
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="card" size={17} color={colors.white} />
+              <View style={surfaces.iconWell}>
+                <Ionicons name="card" size={17} color={colors.accent} />
               </View>
               <View style={styles.securityInfo}>
                 <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.pci')}</Text>

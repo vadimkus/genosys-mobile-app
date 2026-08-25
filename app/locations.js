@@ -192,8 +192,8 @@ export default function LocationsScreen() {
           {/* Office Location */}
           <View style={styles.officeSection}>
             <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="business" size={17} color={colors.white} />
+              <View style={surfaces.iconWell}>
+                <Ionicons name="business" size={17} color={colors.accent} />
               </View>
               <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
                 {l('Our Office', 'مكتبنا', 'Наш офис')}
@@ -204,8 +204,8 @@ export default function LocationsScreen() {
               onPress={() => Linking.openURL('https://maps.google.com/?q=Cordoba+Residence+E02+Dubai+UAE').catch(() => {})}
               activeOpacity={0.7}
             >
-              <View style={[surfaces.iconTile, styles.officeTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="map" size={20} color={colors.white} />
+              <View style={[surfaces.iconWell, styles.officeTile]}>
+                <Ionicons name="map" size={20} color={colors.accent} />
               </View>
               <View style={styles.officeInfo}>
                 <Text style={[styles.officeAddress, isRTL && styles.textRTL]}>Cordoba Residence, Villa E02</Text>

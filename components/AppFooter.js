@@ -4,13 +4,17 @@ import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import * as haptics from '../utils/haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { colors } from '../utils/theme';
+import { colors, surfaces } from '../utils/theme';
 
 /**
  * Shared app footer — single source of truth for the brand block shown
  * at the bottom of Account, About, Brand, Training and similar screens.
  *
- * Corporate dark card:
+ * A quiet card at the foot of the page, not an inverted slab: the wordmark in
+ * ink, the links in rose, the legal line in grey. It used to be black to match
+ * the Partner Portal block on Account, and that block is a light card now.
+ *
+ * Layout:
  *   ┌────────────────────────────────┐
  *   │        G E N O S Y S           │
  *   │  Official Distributor in the UAE │
@@ -63,7 +67,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
             accessibilityRole="link"
             accessibilityLabel="www.genosys.ae"
           >
-            <Ionicons name="globe-outline" size={13} color={colors.white} />
+            <Ionicons name="globe-outline" size={13} color={colors.accent} />
             <Text style={styles.linkText}>genosys.ae</Text>
           </TouchableOpacity>
           <View style={styles.linkSeparator} />
@@ -74,7 +78,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
             accessibilityRole="link"
             accessibilityLabel="sales@genosys.ae"
           >
-            <Ionicons name="mail-outline" size={13} color={colors.white} />
+            <Ionicons name="mail-outline" size={13} color={colors.accent} />
             <Text style={styles.linkText}>sales@genosys.ae</Text>
           </TouchableOpacity>
         </View>
@@ -92,9 +96,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   card: {
-    // Match Partner Portal card on Account (`#0B0B0C` + white type)
-    backgroundColor: colors.label,
-    borderRadius: 16,
+    ...surfaces.card,
     paddingVertical: 22,
     paddingHorizontal: 20,
     alignItems: 'center',
@@ -103,18 +105,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 5,
-    color: colors.white,
+    color: colors.label,
   },
   tagline: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.mutedText,
     marginTop: 5,
     textAlign: 'center',
   },
   divider: {
     alignSelf: 'stretch',
     height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: colors.separator,
     marginVertical: 14,
   },
   linksRow: {
@@ -132,23 +134,23 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.white,
+    color: colors.accent,
   },
   linkSeparator: {
     width: StyleSheet.hairlineWidth,
     height: 14,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: colors.separatorStrong,
     marginHorizontal: 10,
   },
   legal: {
     fontSize: 10.5,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.mutedText,
     marginTop: 14,
     textAlign: 'center',
   },
   legalSub: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.45)',
+    color: colors.placeholder,
     marginTop: 3,
     textAlign: 'center',
     letterSpacing: 0.3,

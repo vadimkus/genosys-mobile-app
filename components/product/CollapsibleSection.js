@@ -35,7 +35,7 @@ if (
 export default function CollapsibleSection({
   title,
   icon,
-  iconColor = colors.secondaryLabel,
+  iconColor = colors.accent,
   defaultOpen = false,
   isRTL = false,
   children,
@@ -63,14 +63,8 @@ export default function CollapsibleSection({
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <View style={[styles.headerLeft, isRTL && styles.headerLeftRTL]}>
             {icon ? (
-              <View
-                style={[
-                  surfaces.iconTile,
-                  { backgroundColor: iconColor },
-                  isRTL ? styles.iconRTL : styles.icon,
-                ]}
-              >
-                <Ionicons name={icon} size={16} color={colors.white} />
+              <View style={[surfaces.iconWell, isRTL ? styles.iconRTL : styles.icon]}>
+                <Ionicons name={icon} size={16} color={iconColor} />
               </View>
             ) : null}
             <Text

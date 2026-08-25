@@ -290,8 +290,8 @@ export default function HelpSupportScreen() {
               onPress={() => { haptics.lightTap(); router.push('/profile/orders'); }}
               activeOpacity={0.7}
             >
-              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="receipt" size={20} color={colors.white} />
+              <View style={[surfaces.iconWell, styles.quickTile]}>
+                <Ionicons name="receipt" size={20} color={colors.accent} />
               </View>
               <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.trackOrder')}</Text>
             </TouchableOpacity>
@@ -301,8 +301,8 @@ export default function HelpSupportScreen() {
               onPress={() => { haptics.lightTap(); setReturnModalVisible(true); }}
               activeOpacity={0.7}
             >
-              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.accent }]}>
-                <Ionicons name="refresh" size={20} color={colors.white} />
+              <View style={[surfaces.iconWell, styles.quickTile]}>
+                <Ionicons name="refresh" size={20} color={colors.accent} />
               </View>
               <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.returnItem')}</Text>
             </TouchableOpacity>
@@ -342,8 +342,8 @@ export default function HelpSupportScreen() {
           <View style={[styles.returnModalCard, shadow.card]}>
             <View style={[styles.returnModalHeader, isRTL && styles.returnModalHeaderRTL]}>
               <View style={[styles.returnModalHeaderLeft, isRTL && styles.returnModalHeaderLeftRTL]}>
-                <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-                  <Ionicons name="refresh" size={17} color={colors.white} />
+                <View style={surfaces.iconWell}>
+                  <Ionicons name="refresh" size={17} color={colors.accent} />
                 </View>
                 <Text style={[styles.returnModalTitle, isRTL && styles.textRTL]}>{t('help.returnItem')}</Text>
               </View>

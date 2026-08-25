@@ -317,8 +317,8 @@ export default function ProfileScreen() {
           <View style={[styles.row, rtl && styles.rowReverse]}>
             <View style={[styles.rowLeft, rtl && styles.rowReverse]}>
               {icon ? (
-                <View style={[surfaces.iconTile, { backgroundColor: tint || colors.accent }]}>
-                  <Ionicons name={icon} size={17} color={colors.white} />
+                <View style={surfaces.iconWell}>
+                  <Ionicons name={icon} size={17} color={tint || colors.accent} />
                 </View>
               ) : null}
               <View style={[styles.rowText, rtl && styles.rowTextRTL]}>
@@ -356,8 +356,8 @@ export default function ProfileScreen() {
       onPress={onPress}
       activeOpacity={0.85}
     >
-      <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
-        <Ionicons name={icon} size={22} color={colors.white} />
+      <View style={styles.quickActionIcon}>
+        <Ionicons name={icon} size={22} color={color} />
       </View>
       <Text style={[styles.quickActionTitle, isRTL && styles.quickActionTitleRTL]}>{title}</Text>
       <Text style={[styles.quickActionSubtitle, isRTL && styles.quickActionSubtitleRTL]}>{subtitle}</Text>
@@ -381,8 +381,8 @@ export default function ProfileScreen() {
       <>
         <View style={[styles.rowLeft, isRTL && styles.rowReverse]}>
           {icon ? (
-            <View style={[surfaces.iconTile, { backgroundColor: tint }]}>
-              <Ionicons name={icon} size={17} color={colors.white} />
+            <View style={surfaces.iconWell}>
+              <Ionicons name={icon} size={17} color={tint} />
             </View>
           ) : null}
           <View style={[styles.rowText, isRTL && styles.rowTextRTL]}>
@@ -494,8 +494,8 @@ export default function ProfileScreen() {
             style={[styles.portalCard, shadow.card, isRTL && styles.rowReverse]}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flex: 1 }}>
-              <View style={[surfaces.iconTile, styles.portalIcon]}>
-                <Ionicons name="cube-outline" size={20} color={colors.white} />
+              <View style={[surfaces.iconWell, styles.portalIcon]}>
+                <Ionicons name="cube-outline" size={20} color={colors.accent} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.portalTitle, isRTL && styles.textRTL]}>
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentBg,
     marginEnd: 12,
   },
   portalTitle: {
@@ -960,6 +960,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
+    backgroundColor: colors.accentBg,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
