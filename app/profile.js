@@ -26,7 +26,11 @@ import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTok
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, surfaces } from '../utils/theme';
+// Pilot screen for the website design language. Every style below already read
+// from tokens, so adopting the site's palette is this import and nothing else.
+// See docs/DESIGN_ALIGNMENT_WITH_WEBSITE.md; if this reads well, `colors` gets
+// repointed globally and this alias goes away.
+import { ceraColors as colors, cera, shadow, surfaces } from '../utils/theme';
 
 const log = createLogger('Profile');
 
@@ -791,6 +795,8 @@ const styles = StyleSheet.create({
     padding: 18,
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
   profileCardRTL: {
     flexDirection: 'row-reverse',
@@ -843,14 +849,19 @@ const styles = StyleSheet.create({
     marginStart: 16,
   },
   userName: {
-    ...T.pageTitle,
-    fontSize: 22,
+    ...T.serifTitle,
+    fontSize: 24,
+    lineHeight: 28,
     color: colors.label,
     marginBottom: 2,
   },
   userNameRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
+    // Cormorant Garamond ships Latin and Cyrillic only. Clearing the family
+    // hands Arabic back to the system face rather than relying on per-glyph
+    // fallback, which mixes metrics.
+    fontFamily: undefined,
   },
   userEmail: {
     ...T.body,
@@ -941,6 +952,8 @@ const styles = StyleSheet.create({
     padding: 16,
     width: (width - 44) / 2,
     alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
   quickActionCardRTL: {
     alignItems: 'center',
@@ -976,23 +989,28 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 18,
   },
+  // Tracked uppercase, the eyebrow the website sets above every section.
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.secondaryLabel,
-    marginBottom: 8,
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    color: cera.roseInk,
+    marginBottom: 10,
     marginHorizontal: 28,
-    letterSpacing: -0.1,
+    letterSpacing: 1.1,
   },
   sectionTitleRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
   },
+  // The website carries cards on a hairline rather than a shadow. On cream a
+  // drop shadow muddies rather than lifts.
   sectionContent: {
     ...surfaces.card,
-    ...shadow.card,
     marginHorizontal: 16,
     overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
   },
 
   // Settings-style rows

@@ -83,6 +83,45 @@ export const cera = {
   shot: '#eeeeee',        // packshot stage
 };
 
+/**
+ * The `colors` contract above, expressed in the website's palette.
+ *
+ * This is the stage 2 target. A screen adopts it with a single line —
+ * `import { ceraColors as colors } from '../utils/theme'` — because every
+ * screen now reads tokens rather than naming colours inline. When enough
+ * screens have moved and the look is settled, `colors` is repointed at these
+ * values and the aliasing disappears.
+ *
+ * Three greys have no direct counterpart on the website, which only needs
+ * ink / body / muted. They are interpolated along the same warm axis so the
+ * six-step text hierarchy the app relies on survives the move; a straight
+ * collapse onto `muted` would flatten metadata into body text.
+ *
+ * Brand red is carried across unchanged, deliberately. The website is split on
+ * this: its bespoke product pages use an ink CTA and no red at all, while shop,
+ * cart and checkout still lead with red. Picking a side is a brand decision,
+ * not a styling one, so red stays until it is made.
+ */
+export const ceraColors = {
+  ...colors,
+
+  groupedBg: cera.cream,
+  card: '#FFFFFF',          // white cards read as paper on cream
+  subtleBg: cera.creamDeep,
+  fillSecondary: cera.creamDeep,
+  fill: cera.creamDeep,
+
+  label: cera.ink,
+  bodyText: cera.body,
+  mutedText: cera.muted,
+  secondaryLabel: '#7a716b', // interpolated: muted → placeholder
+  placeholder: '#9a908a',
+  tertiary: '#c2b7b0',       // chevrons, warm counterpart of #C7C7CC
+
+  separator: cera.line,
+  separatorStrong: '#d9cec7',
+};
+
 // 10% alpha helper for tinted capsules / button backgrounds.
 export const tint = (hex, alpha = '1A') => `${hex}${alpha}`;
 
@@ -142,6 +181,7 @@ export const statusStyle = (status) => {
 export const theme = {
   colors,
   cera,
+  ceraColors,
   tint,
   shadow,
   surfaces,

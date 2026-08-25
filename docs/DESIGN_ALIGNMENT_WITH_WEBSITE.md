@@ -137,8 +137,60 @@ read as a flash on cold start. Same reasoning applies to the two
 `shadowColor` was skipped throughout: it is black by design and has nothing to
 do with the surface palette.
 
-### Fixed along the way
+### Fixed along the way (stage 1)
 
 `app/partner-portal.js` referenced `colors.groupedBackground`, which has never
 existed — six style rules were silently falling through to a literal. Now
 `colors.groupedBg`.
+
+## Stage 2 — pilot on Profile
+
+Rather than repaint everything at once, `app/profile.js` adopts the website
+palette alone so the look can be judged on a real screen. Profile was chosen
+because it exercises the whole system — page background, cards, hairlines, the
+full six-step text scale — while carrying no commercial risk.
+
+Because stage 1 left every style reading from tokens, adopting the palette is
+one import:
+
+```js
+import { ceraColors as colors, cera, shadow, surfaces } from '../utils/theme';
+```
+
+`ceraColors` in `utils/theme.js` is the stage 2 target: the same token contract,
+warm values. Ink, body and muted come straight from the site. Three greys are
+interpolated along the same axis, because the site only needs three text
+weights and the app needs six; collapsing them onto `muted` would flatten
+metadata into body text.
+
+| Token | Now | Pilot |
+|---|---|---|
+| `groupedBg` | `#F2F2F7` | `#faf7f5` cream |
+| `subtleBg` / `fill` | `#F8F9FA` | `#f3ece8` |
+| `label` | `#1D1D1F` | `#191716` ink |
+| `bodyText` | `#374151` | `#3d3734` |
+| `mutedText` | `#6B7280` | `#665e59` |
+| `secondaryLabel` | `#8E8E93` | `#7a716b` *interpolated* |
+| `placeholder` | `#9CA3AF` | `#9a908a` *interpolated* |
+| `tertiary` | `#C7C7CC` | `#c2b7b0` *interpolated* |
+| `separator` | `#E5E5EA` | `#e8e0db` line |
+
+Beyond colour, three treatments come from the site: the user's name is set in
+Cormorant, section headers become tracked uppercase eyebrows in `roseInk`, and
+cards sit on a hairline instead of a drop shadow, which muddies on cream.
+
+`CollapsibleHeader` is shared across screens and stays untouched — that belongs
+to stage 3.
+
+### The open question: red or ink
+
+The website does not have one answer. Its bespoke product pages — the cera
+pages — use **no `#dc2626` at all**; the primary action is
+`bg-[var(--cera-ink)]` with white text, and rose carries the accents. Shop,
+cart and checkout still lead with red, which appears across 69 web components
+and is declared as `--brand-red: #dc2626`, "default solid CTA".
+
+The app currently follows the second convention: red on buttons, prices and
+badges, 157 occurrences before stage 1. Moving to ink CTAs is the single
+largest visual change in this whole effort and is a brand decision. The pilot
+keeps red so that the surfaces and type can be judged on their own.
