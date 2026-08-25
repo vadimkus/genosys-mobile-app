@@ -417,11 +417,7 @@ const styles = StyleSheet.create({
 
   // Group header
   groupHeader: {
-    ...T.captionSmall,
-    fontWeight: '600',
-    color: colors.secondaryLabel,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    ...T.eyebrow,
     marginHorizontal: 32,
     marginTop: 14,
     marginBottom: 8,

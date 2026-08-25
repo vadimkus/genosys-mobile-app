@@ -19,7 +19,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
 import { resetPasswordWithToken } from '../../services/authService';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors, shadow } from '../../utils/theme';
 
 /**
  * Extract the reset token from whatever the user pastes:

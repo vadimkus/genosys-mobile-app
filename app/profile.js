@@ -26,7 +26,7 @@ import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTok
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, cera, shadow, surfaces } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 
 const log = createLogger('Profile');
 
@@ -983,13 +983,9 @@ const styles = StyleSheet.create({
   },
   // Tracked uppercase, the eyebrow the website sets above every section.
   sectionTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    color: cera.roseInk,
+    ...T.eyebrow,
     marginBottom: 10,
     marginHorizontal: 28,
-    letterSpacing: 1.1,
   },
   sectionTitleRTL: {
     textAlign: 'right',

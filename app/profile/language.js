@@ -120,11 +120,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.groupedBg },
   scrollView: { flex: 1 },
   groupHeader: {
-    ...T.captionSmall,
-    fontWeight: '600',
-    color: colors.secondaryLabel,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    ...T.eyebrow,
     marginHorizontal: 32,
     marginTop: 8,
     marginBottom: 8,

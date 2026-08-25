@@ -27,7 +27,7 @@ import { isProductOutOfStock } from '../utils/stock';
 import { formatAed, getPricingDisplay } from '../utils/pricingDisplay';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, tint } from '../utils/theme';
+import { colors, tint } from '../utils/theme';
 
 const MAX_QTY = 99;
 
@@ -466,11 +466,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   eyebrow: {
-    ...T.captionSmall,
-    color: colors.accent,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    ...T.eyebrow,
     marginBottom: 3,
   },
   productName: {

@@ -28,7 +28,7 @@ import { formatEmirateLabel } from '../../utils/emirateUtils';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces, statusStyle } from '../../utils/theme';
+import { colors, shadow, statusStyle } from '../../utils/theme';
 import AUTH_CONFIG from '../../config/auth';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 

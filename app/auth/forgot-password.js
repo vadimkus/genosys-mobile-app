@@ -19,7 +19,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
 import { requestPasswordReset } from '../../services/authService';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors, shadow } from '../../utils/theme';
 
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -14,7 +14,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { updateUserSettings } from '../services/databaseService';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, tint } from '../utils/theme';
+import { colors } from '../utils/theme';
 
 /**
  * Compact language control for content screens.

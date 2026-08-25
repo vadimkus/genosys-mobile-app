@@ -14,7 +14,7 @@ import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
-import { colors, shadow } from '../utils/theme';
+import { colors } from '../utils/theme';
 
 const log = createLogger('WebView');
 

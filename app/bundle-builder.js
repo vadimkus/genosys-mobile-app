@@ -24,7 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, tint, shadow, surfaces } from '../utils/theme';
+import { colors } from '../utils/theme';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';

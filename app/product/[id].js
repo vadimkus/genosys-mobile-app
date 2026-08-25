@@ -1965,10 +1965,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   category: {
-    ...T.label,
-    letterSpacing: 0.5,
-    color: colors.accent,
-    textTransform: 'uppercase',
+    ...T.eyebrow,
     marginBottom: 8,
   },
   // The website sets product names in its display serif. Arabic falls back to

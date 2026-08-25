@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces, tint } from '../../utils/theme';
+import { colors, shadow } from '../../utils/theme';
 
 const COPY = {
   en: { title: 'Quick facts', eyebrow: 'Product snapshot' },
@@ -104,11 +104,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   eyebrow: {
-    ...T.captionSmall,
-    color: colors.accent,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    ...T.eyebrow,
   },
   title: {
     ...T.body,

@@ -39,7 +39,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import AUTH_CONFIG from '../../config/auth';
 import { getJson, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
-import { colors, shadow, surfaces, tint } from '../../utils/theme';
+import { colors, shadow, surfaces } from '../../utils/theme';
 
 const log = createLogger('BlogPost');
 

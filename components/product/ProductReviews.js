@@ -21,7 +21,7 @@ import AUTH_CONFIG from '../../config/auth';
 import { getJson, sendJson } from '../../services/httpClient';
 import { createLogger } from '../../utils/logger';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors, surfaces } from '../../utils/theme';
 
 const log = createLogger('ProductReviews');
 

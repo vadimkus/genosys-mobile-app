@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors, surfaces } from '../../utils/theme';
 
 // Old-arch Android needs the opt-in; on Fabric (new arch) it's a no-op that
 // logs a deprecation warning, so skip it there.

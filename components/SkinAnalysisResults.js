@@ -30,7 +30,7 @@ import { getPricingDisplay, formatAed } from '../utils/pricingDisplay';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
-import { colors, tint, shadow, surfaces } from '../utils/theme';
+import { colors } from '../utils/theme';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 

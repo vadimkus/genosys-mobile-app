@@ -44,7 +44,7 @@ import {
   getDeliveryEtaInfo,
 } from '../utils/checkoutFormUtils';
 import T from '../utils/typography';
-import { colors, shadow, surfaces, tint } from '../utils/theme';
+import { colors, shadow } from '../utils/theme';
 import { withErrorBoundary } from '../components/ErrorBoundary';
 
 function CheckoutScreen() {
@@ -925,11 +925,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   orderEyebrow: {
-    ...T.captionTiny,
-    color: colors.secondaryLabel,
-    fontWeight: '600',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    ...T.eyebrow,
   },
   orderHeaderTotal: {
     fontSize: 18,

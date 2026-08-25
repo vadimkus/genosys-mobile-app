@@ -30,7 +30,7 @@ import { getLocalizedProductName, getCategoryTranslationKey, normalizeCategoryCa
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, surfaces, tint } from '../utils/theme';
+import { colors, shadow, tint } from '../utils/theme';
 import AUTH_CONFIG from '../config/auth';
 
 const log = createLogger('FavoritesScreen');

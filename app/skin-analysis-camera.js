@@ -29,7 +29,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SkinAnalysisResults from '../components/SkinAnalysisResults';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
-import { colors, tint, shadow, surfaces } from '../utils/theme';
+import { colors } from '../utils/theme';
 import { analyzeSkinImage } from '../utils/skinImageAnalysis';
 import AUTH_CONFIG from '../config/auth';
 import { getJson, sendJson } from '../services/httpClient';

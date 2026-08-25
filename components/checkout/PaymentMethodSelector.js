@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import { PAYMENT_METHODS } from '../../services/paymentPreferences';
-import { colors, surfaces, tint } from '../../utils/theme';
+import { colors, surfaces } from '../../utils/theme';
 import T from '../../utils/typography';
 
 /**

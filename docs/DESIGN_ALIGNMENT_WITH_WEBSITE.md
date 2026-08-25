@@ -395,3 +395,29 @@ panel underneath, that shadow is just a smudge, so they were stripped.
 
 This is a layout change rather than a colour change, and it is the one most
 worth a look before it settles.
+
+## Stage 6 — one eyebrow instead of twenty-three
+
+Twenty-three styles across the app were setting a small uppercase label, each
+with its own size, weight, tracking and colour, while `T.eyebrow` — added in
+stage 0 for exactly this — had a single user.
+
+Sorting them apart mattered more than merging them. Only some are eyebrows in
+the website's sense, a label sitting above a heading on the page background.
+The rest are text inside a coloured pill: stock badges, tier badges, "NEW"
+pills, the free-gift flag. Those are a different device and were left alone.
+
+Eight genuine eyebrows now share the one style, keeping their own margins:
+the product category, the option sheet and quick-facts labels, the checkout
+order label, the group headers on contact, help and language, and the profile
+section titles. They read at 11px, 700, 1.2 tracking, in rose.
+
+Two were deliberately skipped. `MembershipCard` sets its label on a dark
+gradient where rose would not carry, and `ConcernFaceMap`'s labels annotate a
+diagram rather than head a section.
+
+### Dead imports
+
+Forty unused specifiers across twenty-four files, mostly predating this work.
+Removed, then checked in the other direction: every theme symbol still
+referenced anywhere is still imported.
