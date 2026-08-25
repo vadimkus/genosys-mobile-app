@@ -65,7 +65,7 @@ export default function OrderSuccessScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
     paddingHorizontal: 24,
   },
   progressWrap: {

@@ -9,9 +9,9 @@ import { tStatic } from '../contexts/LocalizationContext';
 /**
  * Scroll-aware navigation header — the stock-iOS effect.
  *
- * At the top of the scroll the bar is transparent so it blends into the
- * grouped-gray background; as the user scrolls, a white fill + hairline fade
- * in (and content scrolls *under* the bar). Reusable across every screen.
+ * At the top of the scroll the bar is transparent so it blends into the page
+ * background; as the user scrolls, a cream fill + hairline fade in (and
+ * content scrolls *under* the bar). Reusable across every screen.
  *
  * Usage:
  *   const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
@@ -54,7 +54,7 @@ export default function CollapsibleHeader({
 
   return (
     <View style={[styles.wrap, { height: HEADER_BAR_HEIGHT + insets.top, paddingTop: insets.top }]}>
-      {/* White fill + hairline fade in on scroll (opacity → native-driver friendly) */}
+      {/* Fill + hairline fade in on scroll (opacity → native-driver friendly) */}
       <Animated.View style={[StyleSheet.absoluteFill, styles.fill, { opacity: bgOpacity }]} />
       <Animated.View style={[styles.hairline, { opacity: bgOpacity }]} />
 
@@ -104,8 +104,11 @@ const styles = StyleSheet.create({
     zIndex: 10,
     backgroundColor: 'transparent',
   },
+  // Cream, not white: the bar floats over the page, and a white fill would
+  // read as a separate panel sliding in rather than the page continuing under
+  // its own header.
   fill: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   hairline: {
     position: 'absolute',

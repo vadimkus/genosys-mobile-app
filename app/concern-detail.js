@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
     paddingBottom: 34,
     borderTopWidth: 1,
     borderTopColor: colors.separator,
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
     shadowRadius: 8,

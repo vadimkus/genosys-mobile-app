@@ -1291,7 +1291,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.groupedBg,
     paddingHorizontal: 20,
     paddingTop: 16,
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,

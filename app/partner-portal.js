@@ -1044,7 +1044,7 @@ export default function PartnerPortalScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.groupedBg },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: colors.card },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: colors.groupedBg },
   // Header
   header: { backgroundColor: colors.label, paddingHorizontal: 16, paddingBottom: 12 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

@@ -50,16 +50,16 @@ export default function TabLayout() {
                 start: 0,
                 end: 0,
                 elevation: 0,
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderTopWidth: 0.5,
-                borderTopColor: 'rgba(0, 0, 0, 0.1)',
+                // Cream rather than white, so the bar reads as the same sheet
+                // of paper as the page above it. The old white sat as a panel
+                // on top and the drop shadow underlined that; the website
+                // separates with a hairline and nothing else.
+                backgroundColor: 'rgba(250, 247, 245, 0.94)',
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: colors.separator,
                 height: 88,
                 paddingTop: 8,
                 paddingBottom: 34, // Safe area for home indicator
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
               }
             : styles.androidTabBar,
           Platform.OS === 'android' && {
@@ -149,16 +149,14 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   androidTabBar: {
-    backgroundColor: colors.card,
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: colors.groupedBg,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.separator,
     height: 60,
     paddingBottom: 8,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    // Flat, like the iOS bar above and like the website. Android's elevation
+    // would otherwise paint a shadow the hairline is meant to replace.
+    elevation: 0,
   },
   badge: {
     position: 'absolute',

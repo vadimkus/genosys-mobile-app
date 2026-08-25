@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 /**
  * Apple-native design tokens.
@@ -58,12 +58,16 @@ export const colors = {
   flagRed: '#CE1126',        // UAE national red. Not the brand token: the
                              // emirate flags must not follow a rebrand.
 
-  // Kept for the logo and anywhere the mark itself appears. No longer paints
-  // buttons or accents.
-  brand: '#dc2626',          // GENOSYS red
-  brandDark: '#B91C1C',      // pressed state
-  brandLight: '#EF4444',     // secondary accents
-  brandTint: '#FEF2F2',      // washed background behind red text
+  // What a shadow is cast in. Warm rather than black: on cream a black cast
+  // greys the surface under it instead of suggesting depth.
+  shadowCast: '#3d3734',
+
+  // GENOSYS red. Nothing in the interface paints with it any more: actions are
+  // ink, accents are rose, danger is `red`, and the logos in use are the grey
+  // and white variants. Kept defined because the mark itself is red wherever it
+  // does appear, starting with the app icon. The pressed, light and tint
+  // variants were dropped once they had no users.
+  brand: '#dc2626',
   blue: '#007AFF',
   green: '#34C759',
   greenDeep: '#16A34A',
@@ -121,26 +125,37 @@ export const tint = (hex, alpha = '1A') => `${hex}${alpha}`;
 
 // ─── Elevation ────────────────────────────────────────────────────────
 export const shadow = {
+  // Warm and very faint. A black shadow reads as grey dirt against cream
+  // rather than as depth, which is why the website separates cards with a
+  // hairline instead. Around a hundred styles here still lean on this for
+  // definition, so it is softened rather than removed, and `surfaces.card`
+  // now carries the hairline that does the real work.
   card: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
+    shadowColor: cera.body,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 2,
+    elevation: 1,
   },
-  // Colored CTA glow (use sparingly, primary buttons only)
+  // Lift under a primary button. Matches the ink CTA shadow the website uses:
+  // low, wide and dark, not a coloured glow.
   cta: (hex) => ({
     shadowColor: hex,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 3,
   }),
 };
 
 // ─── Reusable surfaces ────────────────────────────────────────────────
 export const surfaces = {
+  // The hairline is what defines a card on cream. Styles that set their own
+  // border override this; styles that set none now get an edge instead of
+  // relying on a shadow to imply one.
   card: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     backgroundColor: colors.card,
     borderRadius: 16,
   },

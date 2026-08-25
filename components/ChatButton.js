@@ -531,7 +531,7 @@ const s = StyleSheet.create({
     borderTopRightRadius: 20,
     overflow: 'hidden',
     ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.15, shadowRadius: 12 },
+      ios: { shadowColor: colors.shadowCast, shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.15, shadowRadius: 12 },
       android: { elevation: 16 },
     }),
   },
@@ -573,7 +573,7 @@ const s = StyleSheet.create({
   assistantBubble: {
     backgroundColor: colors.card, borderBottomStartRadius: 4,
     ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 },
+      ios: { shadowColor: colors.shadowCast, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 },
       android: { elevation: 1 },
     }),
   },

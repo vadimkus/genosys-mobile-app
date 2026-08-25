@@ -255,7 +255,7 @@ const videoStyles = StyleSheet.create({
     backgroundColor: colors.separator,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.12,
     shadowRadius: 4,
@@ -1810,13 +1810,13 @@ function ProductDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   loadingText: {
     ...T.body,
@@ -1828,7 +1828,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
     paddingHorizontal: 20,
   },
   errorText: {
@@ -1919,7 +1919,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -2433,7 +2433,7 @@ const styles = StyleSheet.create({
     paddingBottom: 34, // Safe area for home indicator
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.separator,
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.06,
     shadowRadius: 10,
@@ -2487,7 +2487,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,

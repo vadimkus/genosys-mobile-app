@@ -251,3 +251,61 @@ disabled state only, never content.
 components and were not touched beyond the palette they inherit. Several
 screens use `colors.card` white as a page background and will read as islands
 against cream until they are moved.
+
+## Stage 3 — shared chrome and page surfaces
+
+### Pages that were islands
+
+Fourteen page surfaces were painting themselves white while everything around
+them had gone cream, so they read as panels floating on the app rather than as
+the page: shop, the product screen, the product guide, the webview backdrop,
+the auth gate, the update and error screens, the privacy sheet, the skeleton
+loader and the order success screen.
+
+Two matches were left alone on purpose. `concern-detail`'s secondary button and
+`homecare-scripts`' points card are a button and a card; white is correct for
+both.
+
+### Tab bar and header
+
+Both were white with a black hairline and a drop shadow, which is the iOS
+convention and reads as a panel laid over the page. The website separates with
+a hairline and nothing else, so:
+
+- the tab bar is cream at 94% opacity, on a warm hairline, with the shadow and
+  Android elevation removed
+- `CollapsibleHeader` fades in cream rather than white, so scrolling looks like
+  the page continuing under its own header instead of a white bar sliding in
+
+Nav titles stay sans. The website uses its serif for content headings, not for
+chrome, and Cormorant at 17px is too fine to hold a bar.
+
+### Shadows, warmed and quietened
+
+A black shadow on cream greys the surface beneath it instead of suggesting
+depth. Around a hundred styles still lean on `shadow.card` for definition, so
+rather than removing it:
+
+- `shadow.card` casts in `#3d3734` at 5% instead of black at 6%
+- `surfaces.card` now carries the hairline that does the actual separating
+- the twenty ad-hoc `shadowColor: '#000'` declarations became `colors.shadowCast`
+- the product card dropped its shadow entirely and kept its border, at a
+  slightly larger radius
+
+`shadow.cta` became the website's ink button lift — low, wide, dark — rather
+than a coloured glow.
+
+### Brand red is now absent from the interface
+
+Worth stating plainly: after stage 2 and this stage, `colors.brand` has **no
+users**. Actions are ink, accents are rose, danger is its own token, and the
+logos in use are the grey and white variants. The mark stays red where it is
+actually the mark, starting with the app icon, which is native and unchanged.
+
+`brandDark`, `brandLight` and `brandTint` were dropped once they had no users.
+
+### Still to do (stage 4)
+
+The product screen and blog, where the website is most itself: serif headings
+in content, the eyebrow-and-rule section rhythm, and the generous spacing the
+site uses between blocks.

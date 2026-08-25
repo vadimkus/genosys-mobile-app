@@ -418,7 +418,7 @@ export default function ProductGuideScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   content: {
     flex: 1,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,

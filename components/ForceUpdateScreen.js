@@ -55,7 +55,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,

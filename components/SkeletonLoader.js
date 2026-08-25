@@ -143,7 +143,7 @@ export default ShimmerBar;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   bar: {
     backgroundColor: colors.separator,

@@ -63,7 +63,7 @@ export default function PrivacyPolicyModal({ visible, onClose, showCloseButton =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
   },
   header: {
     flexDirection: 'row',

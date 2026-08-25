@@ -122,7 +122,7 @@ export function withErrorBoundary(Component, options = {}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.groupedBg,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,

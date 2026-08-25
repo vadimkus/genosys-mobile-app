@@ -345,21 +345,16 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
 }
 
 const styles = StyleSheet.create({
+  // Flat on a hairline, the way the website sets its product cards. The border
+  // was already doing the separating; the shadow underneath it only smudged
+  // the edge, and against cream that reads as dirt rather than depth.
   card: {
     width: CARD_WIDTH,
     backgroundColor: colors.card,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 20,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
     // overflow: 'hidden', // Remove this to allow badges to show outside
   },
   cardOutOfStock: {
@@ -425,7 +420,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     minWidth: 30,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2,

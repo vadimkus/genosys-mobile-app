@@ -791,8 +791,6 @@ const styles = StyleSheet.create({
     padding: 18,
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.separator,
   },
   profileCardRTL: {
     flexDirection: 'row-reverse',
@@ -948,8 +946,6 @@ const styles = StyleSheet.create({
     padding: 16,
     width: (width - 44) / 2,
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.separator,
   },
   quickActionCardRTL: {
     alignItems: 'center',
@@ -1005,8 +1001,6 @@ const styles = StyleSheet.create({
     ...surfaces.card,
     marginHorizontal: 16,
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.separator,
   },
 
   // Settings-style rows

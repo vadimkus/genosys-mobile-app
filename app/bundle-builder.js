@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
   addBtnTextSelected: { color: colors.white },
 
   // Bottom bar
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: colors.shadowCast, shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
   footerChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
   footerHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, marginBottom: 2 },
   footerPricing: { paddingHorizontal: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, marginBottom: 4 },
