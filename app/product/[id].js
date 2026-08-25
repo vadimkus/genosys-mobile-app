@@ -357,6 +357,7 @@ function ProductDetailScreen() {
   const galleryRef = useRef(null);
   const scrollRef = useRef(null);
   const reviewsWrapperRef = useRef(null);
+  const variantWrapperRef = useRef(null);
   // Subtle entrance motion for the content below the hero gallery (matches
   // order-details mount feel). Independent Animated.Values → does not touch
   // the scrollY-driven mini-header/gallery animation.
@@ -407,10 +408,10 @@ function ProductDetailScreen() {
     };
   }, [id]);
 
-  const scrollToReviews = useCallback(() => {
+  const scrollToSection = useCallback((ref) => {
     haptics.lightTap();
     const scrollable = scrollRef.current;
-    const target = reviewsWrapperRef.current;
+    const target = ref?.current;
     if (!scrollable || !target) return;
     // Animated.ScrollView proxies scrollTo. For measureLayout we need the native node handle
     // of the underlying ScrollView's inner view. `getScrollableNode()` returns it.
@@ -426,6 +427,9 @@ function ProductDetailScreen() {
       () => {}
     );
   }, []);
+
+  const scrollToReviews = useCallback(() => scrollToSection(reviewsWrapperRef), [scrollToSection]);
+  const scrollToVariants = useCallback(() => scrollToSection(variantWrapperRef), [scrollToSection]);
 
   const loadProduct = async () => {
     try {
@@ -1028,6 +1032,15 @@ function ProductDetailScreen() {
 
   const isWishlisted = !!(product?.id && isFavorite(product.id));
   const bespokeContent = product?.bespokeContent || null;
+  const sizeOptions = (product?.variants || []).filter((variant) => variant && variant.size);
+  const hasVariantChoice = Boolean(
+    sizeOptions.length > 0 ||
+    (product?.colorVariants && product.colorVariants.length > 0) ||
+    product?.hasVariants
+  );
+  // The footer states the choice only when there is one to make. A single-size
+  // product would just be repeating its own label back at the shopper.
+  const footerSelection = sizeOptions.length > 1 ? asText(selectedSize) : '';
   const priceView = resolvePriceView(product, { user, selectedSize, selectedColor });
   const priceLabel = priceView.kind === 'discounted' ? discountLabelFor(priceView, t) : null;
 
@@ -1377,6 +1390,22 @@ function ProductDetailScreen() {
             )}
           </View>
 
+          {/* Size and colour sit directly under the price, because they set it.
+              They used to follow the editorial hero, a card tall enough that a
+              shopper could reach the buy button having never seen there was a
+              choice — and be sold the default. */}
+          {hasVariantChoice && (
+            <View ref={variantWrapperRef} collapsable={false}>
+              <ProductVariantSelector
+                product={product}
+                selectedSize={selectedSize}
+                selectedColor={selectedColor}
+                onSizeChange={handleSizeChange}
+                onColorChange={handleColorChange}
+              />
+            </View>
+          )}
+
           {/* The website's opening: headline, the promise in four lines, and the
               figures behind it. Quick facts are the fallback for products with
               no bespoke page, and would only repeat the hero beside one. */}
@@ -1385,19 +1414,6 @@ function ProductDetailScreen() {
           ) : (
             <ProductQuickFactsCard facts={product?.quickFacts} />
           )}
-
-            {/* Enhanced Product Variant Selector */}
-            {((product.variants && product.variants.length > 0) || 
-              (product.colorVariants && product.colorVariants.length > 0) ||
-              product.hasVariants) && (
-              <ProductVariantSelector
-                product={product}
-                selectedSize={selectedSize}
-                selectedColor={selectedColor}
-                onSizeChange={handleSizeChange}
-                onColorChange={handleColorChange}
-              />
-            )}
 
           {/* Product Video */}
           {(() => {
@@ -1589,6 +1605,26 @@ function ProductDetailScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
+        {/* What is about to be added, and for how much. Without this the buy
+            button could add a size the shopper had never seen chosen; tapping
+            the size takes them to the selector rather than making them hunt. */}
+        {footerSelection ? (
+          <View style={[styles.footerSelection, isRTL && styles.footerSelectionRTL]}>
+            <TouchableOpacity
+              onPress={scrollToVariants}
+              activeOpacity={0.7}
+              style={[styles.footerSizeChip, isRTL && styles.rowRTL]}
+              accessibilityRole="button"
+              accessibilityLabel={t('product.sizeLine', { size: footerSelection })}
+            >
+              <Text style={styles.footerSizeText}>{footerSelection}</Text>
+              <Ionicons name="chevron-down" size={14} color={colors.mutedText} />
+            </TouchableOpacity>
+            {priceView.kind === 'single' || priceView.kind === 'discounted' ? (
+              <Text style={styles.footerPrice}>{formatAed(priceView.price)}</Text>
+            ) : null}
+          </View>
+        ) : null}
         {product.isPriceOnRequest ? (
           <TouchableOpacity
             style={[styles.requestQuoteBottomButton, isRTL && styles.addToBagButtonRTL]}
@@ -2390,6 +2426,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  // A thin line above the buy button: the size on the left as a control, the
+  // price of that size on the right.
+  footerSelection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 12,
+  },
+  footerSelectionRTL: {
+    flexDirection: 'row-reverse',
+  },
+  footerSizeChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: colors.fillSecondary,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separatorStrong,
+  },
+  footerSizeText: {
+    ...T.labelSmall,
+    fontWeight: '700',
+    color: colors.label,
+  },
+  footerPrice: {
+    ...T.label,
+    fontWeight: '700',
+    color: colors.label,
+    flexShrink: 1,
+  },
+  rowRTL: {
+    flexDirection: 'row-reverse',
   },
   bottomRowRTL: {
     flexDirection: 'row-reverse',
