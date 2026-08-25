@@ -196,10 +196,9 @@ export default function ProductOptionSheet({
           accessibilityLabel={t('common.close')}
         />
         <View
-          style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) }]}
+          style={[styles.sheet, { marginBottom: insets.bottom || 12 }]}
           accessibilityViewIsModal
         >
-          <View style={styles.handle} />
           <View style={[styles.header, isRTL && styles.rowRTL]}>
             <View style={[styles.productSummary, isRTL && styles.rowRTL]}>
               {imageUrl ? (
@@ -412,26 +411,26 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
+  // A floating card rather than a drawer welded to the bottom edge: inset from
+  // both sides, rounded all round, matching the header, the tab bar and the buy
+  // bar. It used to round only its top two corners because it sat on the edge.
   sheet: {
-    maxHeight: '90%',
+    maxHeight: '86%',
+    marginHorizontal: 12,
+    paddingBottom: 16,
     backgroundColor: colors.card,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 28,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
     ...shadow.card,
-  },
-  handle: {
-    width: 38,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: colors.tertiary,
-    alignSelf: 'center',
-    marginTop: 8,
-    marginBottom: 8,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: 18,
+    // The drag handle used to hold this off the top edge. There is a close
+    // button for that job, so the spacing lives here now.
+    paddingTop: 18,
     paddingBottom: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.separator,
