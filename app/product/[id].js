@@ -11,6 +11,7 @@ import {
   Alert,
   Share,
   FlatList,
+  ScrollView,
   Linking,
   findNodeHandle,
 } from 'react-native';
@@ -357,7 +358,6 @@ function ProductDetailScreen() {
   const galleryRef = useRef(null);
   const scrollRef = useRef(null);
   const reviewsWrapperRef = useRef(null);
-  const variantWrapperRef = useRef(null);
   // Subtle entrance motion for the content below the hero gallery (matches
   // order-details mount feel). Independent Animated.Values → does not touch
   // the scrollY-driven mini-header/gallery animation.
@@ -429,7 +429,6 @@ function ProductDetailScreen() {
   }, []);
 
   const scrollToReviews = useCallback(() => scrollToSection(reviewsWrapperRef), [scrollToSection]);
-  const scrollToVariants = useCallback(() => scrollToSection(variantWrapperRef), [scrollToSection]);
 
   const loadProduct = async () => {
     try {
@@ -1038,9 +1037,33 @@ function ProductDetailScreen() {
     (product?.colorVariants && product.colorVariants.length > 0) ||
     product?.hasVariants
   );
-  // The footer states the choice only when there is one to make. A single-size
+  // The footer offers the choice only when there is one to make. A single-size
   // product would just be repeating its own label back at the shopper.
-  const footerSelection = sizeOptions.length > 1 ? asText(selectedSize) : '';
+  const colorOptions = product?.colorVariants || [];
+  const footerOptions = [
+    ...(colorOptions.length > 1
+      ? colorOptions.map((color) => ({
+          kind: 'color',
+          value: color.value,
+          label: color.label || color.value,
+          hex: color.hex,
+          current: selectedColor,
+          disabled: false,
+          onSelect: handleColorChange,
+        }))
+      : []),
+    ...(sizeOptions.length > 1
+      ? sizeOptions.map((variant) => ({
+          kind: 'size',
+          value: variant.size,
+          label: variant.size,
+          hex: null,
+          current: selectedSize,
+          disabled: !variant.available,
+          onSelect: handleSizeChange,
+        }))
+      : []),
+  ];
   const priceView = resolvePriceView(product, { user, selectedSize, selectedColor });
   const priceLabel = priceView.kind === 'discounted' ? discountLabelFor(priceView, t) : null;
 
@@ -1395,7 +1418,7 @@ function ProductDetailScreen() {
               shopper could reach the buy button having never seen there was a
               choice — and be sold the default. */}
           {hasVariantChoice && (
-            <View ref={variantWrapperRef} collapsable={false}>
+            <View>
               <ProductVariantSelector
                 product={product}
                 selectedSize={selectedSize}
@@ -1605,21 +1628,50 @@ function ProductDetailScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
-        {/* What is about to be added, and for how much. Without this the buy
-            button could add a size the shopper had never seen chosen; tapping
-            the size takes them to the selector rather than making them hunt. */}
-        {footerSelection ? (
+        {/* The choice itself, not a shortcut to it. The options sit beside the
+            buy button so the thing being bought can be changed where it is
+            being bought, and the price on the right follows the tap. */}
+        {footerOptions.length > 0 ? (
           <View style={[styles.footerSelection, isRTL && styles.footerSelectionRTL]}>
-            <TouchableOpacity
-              onPress={scrollToVariants}
-              activeOpacity={0.7}
-              style={[styles.footerSizeChip, isRTL && styles.rowRTL]}
-              accessibilityRole="button"
-              accessibilityLabel={t('product.sizeLine', { size: footerSelection })}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.footerOptionsScroll}
+              contentContainerStyle={[styles.footerOptions, isRTL && styles.rowRTL]}
             >
-              <Text style={styles.footerSizeText}>{footerSelection}</Text>
-              <Ionicons name="chevron-down" size={14} color={colors.mutedText} />
-            </TouchableOpacity>
+              {footerOptions.map((option) => {
+                const selected = option.value === option.current;
+                return (
+                  <TouchableOpacity
+                    key={`${option.kind}-${option.value}`}
+                    onPress={() => option.onSelect(option.value)}
+                    disabled={option.disabled}
+                    activeOpacity={0.75}
+                    style={[
+                      styles.footerOption,
+                      selected && styles.footerOptionSelected,
+                      option.disabled && styles.footerOptionDisabled,
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected, disabled: option.disabled }}
+                    accessibilityLabel={option.label}
+                  >
+                    {option.hex ? (
+                      <View style={[styles.footerSwatch, { backgroundColor: option.hex }]} />
+                    ) : null}
+                    <Text
+                      style={[
+                        styles.footerOptionText,
+                        selected && styles.footerOptionTextSelected,
+                        option.disabled && styles.footerOptionTextDisabled,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
             {priceView.kind === 'single' || priceView.kind === 'discounted' ? (
               <Text style={styles.footerPrice}>{formatAed(priceView.price)}</Text>
             ) : null}
@@ -2439,10 +2491,21 @@ const styles = StyleSheet.create({
   footerSelectionRTL: {
     flexDirection: 'row-reverse',
   },
-  footerSizeChip: {
+  // Scrolls rather than wraps: most products offer two options, but the
+  // needling cartridges offer five depths and must not push the price off.
+  footerOptionsScroll: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  footerOptions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 8,
+  },
+  footerOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
@@ -2450,10 +2513,30 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separatorStrong,
   },
-  footerSizeText: {
+  footerOptionSelected: {
+    backgroundColor: colors.accentBg,
+    borderColor: colors.accent,
+  },
+  footerOptionDisabled: {
+    opacity: 0.4,
+  },
+  footerOptionText: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: colors.label,
+    color: colors.mutedText,
+  },
+  footerOptionTextSelected: {
+    color: colors.accent,
+  },
+  footerOptionTextDisabled: {
+    textDecorationLine: 'line-through',
+  },
+  footerSwatch: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separatorStrong,
   },
   footerPrice: {
     ...T.label,
