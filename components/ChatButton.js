@@ -36,6 +36,7 @@ import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -212,7 +213,7 @@ export default function ChatButton({ visible = true }) {
     if (!product) {
       return (
         <View style={s.productCardLoading} key={`prod-${productId}`}>
-          <ActivityIndicator size="small" color="#dc2626" />
+          <ActivityIndicator size="small" color={colors.brand} />
         </View>
       );
     }
@@ -227,7 +228,7 @@ export default function ChatButton({ visible = true }) {
           <Image source={imageUri} style={s.productImage} contentFit="contain" transition={200} cachePolicy="memory-disk" />
         ) : (
           <View style={s.productImagePlaceholder}>
-            <Ionicons name="bag-outline" size={20} color="#D1D5DB" />
+            <Ionicons name="bag-outline" size={20} color={colors.separatorStrong} />
           </View>
         )}
         <View style={s.productInfo}>
@@ -248,7 +249,7 @@ export default function ChatButton({ visible = true }) {
                 }}
                 activeOpacity={0.8}
               >
-                <Ionicons name="logo-whatsapp" size={12} color="#fff" />
+                <Ionicons name="logo-whatsapp" size={12} color={colors.white} />
                 <Text style={s.addToBagText}>{t('product.requestQuote')}</Text>
               </TouchableOpacity>
             ) : (
@@ -258,7 +259,7 @@ export default function ChatButton({ visible = true }) {
                 activeOpacity={0.8}
                 disabled={isAdded}
               >
-                <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={12} color="#fff" />
+                <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={12} color={colors.white} />
                 <Text style={s.addToBagText}>{isAdded ? t('chat.added') : t('chat.addToBag')}</Text>
               </TouchableOpacity>
             )}
@@ -327,7 +328,7 @@ export default function ChatButton({ visible = true }) {
         <View style={[s.messageBubbleWrap, isUser ? s.userBubbleWrap : s.assistantBubbleWrap, isRTL && (isUser ? s.assistantBubbleWrap : s.userBubbleWrap)]}>
           {!isUser && (
             <View style={s.avatarCircle}>
-              <Ionicons name="sparkles" size={12} color="#dc2626" />
+              <Ionicons name="sparkles" size={12} color={colors.brand} />
             </View>
           )}
           <View style={[s.bubble, isUser ? s.userBubble : s.assistantBubble]}>
@@ -364,7 +365,7 @@ export default function ChatButton({ visible = true }) {
             accessibilityRole="button"
             accessibilityLabel={t('chat.a11y.openChat')}
           >
-            <Ionicons name="chatbubble-ellipses" size={26} color="#ffffff" />
+            <Ionicons name="chatbubble-ellipses" size={26} color={colors.white} />
             <View style={s.notificationDot} />
           </TouchableOpacity>
         </View>
@@ -392,7 +393,7 @@ export default function ChatButton({ visible = true }) {
             {/* Header */}
             <View style={[s.panelHeader, isRTL && s.panelHeaderRTL, isExpanded && { borderTopLeftRadius: 0, borderTopRightRadius: 0, paddingTop: Platform.OS === 'ios' ? 54 : 12 }]}>
               <View style={s.headerLeft}>
-                <Ionicons name="sparkles" size={16} color="#ffffff" />
+                <Ionicons name="sparkles" size={16} color={colors.white} />
                 <View style={{ marginStart: 6 }}>
                   <Text style={s.panelHeaderTitle}>{t('chat.title')}</Text>
                   <Text style={s.panelHeaderSubtitle}>{t('chat.subtitle')}</Text>
@@ -406,7 +407,7 @@ export default function ChatButton({ visible = true }) {
                   accessibilityRole="button"
                   accessibilityLabel={isExpanded ? t('chat.a11y.collapseChat') : t('chat.a11y.expandChat')}
                 >
-                  <Ionicons name={isExpanded ? 'contract-outline' : 'expand-outline'} size={18} color="#ffffff" />
+                  <Ionicons name={isExpanded ? 'contract-outline' : 'expand-outline'} size={18} color={colors.white} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => { haptics.lightTap(); setIsOpen(false); setIsExpanded(false); }}
@@ -415,7 +416,7 @@ export default function ChatButton({ visible = true }) {
                   accessibilityRole="button"
                   accessibilityLabel={t('common.close')}
                 >
-                  <Ionicons name="close" size={20} color="#ffffff" />
+                  <Ionicons name="close" size={20} color={colors.white} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -432,11 +433,11 @@ export default function ChatButton({ visible = true }) {
               {loading && (
                 <View style={[s.messageBubbleWrap, s.assistantBubbleWrap]}>
                   <View style={s.avatarCircle}>
-                    <Ionicons name="sparkles" size={12} color="#dc2626" />
+                    <Ionicons name="sparkles" size={12} color={colors.brand} />
                   </View>
                   <View style={[s.bubble, s.assistantBubble]}>
                     <View style={s.typingRow}>
-                      <ActivityIndicator size="small" color="#dc2626" />
+                      <ActivityIndicator size="small" color={colors.brand} />
                       <Text style={s.typingText}>{t('chat.thinking')}</Text>
                     </View>
                   </View>
@@ -452,7 +453,7 @@ export default function ChatButton({ visible = true }) {
                 value={input}
                 onChangeText={setInput}
                 placeholder={t('chat.placeholder')}
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.placeholder}
                 multiline
                 maxLength={500}
                 returnKeyType="send"
@@ -468,7 +469,7 @@ export default function ChatButton({ visible = true }) {
                 accessibilityLabel={t('chat.send')}
                 accessibilityState={{ disabled: !input.trim() || loading }}
               >
-                <Ionicons name="send" size={18} color="#ffffff" />
+                <Ionicons name="send" size={18} color={colors.white} />
               </TouchableOpacity>
             </View>
           </View>
@@ -490,7 +491,7 @@ const s = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
     ...Platform.select({
@@ -507,7 +508,7 @@ const s = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#22c55e',
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: colors.white,
   },
 
   /* ─── Modal Overlay ─── */
@@ -525,7 +526,7 @@ const s = StyleSheet.create({
   },
   panel: {
     height: PANEL_HEIGHT,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.subtleBg,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: 'hidden',
@@ -542,7 +543,7 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -550,7 +551,7 @@ const s = StyleSheet.create({
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   headerActionBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16 },
-  panelHeaderTitle: { ...T.label, fontWeight: '700', color: '#ffffff' },
+  panelHeaderTitle: { ...T.label, fontWeight: '700', color: colors.white },
   panelHeaderSubtitle: { ...T.badge, fontWeight: '400', color: 'rgba(255,255,255,0.8)', marginTop: 1 },
 
   /* ─── Messages ─── */
@@ -568,9 +569,9 @@ const s = StyleSheet.create({
   },
 
   bubble: { maxWidth: '80%', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8 },
-  userBubble: { backgroundColor: '#dc2626', borderBottomEndRadius: 4 },
+  userBubble: { backgroundColor: colors.brand, borderBottomEndRadius: 4 },
   assistantBubble: {
-    backgroundColor: '#ffffff', borderBottomStartRadius: 4,
+    backgroundColor: colors.card, borderBottomStartRadius: 4,
     ...Platform.select({
       ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 },
       android: { elevation: 1 },
@@ -578,13 +579,13 @@ const s = StyleSheet.create({
   },
 
   messageText: { ...T.label, fontWeight: '400', lineHeight: 20, color: undefined },
-  userText: { color: '#ffffff' },
-  assistantText: { color: '#1F2937' },
+  userText: { color: colors.white },
+  assistantText: { color: colors.label },
   linkText: { ...T.link, color: '#2563EB', textDecorationLine: 'underline' },
   textRTL: { textAlign: 'right' },
 
   typingRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  typingText: { ...T.captionSmall, color: '#6B7280', fontStyle: 'italic' },
+  typingText: { ...T.captionSmall, color: colors.mutedText, fontStyle: 'italic' },
 
   /* ─── Quick-action buttons ─── */
   quickActionsContainer: { marginStart: 30, marginTop: 4, marginBottom: 6, gap: 6 },
@@ -593,51 +594,51 @@ const s = StyleSheet.create({
   quickActionBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 3,
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
-    backgroundColor: '#F3F4F6', borderWidth: StyleSheet.hairlineWidth, borderColor: 'transparent',
+    backgroundColor: colors.fill, borderWidth: StyleSheet.hairlineWidth, borderColor: 'transparent',
   },
-  quickActionBtnHighlight: { backgroundColor: '#dc2626', borderColor: '#dc2626' },
+  quickActionBtnHighlight: { backgroundColor: colors.brand, borderColor: colors.brand },
   quickActionEmoji: { fontSize: 11 },
-  quickActionLabel: { ...T.captionTiny, fontWeight: '600', color: '#374151' },
-  quickActionLabelHighlight: { color: '#ffffff' },
+  quickActionLabel: { ...T.captionTiny, fontWeight: '600', color: colors.bodyText },
+  quickActionLabelHighlight: { color: colors.white },
 
   /* ─── Product card ─── */
   productCard: {
-    flexDirection: 'row', backgroundColor: '#F9FAFB', borderRadius: 10, padding: 8,
-    marginVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: '#E5E7EB',
+    flexDirection: 'row', backgroundColor: colors.subtleBg, borderRadius: 10, padding: 8,
+    marginVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator,
   },
   productCardLoading: { height: 50, alignItems: 'center', justifyContent: 'center', marginVertical: 4 },
-  productImage: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#FFFFFF' },
-  productImagePlaceholder: { width: 48, height: 48, borderRadius: 6, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
+  productImage: { width: 48, height: 48, borderRadius: 6, backgroundColor: colors.card },
+  productImagePlaceholder: { width: 48, height: 48, borderRadius: 6, backgroundColor: colors.fill, alignItems: 'center', justifyContent: 'center' },
   productInfo: { flex: 1, marginStart: 8 },
-  productName: { ...T.captionSmall, fontWeight: '600', color: '#1F2937', lineHeight: 16 },
-  productPrice: { ...T.captionSmall, fontWeight: '800', color: '#dc2626', marginTop: 2 },
+  productName: { ...T.captionSmall, fontWeight: '600', color: colors.label, lineHeight: 16 },
+  productPrice: { ...T.captionSmall, fontWeight: '800', color: colors.brand, marginTop: 2 },
   productPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 6, marginTop: 4 },
-  addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#dc2626', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
+  addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.brand, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
   addToBagBtnAdded: { backgroundColor: '#16A34A' },
   requestQuoteBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#25D366', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
-  addToBagText: { ...T.badge, color: '#ffffff' },
-  viewProductBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, borderWidth: 1, borderColor: '#D1D5DB' },
-  viewProductText: { ...T.badge, fontWeight: '600', color: '#374151' },
+  addToBagText: { ...T.badge, color: colors.white },
+  viewProductBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, borderWidth: 1, borderColor: colors.separatorStrong },
+  viewProductText: { ...T.badge, fontWeight: '600', color: colors.bodyText },
 
   /* ─── Input bar ─── */
   inputBar: {
     flexDirection: 'row', alignItems: 'flex-end',
     paddingHorizontal: 12, paddingTop: 6, paddingBottom: Platform.OS === 'ios' ? 24 : 10,
-    backgroundColor: '#ffffff', borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB',
+    backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator,
   },
   inputBarRTL: { flexDirection: 'row-reverse' },
   input: {
-    ...T.label, fontWeight: '400', color: '#1F2937',
-    flex: 1, backgroundColor: '#F3F4F6',
+    ...T.label, fontWeight: '400', color: colors.label,
+    flex: 1, backgroundColor: colors.fill,
     borderRadius: 18, paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 8 : 6,
-    maxHeight: 80, marginEnd: 8, borderWidth: 1, borderColor: '#E5E7EB',
+    maxHeight: 80, marginEnd: 8, borderWidth: 1, borderColor: colors.separator,
   },
   inputRTL: { textAlign: 'right', marginEnd: 0, marginStart: 8 },
   sendBtn: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center',
   },
-  sendBtnDisabled: { backgroundColor: '#D1D5DB' },
+  sendBtnDisabled: { backgroundColor: colors.separatorStrong },
 });

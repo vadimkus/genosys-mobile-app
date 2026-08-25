@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { tStatic } from '../contexts/LocalizationContext';
+import { colors } from '../utils/theme';
 
 /**
  * Shared footer pattern used across Bag + Checkout:
@@ -15,7 +16,7 @@ export default function CollapsibleFooter({
   onToggle,
   chevronCollapsedName = 'chevron-down',
   chevronExpandedName = 'chevron-up',
-  chevronColor = '#86868B',
+  chevronColor = colors.secondaryLabel,
   chevronSize = 18,
   chevronHitSlop,
   containerStyle,

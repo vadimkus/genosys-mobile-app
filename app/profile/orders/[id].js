@@ -137,7 +137,7 @@ function SectionHeader({ icon, tileColor, title, isRTL }) {
   return (
     <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
       <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color="#ffffff" />
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
       <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
     </View>
@@ -456,7 +456,7 @@ export default function OrderDetailScreen() {
           <View style={[styles.orderNumberCard, shadow.card]}>
             <View style={[styles.orderNumberHeader, isRTL && styles.rowRTL]}>
               <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.brand }]}>
-                <Ionicons name="receipt" size={20} color="#ffffff" />
+                <Ionicons name="receipt" size={20} color={colors.white} />
               </View>
               <View style={[styles.orderNumberTextContainer, isRTL && styles.alignEndRTL]}>
                 <Text style={[styles.orderNumberLabel, isRTL && styles.textRTL]}>{t('ordersDetail.orderNumber')}</Text>
@@ -481,7 +481,7 @@ export default function OrderDetailScreen() {
             <View style={styles.paymentMethodCard}>
               <View style={styles.paymentMethodRow}>
                 {isApplePayLike(order) ? (
-                  <Ionicons name="logo-apple" size={16} color="#111827" style={styles.appleLogo} />
+                  <Ionicons name="logo-apple" size={16} color={colors.label} style={styles.appleLogo} />
                 ) : null}
                 <Text style={[styles.paymentMethodText, isRTL && styles.textRTL]}>{getPaymentMethodLabel()}</Text>
                 {isPaidLikeOrder(order) && isApplePayLike(order) ? (
@@ -952,9 +952,9 @@ export default function OrderDetailScreen() {
                   activeOpacity={0.85}
                 >
                   {paying ? (
-                    <ActivityIndicator color="#ffffff" size="small" />
+                    <ActivityIndicator color={colors.white} size="small" />
                   ) : (
-                    <Ionicons name="card" size={20} color="#ffffff" />
+                    <Ionicons name="card" size={20} color={colors.white} />
                   )}
                   <Text style={[styles.primaryButtonText, isRTL && styles.textRTL]}>
                     {paying ? t('ordersDetail.startingPayment') : t('ordersDetail.payNow')}
@@ -986,9 +986,9 @@ export default function OrderDetailScreen() {
                 activeOpacity={0.85}
               >
                 {reordering ? (
-                  <ActivityIndicator color="#ffffff" size="small" />
+                  <ActivityIndicator color={colors.white} size="small" />
                 ) : (
-                  <Ionicons name="repeat" size={20} color="#ffffff" />
+                  <Ionicons name="repeat" size={20} color={colors.white} />
                 )}
                 <Text style={[styles.primaryButtonText, isRTL && styles.textRTL]}>
                   {reordering ? t('ordersDetail.reordering') : t('ordersDetail.reorderButton')}
@@ -1207,14 +1207,14 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
   },
   itemThumbnailPlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
   },
   itemHeaderContent: {
     flex: 1,
@@ -1305,7 +1305,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   itemPriceValueMuted: {
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   itemPriceValueStrikethrough: {
     textDecorationLine: 'line-through',
@@ -1363,7 +1363,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: '#DCFCE7',
   },
@@ -1441,14 +1441,14 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...T.summaryLabel,
-    color: '#3C3C43',
+    color: colors.bodyText,
   },
   summaryValue: {
     ...T.summaryValue,
   },
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryLabelPurple: {
     fontSize: 14,
@@ -1463,12 +1463,12 @@ const styles = StyleSheet.create({
   summaryLabelMuted: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryValueMuted: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryLabelDiscount: {
     fontSize: 14,
@@ -1530,7 +1530,7 @@ const styles = StyleSheet.create({
   },
   summaryDividerLight: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#D1D5DB',
+    backgroundColor: colors.separatorStrong,
     marginVertical: 8,
   },
   summaryDivider: {
@@ -1687,7 +1687,7 @@ const styles = StyleSheet.create({
   beautyBoxKitBulletText: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#ffffff',
+    color: colors.white,
   },
   beautyBoxKitItemName: {
     flex: 1,
@@ -1698,7 +1698,7 @@ const styles = StyleSheet.create({
   },
   beautyBoxKitItemBody: {
     fontSize: 12,
-    color: '#6B7280',
+    color: colors.mutedText,
     lineHeight: 17,
     marginTop: 4,
     marginStart: 30,

@@ -20,10 +20,10 @@ if (
 }
 
 const TIER_STYLES = {
-  MEMBER: { bg: '#F2F2F7', fg: '#3A3A3C', bar: '#8E8E93' },
-  SILVER: { bg: '#E8E8ED', fg: '#3A3A3C', bar: '#A0A0A8' },
+  MEMBER: { bg: colors.groupedBg, fg: '#3A3A3C', bar: colors.secondaryLabel },
+  SILVER: { bg: colors.groupedBg, fg: '#3A3A3C', bar: colors.placeholder },
   GOLD: { bg: '#FAF3E3', fg: '#8A6D1D', bar: '#D4AF37' },
-  PLATINUM: { bg: '#1D1D1F', fg: '#F5F5F7', bar: '#1D1D1F' },
+  PLATINUM: { bg: colors.label, fg: colors.subtleBg, bar: colors.label },
 };
 
 const TIERS = ['MEMBER', 'SILVER', 'GOLD', 'PLATINUM'];
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.separator,
   },
   tierRowCurrent: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.brandTint,
   },
   tierRowBadge: {
     paddingHorizontal: 8,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   partnerCard: {
-    backgroundColor: '#1D1D1F',
+    backgroundColor: colors.label,
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 16,

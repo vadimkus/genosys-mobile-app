@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { isCushionBB } from '../utils/productRules';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 const parseMaybeJSON = (value) => {
   if (value === null || value === undefined) return null;
@@ -79,7 +80,7 @@ export default function ProductVariantSelector({
                   <View
                     style={[
                       styles.colorSwatch,
-                      { backgroundColor: color.hex || '#FFFFFF' },
+                      { backgroundColor: color.hex || colors.white },
                       selectedColor === color.value && styles.selectedColorSwatch
                     ]}
                   />
@@ -181,12 +182,12 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
     minWidth: 80,
   },
   selectedColorOption: {
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
     backgroundColor: '#FFF5F5',
   },
   colorSwatch: {
@@ -195,19 +196,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 2,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
   },
   selectedColorSwatch: {
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
   },
   colorLabel: {
     ...T.captionSmall,
     fontWeight: '500',
-    color: '#666666',
+    color: colors.mutedText,
     textAlign: 'center',
   },
   selectedColorLabel: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '600',
   },
   
@@ -222,8 +223,8 @@ const styles = StyleSheet.create({
   },
   singleSizeStaticOption: {
     // Keep it non-interactive but visually readable (black text, no "disabled" fade).
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
   },
   sizeOption: {
     alignItems: 'center',
@@ -231,12 +232,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
     minWidth: 80,
   },
   selectedSizeOption: {
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
     backgroundColor: '#FFF5F5',
   },
   sizeLabel: {
@@ -246,38 +247,38 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   selectedSizeLabel: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '600',
   },
   sizePrice: {
     ...T.captionTiny,
-    color: '#666666',
+    color: colors.mutedText,
     textAlign: 'center',
   },
   selectedSizePrice: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '500',
   },
   
   // Enhanced styles for availability states
   sizeOptionDisabled: {
     opacity: 0.5,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
   sizeLabelDisabled: {
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   singleSizeStaticLabel: {
-    color: '#000000',
+    color: colors.label,
     fontWeight: '500',
   },
   sizePriceDisabled: {
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   unavailableText: {
     ...T.badge,
     fontWeight: '500',
-    color: '#EF4444',
+    color: colors.brandLight,
     marginTop: 2,
   },
 });

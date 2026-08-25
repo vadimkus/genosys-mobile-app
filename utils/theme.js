@@ -20,12 +20,25 @@ export const colors = {
   subtleBg: '#F8F9FA',       // nested inset rows
   fillSecondary: '#F2F2F7',  // secondary system fill (tinted buttons)
 
-  label: '#1D1D1F',          // primary text
-  secondaryLabel: '#8E8E93', // systemGray
-  tertiary: '#C7C7CC',       // disclosure chevrons, placeholders
+  fill: '#F3F4F6',           // tinted chips, progress tracks
+
+  // Text scale, darkest to lightest. Screens had accumulated five near-black
+  // heading colours and seven mid-greys from mixing the iOS palette with the
+  // website's old Tailwind one; these six roles replace all of them.
+  label: '#1D1D1F',          // headings
+  bodyText: '#374151',       // running text
+  mutedText: '#6B7280',      // supporting text
+  secondaryLabel: '#8E8E93', // metadata, systemGray
+  placeholder: '#9CA3AF',    // placeholders, disabled text
+  tertiary: '#C7C7CC',       // disclosure chevrons
+
   separator: '#E5E5EA',      // opaque separator
+  separatorStrong: '#D1D5DB', // input borders, dividers that need to read
 
   brand: '#dc2626',          // GENOSYS red
+  brandDark: '#B91C1C',      // pressed state
+  brandLight: '#EF4444',     // secondary accents
+  brandTint: '#FEF2F2',      // washed background behind red text
   blue: '#007AFF',
   green: '#34C759',
   greenDeep: '#16A34A',

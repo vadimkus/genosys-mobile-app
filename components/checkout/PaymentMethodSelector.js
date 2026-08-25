@@ -33,7 +33,7 @@ export default function PaymentMethodSelector({
         accessibilityLabel={title}
       >
         <View style={[surfaces.iconTile, ls.methodTile, { backgroundColor: tileColor }]}>
-          <Ionicons name={icon} size={17} color="#ffffff" />
+          <Ionicons name={icon} size={17} color={colors.white} />
         </View>
         <View style={ls.methodBody}>
           <Text style={[ls.methodTitle, isRTL && styles.textRTL]} numberOfLines={1}>{title}</Text>
@@ -52,7 +52,7 @@ export default function PaymentMethodSelector({
     <View style={styles.section}>
       <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
         <View style={[surfaces.iconTile, { backgroundColor: colors.green }]}>
-          <Ionicons name="card" size={17} color="#ffffff" />
+          <Ionicons name="card" size={17} color={colors.white} />
         </View>
         <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.paymentMethod')}</Text>
       </View>
@@ -89,7 +89,7 @@ export default function PaymentMethodSelector({
 
       {/* Trust badges */}
       <View style={[styles.trustRow, isRTL && styles.rowRTL]}>
-        <Ionicons name="lock-closed" size={14} color="#6B7280" />
+        <Ionicons name="lock-closed" size={14} color={colors.mutedText} />
         <Text style={[styles.trustText, isRTL && styles.textRTL]}>{t('checkout.trustStripe')}</Text>
       </View>
       <Text style={[styles.trustTextSecondary, isRTL && styles.trustTextSecondaryRTL]}>{t('checkout.trustStripeSecondary')}</Text>

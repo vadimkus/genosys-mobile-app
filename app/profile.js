@@ -491,14 +491,14 @@ export default function ProfileScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
-            style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 16, backgroundColor: '#0B0B0C', borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 16, backgroundColor: colors.label, borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flex: 1 }}>
               <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', marginRight: isRTL ? 0 : 12, marginLeft: isRTL ? 12 : 0 }}>
-                <Ionicons name="cube-outline" size={22} color="#FFFFFF" />
+                <Ionicons name="cube-outline" size={22} color={colors.white} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                <Text style={{ color: colors.white, fontSize: 16, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
                   {locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}
                 </Text>
                 <Text

@@ -42,15 +42,15 @@ Each stage is a separate OTA so a regression can be traced to one change.
 | Stage | What | Visible? |
 |---|---|---|
 | **0** | cera tokens + Cormorant loaded | No |
-| 1 | Replace hard-coded hex with tokens | No |
+| **1** | Replace hard-coded hex with tokens | Barely |
 | 2 | Repoint tokens: cream page, ink headings | Yes, everywhere |
 | 3 | Shared components: product card, buttons, headers, tab bar | Yes |
 | 4 | Product screen and blog, where the site is most itself | Yes |
 
-Stage 1 comes before any repaint on purpose. There are **984 hard-coded hex
-values across 65 files** — 212 of them `#ffffff`, 153 `#dc2626` — sitting
+Stage 1 came before any repaint on purpose. There were **984 hard-coded hex
+values across 65 files** — 220 of them `#ffffff`, 157 `#dc2626` — sitting
 alongside the tokens in `utils/theme.js`. Repainting before that sweep would
-mean editing every screen by hand for every subsequent change.
+have meant editing every screen by hand for every subsequent change.
 
 ## Stage 0 (done)
 
@@ -87,3 +87,58 @@ naming a constant, or Android renders tofu where the heading should be.
 Three static TTFs, ~290 KB each, ~870 KB total in the update bundle. Static
 per-weight files rather than the variable font, because React Native does not
 select variable-font weights reliably.
+
+## Stage 1 (done)
+
+**867 literals replaced across 63 files**, by `scripts/codemod-color-tokens.js`.
+Hard-coded hex in `app/` and `components/` went from 984 to 239; what remains
+is deliberate.
+
+### What was swept
+
+Only structural neutrals and the brand red — the colours stage 2 repoints.
+Status colours are left alone: greens, ambers, blues, WhatsApp, Google, the
+emirate flags and the gold accents all carry meaning that survives a retheme
+and would be wrong in cream.
+
+`utils/theme.js` gained six roles the palette had been missing, so the sweep
+had somewhere to land:
+
+| Token | Value | Role |
+|---|---|---|
+| `bodyText` | `#374151` | running text |
+| `mutedText` | `#6B7280` | supporting text |
+| `placeholder` | `#9CA3AF` | placeholders, disabled |
+| `fill` | `#F3F4F6` | chips, progress tracks |
+| `separatorStrong` | `#D1D5DB` | input borders |
+| `brandDark` / `brandLight` / `brandTint` | | pressed, accent, wash |
+
+### The one honest caveat
+
+700 of the replacements are exact. **170 are merges** onto a near neighbour,
+because screens had accumulated five near-black heading colours and seven
+mid-greys from mixing the iOS palette with the website's old Tailwind one.
+
+Most merges are imperceptible (`#e5e7eb` → `#E5E5EA`, two levels on one
+channel). The widest are `#555555` → `#6B7280` and `#333` → `#374151`, around
+40 levels on a mid grey, affecting roughly a dozen places. Every one moves
+toward the palette stage 2 installs anyway, so the drift is in the direction of
+travel rather than away from it.
+
+### Do not tokenise these
+
+`components/VideoLaunchScreen.js` keeps two literal `#ffffff` values. They are
+pinned to `ios/GenosysUAE/Images.xcassets/SplashScreenBackground.colorset`,
+which is native and cannot ship over the air. A token repointed to cream in
+stage 2 would put a coloured surface against a white native launch screen and
+read as a flash on cold start. Same reasoning applies to the two
+`backgroundColor` entries in `app.json`.
+
+`shadowColor` was skipped throughout: it is black by design and has nothing to
+do with the surface palette.
+
+### Fixed along the way
+
+`app/partner-portal.js` referenced `colors.groupedBackground`, which has never
+existed — six style rules were silently falling through to a literal. Now
+`colors.groupedBg`.

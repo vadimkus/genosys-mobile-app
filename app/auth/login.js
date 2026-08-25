@@ -1217,7 +1217,7 @@ const styles = StyleSheet.create({
   emailSuggestionPrimaryText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.white,
   },
   emailSuggestionSecondary: {
     minHeight: 44,
@@ -1225,7 +1225,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#D8A93E',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     paddingHorizontal: 14,
   },
   emailSuggestionSecondaryText: {

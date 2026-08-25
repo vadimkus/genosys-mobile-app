@@ -90,7 +90,7 @@ export default function CheckoutAddressForm({
       <View style={styles.section} onLayout={registerSectionLayout('delivery')}>
         <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
           <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
-            <Ionicons name="location" size={17} color="#ffffff" />
+            <Ionicons name="location" size={17} color={colors.white} />
           </View>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.shippingInformation')}</Text>
         </View>
@@ -127,7 +127,7 @@ export default function CheckoutAddressForm({
             <Ionicons
               name={isRTL ? 'chevron-back' : 'chevron-forward'}
               size={18}
-              color="#8E8E93"
+              color={colors.secondaryLabel}
             />
           </TouchableOpacity>
         </View>
@@ -316,7 +316,7 @@ export default function CheckoutAddressForm({
                     </Text>
                   </View>
                   {selectedEmirate === emirate.name ? (
-                    <Ionicons name="checkmark" size={16} color="#dc2626" />
+                    <Ionicons name="checkmark" size={16} color={colors.brand} />
                   ) : null}
                 </View>
                 <View style={[styles.emirateBottomRow, isRTL && styles.emirateBottomRowRTL]}>
@@ -352,7 +352,7 @@ export default function CheckoutAddressForm({
                 accessibilityRole="button"
                 accessibilityLabel={t('common.close')}
               >
-                <Ionicons name="close" size={22} color="#111827" />
+                <Ionicons name="close" size={22} color={colors.label} />
               </TouchableOpacity>
             </View>
 
@@ -399,7 +399,7 @@ export default function CheckoutAddressForm({
                 })
               ) : (
                 <View style={{ padding: 10 }}>
-                  <Text style={[styles.modalAddressLine, { color: '#6B7280' }, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
+                  <Text style={[styles.modalAddressLine, { color: colors.mutedText }, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
                   <TouchableOpacity
                     style={[styles.modalOption, { paddingHorizontal: 0 }, isRTL && styles.modalOptionRTL]}
                     onPress={() => {

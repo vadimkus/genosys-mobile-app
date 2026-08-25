@@ -31,7 +31,7 @@ function SectionHeader({ icon, tileColor, title, isRTL }) {
   return (
     <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
       <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color="#ffffff" />
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
       <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
     </View>
@@ -223,7 +223,7 @@ export default function AddEditAddressScreen() {
                       <Ionicons
                         name={type === t('addAddress.typeHome') ? 'home' : type === t('addAddress.typeWork') ? 'business' : 'location'}
                         size={18}
-                        color={active ? '#ffffff' : colors.brand}
+                        color={active ? colors.white : colors.brand}
                       />
                       <Text style={[styles.typeButtonText, isRTL && styles.textRTL, active && styles.activeTypeButtonText]}>
                         {type}
@@ -368,7 +368,7 @@ export default function AddEditAddressScreen() {
                   value={formData.isDefault}
                   onValueChange={(value) => { haptics.selectionTick(); updateField('isDefault', value); }}
                   trackColor={{ false: colors.separator, true: colors.brand }}
-                  thumbColor="#ffffff"
+                  thumbColor={colors.white}
                   ios_backgroundColor={colors.separator}
                 />
               </View>
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     color: colors.brand,
   },
   activeTypeButtonText: {
-    color: '#ffffff',
+    color: colors.white,
   },
 
   // Form Fields
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activeEmirateButtonText: {
-    color: '#ffffff',
+    color: colors.white,
   },
 
   // Switch

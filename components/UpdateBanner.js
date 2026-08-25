@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, Linking, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../utils/theme';
 
 /**
  * Non-blocking banner shown when a newer app version is available
@@ -46,7 +47,7 @@ export default function UpdateBanner({ updateUrl, onDismiss }) {
       ]}
     >
       <View style={styles.inner}>
-        <Ionicons name="arrow-up-circle" size={22} color="#ffffff" style={styles.icon} />
+        <Ionicons name="arrow-up-circle" size={22} color={colors.white} style={styles.icon} />
 
         <Text style={styles.text} numberOfLines={1}>
           {Platform.OS === 'ios'
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 998,
-    backgroundColor: '#1D1D1F',
+    backgroundColor: colors.label,
     paddingBottom: 10,
     paddingHorizontal: 16,
   },
@@ -90,13 +91,13 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 13,
     fontWeight: '500',
     letterSpacing: -0.1,
   },
   updateBtn: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 5,
     paddingHorizontal: 14,
     borderRadius: 14,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   updateText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 13,
     fontWeight: '600',
   },

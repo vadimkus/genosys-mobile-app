@@ -190,7 +190,7 @@ export default function BrandScreen() {
                   />
                   <View style={styles.playOverlay}>
                     <View style={styles.playButton}>
-                      <Ionicons name="play" size={30} color="#ffffff" style={{ marginLeft: 3 }} />
+                      <Ionicons name="play" size={30} color={colors.white} style={{ marginLeft: 3 }} />
                     </View>
                   </View>
                 </View>
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
-  productImage: { width: '100%', height: SCREEN_WIDTH * 0.6, backgroundColor: '#ffffff' },
+  productImage: { width: '100%', height: SCREEN_WIDTH * 0.6, backgroundColor: colors.card },
   productCaption: { ...T.caption, color: colors.secondaryLabel, textAlign: 'center', paddingTop: 12, lineHeight: 18 },
 
   // RTL

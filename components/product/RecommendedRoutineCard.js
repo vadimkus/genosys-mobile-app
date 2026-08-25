@@ -41,7 +41,7 @@ export default function RecommendedRoutineCard({ routine, currentProductId, isRT
     <View style={[s.card, shadow.card]}>
       <View style={[s.headerRow, isRTL && s.rowReverse]}>
         <View style={[surfaces.iconTile, { backgroundColor: colors.purple }]}>
-          <Ionicons name="sparkles" size={16} color="#ffffff" />
+          <Ionicons name="sparkles" size={16} color={colors.white} />
         </View>
         <Text style={[s.headerTitle, isRTL && s.textRTL]} numberOfLines={2}>
           {routine.heading}
@@ -143,7 +143,7 @@ const s = StyleSheet.create({
     marginTop: 1,
   },
   stepNumText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -152,7 +152,7 @@ const s = StyleSheet.create({
     height: 52,
     borderRadius: 10,
     marginTop: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
   },

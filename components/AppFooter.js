@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import * as haptics from '../utils/haptics';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { colors } from '../utils/theme';
 
 /**
  * Shared app footer — single source of truth for the brand block shown
@@ -62,7 +63,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
             accessibilityRole="link"
             accessibilityLabel="www.genosys.ae"
           >
-            <Ionicons name="globe-outline" size={13} color="#FFFFFF" />
+            <Ionicons name="globe-outline" size={13} color={colors.white} />
             <Text style={styles.linkText}>genosys.ae</Text>
           </TouchableOpacity>
           <View style={styles.linkSeparator} />
@@ -73,7 +74,7 @@ export default function AppFooter({ tagline, showVersion = true, style }) {
             accessibilityRole="link"
             accessibilityLabel="sales@genosys.ae"
           >
-            <Ionicons name="mail-outline" size={13} color="#FFFFFF" />
+            <Ionicons name="mail-outline" size={13} color={colors.white} />
             <Text style={styles.linkText}>sales@genosys.ae</Text>
           </TouchableOpacity>
         </View>
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   },
   card: {
     // Match Partner Portal card on Account (`#0B0B0C` + white type)
-    backgroundColor: '#0B0B0C',
+    backgroundColor: colors.label,
     borderRadius: 16,
     paddingVertical: 22,
     paddingHorizontal: 20,
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 5,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   tagline: {
     fontSize: 11,
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: colors.white,
   },
   linkSeparator: {
     width: StyleSheet.hairlineWidth,

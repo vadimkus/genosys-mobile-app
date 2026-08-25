@@ -64,7 +64,7 @@ function buildProfileFromConcerns(concerns) {
 function ScoreBar({ label, value, inverted = false, icon, isRTL = false }) {
   // inverted: true means lower value = better (blemishes, wrinkles, etc.)
   const displayValue = inverted ? 100 - value : value;
-  const color = displayValue >= 70 ? '#16A34A' : displayValue >= 45 ? '#F59E0B' : '#dc2626';
+  const color = displayValue >= 70 ? '#16A34A' : displayValue >= 45 ? '#F59E0B' : colors.brand;
 
   return (
     <View style={styles.scoreRow}>
@@ -127,7 +127,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
     }
   };
 
-  const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : '#dc2626';
+  const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : colors.brand;
 
   return (
     <View style={styles.container}>
@@ -259,7 +259,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                           }}
                           activeOpacity={0.8}
                         >
-                          <Ionicons name="logo-whatsapp" size={14} color="#fff" />
+                          <Ionicons name="logo-whatsapp" size={14} color={colors.white} />
                           <Text style={styles.recAddText}>{t('product.requestQuote')}</Text>
                         </TouchableOpacity>
                       ) : (
@@ -269,7 +269,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                           disabled={isAdded}
                           activeOpacity={0.8}
                         >
-                          <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                          <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color={colors.white} />
                           <Text style={styles.recAddText}>
                             {isAdded ? t('chat.added') : !user ? t('shop.loginToBuy') : t('chat.addToBag')}
                           </Text>
@@ -307,7 +307,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
             <Text style={styles.concernCtaBtnText}>
               {t('skinAnalysis.browseByConcernButton')}
             </Text>
-            <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color="#fff" />
+            <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color={colors.white} />
           </View>
         </TouchableOpacity>
 
@@ -349,8 +349,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   overallScore: { fontSize: 36, fontWeight: '900' },
-  overallMax: { ...T.label, color: '#9CA3AF', marginTop: -4 },
-  overallLabel: { ...T.bodySmall, fontWeight: '700', color: '#374151', lineHeight: undefined },
+  overallMax: { ...T.label, color: colors.placeholder, marginTop: -4 },
+  overallLabel: { ...T.bodySmall, fontWeight: '700', color: colors.bodyText, lineHeight: undefined },
 
   // Concerns
   concernsCard: {
@@ -359,20 +359,20 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 20,
   },
-  sectionTitle: { ...T.price, fontWeight: '800', color: '#1F2937', marginBottom: 12 },
+  sectionTitle: { ...T.price, fontWeight: '800', color: colors.label, marginBottom: 12 },
   concernChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   concernChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#FECACA',
   },
-  concernChipText: { ...T.labelSmall, color: '#dc2626' },
+  concernChipText: { ...T.labelSmall, color: colors.brand },
 
   // Score bars
   scoresCard: {
@@ -390,11 +390,11 @@ const styles = StyleSheet.create({
   scoreLabelRowRTL: {
     flexDirection: 'row-reverse',
   },
-  scoreLabel: { ...T.labelSmall, color: '#374151', flex: 1 },
+  scoreLabel: { ...T.labelSmall, color: colors.bodyText, flex: 1 },
   scoreValue: { ...T.labelSmall, fontWeight: '800' },
   barBg: {
     height: 6,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.separator,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -411,17 +411,17 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
-  recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#FFFFFF' },
-  recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
+  recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: colors.card },
+  recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fill },
   recInfo: { flex: 1, marginStart: 12 },
-  recName: { ...T.label, color: '#1F2937', lineHeight: 20 },
-  recPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginTop: 4 },
+  recName: { ...T.label, color: colors.label, lineHeight: 20 },
+  recPrice: { ...T.label, fontWeight: '800', color: colors.brand, marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -437,15 +437,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   recPriceOnRequest: { ...T.labelSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
-  recAddText: { ...T.captionSmall, fontWeight: '700', color: '#fff' },
+  recAddText: { ...T.captionSmall, fontWeight: '700', color: colors.white },
   recViewBtn: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
-  recViewText: { ...T.captionSmall, fontWeight: '600', color: '#374151' },
+  recViewText: { ...T.captionSmall, fontWeight: '600', color: colors.bodyText },
 
   // Concern CTA
   concernCta: {
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -484,9 +484,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
   },
-  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: '#dc2626' },
+  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.brand },
   retakeBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
-  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: '#374151' },
+  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.bodyText },
 });

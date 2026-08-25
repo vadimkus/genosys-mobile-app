@@ -316,7 +316,7 @@ export default function BundleBuilderScreen() {
         {/* Selection indicator */}
         {selected && (
           <View style={styles.selectedBadge}>
-            <Ionicons name="checkmark" size={14} color="#fff" />
+            <Ionicons name="checkmark" size={14} color={colors.white} />
           </View>
         )}
 
@@ -331,7 +331,7 @@ export default function BundleBuilderScreen() {
               cachePolicy="memory-disk"
             />
           ) : (
-            <Ionicons name="image-outline" size={32} color="#D1D5DB" />
+            <Ionicons name="image-outline" size={32} color={colors.separatorStrong} />
           )}
         </View>
 
@@ -361,7 +361,7 @@ export default function BundleBuilderScreen() {
           onPress={() => toggleProduct(product, currentStepData?.id)}
           activeOpacity={0.7}
         >
-          <Ionicons name={selected ? 'checkmark' : 'add'} size={18} color={selected ? '#fff' : '#dc2626'} />
+          <Ionicons name={selected ? 'checkmark' : 'add'} size={18} color={selected ? colors.white : colors.brand} />
           <Text style={[styles.addBtnText, selected && styles.addBtnTextSelected]}>
             {selected ? t('bundleBuilder.added') : t('bundleBuilder.add')}
           </Text>
@@ -377,13 +377,13 @@ export default function BundleBuilderScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.headerBar}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.label} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('bundleBuilder.title')}</Text>
           <View style={styles.backBtn} />
         </View>
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color="#dc2626" />
+          <ActivityIndicator size="large" color={colors.brand} />
           <Text style={styles.loadingText}>{t('bundleBuilder.loadingProducts')}</Text>
         </View>
       </SafeAreaView>
@@ -395,13 +395,13 @@ export default function BundleBuilderScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.headerBar}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.label} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('bundleBuilder.title')}</Text>
           <View style={styles.backBtn} />
         </View>
         <View style={styles.loadingWrap}>
-          <Ionicons name="alert-circle" size={48} color="#EF4444" />
+          <Ionicons name="alert-circle" size={48} color={colors.brandLight} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={fetchBundleData} activeOpacity={0.7}>
             <Text style={styles.retryBtnText}>{t('bundleBuilder.tryAgain')}</Text>
@@ -416,7 +416,7 @@ export default function BundleBuilderScreen() {
       {/* Header */}
       <View style={styles.headerBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.label} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('bundleBuilder.title')}</Text>
         {itemCount > 0 ? (
@@ -428,7 +428,7 @@ export default function BundleBuilderScreen() {
             accessibilityLabel={`${t('bundleBuilder.yourBundle')} (${itemCount})`}
             accessibilityState={{ expanded: showSummary }}
           >
-            <Ionicons name="bag-outline" size={22} color="#dc2626" />
+            <Ionicons name="bag-outline" size={22} color={colors.brand} />
             <View style={styles.cartBadge}><Text style={styles.cartBadgeText}>{itemCount}</Text></View>
           </TouchableOpacity>
         ) : (
@@ -533,7 +533,7 @@ export default function BundleBuilderScreen() {
           columnWrapperStyle={styles.productRow}
           ListEmptyComponent={
             <View style={styles.emptyStep}>
-              <Ionicons name="cube-outline" size={40} color="#D1D5DB" />
+              <Ionicons name="cube-outline" size={40} color={colors.separatorStrong} />
               <Text style={styles.emptyStepText}>{t('bundleBuilder.emptyStep')}</Text>
             </View>
           }
@@ -553,7 +553,7 @@ export default function BundleBuilderScreen() {
           accessibilityState={{ expanded: footerExpanded }}
         >
           <View style={styles.footerHandle} />
-          <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
+          <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color={colors.placeholder} />
         </TouchableOpacity>
 
         {/* Expanded pricing breakdown — best discount wins (bundle vs VIP) */}
@@ -563,7 +563,7 @@ export default function BundleBuilderScreen() {
             {discountAmount > 0 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>{t('bundleBuilder.retailPrice')}</Text>
-                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{formatAed(retailTotal)}</Text>
+                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.placeholder }]}>{formatAed(retailTotal)}</Text>
               </View>
             )}
             {/* Discount row — labelled by the discount that actually won */}
@@ -595,7 +595,7 @@ export default function BundleBuilderScreen() {
             onPress={() => goToStep(currentStep - 1)}
             activeOpacity={0.7}
           >
-            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color={currentStep === 0 ? '#D1D5DB' : '#374151'} />
+            <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color={currentStep === 0 ? colors.separatorStrong : colors.bodyText} />
             <Text style={[styles.navBtnText, currentStep === 0 && styles.navBtnTextDisabled]}>{t('bundleBuilder.previous')}</Text>
           </TouchableOpacity>
 
@@ -624,7 +624,7 @@ export default function BundleBuilderScreen() {
                   ? t('bundleBuilder.skip')
                   : t('bundleBuilder.next')}
               </Text>
-              <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color="#374151" />
+              <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={colors.bodyText} />
             </TouchableOpacity>
           ) : (
             <View style={styles.navBtn} />
@@ -634,7 +634,7 @@ export default function BundleBuilderScreen() {
         {/* Add to cart button */}
         {itemCount >= 2 && user && (
           <TouchableOpacity style={styles.addToCartBtn} onPress={handleAddToCart} activeOpacity={0.8}>
-            <Ionicons name="bag-add" size={20} color="#fff" />
+            <Ionicons name="bag-add" size={20} color={colors.white} />
             <Text style={styles.addToCartText}>
               {t('bundleBuilder.addBundleToCart')}
               {discountPercent > 0 ? ` (${t('product.discountPercent', { percent: discountPercent })})` : ''}
@@ -654,7 +654,7 @@ export default function BundleBuilderScreen() {
             <View style={styles.summaryHandle} />
             <View style={styles.summaryHeader}>
               <Text style={styles.summaryTitle}>{t('bundleBuilder.yourBundle')} ({itemCount})</Text>
-              <TouchableOpacity onPress={closeSummary}><Ionicons name="close" size={24} color="#374151" /></TouchableOpacity>
+              <TouchableOpacity onPress={closeSummary}><Ionicons name="close" size={24} color={colors.bodyText} /></TouchableOpacity>
             </View>
 
             <ScrollView style={styles.summaryScroll} showsVerticalScrollIndicator={false}>
@@ -678,7 +678,7 @@ export default function BundleBuilderScreen() {
                       accessibilityRole="button"
                       accessibilityLabel={`${t('bag.removeItem')} — ${product.name}`}
                     >
-                      <Ionicons name="close-circle" size={22} color="#EF4444" />
+                      <Ionicons name="close-circle" size={22} color={colors.brandLight} />
                     </TouchableOpacity>
                   </View>
                 );
@@ -692,7 +692,7 @@ export default function BundleBuilderScreen() {
                 {discountAmount > 0 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabel}>{t('bundleBuilder.retailPrice')}</Text>
-                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: '#9CA3AF' }]}>{formatAed(retailTotal)}</Text>
+                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.placeholder }]}>{formatAed(retailTotal)}</Text>
                   </View>
                 )}
                 {/* Discount row — labelled by the discount that actually won */}
@@ -721,7 +721,7 @@ export default function BundleBuilderScreen() {
               onPress={() => { haptics.mediumTap(); setSelectedItems({}); closeSummary(); }}
               activeOpacity={0.7}
             >
-              <Ionicons name="trash-outline" size={16} color="#EF4444" />
+              <Ionicons name="trash-outline" size={16} color={colors.brandLight} />
               <Text style={styles.clearAllText}>{t('bundleBuilder.clearAll')}</Text>
             </TouchableOpacity>
           </Animated.View>
@@ -744,41 +744,41 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { ...T.navTitle, flex: 1, fontWeight: '700', color: colors.label, textAlign: 'center' },
   cartBadgeBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: '#dc2626', borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
-  cartBadgeText: { ...T.badge, color: '#fff' },
+  cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: colors.brand, borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  cartBadgeText: { ...T.badge, color: colors.white },
 
   // Progress bar
   progressSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
-  progressBar: { height: 6, backgroundColor: '#E5E7EB', borderRadius: 3, position: 'relative', overflow: 'visible' },
-  progressFill: { height: 6, backgroundColor: '#dc2626', borderRadius: 3 },
+  progressBar: { height: 6, backgroundColor: colors.separator, borderRadius: 3, position: 'relative', overflow: 'visible' },
+  progressFill: { height: 6, backgroundColor: colors.brand, borderRadius: 3 },
   tierMarker: { position: 'absolute', top: -3, alignItems: 'center', marginLeft: -4 },
-  tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#E5E7EB', borderWidth: 2, borderColor: '#fff' },
+  tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.separator, borderWidth: 2, borderColor: colors.white },
   tierDotActive: { backgroundColor: '#16a34a' },
   progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 },
-  progressLabel: { ...T.badge, color: '#9CA3AF' },
+  progressLabel: { ...T.badge, color: colors.placeholder },
   progressLabelActive: { color: '#16a34a', fontWeight: '700' },
-  nextTierHint: { ...T.captionSmall, color: '#dc2626', fontWeight: '600', textAlign: 'center', marginTop: 6 },
+  nextTierHint: { ...T.captionSmall, color: colors.brand, fontWeight: '600', textAlign: 'center', marginTop: 6 },
   discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: '#F0FDF4', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
   discountActiveText: { ...T.badgeMedium, color: '#16a34a' },
 
   // Step indicator
   stepIndicator: { backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, height: 52 },
   stepIndicatorContent: { paddingHorizontal: 12, gap: 8, alignItems: 'center', paddingVertical: 10 },
-  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#F3F4F6', borderWidth: 1.5, borderColor: '#F3F4F6', height: 32 },
-  stepPillActive: { backgroundColor: '#FEF2F2', borderColor: '#dc2626' },
+  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.fill, borderWidth: 1.5, borderColor: colors.fill, height: 32 },
+  stepPillActive: { backgroundColor: colors.brandTint, borderColor: colors.brand },
   stepEmoji: { fontSize: 14 },
-  stepPillText: { ...T.captionTiny, fontWeight: '600', color: '#6B7280' },
-  stepPillTextActive: { color: '#dc2626' },
+  stepPillText: { ...T.captionTiny, fontWeight: '600', color: colors.mutedText },
+  stepPillTextActive: { color: colors.brand },
   requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#F59E0B' },
   stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
-  stepCountText: { ...T.badge, color: '#fff' },
+  stepCountText: { ...T.badge, color: colors.white },
 
   // Step header
   stepHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
   stepHeaderEmoji: { fontSize: 28 },
   stepHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  stepHeaderTitle: { ...T.sectionTitleSmall, color: '#111827' },
-  stepHeaderDesc: { ...T.caption, color: '#6B7280', marginTop: 2 },
+  stepHeaderTitle: { ...T.sectionTitleSmall, color: colors.label },
+  stepHeaderDesc: { ...T.caption, color: colors.mutedText, marginTop: 2 },
   requiredBadge: { backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
   requiredBadgeText: { ...T.captionTiny, fontWeight: '600', color: '#92400E' },
 
@@ -792,88 +792,88 @@ const styles = StyleSheet.create({
   productCardSelected: { borderColor: colors.brand, backgroundColor: tint(colors.brand, '0A') },
   selectedBadge: {
     position: 'absolute', top: 8, right: 8, zIndex: 10,
-    width: 24, height: 24, borderRadius: 12, backgroundColor: '#dc2626',
+    width: 24, height: 24, borderRadius: 12, backgroundColor: colors.brand,
     alignItems: 'center', justifyContent: 'center',
   },
   // Square tile, photo edge-to-edge. contentFit="cover" center-crops the
   // 956×662 landscape studio shots to fill the square (products are centered,
   // verified safe) — kills the white letterbox bands ("white endings").
-  productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
+  productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
-  productName: { ...T.captionSmall, fontWeight: '600', color: '#374151', lineHeight: 16, minHeight: 32 },
-  productDesc: { ...T.badge, fontWeight: '400', color: '#6B7280', lineHeight: 14, marginTop: 2 },
-  productSize: { ...T.captionTiny, color: '#9CA3AF', marginTop: 2 },
+  productName: { ...T.captionSmall, fontWeight: '600', color: colors.bodyText, lineHeight: 16, minHeight: 32 },
+  productDesc: { ...T.badge, fontWeight: '400', color: colors.mutedText, lineHeight: 14, marginTop: 2 },
+  productSize: { ...T.captionTiny, color: colors.placeholder, marginTop: 2 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  priceOriginal: { ...T.captionTiny, color: '#9CA3AF', textDecorationLine: 'line-through' },
-  priceMain: { ...T.label, fontWeight: '700', color: '#111827' },
+  priceOriginal: { ...T.captionTiny, color: colors.placeholder, textDecorationLine: 'line-through' },
+  priceMain: { ...T.label, fontWeight: '700', color: colors.label },
   priceDiscounted: { color: '#16a34a' },
-  loginToSee: { ...T.captionTiny, color: '#9CA3AF', marginTop: 4, fontStyle: 'italic' },
+  loginToSee: { ...T.captionTiny, color: colors.placeholder, marginTop: 4, fontStyle: 'italic' },
 
-  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: '#dc2626' },
-  addBtnSelected: { backgroundColor: '#dc2626', borderColor: '#dc2626' },
-  addBtnText: { ...T.caption, fontWeight: '600', color: '#dc2626' },
-  addBtnTextSelected: { color: '#fff' },
+  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.brand },
+  addBtnSelected: { backgroundColor: colors.brand, borderColor: colors.brand },
+  addBtnText: { ...T.caption, fontWeight: '600', color: colors.brand },
+  addBtnTextSelected: { color: colors.white },
 
   // Bottom bar
   bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
   footerChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
-  footerHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 2 },
-  footerPricing: { paddingHorizontal: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 4 },
+  footerHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, marginBottom: 2 },
+  footerPricing: { paddingHorizontal: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, marginBottom: 4 },
   navRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   navBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 4, minWidth: 80 },
   navBtnDisabled: { opacity: 0.4 },
-  navBtnText: { ...T.buttonSmall, color: '#374151' },
-  navBtnTextDisabled: { color: '#D1D5DB' },
+  navBtnText: { ...T.buttonSmall, color: colors.bodyText },
+  navBtnTextDisabled: { color: colors.separatorStrong },
   navCenter: { alignItems: 'center' },
   navDiscount: { ...T.captionTiny, fontWeight: '700', color: '#16a34a' },
-  navTotal: { ...T.price, color: '#111827' },
-  navItems: { ...T.caption, fontWeight: '600', color: '#6B7280' },
+  navTotal: { ...T.price, color: colors.label },
+  navItems: { ...T.caption, fontWeight: '600', color: colors.mutedText },
 
-  addToCartBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#dc2626', paddingVertical: 14, borderRadius: 14, marginTop: 8 },
-  addToCartText: { ...T.button, fontWeight: '700', color: '#fff' },
+  addToCartBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.brand, paddingVertical: 14, borderRadius: 14, marginTop: 8 },
+  addToCartText: { ...T.button, fontWeight: '700', color: colors.white },
 
   // Summary overlay
   summaryOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 },
   summaryBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
-  summarySheet: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: 34 },
-  summaryHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 10 },
-  summaryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
-  summaryTitle: { ...T.sectionTitleSmall, color: '#111827' },
+  summarySheet: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: 34 },
+  summaryHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, alignSelf: 'center', marginTop: 10 },
+  summaryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
+  summaryTitle: { ...T.sectionTitleSmall, color: colors.label },
   summaryScroll: { paddingHorizontal: 20, maxHeight: 280 },
-  summaryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6' },
+  summaryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.fill },
   summaryImageWrap: { alignItems: 'center' },
-  summaryItemImage: { width: 44, height: 44, borderRadius: 8, backgroundColor: '#F9FAFB' },
-  summaryImageSize: { ...T.badge, fontWeight: '500', color: '#9CA3AF', marginTop: 2, fontSize: 9 },
-  summaryItemName: { ...T.labelSmall, color: '#374151' },
-  summaryItemStep: { ...T.captionTiny, color: '#9CA3AF', marginTop: 2 },
-  summaryItemPrice: { ...T.label, fontWeight: '700', color: '#111827' },
+  summaryItemImage: { width: 44, height: 44, borderRadius: 8, backgroundColor: colors.subtleBg },
+  summaryImageSize: { ...T.badge, fontWeight: '500', color: colors.placeholder, marginTop: 2, fontSize: 9 },
+  summaryItemName: { ...T.labelSmall, color: colors.bodyText },
+  summaryItemStep: { ...T.captionTiny, color: colors.placeholder, marginTop: 2 },
+  summaryItemPrice: { ...T.label, fontWeight: '700', color: colors.label },
   summaryRemoveBtn: { padding: 4 },
 
   // Pricing
-  summaryPricing: { paddingHorizontal: 20, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
+  summaryPricing: { paddingHorizontal: 20, paddingVertical: 14, borderTopWidth: 1, borderTopColor: colors.separator },
   pricingRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  pricingLabel: { ...T.summaryLabel, color: '#6B7280' },
-  pricingValue: { ...T.summaryValue, color: '#374151' },
+  pricingLabel: { ...T.summaryLabel, color: colors.mutedText },
+  pricingValue: { ...T.summaryValue, color: colors.bodyText },
   pricingLabelPurple: { ...T.summaryLabel, color: '#7c3aed', fontWeight: '600' },
   pricingValuePurple: { ...T.summaryValue, fontWeight: '700', color: '#7c3aed' },
   pricingLabelGreen: { ...T.summaryLabel, color: '#16a34a', fontWeight: '600' },
   pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: '#16a34a' },
-  pricingRowTotal: { borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 8, marginTop: 4 },
-  pricingTotalLabel: { ...T.totalLabel, color: '#111827', fontSize: 16 },
-  pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: '#dc2626', fontSize: 18 },
+  pricingRowTotal: { borderTopWidth: 1, borderTopColor: colors.separator, paddingTop: 8, marginTop: 4 },
+  pricingTotalLabel: { ...T.totalLabel, color: colors.label, fontSize: 16 },
+  pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: colors.brand, fontSize: 18 },
 
   clearAllBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12 },
-  clearAllText: { ...T.buttonSmall, color: '#EF4444' },
+  clearAllText: { ...T.buttonSmall, color: colors.brandLight },
 
   // Empty & loading
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
-  loadingText: { ...T.bodySmall, marginTop: 12, color: '#6B7280', lineHeight: undefined },
-  errorText: { ...T.label, fontSize: 16, color: '#374151', marginTop: 12, textAlign: 'center' },
-  retryBtn: { backgroundColor: '#dc2626', paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
-  retryBtnText: { ...T.buttonSmall, color: '#fff', fontSize: 15 },
+  loadingText: { ...T.bodySmall, marginTop: 12, color: colors.mutedText, lineHeight: undefined },
+  errorText: { ...T.label, fontSize: 16, color: colors.bodyText, marginTop: 12, textAlign: 'center' },
+  retryBtn: { backgroundColor: colors.brand, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
+  retryBtnText: { ...T.buttonSmall, color: colors.white, fontSize: 15 },
   emptyStep: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyStepText: { ...T.caption, color: '#9CA3AF', marginTop: 8, fontSize: 14 },
+  emptyStepText: { ...T.caption, color: colors.placeholder, marginTop: 8, fontSize: 14 },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });

@@ -35,7 +35,7 @@ if (
 export default function CollapsibleSection({
   title,
   icon,
-  iconColor = '#86868B',
+  iconColor = colors.secondaryLabel,
   defaultOpen = false,
   isRTL = false,
   children,
@@ -70,7 +70,7 @@ export default function CollapsibleSection({
                   isRTL ? styles.iconRTL : styles.icon,
                 ]}
               >
-                <Ionicons name={icon} size={16} color="#ffffff" />
+                <Ionicons name={icon} size={16} color={colors.white} />
               </View>
             ) : null}
             <Text

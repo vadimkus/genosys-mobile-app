@@ -457,8 +457,8 @@ const styles = StyleSheet.create({
   bullet: { fontSize: 16, lineHeight: 22, color: colors.brand, fontWeight: '800' },
   numBullet: { fontSize: 14, lineHeight: 22, color: colors.brand, fontWeight: '800', minWidth: 22, textAlign: 'right' },
   numBulletRTL: { textAlign: 'left' },
-  answerText: { ...T.faqAnswer, flex: 1, color: '#3C3C43', fontWeight: '500' },
-  answerParagraph: { ...T.faqAnswer, color: '#3C3C43', fontWeight: '500', marginBottom: 8 },
+  answerText: { ...T.faqAnswer, flex: 1, color: colors.bodyText, fontWeight: '500' },
+  answerParagraph: { ...T.faqAnswer, color: colors.bodyText, fontWeight: '500', marginBottom: 8 },
 
   // Empty state
   emptyState: { alignItems: 'center', paddingVertical: 36, gap: 8, marginTop: 8 },

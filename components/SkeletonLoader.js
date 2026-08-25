@@ -6,6 +6,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Dimensions } from 'react-native';
+import { colors } from '../utils/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -142,10 +143,10 @@ export default ShimmerBar;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   bar: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.separator,
   },
   // Shop
   categoryRow: {
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
   },
   productCard: {
     width: (SCREEN_WIDTH - 36) / 2,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.subtleBg,
     borderRadius: 14,
     overflow: 'hidden',
   },
@@ -182,13 +183,13 @@ const styles = StyleSheet.create({
   // Orders
   ordersContainer: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
     paddingTop: 16,
   },
   orderCard: {
     marginHorizontal: 16,
     marginBottom: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 14,
   },
@@ -204,6 +205,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: colors.fill,
   },
 });

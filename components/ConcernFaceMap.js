@@ -176,9 +176,9 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
             <Svg width="100%" height={SCAN_BAND}>
               <Defs>
                 <LinearGradient id="scanGlow" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0" stopColor="#ffffff" stopOpacity="0" />
-                  <Stop offset="0.72" stopColor="#ffffff" stopOpacity="0.34" />
-                  <Stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+                  <Stop offset="0" stopColor={colors.white} stopOpacity="0" />
+                  <Stop offset="0.72" stopColor={colors.white} stopOpacity="0.34" />
+                  <Stop offset="1" stopColor={colors.white} stopOpacity="0" />
                 </LinearGradient>
               </Defs>
               <Rect x="0" y="0" width="100%" height={SCAN_BAND - 4} fill="url(#scanGlow)" />
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   },
   dotActive: {
     backgroundColor: colors.brand,
-    borderColor: '#fff',
+    borderColor: colors.white,
   },
   chipWrap: {
     position: 'absolute',
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     ...T.badge,
-    color: '#fff',
+    color: colors.white,
   },
   leaderLine: {
     width: 1.5,

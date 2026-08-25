@@ -214,7 +214,7 @@ export default function HomecareScriptsScreen() {
           {item.size ? <Text style={[styles.productMeta, isRTL && styles.rtlText]}>{item.size}</Text> : null}
         </View>
         <View style={[styles.check, active && styles.checkActive]}>
-          {active ? <Ionicons name="checkmark" size={16} color="#FFFFFF" /> : null}
+          {active ? <Ionicons name="checkmark" size={16} color={colors.white} /> : null}
         </View>
       </TouchableOpacity>
     );
@@ -225,7 +225,7 @@ export default function HomecareScriptsScreen() {
       <View style={styles.container}>
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <View style={[styles.headerRow, isRTL && styles.rowRTL]}>
-            <TouchableOpacity onPress={reset} style={styles.iconButton}><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color="#FFFFFF" /></TouchableOpacity>
+            <TouchableOpacity onPress={reset} style={styles.iconButton}><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color={colors.white} /></TouchableOpacity>
             <Text style={styles.headerTitle}>{editingId ? tr('Update recommendation', 'Обновить рекомендацию', 'تحديث التوصية') : tr('New recommendation', 'Новая рекомендация', 'توصية جديدة')}</Text>
             <View style={styles.iconButton} />
           </View>
@@ -252,7 +252,7 @@ export default function HomecareScriptsScreen() {
         />
         <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
           <TouchableOpacity style={[styles.saveButton, (!Object.keys(selected).length || saving) && { opacity: 0.45 }]} onPress={save} disabled={!Object.keys(selected).length || saving}>
-            {saving ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.saveText}>{editingId ? tr('Save new version', 'Сохранить новую версию', 'حفظ نسخة جديدة') : tr('Create private link', 'Создать приватную ссылку', 'إنشاء رابط خاص')}</Text>}
+            {saving ? <ActivityIndicator color={colors.white} /> : <Text style={styles.saveText}>{editingId ? tr('Save new version', 'Сохранить новую версию', 'حفظ نسخة جديدة') : tr('Create private link', 'Создать приватную ссылку', 'إنشاء رابط خاص')}</Text>}
           </TouchableOpacity>
         </View>
       </View>
@@ -263,12 +263,12 @@ export default function HomecareScriptsScreen() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <View style={[styles.headerRow, isRTL && styles.rowRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color="#FFFFFF" /></TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color={colors.white} /></TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
             <Text style={styles.brand}>GENOSYS</Text>
             <Text style={styles.headerSubtitle}>{tr('HOMECARE SCRIPTS', 'РЕКОМЕНДАЦИИ', 'توصيات منزلية')}</Text>
           </View>
-          <TouchableOpacity onPress={startNew} style={styles.iconButton}><Ionicons name="add-circle" size={27} color="#DC2626" /></TouchableOpacity>
+          <TouchableOpacity onPress={startNew} style={styles.iconButton}><Ionicons name="add-circle" size={27} color={colors.brand} /></TouchableOpacity>
         </View>
         <Text style={styles.intro}>{tr('Recommend retail products and earn Clinic Points after eligible patient purchases.', 'Рекомендуйте продукты и получайте баллы после покупок пациентов.', 'أوصِ بمنتجات التجزئة واكسب نقاط العيادة بعد مشتريات المرضى المؤهلة.')}</Text>
       </View>
@@ -317,7 +317,7 @@ export default function HomecareScriptsScreen() {
           }
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Ionicons name="paper-plane-outline" size={42} color="#D1D5DB" />
+              <Ionicons name="paper-plane-outline" size={42} color={colors.separatorStrong} />
               <Text style={styles.emptyTitle}>{tr('No recommendations yet', 'Рекомендаций пока нет', 'لا توجد توصيات بعد')}</Text>
               <TouchableOpacity onPress={startNew} style={styles.emptyButton}><Text style={styles.emptyButtonText}>{tr('Create first link', 'Создать первую ссылку', 'إنشاء أول رابط')}</Text></TouchableOpacity>
             </View>
@@ -336,9 +336,9 @@ export default function HomecareScriptsScreen() {
                 </View>
                 {active ? (
                   <View style={[styles.actions, isRTL && styles.rowRTL]}>
-                    <TouchableOpacity style={styles.primaryAction} onPress={() => shareScript(item)}><Ionicons name="share-outline" size={17} color="#FFFFFF" /><Text style={styles.primaryActionText}>{tr('Share', 'Отправить', 'مشاركة')}</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.primaryAction} onPress={() => shareScript(item)}><Ionicons name="share-outline" size={17} color={colors.white} /><Text style={styles.primaryActionText}>{tr('Share', 'Отправить', 'مشاركة')}</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.action} onPress={() => startEdit(item)}><Ionicons name="create-outline" size={17} color={colors.label} /><Text style={styles.actionText}>{tr('Edit', 'Изменить', 'تعديل')}</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.deleteAction} onPress={() => confirmRevoke(item)}><Ionicons name="trash-outline" size={17} color="#B91C1C" /></TouchableOpacity>
+                    <TouchableOpacity style={styles.deleteAction} onPress={() => confirmRevoke(item)}><Ionicons name="trash-outline" size={17} color={colors.brandDark} /></TouchableOpacity>
                   </View>
                 ) : null}
               </View>
@@ -351,61 +351,61 @@ export default function HomecareScriptsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2F2F7' },
-  header: { backgroundColor: '#0B0B0C', paddingHorizontal: 16, paddingBottom: 18 },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
+  header: { backgroundColor: colors.label, paddingHorizontal: 16, paddingBottom: 18 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  brand: { color: '#FFFFFF', fontSize: 18, fontWeight: '900', letterSpacing: 3 },
-  headerTitle: { color: '#FFFFFF', fontSize: 17, fontWeight: '800' },
-  headerSubtitle: { color: '#DC2626', fontSize: 9, fontWeight: '800', letterSpacing: 2 },
-  intro: { color: '#9CA3AF', fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 12, paddingHorizontal: 20 },
+  brand: { color: colors.white, fontSize: 18, fontWeight: '900', letterSpacing: 3 },
+  headerTitle: { color: colors.white, fontSize: 17, fontWeight: '800' },
+  headerSubtitle: { color: colors.brand, fontSize: 9, fontWeight: '800', letterSpacing: 2 },
+  intro: { color: colors.placeholder, fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 12, paddingHorizontal: 20 },
   pointsRow: { flexDirection: 'row', gap: 10, padding: 16, paddingBottom: 0 },
-  pointsCard: { flex: 1, backgroundColor: '#FFFFFF', borderRadius: 16, padding: 15, borderWidth: 1, borderColor: '#ECECEF' },
-  pointsValue: { color: '#111827', fontSize: 23, fontWeight: '900' },
-  pointsLabel: { color: '#6B7280', fontSize: 11, marginTop: 3 },
-  historyCard: { backgroundColor: '#FFFFFF', borderRadius: 14, padding: 14, marginBottom: 14 },
+  pointsCard: { flex: 1, backgroundColor: colors.card, borderRadius: 16, padding: 15, borderWidth: 1, borderColor: colors.groupedBg },
+  pointsValue: { color: colors.label, fontSize: 23, fontWeight: '900' },
+  pointsLabel: { color: colors.mutedText, fontSize: 11, marginTop: 3 },
+  historyCard: { backgroundColor: colors.card, borderRadius: 14, padding: 14, marginBottom: 14 },
   historyTitle: { fontSize: 15, fontWeight: '800', color: colors.label, marginBottom: 6 },
   historyRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator },
   historyDescription: { fontSize: 12, fontWeight: '600', color: colors.label },
   historyMeta: { marginTop: 2, fontSize: 10, color: colors.secondaryLabel },
   historyPoints: { fontSize: 13, fontWeight: '800', color: '#15803D' },
-  historyPointsNegative: { color: '#B91C1C' },
+  historyPointsNegative: { color: colors.brandDark },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scriptCard: { backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#ECECEF', padding: 15, marginBottom: 11 },
+  scriptCard: { backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.groupedBg, padding: 15, marginBottom: 11 },
   scriptTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  scriptTitle: { color: '#111827', fontSize: 15, fontWeight: '800' },
-  scriptMeta: { color: '#6B7280', fontSize: 11, marginTop: 4 },
+  scriptTitle: { color: colors.label, fontSize: 15, fontWeight: '800' },
+  scriptMeta: { color: colors.mutedText, fontSize: 11, marginTop: 4 },
   status: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
   statusActive: { backgroundColor: '#ECFDF3' },
-  statusInactive: { backgroundColor: '#F3F4F6' },
-  statusText: { color: '#6B7280', fontSize: 9, fontWeight: '800' },
-  actions: { flexDirection: 'row', gap: 8, marginTop: 14, paddingTop: 13, borderTopWidth: 1, borderTopColor: '#F2F2F4' },
-  primaryAction: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0B0B0C', borderRadius: 10, paddingVertical: 10 },
-  primaryActionText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
-  action: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6', borderRadius: 10, paddingVertical: 10 },
-  actionText: { color: '#111827', fontSize: 13, fontWeight: '700' },
-  deleteAction: { width: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FEF2F2', borderRadius: 10 },
+  statusInactive: { backgroundColor: colors.fill },
+  statusText: { color: colors.mutedText, fontSize: 9, fontWeight: '800' },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 14, paddingTop: 13, borderTopWidth: 1, borderTopColor: colors.groupedBg },
+  primaryAction: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.label, borderRadius: 10, paddingVertical: 10 },
+  primaryActionText: { color: colors.white, fontSize: 13, fontWeight: '700' },
+  action: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fill, borderRadius: 10, paddingVertical: 10 },
+  actionText: { color: colors.label, fontSize: 13, fontWeight: '700' },
+  deleteAction: { width: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.brandTint, borderRadius: 10 },
   empty: { alignItems: 'center', paddingTop: 80 },
-  emptyTitle: { color: '#111827', fontSize: 16, fontWeight: '700', marginTop: 12 },
-  emptyButton: { backgroundColor: '#DC2626', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12, marginTop: 16 },
-  emptyButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  label: { color: '#6B7280', fontSize: 12, fontWeight: '700', marginBottom: 6 },
-  input: { backgroundColor: '#FFFFFF', borderRadius: 13, borderWidth: 1, borderColor: '#E5E7EB', color: '#111827', fontSize: 14, paddingHorizontal: 13, paddingVertical: 12, marginBottom: 15 },
+  emptyTitle: { color: colors.label, fontSize: 16, fontWeight: '700', marginTop: 12 },
+  emptyButton: { backgroundColor: colors.brand, borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12, marginTop: 16 },
+  emptyButtonText: { color: colors.white, fontSize: 14, fontWeight: '700' },
+  label: { color: colors.mutedText, fontSize: 12, fontWeight: '700', marginBottom: 6 },
+  input: { backgroundColor: colors.card, borderRadius: 13, borderWidth: 1, borderColor: colors.separator, color: colors.label, fontSize: 14, paddingHorizontal: 13, paddingVertical: 12, marginBottom: 15 },
   notes: { minHeight: 76, textAlignVertical: 'top' },
-  search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#FFFFFF', borderRadius: 13, borderWidth: 1, borderColor: '#E5E7EB', paddingHorizontal: 13, marginBottom: 8 },
-  searchInput: { flex: 1, color: '#111827', fontSize: 14, paddingVertical: 12 },
-  selectedText: { color: '#6B7280', fontSize: 12, fontWeight: '600', marginBottom: 10 },
-  productRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: '#ECECEF', padding: 10, marginBottom: 8 },
-  productRowActive: { borderColor: '#DC2626', backgroundColor: '#FFF7F7' },
-  thumb: { width: 48, height: 48, borderRadius: 10, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, borderRadius: 13, borderWidth: 1, borderColor: colors.separator, paddingHorizontal: 13, marginBottom: 8 },
+  searchInput: { flex: 1, color: colors.label, fontSize: 14, paddingVertical: 12 },
+  selectedText: { color: colors.mutedText, fontSize: 12, fontWeight: '600', marginBottom: 10 },
+  productRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 14, borderWidth: 1, borderColor: colors.groupedBg, padding: 10, marginBottom: 8 },
+  productRowActive: { borderColor: colors.brand, backgroundColor: '#FFF7F7' },
+  thumb: { width: 48, height: 48, borderRadius: 10, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   thumbImage: { width: '100%', height: '100%' },
-  productName: { color: '#111827', fontSize: 13.5, fontWeight: '700' },
-  productMeta: { color: '#6B7280', fontSize: 11, marginTop: 2 },
-  check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: '#D1D5DB', alignItems: 'center', justifyContent: 'center' },
-  checkActive: { backgroundColor: '#DC2626', borderColor: '#DC2626' },
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E5E7EB', padding: 14 },
-  saveButton: { backgroundColor: '#DC2626', borderRadius: 14, minHeight: 50, alignItems: 'center', justifyContent: 'center' },
-  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  productName: { color: colors.label, fontSize: 13.5, fontWeight: '700' },
+  productMeta: { color: colors.mutedText, fontSize: 11, marginTop: 2 },
+  check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: colors.separatorStrong, alignItems: 'center', justifyContent: 'center' },
+  checkActive: { backgroundColor: colors.brand, borderColor: colors.brand },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.separator, padding: 14 },
+  saveButton: { backgroundColor: colors.brand, borderRadius: 14, minHeight: 50, alignItems: 'center', justifyContent: 'center' },
+  saveText: { color: colors.white, fontSize: 15, fontWeight: '800' },
   rowRTL: { flexDirection: 'row-reverse' },
   rtlText: { textAlign: 'right', writingDirection: 'rtl' },
 });

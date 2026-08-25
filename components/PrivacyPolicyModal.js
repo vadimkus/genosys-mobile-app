@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalization } from '../contexts/LocalizationContext';
 import PrivacyPolicyContent from './PrivacyPolicyContent';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 export default function PrivacyPolicyModal({ visible, onClose, showCloseButton = true }) {
   const { t, dir } = useLocalization();
@@ -49,7 +50,7 @@ export default function PrivacyPolicyModal({ visible, onClose, showCloseButton =
               accessibilityRole="button"
               accessibilityLabel={t('common.close')}
             >
-              <Ionicons name="close" size={24} color="#86868B" />
+              <Ionicons name="close" size={24} color={colors.secondaryLabel} />
             </TouchableOpacity>
           )}
         </View>
@@ -62,7 +63,7 @@ export default function PrivacyPolicyModal({ visible, onClose, showCloseButton =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   header: {
     flexDirection: 'row',
@@ -71,12 +72,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#C6C6C8',
+    borderBottomColor: colors.tertiary,
   },
   headerRTL: { flexDirection: 'row-reverse' },
   headerTitle: {
     ...T.sectionTitleSmall,
-    color: '#000000',
+    color: colors.label,
     flex: 1,
     textAlign: 'center',
   },

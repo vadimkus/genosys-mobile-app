@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { success as successHaptic } from '../utils/haptics';
 import T from '../utils/typography';
 import CheckoutSteps from './checkout/CheckoutSteps';
+import { colors } from '../utils/theme';
 
 /**
  * Full-screen animated order-success confirmation.
@@ -43,7 +44,7 @@ export default function OrderSuccessScreen({
 
       <View style={styles.successContent}>
         <Animated.View style={[styles.circle, { transform: [{ scale: checkScale }] }]}>
-          <Ionicons name="checkmark-sharp" size={56} color="#ffffff" />
+          <Ionicons name="checkmark-sharp" size={56} color={colors.white} />
         </Animated.View>
         <Animated.View style={[styles.body, { opacity: fade, transform: [{ translateY: lift }] }]}>
           <Text style={styles.title}>{title}</Text>
@@ -64,7 +65,7 @@ export default function OrderSuccessScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     paddingHorizontal: 24,
   },
   progressWrap: {
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
   message: {
     ...T.label,
     fontWeight: '400',
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     lineHeight: 22,
     textAlign: 'center',
     marginTop: 10,
@@ -105,12 +106,12 @@ const styles = StyleSheet.create({
   },
   primary: {
     alignSelf: 'stretch',
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 16,
     borderRadius: 14,
     alignItems: 'center',
   },
-  primaryText: { ...T.buttonSmall, fontSize: 16, fontWeight: '700', color: '#ffffff' },
+  primaryText: { ...T.buttonSmall, fontSize: 16, fontWeight: '700', color: colors.white },
   secondary: { alignSelf: 'stretch', paddingVertical: 14, marginTop: 8, alignItems: 'center' },
-  secondaryText: { ...T.buttonSmall, fontSize: 15, fontWeight: '600', color: '#8E8E93' },
+  secondaryText: { ...T.buttonSmall, fontSize: 15, fontWeight: '600', color: colors.secondaryLabel },
 });

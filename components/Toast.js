@@ -12,6 +12,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 const AUTO_DISMISS_MS = 2500;
 
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#111827',
+    backgroundColor: colors.label,
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   message: {
     ...T.bodySmall,
     flex: 1,
-    color: '#ffffff',
+    color: colors.white,
     fontWeight: '600',
   },
   textRTL: {
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#ffffff',
+    color: colors.white,
     letterSpacing: 0.1,
   },
 });

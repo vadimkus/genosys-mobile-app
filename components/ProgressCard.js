@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, I18nManager } from 'react-native';
 import ProgressBar from './ProgressBar';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 /**
  * Generic progress card used for promo/free-shipping progress UIs.
@@ -48,11 +49,11 @@ export default function ProgressCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
   },
   topRow: {
     flexDirection: 'row',
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   rightText: {
     ...T.label,
     fontWeight: '700',
-    color: '#6B7280',
+    color: colors.mutedText,
   },
   rightTextMet: {
     color: '#34C759',

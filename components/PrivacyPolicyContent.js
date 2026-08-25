@@ -6,6 +6,7 @@ import { AUTH_CONFIG } from '../config/auth';
 import { getJson } from '../services/httpClient';
 import { createLogger } from '../utils/logger';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 const log = createLogger('PrivacyPolicy');
 
@@ -53,7 +54,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
   if (loading) {
     return (
       <View style={[styles.centered, topInsetStyle]}>
-        <ActivityIndicator size="large" color="#dc2626" />
+        <ActivityIndicator size="large" color={colors.brand} />
       </View>
     );
   }
@@ -62,7 +63,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
     const fallbackUrl = `https://genosys.ae/${locale === 'en' ? '' : locale + '/'}privacy-policy`;
     return (
       <View style={[styles.centered, topInsetStyle]}>
-        <Ionicons name="shield-outline" size={48} color="#ccc" />
+        <Ionicons name="shield-outline" size={48} color={colors.tertiary} />
         <Text style={[styles.errorText, isRTL && styles.textRTL]}>
           {locale === 'ar' ? 'لم نتمكن من تحميل سياسة الخصوصية.' : locale === 'ru' ? 'Не удалось загрузить политику конфиденциальности.' : 'Could not load privacy policy.'}
         </Text>
@@ -70,7 +71,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
           <Text style={styles.fallbackButtonText}>
             {locale === 'ar' ? 'عرض على الموقع' : locale === 'ru' ? 'Открыть на сайте' : 'View on Website'}
           </Text>
-          <Ionicons name="open-outline" size={16} color="#dc2626" />
+          <Ionicons name="open-outline" size={16} color={colors.brand} />
         </TouchableOpacity>
       </View>
     );
@@ -113,7 +114,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
             </View>
             {section.links?.map((link, i) => (
               <TouchableOpacity key={i} onPress={() => Linking.openURL(link.url).catch(() => {})} style={[styles.linkRow, isRTL && styles.linkRowRTL]}>
-                <Ionicons name="open-outline" size={14} color="#dc2626" />
+                <Ionicons name="open-outline" size={14} color={colors.brand} />
                 <Text style={styles.link}>{link.label}</Text>
               </TouchableOpacity>
             ))}
@@ -160,15 +161,15 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
             <View style={styles.contactInfo}>
               <Text style={styles.contactCompany}>{section.contact.company}</Text>
               <TouchableOpacity onPress={() => Linking.openURL(`mailto:${section.contact.email}`).catch(() => {})} style={[styles.contactItem, isRTL && styles.rowRTL]}>
-                <Ionicons name="mail-outline" size={16} color="#dc2626" />
+                <Ionicons name="mail-outline" size={16} color={colors.brand} />
                 <Text style={styles.contactLink}>{section.contact.email}</Text>
               </TouchableOpacity>
               <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
-                <Ionicons name="call-outline" size={16} color="#dc2626" />
+                <Ionicons name="call-outline" size={16} color={colors.brand} />
                 <Text style={styles.contactText}>{section.contact.phone}</Text>
               </View>
               <View style={[styles.contactItem, isRTL && styles.rowRTL]}>
-                <Ionicons name="location-outline" size={16} color="#dc2626" />
+                <Ionicons name="location-outline" size={16} color={colors.brand} />
                 <Text style={[styles.contactText, isRTL && styles.textRTL]}>{section.contact.address}</Text>
               </View>
             </View>
@@ -191,7 +192,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
       {showLastUpdated && (
         <View style={[styles.updateInfo, isRTL && styles.updateInfoRTL]}>
           <View style={styles.updatePill}>
-            <Ionicons name="time-outline" size={14} color="#6B7280" />
+            <Ionicons name="time-outline" size={14} color={colors.mutedText} />
             <Text style={styles.updatePillText}>{policy.lastUpdated}</Text>
           </View>
         </View>
@@ -208,9 +209,9 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
   contentContainer: { paddingBottom: 40 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40, minHeight: 300 },
-  errorText: { ...T.body, color: '#666', marginTop: 16, textAlign: 'center' },
+  errorText: { ...T.body, color: colors.mutedText, marginTop: 16, textAlign: 'center' },
   fallbackButton: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 16, padding: 12 },
-  fallbackButtonText: { ...T.button, color: '#dc2626' },
+  fallbackButtonText: { ...T.button, color: colors.brand },
   // Tight pill badge replaces the full-width italic banner — matches
   // the web Privacy Policy "Last Updated" treatment shipped in 6f9e4f04.
   updateInfo: {
@@ -224,12 +225,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.fill,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  updatePillText: { ...T.captionSmall, color: '#4B5563', fontWeight: '500' },
+  updatePillText: { ...T.captionSmall, color: colors.mutedText, fontWeight: '500' },
   highlightSection: {
     backgroundColor: '#FFF3F3',
     marginHorizontal: 20,
@@ -237,25 +238,25 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#dc2626',
+    borderLeftColor: colors.brand,
   },
   highlightSectionRTL: {
     borderLeftWidth: 0,
     borderRightWidth: 4,
-    borderRightColor: '#dc2626',
+    borderRightColor: colors.brand,
   },
-  highlightTitle: { ...T.sectionTitleSmall, color: '#dc2626', marginBottom: 8 },
-  highlightText: { ...T.body, color: '#333' },
+  highlightTitle: { ...T.sectionTitleSmall, color: colors.brand, marginBottom: 8 },
+  highlightText: { ...T.body, color: colors.bodyText },
   section: { paddingHorizontal: 20, paddingVertical: 16 },
   sectionTitle: { ...T.sectionTitleSmall, fontWeight: '600', marginBottom: 12 },
-  paragraph: { ...T.body, color: '#333', marginBottom: 12, lineHeight: 22 },
+  paragraph: { ...T.body, color: colors.bodyText, marginBottom: 12, lineHeight: 22 },
   listContainer: { marginVertical: 4 },
   // Legacy styles — still referenced elsewhere, kept for safety
   listItem: { marginBottom: 12, paddingStart: 16 },
   listItemRTL: { paddingStart: 16 },
   // New grouped-card + divided-row layout (matches web d25b1e16)
   listCard: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
     padding: 16,
     marginTop: 4,
@@ -263,35 +264,35 @@ const styles = StyleSheet.create({
   listRow: { paddingVertical: 4 },
   listRowDivider: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E5EA',
+    borderTopColor: colors.separator,
     marginTop: 12,
     paddingTop: 12,
   },
-  listItemLabel: { ...T.button, color: '#1D1D1F', marginBottom: 4 },
-  listItemText: { ...T.body, color: '#333', lineHeight: 22 },
+  listItemLabel: { ...T.button, color: colors.label, marginBottom: 4 },
+  listItemText: { ...T.body, color: colors.bodyText, lineHeight: 22 },
   bulletItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, paddingStart: 8 },
   bulletItemRTL: { flexDirection: 'row-reverse', paddingStart: 0, paddingEnd: 8 },
-  bullet: { color: '#dc2626', fontSize: 12, marginTop: 4, marginEnd: 8, width: 14 },
-  bulletText: { ...T.body, color: '#333', lineHeight: 22, flex: 1 },
+  bullet: { color: colors.brand, fontSize: 12, marginTop: 4, marginEnd: 8, width: 14 },
+  bulletText: { ...T.body, color: colors.bodyText, lineHeight: 22, flex: 1 },
   linkRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingStart: 16, marginTop: 8 },
   linkRowRTL: { flexDirection: 'row-reverse', paddingStart: 0, paddingEnd: 16 },
   contactInfo: {
     marginTop: 12,
     padding: 16,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     borderRadius: 8,
   },
-  contactCompany: { ...T.button, color: '#1D1D1F', marginBottom: 12 },
+  contactCompany: { ...T.button, color: colors.label, marginBottom: 12 },
   contactItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, paddingStart: 4 },
   contactLink: {
     ...T.body,
-    color: '#dc2626',
+    color: colors.brand,
     lineHeight: undefined,
     textDecorationLine: 'underline',
     marginStart: 8,
   },
-  contactText: { ...T.body, color: '#333', lineHeight: 22, marginStart: 8, flex: 1 },
-  link: { ...T.link, color: '#dc2626', textDecorationLine: 'underline' },
+  contactText: { ...T.body, color: colors.bodyText, lineHeight: 22, marginStart: 8, flex: 1 },
+  link: { ...T.link, color: colors.brand, textDecorationLine: 'underline' },
   rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
   footerSpace: { height: 40 },

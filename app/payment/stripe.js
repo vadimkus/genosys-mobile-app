@@ -279,7 +279,7 @@ export default function StripePaymentScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1D1D1F" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.label} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.headerSpacer} />
@@ -301,7 +301,7 @@ export default function StripePaymentScreen() {
             disabled={busy}
             activeOpacity={0.85}
           >
-            <Ionicons name="card-outline" size={18} color="#fff" />
+            <Ionicons name="card-outline" size={18} color={colors.white} />
             <Text style={styles.primaryButtonText}>{t('payment.payNow')}</Text>
           </TouchableOpacity>
 
@@ -329,7 +329,7 @@ export default function StripePaymentScreen() {
               disabled={busy}
               activeOpacity={0.85}
             >
-              {busy ? <ActivityIndicator color="#fff" /> : <Ionicons name="open-outline" size={18} color="#fff" />}
+              {busy ? <ActivityIndicator color={colors.white} /> : <Ionicons name="open-outline" size={18} color={colors.white} />}
               <Text style={styles.primaryButtonText}>{busy ? t('common.opening') : t('payment.openStripePayment')}</Text>
             </TouchableOpacity>
 
@@ -339,7 +339,7 @@ export default function StripePaymentScreen() {
               disabled={!canCheck || checking}
               activeOpacity={0.85}
             >
-              {checking ? <ActivityIndicator color="#dc2626" /> : <Ionicons name="refresh" size={18} color="#dc2626" />}
+              {checking ? <ActivityIndicator color={colors.brand} /> : <Ionicons name="refresh" size={18} color={colors.brand} />}
               <Text style={styles.secondaryButtonText}>{checking ? t('payment.checking') : t('payment.checkPaymentStatus')}</Text>
             </TouchableOpacity>
 
@@ -370,8 +370,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderBottomColor: colors.separator,
+    backgroundColor: colors.card,
   },
   backButton: { padding: 4 },
   headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700' },
@@ -412,34 +412,34 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 28,
   },
-  nativeBusyText: { ...T.label, color: '#1D1D1F' },
+  nativeBusyText: { ...T.label, color: colors.label },
   nativeButton: { alignSelf: 'stretch', marginTop: 16 },
   nativeCancelledNote: {
     ...T.label,
     fontWeight: '400',
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     lineHeight: 20,
     marginTop: 28,
     textAlign: 'center',
   },
   card: {
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
     borderRadius: 12,
     padding: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   title: { ...T.sectionTitleSmall },
-  subtitle: { ...T.label, fontWeight: '400', color: '#8E8E93', lineHeight: 20, marginTop: 6 },
-  status: { ...T.label, color: '#1D1D1F', marginTop: 10 },
-  errorText: { ...T.label, color: '#dc2626', marginTop: 10 },
+  subtitle: { ...T.label, fontWeight: '400', color: colors.secondaryLabel, lineHeight: 20, marginTop: 6 },
+  status: { ...T.label, color: colors.label, marginTop: 10 },
+  errorText: { ...T.label, color: colors.brand, marginTop: 10 },
   primaryButton: {
     marginTop: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 14,
     borderRadius: 12,
   },
@@ -451,14 +451,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: '#FFF5F5',
   },
-  secondaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700', color: '#dc2626' },
+  secondaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700', color: colors.brand },
   linkButton: { alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 12 },
   linkText: { ...T.link },
   buttonDisabled: { opacity: 0.6 },
-  note: { ...T.captionSmall, color: '#8E8E93', lineHeight: 18, marginTop: 12 },
+  note: { ...T.captionSmall, color: colors.secondaryLabel, lineHeight: 18, marginTop: 12 },
 });

@@ -239,7 +239,7 @@ export default function ConcernDetailScreen() {
               activeOpacity={0.7}
             >
               <Text style={[styles.sectionTitle, { marginBottom: 0, flex: 1, marginRight: 8 }, isRTL && styles.textRTL]}>{why.title}</Text>
-              <Ionicons name={whyExpanded ? 'chevron-up' : 'chevron-down'} size={22} color="#1D1D1F" />
+              <Ionicons name={whyExpanded ? 'chevron-up' : 'chevron-down'} size={22} color={colors.label} />
             </TouchableOpacity>
             {whyExpanded && (
               <View style={[styles.whyGrid, isRTL && { flexDirection: 'row-reverse' }]}>
@@ -266,7 +266,7 @@ export default function ConcernDetailScreen() {
               <Text style={[styles.sectionTitle, { marginBottom: 0, flex: 1, marginRight: 8 }, isRTL && styles.textRTL]}>
                 {locale === 'ar' ? 'الوثائق' : locale === 'ru' ? 'Документация' : 'Documentation'}
               </Text>
-              <Ionicons name={docsExpanded ? 'chevron-up' : 'chevron-down'} size={22} color="#1D1D1F" />
+              <Ionicons name={docsExpanded ? 'chevron-up' : 'chevron-down'} size={22} color={colors.label} />
             </TouchableOpacity>
             {docsExpanded && (
               <TouchableOpacity style={styles.pdfCard} onPress={handleProtocolDownload} activeOpacity={0.85}>
@@ -312,7 +312,7 @@ export default function ConcernDetailScreen() {
                             <Text style={[styles.stepTitle, isRTL && styles.textRTL, isExpanded && styles.stepTitleActive]}>{step.title}</Text>
                             <Text style={[styles.stepDuration, isRTL && styles.textRTL]}>({step.duration})</Text>
                           </View>
-                          <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={isExpanded ? '#dc2626' : '#999'} />
+                          <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={isExpanded ? colors.brand : colors.secondaryLabel} />
                         </View>
                       </Pressable>
                       {isExpanded ? (
@@ -351,8 +351,8 @@ export default function ConcernDetailScreen() {
                                       </Text>
                                     ) : hasDisc ? (
                                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                        <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: '#9CA3AF' }]}>{retailUnit.toFixed(0)}</Text>
-                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: '#dc2626' }]}>{formatAed(finalUnit)}</Text>
+                                        <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: colors.placeholder }]}>{retailUnit.toFixed(0)}</Text>
+                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: colors.brand }]}>{formatAed(finalUnit)}</Text>
                                       </View>
                                     ) : (
                                       <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>
@@ -388,7 +388,7 @@ export default function ConcernDetailScreen() {
               <Ionicons
                 name={productsExpanded ? 'chevron-up' : 'chevron-down'}
                 size={22}
-                color="#1D1D1F"
+                color={colors.label}
               />
             </TouchableOpacity>
             {productsExpanded && (
@@ -456,7 +456,7 @@ export default function ConcernDetailScreen() {
               activeOpacity={0.85}
               disabled={cartItems.length === 0}
             >
-              <Ionicons name="bag-handle-outline" size={18} color="#fff" />
+              <Ionicons name="bag-handle-outline" size={18} color={colors.white} />
               <Text style={styles.ctaBtnPrimaryText}>
                 {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
                 {cartItems.length > 0 ? ` (${cartItems.length})` : ''}
@@ -486,7 +486,7 @@ export default function ConcernDetailScreen() {
                 <Pressable key={i} onPress={() => toggleFaq(i)} style={[styles.faqItem, isOpen && styles.faqItemOpen]}>
                   <View style={[styles.faqHeader, isRTL && { flexDirection: 'row-reverse' }]}>
                     <Text style={[styles.faqQuestion, isRTL && styles.textRTL, { flex: 1 }]}>{item.question}</Text>
-                    <Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={18} color={isOpen ? '#dc2626' : '#999'} />
+                    <Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={18} color={isOpen ? colors.brand : colors.secondaryLabel} />
                   </View>
                   {isOpen ? (
                     <Text style={[styles.faqAnswer, isRTL && styles.textRTL]}>{item.answer}</Text>
@@ -539,7 +539,7 @@ export default function ConcernDetailScreen() {
               accessibilityState={{ expanded: stickyExpanded }}
             >
               <View style={styles.stickyHandle} />
-              <Ionicons name={stickyExpanded ? 'chevron-down' : 'chevron-up'} size={18} color="#9CA3AF" />
+              <Ionicons name={stickyExpanded ? 'chevron-down' : 'chevron-up'} size={18} color={colors.placeholder} />
             </TouchableOpacity>
 
             {/* Expanded: item list + pricing */}
@@ -572,14 +572,14 @@ export default function ConcernDetailScreen() {
                       accessibilityRole="button"
                       accessibilityLabel={`${t('bag.removeItem')} — ${name}`}
                     >
-                      <Ionicons name="close-circle" size={16} color="#D1D5DB" />
+                      <Ionicons name="close-circle" size={16} color={colors.separatorStrong} />
                     </TouchableOpacity>
                     <Text style={[styles.stickyItemName, isRTL && styles.textRTL]} numberOfLines={1}>{name}{qty > 1 ? ` ×${qty}` : ''}</Text>
                     <View style={{ alignItems: 'flex-end' }}>
                       {showStrike && (
                         <Text style={styles.stickyItemOriginalPrice}>{formatAed(retailUnit * qty)}</Text>
                       )}
-                      <Text style={[styles.stickyItemPrice, showStrike && { color: '#dc2626' }]}>{formatAed(finalUnit * qty)}</Text>
+                      <Text style={[styles.stickyItemPrice, showStrike && { color: colors.brand }]}>{formatAed(finalUnit * qty)}</Text>
                     </View>
                   </View>
                 );
@@ -595,7 +595,7 @@ export default function ConcernDetailScreen() {
                       style={[styles.stickyClearAll, isRTL && { alignSelf: 'flex-end' }]}
                       hitSlop={{ top: 6, bottom: 6, left: 10, right: 10 }}
                     >
-                      <Ionicons name="trash-outline" size={13} color="#9CA3AF" />
+                      <Ionicons name="trash-outline" size={13} color={colors.placeholder} />
                       <Text style={styles.stickyClearAllText}>
                         {locale === 'ar' ? 'مسح الكل' : locale === 'ru' ? 'Очистить' : 'Clear all'}
                       </Text>
@@ -605,7 +605,7 @@ export default function ConcernDetailScreen() {
                   {showDiscountRow && (
                     <>
                       <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
-                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#86868B', fontWeight: '500' }]}>
+                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: colors.secondaryLabel, fontWeight: '500' }]}>
                           {locale === 'ar' ? 'السعر الأصلي' : locale === 'ru' ? 'Полная цена' : 'Retail Price'}
                         </Text>
                         <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{formatAed(breakdown.retailTotal)}</Text>
@@ -645,7 +645,7 @@ export default function ConcernDetailScreen() {
             {/* Collapsed summary row + View Bag button */}
             <View style={[styles.stickyRow, isRTL && styles.stickyRowRTL]}>
               <View style={[styles.stickyInfo, isRTL && styles.stickyInfoRTL]}>
-                <Ionicons name="bag-handle" size={20} color="#dc2626" />
+                <Ionicons name="bag-handle" size={20} color={colors.brand} />
                 <Text style={styles.stickyCount}>
                   {cartItems.length} {cartItems.length === 1
                     ? (locale === 'ar' ? 'منتج' : locale === 'ru' ? 'товар' : 'item')
@@ -657,7 +657,7 @@ export default function ConcernDetailScreen() {
                 <Text style={styles.stickyBtnText}>
                   {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Корзина' : 'View Bag'}
                 </Text>
-                <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color="#fff" />
+                <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.white} />
               </TouchableOpacity>
             </View>
           </View>
@@ -667,7 +667,7 @@ export default function ConcernDetailScreen() {
       {/* Toast */}
       {toastMessage ? (
         <Animated.View style={[styles.toast, { opacity: toastOpacity }]} pointerEvents="none">
-          <Ionicons name="bag-check-outline" size={16} color="#fff" />
+          <Ionicons name="bag-check-outline" size={16} color={colors.white} />
           <Text style={styles.toastText}>{toastMessage}</Text>
         </Animated.View>
       ) : null}
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.groupedBg },
 
   // Header
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#E5E5EA' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.separator },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
   headerTitle: { ...T.navTitle, flex: 1, textAlign: 'center' },
@@ -733,17 +733,17 @@ const styles = StyleSheet.create({
   stepNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.label, justifyContent: 'center', alignItems: 'center' },
   stepNumberActive: { backgroundColor: colors.brand },
   stepNumberText: { ...T.badgeMedium },
-  stepNumberTextActive: { color: '#fff' },
+  stepNumberTextActive: { color: colors.white },
   stepTitleWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
   stepTitle: { ...T.label, fontSize: 15 },
-  stepTitleActive: { color: '#dc2626' },
+  stepTitleActive: { color: colors.brand },
   stepDuration: { ...T.caption },
-  stepBody: { paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
-  stepDetail: { ...T.caption, color: '#555', lineHeight: 20, marginBottom: 10 },
+  stepBody: { paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: colors.fill, paddingTop: 10 },
+  stepDetail: { ...T.caption, color: colors.mutedText, lineHeight: 20, marginBottom: 10 },
   stepProducts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.fillSecondary, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
   stepProductChipInCart: { backgroundColor: tint(colors.greenDeep, '1A') },
-  stepProductName: { ...T.captionSmall, fontWeight: '600', color: '#1D1D1F' },
+  stepProductName: { ...T.captionSmall, fontWeight: '600', color: colors.label },
   stepProductNameInCart: { color: '#15803D' },
   stepProductPrice: { ...T.captionSmall },
   stepProductPriceInCart: { color: '#16a34a' },
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
   faqItemOpen: { backgroundColor: '#FFF8F8' },
   faqHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 8 },
   faqQuestion: { ...T.faqQuestion, fontWeight: '600', lineHeight: 20 },
-  faqAnswer: { ...T.faqAnswer, fontSize: 13, paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 10 },
+  faqAnswer: { ...T.faqAnswer, fontSize: 13, paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: colors.fill, paddingTop: 10 },
 
   // Related concerns
   relatedScroll: { gap: 10, paddingRight: 16 },
@@ -797,12 +797,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderRadius: 14,
     paddingVertical: 14,
   },
   ctaBtnDisabled: {
-    backgroundColor: '#D1D5DB',
+    backgroundColor: colors.separatorStrong,
   },
   ctaBtnPrimaryText: {
     ...T.buttonSmall,
@@ -813,16 +813,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderRadius: 14,
     paddingVertical: 14,
     borderWidth: 1.5,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
   },
   ctaBtnSecondaryText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // Sticky Bottom Bar (expandable)
@@ -831,11 +831,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     paddingHorizontal: 16,
     paddingBottom: 34,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: colors.separator,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
@@ -843,17 +843,17 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   stickyChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 2 },
-  stickyHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 2 },
-  stickyDetails: { paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', marginBottom: 6 },
+  stickyHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, marginBottom: 2 },
+  stickyDetails: { paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, marginBottom: 6 },
   stickyClearAll: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 4, paddingVertical: 2, marginTop: 4 },
-  stickyClearAllText: { fontSize: 12, color: '#9CA3AF', fontWeight: '500' },
+  stickyClearAllText: { fontSize: 12, color: colors.placeholder, fontWeight: '500' },
   stickyRemoveBtn: { marginRight: 8 },
   stickyItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
   stickyItemRowRTL: { flexDirection: 'row-reverse' },
-  stickyItemName: { ...T.caption, color: '#374151', flex: 1, marginRight: 12 },
+  stickyItemName: { ...T.caption, color: colors.bodyText, flex: 1, marginRight: 12 },
   stickyItemPrice: { ...T.labelSmall },
   stickyItemOriginalPrice: { ...T.priceStrikethrough, fontSize: 11 },
-  stickyDivider: { height: StyleSheet.hairlineWidth, backgroundColor: '#E5E7EB', marginVertical: 6 },
+  stickyDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginVertical: 6 },
   stickyPricingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 },
   stickyPricingRowRTL: { flexDirection: 'row-reverse' },
   stickyPricingLabel: { ...T.label },
@@ -869,7 +869,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 10,
@@ -878,7 +878,7 @@ const styles = StyleSheet.create({
 
   // Toast
   toast: { position: 'absolute', bottom: 48, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(0,0,0,0.82)', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24 },
-  toastText: { ...T.label, color: '#fff' },
+  toastText: { ...T.label, color: colors.white },
 
   // RTL
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },

@@ -207,7 +207,7 @@ function ProductVideo({ videoUrl }) {
           accessibilityLabel={tStatic('product.watchVideo')}
         >
           <View style={videoStyles.compactPlayButton}>
-            <Ionicons name="play" size={28} color="#374151" style={{ marginLeft: 3 }} />
+            <Ionicons name="play" size={28} color={colors.bodyText} style={{ marginLeft: 3 }} />
           </View>
           <Text style={videoStyles.compactLabel}>{tStatic('product.watchVideo')}</Text>
         </TouchableOpacity>
@@ -242,7 +242,7 @@ const videoStyles = StyleSheet.create({
     width: '100%',
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
   },
   compactWrapper: {
     alignItems: 'center',
@@ -252,7 +252,7 @@ const videoStyles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.separator,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -265,7 +265,7 @@ const videoStyles = StyleSheet.create({
     marginTop: 8,
     fontSize: 12,
     fontWeight: '500',
-    color: '#6B7280',
+    color: colors.mutedText,
   },
   player: {
     width: '100%',
@@ -317,7 +317,7 @@ function PdpSectionHeader({ icon, tileColor, title, isRTL }) {
   return (
     <View style={[styles.cardSectionHeader, isRTL && styles.rowReverse]}>
       <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color="#ffffff" />
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
       <Text style={[styles.cardSectionTitle, isRTL && styles.textRTL]}>{title}</Text>
     </View>
@@ -994,7 +994,7 @@ function ProductDetailScreen() {
           <View key={`${idx}-${it.name}`} style={[styles.listItem, isRTL && styles.listItemRTL]}>
             <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
             <Text style={[styles.listText, isRTL && styles.textRTL]}>
-              <Text style={{ fontWeight: '700', color: '#1D1D1F' }}>{it.name}</Text>
+              <Text style={{ fontWeight: '700', color: colors.label }}>{it.name}</Text>
               {it.description ? ` — ${it.description}` : ''}
             </Text>
           </View>
@@ -1162,7 +1162,7 @@ function ProductDetailScreen() {
               <Ionicons
                 name={isInCart(product.id, selectedColor, selectedSize) ? 'checkmark' : 'bag'}
                 size={16}
-                color="#ffffff"
+                color={colors.white}
               />
             </TouchableOpacity>
           </View>
@@ -1255,7 +1255,7 @@ function ProductDetailScreen() {
                     >
                       <Image
                         source={item}
-                        style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: '#ffffff' }}
+                        style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: colors.card }}
                         contentFit={imageFit}
                         transition={300}
                         cachePolicy="memory-disk"
@@ -1318,7 +1318,7 @@ function ProductDetailScreen() {
                           key={i}
                           name={i <= rounded ? 'star' : 'star-outline'}
                           size={14}
-                          color={i <= rounded ? '#FBBF24' : '#D1D5DB'}
+                          color={i <= rounded ? '#FBBF24' : colors.separatorStrong}
                           style={styles.reviewStarIcon}
                         />
                       ))}
@@ -1343,7 +1343,7 @@ function ProductDetailScreen() {
                   <Ionicons
                     name={isRTL ? 'chevron-back' : 'chevron-forward'}
                     size={14}
-                    color="#dc2626"
+                    color={colors.brand}
                     style={{ marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }}
                   />
                 </TouchableOpacity>
@@ -1687,7 +1687,7 @@ function ProductDetailScreen() {
             <Ionicons
               name="logo-whatsapp"
               size={20}
-              color="#ffffff"
+              color={colors.white}
               style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
             />
             <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
@@ -1771,7 +1771,7 @@ function ProductDetailScreen() {
                 <Ionicons
                   name={disabled ? 'alert-circle' : inBagForSelection ? 'checkmark' : 'bag'}
                   size={20}
-                  color="#ffffff"
+                  color={colors.white}
                   style={[styles.buttonIcon, isRTL && styles.buttonIconRTL]}
                 />
                 <Text style={[styles.addToBagText, isRTL && styles.textRTL]}>
@@ -1810,40 +1810,40 @@ function ProductDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   loadingText: {
     ...T.body,
     marginTop: 16,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     fontWeight: '500',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     paddingHorizontal: 20,
   },
   errorText: {
     fontSize: 18,
-    color: '#1D1D1F',
+    color: colors.label,
     marginBottom: 20,
   },
   backButton: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   backButtonText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1931,11 +1931,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: SCREEN_WIDTH,
     height: HEADER_HEIGHT,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   imageContainerBeautyBox: {
     height: HEADER_HEIGHT + 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   heroImage: {
     width: '100%',
@@ -1944,14 +1944,14 @@ const styles = StyleSheet.create({
   heroImagePlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.subtleBg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   heroPlaceholderText: {
     fontSize: 64,
     fontWeight: '700',
-    color: '#dc2626',
+    color: colors.brand,
   },
   contentContainer: {
     backgroundColor: colors.groupedBg,
@@ -2046,7 +2046,7 @@ const styles = StyleSheet.create({
   },
   size: {
     fontSize: 16,
-    color: '#6E6E73',
+    color: colors.mutedText,
     fontWeight: '500',
   },
   section: {
@@ -2154,18 +2154,18 @@ const styles = StyleSheet.create({
   },
   // Rating styles removed (rating section not used)
   featureList: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
     padding: 20,
   },
   feature: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#1D1D1F',
+    color: colors.label,
     marginBottom: 8,
   },
   detailGrid: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -2360,7 +2360,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   pcAddBtnText: {
-    color: '#ffffff',
+    color: colors.white,
     fontWeight: '700',
     fontSize: 14,
   },
@@ -2411,16 +2411,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
+    borderBottomColor: colors.groupedBg,
   },
   detailLabel: {
     fontSize: 16,
-    color: '#6E6E73',
+    color: colors.mutedText,
   },
   detailValue: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1D1D1F',
+    color: colors.label,
   },
   bottomBar: {
     position: 'absolute',
@@ -2454,7 +2454,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   addToBagButtonDisabled: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: colors.placeholder,
     shadowColor: '#9CA3AF',
     shadowOpacity: 0.15,
   },
@@ -2494,7 +2494,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   qtyBtnDisabled: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.subtleBg,
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -2627,7 +2627,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   dot: {
     width: 7,

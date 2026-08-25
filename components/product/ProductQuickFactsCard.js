@@ -38,7 +38,7 @@ export default function ProductQuickFactsCard({ facts }) {
     <View style={[styles.card, shadow.card]} accessibilityLabel={copy.title}>
       <View style={[styles.header, isRTL && styles.rowRTL]}>
         <View style={styles.headerIcon}>
-          <Ionicons name="sparkles" size={17} color="#ffffff" />
+          <Ionicons name="sparkles" size={17} color={colors.white} />
         </View>
         <View style={styles.headerText}>
           <Text style={[styles.eyebrow, isRTL && styles.textRTL]}>{copy.eyebrow}</Text>

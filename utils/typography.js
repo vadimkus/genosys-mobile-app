@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { colors } from './theme';
 
 /**
  * Centralized typography system for consistent text styling across the app.
@@ -6,7 +7,7 @@ import { Platform } from 'react-native';
  * Usage:
  *   import { T } from '../utils/typography';
  *   <Text style={T.pageTitle}>…</Text>
- *   <Text style={[T.body, { color: '#dc2626' }]}>…</Text>
+ *   <Text style={[T.body, { color: colors.brand }]}>…</Text>
  */
 
 // ─── Base scale ──────────────────────────────────────────────────────
@@ -76,7 +77,7 @@ export const T = {
     fontWeight: '700',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: '#dc2626',
+    color: colors.brand,
   },
 
   // ── Large headings (hero titles, page titles) ──────────────────────
@@ -84,13 +85,13 @@ export const T = {
     fontSize: 24,
     fontWeight: WEIGHTS.bold,
     letterSpacing: -0.4,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   pageTitleLarge: {
     fontSize: 28,
     fontWeight: WEIGHTS.bold,
     letterSpacing: -0.5,
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── Section headings ───────────────────────────────────────────────
@@ -98,27 +99,27 @@ export const T = {
     fontSize: 20,
     fontWeight: WEIGHTS.bold,
     letterSpacing: -0.3,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   sectionTitleSmall: {
     fontSize: 18,
     fontWeight: WEIGHTS.bold,
     letterSpacing: -0.3,
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── Navigation / header bar ────────────────────────────────────────
   navTitle: {
     fontSize: 17,
     fontWeight: WEIGHTS.semibold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── Subtitle / supporting text under headings ──────────────────────
   subtitle: {
     fontSize: 15,
     fontWeight: WEIGHTS.regular,
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
 
   // ── Body text ──────────────────────────────────────────────────────
@@ -126,129 +127,129 @@ export const T = {
     fontSize: 16,
     fontWeight: WEIGHTS.regular,
     lineHeight: 24,
-    color: '#333333',
+    color: colors.bodyText,
   },
   bodySmall: {
     fontSize: 15,
     fontWeight: WEIGHTS.regular,
     lineHeight: 22,
-    color: '#555555',
+    color: colors.mutedText,
   },
 
   // ── Labels (form labels, row labels, list item titles) ─────────────
   label: {
     fontSize: 14,
     fontWeight: WEIGHTS.semibold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   labelSmall: {
     fontSize: 13,
     fontWeight: WEIGHTS.semibold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── Captions / secondary info ──────────────────────────────────────
   caption: {
     fontSize: 13,
     fontWeight: WEIGHTS.regular,
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
   captionSmall: {
     fontSize: 12,
     fontWeight: WEIGHTS.regular,
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
   captionTiny: {
     fontSize: 11,
     fontWeight: WEIGHTS.regular,
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
 
   // ── Prices ─────────────────────────────────────────────────────────
   priceLarge: {
     fontSize: 24,
     fontWeight: WEIGHTS.bold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   price: {
     fontSize: 16,
     fontWeight: WEIGHTS.bold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   priceSmall: {
     fontSize: 15,
     fontWeight: WEIGHTS.bold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   priceStrikethrough: {
     fontSize: 14,
     fontWeight: WEIGHTS.regular,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     textDecorationLine: 'line-through',
   },
   priceDiscount: {
     fontSize: 16,
     fontWeight: WEIGHTS.bold,
-    color: '#dc2626',
+    color: colors.brand,
   },
 
   // ── Buttons ────────────────────────────────────────────────────────
   buttonLarge: {
     fontSize: 18,
     fontWeight: WEIGHTS.semibold,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   button: {
     fontSize: 16,
     fontWeight: WEIGHTS.semibold,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   buttonSmall: {
     fontSize: 14,
     fontWeight: WEIGHTS.semibold,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   buttonTiny: {
     fontSize: 12,
     fontWeight: WEIGHTS.bold,
-    color: '#FFFFFF',
+    color: colors.white,
   },
 
   // ── Badges / pills ────────────────────────────────────────────────
   badge: {
     fontSize: 10,
     fontWeight: WEIGHTS.bold,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   badgeMedium: {
     fontSize: 12,
     fontWeight: WEIGHTS.bold,
-    color: '#FFFFFF',
+    color: colors.white,
   },
 
   // ── Product card specifics ─────────────────────────────────────────
   productName: {
     fontSize: 14,
     fontWeight: WEIGHTS.semibold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   productCategory: {
     fontSize: 12,
     fontWeight: WEIGHTS.regular,
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
   productDescription: {
     fontSize: 11,
     fontWeight: WEIGHTS.regular,
     lineHeight: 15,
-    color: '#999999',
+    color: colors.secondaryLabel,
   },
 
   // ── Input fields ──────────────────────────────────────────────────
   input: {
     fontSize: 15,
     fontWeight: WEIGHTS.regular,
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── Monospace (order numbers, codes) ───────────────────────────────
@@ -256,42 +257,42 @@ export const T = {
     fontSize: 18,
     fontWeight: WEIGHTS.bold,
     fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }),
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── Summary row (cart/checkout totals) ─────────────────────────────
   summaryLabel: {
     fontSize: 14,
     fontWeight: WEIGHTS.medium,
-    color: '#555555',
+    color: colors.mutedText,
   },
   summaryValue: {
     fontSize: 14,
     fontWeight: WEIGHTS.semibold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   totalLabel: {
     fontSize: 18,
     fontWeight: WEIGHTS.semibold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
   totalValue: {
     fontSize: 20,
     fontWeight: WEIGHTS.bold,
-    color: '#1D1D1F',
+    color: colors.label,
   },
 
   // ── FAQ ────────────────────────────────────────────────────────────
   faqQuestion: {
     fontSize: 15,
     fontWeight: WEIGHTS.medium,
-    color: '#1D1D1F',
+    color: colors.label,
     lineHeight: 22,
   },
   faqAnswer: {
     fontSize: 14,
     fontWeight: WEIGHTS.regular,
-    color: '#555555',
+    color: colors.mutedText,
     lineHeight: 22,
   },
 

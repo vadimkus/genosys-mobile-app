@@ -22,6 +22,7 @@ import * as haptics from '../utils/haptics';
 import { isProductOutOfStock } from '../utils/stock';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 20px padding + 20px gap
@@ -84,7 +85,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
         type: 'order',
         text: t('common.order'),
         color: '#FF9500',
-        textColor: '#FFFFFF',
+        textColor: colors.white,
         priority: 0,
       });
     } else if (!isHolidayKit) {
@@ -92,7 +93,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
         type: 'in_stock',
         text: t('stock.inStock'),
         color: '#34C759',
-        textColor: '#FFFFFF',
+        textColor: colors.white,
         priority: 0,
       });
     }
@@ -104,7 +105,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
       type: 'new',
       text: t('common.new'),
       color: '#007AFF',
-      textColor: '#FFFFFF',
+      textColor: colors.white,
       priority: 1,
     });
   }
@@ -153,7 +154,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
                   styles.badge, 
                   { backgroundColor: badge.color || '#007AFF' }
                 ]}>
-                  <Text style={[styles.badgeText, { color: badge.textColor || '#FFFFFF' }]}>
+                  <Text style={[styles.badgeText, { color: badge.textColor || colors.white }]}>
                     {badge.text}
                   </Text>
                 </View>
@@ -323,7 +324,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
             <Ionicons
               name={inCart ? 'checkmark-circle' : justAdded ? 'checkmark-circle' : 'bag-add-outline'}
               size={14}
-              color={inCart ? '#15803D' : '#fff'}
+              color={inCart ? '#15803D' : colors.white}
             />
             <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
               {inCart
@@ -346,11 +347,11 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -369,7 +370,7 @@ const styles = StyleSheet.create({
     // wide photos letterbox invisibly on the white background.
     width: '100%',
     height: CARD_WIDTH,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     position: 'relative',
     overflow: 'visible', // Make sure badges aren't clipped
   },
@@ -383,14 +384,14 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.subtleBg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeholderText: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#dc2626',
+    color: colors.brand,
   },
   stockOverlay: {
     position: 'absolute',
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
   stockOverlayText: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#ffffff',
+    color: colors.white,
   },
   badgesContainer: {
     position: 'absolute',
@@ -464,7 +465,7 @@ const styles = StyleSheet.create({
   loginToSeePrice: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
   discountPricing: {
     alignItems: 'flex-start',
@@ -486,15 +487,15 @@ const styles = StyleSheet.create({
   },
   savings: {
     ...T.badge,
-    color: '#FFFFFF',
+    color: colors.white,
   },
   // Beauty Boxes specific pricing styles
   beautyBoxPricing: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.subtleBg,
     padding: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.separator,
   },
   beautyBoxFullPrice: {
     ...T.captionSmall,
@@ -510,7 +511,7 @@ const styles = StyleSheet.create({
   beautyBoxDiscount: {
     ...T.captionTiny,
     fontWeight: 'bold',
-    color: '#dc2626',
+    color: colors.brand,
     backgroundColor: '#FFE5E5',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -535,7 +536,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sizeBadge: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 8,
@@ -545,14 +546,14 @@ const styles = StyleSheet.create({
     ...T.badge,
     fontSize: 9,
     fontWeight: '500',
-    color: '#666666',
+    color: colors.mutedText,
   },
   addToCartBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderRadius: 8,
     paddingVertical: 8,
     marginTop: 8,

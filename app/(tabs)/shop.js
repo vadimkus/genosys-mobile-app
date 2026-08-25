@@ -324,7 +324,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
               <Ionicons
                 name="logo-whatsapp"
                 size={16}
-                color="#ffffff"
+                color={colors.white}
                 style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
               />
               <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
@@ -357,14 +357,14 @@ const ShopGridCard = React.memo(function ShopGridCard({
                     disabled={isAdding}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="remove" size={18} color="#ffffff" />
+                    <Ionicons name="remove" size={18} color={colors.white} />
                   </TouchableOpacity>
 
                   <View style={styles.qtyStepperLabelWrap} pointerEvents="none">
                     <Ionicons
                       name="checkmark-circle"
                       size={14}
-                      color="#ffffff"
+                      color={colors.white}
                       style={styles.qtyStepperCheck}
                     />
                     <Text
@@ -384,7 +384,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
                     disabled={isAdding}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="add" size={18} color="#ffffff" />
+                    <Ionicons name="add" size={18} color={colors.white} />
                   </TouchableOpacity>
                 </View>
               );
@@ -411,7 +411,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
                 <Ionicons
                   name={isAdding ? 'checkmark' : requiresOptions ? 'options-outline' : 'bag-add'}
                   size={16}
-                  color="#ffffff"
+                  color={colors.white}
                   style={[styles.addToCartIcon, isRTL && styles.addToCartIconRTL]}
                 />
                 <Text style={[styles.addToCartText, isRTL && styles.addToCartTextRTL]}>
@@ -1153,7 +1153,7 @@ function ShopScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={t('shop.clearSearch')}
                   >
-                    <Ionicons name="close" size={14} color="#ffffff" />
+                    <Ionicons name="close" size={14} color={colors.white} />
                   </TouchableOpacity>
                 )}
 
@@ -1184,7 +1184,7 @@ function ShopScreen() {
                 <Pressable style={styles.voiceOverlay} onPress={stopVoiceSearch}>
                   <View style={styles.voiceModal}>
                     <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
-                      <Ionicons name="mic" size={40} color="#ffffff" />
+                      <Ionicons name="mic" size={40} color={colors.white} />
                     </RNAnimated.View>
                     <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
                     {voicePartial ? (
@@ -1333,7 +1333,7 @@ function ShopScreen() {
           ) : (loadFailed && !loading) ? (
             /* API + cache both failed: show retry instead of a silent blank grid */
             <View style={styles.noResultsContainer}>
-              <Ionicons name="cloud-offline-outline" size={44} color="#9CA3AF" style={{ marginBottom: 12 }} />
+              <Ionicons name="cloud-offline-outline" size={44} color={colors.placeholder} style={{ marginBottom: 12 }} />
               <Text style={[styles.noResultsTitle, isRTL && styles.noResultsTitleRTL]}>
                 {t('common.connectionErrorTitle')}
               </Text>
@@ -1476,7 +1476,7 @@ const styles = StyleSheet.create({
     ...T.labelSmall,
     fontWeight: '900',
     letterSpacing: 0.5,
-    color: '#dc2626',
+    color: colors.brand,
   },
   langOverlay: {
     flex: 1,
@@ -1505,7 +1505,7 @@ const styles = StyleSheet.create({
   },
   langMenuItemText: {
     ...T.label,
-    color: '#111827',
+    color: colors.label,
   },
   langMenuItemTextRtl: {
     textAlign: 'right',
@@ -1744,7 +1744,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#86868B',
+    backgroundColor: colors.secondaryLabel,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1780,7 +1780,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   voiceModal: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 24,
     paddingVertical: 36,
     paddingHorizontal: 40,
@@ -1796,7 +1796,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -1808,7 +1808,7 @@ const styles = StyleSheet.create({
   voicePartialText: {
     ...T.bodySmall,
     fontWeight: '500',
-    color: '#dc2626',
+    color: colors.brand,
     textAlign: 'center',
     marginBottom: 16,
     minHeight: 20,
@@ -1823,9 +1823,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 28,
     borderRadius: 20,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
   },
   voiceStopText: {
     ...T.label,
@@ -1952,7 +1952,7 @@ const styles = StyleSheet.create({
   categoryNewBadgeText: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#ffffff',
+    color: colors.white,
     textTransform: 'uppercase',
     letterSpacing: 0.2,
     includeFontPadding: false,
@@ -1990,13 +1990,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   newPill: {
-    backgroundColor: '#1D1D1F',
+    backgroundColor: colors.label,
     borderRadius: 980,
     paddingHorizontal: 8,
     paddingVertical: 2.5,
   },
   newPillText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 9,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -2106,7 +2106,7 @@ const styles = StyleSheet.create({
   },
   savings: {
     fontSize: 10,
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '600',
     backgroundColor: '#dc262620',
     paddingHorizontal: 6,
@@ -2176,7 +2176,7 @@ const styles = StyleSheet.create({
     ...T.buttonTiny,
     fontWeight: '600',
     textAlign: 'center',
-    color: '#ffffff',
+    color: colors.white,
   },
   addToCartTextRTL: {
     writingDirection: 'rtl',
@@ -2219,7 +2219,7 @@ const styles = StyleSheet.create({
   qtyStepperLabel: {
     ...T.buttonTiny,
     fontWeight: '700',
-    color: '#ffffff',
+    color: colors.white,
     textAlign: 'center',
   },
 

@@ -294,7 +294,7 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.analysis && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="sparkles" size={18} color="#dc2626" />
+                <Ionicons name="sparkles" size={18} color={colors.brand} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.aiAnalysis')}</Text>
               </View>
               <Text style={styles.aiAnalysisText}>{aiResult.analysis}</Text>
@@ -305,13 +305,13 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.concerns?.length > 0 && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+                <Ionicons name="alert-circle-outline" size={18} color={colors.brand} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.keyConcerns')}</Text>
               </View>
               <View style={styles.concernChips}>
                 {aiResult.concerns.map((c, i) => (
                   <View key={i} style={styles.concernChip}>
-                    <Ionicons name="ellipse" size={6} color="#dc2626" />
+                    <Ionicons name="ellipse" size={6} color={colors.brand} />
                     <Text style={styles.concernChipText}>{c}</Text>
                   </View>
                 ))}
@@ -323,7 +323,7 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.recommendations?.length > 0 && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="bag-outline" size={18} color="#dc2626" />
+                <Ionicons name="bag-outline" size={18} color={colors.brand} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.recommendedProducts')}</Text>
               </View>
               {aiResult.recommendations.map((rec, idx) => {
@@ -342,7 +342,7 @@ export default function SkinAnalysisCameraScreen() {
                         </View>
                       ) : (
                         <View style={[styles.aiRecImage, styles.aiRecImagePlaceholder]}>
-                          <Ionicons name="leaf-outline" size={24} color="#D1D5DB" />
+                          <Ionicons name="leaf-outline" size={24} color={colors.separatorStrong} />
                         </View>
                       )}
                       <View style={styles.aiRecBody}>
@@ -363,7 +363,7 @@ export default function SkinAnalysisCameraScreen() {
                               disabled={isAdded}
                               activeOpacity={0.8}
                             >
-                              <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                              <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color={colors.white} />
                               <Text style={styles.aiRecAddText}>
                                 {isAdded ? t('skinCamera.added') : !user ? t('shop.loginToBuy') : t('skinCamera.addToBag')}
                               </Text>
@@ -389,7 +389,7 @@ export default function SkinAnalysisCameraScreen() {
           {(aiResult.routine?.am?.length > 0 || aiResult.routine?.pm?.length > 0) && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="sunny-outline" size={18} color="#dc2626" />
+                <Ionicons name="sunny-outline" size={18} color={colors.brand} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.yourSkincareRoutine')}</Text>
               </View>
 
@@ -429,7 +429,7 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.tips?.length > 0 && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="bulb-outline" size={18} color="#dc2626" />
+                <Ionicons name="bulb-outline" size={18} color={colors.brand} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.personalizedTips')}</Text>
               </View>
               {aiResult.tips.map((tip, i) => (
@@ -444,7 +444,7 @@ export default function SkinAnalysisCameraScreen() {
           {/* Bottom Actions */}
           <View style={styles.aiActionsRow}>
             <TouchableOpacity style={styles.retakeBtn} onPress={handleReset} activeOpacity={0.85}>
-              <Ionicons name="camera-outline" size={18} color="#dc2626" />
+              <Ionicons name="camera-outline" size={18} color={colors.brand} />
               <Text style={styles.retakeBtnText}>{t('skinCamera.retakePhoto')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -452,7 +452,7 @@ export default function SkinAnalysisCameraScreen() {
               onPress={() => { handleReset(); router.replace('/skin-analysis'); }}
               activeOpacity={0.85}
             >
-              <Ionicons name="clipboard-outline" size={18} color="#374151" />
+              <Ionicons name="clipboard-outline" size={18} color={colors.bodyText} />
               <Text style={styles.quizBtnText}>{t('skinCamera.takeQuizInstead')}</Text>
             </TouchableOpacity>
           </View>
@@ -472,9 +472,9 @@ export default function SkinAnalysisCameraScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#ffffff" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.white} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: '#ffffff' }]}>{t('skinAnalysis.title')}</Text>
+        <Text style={[styles.headerTitle, { color: colors.white }]}>{t('skinAnalysis.title')}</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -500,7 +500,7 @@ export default function SkinAnalysisCameraScreen() {
       <View style={styles.captureArea}>
         {(analyzing || aiAnalyzing) ? (
           <View style={styles.analyzingBox}>
-            <ActivityIndicator size="large" color="#dc2626" />
+            <ActivityIndicator size="large" color={colors.brand} />
             <Text style={styles.analyzingText}>
               {aiAnalyzing ? t('skinCamera.aiExpertAnalyzing') : t('skinCamera.analyzing')}
             </Text>
@@ -517,7 +517,7 @@ export default function SkinAnalysisCameraScreen() {
               accessibilityState={{ disabled: capturing }}
             >
               <View style={styles.captureInner}>
-                <Ionicons name="camera" size={32} color="#dc2626" />
+                <Ionicons name="camera" size={32} color={colors.brand} />
               </View>
             </TouchableOpacity>
             <Text style={styles.captureLabel}>
@@ -532,10 +532,10 @@ export default function SkinAnalysisCameraScreen() {
 
 // Helpers
 function scoreColor(score) {
-  if (!score) return '#9CA3AF';
+  if (!score) return colors.placeholder;
   if (score >= 7) return '#16A34A';
   if (score >= 5) return '#F59E0B';
-  return '#dc2626';
+  return colors.brand;
 }
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
@@ -543,7 +543,7 @@ function capitalize(s) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.groupedBg },
-  cameraContainer: { flex: 1, backgroundColor: '#000000' },
+  cameraContainer: { flex: 1, backgroundColor: colors.label },
   centerContent: {
     flex: 1,
     alignItems: 'center',
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: colors.separator,
     zIndex: 10,
   },
   headerOverCamera: {
@@ -570,11 +570,11 @@ const styles = StyleSheet.create({
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700', color: '#1F2937', flex: 1, textAlign: 'center' },
+  headerTitle: { ...T.navTitle, fontSize: 16, fontWeight: '700', color: colors.label, flex: 1, textAlign: 'center' },
 
-  permissionText: { ...T.bodySmall, color: '#6B7280', lineHeight: undefined, textAlign: 'center', marginTop: 8 },
+  permissionText: { ...T.bodySmall, color: colors.mutedText, lineHeight: undefined, textAlign: 'center', marginTop: 8 },
   permissionBtn: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
   },
   guideText: {
     ...T.label,
-    color: '#ffffff',
+    color: colors.white,
     marginTop: 20,
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -617,29 +617,29 @@ const styles = StyleSheet.create({
   captureArea: {
     alignItems: 'center',
     paddingVertical: 24,
-    backgroundColor: '#000000',
+    backgroundColor: colors.label,
   },
   captureBtn: {
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
   },
   captureInner: {
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
   },
   captureLabel: {
     ...T.labelSmall,
-    color: '#ffffff',
+    color: colors.white,
     marginTop: 8,
   },
   analyzingBox: {
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
   },
   analyzingText: {
     ...T.label,
-    color: '#ffffff',
+    color: colors.white,
   },
 
   // AI Results
@@ -670,8 +670,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   aiScoreNum: { fontSize: 32, fontWeight: '900' },
-  aiScoreMax: { ...T.labelSmall, color: '#9CA3AF', marginTop: -4 },
-  aiScoreLabel: { ...T.label, fontWeight: '700', color: '#374151', marginBottom: 8 },
+  aiScoreMax: { ...T.labelSmall, color: colors.placeholder, marginTop: -4 },
+  aiScoreLabel: { ...T.label, fontWeight: '700', color: colors.bodyText, marginBottom: 8 },
   aiSkinTypeBadge: {
     backgroundColor: tint(colors.brand, '14'),
     paddingHorizontal: 16,
@@ -693,8 +693,8 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
-  aiSectionTitle: { ...T.price, fontWeight: '800', color: '#1F2937' },
-  aiAnalysisText: { ...T.label, fontWeight: '400', color: '#374151', lineHeight: 22 },
+  aiSectionTitle: { ...T.price, fontWeight: '800', color: colors.label },
+  aiAnalysisText: { ...T.label, fontWeight: '400', color: colors.bodyText, lineHeight: 22 },
 
   // Concerns
   concernChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -727,44 +727,44 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
   },
   aiRecImagePlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.fill,
   },
   aiRecSize: {
     ...T.badge,
     fontWeight: '600',
-    color: '#9CA3AF',
+    color: colors.placeholder,
     marginTop: 3,
   },
   aiRecBody: { flex: 1 },
-  aiRecName: { ...T.label, fontWeight: '700', color: '#1F2937', marginBottom: 2 },
-  aiRecPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginBottom: 4 },
+  aiRecName: { ...T.label, fontWeight: '700', color: colors.label, marginBottom: 2 },
+  aiRecPrice: { ...T.label, fontWeight: '800', color: colors.brand, marginBottom: 4 },
   aiRecPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginBottom: 4 },
-  aiRecReason: { ...T.captionSmall, color: '#6B7280', lineHeight: 17, marginBottom: 8 },
+  aiRecReason: { ...T.captionSmall, color: colors.mutedText, lineHeight: 17, marginBottom: 8 },
   aiRecActions: { flexDirection: 'row', gap: 8 },
   aiRecAddBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
   },
   aiRecAddBtnAdded: { backgroundColor: '#16A34A' },
-  aiRecAddText: { ...T.captionSmall, fontWeight: '700', color: '#fff' },
+  aiRecAddText: { ...T.captionSmall, fontWeight: '700', color: colors.white },
   aiRecViewBtn: {
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
-  aiRecViewText: { ...T.captionSmall, fontWeight: '600', color: '#374151' },
+  aiRecViewText: { ...T.captionSmall, fontWeight: '600', color: colors.bodyText },
 
   // Routine
   routineBlock: { marginBottom: 14 },
@@ -774,7 +774,7 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 8,
   },
-  routineLabel: { ...T.label, fontWeight: '700', color: '#374151' },
+  routineLabel: { ...T.label, fontWeight: '700', color: colors.bodyText },
   routineStep: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -787,13 +787,13 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: '#dc2626',
-    color: '#ffffff',
+    backgroundColor: colors.brand,
+    color: colors.white,
     textAlign: 'center',
     lineHeight: 22,
     overflow: 'hidden',
   },
-  routineStepText: { ...T.caption, color: '#374151', lineHeight: 20, flex: 1 },
+  routineStepText: { ...T.caption, color: colors.bodyText, lineHeight: 20, flex: 1 },
 
   // Tips
   tipRow: {
@@ -802,7 +802,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  tipText: { ...T.caption, color: '#374151', lineHeight: 20, flex: 1 },
+  tipText: { ...T.caption, color: colors.bodyText, lineHeight: 20, flex: 1 },
 
   // Bottom actions
   aiActionsRow: {
@@ -819,9 +819,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
   },
-  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: '#dc2626' },
+  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.brand },
   quizBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -831,7 +831,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
-  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: '#374151' },
+  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.bodyText },
 });

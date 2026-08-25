@@ -16,6 +16,7 @@ import { createLogger } from '../utils/logger';
 import { captureException } from '../config/sentry';
 import { tStatic } from '../contexts/LocalizationContext';
 import T from '../utils/typography';
+import { colors } from '../utils/theme';
 
 const log = createLogger('ErrorBoundary');
 
@@ -121,7 +122,7 @@ export function withErrorBoundary(Component, options = {}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -136,18 +137,18 @@ const styles = StyleSheet.create({
   },
   title: {
     ...T.sectionTitle,
-    color: '#1a1a1a',
+    color: colors.label,
     marginBottom: 8,
     textAlign: 'center',
   },
   message: {
     ...T.bodySmall,
-    color: '#666',
+    color: colors.mutedText,
     textAlign: 'center',
     marginBottom: 24,
   },
   retryButton: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     ...T.button,
   },
   debugContainer: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.fill,
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   debugText: {
     ...T.mono,
     fontSize: 11,
-    color: '#666',
+    color: colors.mutedText,
   },
 });
 

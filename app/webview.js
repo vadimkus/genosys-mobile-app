@@ -280,7 +280,7 @@ export default function WebViewScreen() {
             </Text>
           ) : null}
           <TouchableOpacity onPress={() => { haptics.lightTap(); handleRetry(); }} style={styles.retryButton} activeOpacity={0.7}>
-            <Ionicons name="reload" size={18} color="#ffffff" />
+            <Ionicons name="reload" size={18} color={colors.white} />
             <Text style={styles.retryButtonText}>{t('webview.tryAgain')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { haptics.lightTap(); router.back(); }} style={styles.backButton} activeOpacity={0.7}>

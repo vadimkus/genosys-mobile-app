@@ -26,7 +26,7 @@ function SectionHeader({ icon, tileColor, title, isRTL }) {
   return (
     <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
       <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color="#ffffff" />
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
       <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
     </View>
@@ -111,7 +111,7 @@ export default function PaymentScreen() {
         activeOpacity={0.7}
       >
         <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-          <Ionicons name={icon} size={17} color="#ffffff" />
+          <Ionicons name={icon} size={17} color={colors.white} />
         </View>
         <View style={styles.methodText}>
           <Text style={[styles.methodTitle, isRTL && styles.textRTL]}>{title}</Text>
@@ -194,7 +194,7 @@ export default function PaymentScreen() {
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
               <View style={[surfaces.iconTile, { backgroundColor: colors.greenDeep }]}>
-                <Ionicons name="shield-checkmark" size={17} color="#ffffff" />
+                <Ionicons name="shield-checkmark" size={17} color={colors.white} />
               </View>
               <View style={styles.securityInfo}>
                 <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.securePayments')}</Text>
@@ -206,7 +206,7 @@ export default function PaymentScreen() {
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
               <View style={[surfaces.iconTile, { backgroundColor: colors.blue }]}>
-                <Ionicons name="lock-closed" size={17} color="#ffffff" />
+                <Ionicons name="lock-closed" size={17} color={colors.white} />
               </View>
               <View style={styles.securityInfo}>
                 <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.dataProtection')}</Text>
@@ -218,7 +218,7 @@ export default function PaymentScreen() {
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
               <View style={[surfaces.iconTile, { backgroundColor: colors.indigo }]}>
-                <Ionicons name="card" size={17} color="#ffffff" />
+                <Ionicons name="card" size={17} color={colors.white} />
               </View>
               <View style={styles.securityInfo}>
                 <Text style={[styles.securityItemTitle, isRTL && styles.textRTL]}>{t('paymentSettings.pci')}</Text>

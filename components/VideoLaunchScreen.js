@@ -6,6 +6,7 @@ import { StyleSheet, StatusBar, Animated, Pressable, Image, Platform } from 'rea
 import * as FileSystem from 'expo-file-system/legacy';
 import Constants from 'expo-constants';
 import { WebView } from 'react-native-webview';
+import { colors } from '../utils/theme';
 
 const CACHE_DIR = `${FileSystem.cacheDirectory}splash/`;
 const CACHE_FILE = `${CACHE_DIR}splash.mp4`;
@@ -307,6 +308,12 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
             // blank paint is the same color as the iOS LaunchScreen and the
             // splash cover above — no perceptible color flash if the cover
             // is briefly transparent for any reason.
+            //
+            // Deliberately a literal and not a theme token: it is pinned to
+            // SplashScreenBackground.colorset, which is a native asset and so
+            // cannot be changed over the air. A token that gets repointed
+            // during the retheme would put a coloured surface against a white
+            // native launch screen and show as a flash on cold start.
             backgroundColor="#ffffff"
             onMessage={(event) => {
               const type = event?.nativeEvent?.data;
@@ -345,16 +352,20 @@ const styles = StyleSheet.create({
     // White to match ios/GenosysUAE/Images.xcassets/SplashScreenBackground.colorset
     // (the iOS LaunchScreen background). Keeps the entire splash sequence on a
     // single background color from app launch through video playback.
+    //
+    // Left as a literal on purpose. That colorset is native and cannot ship
+    // over the air, so this must not follow the theme when surfaces are
+    // repointed, or cold start gains a flash.
     backgroundColor: '#ffffff',
     zIndex: 999,
   },
   webVideo: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
   splashCover: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
   },

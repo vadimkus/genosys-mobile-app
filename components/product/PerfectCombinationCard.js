@@ -375,7 +375,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
               }}
               activeOpacity={0.9}
             >
-              <Ionicons name="logo-whatsapp" size={16} color="#ffffff" />
+              <Ionicons name="logo-whatsapp" size={16} color={colors.white} />
               <Text style={styles.pcAddBtnText}>
                 {t('product.requestQuote')}
               </Text>
@@ -410,7 +410,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
                         : 'bag-add'
                 }
                 size={16}
-                color="#ffffff"
+                color={colors.white}
               />
               <Text style={styles.pcAddBtnText}>
                 {!user

@@ -28,7 +28,7 @@ function SectionHeader({ icon, tileColor, title, isRTL }) {
   return (
     <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
       <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color="#ffffff" />
+        <Ionicons name={icon} size={16} color={colors.white} />
       </View>
       <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
     </View>
@@ -179,7 +179,7 @@ export default function BillingScreen() {
                 disabled={saving}
                 activeOpacity={0.85}
               >
-                {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>{t('common.save')}</Text>}
+                {saving ? <ActivityIndicator color={colors.white} /> : <Text style={styles.saveText}>{t('common.save')}</Text>}
               </TouchableOpacity>
             </Animated.ScrollView>
           </Animated.View>

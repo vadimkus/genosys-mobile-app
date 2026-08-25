@@ -217,7 +217,7 @@ export default function ChatScreen() {
     if (!product) {
       return (
         <View style={styles.productCardLoading} key={`prod-${productId}`}>
-          <ActivityIndicator size="small" color="#dc2626" />
+          <ActivityIndicator size="small" color={colors.brand} />
         </View>
       );
     }
@@ -234,7 +234,7 @@ export default function ChatScreen() {
           <Image source={imageUri} style={styles.productImage} contentFit="contain" transition={200} cachePolicy="memory-disk" />
         ) : (
           <View style={styles.productImagePlaceholder}>
-            <Ionicons name="bag-outline" size={24} color="#D1D5DB" />
+            <Ionicons name="bag-outline" size={24} color={colors.separatorStrong} />
           </View>
         )}
         <View style={styles.productInfo}>
@@ -258,7 +258,7 @@ export default function ChatScreen() {
                 }}
                 activeOpacity={0.8}
               >
-                <Ionicons name="logo-whatsapp" size={14} color="#fff" />
+                <Ionicons name="logo-whatsapp" size={14} color={colors.white} />
                 <Text style={styles.addToBagText}>{t('product.requestQuote')}</Text>
               </TouchableOpacity>
             ) : (
@@ -268,7 +268,7 @@ export default function ChatScreen() {
                 activeOpacity={0.8}
                 disabled={isAdded}
               >
-                <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color={colors.white} />
                 <Text style={styles.addToBagText}>
                   {isAdded ? t('chat.added') : t('chat.addToBag')}
                 </Text>
@@ -394,7 +394,7 @@ export default function ChatScreen() {
         >
           {!isUser && (
             <View style={styles.avatarCircle}>
-              <Ionicons name="sparkles" size={14} color="#dc2626" />
+              <Ionicons name="sparkles" size={14} color={colors.brand} />
             </View>
           )}
           <View style={[styles.bubble, isUser ? styles.userBubble : styles.assistantBubble]}>
@@ -453,11 +453,11 @@ export default function ChatScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
         >
-          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#ffffff" />
+          <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.white} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <View style={styles.headerTitleRow}>
-            <Ionicons name="sparkles" size={16} color="#ffffff" />
+            <Ionicons name="sparkles" size={16} color={colors.white} />
             <Text style={styles.headerTitle}>{t('chat.title')}</Text>
           </View>
           <Text style={styles.headerSubtitle}>{t('chat.subtitle')}</Text>
@@ -483,11 +483,11 @@ export default function ChatScreen() {
           {loading && (
             <View style={[styles.messageBubbleWrap, styles.assistantBubbleWrap]}>
               <View style={styles.avatarCircle}>
-                <Ionicons name="sparkles" size={14} color="#dc2626" />
+                <Ionicons name="sparkles" size={14} color={colors.brand} />
               </View>
               <View style={[styles.bubble, styles.assistantBubble]}>
                 <View style={styles.typingRow}>
-                  <ActivityIndicator size="small" color="#dc2626" />
+                  <ActivityIndicator size="small" color={colors.brand} />
                   <Text style={styles.typingText}>{t('chat.thinking')}</Text>
                 </View>
               </View>
@@ -503,7 +503,7 @@ export default function ChatScreen() {
             value={input}
             onChangeText={setInput}
             placeholder={t('chat.placeholder')}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.placeholder}
             multiline
             maxLength={500}
             returnKeyType="send"
@@ -519,7 +519,7 @@ export default function ChatScreen() {
             accessibilityLabel={t('chat.send')}
             accessibilityState={{ disabled: !input.trim() || loading }}
           >
-            <Ionicons name="send" size={20} color="#ffffff" />
+            <Ionicons name="send" size={20} color={colors.white} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -537,13 +537,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerCenter: { flex: 1, alignItems: 'center' },
   headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  headerTitle: { ...T.bodySmall, fontWeight: '700', color: '#ffffff', lineHeight: undefined },
+  headerTitle: { ...T.bodySmall, fontWeight: '700', color: colors.white, lineHeight: undefined },
   headerSubtitle: { ...T.captionTiny, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
 
   /* ─── Messages ─── */
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   userBubble: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     borderBottomEndRadius: 4,
   },
   assistantBubble: {
@@ -586,13 +586,13 @@ const styles = StyleSheet.create({
   },
 
   messageText: { ...T.bodySmall, color: undefined },
-  userText: { color: '#ffffff' },
-  assistantText: { color: '#1F2937' },
+  userText: { color: colors.white },
+  assistantText: { color: colors.label },
   linkText: { ...T.link, color: '#2563EB', textDecorationLine: 'underline' },
   textRTL: { textAlign: 'right' },
 
   typingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  typingText: { ...T.caption, color: '#6B7280', fontStyle: 'italic' },
+  typingText: { ...T.caption, color: colors.mutedText, fontStyle: 'italic' },
 
   /* ─── Quick-action buttons ─── */
   quickActionsContainer: {
@@ -616,13 +616,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.fill,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'transparent',
   },
   quickActionBtnHighlight: {
-    backgroundColor: '#dc2626',
-    borderColor: '#dc2626',
+    backgroundColor: colors.brand,
+    borderColor: colors.brand,
   },
   quickActionEmoji: {
     fontSize: 13,
@@ -630,10 +630,10 @@ const styles = StyleSheet.create({
   quickActionLabel: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#374151',
+    color: colors.bodyText,
   },
   quickActionLabelHighlight: {
-    color: '#ffffff',
+    color: colors.white,
   },
 
   /* ─── Product card ─── */
@@ -655,25 +655,25 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
   },
   productImagePlaceholder: {
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.fill,
     alignItems: 'center',
     justifyContent: 'center',
   },
   productInfo: { flex: 1, marginStart: 10 },
-  productName: { ...T.labelSmall, color: '#1F2937', lineHeight: 18 },
-  productPrice: { ...T.labelSmall, fontWeight: '800', color: '#dc2626', marginTop: 2 },
+  productName: { ...T.labelSmall, color: colors.label, lineHeight: 18 },
+  productPrice: { ...T.labelSmall, fontWeight: '800', color: colors.brand, marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 8, marginTop: 6 },
   addToBagBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
@@ -689,15 +689,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   productPriceOnRequest: { ...T.labelSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
-  addToBagText: { ...T.captionTiny, fontWeight: '700', color: '#ffffff' },
+  addToBagText: { ...T.captionTiny, fontWeight: '700', color: colors.white },
   viewProductBtn: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
-  viewProductText: { ...T.captionTiny, fontWeight: '600', color: '#374151' },
+  viewProductText: { ...T.captionTiny, fontWeight: '600', color: colors.bodyText },
 
   /* ─── Input bar ─── */
   inputBar: {
@@ -729,9 +729,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendBtnDisabled: { backgroundColor: '#D1D5DB' },
+  sendBtnDisabled: { backgroundColor: colors.separatorStrong },
 });

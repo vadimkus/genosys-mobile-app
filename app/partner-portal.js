@@ -743,7 +743,7 @@ export default function PartnerPortalScreen() {
           activeOpacity={0.8}
         >
           <View style={styles.homecareShortcutIcon}>
-            <Ionicons name="paper-plane" size={16} color="#FFFFFF" />
+            <Ionicons name="paper-plane" size={16} color={colors.white} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.homecareShortcutTitle, isRTL && styles.rtlText]}>
@@ -753,7 +753,7 @@ export default function PartnerPortalScreen() {
               {tr('Recommend products · earn Clinic Points', 'Рекомендуйте продукты · получайте баллы', 'أوصِ بالمنتجات · اكسب نقاط العيادة')}
             </Text>
           </View>
-          <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={17} color="#9CA3AF" />
+          <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={17} color={colors.placeholder} />
         </TouchableOpacity>
         <View style={[styles.searchBox, isRTL && styles.rowRTL]}>
           <Ionicons name="search" size={16} color={colors.secondaryLabel} />
@@ -807,7 +807,7 @@ export default function PartnerPortalScreen() {
               <View style={{ marginBottom: 12 }}>
                 {reorderMsg > 0 ? (
                   <View style={[styles.reorderBanner, isRTL && styles.rowRTL]}>
-                    <Ionicons name="refresh" size={16} color="#FFFFFF" />
+                    <Ionicons name="refresh" size={16} color={colors.white} />
                     <Text style={[styles.reorderBannerText, isRTL && styles.rtlText]}>
                       {tr(`Loaded ${reorderMsg} item${reorderMsg === 1 ? '' : 's'} — adjust & place`, `Загружено ${reorderMsg} — измените и оформите`, `تم تحميل ${reorderMsg} — عدّل ثم قدّم`)}
                     </Text>
@@ -1043,41 +1043,41 @@ export default function PartnerPortalScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.groupedBackground || '#F2F2F7' },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: colors.groupedBg },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: colors.card },
   // Header
-  header: { backgroundColor: '#0B0B0C', paddingHorizontal: 16, paddingBottom: 12 },
+  header: { backgroundColor: colors.label, paddingHorizontal: 16, paddingBottom: 12 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerBack: { width: 40 },
-  headerBrand: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', letterSpacing: 3 },
+  headerBrand: { color: colors.white, fontSize: 16, fontWeight: '900', letterSpacing: 3 },
   headerLogo: { width: 118, height: 34 },
   headerLabel: { color: colors.brand, fontSize: 9, fontWeight: '700', letterSpacing: 3, marginTop: 1 },
   offPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, minWidth: 40, alignItems: 'center' },
-  offPillText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
+  offPillText: { color: colors.white, fontSize: 12, fontWeight: '800' },
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 14 },
-  searchInput: { flex: 1, color: '#FFFFFF', fontSize: 15, padding: 0 },
+  searchInput: { flex: 1, color: colors.white, fontSize: 15, padding: 0 },
   // Rows / cards
-  row: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 16, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
+  row: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
+  card: { backgroundColor: colors.card, borderRadius: 16, marginBottom: 10, borderWidth: 1, borderColor: colors.separator },
   cardHeader: { flexDirection: 'row', alignItems: 'center', padding: 12 },
   cardMain: { flexDirection: 'row', alignItems: 'center', flex: 1, minWidth: 0 },
-  cardExpanded: { paddingHorizontal: 12, paddingBottom: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F2F2F4', gap: 8 },
+  cardExpanded: { paddingHorizontal: 12, paddingBottom: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.groupedBg, gap: 8 },
   cardDescription: { fontSize: 12, color: colors.secondaryLabel, lineHeight: 17 },
-  sizeRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.groupedBackground || '#F2F2F7', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
+  sizeRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.groupedBg, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
   sizeLabel: { fontSize: 13, fontWeight: '700', color: colors.label },
-  sizeCountBadge: { backgroundColor: '#F2F2F4', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  sizeCountBadge: { backgroundColor: colors.groupedBg, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   sizeCountBadgeText: { color: colors.secondaryLabel, fontSize: 10, fontWeight: '700' },
   qtyPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
-  qtyPillText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+  qtyPillText: { color: colors.white, fontSize: 13, fontWeight: '800' },
   rowActive: { borderColor: colors.brand },
   rowSoldOut: { opacity: 0.6 },
   rowRTL: { flexDirection: 'row-reverse' },
   rtlText: { textAlign: 'right', writingDirection: 'rtl' },
-  thumb: { width: 52, height: 52, borderRadius: 12, backgroundColor: colors.groupedBackground || '#F2F2F7', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  thumb: { width: 52, height: 52, borderRadius: 12, backgroundColor: colors.groupedBg, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   thumbImg: { width: '100%', height: '100%' },
   soldOverlay: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', paddingVertical: 2, alignItems: 'center' },
-  soldOverlayText: { color: '#FFFFFF', fontSize: 8, fontWeight: '800', textTransform: 'uppercase' },
-  soldPill: { backgroundColor: colors.groupedBackground || '#F2F2F7', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
+  soldOverlayText: { color: colors.white, fontSize: 8, fontWeight: '800', textTransform: 'uppercase' },
+  soldPill: { backgroundColor: colors.groupedBg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
   soldPillText: { color: colors.secondaryLabel, fontSize: 12, fontWeight: '700' },
   rowInfo: { flex: 1, marginHorizontal: 12 },
   rowName: { fontSize: 14, fontWeight: '600', color: colors.label, lineHeight: 18 },
@@ -1090,27 +1090,27 @@ const styles = StyleSheet.create({
   addBtn: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  stepBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.groupedBackground || '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  stepBtnSmall: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: colors.separator, alignItems: 'center', justifyContent: 'center' },
+  stepBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.groupedBg, alignItems: 'center', justifyContent: 'center' },
+  stepBtnSmall: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.separator, alignItems: 'center', justifyContent: 'center' },
   addBtnSmall: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
   stepBtnAdd: { backgroundColor: colors.brand, borderColor: colors.brand },
   stepQty: { minWidth: 20, textAlign: 'center', fontSize: 15, fontWeight: '800', color: colors.label },
   // Notes
   notesWrap: { marginTop: 8 },
   notesLabel: { fontSize: 12, fontWeight: '700', color: colors.secondaryLabel, marginBottom: 6 },
-  notesInput: { backgroundColor: '#FFFFFF', borderRadius: 12, borderWidth: 1, borderColor: colors.separator, padding: 12, fontSize: 14, color: colors.label, minHeight: 60, textAlignVertical: 'top' },
+  notesInput: { backgroundColor: colors.card, borderRadius: 12, borderWidth: 1, borderColor: colors.separator, padding: 12, fontSize: 14, color: colors.label, minHeight: 60, textAlignVertical: 'top' },
   empty: { textAlign: 'center', color: colors.secondaryLabel, marginTop: 40, fontSize: 14 },
   // Reorder strip
-  reorderBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#0B0B0C', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12 },
-  reorderBannerText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', flex: 1 },
+  reorderBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.label, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12 },
+  reorderBannerText: { color: colors.white, fontSize: 13, fontWeight: '600', flex: 1 },
   reorderTitle: { fontSize: 13, fontWeight: '800', color: colors.secondaryLabel, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
-  reorderCard: { backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: colors.separator, marginBottom: 8, overflow: 'hidden' },
+  reorderCard: { backgroundColor: colors.card, borderRadius: 14, borderWidth: 1, borderColor: colors.separator, marginBottom: 8, overflow: 'hidden' },
   reorderRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10 },
   reorderNo: { fontSize: 14, fontWeight: '700', color: colors.label },
   reorderMeta: { fontSize: 12, color: colors.secondaryLabel, marginTop: 2 },
-  reorderItems: { borderTopWidth: 1, borderTopColor: '#F2F2F4', paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
+  reorderItems: { borderTopWidth: 1, borderTopColor: colors.groupedBg, paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
   reorderItemRow: { flexDirection: 'row', alignItems: 'center' },
-  reorderItemThumb: { width: 34, height: 34, borderRadius: 8, backgroundColor: colors.groupedBackground || '#F2F2F7', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  reorderItemThumb: { width: 34, height: 34, borderRadius: 8, backgroundColor: colors.groupedBg, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   reorderItemName: { fontSize: 12.5, color: colors.label, fontWeight: '600' },
   reorderItemMeta: { fontSize: 11, color: colors.secondaryLabel, marginTop: 1 },
   reorderItemPrice: { fontSize: 12.5, fontWeight: '700', color: colors.label },
@@ -1118,30 +1118,30 @@ const styles = StyleSheet.create({
   reorderBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
   pointsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFBEB', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 },
   pointsRowDisabled: { opacity: 0.45 },
   pointsTitle: { fontSize: 12, fontWeight: '700', color: '#78350F' },
   pointsBalance: { fontSize: 11, color: '#92400E', marginTop: 1 },
   pointsApplied: { fontSize: 11, color: '#92400E' },
   footerPills: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
-  pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: '#FFFFFF' },
-  pillActive: { backgroundColor: '#0B0B0C', borderColor: '#0B0B0C' },
+  pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: colors.card },
+  pillActive: { backgroundColor: colors.label, borderColor: colors.label },
   pillConsign: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
   pillCredit: { backgroundColor: '#2563EB', borderColor: '#2563EB' },
   pillText: { fontSize: 12, fontWeight: '700', color: colors.secondaryLabel },
-  pillTextActive: { color: '#FFFFFF' },
+  pillTextActive: { color: colors.white },
   footerHint: { fontSize: 11, color: colors.secondaryLabel, marginBottom: 8 },
   footerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   footerCount: { fontSize: 12, color: colors.secondaryLabel },
   footerTotal: { fontSize: 18, fontWeight: '800', color: colors.label },
   submitBtn: { flex: 1, backgroundColor: colors.brand, borderRadius: 14, paddingVertical: 15, alignItems: 'center', justifyContent: 'center' },
-  submitText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  submitText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   // Guard / success
   guardTitle: { fontSize: 18, fontWeight: '700', color: colors.label, marginTop: 16 },
   guardText: { fontSize: 14, color: colors.secondaryLabel, textAlign: 'center', marginTop: 8, lineHeight: 20 },
   guardBtn: { marginTop: 20, backgroundColor: colors.brand, borderRadius: 14, paddingHorizontal: 28, paddingVertical: 13 },
-  guardBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
+  guardBtnText: { color: colors.white, fontSize: 15, fontWeight: '700' },
   linkText: { color: colors.secondaryLabel, fontSize: 14 },
   successIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.green, alignItems: 'center', justifyContent: 'center' },
   successOrder: { fontSize: 15, fontWeight: '700', color: colors.label, marginTop: 8 },
@@ -1161,22 +1161,22 @@ const styles = StyleSheet.create({
   agreeCardBlue: { backgroundColor: 'rgba(37,99,235,0.12)', borderColor: 'rgba(59,130,246,0.30)' },
   agreeDot: { width: 7, height: 7, borderRadius: 4, marginTop: 4 },
   agreeTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.6 },
-  agreeDesc: { fontSize: 10.5, color: '#9CA3AF', marginTop: 2, lineHeight: 15 },
+  agreeDesc: { fontSize: 10.5, color: colors.placeholder, marginTop: 2, lineHeight: 15 },
   homecareShortcut: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 12 },
-  homecareShortcutIcon: { width: 32, height: 32, borderRadius: 9, backgroundColor: '#DC2626', alignItems: 'center', justifyContent: 'center' },
-  homecareShortcutTitle: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '800' },
-  homecareShortcutText: { color: '#9CA3AF', fontSize: 10.5, marginTop: 1 },
+  homecareShortcutIcon: { width: 32, height: 32, borderRadius: 9, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  homecareShortcutTitle: { color: colors.white, fontSize: 12.5, fontWeight: '800' },
+  homecareShortcutText: { color: colors.placeholder, fontSize: 10.5, marginTop: 1 },
   // Category section headers
-  groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#F0F0F2', paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
+  groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.groupedBg, paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
   groupHeaderActive: { borderColor: '#FECACA' },
   groupHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   groupLabel: { fontSize: 14, fontWeight: '800', color: colors.label },
-  groupCount: { backgroundColor: '#F2F2F4', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  groupCount: { backgroundColor: colors.groupedBg, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
   groupCountText: { fontSize: 10, fontWeight: '700', color: colors.secondaryLabel },
-  groupSelected: { backgroundColor: '#DC2626', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
-  groupSelectedText: { fontSize: 10, fontWeight: '800', color: '#FFFFFF' },
+  groupSelected: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  groupSelectedText: { fontSize: 10, fontWeight: '800', color: colors.white },
   // Professional / equipment badges
   proBadge: { backgroundColor: '#2563EB', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
-  equipBadge: { backgroundColor: '#1F2937', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
-  proBadgeText: { color: '#FFFFFF', fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
+  equipBadge: { backgroundColor: colors.label, borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
+  proBadgeText: { color: colors.white, fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
 });

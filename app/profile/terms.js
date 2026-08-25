@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   rowRTL: { flexDirection: 'row-reverse' },
   sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
-  paragraph: { ...T.body, color: '#333333', marginBottom: 12, lineHeight: 23 },
+  paragraph: { ...T.body, color: colors.bodyText, marginBottom: 12, lineHeight: 23 },
   paragraphLast: { marginBottom: 0 },
 
   // Bullets
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand,
     marginTop: 8,
   },
-  bulletText: { ...T.bodySmall, color: '#333333', flex: 1, lineHeight: 22 },
+  bulletText: { ...T.bodySmall, color: colors.bodyText, flex: 1, lineHeight: 22 },
 
   // Contact info
   contactInfo: {

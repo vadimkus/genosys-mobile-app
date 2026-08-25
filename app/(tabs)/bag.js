@@ -513,7 +513,7 @@ function BagScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={t('shop.decreaseQuantity')}
                 >
-                  <Ionicons name="remove" size={16} color="#000000" />
+                  <Ionicons name="remove" size={16} color={colors.label} />
                 </TouchableOpacity>
 
                 <Text style={[styles.quantityText, isRTL && styles.quantityTextRTL]}>{item.quantity}</Text>
@@ -525,7 +525,7 @@ function BagScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={t('shop.increaseQuantity')}
                 >
-                  <Ionicons name="add" size={16} color="#000000" />
+                  <Ionicons name="add" size={16} color={colors.label} />
                 </TouchableOpacity>
               </View>
 
@@ -536,7 +536,7 @@ function BagScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={`${t('bag.removeItem')} — ${item?.product?.name || ''}`}
               >
-                <Ionicons name="trash-outline" size={20} color="#dc2626" />
+                <Ionicons name="trash-outline" size={20} color={colors.brand} />
               </TouchableOpacity>
             </View>
           )}
@@ -984,7 +984,7 @@ const styles = StyleSheet.create({
   progressRightText: {
     ...T.label,
     fontWeight: '700',
-    color: '#6B7280',
+    color: colors.mutedText,
   },
   progressRightTextMet: {
     color: '#34C759',
@@ -1005,21 +1005,21 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
   },
   rewardImageSmall: {
     width: 46,
     height: 46,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
   },
   rewardText: {
     ...T.body,
     fontWeight: '600',
-    color: '#1D1D1F',
+    color: colors.label,
     lineHeight: undefined,
     flex: 1,
     minWidth: 0,
@@ -1027,7 +1027,7 @@ const styles = StyleSheet.create({
   },
   deliveryHintText: {
     ...T.label,
-    color: '#6B7280',
+    color: colors.mutedText,
     marginTop: 2,
   },
   
@@ -1076,14 +1076,14 @@ const styles = StyleSheet.create({
   itemImageSize: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#1D1D1F',
+    color: colors.label,
     marginTop: 6,
     textAlign: 'center',
   },
   itemImagePlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.subtleBg,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1091,7 +1091,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#dc2626',
+    color: colors.brand,
   },
   itemDetails: {
     flex: 1,
@@ -1106,7 +1106,7 @@ const styles = StyleSheet.create({
     ...T.body,
     fontSize: 14,
     fontWeight: '600',
-    color: '#1D1D1F',
+    color: colors.label,
     lineHeight: 18,
     marginBottom: 4,
   },
@@ -1127,7 +1127,7 @@ const styles = StyleSheet.create({
   promoQtyRight: {
     ...T.captionSmall,
     fontWeight: '700',
-    color: '#000000',
+    color: colors.label,
     marginBottom: 6,
   },
   promoTag: {
@@ -1152,7 +1152,7 @@ const styles = StyleSheet.create({
   variantSelectorLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.mutedText,
     marginBottom: 2,
   },
   variantChipsRow: {
@@ -1165,11 +1165,11 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#D1D1D6',
-    backgroundColor: '#ffffff',
+    borderColor: colors.tertiary,
+    backgroundColor: colors.card,
   },
   variantChipSelected: {
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
     backgroundColor: '#FFF5F5',
   },
   variantChipSizeSelected: {
@@ -1179,10 +1179,10 @@ const styles = StyleSheet.create({
   variantChipText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#374151',
+    color: colors.bodyText,
   },
   variantChipTextSelected: {
-    color: '#dc2626',
+    color: colors.brand,
     fontWeight: '700',
   },
   variantChipTextSizeSelected: {
@@ -1225,14 +1225,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.subtleBg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   quantityText: {
     ...T.body,
     fontWeight: '600',
-    color: '#1D1D1F',
+    color: colors.label,
     lineHeight: undefined,
     minWidth: 20,
     textAlign: 'center',
@@ -1267,7 +1267,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...T.body,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -1286,9 +1286,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderTopWidth: 1,
-    borderTopColor: '#F2F2F7',
+    borderTopColor: colors.groupedBg,
     paddingHorizontal: 20,
     paddingTop: 16,
     shadowColor: '#000',
@@ -1320,20 +1320,20 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...T.summaryLabel,
-    color: '#86868B',
+    color: colors.secondaryLabel,
   },
   summaryValue: {
     ...T.summaryValue,
   },
   summaryOriginalValue: {
     textDecorationLine: 'line-through',
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     fontWeight: '500',
   },
   // Waterfall discount breakdown styles
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryLabelDiscount: {
     ...T.summaryValue,
@@ -1345,11 +1345,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelIntermediate: {
     ...T.captionSmall,
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryValueIntermediate: {
     ...T.captionSmall,
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryLabelBundle: {
     ...T.summaryValue,
@@ -1361,7 +1361,7 @@ const styles = StyleSheet.create({
   },
   waterfallDivider: {
     height: 1,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: colors.separator,
     marginVertical: 4,
   },
   summaryLabelBold: {
@@ -1392,7 +1392,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
     marginVertical: 8,
   },
   totalRow: {
@@ -1404,14 +1404,14 @@ const styles = StyleSheet.create({
   totalLabel: {
     ...T.totalLabel,
     fontSize: 16,
-    color: '#86868B',
+    color: colors.secondaryLabel,
     fontWeight: '500',
   },
   totalAmount: {
     ...T.totalValue,
   },
   checkoutButton: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

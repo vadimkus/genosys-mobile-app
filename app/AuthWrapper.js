@@ -3,6 +3,7 @@ import { Stack, Redirect, useLocalSearchParams, usePathname } from 'expo-router'
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import ChatButton from '../components/ChatButton';
+import { colors } from '../utils/theme';
 
 // Screens where the chat button should be hidden
 // Hides on: all standalone info pages, checkout flow, auth, webview, camera
@@ -85,7 +86,7 @@ export default function AuthWrapper() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#dc2626" />
+        <ActivityIndicator size="large" color={colors.brand} />
       </View>
     );
   }
@@ -202,6 +203,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
 });

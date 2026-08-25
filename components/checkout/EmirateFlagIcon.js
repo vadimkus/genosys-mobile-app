@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { colors } from '../../utils/theme';
 
 export default function EmirateFlagIcon({ name }) {
   const emirate = String(name || '').trim();
@@ -10,36 +11,36 @@ export default function EmirateFlagIcon({ name }) {
       <View style={flagStyles.uaeRed} />
       <View style={flagStyles.uaeRight}>
         <View style={[flagStyles.uaeStripe, { backgroundColor: '#00732F' }]} />
-        <View style={[flagStyles.uaeStripe, { backgroundColor: '#FFFFFF' }]} />
-        <View style={[flagStyles.uaeStripe, { backgroundColor: '#000000' }]} />
+        <View style={[flagStyles.uaeStripe, { backgroundColor: colors.card }]} />
+        <View style={[flagStyles.uaeStripe, { backgroundColor: colors.label }]} />
       </View>
     </View>
   );
 
   // Abu Dhabi: red field with a small white canton in the upper hoist corner
   const AbuDhabi = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.brand }]}>
       <View style={flagStyles.abuDhabiCanton} />
     </View>
   );
 
   // Dubai / Ajman: red field with a vertical white stripe at the hoist
   const DubaiAjman = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.brand }]}>
       <View style={flagStyles.hoistWhiteStripe} />
     </View>
   );
 
   // Sharjah / Ras Al Khaimah: red rectangle on a white field
   const SharjahRas = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#FFFFFF' }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.card }]}>
       <View style={flagStyles.centerRedRect} />
     </View>
   );
 
   // Umm Al Quwain: red field with a vertical white stripe at hoist and a white crescent + star
   const UmmAlQuwain = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: '#D81E05' }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.brand }]}>
       <View style={flagStyles.hoistWhiteStripe} />
       {/* Crescent (approx) */}
       <View style={flagStyles.uaqCrescentOuter} />
@@ -65,8 +66,8 @@ const flagStyles = StyleSheet.create({
     borderRadius: 3,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
     position: 'relative',
   },
 
@@ -97,7 +98,7 @@ const flagStyles = StyleSheet.create({
     top: 0,
     width: '40%',
     height: '45%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
   },
 
   // Dubai / Ajman / UAQ hoist stripe
@@ -107,7 +108,7 @@ const flagStyles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: '18%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
   },
 
   // Sharjah / Ras Al Khaimah
@@ -117,7 +118,7 @@ const flagStyles = StyleSheet.create({
     top: '18%',
     width: '68%',
     height: '64%',
-    backgroundColor: '#D81E05',
+    backgroundColor: colors.brand,
   },
 
   // Umm Al Quwain (approx crescent + star)
@@ -128,7 +129,7 @@ const flagStyles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 5,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
   },
   uaqCrescentInner: {
     position: 'absolute',
@@ -137,14 +138,14 @@ const flagStyles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 5,
-    backgroundColor: '#D81E05',
+    backgroundColor: colors.brand,
   },
   uaqStar: {
     position: 'absolute',
     left: '58%',
     top: '28%',
     fontSize: 8,
-    color: '#FFFFFF',
+    color: colors.white,
     fontWeight: '700',
     backgroundColor: 'transparent',
   },

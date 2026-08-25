@@ -22,6 +22,7 @@ import AUTH_CONFIG from '../config/auth';
 import { checkForUpdates } from '../config/updates';
 import { initSentry } from '../config/sentry';
 import { getJson } from '../services/httpClient';
+import { colors } from '../utils/theme';
 
 const UPDATE_DISMISSED_KEY = '@update_dismissed_version';
 
@@ -209,7 +210,7 @@ export default function RootLayout() {
             <FavoritesProvider>
               <CartProvider>
                 <OrdersProvider>
-                  <StatusBar style="dark" backgroundColor="#ffffff" />
+                  <StatusBar style="dark" backgroundColor={colors.card} />
                   <ErrorBoundary screenName="AppRoot">
                     <AuthWrapper />
                   </ErrorBoundary>

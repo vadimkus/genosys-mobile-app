@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     ...T.label,
-    color: '#111827',
+    color: colors.label,
   },
   menuItemTextRtl: {
     textAlign: 'right',

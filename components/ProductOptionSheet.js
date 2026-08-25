@@ -151,7 +151,7 @@ export default function ProductOptionSheet({
           <View
             style={[
               styles.swatch,
-              { backgroundColor: option.hex || '#F3F4F6' },
+              { backgroundColor: option.hex || colors.fill },
               selected && styles.swatchSelected,
             ]}
           />
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   quantityButtonDisabled: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.subtleBg,
   },
   quantityValue: {
     minWidth: 42,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, StatusBar, Pressable, Linking, Platform } from 'react-native';
 import { Image } from 'expo-image';
+import { colors } from '../utils/theme';
 
 /**
  * Full-screen blocking overlay shown when the installed app version
@@ -18,7 +19,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.card} />
 
       <View style={styles.content}>
         <Image
@@ -54,7 +55,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.brandTint,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
     letterSpacing: -0.3,
     marginBottom: 10,
     textAlign: 'center',
@@ -92,12 +93,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '400',
     lineHeight: 22,
-    color: '#666666',
+    color: colors.mutedText,
     textAlign: 'center',
     marginBottom: 32,
   },
   button: {
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 14,
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   buttonText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: -0.2,
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
     bottom: 48,
     fontSize: 13,
     fontWeight: '600',
-    color: '#dc2626',
+    color: colors.brand,
     letterSpacing: -0.1,
   },
 });

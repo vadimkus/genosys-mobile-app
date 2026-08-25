@@ -183,7 +183,7 @@ export default function ProductReviews({ productId }) {
           <Ionicons
             name={i <= rating ? 'star' : 'star-outline'}
             size={size}
-            color={i <= rating ? '#FBBF24' : '#D1D5DB'}
+            color={i <= rating ? '#FBBF24' : colors.separatorStrong}
           />
         </TouchableOpacity>
       );
@@ -200,7 +200,7 @@ export default function ProductReviews({ productId }) {
         <View style={{ flex: 1 }}>
           <View style={[styles.titleRow, isRTL && styles.titleRowRTL]}>
             <View style={[surfaces.iconTile, { backgroundColor: colors.orange }]}>
-              <Ionicons name="star" size={16} color="#ffffff" />
+              <Ionicons name="star" size={16} color={colors.white} />
             </View>
             <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
               {t('reviews.title') || 'Customer Reviews'}
@@ -218,7 +218,7 @@ export default function ProductReviews({ productId }) {
         </View>
         {user && !userReview && !showForm && (
           <TouchableOpacity style={styles.writeButton} onPress={() => setShowForm(true)}>
-            <Ionicons name="create-outline" size={16} color="#ffffff" />
+            <Ionicons name="create-outline" size={16} color={colors.white} />
             <Text style={styles.writeButtonText}>{t('reviews.writeReview') || 'Write Review'}</Text>
           </TouchableOpacity>
         )}
@@ -242,7 +242,7 @@ export default function ProductReviews({ productId }) {
             value={formTitle}
             onChangeText={setFormTitle}
             placeholder={t('reviews.titlePlaceholder') || 'Brief summary...'}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.placeholder}
             textAlign={isRTL ? 'right' : 'left'}
           />
 
@@ -253,7 +253,7 @@ export default function ProductReviews({ productId }) {
             value={formComment}
             onChangeText={setFormComment}
             placeholder={t('reviews.reviewPlaceholder') || 'Share your experience with this product...'}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.placeholder}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -271,7 +271,7 @@ export default function ProductReviews({ productId }) {
               disabled={submitting || formComment.trim().length < 10}
             >
               {submitting ? (
-                <ActivityIndicator size="small" color="#ffffff" />
+                <ActivityIndicator size="small" color={colors.white} />
               ) : (
                 <Text style={styles.submitButtonText}>
                   {editingReview ? (t('reviews.updateReview') || 'Update') : (t('reviews.submitReview') || 'Submit')}
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   },
   writeButtonText: {
     ...T.labelSmall,
-    color: '#ffffff',
+    color: colors.white,
   },
   // Form
   formContainer: {

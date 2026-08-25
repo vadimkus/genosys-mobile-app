@@ -32,6 +32,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { colors } from '../../utils/theme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MIN_SCALE = 1;
@@ -237,7 +238,7 @@ export default function ImageLightbox({
               activeOpacity={0.8}
               hitSlop={{ top: 12, left: 12, right: 12, bottom: 12 }}
             >
-              <Ionicons name="close" size={26} color="#ffffff" />
+              <Ionicons name="close" size={26} color={colors.white} />
             </TouchableOpacity>
           </View>
 
@@ -297,7 +298,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   counter: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: 0.2,
@@ -342,6 +343,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
   },
 });

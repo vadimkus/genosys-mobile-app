@@ -191,7 +191,7 @@ export default function AddressesScreen() {
       <View style={[styles.card, shadow.card]}>
         <View style={[styles.cardHead, isRTL && styles.rowRTL]}>
           <View style={[surfaces.iconTile, { backgroundColor: colors.teal }]}>
-            <Ionicons name={typeMeta.icon} size={17} color="#ffffff" />
+            <Ionicons name={typeMeta.icon} size={17} color={colors.white} />
           </View>
           <View style={styles.headMiddle}>
             <View style={[styles.typeRow, isRTL && styles.rowRTL]}>
@@ -283,7 +283,7 @@ export default function AddressesScreen() {
             ) : (
               <View style={[styles.emptyState, shadow.card]}>
                 <View style={[surfaces.iconTile, styles.emptyTile, { backgroundColor: colors.teal }]}>
-                  <Ionicons name="location" size={22} color="#ffffff" />
+                  <Ionicons name="location" size={22} color={colors.white} />
                 </View>
                 <Text style={[styles.emptyTitle, isRTL && styles.textRTL]}>{t('addresses.emptyTitle')}</Text>
                 <Text style={[styles.emptySubtitle, isRTL && styles.textRTL]}>{t('addresses.emptySubtitle')}</Text>
@@ -297,7 +297,7 @@ export default function AddressesScreen() {
             onPress={handleAddAddress}
             activeOpacity={0.85}
           >
-            <Ionicons name="add" size={20} color="#ffffff" />
+            <Ionicons name="add" size={20} color={colors.white} />
             <Text style={styles.addButtonText} numberOfLines={1} ellipsizeMode="tail">{t('addresses.addNew')}</Text>
           </TouchableOpacity>
 

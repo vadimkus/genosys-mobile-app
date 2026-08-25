@@ -474,8 +474,8 @@ const styles = StyleSheet.create({
   answerBullet: { fontSize: 16, lineHeight: 22, color: colors.brand, fontWeight: '800' },
   answerNumber: { fontSize: 14, lineHeight: 22, color: colors.brand, fontWeight: '800', minWidth: 22, textAlign: 'right' },
   answerNumberRTL: { textAlign: 'left' },
-  answerText: { ...T.faqAnswer, flex: 1, color: '#3C3C43', fontWeight: '500' },
-  answerParagraph: { ...T.faqAnswer, color: '#3C3C43', fontWeight: '500', marginBottom: 8 },
+  answerText: { ...T.faqAnswer, flex: 1, color: colors.bodyText, fontWeight: '500' },
+  answerParagraph: { ...T.faqAnswer, color: colors.bodyText, fontWeight: '500', marginBottom: 8 },
 
   // Quick Actions
   quickActionsGrid: {
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blue,
     marginTop: 7,
   },
-  returnChecklistText: { ...T.faqAnswer, flex: 1, lineHeight: 20, color: '#3C3C43', fontWeight: '500' },
+  returnChecklistText: { ...T.faqAnswer, flex: 1, lineHeight: 20, color: colors.bodyText, fontWeight: '500' },
   returnEmailButton: {
     marginTop: 16,
     backgroundColor: colors.brand,

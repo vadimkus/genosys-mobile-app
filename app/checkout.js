@@ -854,9 +854,9 @@ function CheckoutScreen() {
           activeOpacity={0.85}
         >
           {isProcessing ? (
-            <ActivityIndicator color="#ffffff" size="small" />
+            <ActivityIndicator color={colors.white} size="small" />
           ) : (
-            <Ionicons name="bag-check" size={20} color="#ffffff" />
+            <Ionicons name="bag-check" size={20} color={colors.white} />
           )}
           <Text style={[styles.placeOrderButtonText, isRTL && styles.placeOrderButtonTextRTL]} numberOfLines={1}>
             {isProcessing
@@ -973,7 +973,7 @@ const styles = StyleSheet.create({
   },
   orderSummaryLine: {
     ...T.captionSmall,
-    color: '#3C3C43',
+    color: colors.bodyText,
     lineHeight: 18,
     marginBottom: 4,
   },
@@ -988,7 +988,7 @@ const styles = StyleSheet.create({
   },
   orderSummaryOriginalPrice: {
     ...T.captionTiny,
-    color: '#9CA3AF',
+    color: colors.placeholder,
     textDecorationLine: 'line-through',
   },
   orderSummaryDiscountPill: {
@@ -1003,12 +1003,12 @@ const styles = StyleSheet.create({
   },
   orderSummaryDiscountedPrice: {
     ...T.captionSmall,
-    color: '#1D1D1F',
+    color: colors.label,
     fontWeight: '800',
   },
   orderSummaryDivider: {
     height: 1,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: colors.separator,
     marginTop: 10,
     marginBottom: 6,
   },
@@ -1024,12 +1024,12 @@ const styles = StyleSheet.create({
   orderTotalsLabel: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#3C3C43',
+    color: colors.bodyText,
   },
   orderTotalsValue: {
     ...T.captionSmall,
     fontWeight: '700',
-    color: '#1D1D1F',
+    color: colors.label,
   },
   orderTotalsLabelStrong: {
     ...T.labelSmall,
@@ -1190,10 +1190,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   modalCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
     overflow: 'hidden',
     maxHeight: '80%',
   },
@@ -1208,14 +1208,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: colors.fill,
   },
   modalHeaderRTL: {
     flexDirection: 'row-reverse',
   },
   modalTitle: {
     ...T.price,
-    color: '#111827',
+    color: colors.label,
   },
   modalCloseButton: {
     padding: 6,
@@ -1227,11 +1227,11 @@ const styles = StyleSheet.create({
   modalOptionText: {
     ...T.label,
     fontWeight: '700',
-    color: '#dc2626',
+    color: colors.brand,
   },
   modalDivider: {
     height: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: colors.fill,
   },
   modalList: {
     paddingHorizontal: 10,
@@ -1242,8 +1242,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
-    backgroundColor: '#ffffff',
+    borderColor: colors.separator,
+    backgroundColor: colors.card,
     marginBottom: 10,
   },
   modalAddressRowRTL: {
@@ -1256,23 +1256,23 @@ const styles = StyleSheet.create({
   modalAddressType: {
     ...T.captionSmall,
     fontWeight: '800',
-    color: '#111827',
+    color: colors.label,
     marginBottom: 4,
   },
   modalAddressName: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: '#111827',
+    color: colors.label,
     marginBottom: 2,
   },
   modalAddressLine: {
     ...T.caption,
-    color: '#374151',
+    color: colors.bodyText,
   },
   modalAddressMeta: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.mutedText,
     marginTop: 4,
   },
   pinButton: {
@@ -1282,9 +1282,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
   },
   pinRowButton: {
     marginTop: 10,
@@ -1294,9 +1294,9 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.groupedBg,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
+    borderColor: colors.separator,
   },
   pinButtonDisabled: {
     opacity: 0.5,
@@ -1373,7 +1373,7 @@ const styles = StyleSheet.create({
   emirateShipping: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
   },
   freeBadge: {
     paddingHorizontal: 10,
@@ -1391,7 +1391,7 @@ const styles = StyleSheet.create({
   deliveryEtaHint: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.mutedText,
     marginTop: 2,
     marginBottom: 8,
   },
@@ -1427,7 +1427,7 @@ const styles = StyleSheet.create({
   paymentDescription: {
     ...T.label,
     fontWeight: '400',
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     marginLeft: 32,
   },
   paymentDescriptionRTL: {
@@ -1439,12 +1439,12 @@ const styles = StyleSheet.create({
   paymentHint: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.mutedText,
     marginTop: -6,
     marginBottom: 10,
   },
   paymentHintStrong: {
-    color: '#1D1D1F',
+    color: colors.label,
     fontWeight: '800',
   },
   trustRow: {
@@ -1456,12 +1456,12 @@ const styles = StyleSheet.create({
   trustText: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#6B7280',
+    color: colors.mutedText,
   },
   trustTextSecondary: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#9CA3AF',
+    color: colors.placeholder,
     marginTop: 6,
     marginLeft: 22,
   },
@@ -1484,7 +1484,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...T.summaryLabel,
-    color: '#3C3C43',
+    color: colors.bodyText,
   },
   summaryValue: {
     ...T.summaryValue,
@@ -1513,7 +1513,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
+    borderTopColor: colors.separator,
     marginTop: 8,
   },
   totalLabel: {
@@ -1521,11 +1521,11 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     ...T.totalValue,
-    color: '#dc2626',
+    color: colors.brand,
   },
   vatNote: {
     ...T.captionSmall,
-    color: '#8E8E93',
+    color: colors.secondaryLabel,
     textAlign: 'center',
     marginTop: 8,
     fontStyle: 'italic',
@@ -1534,7 +1534,7 @@ const styles = StyleSheet.create({
   // Waterfall discount breakdown styles
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryLabelDiscount: {
     ...T.summaryValue,
@@ -1546,11 +1546,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelIntermediate: {
     ...T.captionSmall,
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryValueIntermediate: {
     ...T.captionSmall,
-    color: '#9CA3AF',
+    color: colors.placeholder,
   },
   summaryLabelBundle: {
     ...T.summaryValue,
@@ -1562,7 +1562,7 @@ const styles = StyleSheet.create({
   },
   summaryDividerLight: {
     height: 1,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: colors.separator,
     marginVertical: 6,
   },
   summaryLabelBold: {
@@ -1579,7 +1579,7 @@ const styles = StyleSheet.create({
   },
   vatNoteRed: {
     ...T.captionTiny,
-    color: '#dc2626',
+    color: colors.brand,
     paddingVertical: 2,
   },
   youSavedBanner: {

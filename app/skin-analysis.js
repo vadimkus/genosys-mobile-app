@@ -200,7 +200,7 @@ export default function SkinAnalysisScreen() {
             onPress={() => setStep(1)}
             activeOpacity={0.85}
           >
-            <Ionicons name="clipboard-outline" size={20} color="#fff" />
+            <Ionicons name="clipboard-outline" size={20} color={colors.white} />
             <Text style={styles.startButtonText}>{t('skinAnalysis.startQuiz')}</Text>
           </TouchableOpacity>
 
@@ -273,7 +273,7 @@ export default function SkinAnalysisScreen() {
                 <Text style={styles.errorText}>{t('skinAnalysis.recommendationsFailedFull')}</Text>
                 {/* Retry the request — answers are kept, no need to redo the quiz */}
                 <TouchableOpacity style={styles.retryBtn} onPress={fetchRecommendations} activeOpacity={0.85}>
-                  <Ionicons name="refresh" size={16} color="#fff" />
+                  <Ionicons name="refresh" size={16} color={colors.white} />
                   <Text style={styles.retryBtnText}>{t('skinAnalysis.tryAgain')}</Text>
                 </TouchableOpacity>
               </View>
@@ -331,7 +331,7 @@ export default function SkinAnalysisScreen() {
                             }}
                             activeOpacity={0.8}
                           >
-                            <Ionicons name="logo-whatsapp" size={14} color="#fff" />
+                            <Ionicons name="logo-whatsapp" size={14} color={colors.white} />
                             <Text style={styles.recAddText}>{t('product.requestQuote')}</Text>
                           </TouchableOpacity>
                         ) : (
@@ -341,7 +341,7 @@ export default function SkinAnalysisScreen() {
                             disabled={isAdded}
                             activeOpacity={0.8}
                           >
-                            <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color="#fff" />
+                            <Ionicons name={isAdded ? 'checkmark' : 'bag-add-outline'} size={14} color={colors.white} />
                             <Text style={styles.recAddText}>
                               {isAdded ? t('chat.added') : !user ? t('shop.loginToBuy') : t('chat.addToBag')}
                             </Text>
@@ -378,7 +378,7 @@ export default function SkinAnalysisScreen() {
                 <Text style={styles.concernCtaBtnText}>
                   {t('skinAnalysis.browseByConcernButton')}
                 </Text>
-                <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color="#fff" />
+                <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={16} color={colors.white} />
               </View>
             </TouchableOpacity>
 
@@ -435,7 +435,7 @@ export default function SkinAnalysisScreen() {
                 <Ionicons
                   name={SKIN_TYPE_ICONS[type] || 'ellipse-outline'}
                   size={28}
-                  color={skinType === type ? '#dc2626' : '#6B7280'}
+                  color={skinType === type ? colors.brand : colors.mutedText}
                 />
                 <Text style={[styles.optionLabel, skinType === type && styles.optionLabelSelected]}>
                   {t(`skinAnalysis.skinType${type}`)}
@@ -458,7 +458,7 @@ export default function SkinAnalysisScreen() {
                 <Ionicons
                   name="person-outline"
                   size={28}
-                  color={ageGroup === age ? '#dc2626' : '#6B7280'}
+                  color={ageGroup === age ? colors.brand : colors.mutedText}
                 />
                 <Text style={[styles.optionLabel, ageGroup === age && styles.optionLabelSelected]}>
                   {t(`skinAnalysis.${getAgeKey(age)}`)}
@@ -483,7 +483,7 @@ export default function SkinAnalysisScreen() {
                   <Ionicons
                     name={CONCERN_ICONS[concern] || 'ellipse-outline'}
                     size={16}
-                    color={selected ? '#fff' : '#6B7280'}
+                    color={selected ? colors.white : colors.mutedText}
                   />
                   <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
                     {t(`skinAnalysis.${getConcernKey(concern)}`)}
@@ -509,7 +509,7 @@ export default function SkinAnalysisScreen() {
                   <Ionicons
                     name={icons[opt] || 'ellipse-outline'}
                     size={28}
-                    color={usage === opt ? '#dc2626' : '#6B7280'}
+                    color={usage === opt ? colors.brand : colors.mutedText}
                   />
                   <Text style={[styles.optionLabel, usage === opt && styles.optionLabelSelected]}>
                     {t(`skinAnalysis.${getUsageKey(opt)}`)}
@@ -532,7 +532,7 @@ export default function SkinAnalysisScreen() {
           <Text style={styles.nextButtonText}>
             {step === TOTAL_STEPS ? t('skinAnalysis.getResults') : t('skinAnalysis.next')}
           </Text>
-          <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={18} color="#fff" />
+          <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={18} color={colors.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -573,13 +573,13 @@ const styles = StyleSheet.create({
   landingTitle: {
     ...T.pageTitle,
     fontWeight: '800',
-    color: '#1F2937',
+    color: colors.label,
     marginBottom: 8,
     textAlign: 'center',
   },
   landingSubtitle: {
     ...T.bodySmall,
-    color: '#6B7280',
+    color: colors.mutedText,
     textAlign: 'center',
     marginBottom: 40,
     lineHeight: 22,
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
@@ -601,20 +601,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderWidth: 2,
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
     width: '100%',
     justifyContent: 'center',
   },
-  cameraButtonText: { ...T.button, fontWeight: '700', color: '#dc2626' },
+  cameraButtonText: { ...T.button, fontWeight: '700', color: colors.brand },
 
   // Quiz steps
   stepContent: { padding: 24 },
-  stepTitle: { ...T.sectionTitle, color: '#1F2937', marginBottom: 24 },
+  stepTitle: { ...T.sectionTitle, color: colors.label, marginBottom: 24 },
   textCenter: { textAlign: 'center' },
   textRTL: { textAlign: 'right' },
 
@@ -638,11 +638,11 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     ...T.label,
-    color: '#374151',
+    color: colors.bodyText,
     marginTop: 8,
     textAlign: 'center',
   },
-  optionLabelSelected: { color: '#dc2626' },
+  optionLabelSelected: { color: colors.brand },
 
   chipsContainer: {
     flexDirection: 'row',
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.fill,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 24,
@@ -661,33 +661,33 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   chipSelected: {
-    backgroundColor: '#dc2626',
-    borderColor: '#dc2626',
+    backgroundColor: colors.brand,
+    borderColor: colors.brand,
   },
-  chipText: { ...T.label, color: '#374151' },
-  chipTextSelected: { color: '#ffffff' },
+  chipText: { ...T.label, color: colors.bodyText },
+  chipTextSelected: { color: colors.white },
 
   // Footer
   footer: {
     padding: 16,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: colors.separator,
   },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingVertical: 16,
     borderRadius: 12,
   },
-  nextButtonDisabled: { backgroundColor: '#D1D5DB' },
+  nextButtonDisabled: { backgroundColor: colors.separatorStrong },
   nextButtonText: { ...T.button, fontWeight: '700' },
 
   // Loading
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  loadingText: { ...T.bodySmall, color: '#6B7280', lineHeight: undefined },
+  loadingText: { ...T.bodySmall, color: colors.mutedText, lineHeight: undefined },
 
   // Results
   resultsContent: { padding: 16, paddingBottom: 40 },
@@ -702,10 +702,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 6,
   },
-  profileLabel: { ...T.labelSmall, color: '#6B7280' },
-  profileValue: { ...T.labelSmall, fontWeight: '700', color: '#1F2937', maxWidth: '60%', textAlign: 'right' },
-  sectionTitle: { ...T.sectionTitleSmall, fontWeight: '800', color: '#1F2937', marginBottom: 16 },
-  noResults: { ...T.label, fontWeight: '400', color: '#6B7280', textAlign: 'center', marginTop: 20 },
+  profileLabel: { ...T.labelSmall, color: colors.mutedText },
+  profileValue: { ...T.labelSmall, fontWeight: '700', color: colors.label, maxWidth: '60%', textAlign: 'right' },
+  sectionTitle: { ...T.sectionTitleSmall, fontWeight: '800', color: colors.label, marginBottom: 16 },
+  noResults: { ...T.label, fontWeight: '400', color: colors.mutedText, textAlign: 'center', marginTop: 20 },
 
   // Recommendation card
   recCard: {
@@ -715,10 +715,10 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
-  recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#FFFFFF' },
-  recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
+  recImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: colors.card },
+  recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fill },
   recInfo: { flex: 1, marginStart: 12 },
-  recName: { ...T.label, color: '#1F2937', lineHeight: 20 },
+  recName: { ...T.label, color: colors.label, lineHeight: 20 },
   matchChipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   matchChip: {
     flexDirection: 'row',
@@ -730,13 +730,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   matchChipText: { ...T.badge, fontWeight: '600', color: '#16A34A' },
-  recPrice: { ...T.label, fontWeight: '800', color: '#dc2626', marginTop: 4 },
+  recPrice: { ...T.label, fontWeight: '800', color: colors.brand, marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -752,30 +752,30 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   recPriceOnRequest: { ...T.labelSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
-  recAddText: { ...T.captionSmall, fontWeight: '700', color: '#fff' },
+  recAddText: { ...T.captionSmall, fontWeight: '700', color: colors.white },
   recViewBtn: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: colors.separatorStrong,
   },
-  recViewText: { ...T.captionSmall, fontWeight: '600', color: '#374151' },
+  recViewText: { ...T.captionSmall, fontWeight: '600', color: colors.bodyText },
 
   errorBox: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.brandTint,
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
     gap: 10,
     marginBottom: 16,
   },
-  errorText: { ...T.label, fontWeight: '400', color: '#991B1B', textAlign: 'center', lineHeight: 20 },
+  errorText: { ...T.label, fontWeight: '400', color: colors.brandDark, textAlign: 'center', lineHeight: 20 },
   retryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -787,7 +787,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#F0F0F0',
+    borderColor: colors.fill,
     backgroundColor: '#FFF5F5',
     padding: 20,
     alignItems: 'center',
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.brand,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#dc2626',
+    borderColor: colors.brand,
   },
-  resetButtonText: { ...T.bodySmall, fontWeight: '700', color: '#dc2626', lineHeight: undefined },
+  resetButtonText: { ...T.bodySmall, fontWeight: '700', color: colors.brand, lineHeight: undefined },
 });

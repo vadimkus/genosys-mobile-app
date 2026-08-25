@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useOrders } from '../../contexts/OrdersContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { colors } from '../../utils/theme';
 
 function TabBarBadge({ count, color }) {
   if (!count || count === 0) return null;
@@ -67,8 +68,8 @@ export default function TabLayout() {
           },
           isRTL && { flexDirection: 'row-reverse' },
         ],
-        tabBarActiveTintColor: '#dc2626',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: colors.brand,
+        tabBarInactiveTintColor: colors.secondaryLabel,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '500',
@@ -109,7 +110,7 @@ export default function TabLayout() {
                   size={size}
                   focused={focused}
                 />
-                <TabBarBadge count={ordersCount} color="#dc2626" />
+                <TabBarBadge count={ordersCount} color={colors.brand} />
               </View>
             );
           },
@@ -136,7 +137,7 @@ export default function TabLayout() {
                   size={size}
                   focused={focused}
                 />
-                <TabBarBadge count={cartCount} color="#dc2626" />
+                <TabBarBadge count={cartCount} color={colors.brand} />
               </View>
             );
           },
@@ -148,7 +149,7 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   androidTabBar: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderTopWidth: 0.5,
     borderTopColor: 'rgba(0, 0, 0, 0.1)',
     height: 60,
@@ -169,12 +170,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: colors.white,
   },
   badgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#ffffff',
+    color: colors.white,
     textAlign: 'center',
   },
 });
