@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
-import { useRouter } from 'expo-router';
+import { useRouter, useSegments } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOrders } from '../../contexts/OrdersContext';
@@ -29,6 +29,7 @@ import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, statusStyle } from '../../utils/theme';
+import { tabBarSpace } from '../../utils/tabBar';
 import AUTH_CONFIG from '../../config/auth';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 import { ASSET_ORIGIN, EMPTY_UNI_IMAGE } from '../../utils/assets';
@@ -153,6 +154,8 @@ function StatusCapsule({ status, label, isRTL }) {
 
 function OrdersScreen() {
   const router = useRouter();
+  const segments = useSegments();
+  const inTabs = segments[0] === '(tabs)';
   const { user } = useAuth();
   const { orders: contextOrders, refreshOrdersCount } = useOrders();
   const token = user?.token || user?.accessToken || '';
@@ -359,7 +362,12 @@ function OrdersScreen() {
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
-        contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
+        contentContainerStyle={{
+          paddingTop: headerHeight,
+          // This screen is both the Orders tab and a route pushed from the
+          // profile. Only the tab has a floating bar to clear.
+          paddingBottom: inTabs ? tabBarSpace(insets) + 16 : (insets?.bottom || 0) + 24,
+        }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} progressViewOffset={headerHeight} />}
       >
         {loading ? (

@@ -1,12 +1,13 @@
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React, { useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useOrders } from '../../contexts/OrdersContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { colors } from '../../utils/theme';
+import { colors, shadow } from '../../utils/theme';
+import { TAB_BAR_HEIGHT, TAB_BAR_INSET } from '../../utils/tabBar';
 
 function TabBarBadge({ count, color }) {
   if (!count || count === 0) return null;
@@ -25,7 +26,6 @@ export default function TabLayout() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const androidBottomInset = Platform.OS === 'android' ? Math.max(insets.bottom, 0) : 0;
 
   // Always use Ionicons for tab icons.
   // This avoids device/build-specific SF Symbols rendering issues that can appear as "triangles".
@@ -42,32 +42,19 @@ export default function TabLayout() {
       initialRouteName="shop"
       screenOptions={{
         headerShown: false,
+        // A floating bar rather than a docked one: inset from all three edges,
+        // rounded and on its own shadow, so it is the same kind of object as
+        // the header at the top of the page. Content passes underneath it, and
+        // the screens leave room for it via `tabBarSpace`.
         tabBarStyle: [
-          Platform.OS === 'ios'
-            ? {
-                position: 'absolute',
-                bottom: 0,
-                start: 0,
-                end: 0,
-                elevation: 0,
-                // Cream rather than white, so the bar reads as the same sheet
-                // of paper as the page above it. The old white sat as a panel
-                // on top and the drop shadow underlined that; the website
-                // separates with a hairline and nothing else.
-                backgroundColor: 'rgba(250, 247, 245, 0.94)',
-                borderTopWidth: StyleSheet.hairlineWidth,
-                borderTopColor: colors.separator,
-                height: 88,
-                paddingTop: 8,
-                paddingBottom: 34, // Safe area for home indicator
-              }
-            : styles.androidTabBar,
-          Platform.OS === 'android' && {
-            height: 60 + androidBottomInset,
-            paddingBottom: 8 + androidBottomInset,
+          styles.floatingTabBar,
+          {
+            bottom: insets.bottom || TAB_BAR_INSET,
+            height: TAB_BAR_HEIGHT,
           },
           isRTL && { flexDirection: 'row-reverse' },
         ],
+        tabBarItemStyle: styles.tabBarItem,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.secondaryLabel,
         tabBarLabelStyle: {
@@ -148,15 +135,24 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  androidTabBar: {
-    backgroundColor: colors.groupedBg,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.separator,
-    height: 60,
-    paddingBottom: 8,
-    // Flat, like the iOS bar above and like the website. Android's elevation
-    // would otherwise paint a shadow the hairline is meant to replace.
-    elevation: 0,
+  floatingTabBar: {
+    position: 'absolute',
+    start: TAB_BAR_INSET,
+    end: TAB_BAR_INSET,
+    paddingTop: 6,
+    paddingBottom: 6,
+    backgroundColor: colors.card,
+    borderRadius: TAB_BAR_HEIGHT / 2,
+    borderTopWidth: 0,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    ...shadow.card,
+  },
+  // The docked bar could rely on its own height for centring; a shorter
+  // floating one needs the icon and label to sit as one block.
+  tabBarItem: {
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   badge: {
     position: 'absolute',

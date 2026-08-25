@@ -68,6 +68,7 @@ import { buildAuthenticatedWebViewUrl } from '../../utils/webViewAuth';
 import T from '../../utils/typography';
 import { colors, tint, shadow, surfaces } from '../../utils/theme';
 import { useCollapsibleHeader } from '../../components/CollapsibleHeader';
+import { tabBarSpace } from '../../utils/tabBar';
 
 // Logo, subtitle and the two side controls, plus padding. Only used for the
 // first frame; onLayout replaces it with the measured height immediately after.
@@ -1095,6 +1096,7 @@ function ShopScreen() {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
+          { paddingBottom: tabBarSpace(insets) + 16 },
           // The estimate covers the frame before onLayout reports, so the grid
           // does not start under the header and jump down once it does.
           { paddingTop: (headerHeight || ESTIMATED_HEADER_HEIGHT) + 10 },
