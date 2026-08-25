@@ -16,8 +16,21 @@ Same gap was fixed on the website in the same session.
 
 ## What changed
 
-New `components/LocaleSwitchButton.js`: a compact globe + locale pill that opens
-a bottom sheet with the three languages.
+New `components/LocaleSwitchButton.js`: the green locale code with a chevron,
+opening a small dropdown anchored under it.
+
+Presentation is copied from the language control already in the home header
+(`app/(tabs)/shop.js`) — same green `greenDeep` code, same chevron that flips
+when open, same card/hairline/shadow menu with the active row tinted brand red.
+The first version of this component used a globe pill and a full-width bottom
+sheet, which made the same feature read as two different things depending on
+which screen you were on.
+
+The home control can hard-code its menu position because it owns its header.
+This one is dropped into three different headers, so it measures the trigger
+with `measureInWindow` and hangs the menu off it, clamped to the screen edges,
+aligning to the trigger's leading edge under RTL and its trailing edge under
+LTR.
 
 Added to:
 
@@ -39,9 +52,10 @@ swaps under the reader without losing their position.
 Arabic restarts the app. `I18nManager.forceRTL` only takes effect before the
 React tree mounts, so `LocalizationContext.applyRTLIfNeeded` calls
 `Updates.reloadAsync()` whenever direction flips, which drops the reader on the
-home screen. That is a platform constraint, not a choice, so the sheet asks
-first — reusing the same `profile.restartRequired*` strings the language screen
-uses — rather than yanking the screen away unannounced.
+home screen. That is a platform constraint, not a choice. The home control
+switches straight through and lets the restart happen, so this one does too —
+an earlier confirmation alert here was one more way the two controls behaved
+differently for no reason the user could see.
 
 When the user is signed in the choice is also written back through
 `updateUserSettings`, matching the Profile > Language screen, so it follows them
