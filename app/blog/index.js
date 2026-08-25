@@ -33,7 +33,7 @@ export default function BlogScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const { scrollY, onScroll, headerHeight, insets } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, insets, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -101,7 +101,7 @@ export default function BlogScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader
+      <CollapsibleHeader translateY={headerTranslateY}
         title={t('navigation.blog')}
         scrollY={canScroll ? scrollY : null}
         onBack={onBack}

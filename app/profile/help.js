@@ -32,7 +32,7 @@ export default function HelpSupportScreen() {
   const isRTL = dir === 'rtl';
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [returnModalVisible, setReturnModalVisible] = useState(false);
   const [faqData, setFaqData] = useState([]);
@@ -234,7 +234,7 @@ export default function HelpSupportScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('help.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('help.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

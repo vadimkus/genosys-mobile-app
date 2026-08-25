@@ -54,7 +54,7 @@ export default function BlogPostScreen() {
   const token = user?.token;
   const isRTL = dir === 'rtl';
   const scrollRef = useRef(null);
-  const { scrollY, onScroll, headerHeight, insets } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, insets, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   const l = (en, ar, ru) => (locale === 'ar' ? ar : locale === 'ru' ? ru : en);
 
@@ -233,7 +233,7 @@ export default function BlogPostScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader
+      <CollapsibleHeader translateY={headerTranslateY}
         title={t('navigation.blog') || l('Blog', 'المدونة', 'Блог')}
         scrollY={post && !loading && !error ? scrollY : null}
         onBack={onBack}

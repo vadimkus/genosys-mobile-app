@@ -57,7 +57,7 @@ export default function FAQScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   const [faqData, setFaqData] = useState([]);
   const [subtitle, setSubtitle] = useState('');
@@ -196,7 +196,7 @@ export default function FAQScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={headerTitle} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader translateY={headerTranslateY} title={headerTitle} scrollY={null} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.centered, { paddingTop: headerHeight }]}>
           <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>
@@ -210,7 +210,7 @@ export default function FAQScreen() {
   if (error && faqData.length === 0) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={headerTitle} scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader translateY={headerTranslateY} title={headerTitle} scrollY={null} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.centered, { paddingTop: headerHeight }]}>
           <Ionicons name="cloud-offline" size={48} color={colors.tertiary} />
           <Text style={styles.errorText}>{error}</Text>
@@ -224,7 +224,7 @@ export default function FAQScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={headerTitle} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={headerTitle} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

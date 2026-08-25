@@ -11,7 +11,7 @@ export default function PrivacyPolicyScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   // Subtle entrance motion (matches order screens).
   const fade = useRef(new Animated.Value(0)).current;
@@ -29,7 +29,7 @@ export default function PrivacyPolicyScreen() {
     <View style={styles.container}>
       {/* PrivacyPolicyContent owns its own (now Animated) ScrollView; we pass it our
           scroll handler + top inset so the header fades in on scroll like every other screen. */}
-      <CollapsibleHeader title={t('privacy.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('privacy.title')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
       <Animated.View style={[styles.body, { opacity: fade, transform: [{ translateY: lift }] }]}>
         <PrivacyPolicyContent showLastUpdated onScroll={onScroll} contentTopInset={headerHeight} />

@@ -28,7 +28,7 @@ export default function LocationsScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const [selectedSlug, setSelectedSlug] = useState(null);
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
@@ -118,7 +118,7 @@ export default function LocationsScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader
+      <CollapsibleHeader translateY={headerTranslateY}
         title={t('navigation.locations')}
         scrollY={scrollY}
         onBack={onBack}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import T from '../utils/typography';
@@ -25,20 +25,103 @@ export const HEADER_BAR_HEIGHT = 52;
 // Distance (px) over which the bar fades from transparent to solid.
 const FADE_DISTANCE = 28;
 
+/**
+ * Hide-on-scroll, the pattern Instagram and Safari use: the bar leaves when you
+ * scroll into content and comes back the moment you scroll up, because scrolling
+ * up is how someone signals they are done reading and want to navigate.
+ *
+ * Three details separate a good one from a twitchy one:
+ *   · a direction threshold, so a shaky thumb does not flap the bar;
+ *   · snapping fully open or shut rather than resting halfway;
+ *   · never hiding near the top, where there is nothing to gain.
+ * The movement itself runs on the native thread; only the decision is JS, once
+ * per scroll event rather than per frame.
+ */
+const DIRECTION_THRESHOLD = 10;
+const HIDE_DURATION = 180;
+const REVEAL_DURATION = 220;
+
+/**
+ * Should the bar be hidden after this scroll event?
+ *
+ * Pure, and exported, because the awkward cases are the ones worth having a
+ * test for: rubber-band bounce at the top reads as a downward scroll, and a
+ * thumb resting on the screen sends a stream of one-pixel deltas.
+ */
+export function shouldHideHeader({ y, lastY, headerHeight, isHidden }) {
+  if (y <= headerHeight) return false;
+  const delta = y - lastY;
+  if (Math.abs(delta) < DIRECTION_THRESHOLD) return isHidden;
+  return delta > 0;
+}
+
 /** Hook that wires an Animated scroll value + the padding the content needs. */
-export function useCollapsibleHeader() {
+export function useCollapsibleHeader({ hideOnScroll = false } = {}) {
   const insets = useSafeAreaInsets();
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const onScroll = React.useMemo(
-    () => Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true }),
-    [scrollY]
+  const headerHeight = HEADER_BAR_HEIGHT + insets.top;
+
+  const hidden = React.useRef(new Animated.Value(0)).current;
+  const isHidden = React.useRef(false);
+  const lastY = React.useRef(0);
+
+  const setHidden = React.useCallback(
+    (next) => {
+      if (isHidden.current === next) return;
+      isHidden.current = next;
+      Animated.timing(hidden, {
+        toValue: next ? 1 : 0,
+        duration: next ? HIDE_DURATION : REVEAL_DURATION,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+    },
+    [hidden]
   );
-  return { scrollY, onScroll, headerHeight: HEADER_BAR_HEIGHT + insets.top, insets };
+
+  const revealHeader = React.useCallback(() => setHidden(false), [setHidden]);
+
+  const onScroll = React.useMemo(() => {
+    const config = { useNativeDriver: true };
+    if (hideOnScroll) {
+      config.listener = (event) => {
+        const y = event.nativeEvent.contentOffset.y;
+        const next = shouldHideHeader({
+          y,
+          lastY: lastY.current,
+          headerHeight,
+          isHidden: isHidden.current,
+        });
+        lastY.current = y;
+        setHidden(next);
+      };
+    }
+    return Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], config);
+  }, [scrollY, hideOnScroll, headerHeight, setHidden]);
+
+  const headerTranslate = React.useMemo(
+    () =>
+      hidden.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -headerHeight],
+      }),
+    [hidden, headerHeight]
+  );
+
+  return {
+    scrollY,
+    onScroll,
+    headerHeight,
+    insets,
+    translateY: hideOnScroll ? headerTranslate : undefined,
+    revealHeader,
+  };
 }
 
 export default function CollapsibleHeader({
   title,
   scrollY,
+  translateY,
   onBack,
   onRefresh,
   rightIcon = 'refresh',
@@ -53,7 +136,13 @@ export default function CollapsibleHeader({
   const chevron = backIcon || (isRTL ? 'chevron-forward' : 'chevron-back');
 
   return (
-    <View style={[styles.wrap, { height: HEADER_BAR_HEIGHT + insets.top, paddingTop: insets.top }]}>
+    <Animated.View
+      style={[
+        styles.wrap,
+        { height: HEADER_BAR_HEIGHT + insets.top, paddingTop: insets.top },
+        translateY ? { transform: [{ translateY }] } : null,
+      ]}
+    >
       {/* Fill + hairline fade in on scroll (opacity → native-driver friendly) */}
       <Animated.View style={[StyleSheet.absoluteFill, styles.fill, { opacity: bgOpacity }]} />
       <Animated.View style={[styles.hairline, { opacity: bgOpacity }]} />
@@ -91,7 +180,7 @@ export default function CollapsibleHeader({
           <View style={styles.side} />
         )}
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

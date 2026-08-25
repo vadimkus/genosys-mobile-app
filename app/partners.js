@@ -90,7 +90,7 @@ export default function PartnersScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const [expandedId, setExpandedId] = useState(null);
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,7 +161,7 @@ export default function PartnersScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader
+      <CollapsibleHeader translateY={headerTranslateY}
         title={t('navigation.partners')}
         scrollY={(!loading && !error) ? scrollY : null}
         onBack={onBack}

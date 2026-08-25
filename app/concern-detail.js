@@ -49,7 +49,7 @@ export default function ConcernDetailScreen() {
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/skin-concerns'); };
 
   const { items: cartItems, addItem, removeItem, clearCart, getCartSummary } = useCart();
@@ -192,7 +192,7 @@ export default function ConcernDetailScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title="" scrollY={null} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader translateY={headerTranslateY} title="" scrollY={null} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
           <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>
@@ -211,7 +211,7 @@ export default function ConcernDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={seo?.h1 || ''} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={seo?.h1 || ''} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scroll}

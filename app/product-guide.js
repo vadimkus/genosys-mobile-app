@@ -101,7 +101,7 @@ export default function ProductGuideScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { headerHeight } = useCollapsibleHeader();
+  const { headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
   const webViewRef = useRef(null);
   const timeoutRef = useRef(null);
   const downloadRef = useRef(null);
@@ -278,7 +278,7 @@ export default function ProductGuideScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={documentTitle} scrollY={null} onBack={handleBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={documentTitle} scrollY={null} onBack={handleBack} isRTL={isRTL} />
 
       <View style={[styles.content, { paddingTop: headerHeight }]}>
         {showError ? (

@@ -41,7 +41,7 @@ export default function TrainingScreen() {
   const { user } = useAuth();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
+  const { scrollY, onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -145,7 +145,7 @@ export default function TrainingScreen() {
   if (!user) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={t('navigation.training')} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader translateY={headerTranslateY} title={t('navigation.training')} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.emptyState, { paddingTop: headerHeight }]}>
           <Ionicons name="lock-closed" size={48} color={colors.tertiary} />
           <Text style={styles.emptyTitle}>{l('Login Required', 'يجب تسجيل الدخول', 'Требуется авторизация')}</Text>
@@ -160,7 +160,7 @@ export default function TrainingScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader
+      <CollapsibleHeader translateY={headerTranslateY}
         title={t('navigation.training')}
         scrollY={(!loading && !error) ? scrollY : null}
         onBack={onBack}
