@@ -67,8 +67,14 @@ import { withErrorBoundary } from '../../components/ErrorBoundary';
 import SectionHeader from '../../components/SectionHeader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-// Product detail hero image height
-const HEADER_HEIGHT = 320;
+// Square hero stage, as on the website. The studio packshots are square, so a
+// fixed 320 left roughly a quarter of the screen width as empty margin beside
+// every product photo on the one screen where the photo has to sell.
+const HEADER_HEIGHT = SCREEN_WIDTH;
+// The compact header takes over as the hero leaves: the previous thresholds
+// were absolute pixels tuned to a 320 hero, and would now fire while a third
+// of the image was still on screen.
+const MINI_HEADER_FADE_IN = [HEADER_HEIGHT - 120, HEADER_HEIGHT - 40];
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -1079,14 +1085,14 @@ function ProductDetailScreen() {
             styles.miniHeaderOverlay,
             {
               opacity: scrollY.interpolate({
-                inputRange: [200, 280],
+                inputRange: MINI_HEADER_FADE_IN,
                 outputRange: [0, 1],
                 extrapolate: 'clamp',
               }),
               transform: [
                 {
                   translateY: scrollY.interpolate({
-                    inputRange: [200, 280],
+                    inputRange: MINI_HEADER_FADE_IN,
                     outputRange: [-8, 0],
                     extrapolate: 'clamp',
                   }),
@@ -1153,7 +1159,7 @@ function ProductDetailScreen() {
             useNativeDriver: true,
             listener: (e) => {
               const y = e.nativeEvent.contentOffset.y;
-              const shouldCondense = y > 240;
+              const shouldCondense = y > MINI_HEADER_FADE_IN[0];
               if (shouldCondense !== condensedHeaderRef.current) {
                 condensedHeaderRef.current = shouldCondense;
                 setCondensedHeader(shouldCondense);
@@ -1165,13 +1171,12 @@ function ProductDetailScreen() {
         {/* Image Gallery */}
         {(() => {
           const hasMultipleImages = galleryImages.length > 1;
-          const isBox = isBeautyBoxProduct(product);
           // Use "contain" for all products so images fit within the container without cropping
           const imageFit = 'contain';
           
           if (galleryImages.length === 0) {
             return (
-              <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
+              <View style={styles.imageContainer}>
                 <View style={styles.heroImagePlaceholder}>
                   <Text style={styles.heroPlaceholderText}>
                     {product.name?.charAt(0) || 'G'}
@@ -1183,7 +1188,7 @@ function ProductDetailScreen() {
           
           if (!hasMultipleImages) {
             return (
-              <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
+              <View style={styles.imageContainer}>
                 <TouchableOpacity
                   activeOpacity={0.9}
                   onPress={() => openLightbox(0)}
@@ -1204,53 +1209,45 @@ function ProductDetailScreen() {
           }
           
           return (
-            <>
-              <View style={[styles.imageContainer, isBox && styles.imageContainerBeautyBox]}>
-                <FlatList
-                  ref={galleryRef}
-                  data={galleryImages}
-                  horizontal
-                  pagingEnabled
-                  showsHorizontalScrollIndicator={false}
-                  nestedScrollEnabled={true}
-                  keyExtractor={(item, index) => `gallery-${index}`}
-                  onMomentumScrollEnd={(e) => {
-                    const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-                    setActiveImageIndex(newIndex);
-                  }}
-                  renderItem={({ item, index }) => (
-                    <TouchableOpacity
-                      activeOpacity={0.9}
-                      onPress={() => openLightbox(index)}
-                      accessibilityRole="imagebutton"
-                      accessibilityLabel={t('product.a11y.openImage', { current: index + 1, total: galleryImages.length })}
-                    >
-                      <Image
-                        source={item}
-                        style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: colors.card }}
-                        contentFit={imageFit}
-                        transition={300}
-                        cachePolicy="memory-disk"
-                      />
-                    </TouchableOpacity>
-                  )}
-                />
-              </View>
-              {/* Pagination Dots – outside image container to avoid overlap */}
-              {galleryImages.length > 1 && (
-                <View style={styles.paginationDots}>
-                  {galleryImages.map((_, index) => (
-                    <View
-                      key={`dot-${index}`}
-                      style={[
-                        styles.dot,
-                        activeImageIndex === index && styles.activeDot,
-                      ]}
+            <View style={styles.imageContainer}>
+              <FlatList
+                ref={galleryRef}
+                data={galleryImages}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled={true}
+                keyExtractor={(item, index) => `gallery-${index}`}
+                onMomentumScrollEnd={(e) => {
+                  const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+                  setActiveImageIndex(newIndex);
+                }}
+                renderItem={({ item, index }) => (
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => openLightbox(index)}
+                    accessibilityRole="imagebutton"
+                    accessibilityLabel={t('product.a11y.openImage', { current: index + 1, total: galleryImages.length })}
+                  >
+                    <Image
+                      source={item}
+                      style={{ width: SCREEN_WIDTH, height: HEADER_HEIGHT, backgroundColor: colors.card }}
+                      contentFit={imageFit}
+                      transition={300}
+                      cachePolicy="memory-disk"
                     />
-                  ))}
-                </View>
-              )}
-            </>
+                  </TouchableOpacity>
+                )}
+              />
+              {/* A counter rather than dots. Products now carry up to ten claim
+                  slides, at which point dots are an unreadable smear that says
+                  neither where you are nor how many are left. */}
+              <View style={styles.galleryCounter} pointerEvents="none">
+                <Text style={styles.galleryCounterText}>
+                  {`${activeImageIndex + 1} / ${galleryImages.length}`}
+                </Text>
+              </View>
+            </View>
           );
         })()}
 
@@ -1476,15 +1473,6 @@ function ProductDetailScreen() {
               {/* Required website-like sections (deduped + formatted) */}
               {renderSpecs()}
 
-              <PerfectCombinationCard product={product} user={user} styles={styles} />
-
-              {/* Recommended Routine — API-driven, mirrors the website PDP block */}
-              <RecommendedRoutineCard
-                routine={product?.routine}
-                currentProductId={product?.productNumber || product?.id}
-                isRTL={isRTL}
-              />
-
               {(() => {
                 const benefits = dedupeList([
                   ...asStringList(product?.benefits),
@@ -1527,11 +1515,20 @@ function ProductDetailScreen() {
                 return renderInfoSection(t('product.directions'), fallbackDirections, directionsOpts);
               })()}
 
-              {renderIngredientsSection(
-                t('product.keyIngredients'),
-                toIngredients(product?.ingredients || product?.keyIngredients),
-                { collapsible: true, defaultOpen: false, icon: 'leaf-outline', iconColor: colors.green }
-              )}
+              {(() => {
+                // Clinics come for the composition, so the collapsed header has
+                // to say there is something worth opening.
+                const ingredients = toIngredients(product?.ingredients || product?.keyIngredients);
+                const title = ingredients.length
+                  ? `${t('product.keyIngredients')} (${ingredients.length})`
+                  : t('product.keyIngredients');
+                return renderIngredientsSection(title, ingredients, {
+                  collapsible: true,
+                  defaultOpen: false,
+                  icon: 'leaf-outline',
+                  iconColor: colors.green,
+                });
+              })()}
 
               {(() => {
                 // Prefer backend-driven `product.note` (added to mobile API),
@@ -1559,6 +1556,21 @@ function ProductDetailScreen() {
           <View ref={reviewsWrapperRef} collapsable={false}>
             <ProductReviews productId={product.id} />
           </View>
+
+          {/* Cross-sell last. These used to sit above the benefits, directions
+              and ingredients, offering a second product before the shopper had
+              finished reading about the first. Bundles skip it: a beauty box is
+              already a combination. */}
+          {!isBeautyBoxProduct(product) && (
+            <>
+              <PerfectCombinationCard product={product} user={user} styles={styles} />
+              <RecommendedRoutineCard
+                routine={product?.routine}
+                currentProductId={product?.productNumber || product?.id}
+                isRTL={isRTL}
+              />
+            </>
+          )}
         </Animated.View>
       </Animated.ScrollView>
 
@@ -1824,10 +1836,23 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     height: HEADER_HEIGHT,
     backgroundColor: colors.card,
+    position: 'relative',
   },
-  imageContainerBeautyBox: {
-    height: HEADER_HEIGHT + 20,
-    backgroundColor: colors.card,
+  // A pill in the corner of the stage. Not a bar across the bottom: the
+  // packshots are pale, so it needs its own contrast rather than borrowing it.
+  galleryCounter: {
+    position: 'absolute',
+    bottom: 12,
+    end: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: colors.cta,
+  },
+  galleryCounterText: {
+    ...T.badgeMedium,
+    color: colors.white,
+    letterSpacing: 0.4,
   },
   heroImage: {
     width: '100%',
@@ -2474,26 +2499,6 @@ const styles = StyleSheet.create({
   },
   // Beauty Boxes detail page pricing styles
   // Image Gallery - Pagination Dots
-  paginationDots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 10,
-    backgroundColor: colors.card,
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: colors.label,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
   // Video styles moved to videoStyles (ProductVideo component)
   // Documentation link rows (inside the documentation card)
   docLink: {
