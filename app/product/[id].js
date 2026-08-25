@@ -327,6 +327,7 @@ function ProductDetailScreen() {
   // The pill floats clear of the status bar, and absolute insets ignore the
   // SafeAreaView's padding, so it has to account for that itself — and travel
   // far enough to take the status bar strip with it when it goes.
+  const [footerHeight, setFooterHeight] = useState(0);
   const headerTop = insets.top + 8;
   const { translateY: headerTranslateY, handleScroll: onHeaderScroll } = useHideOnScroll(
     headerTop + HEADER_PILL_HEIGHT + 8
@@ -1145,6 +1146,9 @@ function ProductDetailScreen() {
       <Animated.ScrollView
         ref={scrollRef}
         style={styles.scrollView}
+        contentContainerStyle={{
+          paddingBottom: (footerHeight || 96) + (insets.bottom || 12) + 16,
+        }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={Animated.event(
@@ -1576,7 +1580,13 @@ function ProductDetailScreen() {
       </Animated.ScrollView>
 
       {/* Fixed Bottom Button */}
-      <View style={styles.bottomBar}>
+      <View
+        style={[styles.bottomBar, { bottom: insets.bottom || 12 }]}
+        onLayout={(e) => {
+          const h = e?.nativeEvent?.layout?.height;
+          if (typeof h === 'number' && Number.isFinite(h) && h > 0) setFooterHeight(h);
+        }}
+      >
         {/* The choice itself, not a shortcut to it. The options sit beside the
             buy button so the thing being bought can be changed where it is
             being bought, and the price on the right follows the tap. */}
@@ -1744,7 +1754,7 @@ function ProductDetailScreen() {
           actionLabel={!isOutOfStock ? PDP_COPY.viewBag : null}
           onAction={!isOutOfStock ? handleViewBagFromToast : null}
           onHide={() => setToastVisible(false)}
-          bottomOffset={110}
+          bottomOffset={(footerHeight || 96) + (insets.bottom || 12) + 12}
           isRTL={isRTL}
           icon={isOutOfStock ? 'alert-circle' : 'checkmark-circle'}
           iconColor={isOutOfStock ? '#F59E0B' : '#22C55E'}
@@ -1895,7 +1905,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.groupedBg,
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 100, // Space for bottom button
+    // Clearance for the floating bar is on the scroll view, measured from the
+    // bar itself; a second allowance here would double it.
   },
   productInfo: {
     ...surfaces.card,
@@ -2358,22 +2369,20 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.label,
   },
+  // The floating counterpart of the header: inset, rounded, on its own shadow,
+  // with the page passing underneath rather than stopping at a welded edge.
+  // `bottom` and the content's clearance are set inline from the safe area.
   bottomBar: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    start: 12,
+    end: 12,
     backgroundColor: colors.card,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingBottom: 34, // Safe area for home indicator
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.separator,
-    shadowColor: colors.shadowCast,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 26,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    ...shadow.card,
   },
   addToBagButton: {
     backgroundColor: colors.cta,
