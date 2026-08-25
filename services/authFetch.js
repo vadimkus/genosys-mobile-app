@@ -37,7 +37,7 @@ export function setOnAuthExpired(callback) {
  * @param {string} expiredToken - The current (possibly expired) token
  * @returns {Promise<{token: string, user: object}|null>}
  */
-async function refreshToken(expiredToken) {
+export async function refreshToken(expiredToken) {
   // Deduplicate: if a refresh is already in flight, wait for it
   if (_refreshPromise) {
     log.debug('Token refresh already in progress, waiting...');
@@ -99,7 +99,7 @@ async function refreshToken(expiredToken) {
  * @param {{token: string, user: object|null}} refreshResult
  * @returns {Promise<object>} The updated user object with new token
  */
-async function persistRefreshedToken(refreshResult) {
+export async function persistRefreshedToken(refreshResult) {
   try {
     const storedUser = await getUserSession() || {};
     const updatedUser = {
