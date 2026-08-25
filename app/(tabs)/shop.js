@@ -955,7 +955,10 @@ function ShopScreen() {
         style={[
           styles.header,
           isRTL && styles.headerRtl,
-          { transform: [{ translateY: headerTranslateY }] },
+          // Absolute insets measure from the parent's border box, so the
+          // SafeAreaView's top padding does not offset this and the bar has to
+          // clear the status bar itself.
+          { top: insets.top, transform: [{ translateY: headerTranslateY }] },
         ]}
         onLayout={(e) => {
           const h = e?.nativeEvent?.layout?.height;
@@ -1387,7 +1390,6 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
