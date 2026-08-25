@@ -37,10 +37,10 @@ import { fetchProductById } from '../services/api';
 import { createLogger } from '../utils/logger';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
+import { ASSET_ORIGIN } from '../utils/assets';
 
 const log = createLogger('SkinAnalysisCamera');
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
 // Helper: parse product IDs from AI recommendation text
 // Format: [PRODUCT NAME](url){{id:ID}}

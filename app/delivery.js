@@ -22,7 +22,7 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { colors, shadow, tint } from '../utils/theme';
-import SectionHeader from '../components/SectionHeader';
+import SectionCard from '../components/SectionCard';
 
 export default function DeliveryScreen() {
   const router = useRouter();
@@ -113,8 +113,7 @@ export default function DeliveryScreen() {
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Delivery Options */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="rocket" title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} isRTL={isRTL} />
+          <SectionCard padding={18} icon="rocket" title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} isRTL={isRTL}>
             {deliveryMethods.map((method, index) => {
               const isSelected = selectedMethod === index;
               const isLast = index === deliveryMethods.length - 1;
@@ -139,7 +138,7 @@ export default function DeliveryScreen() {
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </SectionCard>
 
           {/* Free Shipping Banner */}
           <View style={[styles.card, styles.freeShippingCard, shadow.card]}>
@@ -155,8 +154,7 @@ export default function DeliveryScreen() {
           </View>
 
           {/* Shipping Rates */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="pricetags" title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} isRTL={isRTL} />
+          <SectionCard padding={18} icon="pricetags" title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} isRTL={isRTL}>
             {shippingRates.map((item, index) => {
               const isSelected = selectedRate === index;
               const isLast = index === shippingRates.length - 1;
@@ -175,11 +173,10 @@ export default function DeliveryScreen() {
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </SectionCard>
 
           {/* Return Policy */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="shield-checkmark" title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} isRTL={isRTL} />
+          <SectionCard padding={18} icon="shield-checkmark" title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} isRTL={isRTL}>
             {policies.map((policy, index) => {
               const isLast = index === policies.length - 1;
               return (
@@ -191,7 +188,7 @@ export default function DeliveryScreen() {
                 </View>
               );
             })}
-          </View>
+          </SectionCard>
 
           {/* Need Help? */}
           <View style={styles.helpSection}>

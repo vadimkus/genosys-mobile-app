@@ -33,10 +33,10 @@ import { createLogger } from '../utils/logger';
 import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import T from '../utils/typography';
 import { colors } from '../utils/theme';
+import { ASSET_ORIGIN } from '../utils/assets';
 
 const log = createLogger('SkinAnalysis');
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
 const TOTAL_STEPS = 4;
 

@@ -31,8 +31,8 @@ import { isProductOptionSelectionRequired } from '../utils/productOptions';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { colors } from '../utils/theme';
+import { ASSET_ORIGIN } from '../utils/assets';
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
 // Map detected concern names to the canonical vocabulary used by product
 // targetConcerns fields ("acne-blemishes", "anti-aging", ...). Display-cased

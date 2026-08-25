@@ -19,10 +19,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling } from '../../services/databaseService';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
-import SectionHeader from '../../components/SectionHeader';
+import { colors, surfaces } from '../../utils/theme';
+import SectionCard from '../../components/SectionCard';
 
-/** iOS Settings–style filled glyph tile + bold section title. */
 export default function PaymentScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
@@ -129,8 +128,7 @@ export default function PaymentScreen() {
           contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
         >
           {/* Payment Methods */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="wallet" title={t('paymentSettings.defaultMethod')} isRTL={isRTL} />
+          <SectionCard style={styles.sectionSpacing} icon="wallet" title={t('paymentSettings.defaultMethod')} isRTL={isRTL}>
             <MethodRow
               method={PAYMENT_METHODS.COD}
               icon="cash"
@@ -146,7 +144,7 @@ export default function PaymentScreen() {
               title={t('paymentSettings.card')}
               subtitle={t('paymentSettings.cardSubtitle')}
             />
-          </View>
+          </SectionCard>
 
           {/* Secure note */}
           <View style={[styles.noteBox, isRTL && styles.rowRTL]}>
@@ -155,9 +153,7 @@ export default function PaymentScreen() {
           </View>
 
           {/* Billing Information */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="document-text" title={t('paymentSettings.billingInfo')} isRTL={isRTL} />
-
+          <SectionCard style={styles.sectionSpacing} icon="document-text" title={t('paymentSettings.billingInfo')} isRTL={isRTL}>
             <View style={[styles.billingRow, isRTL && styles.rowRTL]}>
               <Text style={[styles.billingLabel, isRTL && styles.textRTL]}>{t('paymentSettings.billingAddress')}</Text>
               <TouchableOpacity onPress={goBilling} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -176,12 +172,10 @@ export default function PaymentScreen() {
             <Text style={[styles.billingValue, isRTL && styles.textRTL]}>
               {vatNumber ? t('paymentSettings.vatTrn', { vatNumber }) : t('paymentSettings.vatNumberMissing')}
             </Text>
-          </View>
+          </SectionCard>
 
           {/* Security Information */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="shield-checkmark" title={t('paymentSettings.securityPrivacy')} isRTL={isRTL} />
-
+          <SectionCard style={styles.sectionSpacing} icon="shield-checkmark" title={t('paymentSettings.securityPrivacy')} isRTL={isRTL}>
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
               <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
                 <Ionicons name="shield-checkmark" size={17} color={colors.white} />
@@ -215,7 +209,7 @@ export default function PaymentScreen() {
                 <Text style={[styles.securityItemText, isRTL && styles.textRTL]}>{t('paymentSettings.pciText')}</Text>
               </View>
             </View>
-          </View>
+          </SectionCard>
         </Animated.ScrollView>
       </Animated.View>
     </View>
@@ -223,6 +217,7 @@ export default function PaymentScreen() {
 }
 
 const styles = StyleSheet.create({
+  sectionSpacing: { marginTop: 14, marginBottom: 0 },
   container: {
     flex: 1,
     backgroundColor: colors.groupedBg,
@@ -239,12 +234,6 @@ const styles = StyleSheet.create({
   },
 
   // Sections
-  section: {
-    ...surfaces.card,
-    marginHorizontal: 16,
-    marginTop: 14,
-    padding: 16,
-  },
   hairline: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.separator,

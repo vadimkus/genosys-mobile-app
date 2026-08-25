@@ -13,7 +13,8 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors } from '../../utils/theme';
+import SectionCard from '../../components/SectionCard';
 
 export default function TermsScreen() {
   const router = useRouter();
@@ -155,18 +156,6 @@ export default function TermsScreen() {
     },
   ];
 
-  const SectionCard = ({ icon, title, children }) => (
-    <View style={[styles.card, shadow.card]}>
-      <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-        <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-          <Ionicons name={icon} size={16} color={colors.white} />
-        </View>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-      </View>
-      {children}
-    </View>
-  );
-
   const Paragraph = ({ children, last }) => (
     <Text style={[styles.paragraph, last && styles.paragraphLast, isRTL && styles.textRTL]}>{children}</Text>
   );
@@ -201,7 +190,7 @@ export default function TermsScreen() {
           </View>
 
           {sections.map((s) => (
-            <SectionCard key={s.key} icon={s.icon} title={s.title}>
+            <SectionCard padding={18} key={s.key} icon={s.icon} title={s.title} isRTL={isRTL}>
               {Array.isArray(s.paragraphs) &&
                 s.paragraphs.map((p, idx) => (
                   <Paragraph key={`${s.key}-p-${idx}`} last={idx === s.paragraphs.length - 1 && !(s.bullets && s.bullets.length)}>{p}</Paragraph>
@@ -217,7 +206,7 @@ export default function TermsScreen() {
           ))}
 
           {/* Contact Information */}
-          <SectionCard icon="chatbubbles" title={t('terms.sections.contact.title')}>
+          <SectionCard padding={18} icon="chatbubbles" title={t('terms.sections.contact.title')} isRTL={isRTL}>
             <Paragraph>{t('terms.sections.contact.p1')}</Paragraph>
             <View style={styles.contactInfo}>
               <Text style={[styles.contactItem, isRTL && styles.textRTL]}>
@@ -261,20 +250,7 @@ const styles = StyleSheet.create({
   updatePillText: { ...T.captionSmall, color: colors.secondaryLabel, fontWeight: '500' },
 
   // Cards
-  card: {
-    ...surfaces.card,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    padding: 18,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 14,
-  },
   rowRTL: { flexDirection: 'row-reverse' },
-  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
   paragraph: { ...T.body, color: colors.bodyText, marginBottom: 12, lineHeight: 23 },
   paragraphLast: { marginBottom: 0 },

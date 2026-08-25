@@ -23,11 +23,10 @@ import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow } from '../../utils/theme';
-import SectionHeader from '../../components/SectionHeader';
+import SectionCard from '../../components/SectionCard';
 
 const log = createLogger('AddAddress');
 
-/** iOS Settings–style filled glyph tile + bold section title. */
 export default function AddEditAddressScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
@@ -198,8 +197,7 @@ export default function AddEditAddressScreen() {
             keyboardDismissMode="on-drag"
           >
             {/* Address Type */}
-            <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="home" title={t('addAddress.addressType')} isRTL={isRTL} />
+            <SectionCard icon="home" title={t('addAddress.addressType')} isRTL={isRTL}>
               <View style={[styles.typeContainer, isRTL && styles.typeContainerRTL]}>
                 {addressTypes.map((type) => {
                   const active = formData.type === type;
@@ -222,11 +220,10 @@ export default function AddEditAddressScreen() {
                   );
                 })}
               </View>
-            </View>
+            </SectionCard>
 
             {/* Contact Information */}
-            <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="person" title={t('addAddress.contactInfo')} isRTL={isRTL} />
+            <SectionCard icon="person" title={t('addAddress.contactInfo')} isRTL={isRTL}>
               <View style={styles.fieldContainer}>
                 <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('addAddress.fullName')}
@@ -262,11 +259,10 @@ export default function AddEditAddressScreen() {
                   placeholderTextColor={colors.tertiary}
                 />
               </View>
-            </View>
+            </SectionCard>
 
             {/* Address Details */}
-            <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="location" title={t('addAddress.addressDetails')} isRTL={isRTL} />
+            <SectionCard icon="location" title={t('addAddress.addressDetails')} isRTL={isRTL}>
               <View style={styles.fieldContainer}>
                 <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('addAddress.streetAddress')}
@@ -344,11 +340,10 @@ export default function AddEditAddressScreen() {
                   placeholderTextColor={colors.tertiary}
                 />
               </View>
-            </View>
+            </SectionCard>
 
             {/* Preferences */}
-            <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="star" title={t('addAddress.preferences')} isRTL={isRTL} />
+            <SectionCard icon="star" title={t('addAddress.preferences')} isRTL={isRTL}>
               <View style={[styles.switchContainer, isRTL && styles.switchContainerRTL]}>
                 <View style={[styles.switchLabel, isRTL && styles.switchLabelRTL]}>
                   <Text style={[styles.fieldLabel, styles.switchTitle, isRTL && styles.textRTL]}>{t('addAddress.setAsDefault')}</Text>
@@ -362,7 +357,7 @@ export default function AddEditAddressScreen() {
                   ios_backgroundColor={colors.separator}
                 />
               </View>
-            </View>
+            </SectionCard>
 
             {/* Delivery Note */}
             <View style={[styles.deliveryNote, isRTL && styles.rowRTL]}>
@@ -408,12 +403,6 @@ const styles = StyleSheet.create({
   },
 
   // Sections
-  section: {
-    ...surfaces.card,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    padding: 16,
-  },
 
   // Address Type
   typeContainer: {

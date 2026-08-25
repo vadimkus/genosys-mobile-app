@@ -35,8 +35,8 @@ import { handleDeepLink } from '../utils/deepLinking';
 import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
+import { ASSET_ORIGIN } from '../utils/assets';
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
 /** Get user context for personalised greetings (mirrors web getUserContext) */
 function getUserContext() {

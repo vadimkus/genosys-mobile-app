@@ -32,10 +32,10 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, tint } from '../utils/theme';
 import AUTH_CONFIG from '../config/auth';
+import { EMPTY_UNI_IMAGE } from '../utils/assets';
 
 const log = createLogger('FavoritesScreen');
 
-const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 
 export default function FavoritesScreen() {
   const { user } = useAuth();

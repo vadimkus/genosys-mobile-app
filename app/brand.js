@@ -23,8 +23,8 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, tint } from '../utils/theme';
-import SectionHeader from '../components/SectionHeader';
+import { colors, tint } from '../utils/theme';
+import SectionCard from '../components/SectionCard';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -133,20 +133,17 @@ export default function BrandScreen() {
           </View>
 
           {/* About Section */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="information-circle" title={sectionLabels.about} isRTL={isRTL} />
+          <SectionCard padding={18} icon="information-circle" title={sectionLabels.about} isRTL={isRTL}>
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandDescription}</Text>
-          </View>
+          </SectionCard>
 
           {/* Mission Section */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="flag" title={sectionLabels.mission} isRTL={isRTL} />
+          <SectionCard padding={18} icon="flag" title={sectionLabels.mission} isRTL={isRTL}>
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandMission}</Text>
-          </View>
+          </SectionCard>
 
           {/* Key Technologies */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="flask" title={sectionLabels.technologies} isRTL={isRTL} />
+          <SectionCard padding={18} icon="flask" title={sectionLabels.technologies} isRTL={isRTL}>
             {keyTechnologies.map((tech, index) => (
               <View
                 key={index}
@@ -161,11 +158,10 @@ export default function BrandScreen() {
                 </View>
               </View>
             ))}
-          </View>
+          </SectionCard>
 
           {/* Brand Videos */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="videocam" title={sectionLabels.videos} isRTL={isRTL} />
+          <SectionCard padding={18} icon="videocam" title={sectionLabels.videos} isRTL={isRTL}>
             {videos.map((video) => (
               <TouchableOpacity
                 key={video.id}
@@ -188,15 +184,12 @@ export default function BrandScreen() {
                 </View>
               </TouchableOpacity>
             ))}
-          </View>
+          </SectionCard>
 
           {/* Product Showcase */}
-          <View style={[styles.card, shadow.card]}>
-            <SectionHeader
-              icon="cube"
+          <SectionCard padding={18} icon="cube"
               title={locale === 'ar' ? 'مجموعة المنتجات المهنية' : locale === 'ru' ? 'Профессиональная линейка продуктов' : 'Professional Product Line'}
-              isRTL={isRTL}
-            />
+              isRTL={isRTL}>
             <View style={styles.productImageWrap}>
               <Image
                 source={{ uri: 'https://genosys.ae/images/genosys-products.jpg' }}
@@ -211,7 +204,7 @@ export default function BrandScreen() {
                 ? 'Профессиональная линейка средств GENOSYS — дерматологически протестированные продукты'
                 : 'GENOSYS Professional Skincare Line — Dermatologically Tested Products'}
             </Text>
-          </View>
+          </SectionCard>
 
           {/* Footer — shared brand block */}
           <AppFooter style={{ paddingBottom: 16 }} />
@@ -246,12 +239,6 @@ const styles = StyleSheet.create({
   badgeGreenText: { color: colors.greenDeep },
 
   // Cards
-  card: {
-    ...surfaces.card,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    padding: 18,
-  },
   rowRTL: { flexDirection: 'row-reverse' },
 
   paragraph: { ...T.body, marginBottom: 12, lineHeight: 23 },

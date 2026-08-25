@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform, Image } from 'react-native';
 import { colors } from '../../utils/theme';
 
-const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -17,6 +16,7 @@ import { createLogger } from '../../utils/logger';
 import { getJson } from '../../services/httpClient';
 import OrderSuccessScreen from '../../components/OrderSuccessScreen';
 import T from '../../utils/typography';
+import { EMPTY_UNI_IMAGE } from '../../utils/assets';
 
 const log = createLogger('StripePayment');
 

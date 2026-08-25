@@ -27,6 +27,7 @@ import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
+import SectionCard from '../../components/SectionCard';
 
 const log = createLogger('EditProfile');
 
@@ -78,22 +79,6 @@ const getGenderLabel = (t, genderValue) => {
   }
 };
 
-function FormSection({ title, children, isRTL, icon, tileColor }) {
-  return (
-    <View style={[styles.section, shadow.card]}>
-      <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
-        {icon ? (
-          <View style={[surfaces.iconTile, { backgroundColor: tileColor || colors.accent }]}>
-            <Ionicons name={icon} size={17} color={colors.white} />
-          </View>
-        ) : null}
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-      </View>
-      {children}
-    </View>
-  );
-}
-
 export default function EditProfileScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
@@ -101,7 +86,7 @@ export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const { scrollY, onScroll, headerHeight } = useCollapsibleHeader();
   const { user, updateProfile, deleteAccount, isAuthenticated } = useAuth();
-  
+
   // Check authentication immediately
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -118,7 +103,7 @@ export default function EditProfileScreen() {
       return;
     }
   }, [user, isAuthenticated]);
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -168,7 +153,7 @@ export default function EditProfileScreen() {
 
       // Start in edit mode on first open. After a save we flip to view-mode.
       setIsEditing(true);
-      
+
       // Set initial date if available
       if (profile.birthday) {
         setSelectedDate(new Date(profile.birthday));
@@ -308,7 +293,7 @@ export default function EditProfileScreen() {
       setShowDatePicker(false);
     }
     setSelectedDate(currentDate);
-    
+
     // Format date as YYYY-MM-DD
     const formattedDate = currentDate.toISOString().split('T')[0];
     updateField('dateOfBirth', formattedDate);
@@ -336,7 +321,7 @@ export default function EditProfileScreen() {
     const displayLocale = locale === 'ru' ? 'ru-RU' : locale === 'ar' ? 'ar-AE' : 'en-GB';
     return date.toLocaleDateString(displayLocale, {
       day: '2-digit',
-      month: '2-digit', 
+      month: '2-digit',
       year: 'numeric'
     });
   };
@@ -381,7 +366,7 @@ export default function EditProfileScreen() {
   const handleSave = async () => {
     haptics.mediumTap();
     log.debug('Profile save started');
-    
+
     // Validate form
     if (
       !formData.firstName.trim() ||
@@ -409,7 +394,7 @@ export default function EditProfileScreen() {
 
     try {
       setIsSaving(true);
-      
+
       // Prepare profile data for API
       const profileData = {
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
@@ -424,7 +409,7 @@ export default function EditProfileScreen() {
 
       const result = await updateProfile(profileData);
       log.debug('Profile update result', { success: !!result?.success });
-      
+
       if (result.success) {
         haptics.success();
         // Mark form as "clean" so it no longer feels like you're mid-edit.
@@ -561,7 +546,7 @@ export default function EditProfileScreen() {
         contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
       >
         {/* Profile Picture Section */}
-        <FormSection title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline" tileColor={colors.accent}>
+        <SectionCard title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline">
           <View style={styles.formContent}>
             <TouchableOpacity
               style={[styles.profilePictureContainer, !isEditing && styles.readOnlyBlock]}
@@ -585,10 +570,10 @@ export default function EditProfileScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </FormSection>
+        </SectionCard>
 
         {/* Personal Information */}
-        <FormSection title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline" tileColor={colors.accent}>
+        <SectionCard title={t('editProfile.personalInfo')} isRTL={isRTL} icon="person-outline">
           <View style={styles.formContent}>
             {/* Required asterisks dropped: at 5/7 fields, they carried no
                 information (redundant noise). Optional fields are marked
@@ -712,10 +697,10 @@ export default function EditProfileScreen() {
               />
             </View>
           </View>
-        </FormSection>
+        </SectionCard>
 
         {/* Additional Information */}
-        <FormSection title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline" tileColor={colors.accent}>
+        <SectionCard title={t('editProfile.additionalInformation')} isRTL={isRTL} icon="information-circle-outline">
           <View style={styles.formContent}>
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
@@ -746,7 +731,7 @@ export default function EditProfileScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </FormSection>
+        </SectionCard>
 
         {/* Danger Zone */}
         <View style={[styles.dangerZone, shadow.card]}>
@@ -968,12 +953,6 @@ const styles = StyleSheet.create({
   },
 
   // Sections (soft cards)
-  section: {
-    ...surfaces.card,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    padding: 16,
-  },
   sectionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -982,12 +961,6 @@ const styles = StyleSheet.create({
   },
   sectionHeaderRowRTL: {
     flexDirection: 'row-reverse',
-  },
-  sectionTitle: {
-    ...T.body,
-    fontWeight: '700',
-    lineHeight: undefined,
-    color: colors.label,
   },
   textRTL: {
     textAlign: 'right',

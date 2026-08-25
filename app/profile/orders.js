@@ -31,11 +31,10 @@ import T from '../../utils/typography';
 import { colors, shadow, statusStyle } from '../../utils/theme';
 import AUTH_CONFIG from '../../config/auth';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
+import { ASSET_ORIGIN, EMPTY_UNI_IMAGE } from '../../utils/assets';
 
 const log = createLogger('Orders');
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
-const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 
 // Enable LayoutAnimation on Android for the inline summary expand/collapse.
 // Old-arch Android needs the opt-in; on Fabric (new arch) it's a no-op that

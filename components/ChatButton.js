@@ -37,8 +37,8 @@ import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { colors } from '../utils/theme';
+import { ASSET_ORIGIN } from '../utils/assets';
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PANEL_HEIGHT = Math.round(SCREEN_HEIGHT * 0.82);
 const PANEL_HEIGHT_EXPANDED = SCREEN_HEIGHT;

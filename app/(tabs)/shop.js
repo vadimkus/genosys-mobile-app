@@ -1369,6 +1369,10 @@ function ShopScreen() {
 }
 
 const styles = StyleSheet.create({
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
   container: {
     flex: 1,
     backgroundColor: colors.groupedBg,

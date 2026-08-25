@@ -29,9 +29,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as haptics from '../../../utils/haptics';
 import T from '../../../utils/typography';
 import { colors, shadow, surfaces, statusStyle } from '../../../utils/theme';
-import SectionHeader from '../../../components/SectionHeader';
+import SectionCard from '../../../components/SectionCard';
+import { ASSET_ORIGIN } from '../../../utils/assets';
 
-const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
 /**
  * Resolve an image path to a full URL.
@@ -59,14 +59,14 @@ const formatDateTime = (dateString, locale, t) => {
   try {
     const date = new Date(dateString);
     const dateStr = date.toLocaleDateString(locale || undefined, {
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric' 
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
     });
     const timeStr = date.toLocaleTimeString(locale || undefined, {
-      hour: '2-digit', 
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
     return `${dateStr} ${t('common.at')} ${timeStr}`;
   } catch {
@@ -133,7 +133,6 @@ const inferOriginalUnitPriceFromPct = ({ unitPrice, discountPct }) => {
   return inferred;
 };
 
-/** iOS Settings–style filled glyph tile + bold section title. */
 export default function OrderDetailScreen() {
   const params = useLocalSearchParams();
   const idParam = String(params.id || '');
@@ -195,14 +194,14 @@ export default function OrderDetailScreen() {
   const freeShipping = shipping === 0 && subtotal > 0;
   const vat = Number(order?.vat ?? order?.vatAmount ?? 0) || 0;
   const total = Number(order?.total ?? order?.totalAmount ?? order?.total_amount ?? order?.amount ?? 0) || 0;
-  
+
   const customerName = order?.customerName || order?.customer_name || user?.name || '';
   const customerEmail = getOrderContactEmail(order, user);
   const customerPhone = order?.customerPhone || order?.customer_phone || user?.phone || '';
   const customerAddress = order?.customerAddress || order?.customer_address || order?.address || '';
   const emirate = order?.emirate || '';
   const orderNotes = String(order?.orderNotes || order?.order_notes || '').trim();
-  
+
   const createdAt = order?.createdAt || order?.created_at || order?.orderDate || order?.order_date;
   const formattedDateTime = formatDateTime(createdAt, locale, t);
 
@@ -341,31 +340,31 @@ export default function OrderDetailScreen() {
   const onReorder = async () => {
     haptics.mediumTap();
     if (!order || !user) return;
-    
+
     const orderItems = Array.isArray(order?.items) ? order.items : [];
     const itemsToReorder = orderItems.filter((it) => !isPromoItem(it));
-    
+
     if (itemsToReorder.length === 0) {
       Alert.alert(t('ordersDetail.reorderTitle'), t('ordersDetail.noItemsToReorder'));
       return;
     }
-    
+
     setReordering(true);
     let addedCount = 0;
     let failedCount = 0;
-    
+
     try {
       for (const item of itemsToReorder) {
     const productId = item?.productId || item?.id;
         const qty = Number(item?.quantity) || 1;
         const size = item?.size || item?.selectedSize || '';
         const color = item?.color || item?.selectedColor || '';
-        
+
         if (!productId) {
           failedCount++;
           continue;
         }
-        
+
         try {
           // Fetch fresh product data
           const product = await fetchProductById(productId, user, { locale });
@@ -386,7 +385,7 @@ export default function OrderDetailScreen() {
           failedCount++;
         }
       }
-      
+
       if (addedCount > 0) {
         Alert.alert(
           t('ordersDetail.reorderSuccessTitle'),
@@ -466,8 +465,7 @@ export default function OrderDetailScreen() {
           </View>
 
           {/* Payment Method Section */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="card" title={t('ordersDetail.paymentMethod')} isRTL={isRTL} />
+          <SectionCard padding={18} icon="card" title={t('ordersDetail.paymentMethod')} isRTL={isRTL}>
             <View style={styles.paymentMethodCard}>
               <View style={styles.paymentMethodRow}>
                 {isApplePayLike(order) ? (
@@ -479,22 +477,19 @@ export default function OrderDetailScreen() {
                 ) : null}
               </View>
             </View>
-          </View>
+          </SectionCard>
 
           {/* Order Notes */}
           {orderNotes ? (
-            <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="chatbubble-ellipses" title={t('ordersDetail.orderNotes')} isRTL={isRTL} />
+            <SectionCard padding={18} icon="chatbubble-ellipses" title={t('ordersDetail.orderNotes')} isRTL={isRTL}>
               <View style={styles.notesCard}>
                 <Text style={[styles.notesText, isRTL && styles.textRTL]}>{orderNotes}</Text>
               </View>
-            </View>
+            </SectionCard>
           ) : null}
 
           {/* Items Section */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="bag-handle" title={t('ordersDetail.items')} isRTL={isRTL} />
-            
+          <SectionCard padding={18} icon="bag-handle" title={t('ordersDetail.items')} isRTL={isRTL}>
             {/* Paid Items */}
             {paidItems.map((it, idx) => {
               const qty = Number(it?.quantity) || 1;
@@ -541,7 +536,7 @@ export default function OrderDetailScreen() {
               const discountUnit = canShowDiscountBreakdown ? (inferredOriginalUnit - price) : 0;
               const originalLineTotal = canShowDiscountBreakdown ? (inferredOriginalUnit * qty) : null;
               const discountLineTotal = canShowDiscountBreakdown ? (discountUnit * qty) : null;
-              
+
               const imageUrl = resolveImageUrl(it?.image || it?.imageUrl || it?.thumbnail);
 
               return (
@@ -728,7 +723,7 @@ export default function OrderDetailScreen() {
                   const qty = Number(it?.quantity) || 1;
                   const name = it?.name || it?.productName || t('common.freeItemWithNumber', { number: idx + 1 });
                   const promoImageUrl = resolveImageUrl(it?.image || it?.imageUrl || it?.thumbnail);
-                  
+
                   return (
                     <View key={`promo-${String(it?.productId || it?.id || name)}-${idx}`} style={styles.promoItemCard}>
                       <View style={styles.promoItemRow}>
@@ -761,12 +756,10 @@ export default function OrderDetailScreen() {
                 })}
               </View>
             ) : null}
-          </View>
+          </SectionCard>
 
           {/* Shipping Details */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="location" title={t('ordersDetail.shippingDetails')} isRTL={isRTL} />
-            
+          <SectionCard padding={18} icon="location" title={t('ordersDetail.shippingDetails')} isRTL={isRTL}>
             {customerName ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="person-outline" size={16} color={colors.secondaryLabel} />
@@ -774,7 +767,7 @@ export default function OrderDetailScreen() {
                 <Text style={[styles.detailValue, isRTL && styles.textRTL]}>{String(customerName)}</Text>
               </View>
             ) : null}
-            
+
             {customerPhone ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="call-outline" size={16} color={colors.secondaryLabel} />
@@ -782,7 +775,7 @@ export default function OrderDetailScreen() {
                 <Text style={[styles.detailValue, isRTL && styles.valueLTR]}>{String(customerPhone)}</Text>
               </View>
             ) : null}
-            
+
             {customerEmail ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="mail-outline" size={16} color={colors.secondaryLabel} />
@@ -790,7 +783,7 @@ export default function OrderDetailScreen() {
                 <Text style={[styles.detailValue, isRTL && styles.valueLTR]}>{String(customerEmail)}</Text>
               </View>
             ) : null}
-            
+
             {emirate ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="flag-outline" size={16} color={colors.secondaryLabel} />
@@ -798,7 +791,7 @@ export default function OrderDetailScreen() {
                 <Text style={[styles.detailValue, isRTL && styles.textRTL]}>{formatEmirateLabel(t, emirate)}</Text>
               </View>
             ) : null}
-            
+
             {customerAddress ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
                 <Ionicons name="home-outline" size={16} color={colors.secondaryLabel} />
@@ -806,12 +799,10 @@ export default function OrderDetailScreen() {
                 <Text style={[styles.detailValue, styles.addressValue, isRTL && styles.textRTL]}>{String(customerAddress)}</Text>
               </View>
             ) : null}
-          </View>
+          </SectionCard>
 
           {/* Order Summary — Waterfall Pricing Breakdown */}
-          <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="calculator" title={t('ordersDetail.orderSummary')} isRTL={isRTL} />
-
+          <SectionCard padding={18} icon="calculator" title={t('ordersDetail.orderSummary')} isRTL={isRTL}>
             {(() => {
               const orderDiscPct = Number(order?.discountPercentage);
               const orderDiscAmt = Number(order?.discountAmount);
@@ -928,7 +919,7 @@ export default function OrderDetailScreen() {
                 </>
               );
             })()}
-          </View>
+          </SectionCard>
 
           {/* Actions */}
           <View style={styles.actionsSection}>
@@ -1057,7 +1048,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  
+
   // Order Number Card
   orderNumberCard: {
     marginHorizontal: 16,
@@ -1114,16 +1105,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.secondaryLabel,
   },
-  
+
   // Section
-  section: {
-    marginHorizontal: 16,
-    marginBottom: 14,
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 18,
-  },
-  
+
   // RTL helpers
   rowRTL: {
     flexDirection: 'row-reverse',
@@ -1135,7 +1119,7 @@ const styles = StyleSheet.create({
   alignEndRTL: {
     alignItems: 'flex-end',
   },
-  
+
   // Payment Method
   paymentMethodCard: {
     backgroundColor: colors.subtleBg,
@@ -1168,7 +1152,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.greenDeep,
   },
-  
+
   // Items
   itemCard: {
     backgroundColor: colors.subtleBg,
@@ -1306,7 +1290,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.separator,
   },
-  
+
   // Promo Items
   promoSection: {
     marginTop: 8,
@@ -1381,7 +1365,7 @@ const styles = StyleSheet.create({
     color: colors.greenDeep,
     textTransform: 'uppercase',
   },
-  
+
   // Shipping Details
   detailRow: {
     flexDirection: 'row',
@@ -1407,7 +1391,7 @@ const styles = StyleSheet.create({
   addressValue: {
     lineHeight: 20,
   },
-  
+
   // Summary
   summaryRow: {
     flexDirection: 'row',
@@ -1531,7 +1515,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.accent,
   },
-  
+
   // Actions
   actionsSection: {
     marginHorizontal: 16,
@@ -1592,7 +1576,7 @@ const styles = StyleSheet.create({
     writingDirection: 'ltr',
     textAlign: 'left',
   },
-  
+
   // Beauty Box expandable contents
   beautyBoxSection: {
     marginTop: 12,

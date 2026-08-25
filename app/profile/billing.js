@@ -21,9 +21,8 @@ import { getUserBilling, updateUserBilling } from '../../services/databaseServic
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow } from '../../utils/theme';
-import SectionHeader from '../../components/SectionHeader';
+import SectionCard from '../../components/SectionCard';
 
-/** iOS Settings–style filled glyph tile + bold section title. */
 export default function BillingScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
@@ -134,9 +133,7 @@ export default function BillingScreen() {
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
             >
-              <View style={[styles.section, shadow.card]}>
-                <SectionHeader icon="document-text" title={t('billing.title')} isRTL={isRTL} />
-
+              <SectionCard icon="document-text" title={t('billing.title')} isRTL={isRTL}>
                 <View style={styles.fieldContainer}>
                   <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.addressLabel')}</Text>
                   <TextInput
@@ -160,7 +157,7 @@ export default function BillingScreen() {
                     autoCapitalize="characters"
                   />
                 </View>
-              </View>
+              </SectionCard>
 
               <TouchableOpacity
                 style={[styles.saveBtn, shadow.cta(colors.cta), saving && styles.saveBtnDisabled]}
@@ -197,14 +194,6 @@ const styles = StyleSheet.create({
   textRTL: {
     writingDirection: 'rtl',
     textAlign: 'right',
-  },
-
-  // Section
-  section: {
-    ...surfaces.card,
-    marginHorizontal: 16,
-    marginBottom: 14,
-    padding: 16,
   },
 
   // Fields

@@ -30,6 +30,7 @@ import { mediumTap, lightTap } from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
+import { EMPTY_UNI_IMAGE } from '../../utils/assets';
 
 function BagScreen() {
   const { user } = useAuth();
@@ -90,7 +91,6 @@ function BagScreen() {
     }
   }, [navSource]);
 
-  const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 
   const cartSummary = getCartSummary();
   const paidItemCount = getTotalItems();
@@ -1311,6 +1311,16 @@ const styles = StyleSheet.create({
     top: 0,
     padding: 8,
     zIndex: 10,
+  },
+  summaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 8,
+  },
+  summaryHeaderTitle: {
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
   },
   summaryRow: {
     flexDirection: 'row',
