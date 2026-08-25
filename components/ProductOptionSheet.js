@@ -529,13 +529,13 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 16,
     borderRadius: 14,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.orangeBg,
     marginBottom: 16,
   },
   errorText: {
     ...T.bodySmall,
     textAlign: 'center',
-    color: '#9A3412',
+    color: colors.orange,
   },
   retryButton: {
     minHeight: 44,

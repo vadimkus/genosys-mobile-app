@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
   },
   rightTextMet: {
-    color: '#34C759',
+    color: colors.green,
   },
   textRTL: {
     textAlign: 'right',

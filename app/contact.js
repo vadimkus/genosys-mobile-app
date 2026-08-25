@@ -56,7 +56,7 @@ export default function ContactScreen() {
       title: t('contact.methodWhatsappTitle'),
       value: PHONE_DISPLAY,
       icon: 'logo-whatsapp',
-      tileColor: colors.whatsapp,
+      tileColor: colors.whatsappDeep,
       description: t('contact.methodWhatsappDesc'),
       action: () => Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() => {}),
     },

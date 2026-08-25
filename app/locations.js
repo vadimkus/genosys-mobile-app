@@ -119,7 +119,7 @@ export default function LocationsScreen() {
   return (
     <View style={styles.container}>
       <CollapsibleHeader
-        title={t('navigation.locations') || 'Locations'}
+        title={t('navigation.locations')}
         scrollY={scrollY}
         onBack={onBack}
         isRTL={isRTL}

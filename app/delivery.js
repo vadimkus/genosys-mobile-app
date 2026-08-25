@@ -102,7 +102,7 @@ export default function DeliveryScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('navigation.delivery') || 'Delivery'} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader title={t('navigation.delivery')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

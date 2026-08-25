@@ -139,8 +139,8 @@ const ShopGridCard = React.memo(function ShopGridCard({
     inStock: t('stock.inStock'),
     new: t('common.new'),
   });
-  const isNewProduct = allBadges.some((b) => String(b?.text || '').toLowerCase().trim() === (t('common.new') || 'new').toLowerCase() || String(b?.text || '').toLowerCase().trim() === 'new');
-  const overlayBadges = allBadges.filter((b) => !(String(b?.text || '').toLowerCase().trim() === (t('common.new') || 'new').toLowerCase() || String(b?.text || '').toLowerCase().trim() === 'new'));
+  const isNewProduct = allBadges.some((b) => String(b?.text || '').toLowerCase().trim() === (t('common.new')).toLowerCase() || String(b?.text || '').toLowerCase().trim() === 'new');
+  const overlayBadges = allBadges.filter((b) => !(String(b?.text || '').toLowerCase().trim() === (t('common.new')).toLowerCase() || String(b?.text || '').toLowerCase().trim() === 'new'));
 
   return (
     <View style={styles.gridCard}>
@@ -548,8 +548,8 @@ function ShopScreen() {
       const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
       if (!granted) {
         Alert.alert(
-          t('voiceSearch.permissionTitle') || 'Microphone Access',
-          t('voiceSearch.permissionMessage') || 'Please allow microphone access in Settings to use voice search.',
+          t('voiceSearch.permissionTitle'),
+          t('voiceSearch.permissionMessage'),
         );
         return;
       }
@@ -1164,7 +1164,7 @@ function ShopScreen() {
                     onPress={isListening ? stopVoiceSearch : startVoiceSearch}
                     activeOpacity={0.7}
                     accessibilityRole="button"
-                    accessibilityLabel={t('voiceSearch.label') || 'Voice search'}
+                    accessibilityLabel={t('voiceSearch.label')}
                   >
                     <RNAnimated.View style={isListening ? { transform: [{ scale: pulseAnim }] } : undefined}>
                       <Ionicons
@@ -1186,14 +1186,14 @@ function ShopScreen() {
                     <RNAnimated.View style={[styles.voicePulseCircle, { transform: [{ scale: pulseAnim }] }]}>
                       <Ionicons name="mic" size={40} color={colors.white} />
                     </RNAnimated.View>
-                    <Text style={styles.voiceTitle}>{t('voiceSearch.listening') || 'Listening...'}</Text>
+                    <Text style={styles.voiceTitle}>{t('voiceSearch.listening')}</Text>
                     {voicePartial ? (
                       <Text style={styles.voicePartialText} numberOfLines={2}>{voicePartial}</Text>
                     ) : (
-                      <Text style={styles.voiceHintText}>{t('voiceSearch.hint') || 'Say a product name'}</Text>
+                      <Text style={styles.voiceHintText}>{t('voiceSearch.hint')}</Text>
                     )}
                     <TouchableOpacity style={styles.voiceStopBtn} onPress={stopVoiceSearch} activeOpacity={0.8}>
-                      <Text style={styles.voiceStopText}>{t('voiceSearch.stop') || 'Stop'}</Text>
+                      <Text style={styles.voiceStopText}>{t('voiceSearch.stop')}</Text>
                     </TouchableOpacity>
                   </View>
                 </Pressable>
@@ -1281,10 +1281,10 @@ function ShopScreen() {
                 <View style={[styles.buildSetContent, isRTL && styles.buildSetContentRTL]}>
                   <View style={styles.buildSetTextArea}>
                     <Text style={[styles.buildSetTitle, isRTL && styles.textRTL]}>
-                      🎁 {t('shop.buildYourSet') || 'Build Your Set'}
+                      🎁 {t('shop.buildYourSet')}
                     </Text>
                     <Text style={[styles.buildSetSubtitle, isRTL && styles.textRTL]}>
-                      {t('shop.buildYourSetDesc') || 'Mix & match products and save up to 20%'}
+                      {t('shop.buildYourSetDesc')}
                     </Text>
                   </View>
                   <View style={styles.buildSetBadge}>
@@ -1558,7 +1558,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: colors.white,
-    shadowColor: '#000000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -1587,7 +1587,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    shadowColor: '#000000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -2046,7 +2046,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000000',
+    shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -2147,7 +2147,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.whatsapp,
+    backgroundColor: colors.whatsappDeep,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,

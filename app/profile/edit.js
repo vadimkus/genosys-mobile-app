@@ -232,7 +232,7 @@ export default function EditProfileScreen() {
     } catch (err) {
       log.error('selectCatAvatar failed:', err);
       setShowCatModal(false);
-      Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not set avatar. Please try again.');
+      Alert.alert(t('common.error'), t('editProfile.avatarError'));
     }
   };
 
@@ -256,7 +256,7 @@ export default function EditProfileScreen() {
       }
     } catch (err) {
       log.error('takePhoto failed:', err);
-      Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not take photo. Please try again.');
+      Alert.alert(t('common.error'), t('editProfile.photoError'));
     }
   };
 
@@ -282,7 +282,7 @@ export default function EditProfileScreen() {
       }
     } catch (err) {
       log.error('pickImage failed:', err);
-      Alert.alert(t('common.error'), t('editProfile.photoError') || 'Could not select photo. Please try again.');
+      Alert.alert(t('common.error'), t('editProfile.photoSelectError'));
     }
   };
 

@@ -1146,7 +1146,7 @@ function ProductDetailScreen() {
               onPress={handleAddToBag}
               style={styles.miniHeaderBagButton}
               accessibilityRole="button"
-              accessibilityLabel={t('product.addToBag') || 'Add to bag'}
+              accessibilityLabel={t('product.addToBag')}
               activeOpacity={0.8}
             >
               <Ionicons
@@ -1328,7 +1328,7 @@ function ProductDetailScreen() {
                   accessibilityLabel={t('product.beTheFirstToReview')}
                 >
                   <Text style={[styles.reviewSummaryLink, isRTL && styles.textRTL]}>
-                    {t('product.beTheFirstToReview') || 'Be the first to review'}
+                    {t('product.beTheFirstToReview')}
                   </Text>
                   <Ionicons
                     name={isRTL ? 'chevron-back' : 'chevron-forward'}
@@ -1508,7 +1508,7 @@ function ProductDetailScreen() {
             if (!docs.length) return null;
             return (
               <View style={styles.section}>
-                <SectionHeader icon="document-attach" title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
+                <SectionHeader icon="document-attach" title={t('product.documentation')} isRTL={isRTL} />
                 {docs.map((doc, index) => (
                   <TouchableOpacity
                     key={`doc-${index}`}
@@ -2443,7 +2443,7 @@ const styles = StyleSheet.create({
   },
   addToBagButtonDisabled: {
     backgroundColor: colors.placeholder,
-    shadowColor: '#9CA3AF',
+    shadowColor: colors.shadowCast,
     shadowOpacity: 0.15,
   },
   bottomRow: {
@@ -2495,14 +2495,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   requestQuoteBottomButton: {
-    backgroundColor: colors.whatsapp,
+    backgroundColor: colors.whatsappDeep,
     borderRadius: 14,
     paddingVertical: 16,
     minHeight: 52,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadow.cta(colors.whatsapp),
+    ...shadow.cta(colors.whatsappDeep),
   },
   priceOnRequestLabel: {
     fontSize: 18,
@@ -2547,7 +2547,7 @@ const styles = StyleSheet.create({
   sizeInfo: {
     ...T.labelSmall,
     fontWeight: '600',
-    color: colors.secondaryLabel,
+    color: colors.mutedText,
     backgroundColor: colors.fillSecondary,
     paddingHorizontal: 10,
     paddingVertical: 5,

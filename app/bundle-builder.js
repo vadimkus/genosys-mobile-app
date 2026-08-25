@@ -753,13 +753,13 @@ const styles = StyleSheet.create({
   progressFill: { height: 6, backgroundColor: colors.cta, borderRadius: 3 },
   tierMarker: { position: 'absolute', top: -3, alignItems: 'center', marginLeft: -4 },
   tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.separator, borderWidth: 2, borderColor: colors.white },
-  tierDotActive: { backgroundColor: '#16a34a' },
+  tierDotActive: { backgroundColor: colors.greenDeep },
   progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 },
   progressLabel: { ...T.badge, color: colors.secondaryLabel },
-  progressLabelActive: { color: '#16a34a', fontWeight: '700' },
+  progressLabelActive: { color: colors.greenDeep, fontWeight: '700' },
   nextTierHint: { ...T.captionSmall, color: colors.accent, fontWeight: '600', textAlign: 'center', marginTop: 6 },
-  discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: '#F0FDF4', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
-  discountActiveText: { ...T.badgeMedium, color: '#16a34a' },
+  discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: colors.greenBg, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
+  discountActiveText: { ...T.badgeMedium, color: colors.greenDeep },
 
   // Step indicator
   stepIndicator: { backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, height: 52 },
@@ -769,8 +769,8 @@ const styles = StyleSheet.create({
   stepEmoji: { fontSize: 14 },
   stepPillText: { ...T.captionTiny, fontWeight: '600', color: colors.mutedText },
   stepPillTextActive: { color: colors.accent },
-  requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#F59E0B' },
-  stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
+  requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.orange },
+  stepCountBadge: { backgroundColor: colors.greenDeep, borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
   stepCountText: { ...T.badge, color: colors.white },
 
   // Step header
@@ -779,8 +779,8 @@ const styles = StyleSheet.create({
   stepHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   stepHeaderTitle: { ...T.sectionTitleSmall, color: colors.label },
   stepHeaderDesc: { ...T.caption, color: colors.mutedText, marginTop: 2 },
-  requiredBadge: { backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  requiredBadgeText: { ...T.captionTiny, fontWeight: '600', color: '#92400E' },
+  requiredBadge: { backgroundColor: colors.orangeBg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
+  requiredBadgeText: { ...T.captionTiny, fontWeight: '600', color: colors.orange },
 
   // Product grid
   productGrid: { paddingHorizontal: 12, paddingVertical: 12, paddingBottom: 200 },
@@ -807,7 +807,7 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   priceOriginal: { ...T.captionTiny, color: colors.secondaryLabel, textDecorationLine: 'line-through' },
   priceMain: { ...T.label, fontWeight: '700', color: colors.label },
-  priceDiscounted: { color: '#16a34a' },
+  priceDiscounted: { color: colors.greenDeep },
   loginToSee: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 4, fontStyle: 'italic' },
 
   addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.accent },
@@ -826,7 +826,7 @@ const styles = StyleSheet.create({
   navBtnText: { ...T.buttonSmall, color: colors.bodyText },
   navBtnTextDisabled: { color: colors.placeholder },
   navCenter: { alignItems: 'center' },
-  navDiscount: { ...T.captionTiny, fontWeight: '700', color: '#16a34a' },
+  navDiscount: { ...T.captionTiny, fontWeight: '700', color: colors.greenDeep },
   navTotal: { ...T.price, color: colors.label },
   navItems: { ...T.caption, fontWeight: '600', color: colors.mutedText },
 
@@ -855,10 +855,10 @@ const styles = StyleSheet.create({
   pricingRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   pricingLabel: { ...T.summaryLabel, color: colors.mutedText },
   pricingValue: { ...T.summaryValue, color: colors.bodyText },
-  pricingLabelPurple: { ...T.summaryLabel, color: '#7c3aed', fontWeight: '600' },
-  pricingValuePurple: { ...T.summaryValue, fontWeight: '700', color: '#7c3aed' },
-  pricingLabelGreen: { ...T.summaryLabel, color: '#16a34a', fontWeight: '600' },
-  pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: '#16a34a' },
+  pricingLabelPurple: { ...T.summaryLabel, color: colors.purple, fontWeight: '600' },
+  pricingValuePurple: { ...T.summaryValue, fontWeight: '700', color: colors.purple },
+  pricingLabelGreen: { ...T.summaryLabel, color: colors.greenDeep, fontWeight: '600' },
+  pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: colors.greenDeep },
   pricingRowTotal: { borderTopWidth: 1, borderTopColor: colors.separator, paddingTop: 8, marginTop: 4 },
   pricingTotalLabel: { ...T.totalLabel, color: colors.label, fontSize: 16 },
   pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: colors.accent, fontSize: 18 },

@@ -162,7 +162,7 @@ export default function PartnersScreen() {
   return (
     <View style={styles.container}>
       <CollapsibleHeader
-        title={t('navigation.partners') || 'Partners'}
+        title={t('navigation.partners')}
         scrollY={(!loading && !error) ? scrollY : null}
         onBack={onBack}
         onRefresh={() => fetchPartners(true)}

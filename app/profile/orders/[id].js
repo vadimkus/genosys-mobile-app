@@ -560,7 +560,7 @@ export default function OrderDetailScreen() {
                       <View style={styles.itemTitleWrap}>
                         <Text style={[styles.itemName, isRTL && styles.textRTL]} numberOfLines={2}>{String(name)}</Text>
                         {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
-                          <View style={[styles.discountPill, isBundleItem && { backgroundColor: '#F0FDF4' }]}>
+                          <View style={[styles.discountPill, isBundleItem && { backgroundColor: colors.greenBg }]}>
                             <Text style={[styles.discountPillText, isBundleItem && { color: colors.greenDeep }]}>
                               {isBundleItem
                                 ? `${Math.round(discountPct)}% Bundle`
@@ -601,7 +601,7 @@ export default function OrderDetailScreen() {
                         <View style={styles.itemPriceRow}>
                           <Text style={[styles.itemPriceLabel, isRTL && styles.textRTL]}>
                             {isBundleItem
-                              ? (t('ordersDetail.bundleDiscount') || 'Bundle Discount')
+                              ? (t('ordersDetail.bundleDiscount'))
                               : t('ordersDetail.discount')}
                             {Number.isFinite(discountPct) ? (
                               <Text style={[styles.discountPctText, isRTL && styles.valueLTR]}> ({Math.round(discountPct)}%)</Text>
@@ -651,8 +651,8 @@ export default function OrderDetailScreen() {
                         <Ionicons name="gift-outline" size={16} color={colors.accent} />
                         <Text style={[styles.beautyBoxToggleText, isRTL && styles.textRTL]}>
                           {expandedBoxes[it?.productId || it?.id || `box-${idx}`]
-                            ? t('ordersDetail.hideBoxContents') || 'Hide Box Contents'
-                            : t('ordersDetail.viewBoxContents') || 'View Box Contents'}
+                            ? t('ordersDetail.hideBoxContents')
+                            : t('ordersDetail.viewBoxContents')}
                         </Text>
                         <Ionicons
                           name={expandedBoxes[it?.productId || it?.id || `box-${idx}`] ? 'chevron-up' : 'chevron-down'}
@@ -670,21 +670,21 @@ export default function OrderDetailScreen() {
                               return (
                                 <View style={styles.beautyBoxLoading}>
                                   <ActivityIndicator size="small" color={colors.accent} />
-                                  <Text style={styles.beautyBoxLoadingText}>{t('common.loading') || 'Loading...'}</Text>
+                                  <Text style={styles.beautyBoxLoadingText}>{t('common.loading')}</Text>
                                 </View>
                               );
                             }
                             if (!details?.items?.length) {
                               return (
                                 <Text style={[styles.beautyBoxNoDetails, isRTL && styles.textRTL]}>
-                                  {t('ordersDetail.boxDetailsUnavailable') || 'Box contents details are not available.'}
+                                  {t('ordersDetail.boxDetailsUnavailable')}
                                 </Text>
                               );
                             }
                             return (
                               <>
                                 <Text style={[styles.beautyBoxKitTitle, isRTL && styles.textRTL]}>
-                                  {t('product.kitIncludes') || 'Kit Includes:'}
+                                  {t('product.kitIncludes')}
                                 </Text>
                                 {details.items.map((kitItem) => (
                                   <View key={`kit-${kitItem.index}-${kitItem.header}`} style={[styles.beautyBoxKitItem, isRTL && { alignItems: 'flex-end' }]}>
@@ -1208,7 +1208,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   discountPill: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: colors.greenBg,
     borderColor: colors.greenDeep,
     borderWidth: 1,
     paddingHorizontal: 8,
@@ -1310,12 +1310,12 @@ const styles = StyleSheet.create({
     color: colors.greenDeep,
   },
   promoItemCard: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#DCFCE7',
+    borderColor: colors.greenLine,
   },
   promoItemRow: {
     flexDirection: FLEX_ROW,
@@ -1328,12 +1328,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: '#DCFCE7',
+    borderColor: colors.greenLine,
   },
   promoThumbnailPlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
   },
   promoItemContent: {
     flex: 1,
@@ -1355,9 +1355,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderWidth: 1,
-    borderColor: '#DCFCE7',
+    borderColor: colors.greenLine,
   },
   freeBadgeText: {
     ...T.captionTiny,
@@ -1444,14 +1444,14 @@ const styles = StyleSheet.create({
     color: colors.greenDeep,
   },
   youSavedBanner: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 14,
     alignItems: 'center',
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: colors.greenLine,
   },
   youSavedText: {
     ...T.labelSmall,
@@ -1475,7 +1475,7 @@ const styles = StyleSheet.create({
   freeShippingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
@@ -1599,11 +1599,11 @@ const styles = StyleSheet.create({
   },
   beautyBoxContents: {
     marginTop: 12,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.orangeBg,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: colors.orangeLine,
   },
   beautyBoxLoading: {
     flexDirection: 'row',
@@ -1626,7 +1626,7 @@ const styles = StyleSheet.create({
   beautyBoxKitTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#9A3412',
+    color: colors.orange,
     marginBottom: 10,
     textTransform: 'uppercase',
     letterSpacing: 0.5,

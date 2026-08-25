@@ -654,7 +654,8 @@
     "pc9Benefit3Title": "Professional Results:",
     "pc9Benefit3Text": "Microneedling device enhances the effectiveness of professional ampoule treatments",
     "pc9Benefit4Title": "Complete Treatment System:",
-    "pc9Benefit4Text": "Addresses anti-aging, wrinkle reduction, and skin firmness for comprehensive professional skincare"
+    "pc9Benefit4Text": "Addresses anti-aging, wrinkle reduction, and skin firmness for comprehensive professional skincare",
+    "quantity": "Quantity"
   },
   "rewards": {
     "title": "GENOSYS Rewards",
@@ -893,7 +894,10 @@
     "additionalInformation": "About You",
     "notificationPreferences": "Notification Preferences",
     "selectDateOfBirthPlaceholder": "Select date of birth",
-    "privacyNote": "Your personal information is protected and will not be shared with third parties. By updating your profile, you agree to our Privacy Policy."
+    "privacyNote": "Your personal information is protected and will not be shared with third parties. By updating your profile, you agree to our Privacy Policy.",
+    "avatarError": "Could not set your avatar. Please try again.",
+    "photoError": "Could not take the photo. Please try again.",
+    "photoSelectError": "Could not select that photo. Please try again."
   },
   "addAddress": {
     "addTitle": "Add Address",

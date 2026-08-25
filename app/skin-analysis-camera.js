@@ -513,7 +513,7 @@ export default function SkinAnalysisCameraScreen() {
               disabled={capturing}
               activeOpacity={0.8}
               accessibilityRole="button"
-              accessibilityLabel={t('profile.takePhoto')}
+              accessibilityLabel={t('skinAnalysis.capturePhoto')}
               accessibilityState={{ disabled: capturing }}
             >
               <View style={styles.captureInner}>
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
   aiRecBody: { flex: 1 },
   aiRecName: { ...T.label, fontWeight: '700', color: colors.label, marginBottom: 2 },
   aiRecPrice: { ...T.label, fontWeight: '800', color: colors.accent, marginBottom: 4 },
-  aiRecPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginBottom: 4 },
+  aiRecPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: colors.whatsappDeep, marginBottom: 4 },
   aiRecReason: { ...T.captionSmall, color: colors.mutedText, lineHeight: 17, marginBottom: 8 },
   aiRecActions: { flexDirection: 'row', gap: 8 },
   aiRecAddBtn: {
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 8,
   },
-  aiRecAddBtnAdded: { backgroundColor: '#16A34A' },
+  aiRecAddBtnAdded: { backgroundColor: colors.greenDeep },
   aiRecAddText: { ...T.captionSmall, fontWeight: '700', color: colors.white },
   aiRecViewBtn: {
     paddingHorizontal: 14,

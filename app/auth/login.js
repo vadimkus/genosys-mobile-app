@@ -1192,14 +1192,14 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#F4C96B',
-    backgroundColor: '#FFF8E7',
+    borderColor: colors.orangeLine,
+    backgroundColor: colors.orangeBg,
   },
   emailSuggestionText: {
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '600',
-    color: '#704B00',
+    color: colors.orange,
   },
   emailSuggestionActions: {
     flexDirection: 'row',
@@ -1211,7 +1211,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
     borderRadius: 10,
-    backgroundColor: '#704B00',
+    backgroundColor: colors.orange,
     paddingHorizontal: 14,
   },
   emailSuggestionPrimaryText: {
@@ -1224,14 +1224,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#D8A93E',
+    borderColor: colors.orangeLine,
     backgroundColor: colors.card,
     paddingHorizontal: 14,
   },
   emailSuggestionSecondaryText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#704B00',
+    color: colors.orange,
   },
   passwordRow: {
     flexDirection: 'row',

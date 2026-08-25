@@ -10,7 +10,7 @@ export default function EmirateFlagIcon({ name }) {
     <View style={flagStyles.flagBox}>
       <View style={flagStyles.uaeRed} />
       <View style={flagStyles.uaeRight}>
-        <View style={[flagStyles.uaeStripe, { backgroundColor: '#00732F' }]} />
+        <View style={[flagStyles.uaeStripe, { backgroundColor: colors.flagGreen }]} />
         <View style={[flagStyles.uaeStripe, { backgroundColor: colors.card }]} />
         <View style={[flagStyles.uaeStripe, { backgroundColor: colors.label }]} />
       </View>
@@ -78,7 +78,7 @@ const flagStyles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: '24%',
-    backgroundColor: '#CE1126',
+    backgroundColor: colors.flagRed,
   },
   uaeRight: {
     position: 'absolute',

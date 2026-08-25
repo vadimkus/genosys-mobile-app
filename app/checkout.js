@@ -945,8 +945,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: '#DCFCE7',
-    color: '#15803D',
+    backgroundColor: colors.greenBg,
+    color: colors.greenDeep,
     fontSize: 11,
     fontWeight: '800',
   },
@@ -990,8 +990,8 @@ const styles = StyleSheet.create({
   orderSummaryDiscountPill: {
     overflow: 'hidden',
     borderRadius: 999,
-    backgroundColor: '#DCFCE7',
-    color: '#15803D',
+    backgroundColor: colors.greenBg,
+    color: colors.greenDeep,
     fontSize: 10,
     fontWeight: '900',
     paddingHorizontal: 6,
@@ -1300,12 +1300,12 @@ const styles = StyleSheet.create({
   pinButtonText: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#007AFF',
+    color: colors.blue,
   },
   pinRowButtonText: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: '#007AFF',
+    color: colors.blue,
   },
   landmarkWrap: {
     marginTop: 12,
@@ -1375,14 +1375,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderWidth: 1,
-    borderColor: '#DCFCE7',
+    borderColor: colors.greenLine,
   },
   freeBadgeText: {
     ...T.captionTiny,
     fontWeight: '800',
-    color: '#16A34A',
+    color: colors.greenDeep,
   },
   deliveryEtaHint: {
     ...T.captionSmall,
@@ -1493,7 +1493,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     padding: 8,
     borderRadius: 6,
     marginVertical: 8,
@@ -1501,7 +1501,7 @@ const styles = StyleSheet.create({
   freeShippingText: {
     ...T.captionSmall,
     fontWeight: '500',
-    color: '#27AE60',
+    color: colors.greenDeep,
   },
   totalRow: {
     flexDirection: 'row',
@@ -1534,11 +1534,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelDiscount: {
     ...T.summaryValue,
-    color: '#7C3AED',
+    color: colors.purple,
   },
   summaryValueDiscount: {
     ...T.summaryValue,
-    color: '#7C3AED',
+    color: colors.purple,
   },
   summaryLabelIntermediate: {
     ...T.captionSmall,
@@ -1550,11 +1550,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelBundle: {
     ...T.summaryValue,
-    color: '#16A34A',
+    color: colors.greenDeep,
   },
   summaryValueBundle: {
     ...T.summaryValue,
-    color: '#16A34A',
+    color: colors.greenDeep,
   },
   summaryDividerLight: {
     height: 1,
@@ -1570,7 +1570,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   summaryValueFree: {
-    color: '#16A34A',
+    color: colors.greenDeep,
     fontWeight: '600',
   },
   vatNoteRed: {
@@ -1579,9 +1579,9 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   youSavedBanner: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: colors.greenLine,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -1591,7 +1591,7 @@ const styles = StyleSheet.create({
   youSavedText: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: '#15803D',
+    color: colors.greenDeep,
   },
 
   // Sticky pay bar

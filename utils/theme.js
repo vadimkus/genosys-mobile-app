@@ -57,6 +57,7 @@ export const colors = {
 
   flagRed: '#CE1126',        // UAE national red. Not the brand token: the
                              // emirate flags must not follow a rebrand.
+  flagGreen: '#00732F',      // and the green stripe beside it, for the same reason.
 
   // What a shadow is cast in. Warm rather than black: on cream a black cast
   // greys the surface under it instead of suggesting depth.
@@ -76,6 +77,18 @@ export const colors = {
   green: '#2E7D4F',          // was #34C759. 4.7:1 on cream, 5.1:1 under white
   greenDeep: '#256A42',      // was #16A34A. 6.1:1 on cream
   orange: '#9A5A00',         // was #FF9500. 5.1:1 on cream
+  // Washed panels behind status content, the counterparts of `redBg`. They
+  // replace a Tailwind-ish set of cool pales (#F0FDF4, #EFF6FF, #FEF3C7 and
+  // friends) that read cold against cream. Each is its status colour mixed a
+  // tenth of the way into the page, so a panel whispers rather than boxes, and
+  // the matching text still clears AA on it. The `Line` values are the same mix
+  // pushed further, because a background this pale disappears as a border.
+  greenBg: '#e8ece6',
+  greenLine: '#c5d7ca',
+  blueBg: '#e7e9ee',
+  blueLine: '#c4cfe1',
+  orangeBg: '#f1e9df',
+  orangeLine: '#e1ceb5',
   // Destructive: errors, delete, negative values. Deepened from iOS #FF3B30,
   // which only reaches 3.3:1 on cream and fails AA as text. This clears 4.8:1
   // on cream and still takes white at 5.1:1 for filled destructive buttons.

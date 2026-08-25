@@ -118,7 +118,7 @@ export default function HelpSupportScreen() {
       subtitle: t('help.support.whatsappSubtitle'),
       description: '+971 58 548 76 65',
       icon: 'logo-whatsapp',
-      tileColor: colors.whatsapp,
+      tileColor: colors.whatsappDeep,
       action: () => Linking.openURL('https://wa.me/971585487665').catch(() => {}),
     },
   ];
@@ -277,7 +277,7 @@ export default function HelpSupportScreen() {
               activeOpacity={0.7}
             >
               <Text style={[styles.retryText, isRTL && styles.textRTLCenter]}>
-                {t('common.tryAgain') || 'Tap to retry'}
+                {t('common.tryAgain')}
               </Text>
             </TouchableOpacity>
           )}
@@ -312,7 +312,7 @@ export default function HelpSupportScreen() {
               onPress={() => { haptics.lightTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
               activeOpacity={0.7}
             >
-              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.whatsapp }]}>
+              <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.whatsappDeep }]}>
                 <Ionicons name="logo-whatsapp" size={20} color={colors.white} />
               </View>
               <Text style={[styles.quickActionTitle, isRTL && styles.textRTLCenter]}>{t('help.whatsappSupport')}</Text>

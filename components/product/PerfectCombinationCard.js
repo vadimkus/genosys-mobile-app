@@ -366,7 +366,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
 
           {recommendedProduct.isPriceOnRequest ? (
             <TouchableOpacity
-              style={[styles.pcAddBtn, { backgroundColor: colors.whatsapp }]}
+              style={[styles.pcAddBtn, { backgroundColor: colors.whatsappDeep }]}
               onPress={() => {
                 const msg = encodeURIComponent(
                   t('product.requestQuoteMessage', { name: recName })

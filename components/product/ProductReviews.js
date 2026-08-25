@@ -78,11 +78,11 @@ export default function ProductReviews({ productId }) {
 
   const handleSubmit = async () => {
     if (!user) {
-      Alert.alert(t('reviews.loginRequired') || 'Login Required', t('reviews.loginToReview') || 'Please log in to write a review.');
+      Alert.alert(t('reviews.loginRequired'), t('reviews.loginToReview'));
       return;
     }
     if (formComment.trim().length < 10) {
-      Alert.alert(t('reviews.tooShort') || 'Too Short', t('reviews.minimumCharacters') || 'Please write at least 10 characters.');
+      Alert.alert(t('reviews.tooShort'), t('reviews.minimumCharacters'));
       return;
     }
 
@@ -104,14 +104,14 @@ export default function ProductReviews({ productId }) {
         authenticated: true,
         token: user.token,
         headers: { apiKey: true, token: user.token },
-        safeMessage: t('reviews.submitFailed') || 'Failed to submit review',
+        safeMessage: t('reviews.submitFailed'),
       });
       if (data?.success === false) throw new Error('review-submit-failed');
 
       resetForm();
       await fetchReviews();
     } catch (error) {
-      Alert.alert(t('common.error') || 'Error', t('reviews.submitFailed') || 'Failed to submit review');
+      Alert.alert(t('common.error'), t('reviews.submitFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -119,12 +119,12 @@ export default function ProductReviews({ productId }) {
 
   const handleDelete = (reviewId) => {
     Alert.alert(
-      t('reviews.deleteTitle') || 'Delete Review',
-      t('reviews.deleteConfirm') || 'Are you sure you want to delete this review?',
+      t('reviews.deleteTitle'),
+      t('reviews.deleteConfirm'),
       [
-        { text: t('common.cancel') || 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: t('common.delete') || 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -133,11 +133,11 @@ export default function ProductReviews({ productId }) {
                 authenticated: true,
                 token: user?.token,
                 headers: { apiKey: true, token: user?.token },
-                safeMessage: t('reviews.deleteFailed') || 'Failed to delete review',
+                safeMessage: t('reviews.deleteFailed'),
               });
               await fetchReviews();
             } catch (error) {
-              Alert.alert(t('common.error') || 'Error', t('reviews.deleteFailed') || 'Failed to delete review');
+              Alert.alert(t('common.error'), t('reviews.deleteFailed'));
             }
           },
         },
@@ -203,7 +203,7 @@ export default function ProductReviews({ productId }) {
               <Ionicons name="star" size={16} color={colors.white} />
             </View>
             <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-              {t('reviews.title') || 'Customer Reviews'}
+              {t('reviews.title')}
             </Text>
           </View>
           {averageRating != null && reviewCount > 0 && (
@@ -211,7 +211,7 @@ export default function ProductReviews({ productId }) {
               {renderStars(Math.floor(averageRating), 18)}
               <Text style={styles.avgRatingText}>{averageRating.toFixed(1)}</Text>
               <Text style={styles.reviewCountText}>
-                ({reviewCount} {reviewCount === 1 ? (t('reviews.review') || 'review') : (t('reviews.reviewsPlural') || 'reviews')})
+                ({reviewCount} {reviewCount === 1 ? (t('reviews.review')) : (t('reviews.reviewsPlural'))})
               </Text>
             </View>
           )}
@@ -219,7 +219,7 @@ export default function ProductReviews({ productId }) {
         {user && !userReview && !showForm && (
           <TouchableOpacity style={styles.writeButton} onPress={() => setShowForm(true)}>
             <Ionicons name="create-outline" size={16} color={colors.white} />
-            <Text style={styles.writeButtonText}>{t('reviews.writeReview') || 'Write Review'}</Text>
+            <Text style={styles.writeButtonText}>{t('reviews.writeReview')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -228,31 +228,31 @@ export default function ProductReviews({ productId }) {
       {showForm && user && (
         <View style={styles.formContainer}>
           <Text style={[styles.formTitle, isRTL && styles.textRTL]}>
-            {editingReview ? (t('reviews.editReview') || 'Edit Review') : (t('reviews.writeReview') || 'Write Review')}
+            {editingReview ? (t('reviews.editReview')) : (t('reviews.writeReview'))}
           </Text>
 
           {/* Rating */}
-          <Text style={[styles.formLabel, isRTL && styles.textRTL]}>{t('reviews.rating') || 'Rating'} *</Text>
+          <Text style={[styles.formLabel, isRTL && styles.textRTL]}>{t('reviews.rating')} *</Text>
           {renderStars(formRating, 28, true, setFormRating)}
 
           {/* Title */}
-          <Text style={[styles.formLabel, isRTL && styles.textRTL]}>{t('reviews.reviewTitle') || 'Title'}</Text>
+          <Text style={[styles.formLabel, isRTL && styles.textRTL]}>{t('reviews.reviewTitle')}</Text>
           <TextInput
             style={[styles.input, isRTL && styles.inputRTL]}
             value={formTitle}
             onChangeText={setFormTitle}
-            placeholder={t('reviews.titlePlaceholder') || 'Brief summary...'}
+            placeholder={t('reviews.titlePlaceholder')}
             placeholderTextColor={colors.placeholder}
             textAlign={isRTL ? 'right' : 'left'}
           />
 
           {/* Comment */}
-          <Text style={[styles.formLabel, isRTL && styles.textRTL]}>{t('reviews.yourReview') || 'Your Review'} *</Text>
+          <Text style={[styles.formLabel, isRTL && styles.textRTL]}>{t('reviews.yourReview')} *</Text>
           <TextInput
             style={[styles.textarea, isRTL && styles.inputRTL]}
             value={formComment}
             onChangeText={setFormComment}
-            placeholder={t('reviews.reviewPlaceholder') || 'Share your experience with this product...'}
+            placeholder={t('reviews.reviewPlaceholder')}
             placeholderTextColor={colors.placeholder}
             multiline
             numberOfLines={4}
@@ -260,7 +260,7 @@ export default function ProductReviews({ productId }) {
             textAlign={isRTL ? 'right' : 'left'}
           />
           <Text style={[styles.charCount, isRTL && styles.textRTL]}>
-            {t('reviews.minimumLabel') || 'Minimum 10 characters'} ({formComment.length}/10)
+            {t('reviews.minimumLabel')} ({formComment.length}/10)
           </Text>
 
           {/* Buttons */}
@@ -274,12 +274,12 @@ export default function ProductReviews({ productId }) {
                 <ActivityIndicator size="small" color={colors.white} />
               ) : (
                 <Text style={styles.submitButtonText}>
-                  {editingReview ? (t('reviews.updateReview') || 'Update') : (t('reviews.submitReview') || 'Submit')}
+                  {editingReview ? (t('reviews.updateReview')) : (t('reviews.submitReview'))}
                 </Text>
               )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
-              <Text style={styles.cancelButtonText}>{t('common.cancel') || 'Cancel'}</Text>
+              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -289,7 +289,7 @@ export default function ProductReviews({ productId }) {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color={colors.accent} />
-          <Text style={styles.loadingText}>{t('reviews.loading') || 'Loading reviews...'}</Text>
+          <Text style={styles.loadingText}>{t('reviews.loading')}</Text>
         </View>
       ) : reviews.length > 0 ? (
         <View style={styles.reviewsList}>
@@ -337,7 +337,7 @@ export default function ProductReviews({ productId }) {
         <View style={styles.emptyContainer}>
           <Ionicons name="chatbubble-outline" size={32} color={colors.tertiary} />
           <Text style={[styles.emptyText, isRTL && styles.textRTL]}>
-            {t('reviews.noReviews') || 'No reviews yet. Be the first to review!'}
+            {t('reviews.noReviews')}
           </Text>
         </View>
       )}

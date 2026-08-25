@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   updatePillText: { ...T.captionSmall, color: colors.mutedText, fontWeight: '500' },
   highlightSection: {
-    backgroundColor: '#FFF3F3',
+    backgroundColor: colors.redBg,
     marginHorizontal: 20,
     marginVertical: 16,
     padding: 20,

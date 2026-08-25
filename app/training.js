@@ -145,7 +145,7 @@ export default function TrainingScreen() {
   if (!user) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={t('navigation.training') || 'Training'} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader title={t('navigation.training')} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.emptyState, { paddingTop: headerHeight }]}>
           <Ionicons name="lock-closed" size={48} color={colors.tertiary} />
           <Text style={styles.emptyTitle}>{l('Login Required', 'يجب تسجيل الدخول', 'Требуется авторизация')}</Text>
@@ -161,7 +161,7 @@ export default function TrainingScreen() {
   return (
     <View style={styles.container}>
       <CollapsibleHeader
-        title={t('navigation.training') || 'Training'}
+        title={t('navigation.training')}
         scrollY={(!loading && !error) ? scrollY : null}
         onBack={onBack}
         onRefresh={() => fetchTraining(true)}

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   fillMet: {
-    backgroundColor: '#34C759',
+    backgroundColor: colors.green,
   },
 });
 

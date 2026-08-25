@@ -191,7 +191,7 @@ export default function FAQScreen() {
   };
 
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/'); };
-  const headerTitle = t('navigation.faq') || 'FAQ';
+  const headerTitle = t('navigation.faq');
 
   if (loading) {
     return (

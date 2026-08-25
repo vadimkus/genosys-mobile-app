@@ -105,7 +105,7 @@ export default function SkinConcernsScreen() {
   return (
     <View style={styles.container}>
       <CollapsibleHeader
-        title={t('categories.skinConcern') || 'Skin Concern'}
+        title={t('categories.skinConcern')}
         scrollY={scrollY}
         onBack={onBack}
         isRTL={isRTL}

@@ -154,8 +154,8 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
   },
   redeemRowActive: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
+    backgroundColor: colors.blueBg,
+    borderColor: colors.blueLine,
   },
   redeemText: {
     flex: 1,

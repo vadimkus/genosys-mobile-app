@@ -102,7 +102,7 @@ export default function BlogScreen() {
   return (
     <View style={styles.container}>
       <CollapsibleHeader
-        title={t('navigation.blog') || 'Blog'}
+        title={t('navigation.blog')}
         scrollY={canScroll ? scrollY : null}
         onBack={onBack}
         // Pull-to-refresh already covers reloading, so the slot goes to the

@@ -973,7 +973,7 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
   },
   progressRightTextMet: {
-    color: '#34C759',
+    color: colors.green,
   },
   rewardRow: {
     flexDirection: 'row',
@@ -1022,7 +1022,7 @@ const styles = StyleSheet.create({
   freeShippingBannerGreen: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   freeShippingTextGreen: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: '#27AE60',
+    color: colors.greenDeep,
   },
   vatNoteRed: {
     ...T.captionTiny,
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   promoItemPriceRight: {
     ...T.price,
     fontWeight: '900',
-    color: '#27AE60',
+    color: colors.greenDeep,
   },
   promoQtyRight: {
     ...T.captionSmall,
@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
   promoTag: {
     ...T.captionTiny,
     fontWeight: '800',
-    color: '#27AE60',
+    color: colors.greenDeep,
     marginTop: 4,
     textAlign: 'right',
   },
@@ -1159,8 +1159,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.redBg,
   },
   variantChipSizeSelected: {
-    borderColor: '#2563EB',
-    backgroundColor: '#EFF6FF',
+    borderColor: colors.blue,
+    backgroundColor: colors.blueBg,
   },
   variantChipText: {
     fontSize: 10,
@@ -1172,7 +1172,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   variantChipTextSizeSelected: {
-    color: '#2563EB',
+    color: colors.blue,
     fontWeight: '700',
   },
   
@@ -1195,12 +1195,12 @@ const styles = StyleSheet.create({
   itemBundleLabel: {
     ...T.captionTiny,
     fontWeight: '700',
-    color: '#27AE60',
+    color: colors.greenDeep,
   },
   itemDiscountLabel: {
     ...T.captionTiny,
     fontWeight: '700',
-    color: '#27AE60',
+    color: colors.greenDeep,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -1333,11 +1333,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelDiscount: {
     ...T.summaryValue,
-    color: '#7C3AED',
+    color: colors.purple,
   },
   summaryValueDiscountPurple: {
     ...T.summaryValue,
-    color: '#7C3AED',
+    color: colors.purple,
   },
   summaryLabelIntermediate: {
     ...T.captionSmall,
@@ -1349,11 +1349,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelBundle: {
     ...T.summaryValue,
-    color: '#16A34A',
+    color: colors.greenDeep,
   },
   summaryValueBundle: {
     ...T.summaryValue,
-    color: '#16A34A',
+    color: colors.greenDeep,
   },
   waterfallDivider: {
     height: 1,
@@ -1369,9 +1369,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   youSavedBanner: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: colors.greenLine,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -1381,10 +1381,10 @@ const styles = StyleSheet.create({
   youSavedText: {
     ...T.captionSmall,
     fontWeight: '700',
-    color: '#15803D',
+    color: colors.greenDeep,
   },
   freeText: {
-    color: '#34C759',
+    color: colors.green,
   },
   divider: {
     height: 1,

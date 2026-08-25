@@ -708,9 +708,9 @@ export default function PartnerPortalScreen() {
           <View style={styles.agreeWrap}>
             {hasConsignment ? (
               <View style={[styles.agreeCard, styles.agreeCardAmber, isRTL && styles.rowRTL]}>
-                <View style={[styles.agreeDot, { backgroundColor: '#FBBF24' }]} />
+                <View style={[styles.agreeDot, { backgroundColor: colors.orange }]} />
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.agreeTitle, { color: '#FCD34D' }, isRTL && styles.rtlText]}>
+                  <Text style={[styles.agreeTitle, { color: colors.orange }, isRTL && styles.rtlText]}>
                     {tr('CONSIGNMENT AGREEMENT — ACTIVE', 'ДОГОВОР КОНСИГНАЦИИ — АКТИВЕН', 'اتفاقية الأمانة — مفعّلة')}
                   </Text>
                   <Text style={[styles.agreeDesc, isRTL && styles.rtlText]}>
@@ -721,9 +721,9 @@ export default function PartnerPortalScreen() {
             ) : null}
             {hasCredit ? (
               <View style={[styles.agreeCard, styles.agreeCardBlue, isRTL && styles.rowRTL]}>
-                <View style={[styles.agreeDot, { backgroundColor: '#60A5FA' }]} />
+                <View style={[styles.agreeDot, { backgroundColor: colors.blue }]} />
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.agreeTitle, { color: '#93C5FD' }, isRTL && styles.rtlText]}>
+                  <Text style={[styles.agreeTitle, { color: colors.blue }, isRTL && styles.rtlText]}>
                     {tr(`CREDIT ${creditDays} DAYS — ACTIVE`, `КРЕДИТ ${creditDays} ДНЕЙ — АКТИВЕН`, `أجل ${creditDays} يومًا — مفعّل`)}
                   </Text>
                   <Text style={[styles.agreeDesc, isRTL && styles.rtlText]}>
@@ -1084,8 +1084,8 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   rowPrice: { fontSize: 14, fontWeight: '800', color: colors.accent },
   rowRetail: { fontSize: 12, color: colors.secondaryLabel, textDecorationLine: 'line-through' },
-  offBadge: { backgroundColor: '#E9F9EF', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  offBadgeText: { color: '#0F7B3E', fontSize: 10, fontWeight: '800' },
+  offBadge: { backgroundColor: colors.greenBg, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  offBadgeText: { color: colors.greenDeep, fontSize: 10, fontWeight: '800' },
   // Stepper / add
   addBtn: { backgroundColor: colors.redBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnText: { color: colors.accent, fontSize: 13, fontWeight: '700' },
@@ -1119,16 +1119,16 @@ const styles = StyleSheet.create({
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
-  pointsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFBEB', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 },
+  pointsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.orangeBg, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 },
   pointsRowDisabled: { opacity: 0.45 },
-  pointsTitle: { fontSize: 12, fontWeight: '700', color: '#78350F' },
-  pointsBalance: { fontSize: 11, color: '#92400E', marginTop: 1 },
-  pointsApplied: { fontSize: 11, color: '#92400E' },
+  pointsTitle: { fontSize: 12, fontWeight: '700', color: colors.orange },
+  pointsBalance: { fontSize: 11, color: colors.orange, marginTop: 1 },
+  pointsApplied: { fontSize: 11, color: colors.orange },
   footerPills: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
   pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.5, borderColor: colors.separator, backgroundColor: colors.card },
   pillActive: { backgroundColor: colors.label, borderColor: colors.label },
-  pillConsign: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
-  pillCredit: { backgroundColor: '#2563EB', borderColor: '#2563EB' },
+  pillConsign: { backgroundColor: colors.orange, borderColor: colors.orange },
+  pillCredit: { backgroundColor: colors.blue, borderColor: colors.blue },
   pillText: { fontSize: 12, fontWeight: '700', color: colors.secondaryLabel },
   pillTextActive: { color: colors.white },
   footerHint: { fontSize: 11, color: colors.secondaryLabel, marginBottom: 8 },
@@ -1147,13 +1147,13 @@ const styles = StyleSheet.create({
   successOrder: { fontSize: 15, fontWeight: '700', color: colors.label, marginTop: 8 },
   successTotal: { fontSize: 20, fontWeight: '800', color: colors.accent, marginTop: 4, marginBottom: 4 },
   // Consignment chips
-  consignPill: { backgroundColor: '#FEF3C7', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
-  consignPillText: { color: '#92400E', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  consignPill: { backgroundColor: colors.orangeBg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
+  consignPillText: { color: colors.orange, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
   consignHeaderPill: { backgroundColor: 'rgba(245,158,11,0.25)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-  consignHeaderPillText: { color: '#FCD34D', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
-  creditPill: { backgroundColor: '#DBEAFE', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
+  consignHeaderPillText: { color: colors.orange, fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  creditPill: { backgroundColor: colors.blueBg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
   creditHeaderPill: { backgroundColor: 'rgba(37,99,235,0.3)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-  creditHeaderPillText: { color: '#93C5FD', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  creditHeaderPillText: { color: colors.blue, fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
   // Trade agreement cards in the dark header
   agreeWrap: { gap: 8, marginTop: 12 },
   agreeCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 10 },
@@ -1176,7 +1176,7 @@ const styles = StyleSheet.create({
   groupSelected: { backgroundColor: colors.cta, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
   groupSelectedText: { fontSize: 10, fontWeight: '800', color: colors.white },
   // Professional / equipment badges
-  proBadge: { backgroundColor: '#2563EB', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
+  proBadge: { backgroundColor: colors.blue, borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
   equipBadge: { backgroundColor: colors.label, borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
   proBadgeText: { color: colors.white, fontSize: 8, fontWeight: '800', letterSpacing: 0.4 },
 });

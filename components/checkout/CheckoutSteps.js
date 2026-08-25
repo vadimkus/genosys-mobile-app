@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.fillSecondary,
   },
   markerActive: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: colors.greenBg,
   },
   markerText: {
     fontSize: 10,

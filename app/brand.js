@@ -104,7 +104,7 @@ export default function BrandScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('navigation.brand') || 'Brand'} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader title={t('navigation.brand')} scrollY={scrollY} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

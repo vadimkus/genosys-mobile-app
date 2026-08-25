@@ -84,7 +84,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
       computedBadges.push({
         type: 'order',
         text: t('common.order'),
-        color: '#FF9500',
+        color: colors.orange,
         textColor: colors.white,
         priority: 0,
       });
@@ -92,7 +92,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
       computedBadges.push({
         type: 'in_stock',
         text: t('stock.inStock'),
-        color: '#34C759',
+        color: colors.green,
         textColor: colors.white,
         priority: 0,
       });
@@ -104,7 +104,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
     computedBadges.push({
       type: 'new',
       text: t('common.new'),
-      color: '#007AFF',
+      color: colors.blue,
       textColor: colors.white,
       priority: 1,
     });
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   savingsContainer: {
-    backgroundColor: '#16a34a',
+    backgroundColor: colors.greenDeep,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   beautyBoxFullPrice: {
     ...T.captionSmall,
     fontWeight: '500',
-    color: '#2C3E50',
+    color: colors.label,
     marginBottom: 4,
   },
   beautyBoxDiscountContainer: {
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     ...T.captionTiny,
     fontWeight: 'bold',
     color: colors.accent,
-    backgroundColor: '#FFE5E5',
+    backgroundColor: colors.redBg,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
   beautyBoxFinalPrice: {
     ...T.labelSmall,
     fontWeight: 'bold',
-    color: '#27AE60',
+    color: colors.greenDeep,
   },
   rowRTL: { flexDirection: 'row-reverse' },
   alignEndRTL: { alignItems: 'flex-end' },
@@ -554,14 +554,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   addToCartBtnInCart: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: colors.greenLine,
   },
   addToCartBtnText: {
     ...T.buttonTiny,
   },
   addToCartBtnTextInCart: {
-    color: '#15803D',
+    color: colors.greenDeep,
   },
 });

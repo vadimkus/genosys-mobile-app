@@ -611,10 +611,10 @@ export default function ConcernDetailScreen() {
                         <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{formatAed(breakdown.retailTotal)}</Text>
                       </View>
                       <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
-                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: '#16a34a', fontWeight: '600' }]}>
+                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: colors.greenDeep, fontWeight: '600' }]}>
                           {locale === 'ar' ? `خصم ${breakdown.userDiscountPct}%` : locale === 'ru' ? `Скидка ${breakdown.userDiscountPct}%` : `${breakdown.userDiscountPct}% Discount`}
                         </Text>
-                        <Text style={{ fontSize: 14, fontWeight: '600', color: '#16a34a' }}>-{formatAed(discountAmount)}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.greenDeep }}>-{formatAed(discountAmount)}</Text>
                       </View>
                     </>
                   )}
@@ -712,23 +712,23 @@ const styles = StyleSheet.create({
   whyDetail: { ...T.captionTiny, textAlign: 'center', lineHeight: 16 },
 
   // Protocol PDF
-  pdfCard: { marginTop: 16, marginBottom: 8, backgroundColor: '#FFFBEB', borderRadius: 16, padding: 16, ...shadow.card },
+  pdfCard: { marginTop: 16, marginBottom: 8, backgroundColor: colors.orangeBg, borderRadius: 16, padding: 16, ...shadow.card },
   pdfRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  pdfIconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#FEF3C7', justifyContent: 'center', alignItems: 'center' },
+  pdfIconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: colors.orangeBg, justifyContent: 'center', alignItems: 'center' },
   pdfContent: { flex: 1 },
   pdfTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
   pdfTitle: { ...T.label, flex: 1 },
-  pdfBadge: { backgroundColor: '#FEF3C7', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
-  pdfBadgeText: { ...T.badge, fontWeight: '600', color: '#92400E' },
+  pdfBadge: { backgroundColor: colors.orangeBg, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
+  pdfBadgeText: { ...T.badge, fontWeight: '600', color: colors.orange },
   pdfDesc: { ...T.captionSmall, lineHeight: 17 },
   pdfDownload: { alignItems: 'center', gap: 4 },
-  pdfSize: { ...T.badge, fontWeight: '400', color: '#92400E' },
+  pdfSize: { ...T.badge, fontWeight: '400', color: colors.orange },
 
   // Routine
   routineSectionTitle: { ...T.sectionTitle, marginBottom: 4 },
   routineSubtitle: { ...T.caption, marginBottom: 12 },
   routineStep: { ...surfaces.card, ...shadow.card, borderRadius: 14, marginBottom: 10, overflow: 'hidden' },
-  routineStepExpanded: { backgroundColor: '#FFF8F8' },
+  routineStepExpanded: { backgroundColor: colors.redBg },
   routineStepHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 10 },
   stepNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.label, justifyContent: 'center', alignItems: 'center' },
   stepNumberActive: { backgroundColor: colors.cta },
@@ -744,9 +744,9 @@ const styles = StyleSheet.create({
   stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.fillSecondary, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
   stepProductChipInCart: { backgroundColor: tint(colors.greenDeep, '1A') },
   stepProductName: { ...T.captionSmall, fontWeight: '600', color: colors.label },
-  stepProductNameInCart: { color: '#15803D' },
+  stepProductNameInCart: { color: colors.greenDeep },
   stepProductPrice: { ...T.captionSmall },
-  stepProductPriceInCart: { color: '#16a34a' },
+  stepProductPriceInCart: { color: colors.greenDeep },
 
   // Products grid
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
   // FAQ
   faqSection: { marginTop: 24, marginBottom: 8 },
   faqItem: { ...surfaces.card, ...shadow.card, borderRadius: 12, marginBottom: 8, overflow: 'hidden' },
-  faqItemOpen: { backgroundColor: '#FFF8F8' },
+  faqItemOpen: { backgroundColor: colors.redBg },
   faqHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 8 },
   faqQuestion: { ...T.faqQuestion, fontWeight: '600', lineHeight: 20 },
   faqAnswer: { ...T.faqAnswer, fontSize: 13, paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: colors.fill, paddingTop: 10 },
@@ -858,8 +858,8 @@ const styles = StyleSheet.create({
   stickyPricingRowRTL: { flexDirection: 'row-reverse' },
   stickyPricingLabel: { ...T.label },
   stickyPricingValue: { ...T.summaryValue, fontWeight: '700' },
-  stickyFreeShipping: { ...T.captionSmall, color: '#D97706', marginTop: 4 },
-  stickyFreeShippingDone: { ...T.captionSmall, fontWeight: '600', color: '#059669', marginTop: 4 },
+  stickyFreeShipping: { ...T.captionSmall, color: colors.orange, marginTop: 4 },
+  stickyFreeShippingDone: { ...T.captionSmall, fontWeight: '600', color: colors.greenDeep, marginTop: 4 },
   stickyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 },
   stickyRowRTL: { flexDirection: 'row-reverse' },
   stickyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },

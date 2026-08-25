@@ -886,7 +886,7 @@ const styles = StyleSheet.create({
   freeShippingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderRadius: 8,
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -895,14 +895,14 @@ const styles = StyleSheet.create({
   freeShippingText: { fontSize: 10, color: colors.greenDeep, fontWeight: '600' },
   vatNoteRed: { fontSize: 10, color: colors.accent, paddingVertical: 1 },
   youSavedBanner: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: colors.greenBg,
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
     alignItems: 'center',
     marginTop: 6,
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: colors.greenLine,
   },
   youSavedText: { fontSize: 12, color: colors.greenDeep, fontWeight: '800' },
 

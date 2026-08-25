@@ -555,33 +555,33 @@ export default function ProfileScreen() {
         </View>
 
         {/* Explore */}
-        <ProfileSection title={t('navigation.explore') || 'Explore'}>
+        <ProfileSection title={t('navigation.explore')}>
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="gift-outline"
               tint={colors.accent}
-              title={t('navigation.bundleBuilder') || 'Bundle Builder'}
-              subtitle={t('profile.buildYourSet') || 'Build your skincare set'}
+              title={t('navigation.bundleBuilder')}
+              subtitle={t('profile.buildYourSet')}
               onPress={() => { haptics.lightTap(); router.push('/bundle-builder'); }}
             />
             <ProfileItem
               icon="sparkles-outline"
               tint={colors.purple}
-              title={t('navigation.aiSkinAnalysis') || 'AI Skin Analysis'}
-              subtitle={t('profile.aiSkinSubtitle') || 'Camera or quiz analysis'}
+              title={t('navigation.aiSkinAnalysis')}
+              subtitle={t('profile.aiSkinSubtitle')}
               onPress={() => { haptics.lightTap(); router.push('/skin-analysis'); }}
             />
             <ProfileItem
               icon="leaf-outline"
               tint={colors.green}
-              title={t('categories.skinConcern') || 'Skin Concern'}
-              subtitle={t('profile.skinConcernSubtitle') || 'Browse by concern'}
+              title={t('categories.skinConcern')}
+              subtitle={t('profile.skinConcernSubtitle')}
               onPress={() => { haptics.lightTap(); router.push('/skin-concerns'); }}
             />
             <ProfileItem
               icon="newspaper-outline"
               tint={colors.orange}
-              title={t('navigation.blog') || 'Blog'}
+              title={t('navigation.blog')}
               onPress={() => { haptics.lightTap(); router.push('/blog'); }}
               isLast={true}
             />
@@ -698,7 +698,7 @@ export default function ProfileScreen() {
         </ProfileSection>
 
         {/* Information */}
-        <ProfileSection title={t('navigation.information') || 'Information'}>
+        <ProfileSection title={t('navigation.information')}>
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="information-circle-outline"
@@ -709,43 +709,43 @@ export default function ProfileScreen() {
             <ProfileItem
               icon="business-outline"
               tint={colors.accent}
-              title={t('navigation.brand') || 'Brand'}
+              title={t('navigation.brand')}
               onPress={() => { haptics.lightTap(); router.push('/brand'); }}
             />
             <ProfileItem
               icon="people-outline"
               tint={colors.indigo}
-              title={t('navigation.partners') || 'Partners'}
+              title={t('navigation.partners')}
               onPress={() => { haptics.lightTap(); router.push('/partners'); }}
             />
             <ProfileItem
               icon="download-outline"
               tint={colors.purple}
-              title={t('profile.trainingMaterials') || 'Training Materials'}
+              title={t('profile.trainingMaterials')}
               onPress={() => { haptics.lightTap(); router.push('/training'); }}
             />
             <ProfileItem
               icon="car-outline"
               tint={colors.blue}
-              title={t('navigation.delivery') || 'Delivery'}
+              title={t('navigation.delivery')}
               onPress={() => { haptics.lightTap(); router.push('/delivery'); }}
             />
             <ProfileItem
               icon="navigate-outline"
               tint={colors.teal}
-              title={t('navigation.locations') || 'Locations'}
+              title={t('navigation.locations')}
               onPress={() => { haptics.lightTap(); router.push('/locations'); }}
             />
             <ProfileItem
               icon="help-buoy-outline"
               tint={colors.orange}
-              title={t('navigation.faq') || 'FAQ'}
+              title={t('navigation.faq')}
               onPress={() => { haptics.lightTap(); router.push('/faq'); }}
             />
             <ProfileItem
               icon="chatbubble-ellipses-outline"
               tint={colors.green}
-              title={t('navigation.contact') || 'Contact'}
+              title={t('navigation.contact')}
               onPress={() => { haptics.lightTap(); router.push('/contact'); }}
               isLast={true}
             />
