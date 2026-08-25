@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     borderRadius: 34,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FEE2E2',
+    backgroundColor: colors.redBg,
     marginBottom: 16,
   },
   errorTitle: {

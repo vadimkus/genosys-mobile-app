@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: colors.redLine,
   },
   concernChipText: { ...T.labelSmall, color: colors.accent },
 

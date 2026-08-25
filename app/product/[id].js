@@ -873,7 +873,7 @@ function ProductDetailScreen() {
     };
 
     return (
-      <View style={[styles.section, shadow.card]}>
+      <View style={styles.section}>
         <PdpSectionHeader icon="information-circle" tileColor={colors.indigo} title={t('product.productDetails')} isRTL={isRTL} />
         <View style={styles.specList}>
           {rows.map((row, idx) => (
@@ -1517,7 +1517,7 @@ function ProductDetailScreen() {
             const docs = getProductDocs(productId, product);
             if (!docs.length) return null;
             return (
-              <View style={[styles.section, shadow.card]}>
+              <View style={styles.section}>
                 <PdpSectionHeader icon="document-attach" tileColor={colors.teal} title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
                 {docs.map((doc, index) => (
                   <TouchableOpacity
@@ -1555,7 +1555,7 @@ function ProductDetailScreen() {
                   ? fullText.substring(0, 500).trimEnd() + '…'
                   : fullText;
                 return (
-                  <View style={[styles.section, shadow.card]}>
+                  <View style={styles.section}>
                     <PdpSectionHeader icon="document-text" tileColor={colors.blue} title={t('product.about')} isRTL={isRTL} />
                     <View style={styles.descriptionContainer}>
                       <Text style={[styles.description, isRTL && styles.textRTL]}>
@@ -2052,12 +2052,16 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
     fontWeight: '500',
   },
-  // A little more air inside and between sections. The website leans on
-  // whitespace to separate blocks where the app was leaning on borders.
+  // Bands, not cards. The website runs its product copy as full-width blocks
+  // divided by a rule; boxing each one made the page read as a stack of
+  // widgets. The cream page now shows through and the hairline does the
+  // dividing, which is also why the three call sites that added `shadow.card`
+  // had to drop it: a shadow with no panel under it is just a smudge.
   section: {
-    ...surfaces.card,
-    padding: 20,
-    marginBottom: 18,
+    paddingVertical: 24,
+    marginBottom: 0,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.separator,
   },
   sectionTitle: {
     ...T.serifHeading,

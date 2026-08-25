@@ -49,10 +49,10 @@ export const colors = {
   // white text, with rose carrying the accents. Brand red stays defined
   // because the logo and a few badges still need it, but it no longer paints
   // buttons.
+  // Button labels come from the `T.button*` styles, which already carry white,
+  // so there is no separate token for them.
   cta: '#191716',            // primary button background, cera ink
-  ctaText: '#FFFFFF',
   accent: '#8f5a5a',         // links, active icons, prices. cera rose-ink
-  accentSoft: '#c98b8b',     // decorative rules, quiet icons. cera rose
   accentBg: '#f7ecec',       // tinted pills behind accent text. cera blush
 
   flagRed: '#CE1126',        // UAE national red. Not the brand token: the
@@ -68,14 +68,25 @@ export const colors = {
   // does appear, starting with the app icon. The pressed, light and tint
   // variants were dropped once they had no users.
   brand: '#dc2626',
-  blue: '#007AFF',
-  green: '#34C759',
-  greenDeep: '#16A34A',
-  orange: '#FF9500',
+  // Status colours, deepened off their iOS values. The originals are tuned for
+  // white and fail badly as text on cream: blue reached 3.8:1, green 2.1:1 and
+  // orange 2.1:1 against the 4.5:1 needed. These all clear it, and still take
+  // white at 5:1 or better where they back an icon tile.
+  blue: '#2A5DA8',           // was #007AFF. 6.1:1 on cream
+  green: '#2E7D4F',          // was #34C759. 4.7:1 on cream, 5.1:1 under white
+  greenDeep: '#256A42',      // was #16A34A. 6.1:1 on cream
+  orange: '#9A5A00',         // was #FF9500. 5.1:1 on cream
   // Destructive: errors, delete, negative values. Deepened from iOS #FF3B30,
   // which only reaches 3.3:1 on cream and fails AA as text. This clears 4.8:1
   // on cream and still takes white at 5.1:1 for filled destructive buttons.
   red: '#D22B1E',
+  // Washed background behind destructive content. Replaces a scatter of cool
+  // pinks (#FFF5F5, #FEE2E2, #FCE8E8) that read cold against cream.
+  redBg: '#f6eae8',
+  // The border version. `redBg` is a whisper against cream by design and would
+  // be invisible as a line, so the few places drawing a destructive edge get
+  // their own value.
+  redLine: '#e0bdb7',
   indigo: '#5856D6',
   purple: '#7C3AED',
   teal: '#30B0C7',
@@ -114,11 +125,6 @@ export const cera = {
   line: '#e8e0db',        // hairlines and borders
   shot: '#eeeeee',        // packshot stage
 };
-
-// Retained so the pilot's import keeps resolving; `colors` now holds these
-// values, so the two are the same object shape and this can go once no screen
-// imports it.
-export const ceraColors = colors;
 
 // 10% alpha helper for tinted capsules / button backgrounds.
 export const tint = (hex, alpha = '1A') => `${hex}${alpha}`;
@@ -190,7 +196,6 @@ export const statusStyle = (status) => {
 export const theme = {
   colors,
   cera,
-  ceraColors,
   tint,
   shadow,
   surfaces,

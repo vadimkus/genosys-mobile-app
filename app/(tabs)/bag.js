@@ -1170,7 +1170,7 @@ const styles = StyleSheet.create({
   },
   variantChipSelected: {
     borderColor: colors.accent,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: colors.redBg,
   },
   variantChipSizeSelected: {
     borderColor: '#2563EB',

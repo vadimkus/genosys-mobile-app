@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.fill,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: colors.redBg,
     padding: 20,
     alignItems: 'center',
   },

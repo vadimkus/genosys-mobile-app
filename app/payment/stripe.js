@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     borderColor: colors.accent,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: colors.redBg,
   },
   secondaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700', color: colors.accent },
   linkButton: { alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 12 },

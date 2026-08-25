@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   selectedColorOption: {
     borderColor: colors.accent,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: colors.redBg,
   },
   colorSwatch: {
     width: 24,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   selectedSizeOption: {
     borderColor: colors.accent,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: colors.redBg,
   },
   sizeLabel: {
     ...T.label,

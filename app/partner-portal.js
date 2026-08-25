@@ -1087,12 +1087,12 @@ const styles = StyleSheet.create({
   offBadge: { backgroundColor: '#E9F9EF', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   offBadgeText: { color: '#0F7B3E', fontSize: 10, fontWeight: '800' },
   // Stepper / add
-  addBtn: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
+  addBtn: { backgroundColor: colors.redBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnText: { color: colors.accent, fontSize: 13, fontWeight: '700' },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stepBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.groupedBg, alignItems: 'center', justifyContent: 'center' },
   stepBtnSmall: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.separator, alignItems: 'center', justifyContent: 'center' },
-  addBtnSmall: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  addBtnSmall: { backgroundColor: colors.redBg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
   stepBtnAdd: { backgroundColor: colors.cta, borderColor: colors.accent },
   stepQty: { minWidth: 20, textAlign: 'center', fontSize: 15, fontWeight: '800', color: colors.label },
   // Notes
@@ -1114,7 +1114,7 @@ const styles = StyleSheet.create({
   reorderItemName: { fontSize: 12.5, color: colors.label, fontWeight: '600' },
   reorderItemMeta: { fontSize: 11, color: colors.secondaryLabel, marginTop: 1 },
   reorderItemPrice: { fontSize: 12.5, fontWeight: '700', color: colors.label },
-  reorderBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
+  reorderBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.redBg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   reorderBtnText: { color: colors.accent, fontSize: 13, fontWeight: '700' },
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
   homecareShortcutText: { color: colors.placeholder, fontSize: 10.5, marginTop: 1 },
   // Category section headers
   groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.groupedBg, paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
-  groupHeaderActive: { borderColor: '#FECACA' },
+  groupHeaderActive: { borderColor: colors.redLine },
   groupHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   groupLabel: { fontSize: 14, fontWeight: '800', color: colors.label },
   groupCount: { backgroundColor: colors.groupedBg, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },

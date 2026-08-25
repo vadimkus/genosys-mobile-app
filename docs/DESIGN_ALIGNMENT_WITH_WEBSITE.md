@@ -348,3 +348,50 @@ the new call sites reintroduce one.
 
 Product page sections went to 20pt padding and 18pt between, since the website
 separates blocks with air where the app was separating them with borders.
+
+## Stage 5 — corrections, then bands
+
+### Status colours were failing contrast
+
+The iOS status palette is tuned for white and was never rechecked against
+cream. Measured on the new background:
+
+| Token | Was | Contrast | Now | Contrast |
+|---|---|---|---|---|
+| blue | `#007AFF` | 3.77 | `#2A5DA8` | 6.10 |
+| green | `#34C759` | 2.08 | `#2E7D4F` | 4.73 |
+| greenDeep | `#16A34A` | 3.09 | `#256A42` | 6.12 |
+| orange | `#FF9500` | 2.06 | `#9A5A00` | 5.13 |
+
+AA wants 4.5 for text. Green at 2.08 was effectively decorative. All four still
+take white at 5:1 or better where they back an icon tile.
+
+### Cool pinks
+
+Fifteen washed pink fills (`#FFF5F5`, `#FEE2E2`, `#FCE8E8`) sat behind
+destructive content and read cold against cream. They became `colors.redBg`.
+Three of the matches turned out to be borders rather than fills, and a whisper
+tint used as a line is invisible, so those got `colors.redLine` instead.
+
+### Dead tokens
+
+`ceraColors`, `ctaText` and `accentSoft` all had zero users. Button labels get
+their white from the `T.button*` styles, so `ctaText` was never needed. Removed.
+
+A false alarm worth recording: an audit of the fifteen primary buttons reported
+their labels had no colour, which on an ink background would have meant
+invisible text on checkout and add-to-bag. They inherit white through
+`...T.button`; the audit could not see through the spread.
+
+### Product sections are bands now
+
+The biggest visible change so far. The website runs product copy as full-width
+blocks divided by a rule, where the app boxed each one, so the page read as a
+stack of widgets rather than as a document. Sections lost their panel and
+border and gained 24pt of vertical breathing room with a hairline under each.
+
+Three call sites were adding `shadow.card` on top of the section style. With no
+panel underneath, that shadow is just a smudge, so they were stripped.
+
+This is a layout change rather than a colour change, and it is the one most
+worth a look before it settles.
