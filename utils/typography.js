@@ -70,14 +70,15 @@ export const T = {
   },
 
   // ── Eyebrow ────────────────────────────────────────────────────────
-  // The small red uppercase label the site sets above headings ("BLOG",
-  // "CLEANSER", "LATEST ARTICLE"). Sans, not serif, on the site too.
+  // The small uppercase label the site sets above headings ("BLOG",
+  // "CLEANSER", "LATEST ARTICLE"). Sans, not serif, on the site too. Rose
+  // rather than red: the interface has no red left in it.
   eyebrow: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: colors.brand,
+    color: colors.accent,
   },
 
   // ── Large headings (hero titles, page titles) ──────────────────────

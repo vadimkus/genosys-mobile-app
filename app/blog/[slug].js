@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
   },
   sheetOverlap: { marginTop: -24 },
-  articleTitle: { ...T.pageTitleLarge, fontWeight: '800', color: colors.label, lineHeight: 32, fontSize: 24, marginBottom: 12 },
+  articleTitle: { ...T.serifDisplay, fontSize: 30, lineHeight: 35, marginBottom: 12 },
 
   // Article meta
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, marginBottom: 4 },
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   commentsSection: { paddingHorizontal: 16, paddingTop: 24 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
   rowRTL: { flexDirection: 'row-reverse' },
-  commentsTitle: { ...T.sectionTitleSmall, color: colors.label },
+  commentsTitle: { ...T.serifHeading, fontSize: 19 },
   commentCountBadge: { backgroundColor: colors.cta, borderRadius: 11, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   commentCountText: { ...T.badgeMedium, color: colors.white },
 
@@ -532,5 +532,7 @@ const styles = StyleSheet.create({
   retryBtnText: { ...T.buttonSmall, color: colors.white },
 
   // RTL
-  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  // Clearing the family gives Arabic the system face: Cormorant has no
+  // Arabic glyphs. No-op for the sans text that also uses this style.
+  textRTL: { writingDirection: 'rtl', textAlign: 'right', fontFamily: undefined },
 });

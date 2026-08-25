@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
 
   // Hero
   hero: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 6 },
-  heroTitle: { ...T.pageTitleLarge, marginBottom: 4 },
+  heroTitle: { ...T.serifDisplay, marginBottom: 4 },
   heroSubtitle: { ...T.subtitle, color: colors.secondaryLabel, lineHeight: 20 },
 
   // Feed
@@ -245,9 +245,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   categoryPillRTL: { alignSelf: 'flex-end' },
-  categoryText: { ...T.captionTiny, fontWeight: '700', color: colors.accent },
+  // The category above a post title is the site's eyebrow: small, uppercase,
+  // letter-spaced, rose.
+  categoryText: { ...T.eyebrow },
 
-  postTitle: { ...T.sectionTitleSmall, color: colors.label, lineHeight: 23 },
+  postTitle: { ...T.serifHeading, fontSize: 19, lineHeight: 23 },
   postExcerpt: { ...T.caption, color: colors.secondaryLabel, lineHeight: 20, marginTop: 6 },
   metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 },
   rowRTL: { flexDirection: 'row-reverse' },
@@ -256,5 +258,7 @@ const styles = StyleSheet.create({
   viewsText: { ...T.captionSmall, color: colors.secondaryLabel },
 
   // RTL
-  textRTL: { writingDirection: 'rtl', textAlign: 'right' },
+  // Clearing the family gives Arabic the system face: Cormorant has no
+  // Arabic glyphs. No-op for the sans text that also uses this style.
+  textRTL: { writingDirection: 'rtl', textAlign: 'right', fontFamily: undefined },
 });

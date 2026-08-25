@@ -1971,9 +1971,12 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginBottom: 8,
   },
+  // The website sets product names in its display serif. Arabic falls back to
+  // the system face via `textRTL`, which clears the family.
   productName: {
-    ...T.pageTitleLarge,
-    lineHeight: 34,
+    ...T.serifTitle,
+    fontSize: 28,
+    lineHeight: 33,
     marginBottom: 12,
   },
   reviewSummary: {
@@ -2049,14 +2052,15 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
     fontWeight: '500',
   },
+  // A little more air inside and between sections. The website leans on
+  // whitespace to separate blocks where the app was leaning on borders.
   section: {
     ...surfaces.card,
-    padding: 18,
-    marginBottom: 14,
+    padding: 20,
+    marginBottom: 18,
   },
   sectionTitle: {
-    ...T.sectionTitle,
-    fontWeight: '700',
+    ...T.serifHeading,
     marginBottom: 16,
   },
   // iOS Settings–style icon-tile section header (used on card sections).
@@ -2243,6 +2247,10 @@ const styles = StyleSheet.create({
   textRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
+    // Cormorant has no Arabic glyphs, so naming it would leave Android
+    // rendering tofu. Clearing the family here covers every serif heading on
+    // the screen at once, and is a no-op for the sans text that also uses this.
+    fontFamily: undefined,
   },
   // Perfect Combination
   pcOuter: {

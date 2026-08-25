@@ -309,3 +309,42 @@ actually the mark, starting with the app icon, which is native and unchanged.
 The product screen and blog, where the website is most itself: serif headings
 in content, the eyebrow-and-rule section rhythm, and the generous spacing the
 site uses between blocks.
+
+## Stage 4 — the serif finally does something
+
+Cormorant Garamond has been shipping in the bundle since stage 0 without a
+single screen setting it. It now runs where the website runs it: in content,
+never in chrome.
+
+| Where | Was | Now |
+|---|---|---|
+| Product name | sans 24 | serif 28 |
+| Product section headings | sans 700 | serif medium 21 |
+| Blog page title | sans | serif 34 |
+| Blog post card titles | sans | serif 19 |
+| Article title | sans 800/24 | serif 30 |
+| Comments heading | sans | serif 19 |
+| Blog category label | small bold rose | the eyebrow style |
+
+`T.eyebrow` was also still painting itself in brand red, left over from stage 0
+when red was a working colour. It is rose now, and has its first user.
+
+### Arabic
+
+Cormorant carries Latin and Cyrillic but no Arabic, and naming a family with no
+glyphs for the script leaves Android rendering tofu. Each of the three screens
+already applied a `textRTL` style to every heading, so clearing `fontFamily`
+there hands Arabic back to the system face in one place per screen. It is a
+no-op for the sans text that shares the same style. Every serif call site was
+checked for the guard rather than assumed: all five product section headings,
+both blog titles, the article title and the comments heading.
+
+Serif styles deliberately carry no `fontWeight`. Setting a custom family and a
+weight together makes iOS synthesise the weight instead of using the file we
+shipped, which shows as smeared strokes at display sizes. Verified that none of
+the new call sites reintroduce one.
+
+### Spacing
+
+Product page sections went to 20pt padding and 18pt between, since the website
+separates blocks with air where the app was separating them with borders.
