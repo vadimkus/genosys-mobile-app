@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import CollapsibleFooter from '../../components/CollapsibleFooter';
@@ -52,6 +52,7 @@ function BagScreen() {
     isLoading
   } = useCart();
   
+  const insets = useSafeAreaInsets();
   const [footerHeight, setFooterHeight] = useState(0);
   const [footerCollapsed, setFooterCollapsed] = useState(true);
 
@@ -624,7 +625,9 @@ function BagScreen() {
         contentContainerStyle={[
           styles.scrollContent,
           { paddingTop: navBarHeight + 12 },
-          { paddingBottom: Math.max(footerHeight + 24, 240) },
+          // The footer floats now, so the gap under it counts too. The floor
+          // covers the frame before onLayout reports a height.
+          { paddingBottom: Math.max(footerHeight + (insets.bottom || 12) + 16, 200) },
         ]}
         ListHeaderComponent={<CheckoutSteps currentStep="cart" />}
         ListFooterComponent={
@@ -723,7 +726,7 @@ function BagScreen() {
 
       {/* Checkout Footer - Fixed at bottom */}
       <View
-        style={styles.checkoutFooter}
+        style={[styles.checkoutFooter, { bottom: insets.bottom || 12 }]}
         onLayout={(e) => {
           const h = e?.nativeEvent?.layout?.height;
           if (typeof h === 'number' && Number.isFinite(h) && h > 0) {
@@ -731,7 +734,7 @@ function BagScreen() {
           }
         }}
       >
-        <SafeAreaView edges={['bottom']}>
+        <View style={styles.footerInner}>
         <CollapsibleFooter
           collapsed={footerCollapsed}
           onToggle={() => setFooterCollapsed((v) => !v)}
@@ -876,7 +879,7 @@ function BagScreen() {
         >
           <Text style={styles.checkoutButtonText}>{t('bag.proceedToCheckout')}</Text>
         </TouchableOpacity>
-        </SafeAreaView>
+        </View>
       </View>
 
     </View>
@@ -1274,24 +1277,27 @@ const styles = StyleSheet.create({
   shopButtonText: {
     ...T.button,
   },
+  // Floating, like the header above it and the buy bar on a product page.
+  // `bottom` comes from the safe area inline, and the list leaves room for the
+  // measured height rather than a guess — this footer changes height as the
+  // summary expands.
   checkoutFooter: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    start: 12,
+    end: 12,
     backgroundColor: colors.card,
-    borderTopWidth: 1,
-    borderTopColor: colors.groupedBg,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    shadowColor: colors.shadowCast,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
+    borderRadius: 26,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    ...shadow.card,
   },
   
   // Enhanced Summary
+  footerInner: {
+    paddingBottom: 14,
+  },
   summaryContainer: {
     marginTop: 4,
     marginBottom: 16,
