@@ -112,9 +112,11 @@ export default function ChatButton({ visible = true }) {
 
   if (!visible) return null;
 
-  /* ─── Quick-action definitions (3-3-2-2 layout) ─── */
+  /* Quick-action definitions (3-3-2-2 layout). Deliberately not memoised: this
+     sits below the `visible` early return, so a hook here would run on some
+     renders and not others. */
   const [QUICK_ACTIONS_ROW1, QUICK_ACTIONS_ROW2, QUICK_ACTIONS_ROW3, QUICK_ACTIONS_ROW4] =
-    useMemo(() => buildQuickActionRows(t), [t]);
+    buildQuickActionRows(t);
 
   /* ─── Chat API ─── */
   const handleSend = async (overrideText) => {
