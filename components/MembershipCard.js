@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchMembership } from '../services/api';
-import { colors, shadow } from '../utils/theme';
+import { colors, shadow, surfaces } from '../utils/theme';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 
@@ -104,7 +104,7 @@ export default function MembershipCard({ isRTL = false }) {
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={16}
-            color="rgba(255,255,255,0.5)"
+            color={colors.tertiary}
             style={{ marginLeft: isRTL ? 0 : 6, marginRight: isRTL ? 6 : 0 }}
           />
         </View>
@@ -419,9 +419,11 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontWeight: '700',
   },
+  // A card like the rest of the page. It was inverted — white on ink — which
+  // made the two partner blocks read as dark slabs against the cream rather
+  // than as the account's most important rows.
   partnerCard: {
-    backgroundColor: colors.label,
-    borderRadius: 16,
+    ...surfaces.card,
     padding: 16,
     marginHorizontal: 16,
     marginBottom: 12,
@@ -434,8 +436,8 @@ const styles = StyleSheet.create({
   partnerIcon: {
     width: 38,
     height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 12,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -444,55 +446,53 @@ const styles = StyleSheet.create({
   },
   partnerTitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: colors.white,
+    fontWeight: '700',
+    color: colors.label,
   },
   partnerSubtitle: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.mutedText,
     marginTop: 2,
   },
   partnerNumber: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.45)',
+    color: colors.placeholder,
     letterSpacing: 1.2,
   },
   partnerExpanded: {
     marginTop: 14,
     paddingTop: 14,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255,255,255,0.15)',
+    borderTopColor: colors.separator,
   },
   partnerSectionTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.accent,
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 10,
+    letterSpacing: 1.1,
   },
   partnerPriceBox: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: colors.accentBg,
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
     alignItems: 'center',
-    marginBottom: 12,
   },
   partnerPriceLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.55)',
+    color: colors.mutedText,
   },
   partnerPriceValue: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.white,
+    color: colors.accent,
     marginVertical: 4,
   },
   partnerThanks: {
     fontSize: 12,
     lineHeight: 18,
-    color: 'rgba(255,255,255,0.75)',
+    color: colors.bodyText,
   },
   rowReverse: {
     flexDirection: 'row-reverse',

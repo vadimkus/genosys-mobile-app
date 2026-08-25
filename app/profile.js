@@ -491,19 +491,19 @@ export default function ProfileScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => { haptics.lightTap(); router.push('/partner-portal'); }}
-            style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 16, backgroundColor: colors.label, borderRadius: 16, padding: 16, flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            style={[styles.portalCard, shadow.card, isRTL && styles.rowReverse]}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flex: 1 }}>
-              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', marginRight: isRTL ? 0 : 12, marginLeft: isRTL ? 12 : 0 }}>
-                <Ionicons name="cube-outline" size={22} color={colors.white} />
+              <View style={[surfaces.iconTile, styles.portalIcon]}>
+                <Ionicons name="cube-outline" size={20} color={colors.white} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: colors.white, fontSize: 16, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                <Text style={[styles.portalTitle, isRTL && styles.textRTL]}>
                   {locale === 'ru' ? 'Портал партнёра' : locale === 'ar' ? 'بوابة الشركاء' : 'Partner Portal'}
                 </Text>
                 <Text
                   numberOfLines={2}
-                  style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, lineHeight: 16, marginTop: 2, textAlign: isRTL ? 'right' : 'left' }}
+                  style={[styles.portalSubtitle, isRTL && styles.textRTL]}
                 >
                   {(() => {
                     // Trade terms instead of the −50% (already shown on the
@@ -522,7 +522,7 @@ export default function ProfileScreen() {
                 </Text>
               </View>
             </View>
-            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color="rgba(255,255,255,0.6)" />
+            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.tertiary} />
           </TouchableOpacity>
         )}
 
@@ -532,7 +532,6 @@ export default function ProfileScreen() {
             icon="receipt-outline"
             title={t('profile.orders')}
             subtitle={ordersSubtitle}
-            color={colors.accent}
             onPress={async () => {
               haptics.lightTap();
               // Ensure Orders header can route back to Account when opened from here.
@@ -544,7 +543,6 @@ export default function ProfileScreen() {
             icon="bag-outline"
             title={t('profile.bag')}
             subtitle={cartCount > 0 ? t('profile.itemsCount', { count: cartCount }) : t('profile.empty')}
-            color={colors.green}
             onPress={async () => {
               haptics.lightTap();
               // Ensure Bag header can route back to Account when opened from here.
@@ -559,28 +557,24 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="gift-outline"
-              tint={colors.accent}
               title={t('navigation.bundleBuilder')}
               subtitle={t('profile.buildYourSet')}
               onPress={() => { haptics.lightTap(); router.push('/bundle-builder'); }}
             />
             <ProfileItem
               icon="sparkles-outline"
-              tint={colors.purple}
               title={t('navigation.aiSkinAnalysis')}
               subtitle={t('profile.aiSkinSubtitle')}
               onPress={() => { haptics.lightTap(); router.push('/skin-analysis'); }}
             />
             <ProfileItem
               icon="leaf-outline"
-              tint={colors.green}
               title={t('categories.skinConcern')}
               subtitle={t('profile.skinConcernSubtitle')}
               onPress={() => { haptics.lightTap(); router.push('/skin-concerns'); }}
             />
             <ProfileItem
               icon="newspaper-outline"
-              tint={colors.orange}
               title={t('navigation.blog')}
               onPress={() => { haptics.lightTap(); router.push('/blog'); }}
               isLast={true}
@@ -593,19 +587,16 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="person-outline"
-              tint={colors.blue}
               title={t('profile.personalInformation')}
               onPress={handleEditProfile}
             />
             <ProfileItem
               icon="location-outline"
-              tint={colors.teal}
               title={t('profile.addresses')}
               onPress={() => { haptics.lightTap(); router.push('/profile/addresses'); }}
             />
             <ProfileItem
               icon="card-outline"
-              tint={colors.green}
               title={t('profile.paymentAndBilling')}
               onPress={() => { haptics.lightTap(); router.push('/profile/payment'); }}
               isLast={true}
@@ -619,7 +610,6 @@ export default function ProfileScreen() {
             {biometricAvailable ? (
               <ProfileSwitchItem
                 icon={biometricType.includes('Face') ? 'scan-outline' : 'finger-print-outline'}
-                tint={colors.indigo}
                 title={biometricType}
                 value={biometricEnabled}
                 onValueChange={handleBiometricToggle}
@@ -630,7 +620,6 @@ export default function ProfileScreen() {
             ) : (
               <ProfileItem
                 icon="scan-outline"
-                tint={colors.indigo}
                 title={t('profile.biometricAuthentication')}
                 rightComponent={
                   <Text style={styles.unavailableText}>{t('profile.notAvailable')}</Text>
@@ -642,7 +631,6 @@ export default function ProfileScreen() {
             {/* Moved here from Edit Profile */}
             <ProfileSwitchItem
               icon="mail-outline"
-              tint={colors.blue}
               title={t('editProfile.emailNotifications')}
               subtitle={t('editProfile.emailNotificationsHint')}
               value={emailNotifications}
@@ -653,7 +641,6 @@ export default function ProfileScreen() {
             />
             <ProfileSwitchItem
               icon="notifications-outline"
-              tint={colors.orange}
               title={t('profile.pushNotifications')}
               value={notificationsEnabled}
               onValueChange={handlePushToggle}
@@ -663,13 +650,11 @@ export default function ProfileScreen() {
             />
             <ProfileItem
               icon="shield-outline"
-              tint={colors.blue}
               title={t('profile.privacyPolicy')}
               onPress={() => { haptics.lightTap(); router.push('/profile/privacy'); }}
             />
             <ProfileItem
               icon="document-text-outline"
-              tint={colors.secondaryLabel}
               title={t('profile.termsAndConditions')}
               onPress={() => { haptics.lightTap(); router.push('/profile/terms'); }}
               isLast={true}
@@ -682,14 +667,12 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="language-outline"
-              tint={colors.blue}
               title={t('profile.language')}
               value={locale === 'ru' ? t('profile.russian') : locale === 'ar' ? t('profile.arabic') : t('profile.english')}
               onPress={() => { haptics.lightTap(); router.push('/profile/language'); }}
             />
             <ProfileItem
               icon="help-circle-outline"
-              tint={colors.teal}
               title={t('profile.helpAndSupport')}
               onPress={() => { haptics.lightTap(); router.push('/profile/help'); }}
               isLast={true}
@@ -702,49 +685,41 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="information-circle-outline"
-              tint={colors.secondaryLabel}
               title={t('profile.aboutGenosys')}
               onPress={() => { haptics.lightTap(); router.push('/about'); }}
             />
             <ProfileItem
               icon="business-outline"
-              tint={colors.accent}
               title={t('navigation.brand')}
               onPress={() => { haptics.lightTap(); router.push('/brand'); }}
             />
             <ProfileItem
               icon="people-outline"
-              tint={colors.indigo}
               title={t('navigation.partners')}
               onPress={() => { haptics.lightTap(); router.push('/partners'); }}
             />
             <ProfileItem
               icon="download-outline"
-              tint={colors.purple}
               title={t('profile.trainingMaterials')}
               onPress={() => { haptics.lightTap(); router.push('/training'); }}
             />
             <ProfileItem
               icon="car-outline"
-              tint={colors.blue}
               title={t('navigation.delivery')}
               onPress={() => { haptics.lightTap(); router.push('/delivery'); }}
             />
             <ProfileItem
               icon="navigate-outline"
-              tint={colors.teal}
               title={t('navigation.locations')}
               onPress={() => { haptics.lightTap(); router.push('/locations'); }}
             />
             <ProfileItem
               icon="help-buoy-outline"
-              tint={colors.orange}
               title={t('navigation.faq')}
               onPress={() => { haptics.lightTap(); router.push('/faq'); }}
             />
             <ProfileItem
               icon="chatbubble-ellipses-outline"
-              tint={colors.green}
               title={t('navigation.contact')}
               onPress={() => { haptics.lightTap(); router.push('/contact'); }}
               isLast={true}
@@ -935,6 +910,37 @@ const styles = StyleSheet.create({
   },
 
   // Quick Actions
+  // The partner blocks used to be inverted — white on ink — which on a cream
+  // page read as two dark slabs rather than as the most important rows. They
+  // are cards like everything else now; their weight comes from sitting first.
+  portalCard: {
+    ...surfaces.card,
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  portalIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: colors.accent,
+    marginEnd: 12,
+  },
+  portalTitle: {
+    ...T.body,
+    fontWeight: '700',
+    color: colors.label,
+  },
+  portalSubtitle: {
+    ...T.caption,
+    color: colors.mutedText,
+    lineHeight: 17,
+    marginTop: 2,
+  },
   quickActionsRow: {
     flexDirection: 'row',
     gap: 12,
