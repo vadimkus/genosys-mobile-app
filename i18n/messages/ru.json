@@ -657,7 +657,8 @@
     "pc9Benefit4Text": "Решает проблемы антивозрастного ухода, уменьшения морщин и упругости кожи для комплексного профессионального ухода за кожей",
     "quantity": "Количество",
     "bundleDiscountPercent": "Скидка {percent}% (набор)",
-    "blackFridayPercent": "Чёрная пятница: скидка {percent}%"
+    "blackFridayPercent": "Чёрная пятница: скидка {percent}%",
+    "pricePerUnit": "{count} × {price}"
   },
   "rewards": {
     "title": "GENOSYS Rewards",

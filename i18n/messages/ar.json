@@ -657,7 +657,8 @@
     "pc9Benefit4Text": "يتناول مكافحة الشيخوخة وتقليل التجاعيد ومتانة البشرة للعناية بالبشرة الاحترافية الشاملة",
     "quantity": "الكمية",
     "bundleDiscountPercent": "خصم {percent}% (باقة)",
-    "blackFridayPercent": "الجمعة السوداء: خصم {percent}%"
+    "blackFridayPercent": "الجمعة السوداء: خصم {percent}%",
+    "pricePerUnit": "{count} × {price}"
   },
   "rewards": {
     "title": "مكافآت جينوسيس",

@@ -1075,6 +1075,34 @@ function ProductDetailScreen() {
   ];
   const priceView = resolvePriceView(product, { user, selectedSize, selectedColor });
   const priceLabel = priceView.kind === 'discounted' ? discountLabelFor(priceView, t) : null;
+  const showFooterPrice = priceView.kind === 'single' || priceView.kind === 'discounted';
+
+  /**
+   * What this tap will cost, beside the button that makes it.
+   *
+   * It used to print the unit price and sit there unchanged while the stepper
+   * counted up, so a shopper adding five read 300 and was charged 1,500. The
+   * stepper drives the cart's quantity once the item is in the bag and a local
+   * one before that, so the total follows whichever the stepper is showing, and
+   * the unit price stays visible above it rather than disappearing into a
+   * multiplication the shopper has to trust.
+   */
+  const renderFooterPrice = () => {
+    if (!showFooterPrice) return null;
+    const inBag = isInCart(product.id, selectedColor, selectedSize);
+    const count = inBag ? getItemQuantity(product.id, selectedColor, selectedSize) : quantity;
+    const each = Number(priceView.price) || 0;
+    return (
+      <View style={styles.footerPriceWrap}>
+        {count > 1 ? (
+          <Text style={styles.footerPriceEach}>
+            {t('product.pricePerUnit', { count, price: formatAed(each) })}
+          </Text>
+        ) : null}
+        <Text style={styles.footerPrice}>{formatAed(each * Math.max(1, count))}</Text>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -1636,9 +1664,14 @@ function ProductDetailScreen() {
                 );
               })}
             </ScrollView>
-            {priceView.kind === 'single' || priceView.kind === 'discounted' ? (
-              <Text style={styles.footerPrice}>{formatAed(priceView.price)}</Text>
-            ) : null}
+            {renderFooterPrice()}
+          </View>
+        ) : showFooterPrice ? (
+          // No options to choose, but there is still a number worth showing
+          // beside the button, and it has to move when the stepper does.
+          <View style={[styles.footerSelection, isRTL && styles.footerSelectionRTL]}>
+            <View />
+            {renderFooterPrice()}
           </View>
         ) : null}
         {product.isPriceOnRequest ? (
@@ -2487,6 +2520,14 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separatorStrong,
+  },
+  footerPriceWrap: {
+    alignItems: 'flex-end',
+    flexShrink: 1,
+  },
+  footerPriceEach: {
+    ...T.captionSmall,
+    color: colors.mutedText,
   },
   footerPrice: {
     ...T.label,

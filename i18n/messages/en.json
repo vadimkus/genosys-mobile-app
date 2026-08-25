@@ -657,7 +657,8 @@
     "pc9Benefit4Text": "Addresses anti-aging, wrinkle reduction, and skin firmness for comprehensive professional skincare",
     "quantity": "Quantity",
     "bundleDiscountPercent": "{percent}% OFF (Bundle Discount)",
-    "blackFridayPercent": "Black Friday {percent}% OFF"
+    "blackFridayPercent": "Black Friday {percent}% OFF",
+    "pricePerUnit": "{count} × {price}"
   },
   "rewards": {
     "title": "GENOSYS Rewards",
