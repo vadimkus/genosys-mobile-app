@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   brand: { color: colors.white, fontSize: 18, fontWeight: '900', letterSpacing: 3 },
   headerTitle: { color: colors.white, fontSize: 17, fontWeight: '800' },
   headerSubtitle: { color: colors.accent, fontSize: 9, fontWeight: '800', letterSpacing: 2 },
-  intro: { color: colors.placeholder, fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 12, paddingHorizontal: 20 },
+  intro: { color: colors.secondaryLabel, fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 12, paddingHorizontal: 20 },
   pointsRow: { flexDirection: 'row', gap: 10, padding: 16, paddingBottom: 0 },
   pointsCard: { flex: 1, backgroundColor: colors.card, borderRadius: 16, padding: 15, borderWidth: 1, borderColor: colors.groupedBg },
   pointsValue: { color: colors.label, fontSize: 23, fontWeight: '900' },

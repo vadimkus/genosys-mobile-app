@@ -22,22 +22,12 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors, shadow } from '../../utils/theme';
+import SectionHeader from '../../components/SectionHeader';
 
 const log = createLogger('AddAddress');
 
 /** iOS Settings–style filled glyph tile + bold section title. */
-function SectionHeader({ icon, tileColor, title, isRTL }) {
-  return (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-}
-
 export default function AddEditAddressScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
@@ -209,7 +199,7 @@ export default function AddEditAddressScreen() {
           >
             {/* Address Type */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="home" tileColor={colors.accent} title={t('addAddress.addressType')} isRTL={isRTL} />
+              <SectionHeader icon="home" title={t('addAddress.addressType')} isRTL={isRTL} />
               <View style={[styles.typeContainer, isRTL && styles.typeContainerRTL]}>
                 {addressTypes.map((type) => {
                   const active = formData.type === type;
@@ -236,7 +226,7 @@ export default function AddEditAddressScreen() {
 
             {/* Contact Information */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="person" tileColor={colors.accent} title={t('addAddress.contactInfo')} isRTL={isRTL} />
+              <SectionHeader icon="person" title={t('addAddress.contactInfo')} isRTL={isRTL} />
               <View style={styles.fieldContainer}>
                 <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('addAddress.fullName')}
@@ -276,7 +266,7 @@ export default function AddEditAddressScreen() {
 
             {/* Address Details */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="location" tileColor={colors.accent} title={t('addAddress.addressDetails')} isRTL={isRTL} />
+              <SectionHeader icon="location" title={t('addAddress.addressDetails')} isRTL={isRTL} />
               <View style={styles.fieldContainer}>
                 <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                   {t('addAddress.streetAddress')}
@@ -358,7 +348,7 @@ export default function AddEditAddressScreen() {
 
             {/* Preferences */}
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="star" tileColor={colors.accent} title={t('addAddress.preferences')} isRTL={isRTL} />
+              <SectionHeader icon="star" title={t('addAddress.preferences')} isRTL={isRTL} />
               <View style={[styles.switchContainer, isRTL && styles.switchContainerRTL]}>
                 <View style={[styles.switchLabel, isRTL && styles.switchLabelRTL]}>
                   <Text style={[styles.fieldLabel, styles.switchTitle, isRTL && styles.textRTL]}>{t('addAddress.setAsDefault')}</Text>
@@ -423,17 +413,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 14,
     padding: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    ...T.body,
-    fontWeight: '700',
-    color: colors.label,
   },
 
   // Address Type

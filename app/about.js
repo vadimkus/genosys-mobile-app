@@ -24,7 +24,8 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, surfaces } from '../utils/theme';
+import { colors, shadow } from '../utils/theme';
+import SectionHeader from '../components/SectionHeader';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -42,15 +43,6 @@ export default function AboutScreen() {
       Animated.timing(lift, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
     ]).start();
   }, [fade, lift]);
-
-  const SectionHeader = ({ icon, tileColor, title }) => (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
 
   const InfoRow = ({ label, value, onPress, isLast }) => (
     <View style={[styles.infoRow, isRTL && styles.infoRowRTL, isLast && styles.infoRowLast]}>
@@ -96,20 +88,20 @@ export default function AboutScreen() {
 
           {/* About Us */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="information-circle" tileColor={colors.accent} title={t('about.aboutUsTitle')} />
+            <SectionHeader icon="information-circle" title={t('about.aboutUsTitle')} isRTL={isRTL} />
             <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{t('about.aboutUsLine1')}</Text>
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{t('about.aboutUsLine2')}</Text>
           </View>
 
           {/* Mission */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="flag" tileColor={colors.accent} title={t('about.missionTitle')} />
+            <SectionHeader icon="flag" title={t('about.missionTitle')} isRTL={isRTL} />
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{t('about.missionText')}</Text>
           </View>
 
           {/* Company Details */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="business" tileColor={colors.accent} title={t('about.companyDetailsTitle')} />
+            <SectionHeader icon="business" title={t('about.companyDetailsTitle')} isRTL={isRTL} />
             <InfoRow label={t('about.companyLabel')} value={t('about.companyName')} />
             <InfoRow label={t('about.yearLabel')} value={t('about.yearValue')} />
             <InfoRow label={t('about.licenseLabel')} value={t('about.licenseValue')} />
@@ -120,7 +112,7 @@ export default function AboutScreen() {
 
           {/* Business Info */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="briefcase" tileColor={colors.accent} title={t('about.businessInfoTitle')} />
+            <SectionHeader icon="briefcase" title={t('about.businessInfoTitle')} isRTL={isRTL} />
             <InfoRow label={t('about.distributorLabel')} value={t('about.distributorValue')} />
             <InfoRow label={t('about.certificationLabel')} value={t('about.certificationValue')} />
             <InfoRow label={t('about.productsLabel')} value={t('about.productsValue')} />
@@ -166,14 +158,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   cardPad: { padding: 18 },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 14,
-  },
-  rowRTL: { flexDirection: 'row-reverse' },
-  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label },
 
   paragraph: { ...T.body, marginBottom: 12, lineHeight: 23 },
   paragraphLast: { marginBottom: 0 },

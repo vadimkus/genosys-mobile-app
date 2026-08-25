@@ -20,19 +20,9 @@ import { getUserBilling } from '../../services/databaseService';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces } from '../../utils/theme';
+import SectionHeader from '../../components/SectionHeader';
 
 /** iOS Settings–style filled glyph tile + bold section title. */
-function SectionHeader({ icon, tileColor, title, isRTL }) {
-  return (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-}
-
 export default function PaymentScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
@@ -140,7 +130,7 @@ export default function PaymentScreen() {
         >
           {/* Payment Methods */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="wallet" tileColor={colors.accent} title={t('paymentSettings.defaultMethod')} isRTL={isRTL} />
+            <SectionHeader icon="wallet" title={t('paymentSettings.defaultMethod')} isRTL={isRTL} />
             <MethodRow
               method={PAYMENT_METHODS.COD}
               icon="cash"
@@ -166,7 +156,7 @@ export default function PaymentScreen() {
 
           {/* Billing Information */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="document-text" tileColor={colors.accent} title={t('paymentSettings.billingInfo')} isRTL={isRTL} />
+            <SectionHeader icon="document-text" title={t('paymentSettings.billingInfo')} isRTL={isRTL} />
 
             <View style={[styles.billingRow, isRTL && styles.rowRTL]}>
               <Text style={[styles.billingLabel, isRTL && styles.textRTL]}>{t('paymentSettings.billingAddress')}</Text>
@@ -190,7 +180,7 @@ export default function PaymentScreen() {
 
           {/* Security Information */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="shield-checkmark" tileColor={colors.accent} title={t('paymentSettings.securityPrivacy')} isRTL={isRTL} />
+            <SectionHeader icon="shield-checkmark" title={t('paymentSettings.securityPrivacy')} isRTL={isRTL} />
 
             <View style={[styles.securityItem, isRTL && styles.rowRTL]}>
               <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
@@ -254,17 +244,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 14,
     padding: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 14,
-  },
-  sectionTitle: {
-    ...T.body,
-    fontWeight: '700',
-    color: colors.label,
   },
   hairline: {
     height: StyleSheet.hairlineWidth,

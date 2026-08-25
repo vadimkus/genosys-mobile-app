@@ -964,7 +964,7 @@ const styles = StyleSheet.create({
     color: colors.accent,
   },
   headerActionDisabled: {
-    color: colors.tertiary,
+    color: colors.secondaryLabel,
   },
 
   // Sections (soft cards)
@@ -1201,7 +1201,7 @@ const styles = StyleSheet.create({
 
   // Additional Field Styles
   placeholderText: {
-    color: colors.tertiary,
+    color: colors.secondaryLabel,
   },
 
   // Modal Styles

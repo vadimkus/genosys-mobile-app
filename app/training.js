@@ -31,6 +31,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchTraining as fetchTrainingAPI } from '../services/api';
 import { createLogger } from '../utils/logger';
+import SectionHeader from '../components/SectionHeader';
 
 const log = createLogger('Training');
 
@@ -140,15 +141,6 @@ export default function TrainingScreen() {
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); };
 
   /** iOS Settings–style filled glyph tile + bold section title. */
-  const SectionHeader = ({ icon, tileColor, title }) => (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={17} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-
   // Redirect if not logged in
   if (!user) {
     return (
@@ -240,7 +232,7 @@ export default function TrainingScreen() {
             {/* Training Documents */}
             {trainingDocs.length > 0 && (
               <View style={styles.section}>
-                <SectionHeader icon="document-text" tileColor={colors.accent} title={l('Training Documents', 'وثائق التدريب', 'Учебные документы')} />
+                <SectionHeader icon="document-text" title={l('Training Documents', 'وثائق التدريب', 'Учебные документы')} isRTL={isRTL} />
                 <View style={[styles.card, shadow.card]}>
                   {trainingDocs.map((doc, idx) => (
                     <TouchableOpacity
@@ -269,7 +261,7 @@ export default function TrainingScreen() {
             {/* Product Documentation */}
             {productDocs.length > 0 && (
               <View style={styles.section}>
-                <SectionHeader icon="flask" tileColor={colors.accent} title={l('Product Documentation', 'وثائق المنتجات', 'Документация по продуктам')} />
+                <SectionHeader icon="flask" title={l('Product Documentation', 'وثائق المنتجات', 'Документация по продуктам')} isRTL={isRTL} />
                 <View style={[styles.card, shadow.card]}>
                   {productDocs.map((doc, idx) => (
                     <TouchableOpacity
@@ -302,7 +294,7 @@ export default function TrainingScreen() {
             {/* Training Videos */}
             {videos.length > 0 && (
               <View style={styles.section}>
-                <SectionHeader icon="play-circle" tileColor={colors.accent} title={l('Video Lessons', 'دروس فيديو', 'Видеоуроки')} />
+                <SectionHeader icon="play-circle" title={l('Video Lessons', 'دروس فيديو', 'Видеоуроки')} isRTL={isRTL} />
                 <View style={styles.videoGrid}>
                   {videos.map((video) => (
                     <TouchableOpacity
@@ -381,8 +373,6 @@ const styles = StyleSheet.create({
 
   // Sections
   section: { paddingHorizontal: 16, paddingTop: 6, paddingBottom: 8 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12 },
-  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label },
 
   // Grouped card (training + product doc rows)
   card: { ...surfaces.card, paddingHorizontal: 14 },

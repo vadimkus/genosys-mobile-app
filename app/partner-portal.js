@@ -1161,11 +1161,11 @@ const styles = StyleSheet.create({
   agreeCardBlue: { backgroundColor: 'rgba(37,99,235,0.12)', borderColor: 'rgba(59,130,246,0.30)' },
   agreeDot: { width: 7, height: 7, borderRadius: 4, marginTop: 4 },
   agreeTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.6 },
-  agreeDesc: { fontSize: 10.5, color: colors.placeholder, marginTop: 2, lineHeight: 15 },
+  agreeDesc: { fontSize: 10.5, color: colors.secondaryLabel, marginTop: 2, lineHeight: 15 },
   homecareShortcut: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 12 },
   homecareShortcutIcon: { width: 32, height: 32, borderRadius: 9, backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center' },
   homecareShortcutTitle: { color: colors.white, fontSize: 12.5, fontWeight: '800' },
-  homecareShortcutText: { color: colors.placeholder, fontSize: 10.5, marginTop: 1 },
+  homecareShortcutText: { color: colors.secondaryLabel, fontSize: 10.5, marginTop: 1 },
   // Category section headers
   groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.groupedBg, paddingHorizontal: 16, paddingVertical: 15, marginBottom: 10 },
   groupHeaderActive: { borderColor: colors.redLine },

@@ -1333,7 +1333,7 @@ const styles = StyleSheet.create({
   // Waterfall discount breakdown styles
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryLabelDiscount: {
     ...T.summaryValue,
@@ -1345,11 +1345,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelIntermediate: {
     ...T.captionSmall,
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryValueIntermediate: {
     ...T.captionSmall,
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryLabelBundle: {
     ...T.summaryValue,

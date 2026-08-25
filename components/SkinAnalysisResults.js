@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   overallScore: { fontSize: 36, fontWeight: '900' },
-  overallMax: { ...T.label, color: colors.placeholder, marginTop: -4 },
+  overallMax: { ...T.label, color: colors.secondaryLabel, marginTop: -4 },
   overallLabel: { ...T.bodySmall, fontWeight: '700', color: colors.bodyText, lineHeight: undefined },
 
   // Concerns

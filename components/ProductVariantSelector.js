@@ -266,14 +266,14 @@ const styles = StyleSheet.create({
     borderColor: colors.separatorStrong,
   },
   sizeLabelDisabled: {
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   singleSizeStaticLabel: {
     color: colors.label,
     fontWeight: '500',
   },
   sizePriceDisabled: {
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   unavailableText: {
     ...T.badge,

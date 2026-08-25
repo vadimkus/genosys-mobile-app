@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   },
   dayText: { ...T.body, fontWeight: '500', color: colors.label },
   hoursText: { ...T.body, color: colors.secondaryLabel },
-  timezoneText: { ...T.caption, color: colors.tertiary, textAlign: 'center', marginTop: 8 },
+  timezoneText: { ...T.caption, color: colors.secondaryLabel, textAlign: 'center', marginTop: 8 },
 
   // Return modal
   modalOverlay: {

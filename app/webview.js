@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   errorUrl: {
     ...T.badge,
     fontWeight: '400',
-    color: colors.tertiary,
+    color: colors.secondaryLabel,
     textAlign: 'center',
     marginBottom: 16,
     paddingHorizontal: 8,

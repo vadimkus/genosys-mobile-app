@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   aiScoreNum: { fontSize: 32, fontWeight: '900' },
-  aiScoreMax: { ...T.labelSmall, color: colors.placeholder, marginTop: -4 },
+  aiScoreMax: { ...T.labelSmall, color: colors.secondaryLabel, marginTop: -4 },
   aiScoreLabel: { ...T.label, fontWeight: '700', color: colors.bodyText, marginBottom: 8 },
   aiSkinTypeBadge: {
     backgroundColor: colors.accentBg,
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
   aiRecSize: {
     ...T.badge,
     fontWeight: '600',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
     marginTop: 3,
   },
   aiRecBody: { flex: 1 },

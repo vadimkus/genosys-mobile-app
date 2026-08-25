@@ -13,7 +13,6 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../../contexts/LocalizationContext';
@@ -21,20 +20,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getUserBilling, updateUserBilling } from '../../services/databaseService';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
-import { colors, shadow, surfaces } from '../../utils/theme';
+import { colors, shadow } from '../../utils/theme';
+import SectionHeader from '../../components/SectionHeader';
 
 /** iOS Settings–style filled glyph tile + bold section title. */
-function SectionHeader({ icon, tileColor, title, isRTL }) {
-  return (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-}
-
 export default function BillingScreen() {
   const router = useRouter();
   const { t, dir } = useLocalization();
@@ -146,7 +135,7 @@ export default function BillingScreen() {
               keyboardDismissMode="on-drag"
             >
               <View style={[styles.section, shadow.card]}>
-                <SectionHeader icon="document-text" tileColor={colors.accent} title={t('billing.title')} isRTL={isRTL} />
+                <SectionHeader icon="document-text" title={t('billing.title')} isRTL={isRTL} />
 
                 <View style={styles.fieldContainer}>
                   <Text style={[styles.label, isRTL && styles.textRTL]}>{t('billing.addressLabel')}</Text>
@@ -205,9 +194,6 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
   },
-  rowRTL: {
-    flexDirection: 'row-reverse',
-  },
   textRTL: {
     writingDirection: 'rtl',
     textAlign: 'right',
@@ -219,17 +205,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 14,
     padding: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    ...T.body,
-    fontWeight: '700',
-    color: colors.label,
   },
 
   // Fields

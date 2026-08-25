@@ -21,7 +21,8 @@ import { useRouter } from 'expo-router';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { colors, shadow, surfaces, tint } from '../utils/theme';
+import { colors, shadow, tint } from '../utils/theme';
+import SectionHeader from '../components/SectionHeader';
 
 export default function DeliveryScreen() {
   const router = useRouter();
@@ -97,15 +98,6 @@ export default function DeliveryScreen() {
     },
   ];
 
-  const SectionHeader = ({ icon, tileColor, title }) => (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
 
   return (
@@ -122,7 +114,7 @@ export default function DeliveryScreen() {
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Delivery Options */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="rocket" tileColor={colors.accent} title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} />
+            <SectionHeader icon="rocket" title={l('Delivery Options', 'خيارات التوصيل', 'Варианты доставки')} isRTL={isRTL} />
             {deliveryMethods.map((method, index) => {
               const isSelected = selectedMethod === index;
               const isLast = index === deliveryMethods.length - 1;
@@ -164,7 +156,7 @@ export default function DeliveryScreen() {
 
           {/* Shipping Rates */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="pricetags" tileColor={colors.accent} title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} />
+            <SectionHeader icon="pricetags" title={l('Shipping Rates by Emirate', 'أسعار الشحن حسب الإمارة', 'Стоимость доставки по эмиратам')} isRTL={isRTL} />
             {shippingRates.map((item, index) => {
               const isSelected = selectedRate === index;
               const isLast = index === shippingRates.length - 1;
@@ -187,7 +179,7 @@ export default function DeliveryScreen() {
 
           {/* Return Policy */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="shield-checkmark" tileColor={colors.accent} title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} />
+            <SectionHeader icon="shield-checkmark" title={l('Return Policy', 'سياسة الإرجاع', 'Политика возврата')} isRTL={isRTL} />
             {policies.map((policy, index) => {
               const isLast = index === policies.length - 1;
               return (
@@ -237,14 +229,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     padding: 18,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 14,
-  },
   rowRTL: { flexDirection: 'row-reverse' },
-  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
   // Delivery methods
   methodRow: {

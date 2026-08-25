@@ -38,9 +38,9 @@ export const colors = {
   label: '#191716',          // headings, cera ink. was #1D1D1F
   bodyText: '#3d3734',       // running text, cera body. was #374151
   mutedText: '#665e59',      // supporting text, cera muted. was #6B7280
-  secondaryLabel: '#7a716b', // metadata, interpolated. was #8E8E93
+  secondaryLabel: '#776e68', // metadata, interpolated. was #8E8E93
   placeholder: '#9a908a',    // placeholders, interpolated. was #9CA3AF
-  tertiary: '#c2b7b0',       // disclosure chevrons, interpolated. was #C7C7CC
+  tertiary: '#968981',       // disclosure chevrons, interpolated. was #C7C7CC
 
   separator: '#e8e0db',      // hairlines, cera line. was #E5E5EA
   separatorStrong: '#d9cec7', // input borders. was #D1D5DB

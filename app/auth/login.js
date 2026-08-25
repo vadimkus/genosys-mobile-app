@@ -1267,7 +1267,7 @@ const styles = StyleSheet.create({
     color: colors.label,
   },
   selectFieldPlaceholder: {
-    color: colors.tertiary,
+    color: colors.secondaryLabel,
   },
   requiredStar: {
     color: colors.accent,

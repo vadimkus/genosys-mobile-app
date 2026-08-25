@@ -984,7 +984,7 @@ const styles = StyleSheet.create({
   },
   orderSummaryOriginalPrice: {
     ...T.captionTiny,
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
     textDecorationLine: 'line-through',
   },
   orderSummaryDiscountPill: {
@@ -1114,7 +1114,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   selectPlaceholder: {
-    color: colors.tertiary,
+    color: colors.secondaryLabel,
   },
   phoneRow: {
     flexDirection: 'row',
@@ -1457,7 +1457,7 @@ const styles = StyleSheet.create({
   trustTextSecondary: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
     marginTop: 6,
     marginLeft: 22,
   },
@@ -1530,7 +1530,7 @@ const styles = StyleSheet.create({
   // Waterfall discount breakdown styles
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryLabelDiscount: {
     ...T.summaryValue,
@@ -1542,11 +1542,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelIntermediate: {
     ...T.captionSmall,
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryValueIntermediate: {
     ...T.captionSmall,
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryLabelBundle: {
     ...T.summaryValue,

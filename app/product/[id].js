@@ -67,6 +67,7 @@ import { isProductOutOfStock } from '../../utils/stock';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
+import SectionHeader from '../../components/SectionHeader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Product detail hero image height
@@ -313,17 +314,6 @@ const getPdpCopy = (locale) => {
 };
 
 /** iOS Settings–style filled glyph tile + bold section title (matches order details). */
-function PdpSectionHeader({ icon, tileColor, title, isRTL }) {
-  return (
-    <View style={[styles.cardSectionHeader, isRTL && styles.rowReverse]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.cardSectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-}
-
 function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
@@ -874,7 +864,7 @@ function ProductDetailScreen() {
 
     return (
       <View style={styles.section}>
-        <PdpSectionHeader icon="information-circle" tileColor={colors.accent} title={t('product.productDetails')} isRTL={isRTL} />
+        <SectionHeader icon="information-circle" title={t('product.productDetails')} isRTL={isRTL} />
         <View style={styles.specList}>
           {rows.map((row, idx) => (
             <View
@@ -1518,7 +1508,7 @@ function ProductDetailScreen() {
             if (!docs.length) return null;
             return (
               <View style={styles.section}>
-                <PdpSectionHeader icon="document-attach" tileColor={colors.accent} title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
+                <SectionHeader icon="document-attach" title={t('product.documentation') || 'Documentation'} isRTL={isRTL} />
                 {docs.map((doc, index) => (
                   <TouchableOpacity
                     key={`doc-${index}`}
@@ -1556,7 +1546,7 @@ function ProductDetailScreen() {
                   : fullText;
                 return (
                   <View style={styles.section}>
-                    <PdpSectionHeader icon="document-text" tileColor={colors.accent} title={t('product.about')} isRTL={isRTL} />
+                    <SectionHeader icon="document-text" title={t('product.about')} isRTL={isRTL} />
                     <View style={styles.descriptionContainer}>
                       <Text style={[styles.description, isRTL && styles.textRTL]}>
                         {visible}
@@ -2065,17 +2055,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   // iOS Settings–style icon-tile section header (used on card sections).
-  cardSectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  cardSectionTitle: {
-    ...T.body,
-    fontWeight: '700',
-    color: colors.label,
-  },
   rowReverse: {
     flexDirection: 'row-reverse',
   },

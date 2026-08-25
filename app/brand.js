@@ -23,7 +23,8 @@ import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-import { colors, shadow, surfaces, tint } from '../utils/theme';
+import { colors, shadow, tint } from '../utils/theme';
+import SectionHeader from '../components/SectionHeader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -99,15 +100,6 @@ export default function BrandScreen() {
     Linking.openURL(`https://www.youtube.com/watch?v=${youtubeId}`).catch(() => {});
   }, []);
 
-  const SectionHeader = ({ icon, tileColor, title }) => (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/profile'); };
 
   return (
@@ -142,19 +134,19 @@ export default function BrandScreen() {
 
           {/* About Section */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="information-circle" tileColor={colors.accent} title={sectionLabels.about} />
+            <SectionHeader icon="information-circle" title={sectionLabels.about} isRTL={isRTL} />
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandDescription}</Text>
           </View>
 
           {/* Mission Section */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="flag" tileColor={colors.accent} title={sectionLabels.mission} />
+            <SectionHeader icon="flag" title={sectionLabels.mission} isRTL={isRTL} />
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandMission}</Text>
           </View>
 
           {/* Key Technologies */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="flask" tileColor={colors.accent} title={sectionLabels.technologies} />
+            <SectionHeader icon="flask" title={sectionLabels.technologies} isRTL={isRTL} />
             {keyTechnologies.map((tech, index) => (
               <View
                 key={index}
@@ -173,7 +165,7 @@ export default function BrandScreen() {
 
           {/* Brand Videos */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="videocam" tileColor={colors.accent} title={sectionLabels.videos} />
+            <SectionHeader icon="videocam" title={sectionLabels.videos} isRTL={isRTL} />
             {videos.map((video) => (
               <TouchableOpacity
                 key={video.id}
@@ -202,8 +194,8 @@ export default function BrandScreen() {
           <View style={[styles.card, shadow.card]}>
             <SectionHeader
               icon="cube"
-              tileColor={colors.accent}
               title={locale === 'ar' ? 'مجموعة المنتجات المهنية' : locale === 'ru' ? 'Профессиональная линейка продуктов' : 'Professional Product Line'}
+              isRTL={isRTL}
             />
             <View style={styles.productImageWrap}>
               <Image
@@ -260,14 +252,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     padding: 18,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 14,
-  },
   rowRTL: { flexDirection: 'row-reverse' },
-  sectionTitle: { ...T.body, fontWeight: '700', color: colors.label, flex: 1 },
 
   paragraph: { ...T.body, marginBottom: 12, lineHeight: 23 },
   paragraphLast: { marginBottom: 0 },

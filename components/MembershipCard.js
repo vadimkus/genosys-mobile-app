@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   memberNumber: {
     fontSize: 10,
-    color: colors.tertiary,
+    color: colors.secondaryLabel,
     letterSpacing: 1.2,
     marginTop: 10,
   },

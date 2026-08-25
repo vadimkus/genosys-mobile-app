@@ -563,7 +563,7 @@ export default function BundleBuilderScreen() {
             {discountAmount > 0 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>{t('bundleBuilder.retailPrice')}</Text>
-                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.placeholder }]}>{formatAed(retailTotal)}</Text>
+                <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.secondaryLabel }]}>{formatAed(retailTotal)}</Text>
               </View>
             )}
             {/* Discount row — labelled by the discount that actually won */}
@@ -692,7 +692,7 @@ export default function BundleBuilderScreen() {
                 {discountAmount > 0 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabel}>{t('bundleBuilder.retailPrice')}</Text>
-                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.placeholder }]}>{formatAed(retailTotal)}</Text>
+                    <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.secondaryLabel }]}>{formatAed(retailTotal)}</Text>
                   </View>
                 )}
                 {/* Discount row — labelled by the discount that actually won */}
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
   tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.separator, borderWidth: 2, borderColor: colors.white },
   tierDotActive: { backgroundColor: '#16a34a' },
   progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 },
-  progressLabel: { ...T.badge, color: colors.placeholder },
+  progressLabel: { ...T.badge, color: colors.secondaryLabel },
   progressLabelActive: { color: '#16a34a', fontWeight: '700' },
   nextTierHint: { ...T.captionSmall, color: colors.accent, fontWeight: '600', textAlign: 'center', marginTop: 6 },
   discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: '#F0FDF4', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
@@ -803,12 +803,12 @@ const styles = StyleSheet.create({
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },
   productName: { ...T.captionSmall, fontWeight: '600', color: colors.bodyText, lineHeight: 16, minHeight: 32 },
   productDesc: { ...T.badge, fontWeight: '400', color: colors.mutedText, lineHeight: 14, marginTop: 2 },
-  productSize: { ...T.captionTiny, color: colors.placeholder, marginTop: 2 },
+  productSize: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 2 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  priceOriginal: { ...T.captionTiny, color: colors.placeholder, textDecorationLine: 'line-through' },
+  priceOriginal: { ...T.captionTiny, color: colors.secondaryLabel, textDecorationLine: 'line-through' },
   priceMain: { ...T.label, fontWeight: '700', color: colors.label },
   priceDiscounted: { color: '#16a34a' },
-  loginToSee: { ...T.captionTiny, color: colors.placeholder, marginTop: 4, fontStyle: 'italic' },
+  loginToSee: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 4, fontStyle: 'italic' },
 
   addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.accent },
   addBtnSelected: { backgroundColor: colors.cta, borderColor: colors.accent },
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
   navBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 4, minWidth: 80 },
   navBtnDisabled: { opacity: 0.4 },
   navBtnText: { ...T.buttonSmall, color: colors.bodyText },
-  navBtnTextDisabled: { color: colors.separatorStrong },
+  navBtnTextDisabled: { color: colors.placeholder },
   navCenter: { alignItems: 'center' },
   navDiscount: { ...T.captionTiny, fontWeight: '700', color: '#16a34a' },
   navTotal: { ...T.price, color: colors.label },
@@ -844,9 +844,9 @@ const styles = StyleSheet.create({
   summaryItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.fill },
   summaryImageWrap: { alignItems: 'center' },
   summaryItemImage: { width: 44, height: 44, borderRadius: 8, backgroundColor: colors.subtleBg },
-  summaryImageSize: { ...T.badge, fontWeight: '500', color: colors.placeholder, marginTop: 2, fontSize: 9 },
+  summaryImageSize: { ...T.badge, fontWeight: '500', color: colors.secondaryLabel, marginTop: 2, fontSize: 9 },
   summaryItemName: { ...T.labelSmall, color: colors.bodyText },
-  summaryItemStep: { ...T.captionTiny, color: colors.placeholder, marginTop: 2 },
+  summaryItemStep: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 2 },
   summaryItemPrice: { ...T.label, fontWeight: '700', color: colors.label },
   summaryRemoveBtn: { padding: 4 },
 
@@ -873,7 +873,7 @@ const styles = StyleSheet.create({
   retryBtn: { backgroundColor: colors.cta, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
   retryBtnText: { ...T.buttonSmall, color: colors.white, fontSize: 15 },
   emptyStep: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyStepText: { ...T.caption, color: colors.placeholder, marginTop: 8, fontSize: 14 },
+  emptyStepText: { ...T.caption, color: colors.secondaryLabel, marginTop: 8, fontSize: 14 },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
 });

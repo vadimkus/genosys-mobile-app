@@ -29,6 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as haptics from '../../../utils/haptics';
 import T from '../../../utils/typography';
 import { colors, shadow, surfaces, statusStyle } from '../../../utils/theme';
+import SectionHeader from '../../../components/SectionHeader';
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
 
@@ -133,17 +134,6 @@ const inferOriginalUnitPriceFromPct = ({ unitPrice, discountPct }) => {
 };
 
 /** iOS Settings–style filled glyph tile + bold section title. */
-function SectionHeader({ icon, tileColor, title, isRTL }) {
-  return (
-    <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-      <View style={[surfaces.iconTile, { backgroundColor: tileColor }]}>
-        <Ionicons name={icon} size={16} color={colors.white} />
-      </View>
-      <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{title}</Text>
-    </View>
-  );
-}
-
 export default function OrderDetailScreen() {
   const params = useLocalSearchParams();
   const idParam = String(params.id || '');
@@ -477,7 +467,7 @@ export default function OrderDetailScreen() {
 
           {/* Payment Method Section */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="card" tileColor={colors.accent} title={t('ordersDetail.paymentMethod')} isRTL={isRTL} />
+            <SectionHeader icon="card" title={t('ordersDetail.paymentMethod')} isRTL={isRTL} />
             <View style={styles.paymentMethodCard}>
               <View style={styles.paymentMethodRow}>
                 {isApplePayLike(order) ? (
@@ -494,7 +484,7 @@ export default function OrderDetailScreen() {
           {/* Order Notes */}
           {orderNotes ? (
             <View style={[styles.section, shadow.card]}>
-              <SectionHeader icon="chatbubble-ellipses" tileColor={colors.accent} title={t('ordersDetail.orderNotes')} isRTL={isRTL} />
+              <SectionHeader icon="chatbubble-ellipses" title={t('ordersDetail.orderNotes')} isRTL={isRTL} />
               <View style={styles.notesCard}>
                 <Text style={[styles.notesText, isRTL && styles.textRTL]}>{orderNotes}</Text>
               </View>
@@ -503,7 +493,7 @@ export default function OrderDetailScreen() {
 
           {/* Items Section */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="bag-handle" tileColor={colors.accent} title={t('ordersDetail.items')} isRTL={isRTL} />
+            <SectionHeader icon="bag-handle" title={t('ordersDetail.items')} isRTL={isRTL} />
             
             {/* Paid Items */}
             {paidItems.map((it, idx) => {
@@ -775,7 +765,7 @@ export default function OrderDetailScreen() {
 
           {/* Shipping Details */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="location" tileColor={colors.accent} title={t('ordersDetail.shippingDetails')} isRTL={isRTL} />
+            <SectionHeader icon="location" title={t('ordersDetail.shippingDetails')} isRTL={isRTL} />
             
             {customerName ? (
               <View style={[styles.detailRow, isRTL && styles.detailRowRTL]}>
@@ -820,7 +810,7 @@ export default function OrderDetailScreen() {
 
           {/* Order Summary — Waterfall Pricing Breakdown */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="calculator" tileColor={colors.accent} title={t('ordersDetail.orderSummary')} isRTL={isRTL} />
+            <SectionHeader icon="calculator" title={t('ordersDetail.orderSummary')} isRTL={isRTL} />
 
             {(() => {
               const orderDiscPct = Number(order?.discountPercentage);
@@ -1133,17 +1123,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 18,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    ...T.body,
-    fontWeight: '700',
-    color: colors.label,
-  },
   
   // RTL helpers
   rowRTL: {
@@ -1305,7 +1284,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   itemPriceValueMuted: {
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   itemPriceValueStrikethrough: {
     textDecorationLine: 'line-through',
@@ -1448,7 +1427,7 @@ const styles = StyleSheet.create({
   },
   summaryValueStrikethrough: {
     textDecorationLine: 'line-through',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryLabelPurple: {
     fontSize: 14,
@@ -1463,12 +1442,12 @@ const styles = StyleSheet.create({
   summaryLabelMuted: {
     fontSize: 13,
     fontWeight: '500',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryValueMuted: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.placeholder,
+    color: colors.secondaryLabel,
   },
   summaryLabelDiscount: {
     fontSize: 14,

@@ -351,7 +351,7 @@ export default function ConcernDetailScreen() {
                                       </Text>
                                     ) : hasDisc ? (
                                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                        <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: colors.placeholder }]}>{retailUnit.toFixed(0)}</Text>
+                                        <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: colors.secondaryLabel }]}>{retailUnit.toFixed(0)}</Text>
                                         <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: colors.accent }]}>{formatAed(finalUnit)}</Text>
                                       </View>
                                     ) : (
@@ -846,7 +846,7 @@ const styles = StyleSheet.create({
   stickyHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, marginBottom: 2 },
   stickyDetails: { paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, marginBottom: 6 },
   stickyClearAll: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 4, paddingVertical: 2, marginTop: 4 },
-  stickyClearAllText: { fontSize: 12, color: colors.placeholder, fontWeight: '500' },
+  stickyClearAllText: { fontSize: 12, color: colors.secondaryLabel, fontWeight: '500' },
   stickyRemoveBtn: { marginRight: 8 },
   stickyItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
   stickyItemRowRTL: { flexDirection: 'row-reverse' },
