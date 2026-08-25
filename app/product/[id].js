@@ -27,7 +27,6 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { fetchProductById } from '../../services/api';
 import { getJson } from '../../services/httpClient';
 import ProductVariantSelector from '../../components/ProductVariantSelector';
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isUserDiscountExcludedProduct } from '../../utils/productRules';
 import { isBeautyBoxProduct } from '../../utils/productRules';
 import { useLocalization, tStatic } from '../../contexts/LocalizationContext';
 import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedProductSize } from '../../utils/productLocalization';
@@ -47,7 +46,6 @@ import { createLogger } from '../../utils/logger';
 import AUTH_CONFIG from '../../config/auth';
 import { getProductImages, getProductVideoUrl, getProductDocs } from '../../data/productConfig';
 import {
-  formatPrice,
   asText,
   normalizeForCompare,
   dedupeList,
@@ -59,10 +57,9 @@ import {
   toHowToSteps,
   toIngredients,
   getObjectField,
-  deriveDiscountFromBadges,
 } from '../../utils/productDetailUtils';
 import { getCategoryTranslationKey, normalizeCategoryCanonical } from '../../utils/productLocalization';
-import { getPricingDisplay, formatAed } from '../../utils/pricingDisplay';
+import { getPricingDisplay, formatAed, resolvePriceView, discountLabelFor } from '../../utils/pricingDisplay';
 import { isProductOutOfStock } from '../../utils/stock';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
@@ -359,18 +356,6 @@ function ProductDetailScreen() {
   const contentFade = useRef(new Animated.Value(0)).current;
   const contentLift = useRef(new Animated.Value(12)).current;
 
-  const discountLabel = useCallback(
-    (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) }),
-    [t]
-  );
-
-  const localizeDiscountLabel = useCallback(
-    (label) => {
-      const match = String(label || '').trim().match(/^(\d+(?:\.\d+)?)%\s*OFF$/i);
-      return match ? discountLabel(Number(match[1])) : label;
-    },
-    [discountLabel]
-  );
   const condensedHeaderRef = useRef(false);
 
   // Re-fetch when the auth token changes too (M4): logging in while the PDP
@@ -1035,6 +1020,8 @@ function ProductDetailScreen() {
   }
 
   const isWishlisted = !!(product?.id && isFavorite(product.id));
+  const priceView = resolvePriceView(product, { user, selectedSize, selectedColor });
+  const priceLabel = priceView.kind === 'discounted' ? discountLabelFor(priceView, t) : null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -1131,16 +1118,11 @@ function ProductDetailScreen() {
               >
                 {asText(getLocalizedProductName(product, locale) || product.name)}
               </Text>
-              {(() => {
-                if (!user) return null;
-                const unit = getSelectedPricingDisplay().displayPrice;
-                if (!unit) return null;
-                return (
-                  <Text style={[styles.miniHeaderPrice, isRTL && styles.textRTL]} numberOfLines={1}>
-                    {formatPrice(unit)} AED
-                  </Text>
-                );
-              })()}
+              {(priceView.kind === 'single' || priceView.kind === 'discounted') && priceView.price ? (
+                <Text style={[styles.miniHeaderPrice, isRTL && styles.textRTL]} numberOfLines={1}>
+                  {formatAed(priceView.price)}
+                </Text>
+              ) : null}
             </View>
             <TouchableOpacity
               onPress={handleAddToBag}
@@ -1356,120 +1338,40 @@ function ProductDetailScreen() {
               </View>
             )}
               
-              {/* Enhanced Pricing with Beauty Boxes Special Display */}
-              {!user ? (
-                <View style={styles.priceBlock}>
+              {/* Price. `resolvePriceView` is the single decision, shared with
+                  the catalogue, favourites and the shop list, so the same
+                  product cannot show two different numbers in two places. */}
+              <View style={styles.priceBlock}>
+                {priceView.kind === 'login' ? (
                   <Text style={[styles.loginToSeePriceText, isRTL && styles.textRTL]}>
                     {t('product.loginToSeePrice')}
                   </Text>
-                </View>
-              ) : product.isPriceOnRequest ? (
-                <View style={styles.priceBlock}>
+                ) : priceView.kind === 'onRequest' ? (
                   <Text style={styles.priceOnRequestLabel}>{t('product.priceOnRequest')}</Text>
-                </View>
-              ) : product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box')) ? (
-                // Special pricing display for Beauty Boxes on detail page
-                <View style={styles.beautyBoxDetailPricing}>
-                  <Text style={styles.beautyBoxDetailFullPrice}>
-                    {t('product.fullPrice', { price: formatPrice(getSelectedPricingDisplay().originalPrice || getSelectedPricingDisplay().displayPrice || 0) })}
-                  </Text>
-                  <View style={[styles.beautyBoxDetailDiscountRow, isRTL && { flexDirection: 'row-reverse' }]}>
-                    <Text style={styles.beautyBoxDetailDiscount}>{t('product.bundleDiscount')}</Text>
-                    <Text style={[styles.beautyBoxDetailFinalPrice, isRTL && { textAlign: 'left' }]}>
-                      {t('product.finalPrice', { price: formatPrice(getSelectedPricingDisplay().displayPrice || 0) })}
+                ) : priceView.kind === 'discounted' ? (
+                  <View>
+                    <Text style={[styles.originalPrice, isRTL && styles.textRTL]}>
+                      {formatAed(priceView.originalPrice)}
                     </Text>
+                    <View style={[styles.discountRow, isRTL && styles.discountRowRTL]}>
+                      <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>
+                        {formatAed(priceView.price)}
+                      </Text>
+                      {priceLabel ? (
+                        <View style={styles.discountBadge}>
+                          <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{priceLabel}</Text>
+                        </View>
+                      ) : null}
+                    </View>
                   </View>
-                </View>
-              ) : (
-                <View style={styles.priceBlock}>
-                  {(() => {
-                    const pricing = getSelectedPricingDisplay();
-                    if (pricing.hasContract) {
-                      const base = Number(pricing.displayPrice || 0);
-                      const original = Number(pricing.originalPrice || 0);
-                      const hasDiscount = original > base + 0.01;
-                      const label = localizeDiscountLabel(pricing.discountLabel) ||
-                        (pricing.discountPercentage > 0 ? discountLabel(pricing.discountPercentage) : null);
+                ) : (
+                  <Text style={styles.price}>{formatAed(priceView.price)}</Text>
+                )}
+              </View>
 
-                      if (!hasDiscount) {
-                        return <Text style={styles.price}>{formatAed(base)}</Text>;
-                      }
-
-                      return (
-                        <View>
-                          <Text style={[styles.originalPrice, isRTL && styles.textRTL]}>{formatAed(original)}</Text>
-                          <View style={[styles.discountRow, isRTL && styles.discountRowRTL]}>
-                            <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatAed(base)}</Text>
-                            {label ? (
-                              <View style={styles.discountBadge}>
-                                <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{label}</Text>
-                              </View>
-                            ) : null}
-                          </View>
-                        </View>
-                      );
-                    }
-
-                    // Canonical-price / no-user-discount products: show canonical/base price only.
-                    if (isUserDiscountExcludedProduct(product) || hasFixedPriceOverride(product)) {
-                      return <Text style={styles.price}>{`${formatPrice(getCanonicalUnitPrice(product))} AED`}</Text>;
-                    }
-
-                    const base = Number(getSelectedUnitPrice() || 0);
-                    const userPct = user?.discountType ? Number(user?.discountPercentage) : 0;
-                    const derived = deriveDiscountFromBadges(product);
-                    const serverOrig = Number(product?.originalPrice);
-                    const serverBase = Number(product?.displayPrice ?? product?.price);
-                    const serverHasDiscount =
-                      Number.isFinite(serverOrig) &&
-                      Number.isFinite(serverBase) &&
-                      serverOrig > 0 &&
-                      serverOrig > serverBase;
-
-                    const pctFromServer =
-                      serverHasDiscount && serverOrig
-                        ? Math.round((1 - serverBase / serverOrig) * 100)
-                        : null;
-
-                    const pct =
-                      (Number.isFinite(pctFromServer) && pctFromServer > 0 && pctFromServer < 100 && pctFromServer) ||
-                      (Number.isFinite(derived?.percent) && derived.percent) ||
-                      (Number.isFinite(userPct) && userPct > 0 && userPct < 100 && userPct) ||
-                      null;
-
-                    // If backend provided originalPrice/discount, treat base as already discounted.
-                    // Otherwise, if user has a discount %, show computed before/after as a fallback.
-                    const showDiscount =
-                      (serverHasDiscount && Number.isFinite(pct) && pct > 0) ||
-                      (!serverHasDiscount && Number.isFinite(userPct) && userPct > 0 && userPct < 100);
-
-                    if (!showDiscount) {
-                      return <Text style={styles.price}>{`${formatPrice(base)} AED`}</Text>;
-                    }
-
-                    const effectivePct = pct || userPct;
-                    const discounted = serverHasDiscount ? base : base * (1 - effectivePct / 100);
-                    const original = serverHasDiscount ? base / (1 - effectivePct / 100) : base;
-
-                    return (
-                      <View>
-                        <Text style={[styles.originalPrice, isRTL && styles.textRTL]}>{formatPrice(original)} AED</Text>
-                        <View style={[styles.discountRow, isRTL && styles.discountRowRTL]}>
-                          <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatPrice(discounted)} AED</Text>
-                          <View style={styles.discountBadge}>
-                            <Text style={[styles.discountBadgeText, isRTL && styles.textRTL]}>{discountLabel(effectivePct)}</Text>
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  })()}
-                </View>
-              )}
-
-            {/* VAT-inclusive disclosure — matches web PDP. Hidden for
-                price-on-request and beauty-box bundles which render
-                their own pricing treatment above. */}
-            {user && !product.isPriceOnRequest && !(product.category === 'Beauty Boxes' || (product.name && product.name.toLowerCase().includes('beauty box'))) && (
+            {/* VAT-inclusive disclosure — matches web PDP. Only where an
+                actual number is on screen. */}
+            {(priceView.kind === 'single' || priceView.kind === 'discounted') && (
               <Text style={[styles.vatNote, isRTL && styles.textRTL]}>
                 {PDP_COPY.vatIncluded}
               </Text>
@@ -2571,44 +2473,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   // Beauty Boxes detail page pricing styles
-  beautyBoxDetailPricing: {
-    backgroundColor: colors.subtleBg,
-    padding: 14,
-    borderRadius: 12,
-    marginVertical: 8,
-  },
-  beautyBoxDetailFullPrice: {
-    ...T.priceStrikethrough,
-    fontSize: 15,
-    color: colors.secondaryLabel,
-    marginBottom: 8,
-  },
-  beautyBoxDetailDiscountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    rowGap: 8,
-    columnGap: 10,
-  },
-  beautyBoxDetailDiscount: {
-    ...T.captionSmall,
-    color: colors.accent,
-    fontWeight: '700',
-    backgroundColor: colors.accentBg,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    flexShrink: 1,
-  },
-  beautyBoxDetailFinalPrice: {
-    fontSize: 18,
-    color: colors.greenDeep,
-    fontWeight: '800',
-    marginStart: 'auto',
-    flexShrink: 1,
-    minWidth: 0,
-    textAlign: 'right',
-  },
   // Image Gallery - Pagination Dots
   paginationDots: {
     flexDirection: 'row',

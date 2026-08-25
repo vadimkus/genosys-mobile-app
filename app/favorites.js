@@ -16,8 +16,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct } from '../utils/productRules';
-import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
+import { formatAed, resolvePriceView, discountLabelFor } from '../utils/pricingDisplay';
 import {
   isProductOptionSelectionRequired,
   loadCanonicalProductForQuickAdd,
@@ -260,18 +259,11 @@ export default function FavoritesScreen() {
                           })()}
                         </Text>
 
-                        {/* Pricing */}
+                        {/* Pricing — shared decision, see `resolvePriceView`. */}
                         {(() => {
-                          const pricing = getPricingDisplay(product);
-                          const contractPrice = hasServerPricing(product);
-                          const displayPrice = contractPrice
-                            ? pricing.displayPrice
-                            : Number(product.displayPrice || product.price || 0);
-                          const originalPrice = contractPrice
-                            ? pricing.originalPrice
-                            : Number(product.originalPrice);
+                          const view = resolvePriceView(product, { user });
 
-                          if (!user) {
+                          if (view.kind === 'login') {
                             return (
                               <View style={styles.priceContainer}>
                                 <Text style={[styles.loginToSeePriceText, isRTL && styles.textRTL]}>{t('product.loginToSeePrice')}</Text>
@@ -279,7 +271,7 @@ export default function FavoritesScreen() {
                             );
                           }
 
-                          if (pricing.isPriceOnRequest) {
+                          if (view.kind === 'onRequest') {
                             return (
                               <View style={styles.priceContainer}>
                                 <Text style={[styles.priceOnRequestText, isRTL && styles.textRTL]}>{t('product.priceOnRequest')}</Text>
@@ -287,25 +279,15 @@ export default function FavoritesScreen() {
                             );
                           }
 
-                          if (!contractPrice && (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product))) {
-                            return (
-                              <View style={styles.priceContainer}>
-                                <Text style={[styles.price, isRTL && styles.textRTL]}>{formatAed(getCanonicalUnitPrice(product))}</Text>
-                                <Text style={[styles.vatText, isRTL && styles.textRTL]}>{t('favorites.vatIncluded')}</Text>
-                              </View>
-                            );
-                          }
-
-                          if (originalPrice && Number(originalPrice) > Number(displayPrice || 0)) {
+                          if (view.kind === 'discounted') {
+                            const label = discountLabelFor(view, t);
                             return (
                               <View style={styles.priceContainer}>
                                 <View style={[styles.priceRow, isRTL && styles.rowRTL]}>
-                                  <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
-                                  {pricing.discountLabel ? (
-                                    <Text style={styles.savings}>{pricing.discountLabel}</Text>
-                                  ) : null}
+                                  <Text style={styles.originalPrice}>{formatAed(view.originalPrice)}</Text>
+                                  {label ? <Text style={styles.savings}>{label}</Text> : null}
                                 </View>
-                                <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatAed(displayPrice)}</Text>
+                                <Text style={[styles.discountedPrice, isRTL && styles.textRTL]}>{formatAed(view.price)}</Text>
                                 <Text style={[styles.vatText, isRTL && styles.textRTL]}>{t('favorites.vatIncluded')}</Text>
                               </View>
                             );
@@ -313,7 +295,7 @@ export default function FavoritesScreen() {
 
                           return (
                             <View style={styles.priceContainer}>
-                              <Text style={[styles.price, isRTL && styles.textRTL]}>{formatAed(displayPrice)}</Text>
+                              <Text style={[styles.price, isRTL && styles.textRTL]}>{formatAed(view.price)}</Text>
                               <Text style={[styles.vatText, isRTL && styles.textRTL]}>{t('favorites.vatIncluded')}</Text>
                             </View>
                           );

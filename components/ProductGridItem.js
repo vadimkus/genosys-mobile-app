@@ -12,8 +12,8 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { getCanonicalUnitPrice, hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, isBeautyBoxProduct, isUserDiscountExcludedProduct } from '../utils/productRules';
-import { getPricingDisplay, hasServerPricing, formatAed } from '../utils/pricingDisplay';
+import { isBeautyBoxProduct } from '../utils/productRules';
+import { formatAed, resolvePriceView, discountLabelFor } from '../utils/pricingDisplay';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getLocalizedProductName, getLocalizedProductSize, getLocalizedProductDescription, getCategoryTranslationKey, normalizeCategoryCanonical } from '../utils/productLocalization';
@@ -32,10 +32,9 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
   const { t, locale } = useLocalization();
   const { user } = useAuth();
   const isRTL = !!I18nManager.isRTL;
-  const canSeePrices = !!user;
 
-  const discountPct = Number(user?.discountPercentage);
-  const hasUserDiscount = !!user?.discountType && Number.isFinite(discountPct) && discountPct > 0 && discountPct < 100;
+  const priceView = resolvePriceView(product, { user });
+  const priceLabel = priceView.kind === 'discounted' ? discountLabelFor(priceView, t) : null;
 
   const handlePress = () => {
     haptics.lightTap();
@@ -48,6 +47,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
       ? (product.image.startsWith('http') ? product.image : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${product.image}`)
       : null);
   const isOutOfStock = isProductOutOfStock(product);
+  const isWishlisted = !!(product?.id && isFavorite(product.id));
   const requiresOptions = isProductOptionSelectionRequired(product);
   const nameLower = (product?.name || '').trim().toLowerCase();
   const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
@@ -57,13 +57,6 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
   const isEyeZoneKit = nameLower.includes('eye') && nameLower.includes('zone') && nameLower.includes('kit');
   const isRevitaGlow = nameLower.includes('revita glow') || (nameLower.includes('revita') && nameLower.includes('blemish')) || String(product?.id) === '63';
   const isBeautyBox = isBeautyBoxProduct(product);
-  const pricingDisplay = getPricingDisplay(product);
-  const hasPricingContract = hasServerPricing(product);
-  const discountLabel = (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) });
-  const localizeDiscountLabel = (label) => {
-    const match = String(label || '').trim().match(/^(\d+(?:\.\d+)?)%\s*OFF$/i);
-    return match ? discountLabel(Number(match[1])) : label;
-  };
 
   const baseBadges = (product.badges || []).filter((b) => {
     const text = (b.text || '').toLowerCase().trim();
@@ -113,11 +106,13 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
   const badges = [...computedBadges, ...baseBadges];
 
   return (
+    // Out of stock dims the card and hides the buy button, but the card stays
+    // tappable: a shopper still needs to read the ingredients, see the photos
+    // and save it for when it returns.
     <TouchableOpacity
       style={[styles.card, isOutOfStock && styles.cardOutOfStock]}
       onPress={handlePress}
       activeOpacity={0.95}
-      disabled={isOutOfStock}
     >
       <View style={styles.imageContainer}>
         {imageUrl ? (
@@ -152,7 +147,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
               .map((badge, index) => (
                 <View key={badge.type || index} style={[
                   styles.badge, 
-                  { backgroundColor: badge.color || '#007AFF' }
+                  { backgroundColor: badge.color || colors.blue }
                 ]}>
                   <Text style={[styles.badgeText, { color: badge.textColor || colors.white }]}>
                     {badge.text}
@@ -162,6 +157,28 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
             }
           </View>
         )}
+
+        {/* Saving a product is a list-level action: the shopper is comparing
+            here, not on the detail page. Matches the shop tab's card. */}
+        <TouchableOpacity
+          style={styles.favoriteHeart}
+          onPress={(e) => {
+            e.stopPropagation?.();
+            haptics.lightTap();
+            toggleFavorite(product);
+          }}
+          activeOpacity={0.8}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityRole="button"
+          accessibilityLabel={isWishlisted ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
+          accessibilityState={{ selected: isWishlisted }}
+        >
+          <Ionicons
+            name={isWishlisted ? 'heart' : 'heart-outline'}
+            size={18}
+            color={isWishlisted ? colors.accent : colors.mutedText}
+          />
+        </TouchableOpacity>
       </View>
       
       <View style={styles.content}>
@@ -201,101 +218,36 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
           </View>
         )}
         
-        {/* Enhanced Pricing from Server with Beauty Boxes Special Display */}
+        {/* Price, decided once in `resolvePriceView` so the catalogue can never
+            advertise a number the product page or checkout disagrees with. */}
         <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-          {!canSeePrices ? (
+          {priceView.kind === 'login' ? (
             <Text style={[styles.loginToSeePrice, isRTL && styles.valueRTL]}>
               {t('product.loginToSeePrice')}
             </Text>
-          ) : pricingDisplay.isPriceOnRequest ? (
+          ) : priceView.kind === 'onRequest' ? (
             <Text style={[styles.price, isRTL && styles.valueRTL]}>
               {t('product.priceOnRequest')}
             </Text>
-          ) : (() => {
-            const category = product?.category;
-            const name = product?.name || '';
-            const hasBeautyBoxInName = name.toUpperCase().includes('BEAUTY BOX');
-            const isCategoryBeautyBoxes = category === 'Beauty Boxes';
-            return isCategoryBeautyBoxes || hasBeautyBoxInName;
-          })() ? (
-            // Special pricing display for Beauty Boxes - show full price + 15% discount clearly
-            <View style={[styles.beautyBoxPricing, isRTL && styles.alignEndRTL]}>
-              <Text style={[styles.beautyBoxFullPrice, isRTL && styles.textRTL]}>
-                {t('product.fullPrice', { price: (pricingDisplay.originalPrice || pricingDisplay.displayPrice || 0).toFixed(2) })}
+          ) : priceView.kind === 'discounted' ? (
+            <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
+              <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
+                {formatAed(priceView.originalPrice)}
               </Text>
-              <View style={[styles.beautyBoxDiscountContainer, isRTL && styles.rowRTL]}>
-                <Text style={styles.beautyBoxDiscount}>{t('bag.bundleDiscount15')}</Text>
-                <Text style={[styles.beautyBoxFinalPrice, isRTL && styles.valueRTL]}>
-                  {t('product.finalPrice', { price: (pricingDisplay.displayPrice || 0).toFixed(2) })}
-                </Text>
-              </View>
-            </View>
-          ) : (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product)) ? (
-            <Text style={[styles.price, isRTL && styles.valueRTL]}>
-              {formatAed(hasPricingContract ? pricingDisplay.displayPrice : getCanonicalUnitPrice(product))}
-            </Text>
-          ) : (() => {
-            if (hasPricingContract) {
-              const finalPrice = pricingDisplay.displayPrice;
-              const retailPrice = pricingDisplay.originalPrice || finalPrice;
-              const hasDiscount = retailPrice > finalPrice + 0.01;
-              const label = localizeDiscountLabel(pricingDisplay.discountLabel) ||
-                (pricingDisplay.discountPercentage > 0 ? discountLabel(pricingDisplay.discountPercentage) : null);
-
-              return hasDiscount ? (
-                <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
-                  <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
-                    {formatAed(retailPrice)}
-                  </Text>
-                  <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
-                    {formatAed(finalPrice)}
-                  </Text>
-                  {label ? (
-                    <View style={styles.savingsContainer}>
-                      <Text style={styles.savings}>{label}</Text>
-                    </View>
-                  ) : null}
+              <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
+                {formatAed(priceView.price)}
+              </Text>
+              {priceLabel ? (
+                <View style={styles.savingsContainer}>
+                  <Text style={styles.savings}>{priceLabel}</Text>
                 </View>
-              ) : (
-                <Text style={[styles.price, isRTL && styles.valueRTL]}>
-                  {formatAed(finalPrice)}
-                </Text>
-              );
-            }
-
-            const displayP = Number(product.displayPrice || product.price || 0);
-            const serverOriginal = Number(product.originalPrice);
-            const hasServerOriginal = Number.isFinite(serverOriginal) && serverOriginal > 0;
-            const excluded = isUserDiscountExcludedProduct(product);
-            const retailPrice = (hasServerOriginal && serverOriginal > displayP) ? serverOriginal : displayP;
-            const serverAlreadyDiscounted = hasServerOriginal && serverOriginal > displayP;
-            const canApplyUserDiscount = hasUserDiscount && !excluded && !serverAlreadyDiscounted;
-            const finalPrice = canApplyUserDiscount ? retailPrice * (1 - discountPct / 100) : displayP;
-            const hasDiscount = retailPrice > finalPrice + 0.01;
-            const label = serverAlreadyDiscounted
-              ? localizeDiscountLabel(product.discountLabel)
-              : (canApplyUserDiscount ? discountLabel(discountPct) : null);
-
-            return hasDiscount ? (
-              <View style={[styles.discountPricing, isRTL && styles.alignEndRTL]}>
-                <Text style={[styles.originalPrice, isRTL && styles.valueRTL]}>
-                  {retailPrice.toFixed(2)} AED
-                </Text>
-                <Text style={[styles.discountedPrice, isRTL && styles.valueRTL]}>
-                  {finalPrice.toFixed(2)} AED
-                </Text>
-                {label ? (
-                  <View style={styles.savingsContainer}>
-                    <Text style={styles.savings}>{label}</Text>
-                  </View>
-                ) : null}
-              </View>
-            ) : (
-              <Text style={[styles.price, isRTL && styles.valueRTL]}>
-                {finalPrice.toFixed(2)} AED
-              </Text>
-            );
-          })()}
+              ) : null}
+            </View>
+          ) : (
+            <Text style={[styles.price, isRTL && styles.valueRTL]}>
+              {formatAed(priceView.price)}
+            </Text>
+          )}
         </View>
         {onAddToCart && !isOutOfStock && (
           <TouchableOpacity
@@ -330,12 +282,12 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
               {inCart
                 ? requiresOptions
                   ? t('product.viewBag')
-                  : `${locale === 'ar' ? 'في الحقيبة' : locale === 'ru' ? 'В корзине' : 'In Bag'}${inCartQty > 0 ? ` (${inCartQty})` : ' ✓'}`
+                  : t('product.inBag', { count: inCartQty > 0 ? inCartQty : 1 })
                 : !user
                   ? t('shop.loginToBuy')
                   : requiresOptions
                     ? t('variant.chooseOptions')
-                    : (locale === 'ar' ? 'أضف للحقيبة' : locale === 'ru' ? 'В корзину' : 'Add to Bag')}
+                    : t('product.addToBag')}
             </Text>
           </TouchableOpacity>
         )}
@@ -387,6 +339,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: colors.accent,
+  },
+  // Sits on the image, opposite the badge stack, on a soft disc so the outline
+  // heart stays visible over a white packshot as well as a dark one.
+  favoriteHeart: {
+    position: 'absolute',
+    top: 8,
+    end: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    zIndex: 10,
   },
   stockOverlay: {
     position: 'absolute',
@@ -483,39 +451,6 @@ const styles = StyleSheet.create({
   savings: {
     ...T.badge,
     color: colors.white,
-  },
-  // Beauty Boxes specific pricing styles
-  beautyBoxPricing: {
-    backgroundColor: colors.subtleBg,
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.separator,
-  },
-  beautyBoxFullPrice: {
-    ...T.captionSmall,
-    fontWeight: '500',
-    color: colors.label,
-    marginBottom: 4,
-  },
-  beautyBoxDiscountContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  beautyBoxDiscount: {
-    ...T.captionTiny,
-    fontWeight: 'bold',
-    color: colors.accent,
-    backgroundColor: colors.redBg,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  beautyBoxFinalPrice: {
-    ...T.labelSmall,
-    fontWeight: 'bold',
-    color: colors.greenDeep,
   },
   rowRTL: { flexDirection: 'row-reverse' },
   alignEndRTL: { alignItems: 'flex-end' },

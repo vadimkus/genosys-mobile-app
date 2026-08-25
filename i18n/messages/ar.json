@@ -655,7 +655,9 @@
     "pc9Benefit3Text": "جهاز الميكرونيدلينج يعزز فعالية علاجات الأمبول الاحترافية",
     "pc9Benefit4Title": "نظام العلاج الكامل:",
     "pc9Benefit4Text": "يتناول مكافحة الشيخوخة وتقليل التجاعيد ومتانة البشرة للعناية بالبشرة الاحترافية الشاملة",
-    "quantity": "الكمية"
+    "quantity": "الكمية",
+    "bundleDiscountPercent": "خصم {percent}% (باقة)",
+    "blackFridayPercent": "الجمعة السوداء: خصم {percent}%"
   },
   "rewards": {
     "title": "مكافآت جينوسيس",

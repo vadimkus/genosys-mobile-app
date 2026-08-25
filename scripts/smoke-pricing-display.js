@@ -1,4 +1,9 @@
-const { getPricingDisplay, formatAed } = require('../utils/pricingDisplay');
+const {
+  getPricingDisplay,
+  formatAed,
+  resolvePriceView,
+  discountLabelFor,
+} = require('../utils/pricingDisplay');
 
 function assertEqual(name, actual, expected) {
   if (actual !== expected) {
@@ -134,3 +139,95 @@ for (const scenario of scenarios) {
 }
 
 console.log(`[pricing-display] ${scenarios.length} display scenarios passed`);
+
+// ── The storefront view model ────────────────────────────────────────────────
+// Every surface that shows a price renders `resolvePriceView`, so these cases
+// are the guarantee that the catalogue, favourites and the product page cannot
+// disagree with each other or with what checkout charges.
+
+const signedIn = { id: 'user-1', discountType: 'vip', discountPercentage: 20 };
+const label = (key, params) => (params ? `${key}:${params.percent}` : key);
+
+const viewScenarios = [
+  {
+    name: 'signed out hides the number',
+    product: product(),
+    user: null,
+    expected: { kind: 'login' },
+  },
+  {
+    name: 'quote-only product',
+    product: product({ isPriceOnRequest: true }),
+    user: signedIn,
+    expected: { kind: 'onRequest' },
+  },
+  {
+    name: 'bundle reports the percentage the server charged, not a fixed 15',
+    product: product({
+      category: 'Beauty Boxes',
+      pricing: {
+        source: 'server',
+        displayPrice: 800,
+        originalPrice: 1000,
+        discountPercentage: 20,
+        discountType: 'beauty_box',
+        discountLabel: 'Bundle 20% off',
+      },
+    }),
+    user: signedIn,
+    expected: { kind: 'discounted', price: 800, originalPrice: 1000, label: 'product.bundleDiscountPercent:20' },
+  },
+  {
+    name: 'black friday keeps its own wording',
+    product: product({
+      pricing: {
+        source: 'server',
+        displayPrice: 80,
+        originalPrice: 100,
+        discountPercentage: 20,
+        discountType: 'black_friday',
+        discountLabel: 'Black Friday 20% off',
+      },
+    }),
+    user: signedIn,
+    expected: { kind: 'discounted', price: 80, originalPrice: 100, label: 'product.blackFridayPercent:20' },
+  },
+  {
+    // The regression this replaced: the grid tile applied the shopper's own
+    // percentage to a product the backend excludes, advertising a price that
+    // checkout would not honour.
+    name: 'noDiscount product never takes the shopper percentage',
+    product: product({ noDiscount: true, price: 300, displayPrice: 300 }),
+    user: signedIn,
+    expected: { kind: 'single', price: 300, originalPrice: null },
+  },
+  {
+    name: 'device without a contract shows one price',
+    product: product({ category: 'Device', price: 5000, displayPrice: 5000 }),
+    user: signedIn,
+    expected: { kind: 'single', price: 5000, originalPrice: null },
+  },
+  {
+    name: 'stale cached payload still renders its own discount',
+    product: product({ displayPrice: 90, originalPrice: 100, discountLabel: '10% OFF' }),
+    user: signedIn,
+    expected: { kind: 'discounted', price: 90, originalPrice: 100, label: 'product.discountPercent:10' },
+  },
+];
+
+for (const scenario of viewScenarios) {
+  const view = resolvePriceView(scenario.product, { user: scenario.user });
+  assertEqual(`${scenario.name} kind`, view.kind, scenario.expected.kind);
+  if ('price' in scenario.expected) {
+    assertEqual(`${scenario.name} price`, view.price, scenario.expected.price);
+  }
+  if ('originalPrice' in scenario.expected) {
+    assertEqual(`${scenario.name} originalPrice`, view.originalPrice, scenario.expected.originalPrice);
+  }
+  if ('label' in scenario.expected) {
+    assertEqual(`${scenario.name} label`, discountLabelFor(view, label), scenario.expected.label);
+  }
+  console.log(`[price-view] ${scenario.name}: ${view.kind}`);
+}
+
+console.log(`[price-view] ${viewScenarios.length} storefront scenarios passed`);

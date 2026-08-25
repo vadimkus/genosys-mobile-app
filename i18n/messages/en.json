@@ -655,7 +655,9 @@
     "pc9Benefit3Text": "Microneedling device enhances the effectiveness of professional ampoule treatments",
     "pc9Benefit4Title": "Complete Treatment System:",
     "pc9Benefit4Text": "Addresses anti-aging, wrinkle reduction, and skin firmness for comprehensive professional skincare",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "bundleDiscountPercent": "{percent}% OFF (Bundle Discount)",
+    "blackFridayPercent": "Black Friday {percent}% OFF"
   },
   "rewards": {
     "title": "GENOSYS Rewards",

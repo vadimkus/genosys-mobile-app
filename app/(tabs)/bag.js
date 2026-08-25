@@ -415,17 +415,24 @@ function BagScreen() {
                   );
                 }
 
-                // Beauty Boxes: show bundle discount (15%) explicitly, ignore user discount
+                // Beauty Boxes carry a bundle discount instead of the user's own.
+                // The struck-through price and the percentage both come from what
+                // the server sent: this used to divide by 0.85 when no original
+                // price was supplied, which invented a "full price" and printed a
+                // 15% saving whatever the bundle was actually discounted by.
                 if (isBeautyBox && Number.isFinite(base) && base > 0) {
-                  const fullPrice = (Number.isFinite(original) && original > base)
-                    ? original
-                    : (base / 0.85);
-
+                  const hasFullPrice = Number.isFinite(original) && original > base;
+                  if (!hasFullPrice) {
+                    return <Text style={[styles.itemPrice, isRTL && styles.itemPriceRTL]}>{base.toFixed(2)} AED</Text>;
+                  }
+                  const percent = Math.round((1 - base / original) * 100);
                   return (
                     <View style={[styles.itemPriceContainer, isRTL && styles.itemPriceContainerRTL]}>
                       <View style={styles.itemPriceRow}>
-                        <Text style={styles.itemOriginalPrice}>{fullPrice.toFixed(2)} AED</Text>
-                        <Text style={styles.itemBundleLabel}>{t('bag.bundleDiscount15')}</Text>
+                        <Text style={styles.itemOriginalPrice}>{original.toFixed(2)} AED</Text>
+                        <Text style={styles.itemBundleLabel}>
+                          {t('product.bundleDiscountPercent', { percent })}
+                        </Text>
                       </View>
                       <Text style={styles.itemDiscountedPrice}>{base.toFixed(2)} AED</Text>
                     </View>

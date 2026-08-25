@@ -44,8 +44,7 @@ import * as haptics from '../../utils/haptics';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
-import { hasFixedPriceOverride, isHydroCoolMask, isDeviceProduct, getCanonicalUnitPrice } from '../../utils/productRules';
-import { getPricingDisplay, hasServerPricing, formatAed } from '../../utils/pricingDisplay';
+import { formatAed, resolvePriceView, discountLabelFor } from '../../utils/pricingDisplay';
 import { computeProductBadges } from '../../utils/badges';
 import { isProductOutOfStock } from '../../utils/stock';
 import {
@@ -130,7 +129,6 @@ const ShopGridCard = React.memo(function ShopGridCard({
   onToggleFavorite,
   onAddToCart,
   onDecrement,
-  localizeDiscountLabel,
 }) {
   // NEW is shown as a black pill next to the category (like the website
   // rail cards); other badges (e.g. Order) stay as an image overlay.
@@ -236,14 +234,11 @@ const ShopGridCard = React.memo(function ShopGridCard({
             </Text>
           )}
 
-          {/* Pricing Display */}
+          {/* Pricing Display — shared decision, see `resolvePriceView`. */}
           {(() => {
-            const pricing = getPricingDisplay(product);
-            const contractPrice = hasServerPricing(product);
-            const displayPrice = contractPrice ? pricing.displayPrice : Number(product.displayPrice || product.price || 0);
-            const originalPrice = contractPrice ? pricing.originalPrice : Number(product.originalPrice);
+            const view = resolvePriceView(product, { user });
 
-            if (!user) {
+            if (view.kind === 'login') {
               return (
                 <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
                   <Text style={styles.loginToSeePriceText}>{t('product.loginToSeePrice')}</Text>
@@ -251,7 +246,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
               );
             }
 
-            if (pricing.isPriceOnRequest) {
+            if (view.kind === 'onRequest') {
               return (
                 <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
                   <Text style={styles.priceOnRequestText}>{t('shop.priceOnRequest')}</Text>
@@ -259,40 +254,13 @@ const ShopGridCard = React.memo(function ShopGridCard({
               );
             }
 
-            const category = product.category;
-            const nm = getLocalizedProductName(product, locale) || product.name || '';
-            const hasBeautyBoxInName = nm.toUpperCase().includes('BEAUTY BOX');
-            const isCategoryBeautyBoxes = category === 'Beauty Boxes';
-            const isBeautyBox = isCategoryBeautyBoxes || hasBeautyBoxInName;
-
-            if (isBeautyBox) {
+            if (view.kind === 'discounted') {
+              const label = discountLabelFor(view, t);
               return (
                 <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  {Number(originalPrice) > Number(displayPrice || 0) && (
-                    <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
-                  )}
-                  <Text style={styles.userDiscount}>{t('bag.bundleDiscount15')}</Text>
-                  <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
-                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                </View>
-              );
-            }
-
-            if (!contractPrice && (hasFixedPriceOverride(product) || isHydroCoolMask(product) || isDeviceProduct(product))) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.gridPrice}>{formatAed(getCanonicalUnitPrice(product))}</Text>
-                  <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
-                </View>
-              );
-            }
-
-            if (originalPrice && Number(originalPrice) > Number(displayPrice || 0)) {
-              return (
-                <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                  <Text style={styles.originalPrice}>{formatAed(originalPrice)}</Text>
-                  <Text style={styles.discountedPrice}>{formatAed(displayPrice)}</Text>
-                  {pricing.discountLabel && <Text style={styles.userDiscount}>{localizeDiscountLabel(pricing.discountLabel)}</Text>}
+                  <Text style={styles.originalPrice}>{formatAed(view.originalPrice)}</Text>
+                  <Text style={styles.discountedPrice}>{formatAed(view.price)}</Text>
+                  {label ? <Text style={styles.userDiscount}>{label}</Text> : null}
                   <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
                 </View>
               );
@@ -300,7 +268,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
 
             return (
               <View style={[styles.priceContainer, isRTL && styles.priceContainerRTL]}>
-                <Text style={styles.gridPrice}>{formatAed(displayPrice)}</Text>
+                <Text style={styles.gridPrice}>{formatAed(view.price)}</Text>
                 <Text style={styles.vatText}>{t('favorites.vatIncluded')}</Text>
               </View>
             );
@@ -464,18 +432,6 @@ function ShopScreen() {
   const [langSwitching, setLangSwitching] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const isRTL = dir === 'rtl';
-  const discountLabel = useCallback(
-    (percent) => t('product.discountPercent', { percent: Math.round(Number(percent) || 0) }),
-    [t]
-  );
-  const localizeDiscountLabel = useCallback(
-    (label) => {
-      const match = String(label || '').trim().match(/^(\d+(?:\.\d+)?)%\s*OFF$/i);
-      return match ? discountLabel(Number(match[1])) : label;
-    },
-    [discountLabel]
-  );
-
   // ─── Voice Search (only when native module is available) ───
   const speechAvailable = _speechAvailable;
   const [isListening, setIsListening] = useState(false);
@@ -947,7 +903,6 @@ function ShopScreen() {
       onToggleFavorite={handleToggleFavorite}
       onAddToCart={handleAddToCart}
       onDecrement={handleDecrementFromCart}
-      localizeDiscountLabel={localizeDiscountLabel}
     />
   ), [
     isFavorite,
@@ -961,7 +916,6 @@ function ShopScreen() {
     handleToggleFavorite,
     handleAddToCart,
     handleDecrementFromCart,
-    localizeDiscountLabel,
   ]);
 
   const keyExtractor = useCallback((item) => String(item.id), []);
