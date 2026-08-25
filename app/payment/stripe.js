@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform, Image } from 'react-native';
 import { colors } from '../../utils/theme';
 
-const GRAY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
+const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -288,7 +288,7 @@ export default function StripePaymentScreen() {
       {useNativeSheet ? (
         // --- Native Payment Sheet: clean branded screen behind the sheet ------
         <View style={styles.nativeContent}>
-          <Image source={{ uri: GRAY_UNI_IMAGE }} style={styles.nativeUni} resizeMode="contain" />
+          <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.nativeUni} resizeMode="contain" />
           <Text style={styles.nativeTitle}>{t('payment.securePaymentTitle')}</Text>
           <Text style={styles.nativeSubtitle}>{t('payment.securePaymentSubtitle')}</Text>
           <Text style={styles.nativeTagline}>{t('payment.securePaymentTagline')}</Text>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     alignItems: 'center',
   },
-  // Gray unicorn blends into the grouped-gray background (no card frame).
+  // Transparent PNG, so it sits directly on the cream page with no frame.
   nativeUni: {
     width: 168,
     height: 168,

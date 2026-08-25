@@ -35,7 +35,7 @@ import { withErrorBoundary } from '../../components/ErrorBoundary';
 const log = createLogger('Orders');
 
 const ASSET_ORIGIN = AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae';
-const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
+const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 
 // Enable LayoutAnimation on Android for the inline summary expand/collapse.
 // Old-arch Android needs the opt-in; on Fabric (new arch) it's a no-op that

@@ -35,7 +35,7 @@ import AUTH_CONFIG from '../config/auth';
 
 const log = createLogger('FavoritesScreen');
 
-const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
+const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 
 export default function FavoritesScreen() {
   const { user } = useAuth();
@@ -549,9 +549,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: 40,
   },
-  // Frame the illustration in a soft rounded white card so its white canvas
-  // reads as an intentional tile on the grouped-gray background.
-  // Gray unicorn blends into the grouped-gray background — no card frame.
+  // The illustration is a transparent PNG, so it sits directly on the page
+  // whatever colour the page is. It used to be a JPEG with a grey canvas baked
+  // in, which stopped blending the moment the background went cream.
   iconContainer: {
     marginBottom: 24,
   },

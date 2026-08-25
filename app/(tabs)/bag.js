@@ -90,7 +90,7 @@ function BagScreen() {
     }
   }, [navSource]);
 
-  const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Fgray_uni.jpeg&w=512&q=75';
+  const EMPTY_UNI_IMAGE = 'https://genosys.ae/_next/image?url=%2Fimages%2Favatar%2Funi-transparent.png&w=512&q=75';
 
   const cartSummary = getCartSummary();
   const paidItemCount = getTotalItems();
@@ -1250,8 +1250,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingTop: 16,
   },
-  // The gray unicorn illustration shares the grouped-gray canvas, so it blends
-  // straight into the background and floats without a card frame.
+  // Transparent PNG, so it floats on the page with no frame and no canvas of
+  // its own. The old JPEG had a grey rectangle baked in.
   iconContainer: {
     marginBottom: 24,
   },
