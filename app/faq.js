@@ -44,7 +44,7 @@ if (Platform.OS === 'android' && !global?.nativeFabricUIManager && UIManager.set
 const CATEGORY_ORDER = ['general', 'products', 'orders', 'shipping', 'app', 'account'];
 
 const CATEGORY_LABELS = {
-  general:  { en: 'About GENOSYS',     ar: 'عن GENOSYS',       ru: 'О GENOSYS',           icon: 'storefront', color: colors.brand },
+  general:  { en: 'About GENOSYS',     ar: 'عن GENOSYS',       ru: 'О GENOSYS',           icon: 'storefront', color: colors.accent },
   products: { en: 'Products',          ar: 'المنتجات',         ru: 'Продукты',            icon: 'sparkles',   color: colors.purple },
   orders:   { en: 'Orders & Payment',  ar: 'الطلبات والدفع',   ru: 'Заказы и оплата',     icon: 'card',       color: colors.indigo },
   shipping: { en: 'Shipping',          ar: 'الشحن',            ru: 'Доставка',            icon: 'car',        color: colors.teal },
@@ -198,7 +198,7 @@ export default function FAQScreen() {
       <View style={styles.container}>
         <CollapsibleHeader title={headerTitle} scrollY={null} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.centered, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>
             {l('Loading...', 'جارٍ التحميل...', 'Загрузка...')}
           </Text>
@@ -214,7 +214,7 @@ export default function FAQScreen() {
         <View style={[styles.centered, { paddingTop: headerHeight }]}>
           <Ionicons name="cloud-offline" size={48} color={colors.tertiary} />
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.brand)]} onPress={() => fetchFAQ()} activeOpacity={0.85}>
+          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.cta)]} onPress={() => fetchFAQ()} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>{l('Try Again', 'حاول مرة أخرى', 'Попробовать снова')}</Text>
           </TouchableOpacity>
         </View>
@@ -237,7 +237,7 @@ export default function FAQScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => fetchFAQ(true)}
-            tintColor={colors.brand}
+            tintColor={colors.accent}
             progressViewOffset={headerHeight}
           />
         }
@@ -302,7 +302,7 @@ export default function FAQScreen() {
               <View key={category}>
                 {/* Category header (icon tile + title) */}
                 <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
-                  <View style={[surfaces.iconTile, { backgroundColor: meta.color || colors.brand }]}>
+                  <View style={[surfaces.iconTile, { backgroundColor: meta.color || colors.accent }]}>
                     <Ionicons name={meta.icon} size={17} color={colors.white} />
                   </View>
                   <Text style={[styles.sectionHeaderTitle, isRTL && styles.textRTL]}>
@@ -328,7 +328,7 @@ export default function FAQScreen() {
                           <Ionicons
                             name={isExpanded ? 'chevron-up' : 'chevron-down'}
                             size={18}
-                            color={isExpanded ? colors.brand : colors.secondaryLabel}
+                            color={isExpanded ? colors.accent : colors.secondaryLabel}
                           />
                         </TouchableOpacity>
                         {isExpanded && (
@@ -359,12 +359,12 @@ export default function FAQScreen() {
                 <Text style={[styles.ctaBtnText, { color: colors.whatsapp }]}>WhatsApp</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.ctaBtn, { backgroundColor: tint(colors.brand) }]}
+                style={[styles.ctaBtn, { backgroundColor: colors.accentBg }]}
                 onPress={() => { haptics.mediumTap(); Linking.openURL('mailto:sales@genosys.ae').catch(() => {}); }}
                 activeOpacity={0.7}
               >
-                <Ionicons name="mail" size={18} color={colors.brand} />
-                <Text style={[styles.ctaBtnText, { color: colors.brand }]}>Email</Text>
+                <Ionicons name="mail" size={18} color={colors.accent} />
+                <Text style={[styles.ctaBtnText, { color: colors.accent }]}>Email</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   errorText: { ...T.bodySmall, marginTop: 12, color: colors.secondaryLabel, textAlign: 'center', lineHeight: undefined },
   retryBtn: {
     marginTop: 16,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 24,
     paddingVertical: 13,
     borderRadius: 14,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   },
   faqQuestionRTL: { flexDirection: 'row-reverse' },
   faqQuestionText: { ...T.faqQuestion, flex: 1, color: colors.label },
-  faqQuestionTextActive: { color: colors.brand, fontWeight: '600' },
+  faqQuestionTextActive: { color: colors.accent, fontWeight: '600' },
   faqAnswer: { paddingBottom: 14 },
   faqAnswerBody: {
     backgroundColor: colors.subtleBg,
@@ -454,8 +454,8 @@ const styles = StyleSheet.create({
   },
   answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 8 },
   answerRowRTL: { flexDirection: 'row-reverse' },
-  bullet: { fontSize: 16, lineHeight: 22, color: colors.brand, fontWeight: '800' },
-  numBullet: { fontSize: 14, lineHeight: 22, color: colors.brand, fontWeight: '800', minWidth: 22, textAlign: 'right' },
+  bullet: { fontSize: 16, lineHeight: 22, color: colors.accent, fontWeight: '800' },
+  numBullet: { fontSize: 14, lineHeight: 22, color: colors.accent, fontWeight: '800', minWidth: 22, textAlign: 'right' },
   numBulletRTL: { textAlign: 'left' },
   answerText: { ...T.faqAnswer, flex: 1, color: colors.bodyText, fontWeight: '500' },
   answerParagraph: { ...T.faqAnswer, color: colors.bodyText, fontWeight: '500', marginBottom: 8 },
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   // Empty state
   emptyState: { alignItems: 'center', paddingVertical: 36, gap: 8, marginTop: 8 },
   emptyText: { ...T.bodySmall, color: colors.secondaryLabel, lineHeight: undefined },
-  clearSearchLink: { ...T.bodySmall, color: colors.brand, fontWeight: '600', marginTop: 4, lineHeight: undefined },
+  clearSearchLink: { ...T.bodySmall, color: colors.accent, fontWeight: '600', marginTop: 4, lineHeight: undefined },
 
   // CTA
   ctaSection: { paddingHorizontal: 16, paddingTop: 24, paddingBottom: 8, alignItems: 'center' },

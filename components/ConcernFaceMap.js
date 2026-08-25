@@ -182,7 +182,7 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
                 </LinearGradient>
               </Defs>
               <Rect x="0" y="0" width="100%" height={SCAN_BAND - 4} fill="url(#scanGlow)" />
-              <Rect x="0" y={SCAN_BAND - 26} width="100%" height="1.6" fill={colors.brand} opacity="0.8" />
+              <Rect x="0" y={SCAN_BAND - 26} width="100%" height="1.6" fill={colors.accent} opacity="0.8" />
             </Svg>
           </Animated.View>
         )}
@@ -219,17 +219,17 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
                         cx={RETICLE_SIZE / 2}
                         cy={RETICLE_SIZE / 2}
                         r={RETICLE_SIZE / 2 - 5}
-                        stroke={colors.brand}
+                        stroke={colors.accent}
                         strokeWidth="1.6"
                         strokeDasharray="7 8"
                         strokeLinecap="round"
                         fill="none"
                       />
                       {/* Crosshair ticks */}
-                      <Line x1={RETICLE_SIZE / 2} y1="0" x2={RETICLE_SIZE / 2} y2="4.5" stroke={colors.brand} strokeWidth="1.8" strokeLinecap="round" />
-                      <Line x1={RETICLE_SIZE / 2} y1={RETICLE_SIZE} x2={RETICLE_SIZE / 2} y2={RETICLE_SIZE - 4.5} stroke={colors.brand} strokeWidth="1.8" strokeLinecap="round" />
-                      <Line x1="0" y1={RETICLE_SIZE / 2} x2="4.5" y2={RETICLE_SIZE / 2} stroke={colors.brand} strokeWidth="1.8" strokeLinecap="round" />
-                      <Line x1={RETICLE_SIZE} y1={RETICLE_SIZE / 2} x2={RETICLE_SIZE - 4.5} y2={RETICLE_SIZE / 2} stroke={colors.brand} strokeWidth="1.8" strokeLinecap="round" />
+                      <Line x1={RETICLE_SIZE / 2} y1="0" x2={RETICLE_SIZE / 2} y2="4.5" stroke={colors.accent} strokeWidth="1.8" strokeLinecap="round" />
+                      <Line x1={RETICLE_SIZE / 2} y1={RETICLE_SIZE} x2={RETICLE_SIZE / 2} y2={RETICLE_SIZE - 4.5} stroke={colors.accent} strokeWidth="1.8" strokeLinecap="round" />
+                      <Line x1="0" y1={RETICLE_SIZE / 2} x2="4.5" y2={RETICLE_SIZE / 2} stroke={colors.accent} strokeWidth="1.8" strokeLinecap="round" />
+                      <Line x1={RETICLE_SIZE} y1={RETICLE_SIZE / 2} x2={RETICLE_SIZE - 4.5} y2={RETICLE_SIZE / 2} stroke={colors.accent} strokeWidth="1.8" strokeLinecap="round" />
                     </Svg>
                   </Animated.View>
                 )}
@@ -289,7 +289,7 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
                     ) : null}
                     <View style={[styles.exploreRow, isRTL && styles.rowRTL]}>
                       <Text style={styles.exploreText}>{loc(COPY.explore)}</Text>
-                      <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={13} color={colors.brand} />
+                      <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={13} color={colors.accent} />
                     </View>
                   </View>
                 </View>
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...T.badge,
-    color: colors.brand,
+    color: colors.accent,
     textAlign: 'center',
     letterSpacing: 2,
     marginBottom: 6,
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   dotActive: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderColor: colors.white,
   },
   chipWrap: {
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
   },
   chipText: {
     ...T.badge,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   },
   exploreText: {
     ...T.badge,
-    color: colors.brand,
+    color: colors.accent,
   },
   hintBox: {
     marginTop: 16,

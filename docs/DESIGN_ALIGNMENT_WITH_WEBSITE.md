@@ -194,3 +194,60 @@ The app currently follows the second convention: red on buttons, prices and
 badges, 157 occurrences before stage 1. Moving to ink CTAs is the single
 largest visual change in this whole effort and is a brand decision. The pilot
 keeps red so that the surfaces and type can be judged on their own.
+
+## Stage 2 — rolled out
+
+`colors` now holds the website palette, so every screen that reads tokens moved
+at once. `ceraColors` remains as an alias and can go once nothing imports it.
+
+### Red resolved: ink actions, rose accents
+
+The decision was ink, following the bespoke product pages. `colors.brand` had
+been doing four jobs at once, so it was split by what each use was actually
+for rather than swapped wholesale:
+
+| Was | Now | Where |
+|---|---|---|
+| `backgroundColor: brand` | `cta` `#191716` | primary buttons |
+| `color` / `borderColor` / `tintColor: brand` | `accent` `#8f5a5a` | links, prices, active icons |
+| `tint(brand)` | `accentBg` `#f7ecec` | tinted washes |
+| `shadow.cta(brand)` | `cta` | the glow has to match the button |
+| icon tiles | `accent` | white icon needs 3:1 against its tile |
+| errors, delete, negative values | `red` | danger, never brand |
+
+`brand` stays defined for the logo. `brandDark`, `brandLight` and `brandTint`
+no longer have users.
+
+### Two things that had been quietly wrong
+
+The **emirate flags** were painting themselves with `colors.brand`. A rebrand
+would have recoloured a national flag. They now use `flagRed` `#CE1126`, the
+actual UAE red, which the national flag in the same file was already using.
+
+**Destructive red** was iOS `#FF3B30`, which manages only 3.3:1 on cream and
+fails AA as text. Deepened to `#D22B1E`: 4.8:1 on cream, and still takes white
+at 5.1:1 for filled destructive buttons.
+
+### Contrast improved rather than regressed
+
+The warm palette reads better than the greys it replaced, measured against the
+page background in each case:
+
+| Token | Before | After |
+|---|---|---|
+| `bodyText` | 9.24 | **10.97** |
+| `mutedText` | 4.33 *large only* | **5.95 AA** |
+| `secondaryLabel` | 2.92 *fail* | **4.47** |
+| `placeholder` | 2.28 *fail* | **2.93** |
+
+White on the ink CTA is 17.9:1. `accent` on cream is 5.2:1.
+
+`placeholder` still falls short, as it did before; it is placeholder text and
+disabled state only, never content.
+
+### Still to do (stage 3)
+
+`CollapsibleHeader`, the tab bar, product cards and buttons are shared
+components and were not touched beyond the palette they inherit. Several
+screens use `colors.card` white as a page background and will read as islands
+against cream until they are moved.

@@ -148,7 +148,7 @@ export default function MembershipCard({ isRTL = false }) {
       {/* Header */}
       <View style={[styles.headerRow, isRTL && styles.rowReverse]}>
         <View style={[styles.titleWrap, isRTL && styles.rowReverse]}>
-          <Ionicons name="ribbon-outline" size={17} color={colors.brand} />
+          <Ionicons name="ribbon-outline" size={17} color={colors.accent} />
           <Text style={styles.title}>{t('rewards.title')}</Text>
         </View>
         <View style={[styles.headerRight, isRTL && styles.rowReverse]}>
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.separator,
   },
   tierRowCurrent: {
-    backgroundColor: colors.brandTint,
+    backgroundColor: colors.accentBg,
   },
   tierRowBadge: {
     paddingHorizontal: 8,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   yourTier: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
   },
   partnerCard: {

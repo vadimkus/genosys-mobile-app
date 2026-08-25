@@ -26,20 +26,16 @@ import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTok
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
-// Pilot screen for the website design language. Every style below already read
-// from tokens, so adopting the site's palette is this import and nothing else.
-// See docs/DESIGN_ALIGNMENT_WITH_WEBSITE.md; if this reads well, `colors` gets
-// repointed globally and this alias goes away.
-import { ceraColors as colors, cera, shadow, surfaces } from '../utils/theme';
+import { colors, cera, shadow, surfaces } from '../utils/theme';
 
 const log = createLogger('Profile');
 
 const { width } = Dimensions.get('window');
 
 // Keep Switch color props stable across renders (prevents iOS visual flicker on nearby switches).
-const SWITCH_TRACK_PUSH = { false: colors.separator, true: colors.brand };
+const SWITCH_TRACK_PUSH = { false: colors.separator, true: colors.accent };
 const SWITCH_TRACK_BIOMETRIC = { false: colors.separator, true: colors.green };
-const SWITCH_TRACK_EMAIL = { false: colors.separator, true: colors.brand };
+const SWITCH_TRACK_EMAIL = { false: colors.separator, true: colors.accent };
 const SWITCH_THUMB = colors.white;
 const SWITCH_IOS_BG = colors.separator;
 const PUSH_PREF_KEY = '@genosys_push_enabled';
@@ -321,7 +317,7 @@ export default function ProfileScreen() {
           <View style={[styles.row, rtl && styles.rowReverse]}>
             <View style={[styles.rowLeft, rtl && styles.rowReverse]}>
               {icon ? (
-                <View style={[surfaces.iconTile, { backgroundColor: tint || colors.brand }]}>
+                <View style={[surfaces.iconTile, { backgroundColor: tint || colors.accent }]}>
                   <Ionicons name={icon} size={17} color={colors.white} />
                 </View>
               ) : null}
@@ -353,7 +349,7 @@ export default function ProfileScreen() {
     title,
     subtitle,
     onPress,
-    color = colors.brand,
+    color = colors.accent,
   }) => (
     <TouchableOpacity
       style={[styles.quickActionCard, shadow.card, isRTL && styles.quickActionCardRTL]}
@@ -380,7 +376,7 @@ export default function ProfileScreen() {
     </View>
   );
 
-  const ProfileItem = ({ icon, tint = colors.brand, title, subtitle, value, onPress, rightComponent, hasArrow = true, isLast = false }) => {
+  const ProfileItem = ({ icon, tint = colors.accent, title, subtitle, value, onPress, rightComponent, hasArrow = true, isLast = false }) => {
     const content = (
       <>
         <View style={[styles.rowLeft, isRTL && styles.rowReverse]}>
@@ -439,7 +435,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('promo.infoTitle')}
           >
-            <Ionicons name="megaphone-outline" size={16} color={colors.brand} />
+            <Ionicons name="megaphone-outline" size={16} color={colors.accent} />
           </TouchableOpacity>
           <View style={[styles.avatarWrap, isRTL && styles.avatarWrapRTL]}>
             <View style={styles.avatarContainer}>
@@ -536,7 +532,7 @@ export default function ProfileScreen() {
             icon="receipt-outline"
             title={t('profile.orders')}
             subtitle={ordersSubtitle}
-            color={colors.brand}
+            color={colors.accent}
             onPress={async () => {
               haptics.lightTap();
               // Ensure Orders header can route back to Account when opened from here.
@@ -563,7 +559,7 @@ export default function ProfileScreen() {
           <View style={styles.sectionContent}>
             <ProfileItem
               icon="gift-outline"
-              tint={colors.brand}
+              tint={colors.accent}
               title={t('navigation.bundleBuilder') || 'Bundle Builder'}
               subtitle={t('profile.buildYourSet') || 'Build your skincare set'}
               onPress={() => { haptics.lightTap(); router.push('/bundle-builder'); }}
@@ -712,7 +708,7 @@ export default function ProfileScreen() {
             />
             <ProfileItem
               icon="business-outline"
-              tint={colors.brand}
+              tint={colors.accent}
               title={t('navigation.brand') || 'Brand'}
               onPress={() => { haptics.lightTap(); router.push('/brand'); }}
             />
@@ -764,7 +760,7 @@ export default function ProfileScreen() {
             disabled={isLoggingOut}
           >
             {isLoggingOut ? (
-              <ActivityIndicator color={colors.brand} size="small" />
+              <ActivityIndicator color={colors.accent} size="small" />
             ) : (
               <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
             )}
@@ -813,7 +809,7 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -1093,7 +1089,7 @@ const styles = StyleSheet.create({
   signOutText: {
     ...T.navTitle,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   signOutButtonDisabled: {
     opacity: 0.6,

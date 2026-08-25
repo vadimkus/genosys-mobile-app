@@ -223,7 +223,7 @@ export default function AddEditAddressScreen() {
                       <Ionicons
                         name={type === t('addAddress.typeHome') ? 'home' : type === t('addAddress.typeWork') ? 'business' : 'location'}
                         size={18}
-                        color={active ? colors.white : colors.brand}
+                        color={active ? colors.white : colors.accent}
                       />
                       <Text style={[styles.typeButtonText, isRTL && styles.textRTL, active && styles.activeTypeButtonText]}>
                         {type}
@@ -367,7 +367,7 @@ export default function AddEditAddressScreen() {
                 <Switch
                   value={formData.isDefault}
                   onValueChange={(value) => { haptics.selectionTick(); updateField('isDefault', value); }}
-                  trackColor={{ false: colors.separator, true: colors.brand }}
+                  trackColor={{ false: colors.separator, true: colors.accent }}
                   thumbColor={colors.white}
                   ios_backgroundColor={colors.separator}
                 />
@@ -384,7 +384,7 @@ export default function AddEditAddressScreen() {
 
             {/* Save — primary action */}
             <TouchableOpacity
-              style={[styles.saveButton, shadow.cta(colors.brand), isSaving && styles.buttonDisabled]}
+              style={[styles.saveButton, shadow.cta(colors.cta), isSaving && styles.buttonDisabled]}
               onPress={handleSave}
               disabled={isSaving}
               activeOpacity={0.85}
@@ -458,13 +458,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   activeTypeButton: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
+    backgroundColor: colors.cta,
+    borderColor: colors.accent,
   },
   typeButtonText: {
     ...T.labelSmall,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   activeTypeButtonText: {
     color: colors.white,
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   requiredMark: {
-    color: colors.brand,
+    color: colors.accent,
     fontSize: 14,
     fontWeight: '700',
   },
@@ -537,8 +537,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   activeEmirateButton: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
+    backgroundColor: colors.cta,
+    borderColor: colors.accent,
   },
   emirateButtonText: {
     ...T.labelSmall,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 16,
     marginHorizontal: 16,

@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   retryButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,

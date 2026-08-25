@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   menuItemActive: {
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
   },
   menuItemText: {
     ...T.label,
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   menuItemTextActive: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '800',
   },
 });

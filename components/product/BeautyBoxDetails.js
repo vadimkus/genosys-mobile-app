@@ -128,7 +128,7 @@ export default function BeautyBoxDetails({ product, styles: parentStyles }) {
                       <Ionicons
                         name={isRTL ? 'chevron-back' : 'chevron-forward'}
                         size={16}
-                        color={colors.brand}
+                        color={colors.accent}
                         style={localStyles.kitHeaderChevron}
                       />
                     </TouchableOpacity>
@@ -155,7 +155,7 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   kitHeaderLinkText: {
-    color: colors.brand,
+    color: colors.accent,
     flex: 1,
   },
   kitHeaderChevron: {

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.brandTint,
+    backgroundColor: colors.accentBg,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   button: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 14,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     bottom: 48,
     fontSize: 13,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
     letterSpacing: -0.1,
   },
 });

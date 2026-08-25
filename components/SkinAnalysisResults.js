@@ -64,7 +64,7 @@ function buildProfileFromConcerns(concerns) {
 function ScoreBar({ label, value, inverted = false, icon, isRTL = false }) {
   // inverted: true means lower value = better (blemishes, wrinkles, etc.)
   const displayValue = inverted ? 100 - value : value;
-  const color = displayValue >= 70 ? '#16A34A' : displayValue >= 45 ? '#F59E0B' : colors.brand;
+  const color = displayValue >= 70 ? '#16A34A' : displayValue >= 45 ? '#F59E0B' : colors.accent;
 
   return (
     <View style={styles.scoreRow}>
@@ -127,7 +127,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
     }
   };
 
-  const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : colors.brand;
+  const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : colors.accent;
 
   return (
     <View style={styles.container}>
@@ -162,7 +162,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
             <View style={styles.concernChips}>
               {result.concerns.map((concern, idx) => (
                 <View key={idx} style={styles.concernChip}>
-                  <Ionicons name="alert-circle" size={14} color={colors.brand} />
+                  <Ionicons name="alert-circle" size={14} color={colors.accent} />
                   <Text style={styles.concernChipText}>{concern}</Text>
                 </View>
               ))}
@@ -314,7 +314,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
         {/* Actions */}
         <View style={styles.actionsRow}>
           <TouchableOpacity style={styles.quizBtn} onPress={() => router.push('/skin-analysis')} activeOpacity={0.85}>
-            <Ionicons name="clipboard-outline" size={18} color={colors.brand} />
+            <Ionicons name="clipboard-outline" size={18} color={colors.accent} />
             <Text style={styles.quizBtnText}>{t('skinAnalysis.startQuiz')}</Text>
           </TouchableOpacity>
 
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
 
   // Concerns
   concernsCard: {
-    backgroundColor: tint(colors.brand, '0F'),
+    backgroundColor: colors.accentBg,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FECACA',
   },
-  concernChipText: { ...T.labelSmall, color: colors.brand },
+  concernChipText: { ...T.labelSmall, color: colors.accent },
 
   // Score bars
   scoresCard: {
@@ -415,13 +415,13 @@ const styles = StyleSheet.create({
   recImagePlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fill },
   recInfo: { flex: 1, marginStart: 12 },
   recName: { ...T.label, color: colors.label, lineHeight: 20 },
-  recPrice: { ...T.label, fontWeight: '800', color: colors.brand, marginTop: 4 },
+  recPrice: { ...T.label, fontWeight: '800', color: colors.accent, marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   concernCta: {
     marginTop: 24,
     borderRadius: 16,
-    backgroundColor: tint(colors.brand, '0F'),
+    backgroundColor: colors.accentBg,
     padding: 20,
     alignItems: 'center',
   },
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -484,9 +484,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
   },
-  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.brand },
+  quizBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.accent },
   retakeBtn: {
     flex: 1,
     flexDirection: 'row',

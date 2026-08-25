@@ -845,7 +845,7 @@ function CheckoutScreen() {
         <TouchableOpacity
           style={[
             styles.placeOrderButton,
-            shadow.cta(colors.brand),
+            shadow.cta(colors.cta),
             isProcessing && styles.placeOrderButtonDisabled,
             isRTL && styles.placeOrderButtonRTL,
           ]}
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1157,13 +1157,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputError: {
-    borderColor: colors.brand,
-    backgroundColor: tint(colors.brand, '0D'),
+    borderColor: colors.accent,
+    backgroundColor: colors.accentBg,
   },
   helperError: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
     marginTop: 6,
   },
   helperErrorRTL: {
@@ -1227,7 +1227,7 @@ const styles = StyleSheet.create({
   modalOptionText: {
     ...T.label,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
   },
   modalDivider: {
     height: 1,
@@ -1250,8 +1250,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   modalAddressRowActive: {
-    borderColor: colors.brand,
-    backgroundColor: tint(colors.brand, '0D'),
+    borderColor: colors.accent,
+    backgroundColor: colors.accentBg,
   },
   modalAddressType: {
     ...T.captionSmall,
@@ -1351,8 +1351,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.subtleBg,
   },
   emirateOptionSelected: {
-    borderColor: colors.brand,
-    backgroundColor: tint(colors.brand, '0D'),
+    borderColor: colors.accent,
+    backgroundColor: colors.accentBg,
   },
   emirateText: {
     ...T.label,
@@ -1361,7 +1361,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   emirateTextSelected: {
-    color: colors.brand,
+    color: colors.accent,
   },
   emirateBottomRow: {
     marginTop: 6,
@@ -1408,8 +1408,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.subtleBg,
   },
   paymentOptionSelected: {
-    borderColor: colors.brand,
-    backgroundColor: tint(colors.brand, '0D'),
+    borderColor: colors.accent,
+    backgroundColor: colors.accentBg,
   },
   paymentOptionDisabled: {
     opacity: 0.6,
@@ -1521,7 +1521,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     ...T.totalValue,
-    color: colors.brand,
+    color: colors.accent,
   },
   vatNote: {
     ...T.captionSmall,
@@ -1579,7 +1579,7 @@ const styles = StyleSheet.create({
   },
   vatNoteRed: {
     ...T.captionTiny,
-    color: colors.brand,
+    color: colors.accent,
     paddingVertical: 2,
   },
   youSavedBanner: {
@@ -1615,7 +1615,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 16,
     minHeight: 52,
     borderRadius: 14,

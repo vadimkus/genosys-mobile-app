@@ -488,7 +488,7 @@ function BagScreen() {
               if (pts <= 0) return null;
               return (
                 <View style={[styles.earnPointsRow, isRTL && styles.earnPointsRowRTL]}>
-                  <Ionicons name="sparkles-outline" size={11} color={colors.brand} />
+                  <Ionicons name="sparkles-outline" size={11} color={colors.accent} />
                   <Text style={[styles.earnPointsText, isRTL && styles.earnPointsTextRTL]}>
                     {t('rewards.earnItem', { points: pts.toLocaleString() })}
                   </Text>
@@ -536,7 +536,7 @@ function BagScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={`${t('bag.removeItem')} — ${item?.product?.name || ''}`}
               >
-                <Ionicons name="trash-outline" size={20} color={colors.brand} />
+                <Ionicons name="trash-outline" size={20} color={colors.accent} />
               </TouchableOpacity>
             </View>
           )}
@@ -599,7 +599,7 @@ function BagScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('bag.clearBagTitle')}
           >
-            <Ionicons name="trash-outline" size={20} color={colors.brand} />
+            <Ionicons name="trash-outline" size={20} color={colors.accent} />
           </TouchableOpacity>
         }
       />
@@ -625,7 +625,7 @@ function BagScreen() {
             <View style={[styles.sectionCard, isRTL && styles.sectionCardRTL]}>
               <View style={[styles.sectionTitleRow, isRTL && styles.sectionTitleRowRTL]}>
                 <View style={[styles.sectionTitleLeft, isRTL && styles.sectionTitleLeftRTL]}>
-                  <View style={[surfaces.iconTile, { backgroundColor: colors.brand }]}>
+                  <View style={[surfaces.iconTile, { backgroundColor: colors.cta }]}>
                     <Ionicons name="gift" size={16} color={colors.white} />
                   </View>
                   <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('bag.freeMaskPromotion')}</Text>
@@ -696,7 +696,7 @@ function BagScreen() {
             {/* GENOSYS Rewards — order earn preview */}
             {orderEarnPoints > 0 ? (
               <View style={[styles.rewardsEarnCard, shadow.card, isRTL && styles.rewardsEarnCardRTL]}>
-                <View style={[surfaces.iconTile, { backgroundColor: colors.brand }]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.cta }]}>
                   <Ionicons name="ribbon-outline" size={16} color={colors.white} />
                 </View>
                 <View style={[styles.rewardsEarnTextWrap, isRTL && styles.rewardsEarnTextWrapRTL]}>
@@ -1049,7 +1049,7 @@ const styles = StyleSheet.create({
   },
   vatNoteRed: {
     ...T.captionTiny,
-    color: colors.brand,
+    color: colors.accent,
     paddingVertical: 2,
   },
   cartItem: {
@@ -1091,7 +1091,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 24,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   itemDetails: {
     flex: 1,
@@ -1169,7 +1169,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
   },
   variantChipSelected: {
-    borderColor: colors.brand,
+    borderColor: colors.accent,
     backgroundColor: '#FFF5F5',
   },
   variantChipSizeSelected: {
@@ -1182,7 +1182,7 @@ const styles = StyleSheet.create({
     color: colors.bodyText,
   },
   variantChipTextSelected: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
   },
   variantChipTextSizeSelected: {
@@ -1272,11 +1272,11 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   shopButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 14,
-    ...shadow.cta(colors.brand),
+    ...shadow.cta(colors.cta),
   },
   shopButtonText: {
     ...T.button,
@@ -1411,7 +1411,7 @@ const styles = StyleSheet.create({
     ...T.totalValue,
   },
   checkoutButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

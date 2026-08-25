@@ -194,7 +194,7 @@ export default function ConcernDetailScreen() {
       <View style={styles.container}>
         <CollapsibleHeader title="" scrollY={null} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>
             {locale === 'ar' ? 'جارٍ التحميل...' : locale === 'ru' ? 'Загرузка...' : 'Loading...'}
           </Text>
@@ -312,7 +312,7 @@ export default function ConcernDetailScreen() {
                             <Text style={[styles.stepTitle, isRTL && styles.textRTL, isExpanded && styles.stepTitleActive]}>{step.title}</Text>
                             <Text style={[styles.stepDuration, isRTL && styles.textRTL]}>({step.duration})</Text>
                           </View>
-                          <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={isExpanded ? colors.brand : colors.secondaryLabel} />
+                          <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={isExpanded ? colors.accent : colors.secondaryLabel} />
                         </View>
                       </Pressable>
                       {isExpanded ? (
@@ -352,7 +352,7 @@ export default function ConcernDetailScreen() {
                                     ) : hasDisc ? (
                                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Text style={[styles.stepProductPrice, { textDecorationLine: 'line-through', fontSize: 10, color: colors.placeholder }]}>{retailUnit.toFixed(0)}</Text>
-                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: colors.brand }]}>{formatAed(finalUnit)}</Text>
+                                        <Text style={[styles.stepProductPrice, chipInCart ? styles.stepProductPriceInCart : { color: colors.accent }]}>{formatAed(finalUnit)}</Text>
                                       </View>
                                     ) : (
                                       <Text style={[styles.stepProductPrice, chipInCart && styles.stepProductPriceInCart]}>
@@ -486,7 +486,7 @@ export default function ConcernDetailScreen() {
                 <Pressable key={i} onPress={() => toggleFaq(i)} style={[styles.faqItem, isOpen && styles.faqItemOpen]}>
                   <View style={[styles.faqHeader, isRTL && { flexDirection: 'row-reverse' }]}>
                     <Text style={[styles.faqQuestion, isRTL && styles.textRTL, { flex: 1 }]}>{item.question}</Text>
-                    <Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={18} color={isOpen ? colors.brand : colors.secondaryLabel} />
+                    <Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={18} color={isOpen ? colors.accent : colors.secondaryLabel} />
                   </View>
                   {isOpen ? (
                     <Text style={[styles.faqAnswer, isRTL && styles.textRTL]}>{item.answer}</Text>
@@ -579,7 +579,7 @@ export default function ConcernDetailScreen() {
                       {showStrike && (
                         <Text style={styles.stickyItemOriginalPrice}>{formatAed(retailUnit * qty)}</Text>
                       )}
-                      <Text style={[styles.stickyItemPrice, showStrike && { color: colors.brand }]}>{formatAed(finalUnit * qty)}</Text>
+                      <Text style={[styles.stickyItemPrice, showStrike && { color: colors.accent }]}>{formatAed(finalUnit * qty)}</Text>
                     </View>
                   </View>
                 );
@@ -645,7 +645,7 @@ export default function ConcernDetailScreen() {
             {/* Collapsed summary row + View Bag button */}
             <View style={[styles.stickyRow, isRTL && styles.stickyRowRTL]}>
               <View style={[styles.stickyInfo, isRTL && styles.stickyInfoRTL]}>
-                <Ionicons name="bag-handle" size={20} color={colors.brand} />
+                <Ionicons name="bag-handle" size={20} color={colors.accent} />
                 <Text style={styles.stickyCount}>
                   {cartItems.length} {cartItems.length === 1
                     ? (locale === 'ar' ? 'منتج' : locale === 'ru' ? 'товар' : 'item')
@@ -731,12 +731,12 @@ const styles = StyleSheet.create({
   routineStepExpanded: { backgroundColor: '#FFF8F8' },
   routineStepHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 10 },
   stepNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.label, justifyContent: 'center', alignItems: 'center' },
-  stepNumberActive: { backgroundColor: colors.brand },
+  stepNumberActive: { backgroundColor: colors.cta },
   stepNumberText: { ...T.badgeMedium },
   stepNumberTextActive: { color: colors.white },
   stepTitleWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
   stepTitle: { ...T.label, fontSize: 15 },
-  stepTitleActive: { color: colors.brand },
+  stepTitleActive: { color: colors.accent },
   stepDuration: { ...T.caption },
   stepBody: { paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: colors.fill, paddingTop: 10 },
   stepDetail: { ...T.caption, color: colors.mutedText, lineHeight: 20, marginBottom: 10 },
@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
   ctaBlock: {
     marginTop: 28,
     marginBottom: 8,
-    backgroundColor: tint(colors.brand, '0F'),
+    backgroundColor: colors.accentBg,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
@@ -797,7 +797,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 14,
   },
@@ -869,7 +869,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 10,

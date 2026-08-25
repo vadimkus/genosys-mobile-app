@@ -127,7 +127,7 @@ export default function BillingScreen() {
 
       {loading ? (
         <View style={[styles.loading, { paddingTop: headerHeight }]}>
-          <ActivityIndicator color={colors.brand} />
+          <ActivityIndicator color={colors.accent} />
         </View>
       ) : (
         <KeyboardAvoidingView
@@ -174,7 +174,7 @@ export default function BillingScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.saveBtn, shadow.cta(colors.brand), saving && styles.saveBtnDisabled]}
+                style={[styles.saveBtn, shadow.cta(colors.cta), saving && styles.saveBtnDisabled]}
                 onPress={handleSave}
                 disabled={saving}
                 activeOpacity={0.85}
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 16,
     marginHorizontal: 16,

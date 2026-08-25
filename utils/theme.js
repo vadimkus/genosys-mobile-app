@@ -13,28 +13,53 @@ import { Platform } from 'react-native';
  *   const s = theme.statusStyle('confirmed');
  */
 
-// ─── System colors (approximate iOS system palette) ───────────────────
+// ─── Surface and text palette ─────────────────────────────────────────
+/**
+ * The website's palette, in the token contract the app screens read.
+ *
+ * Values come from the `--cera-*` custom properties in
+ * `cosmetics-website/components/product/cerabarrier/cerabarrier.css`. The
+ * previous iOS system greys are kept in the comments so the swap is legible
+ * and reversible.
+ *
+ * Three greys are interpolated rather than copied: the site needs three text
+ * weights, the app needs six, and collapsing the extra ones onto `muted` would
+ * flatten metadata into body text.
+ */
 export const colors = {
-  groupedBg: '#F2F2F7',      // systemGroupedBackground
-  card: '#FFFFFF',           // secondarySystemGroupedBackground
-  subtleBg: '#F8F9FA',       // nested inset rows
-  fillSecondary: '#F2F2F7',  // secondary system fill (tinted buttons)
+  groupedBg: '#faf7f5',      // cream page. was #F2F2F7
+  card: '#FFFFFF',           // cards read as paper on cream
+  subtleBg: '#f3ece8',       // nested inset rows. was #F8F9FA
+  fillSecondary: '#f3ece8',  // tinted buttons. was #F2F2F7
 
-  fill: '#F3F4F6',           // tinted chips, progress tracks
+  fill: '#f3ece8',           // tinted chips, progress tracks. was #F3F4F6
 
-  // Text scale, darkest to lightest. Screens had accumulated five near-black
-  // heading colours and seven mid-greys from mixing the iOS palette with the
-  // website's old Tailwind one; these six roles replace all of them.
-  label: '#1D1D1F',          // headings
-  bodyText: '#374151',       // running text
-  mutedText: '#6B7280',      // supporting text
-  secondaryLabel: '#8E8E93', // metadata, systemGray
-  placeholder: '#9CA3AF',    // placeholders, disabled text
-  tertiary: '#C7C7CC',       // disclosure chevrons
+  // Text scale, darkest to lightest.
+  label: '#191716',          // headings, cera ink. was #1D1D1F
+  bodyText: '#3d3734',       // running text, cera body. was #374151
+  mutedText: '#665e59',      // supporting text, cera muted. was #6B7280
+  secondaryLabel: '#7a716b', // metadata, interpolated. was #8E8E93
+  placeholder: '#9a908a',    // placeholders, interpolated. was #9CA3AF
+  tertiary: '#c2b7b0',       // disclosure chevrons, interpolated. was #C7C7CC
 
-  separator: '#E5E5EA',      // opaque separator
-  separatorStrong: '#D1D5DB', // input borders, dividers that need to read
+  separator: '#e8e0db',      // hairlines, cera line. was #E5E5EA
+  separatorStrong: '#d9cec7', // input borders. was #D1D5DB
 
+  // Primary actions follow the website's product pages: an ink button with
+  // white text, with rose carrying the accents. Brand red stays defined
+  // because the logo and a few badges still need it, but it no longer paints
+  // buttons.
+  cta: '#191716',            // primary button background, cera ink
+  ctaText: '#FFFFFF',
+  accent: '#8f5a5a',         // links, active icons, prices. cera rose-ink
+  accentSoft: '#c98b8b',     // decorative rules, quiet icons. cera rose
+  accentBg: '#f7ecec',       // tinted pills behind accent text. cera blush
+
+  flagRed: '#CE1126',        // UAE national red. Not the brand token: the
+                             // emirate flags must not follow a rebrand.
+
+  // Kept for the logo and anywhere the mark itself appears. No longer paints
+  // buttons or accents.
   brand: '#dc2626',          // GENOSYS red
   brandDark: '#B91C1C',      // pressed state
   brandLight: '#EF4444',     // secondary accents
@@ -43,7 +68,10 @@ export const colors = {
   green: '#34C759',
   greenDeep: '#16A34A',
   orange: '#FF9500',
-  red: '#FF3B30',
+  // Destructive: errors, delete, negative values. Deepened from iOS #FF3B30,
+  // which only reaches 3.3:1 on cream and fails AA as text. This clears 4.8:1
+  // on cream and still takes white at 5.1:1 for filled destructive buttons.
+  red: '#D22B1E',
   indigo: '#5856D6',
   purple: '#7C3AED',
   teal: '#30B0C7',
@@ -83,44 +111,10 @@ export const cera = {
   shot: '#eeeeee',        // packshot stage
 };
 
-/**
- * The `colors` contract above, expressed in the website's palette.
- *
- * This is the stage 2 target. A screen adopts it with a single line —
- * `import { ceraColors as colors } from '../utils/theme'` — because every
- * screen now reads tokens rather than naming colours inline. When enough
- * screens have moved and the look is settled, `colors` is repointed at these
- * values and the aliasing disappears.
- *
- * Three greys have no direct counterpart on the website, which only needs
- * ink / body / muted. They are interpolated along the same warm axis so the
- * six-step text hierarchy the app relies on survives the move; a straight
- * collapse onto `muted` would flatten metadata into body text.
- *
- * Brand red is carried across unchanged, deliberately. The website is split on
- * this: its bespoke product pages use an ink CTA and no red at all, while shop,
- * cart and checkout still lead with red. Picking a side is a brand decision,
- * not a styling one, so red stays until it is made.
- */
-export const ceraColors = {
-  ...colors,
-
-  groupedBg: cera.cream,
-  card: '#FFFFFF',          // white cards read as paper on cream
-  subtleBg: cera.creamDeep,
-  fillSecondary: cera.creamDeep,
-  fill: cera.creamDeep,
-
-  label: cera.ink,
-  bodyText: cera.body,
-  mutedText: cera.muted,
-  secondaryLabel: '#7a716b', // interpolated: muted → placeholder
-  placeholder: '#9a908a',
-  tertiary: '#c2b7b0',       // chevrons, warm counterpart of #C7C7CC
-
-  separator: cera.line,
-  separatorStrong: '#d9cec7',
-};
+// Retained so the pilot's import keeps resolving; `colors` now holds these
+// values, so the two are the same object shape and this can go once no screen
+// imports it.
+export const ceraColors = colors;
 
 // 10% alpha helper for tinted capsules / button backgrounds.
 export const tint = (hex, alpha = '1A') => `${hex}${alpha}`;

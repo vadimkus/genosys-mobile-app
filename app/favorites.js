@@ -177,7 +177,7 @@ export default function FavoritesScreen() {
                 style={[styles.loginNudgeButton, isRTL && styles.rowRTL]}
                 activeOpacity={0.7}
               >
-                <Ionicons name="log-in-outline" size={16} color={colors.brand} />
+                <Ionicons name="log-in-outline" size={16} color={colors.accent} />
                 <Text style={styles.loginNudgeButtonText}>{t('favorites.signIn')}</Text>
               </TouchableOpacity>
             </View>
@@ -330,7 +330,7 @@ export default function FavoritesScreen() {
                       accessibilityRole="button"
                       accessibilityLabel={`${t('favorites.removeFromFavorites')} — ${product?.name || ''}`}
                     >
-                      <Ionicons name="heart" size={22} color={colors.brand} />
+                      <Ionicons name="heart" size={22} color={colors.accent} />
                     </TouchableOpacity>
                   </View>
 
@@ -360,7 +360,7 @@ export default function FavoritesScreen() {
                       <Ionicons
                         name={isAdding ? 'checkmark' : 'bag-add'}
                         size={16}
-                        color={disabled ? colors.secondaryLabel : colors.brand}
+                        color={disabled ? colors.secondaryLabel : colors.accent}
                       />
                       <Text style={[styles.addToCartText, disabled && styles.addToCartTextDisabled]}>
                         {isAdding
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   thumbPlaceholderText: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
   },
   badgeContainer: {
     position: 'absolute',
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   },
   price: {
     ...T.priceSmall,
-    color: colors.brand,
+    color: colors.accent,
   },
   originalPrice: {
     ...T.priceStrikethrough,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   },
   discountedPrice: {
     ...T.priceSmall,
-    color: colors.brand,
+    color: colors.accent,
     marginTop: 2,
   },
   savings: {
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
     paddingVertical: 11,
     borderRadius: 12,
   },
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   },
   addToCartText: {
     ...T.buttonSmall,
-    color: colors.brand,
+    color: colors.accent,
   },
   addToCartTextDisabled: {
     color: colors.secondaryLabel,
@@ -573,11 +573,11 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   browseButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 14,
-    ...shadow.cta(colors.brand),
+    ...shadow.cta(colors.cta),
   },
   browseButtonText: {
     ...T.button,
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
   },
   loginNudgeButtonText: {
     ...T.button,
-    color: colors.brand,
+    color: colors.accent,
     fontSize: 15,
   },
 

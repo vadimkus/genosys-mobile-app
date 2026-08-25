@@ -260,7 +260,7 @@ export default function ProductOptionSheet({
           >
             {isRefreshing && (
               <View style={[styles.notice, isRTL && styles.rowRTL]}>
-                <ActivityIndicator size="small" color={colors.brand} />
+                <ActivityIndicator size="small" color={colors.accent} />
                 <Text style={[styles.noticeText, isRTL && styles.textRTL]}>
                   {t('variant.refreshingOptions')}
                 </Text>
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   imagePlaceholderText: {
     fontSize: 26,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
   },
   headerText: {
     flex: 1,
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     ...T.captionSmall,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   },
   price: {
     ...T.price,
-    color: colors.brand,
+    color: colors.accent,
   },
   priceRow: {
     flexDirection: 'row',
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     ...T.buttonTiny,
-    color: colors.brand,
+    color: colors.accent,
   },
   group: {
     marginBottom: 22,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   },
   requiredText: {
     ...T.captionTiny,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
@@ -598,8 +598,8 @@ const styles = StyleSheet.create({
     minWidth: 96,
   },
   optionSelected: {
-    borderColor: colors.brand,
-    backgroundColor: tint(colors.brand),
+    borderColor: colors.accent,
+    backgroundColor: colors.accentBg,
   },
   optionDisabled: {
     opacity: 0.48,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   optionLabelSelected: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
   },
   optionLabelDisabled: {
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
   },
   swatchSelected: {
     borderWidth: 2,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
   },
   unavailable: {
     ...T.captionTiny,
@@ -686,12 +686,12 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 52,
     borderRadius: 14,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    ...shadow.cta(colors.brand),
+    ...shadow.cta(colors.cta),
   },
   confirmButtonDisabled: {
     backgroundColor: colors.tertiary,

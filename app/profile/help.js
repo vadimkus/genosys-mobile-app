@@ -262,7 +262,7 @@ export default function HelpSupportScreen() {
           <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('help.faqTitle')}</Text>
           {faqLoading ? (
             <View style={[styles.card, styles.cardCenter, shadow.card]}>
-              <ActivityIndicator size="small" color={colors.brand} />
+              <ActivityIndicator size="small" color={colors.accent} />
             </View>
           ) : faqData.length > 0 ? (
             <View style={[styles.card, shadow.card]}>
@@ -375,7 +375,7 @@ export default function HelpSupportScreen() {
             </View>
 
             <TouchableOpacity
-              style={[styles.returnEmailButton, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
+              style={[styles.returnEmailButton, shadow.cta(colors.cta), isRTL && styles.rowRTL]}
               onPress={async () => {
                 haptics.lightTap();
                 setReturnModalVisible(false);
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   rowMiddle: { flex: 1, minWidth: 0 },
   rowTitle: { ...T.label, fontSize: 15, color: colors.label },
   rowSubtitle: { ...T.captionSmall, color: colors.secondaryLabel, marginTop: 2 },
-  rowValue: { ...T.captionSmall, color: colors.brand, fontWeight: '600', marginTop: 2 },
+  rowValue: { ...T.captionSmall, color: colors.accent, fontWeight: '600', marginTop: 2 },
   retryText: { ...T.bodySmall, color: colors.secondaryLabel, textAlign: 'center' },
 
   // FAQ
@@ -471,8 +471,8 @@ const styles = StyleSheet.create({
   },
   answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 8 },
   answerRowRTL: { flexDirection: 'row-reverse' },
-  answerBullet: { fontSize: 16, lineHeight: 22, color: colors.brand, fontWeight: '800' },
-  answerNumber: { fontSize: 14, lineHeight: 22, color: colors.brand, fontWeight: '800', minWidth: 22, textAlign: 'right' },
+  answerBullet: { fontSize: 16, lineHeight: 22, color: colors.accent, fontWeight: '800' },
+  answerNumber: { fontSize: 14, lineHeight: 22, color: colors.accent, fontWeight: '800', minWidth: 22, textAlign: 'right' },
   answerNumberRTL: { textAlign: 'left' },
   answerText: { ...T.faqAnswer, flex: 1, color: colors.bodyText, fontWeight: '500' },
   answerParagraph: { ...T.faqAnswer, color: colors.bodyText, fontWeight: '500', marginBottom: 8 },
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
   returnChecklistText: { ...T.faqAnswer, flex: 1, lineHeight: 20, color: colors.bodyText, fontWeight: '500' },
   returnEmailButton: {
     marginTop: 16,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 14,
     flexDirection: 'row',

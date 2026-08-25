@@ -213,7 +213,7 @@ export default function ChatButton({ visible = true }) {
     if (!product) {
       return (
         <View style={s.productCardLoading} key={`prod-${productId}`}>
-          <ActivityIndicator size="small" color={colors.brand} />
+          <ActivityIndicator size="small" color={colors.accent} />
         </View>
       );
     }
@@ -328,7 +328,7 @@ export default function ChatButton({ visible = true }) {
         <View style={[s.messageBubbleWrap, isUser ? s.userBubbleWrap : s.assistantBubbleWrap, isRTL && (isUser ? s.assistantBubbleWrap : s.userBubbleWrap)]}>
           {!isUser && (
             <View style={s.avatarCircle}>
-              <Ionicons name="sparkles" size={12} color={colors.brand} />
+              <Ionicons name="sparkles" size={12} color={colors.accent} />
             </View>
           )}
           <View style={[s.bubble, isUser ? s.userBubble : s.assistantBubble]}>
@@ -433,11 +433,11 @@ export default function ChatButton({ visible = true }) {
               {loading && (
                 <View style={[s.messageBubbleWrap, s.assistantBubbleWrap]}>
                   <View style={s.avatarCircle}>
-                    <Ionicons name="sparkles" size={12} color={colors.brand} />
+                    <Ionicons name="sparkles" size={12} color={colors.accent} />
                   </View>
                   <View style={[s.bubble, s.assistantBubble]}>
                     <View style={s.typingRow}>
-                      <ActivityIndicator size="small" color={colors.brand} />
+                      <ActivityIndicator size="small" color={colors.accent} />
                       <Text style={s.typingText}>{t('chat.thinking')}</Text>
                     </View>
                   </View>
@@ -491,7 +491,7 @@ const s = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
     ...Platform.select({
@@ -543,7 +543,7 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -569,7 +569,7 @@ const s = StyleSheet.create({
   },
 
   bubble: { maxWidth: '80%', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8 },
-  userBubble: { backgroundColor: colors.brand, borderBottomEndRadius: 4 },
+  userBubble: { backgroundColor: colors.cta, borderBottomEndRadius: 4 },
   assistantBubble: {
     backgroundColor: colors.card, borderBottomStartRadius: 4,
     ...Platform.select({
@@ -596,7 +596,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
     backgroundColor: colors.fill, borderWidth: StyleSheet.hairlineWidth, borderColor: 'transparent',
   },
-  quickActionBtnHighlight: { backgroundColor: colors.brand, borderColor: colors.brand },
+  quickActionBtnHighlight: { backgroundColor: colors.cta, borderColor: colors.accent },
   quickActionEmoji: { fontSize: 11 },
   quickActionLabel: { ...T.captionTiny, fontWeight: '600', color: colors.bodyText },
   quickActionLabelHighlight: { color: colors.white },
@@ -611,10 +611,10 @@ const s = StyleSheet.create({
   productImagePlaceholder: { width: 48, height: 48, borderRadius: 6, backgroundColor: colors.fill, alignItems: 'center', justifyContent: 'center' },
   productInfo: { flex: 1, marginStart: 8 },
   productName: { ...T.captionSmall, fontWeight: '600', color: colors.label, lineHeight: 16 },
-  productPrice: { ...T.captionSmall, fontWeight: '800', color: colors.brand, marginTop: 2 },
+  productPrice: { ...T.captionSmall, fontWeight: '800', color: colors.accent, marginTop: 2 },
   productPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 6, marginTop: 4 },
-  addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.brand, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
+  addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.cta, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
   addToBagBtnAdded: { backgroundColor: '#16A34A' },
   requestQuoteBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#25D366', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
   addToBagText: { ...T.badge, color: colors.white },
@@ -638,7 +638,7 @@ const s = StyleSheet.create({
   inputRTL: { textAlign: 'right', marginEnd: 0, marginStart: 8 },
   sendBtn: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center',
   },
   sendBtnDisabled: { backgroundColor: colors.separatorStrong },
 });

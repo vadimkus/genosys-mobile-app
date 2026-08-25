@@ -434,7 +434,7 @@ export default function OrderDetailScreen() {
 
       {loading ? (
         <View style={[styles.centerContainer, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={[styles.loadingText, isRTL && styles.textRTL]}>{t('ordersDetail.loading')}</Text>
         </View>
       ) : !order ? (
@@ -455,7 +455,7 @@ export default function OrderDetailScreen() {
           {/* Order Number Card */}
           <View style={[styles.orderNumberCard, shadow.card]}>
             <View style={[styles.orderNumberHeader, isRTL && styles.rowRTL]}>
-              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.brand }]}>
+              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.cta }]}>
                 <Ionicons name="receipt" size={20} color={colors.white} />
               </View>
               <View style={[styles.orderNumberTextContainer, isRTL && styles.alignEndRTL]}>
@@ -503,7 +503,7 @@ export default function OrderDetailScreen() {
 
           {/* Items Section */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="bag-handle" tileColor={colors.brand} title={t('ordersDetail.items')} isRTL={isRTL} />
+            <SectionHeader icon="bag-handle" tileColor={colors.accent} title={t('ordersDetail.items')} isRTL={isRTL} />
             
             {/* Paid Items */}
             {paidItems.map((it, idx) => {
@@ -663,7 +663,7 @@ export default function OrderDetailScreen() {
                         onPress={() => toggleBeautyBox(it?.productId || it?.id || `box-${idx}`)}
                         activeOpacity={0.7}
                       >
-                        <Ionicons name="gift-outline" size={16} color={colors.brand} />
+                        <Ionicons name="gift-outline" size={16} color={colors.accent} />
                         <Text style={[styles.beautyBoxToggleText, isRTL && styles.textRTL]}>
                           {expandedBoxes[it?.productId || it?.id || `box-${idx}`]
                             ? t('ordersDetail.hideBoxContents') || 'Hide Box Contents'
@@ -672,7 +672,7 @@ export default function OrderDetailScreen() {
                         <Ionicons
                           name={expandedBoxes[it?.productId || it?.id || `box-${idx}`] ? 'chevron-up' : 'chevron-down'}
                           size={16}
-                          color={colors.brand}
+                          color={colors.accent}
                         />
                       </TouchableOpacity>
 
@@ -684,7 +684,7 @@ export default function OrderDetailScreen() {
                             if (details === undefined || details === null) {
                               return (
                                 <View style={styles.beautyBoxLoading}>
-                                  <ActivityIndicator size="small" color={colors.brand} />
+                                  <ActivityIndicator size="small" color={colors.accent} />
                                   <Text style={styles.beautyBoxLoadingText}>{t('common.loading') || 'Loading...'}</Text>
                                 </View>
                               );
@@ -946,7 +946,7 @@ export default function OrderDetailScreen() {
               <>
                 {/* Pay is the primary action when resumable */}
                 <TouchableOpacity
-                  style={[styles.primaryButton, shadow.cta(colors.brand), isRTL && styles.buttonRTL, paying && styles.buttonDisabled]}
+                  style={[styles.primaryButton, shadow.cta(colors.cta), isRTL && styles.buttonRTL, paying && styles.buttonDisabled]}
                   onPress={onPay}
                   disabled={paying}
                   activeOpacity={0.85}
@@ -980,7 +980,7 @@ export default function OrderDetailScreen() {
             ) : (
               /* Reorder is primary when there is nothing to pay */
               <TouchableOpacity
-                style={[styles.primaryButton, shadow.cta(colors.brand), isRTL && styles.buttonRTL, reordering && styles.buttonDisabled]}
+                style={[styles.primaryButton, shadow.cta(colors.cta), isRTL && styles.buttonRTL, reordering && styles.buttonDisabled]}
                 onPress={onReorder}
                 disabled={reordering}
                 activeOpacity={0.85}
@@ -1260,7 +1260,7 @@ const styles = StyleSheet.create({
   itemPrice: {
     ...T.label,
     fontWeight: '800',
-    color: colors.brand,
+    color: colors.accent,
   },
   itemDetails: {
     flexDirection: FLEX_ROW,
@@ -1525,7 +1525,7 @@ const styles = StyleSheet.create({
   },
   vatNoteRed: {
     ...T.captionTiny,
-    color: colors.brand,
+    color: colors.accent,
     paddingVertical: 2,
   },
   summaryDividerLight: {
@@ -1550,7 +1550,7 @@ const styles = StyleSheet.create({
   totalValue: {
     ...T.totalValue,
     fontWeight: '900',
-    color: colors.brand,
+    color: colors.accent,
   },
   
   // Actions
@@ -1565,7 +1565,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 16,
     borderRadius: 14,
   },
@@ -1632,7 +1632,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
   },
   beautyBoxContents: {
     marginTop: 12,
@@ -1680,7 +1680,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
   },

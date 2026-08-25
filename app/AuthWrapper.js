@@ -86,7 +86,7 @@ export default function AuthWrapper() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.brand} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }

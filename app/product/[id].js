@@ -1087,7 +1087,7 @@ function ProductDetailScreen() {
               <Ionicons
                 name={isWishlisted ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isWishlisted ? colors.brand : colors.label}
+                color={isWishlisted ? colors.accent : colors.label}
               />
             </TouchableOpacity>
           </View>
@@ -1343,7 +1343,7 @@ function ProductDetailScreen() {
                   <Ionicons
                     name={isRTL ? 'chevron-back' : 'chevron-forward'}
                     size={14}
-                    color={colors.brand}
+                    color={colors.accent}
                     style={{ marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }}
                   />
                 </TouchableOpacity>
@@ -1612,7 +1612,7 @@ function ProductDetailScreen() {
                   })(),
                 ]);
                 const filteredBenefits = filterListForLocale(benefits, locale);
-                const benefitsOpts = { collapsible: true, defaultOpen: true, icon: 'sparkles-outline', iconColor: colors.brand };
+                const benefitsOpts = { collapsible: true, defaultOpen: true, icon: 'sparkles-outline', iconColor: colors.accent };
 
                 if (filteredBenefits.length === 1 && filteredBenefits[0].length > 200 && !filteredBenefits[0].includes(' — ')) {
                   return renderInfoSection(t('product.benefits'), filteredBenefits[0], benefitsOpts);
@@ -1837,7 +1837,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1890,7 +1890,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1951,7 +1951,7 @@ const styles = StyleSheet.create({
   heroPlaceholderText: {
     fontSize: 64,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
   },
   contentContainer: {
     backgroundColor: colors.groupedBg,
@@ -1967,7 +1967,7 @@ const styles = StyleSheet.create({
   category: {
     ...T.label,
     letterSpacing: 0.5,
-    color: colors.brand,
+    color: colors.accent,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
@@ -2006,12 +2006,12 @@ const styles = StyleSheet.create({
   },
   reviewSummaryLink: {
     ...T.captionSmall,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
   },
   price: {
     ...T.priceLarge,
-    color: colors.brand,
+    color: colors.accent,
     marginBottom: 8,
   },
   priceBlock: {
@@ -2150,7 +2150,7 @@ const styles = StyleSheet.create({
   readMoreText: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   // Rating styles removed (rating section not used)
   featureList: {
@@ -2183,7 +2183,7 @@ const styles = StyleSheet.create({
   },
   listBullet: {
     fontSize: 18,
-    color: colors.brand,
+    color: colors.accent,
     lineHeight: 22,
   },
   listBulletRTL: {
@@ -2324,7 +2324,7 @@ const styles = StyleSheet.create({
   pcPriceMain: {
     fontSize: 16,
     fontWeight: '800',
-    color: colors.brand,
+    color: colors.accent,
   },
   pcPriceOld: {
     fontSize: 12,
@@ -2355,7 +2355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 12,
     borderRadius: 12,
   },
@@ -2390,7 +2390,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pcBenefitCheck: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '900',
     marginTop: 1,
   },
@@ -2440,14 +2440,14 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   addToBagButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 18,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadow.cta(colors.brand),
+    ...shadow.cta(colors.cta),
   },
   addToBagButtonFlex: {
     flex: 1,
@@ -2519,7 +2519,7 @@ const styles = StyleSheet.create({
   priceOnRequestLabel: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
     letterSpacing: 0.3,
   },
   loginToSeePriceText: {
@@ -2604,9 +2604,9 @@ const styles = StyleSheet.create({
   },
   beautyBoxDetailDiscount: {
     ...T.captionSmall,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,

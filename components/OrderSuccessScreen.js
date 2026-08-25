@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   primary: {
     alignSelf: 'stretch',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 16,
     borderRadius: 14,
     alignItems: 'center',

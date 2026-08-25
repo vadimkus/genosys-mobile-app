@@ -148,7 +148,7 @@ export default function BrandScreen() {
 
           {/* Mission Section */}
           <View style={[styles.card, shadow.card]}>
-            <SectionHeader icon="flag" tileColor={colors.brand} title={sectionLabels.mission} />
+            <SectionHeader icon="flag" tileColor={colors.accent} title={sectionLabels.mission} />
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{brandMission}</Text>
           </View>
 
@@ -244,12 +244,12 @@ const styles = StyleSheet.create({
   heroTitle: { ...T.sectionTitle, textAlign: 'center', marginBottom: 16 },
   badgeRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
   badge: {
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
   },
-  badgeText: { ...T.caption, fontWeight: '700', color: colors.brand },
+  badgeText: { ...T.caption, fontWeight: '700', color: colors.accent },
   badgeGreen: { backgroundColor: tint(colors.greenDeep) },
   badgeGreenText: { color: colors.greenDeep },
 
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: tint(colors.brand, 'E6'),
+    backgroundColor: colors.accentBg,
     justifyContent: 'center',
     alignItems: 'center',
   },

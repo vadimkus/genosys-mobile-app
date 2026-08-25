@@ -120,7 +120,7 @@ export default function PaymentScreen() {
         <Ionicons
           name={selected ? 'radio-button-on' : 'radio-button-off'}
           size={22}
-          color={selected ? colors.brand : colors.tertiary}
+          color={selected ? colors.accent : colors.tertiary}
         />
       </TouchableOpacity>
     );
@@ -140,7 +140,7 @@ export default function PaymentScreen() {
         >
           {/* Payment Methods */}
           <View style={[styles.section, shadow.card]}>
-            <SectionHeader icon="wallet" tileColor={colors.brand} title={t('paymentSettings.defaultMethod')} isRTL={isRTL} />
+            <SectionHeader icon="wallet" tileColor={colors.accent} title={t('paymentSettings.defaultMethod')} isRTL={isRTL} />
             <MethodRow
               method={PAYMENT_METHODS.COD}
               icon="cash"
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   billingLink: {
     ...T.label,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
   },
   billingValue: {

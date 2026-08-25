@@ -214,7 +214,7 @@ export default function SkinAnalysisCameraScreen() {
       <View style={styles.container}>
         <CollapsibleHeader title={t('skinAnalysis.title')} scrollY={null} onBack={() => router.back()} isRTL={isRTL} />
         <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </View>
     );
@@ -294,7 +294,7 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.analysis && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="sparkles" size={18} color={colors.brand} />
+                <Ionicons name="sparkles" size={18} color={colors.accent} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.aiAnalysis')}</Text>
               </View>
               <Text style={styles.aiAnalysisText}>{aiResult.analysis}</Text>
@@ -305,13 +305,13 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.concerns?.length > 0 && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="alert-circle-outline" size={18} color={colors.brand} />
+                <Ionicons name="alert-circle-outline" size={18} color={colors.accent} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.keyConcerns')}</Text>
               </View>
               <View style={styles.concernChips}>
                 {aiResult.concerns.map((c, i) => (
                   <View key={i} style={styles.concernChip}>
-                    <Ionicons name="ellipse" size={6} color={colors.brand} />
+                    <Ionicons name="ellipse" size={6} color={colors.accent} />
                     <Text style={styles.concernChipText}>{c}</Text>
                   </View>
                 ))}
@@ -323,7 +323,7 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.recommendations?.length > 0 && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="bag-outline" size={18} color={colors.brand} />
+                <Ionicons name="bag-outline" size={18} color={colors.accent} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.recommendedProducts')}</Text>
               </View>
               {aiResult.recommendations.map((rec, idx) => {
@@ -389,7 +389,7 @@ export default function SkinAnalysisCameraScreen() {
           {(aiResult.routine?.am?.length > 0 || aiResult.routine?.pm?.length > 0) && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="sunny-outline" size={18} color={colors.brand} />
+                <Ionicons name="sunny-outline" size={18} color={colors.accent} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.yourSkincareRoutine')}</Text>
               </View>
 
@@ -429,7 +429,7 @@ export default function SkinAnalysisCameraScreen() {
           {aiResult.tips?.length > 0 && (
             <View style={styles.aiSection}>
               <View style={styles.aiSectionHeader}>
-                <Ionicons name="bulb-outline" size={18} color={colors.brand} />
+                <Ionicons name="bulb-outline" size={18} color={colors.accent} />
                 <Text style={styles.aiSectionTitle}>{t('skinCamera.personalizedTips')}</Text>
               </View>
               {aiResult.tips.map((tip, i) => (
@@ -444,7 +444,7 @@ export default function SkinAnalysisCameraScreen() {
           {/* Bottom Actions */}
           <View style={styles.aiActionsRow}>
             <TouchableOpacity style={styles.retakeBtn} onPress={handleReset} activeOpacity={0.85}>
-              <Ionicons name="camera-outline" size={18} color={colors.brand} />
+              <Ionicons name="camera-outline" size={18} color={colors.accent} />
               <Text style={styles.retakeBtnText}>{t('skinCamera.retakePhoto')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -500,7 +500,7 @@ export default function SkinAnalysisCameraScreen() {
       <View style={styles.captureArea}>
         {(analyzing || aiAnalyzing) ? (
           <View style={styles.analyzingBox}>
-            <ActivityIndicator size="large" color={colors.brand} />
+            <ActivityIndicator size="large" color={colors.accent} />
             <Text style={styles.analyzingText}>
               {aiAnalyzing ? t('skinCamera.aiExpertAnalyzing') : t('skinCamera.analyzing')}
             </Text>
@@ -517,7 +517,7 @@ export default function SkinAnalysisCameraScreen() {
               accessibilityState={{ disabled: capturing }}
             >
               <View style={styles.captureInner}>
-                <Ionicons name="camera" size={32} color={colors.brand} />
+                <Ionicons name="camera" size={32} color={colors.accent} />
               </View>
             </TouchableOpacity>
             <Text style={styles.captureLabel}>
@@ -535,7 +535,7 @@ function scoreColor(score) {
   if (!score) return colors.placeholder;
   if (score >= 7) return '#16A34A';
   if (score >= 5) return '#F59E0B';
-  return colors.brand;
+  return colors.accent;
 }
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
 
   permissionText: { ...T.bodySmall, color: colors.mutedText, lineHeight: undefined, textAlign: 'center', marginTop: 8 },
   permissionBtn: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
   },
   captureInner: {
     width: 58,
@@ -673,12 +673,12 @@ const styles = StyleSheet.create({
   aiScoreMax: { ...T.labelSmall, color: colors.placeholder, marginTop: -4 },
   aiScoreLabel: { ...T.label, fontWeight: '700', color: colors.bodyText, marginBottom: 8 },
   aiSkinTypeBadge: {
-    backgroundColor: tint(colors.brand, '14'),
+    backgroundColor: colors.accentBg,
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
   },
-  aiSkinTypeText: { ...T.labelSmall, fontWeight: '700', color: colors.brand },
+  aiSkinTypeText: { ...T.labelSmall, fontWeight: '700', color: colors.accent },
 
   aiSection: {
     ...surfaces.card,
@@ -702,12 +702,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: tint(colors.brand, '14'),
+    backgroundColor: colors.accentBg,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 16,
   },
-  concernChipText: { ...T.labelSmall, color: colors.brand },
+  concernChipText: { ...T.labelSmall, color: colors.accent },
 
   // AI Recommendations
   aiRecCard: {
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
   },
   aiRecBody: { flex: 1 },
   aiRecName: { ...T.label, fontWeight: '700', color: colors.label, marginBottom: 2 },
-  aiRecPrice: { ...T.label, fontWeight: '800', color: colors.brand, marginBottom: 4 },
+  aiRecPrice: { ...T.label, fontWeight: '800', color: colors.accent, marginBottom: 4 },
   aiRecPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: '#25D366', marginBottom: 4 },
   aiRecReason: { ...T.captionSmall, color: colors.mutedText, lineHeight: 17, marginBottom: 8 },
   aiRecActions: { flexDirection: 'row', gap: 8 },
@@ -750,7 +750,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
@@ -787,7 +787,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     color: colors.white,
     textAlign: 'center',
     lineHeight: 22,
@@ -819,9 +819,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
   },
-  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.brand },
+  retakeBtnText: { ...T.buttonSmall, fontWeight: '700', color: colors.accent },
   quizBtn: {
     flex: 1,
     flexDirection: 'row',

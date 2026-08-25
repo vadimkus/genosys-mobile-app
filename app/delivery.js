@@ -58,7 +58,7 @@ export default function DeliveryScreen() {
   const deliveryMethods = [
     {
       icon: 'flash',
-      iconColor: colors.brand,
+      iconColor: colors.accent,
       title: l('Express Delivery — Dubai', 'التوصيل السريع — دبي', 'Экспресс-доставка — Дубай'),
       desc: l('Within 1–2 hours', 'خلال ١-٢ ساعة', 'В течение 1–2 часов'),
       partner: l('Via Careem / QuipQup', 'عبر كريم / كويب كوب', 'Через Careem / QuipQup'),
@@ -176,7 +176,7 @@ export default function DeliveryScreen() {
                   activeOpacity={0.7}
                 >
                   {isSelected ? (
-                    <Ionicons name="location" size={15} color={colors.brand} style={isRTL ? styles.rateIconRTL : styles.rateIcon} />
+                    <Ionicons name="location" size={15} color={colors.accent} style={isRTL ? styles.rateIconRTL : styles.rateIcon} />
                   ) : null}
                   <Text style={[styles.rateEmirate, isRTL && styles.textRTL, isSelected && styles.rateEmirateSelected]}>{item.emirate}</Text>
                   <Text style={[styles.rateAmount, isSelected && styles.rateAmountSelected]}>{item.rate}</Text>
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   rateEmirate: { ...T.bodySmall, flex: 1, fontWeight: '500', color: colors.label },
   rateEmirateSelected: { fontWeight: '700' },
   rateAmount: { ...T.bodySmall, fontWeight: '700', color: colors.label },
-  rateAmountSelected: { color: colors.brand },
+  rateAmountSelected: { color: colors.accent },
 
   // Return policy
   policyRow: {

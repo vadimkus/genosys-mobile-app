@@ -85,7 +85,7 @@ function ActionButton({ icon, label, onPress, disabled, busy, isRTL }) {
       accessibilityState={{ disabled: !!disabled, busy: !!busy }}
     >
       {busy ? (
-        <ActivityIndicator size="small" color={colors.brand} />
+        <ActivityIndicator size="small" color={colors.accent} />
       ) : (
         <Ionicons name={icon} size={20} color={disabled ? colors.tertiary : colors.blue} />
       )}
@@ -284,7 +284,7 @@ export default function ProductGuideScreen() {
         {showError ? (
           <View style={styles.errorContainer}>
             <View style={styles.errorIcon}>
-              <Ionicons name="cloud-offline-outline" size={34} color={colors.brand} />
+              <Ionicons name="cloud-offline-outline" size={34} color={colors.accent} />
             </View>
             <Text style={[styles.errorTitle, isRTL && styles.textRTL]}>{t('productGuide.loadFailedTitle')}</Text>
             <Text style={[styles.errorMessage, isRTL && styles.textRTL]}>
@@ -368,7 +368,7 @@ export default function ProductGuideScreen() {
             />
             {loading ? (
               <View style={styles.loadingOverlay} pointerEvents="none">
-                <ActivityIndicator size="large" color={colors.brand} />
+                <ActivityIndicator size="large" color={colors.accent} />
                 <Text style={[styles.loadingText, isRTL && styles.textRTL]}>
                   {t('productGuide.loading', { percent: loadingPercent })}
                 </Text>
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 2,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
   },
   errorContainer: {
     flex: 1,
@@ -486,11 +486,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingHorizontal: 24,
     paddingVertical: 13,
-    ...shadow.cta(colors.brand),
+    ...shadow.cta(colors.cta),
   },
   retryText: {
     ...T.buttonSmall,

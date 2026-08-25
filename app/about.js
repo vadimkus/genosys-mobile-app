@@ -90,7 +90,7 @@ export default function AboutScreen() {
             <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
               <Text style={styles.flagText}>🇦🇪</Text>
               <Text style={[styles.countryText, isRTL && styles.textRTLCenter]}>{t('about.country')}</Text>
-              <Ionicons name="heart" size={14} color={colors.brand} />
+              <Ionicons name="heart" size={14} color={colors.accent} />
             </View>
           </View>
 
@@ -103,7 +103,7 @@ export default function AboutScreen() {
 
           {/* Mission */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
-            <SectionHeader icon="flag" tileColor={colors.brand} title={t('about.missionTitle')} />
+            <SectionHeader icon="flag" tileColor={colors.accent} title={t('about.missionTitle')} />
             <Text style={[styles.paragraph, styles.paragraphLast, isRTL && styles.textRTL]}>{t('about.missionText')}</Text>
           </View>
 

@@ -316,7 +316,7 @@ export default function CheckoutAddressForm({
                     </Text>
                   </View>
                   {selectedEmirate === emirate.name ? (
-                    <Ionicons name="checkmark" size={16} color={colors.brand} />
+                    <Ionicons name="checkmark" size={16} color={colors.accent} />
                   ) : null}
                 </View>
                 <View style={[styles.emirateBottomRow, isRTL && styles.emirateBottomRowRTL]}>

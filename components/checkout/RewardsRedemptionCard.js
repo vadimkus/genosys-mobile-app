@@ -89,7 +89,7 @@ export default function RewardsRedemptionCard({
 
       {earnPreview > 0 ? (
         <View style={[styles.earnRow, isRTL && styles.rowReverse]}>
-          <Ionicons name="sparkles-outline" size={13} color={colors.brand} />
+          <Ionicons name="sparkles-outline" size={13} color={colors.accent} />
           <Text style={[styles.earnText, isRTL && styles.textRTL]}>
             {t('rewards.earnPreview', { points: Number(earnPreview).toLocaleString() })}
           </Text>
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 7,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
   },

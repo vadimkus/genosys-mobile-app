@@ -39,7 +39,7 @@ export default function CheckoutOrderHeaderCard({
         accessibilityState={{ expanded: !!orderSummaryExpanded }}
         accessibilityLabel={t('checkout.orderSummary')}
       >
-        <View style={[styles.orderHeaderIconWrap, isRTL && styles.orderHeaderIconWrapRTL, { backgroundColor: colors.brand }]}>
+        <View style={[styles.orderHeaderIconWrap, isRTL && styles.orderHeaderIconWrapRTL, { backgroundColor: colors.cta }]}>
           <Ionicons name="bag-handle" size={18} color={colors.white} />
         </View>
         <View style={[styles.orderHeaderLeft, isRTL && styles.orderHeaderLeftRTL]}>

@@ -19,14 +19,14 @@ export default function EmirateFlagIcon({ name }) {
 
   // Abu Dhabi: red field with a small white canton in the upper hoist corner
   const AbuDhabi = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: colors.brand }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.flagRed }]}>
       <View style={flagStyles.abuDhabiCanton} />
     </View>
   );
 
   // Dubai / Ajman: red field with a vertical white stripe at the hoist
   const DubaiAjman = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: colors.brand }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.flagRed }]}>
       <View style={flagStyles.hoistWhiteStripe} />
     </View>
   );
@@ -40,7 +40,7 @@ export default function EmirateFlagIcon({ name }) {
 
   // Umm Al Quwain: red field with a vertical white stripe at hoist and a white crescent + star
   const UmmAlQuwain = () => (
-    <View style={[flagStyles.flagBox, { backgroundColor: colors.brand }]}>
+    <View style={[flagStyles.flagBox, { backgroundColor: colors.flagRed }]}>
       <View style={flagStyles.hoistWhiteStripe} />
       {/* Crescent (approx) */}
       <View style={flagStyles.uaqCrescentOuter} />
@@ -118,7 +118,7 @@ const flagStyles = StyleSheet.create({
     top: '18%',
     width: '68%',
     height: '64%',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.flagRed,
   },
 
   // Umm Al Quwain (approx crescent + star)
@@ -138,7 +138,7 @@ const flagStyles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 5,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.flagRed,
   },
   uaqStar: {
     position: 'absolute',

@@ -217,7 +217,7 @@ export default function ChatScreen() {
     if (!product) {
       return (
         <View style={styles.productCardLoading} key={`prod-${productId}`}>
-          <ActivityIndicator size="small" color={colors.brand} />
+          <ActivityIndicator size="small" color={colors.accent} />
         </View>
       );
     }
@@ -394,7 +394,7 @@ export default function ChatScreen() {
         >
           {!isUser && (
             <View style={styles.avatarCircle}>
-              <Ionicons name="sparkles" size={14} color={colors.brand} />
+              <Ionicons name="sparkles" size={14} color={colors.accent} />
             </View>
           )}
           <View style={[styles.bubble, isUser ? styles.userBubble : styles.assistantBubble]}>
@@ -483,11 +483,11 @@ export default function ChatScreen() {
           {loading && (
             <View style={[styles.messageBubbleWrap, styles.assistantBubbleWrap]}>
               <View style={styles.avatarCircle}>
-                <Ionicons name="sparkles" size={14} color={colors.brand} />
+                <Ionicons name="sparkles" size={14} color={colors.accent} />
               </View>
               <View style={[styles.bubble, styles.assistantBubble]}>
                 <View style={styles.typingRow}>
-                  <ActivityIndicator size="small" color={colors.brand} />
+                  <ActivityIndicator size="small" color={colors.accent} />
                   <Text style={styles.typingText}>{t('chat.thinking')}</Text>
                 </View>
               </View>
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
   },
   headerRTL: { flexDirection: 'row-reverse' },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   userBubble: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderBottomEndRadius: 4,
   },
   assistantBubble: {
@@ -621,8 +621,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   quickActionBtnHighlight: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
+    backgroundColor: colors.cta,
+    borderColor: colors.accent,
   },
   quickActionEmoji: {
     fontSize: 13,
@@ -667,13 +667,13 @@ const styles = StyleSheet.create({
   },
   productInfo: { flex: 1, marginStart: 10 },
   productName: { ...T.labelSmall, color: colors.label, lineHeight: 18 },
-  productPrice: { ...T.labelSmall, fontWeight: '800', color: colors.brand, marginTop: 2 },
+  productPrice: { ...T.labelSmall, fontWeight: '800', color: colors.accent, marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 8, marginTop: 6 },
   addToBagBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
   },

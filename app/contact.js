@@ -162,7 +162,7 @@ export default function ContactScreen() {
             <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
               <Text style={styles.flagText}>🇦🇪</Text>
               <Text style={[styles.countryText, isRTL && styles.textRTLCenter]}>{t('contact.country')}</Text>
-              <Ionicons name="heart" size={14} color={colors.brand} />
+              <Ionicons name="heart" size={14} color={colors.accent} />
             </View>
           </View>
 
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   rowRTL: { flexDirection: 'row-reverse' },
   rowMiddle: { flex: 1, minWidth: 0 },
   rowTitle: { ...T.label, fontSize: 15, color: colors.label },
-  rowValue: { ...T.captionSmall, color: colors.brand, fontWeight: '600', marginTop: 2 },
+  rowValue: { ...T.captionSmall, color: colors.accent, fontWeight: '600', marginTop: 2 },
   rowDesc: { ...T.captionSmall, color: colors.secondaryLabel, marginTop: 2 },
 
   // Distributor

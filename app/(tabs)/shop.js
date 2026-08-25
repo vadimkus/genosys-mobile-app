@@ -198,7 +198,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
               <Ionicons
                 name={isFav ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isFav ? colors.brand : colors.white}
+                color={isFav ? colors.accent : colors.white}
               />
             </View>
           </TouchableOpacity>
@@ -1023,7 +1023,7 @@ function ShopScreen() {
                 <Ionicons 
                   name={getFavoritesCount() > 0 ? "heart" : "heart-outline"} 
                   size={24} 
-                  color={colors.brand}
+                  color={colors.accent}
                 />
               </View>
               {getFavoritesCount() > 0 && (
@@ -1170,7 +1170,7 @@ function ShopScreen() {
                       <Ionicons
                         name={isListening ? 'mic' : 'mic-outline'}
                         size={20}
-                        color={isListening ? colors.brand : colors.secondaryLabel}
+                        color={isListening ? colors.accent : colors.secondaryLabel}
                       />
                     </RNAnimated.View>
                   </TouchableOpacity>
@@ -1476,7 +1476,7 @@ const styles = StyleSheet.create({
     ...T.labelSmall,
     fontWeight: '900',
     letterSpacing: 0.5,
-    color: colors.brand,
+    color: colors.accent,
   },
   langOverlay: {
     flex: 1,
@@ -1501,7 +1501,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   langMenuItemActive: {
-    backgroundColor: tint(colors.brand), // primary-50
+    backgroundColor: colors.accentBg, // primary-50
   },
   langMenuItemText: {
     ...T.label,
@@ -1511,7 +1511,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   langMenuItemTextActive: {
-    color: colors.brand, // primary-600
+    color: colors.accent, // primary-600
     fontWeight: '800',
   },
   logo: {
@@ -1546,7 +1546,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     end: -4,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 8,
     minWidth: 16,
     height: 16,
@@ -1579,7 +1579,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -1674,7 +1674,7 @@ const styles = StyleSheet.create({
   gridPlaceholderText: {
     fontSize: 32,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   gridContent: {
     padding: 12,
@@ -1711,7 +1711,7 @@ const styles = StyleSheet.create({
   },
   gridPrice: {
     ...T.priceSmall,
-    color: colors.brand,
+    color: colors.accent,
   },
 
   // Search Styles
@@ -1796,7 +1796,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -1808,7 +1808,7 @@ const styles = StyleSheet.create({
   voicePartialText: {
     ...T.bodySmall,
     fontWeight: '500',
-    color: colors.brand,
+    color: colors.accent,
     textAlign: 'center',
     marginBottom: 16,
     minHeight: 20,
@@ -1854,7 +1854,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   clearSearchButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1913,8 +1913,8 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   activeCategoryButton: {
-    backgroundColor: tint(colors.brand),
-    borderColor: colors.brand,
+    backgroundColor: colors.accentBg,
+    borderColor: colors.accent,
   },
   // Transparent positioner that spans the pill's horizontal extent and
   // centers the badge above it. Using a wrapper (instead of a hard-coded
@@ -1958,7 +1958,7 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   categoryNewBadgeTextActive: {
-    color: colors.brand,
+    color: colors.accent,
   },
   categoryButtonText: {
     ...T.label,
@@ -1967,7 +1967,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   activeCategoryButtonText: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
   },
   
@@ -2106,7 +2106,7 @@ const styles = StyleSheet.create({
   },
   savings: {
     fontSize: 10,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
     backgroundColor: '#dc262620',
     paddingHorizontal: 6,
@@ -2132,7 +2132,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
@@ -2153,7 +2153,7 @@ const styles = StyleSheet.create({
   priceOnRequestText: {
     ...T.label,
     letterSpacing: 0.3,
-    color: colors.brand,
+    color: colors.accent,
   },
   loginToSeePriceText: {
     ...T.labelSmall,
@@ -2271,7 +2271,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 4,
     marginBottom: 12,
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
     borderRadius: 14,
     overflow: 'hidden',
   },
@@ -2300,7 +2300,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   buildSetBadge: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,

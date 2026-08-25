@@ -172,7 +172,7 @@ export default function PartnersScreen() {
       {/* Loading State */}
       {loading && (
         <View style={[styles.centerState, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.stateText}>{l('Loading partners...', 'جارٍ تحميل الشركاء...', 'Загрузка партнёров...')}</Text>
         </View>
       )}
@@ -182,7 +182,7 @@ export default function PartnersScreen() {
         <View style={[styles.centerState, { paddingTop: headerHeight }]}>
           <Ionicons name="cloud-offline" size={48} color={colors.tertiary} />
           <Text style={styles.stateText}>{error}</Text>
-          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.brand)]} onPress={() => fetchPartners()} activeOpacity={0.85}>
+          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.cta)]} onPress={() => fetchPartners()} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>{l('Retry', 'إعادة المحاولة', 'Повторить')}</Text>
           </TouchableOpacity>
         </View>
@@ -197,13 +197,13 @@ export default function PartnersScreen() {
           scrollEventThrottle={16}
           contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => fetchPartners(true)} tintColor={colors.brand} progressViewOffset={headerHeight} />
+            <RefreshControl refreshing={refreshing} onRefresh={() => fetchPartners(true)} tintColor={colors.accent} progressViewOffset={headerHeight} />
           }
         >
           <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
             {/* Hero */}
             <View style={styles.heroSection}>
-              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.brand }]}>
+              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.cta }]}>
                 <Ionicons name="business" size={24} color={colors.white} />
               </View>
               <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
@@ -221,7 +221,7 @@ export default function PartnersScreen() {
             {/* Partners List */}
             <View style={styles.section}>
               {partners.map((partner) => {
-                const color = THEME_COLORS[partner.theme] || colors.brand;
+                const color = THEME_COLORS[partner.theme] || colors.accent;
                 const isExpanded = expandedId === partner.id;
                 const { displayName, branch } = parsePartnerName(partner.name);
 
@@ -314,7 +314,7 @@ export default function PartnersScreen() {
             {/* Become a Partner CTA */}
             <View style={[styles.ctaCard, shadow.card]}>
               <View style={[styles.sectionHeader, isRTL && styles.rowRTL]}>
-                <View style={[surfaces.iconTile, { backgroundColor: colors.brand }]}>
+                <View style={[surfaces.iconTile, { backgroundColor: colors.cta }]}>
                   <Ionicons name="people" size={17} color={colors.white} />
                 </View>
                 <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
@@ -327,7 +327,7 @@ export default function PartnersScreen() {
                    'Присоединяйтесь к нашей сети премиальных специалистов красоты в ОАЭ')}
               </Text>
               <TouchableOpacity
-                style={[styles.ctaBtn, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
+                style={[styles.ctaBtn, shadow.cta(colors.cta), isRTL && styles.rowRTL]}
                 onPress={() => Linking.openURL('mailto:sales@genosys.ae?subject=Partnership%20Inquiry').catch(() => {})}
                 activeOpacity={0.85}
               >
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   // Loading / Error states
   centerState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
   stateText: { ...T.bodySmall, color: colors.secondaryLabel, marginTop: 12, textAlign: 'center' },
-  retryBtn: { marginTop: 16, backgroundColor: colors.brand, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 14 },
+  retryBtn: { marginTop: 16, backgroundColor: colors.cta, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 14 },
   retryBtnText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
 
   // Hero
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 15,
     borderRadius: 14,
   },

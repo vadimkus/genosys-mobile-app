@@ -158,7 +158,7 @@ export default function TrainingScreen() {
           <Ionicons name="lock-closed" size={48} color={colors.tertiary} />
           <Text style={styles.emptyTitle}>{l('Login Required', 'يجب تسجيل الدخول', 'Требуется авторизация')}</Text>
           <Text style={styles.emptyDesc}>{l('Please log in to access training materials', 'يرجى تسجيل الدخول للوصول إلى مواد التدريب', 'Войдите для доступа к учебным материалам')}</Text>
-          <TouchableOpacity style={[styles.loginBtn, shadow.cta(colors.brand)]} onPress={() => router.push('/auth/login')} activeOpacity={0.85}>
+          <TouchableOpacity style={[styles.loginBtn, shadow.cta(colors.cta)]} onPress={() => router.push('/auth/login')} activeOpacity={0.85}>
             <Text style={styles.loginBtnText}>{l('Log In', 'تسجيل الدخول', 'Войти')}</Text>
           </TouchableOpacity>
         </View>
@@ -179,7 +179,7 @@ export default function TrainingScreen() {
       {/* Loading */}
       {loading && (
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>{l('Loading training materials...', 'جاري تحميل مواد التدريب...', 'Загрузка учебных материалов...')}</Text>
         </View>
       )}
@@ -189,7 +189,7 @@ export default function TrainingScreen() {
         <View style={[styles.emptyState, { paddingTop: headerHeight }]}>
           <Ionicons name="alert-circle" size={48} color={colors.red} />
           <Text style={styles.emptyTitle}>{error}</Text>
-          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.brand)]} onPress={() => fetchTraining()} activeOpacity={0.85}>
+          <TouchableOpacity style={[styles.retryBtn, shadow.cta(colors.cta)]} onPress={() => fetchTraining()} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>{l('Try Again', 'حاول مجدداً', 'Повторить')}</Text>
           </TouchableOpacity>
         </View>
@@ -204,7 +204,7 @@ export default function TrainingScreen() {
           scrollEventThrottle={16}
           contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => fetchTraining(true)} tintColor={colors.brand} progressViewOffset={headerHeight} />
+            <RefreshControl refreshing={refreshing} onRefresh={() => fetchTraining(true)} tintColor={colors.accent} progressViewOffset={headerHeight} />
           }
         >
           <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
@@ -226,7 +226,7 @@ export default function TrainingScreen() {
                     <Text style={styles.statText}>{stats.totalDocuments} {l('Guides', 'أدلة', 'Пособий')}</Text>
                   </View>
                   <View style={styles.statBadge}>
-                    <Ionicons name="flask" size={14} color={colors.brand} />
+                    <Ionicons name="flask" size={14} color={colors.accent} />
                     <Text style={styles.statText}>{stats.totalProductDocs} {l('Products', 'منتجات', 'Продуктов')}</Text>
                   </View>
                   <View style={styles.statBadge}>
@@ -269,7 +269,7 @@ export default function TrainingScreen() {
             {/* Product Documentation */}
             {productDocs.length > 0 && (
               <View style={styles.section}>
-                <SectionHeader icon="flask" tileColor={colors.brand} title={l('Product Documentation', 'وثائق المنتجات', 'Документация по продуктам')} />
+                <SectionHeader icon="flask" tileColor={colors.accent} title={l('Product Documentation', 'وثائق المنتجات', 'Документация по продуктам')} />
                 <View style={[styles.card, shadow.card]}>
                   {productDocs.map((doc, idx) => (
                     <TouchableOpacity
@@ -289,9 +289,9 @@ export default function TrainingScreen() {
                         <Text style={[styles.docTitle, isRTL && styles.textRTL]} numberOfLines={2}>{doc.title}</Text>
                         <Text style={[styles.docSize, isRTL && styles.textRTL]}>{doc.fileSize}</Text>
                       </View>
-                      <View style={[styles.pdfBadge, { backgroundColor: tint(colors.brand) }]}>
-                        <Ionicons name="download-outline" size={15} color={colors.brand} />
-                        <Text style={[styles.pdfBadgeText, { color: colors.brand }]}>PDF</Text>
+                      <View style={[styles.pdfBadge, { backgroundColor: colors.accentBg }]}>
+                        <Ionicons name="download-outline" size={15} color={colors.accent} />
+                        <Text style={[styles.pdfBadgeText, { color: colors.accent }]}>PDF</Text>
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -436,9 +436,9 @@ const styles = StyleSheet.create({
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
   emptyTitle: { ...T.sectionTitleSmall, color: colors.label, marginTop: 16, marginBottom: 8, textAlign: 'center' },
   emptyDesc: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', marginBottom: 20, lineHeight: 22 },
-  loginBtn: { backgroundColor: colors.brand, paddingHorizontal: 32, paddingVertical: 15, borderRadius: 14 },
+  loginBtn: { backgroundColor: colors.cta, paddingHorizontal: 32, paddingVertical: 15, borderRadius: 14 },
   loginBtnText: { ...T.button, fontWeight: '700' },
-  retryBtn: { backgroundColor: colors.brand, paddingHorizontal: 28, paddingVertical: 13, borderRadius: 14, marginTop: 8 },
+  retryBtn: { backgroundColor: colors.cta, paddingHorizontal: 28, paddingVertical: 13, borderRadius: 14, marginTop: 8 },
   retryBtnText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
 
   // RTL

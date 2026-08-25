@@ -235,7 +235,7 @@ export default function AddressesScreen() {
       accessibilityRole="button"
       accessibilityLabel={t('addresses.addNew')}
     >
-      <Ionicons name="add" size={26} color={colors.brand} />
+      <Ionicons name="add" size={26} color={colors.accent} />
     </TouchableOpacity>
   );
 
@@ -244,7 +244,7 @@ export default function AddressesScreen() {
       <View style={styles.container}>
         <CollapsibleHeader title={t('addresses.title')} onBack={onBack} right={addButton} isRTL={isRTL} />
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>{t('addresses.loading')}</Text>
         </View>
       </View>
@@ -266,7 +266,7 @@ export default function AddressesScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              tintColor={colors.brand}
+              tintColor={colors.accent}
               progressViewOffset={headerHeight}
             />
           }
@@ -293,7 +293,7 @@ export default function AddressesScreen() {
 
           {/* Add New Address — primary action */}
           <TouchableOpacity
-            style={[styles.addButton, shadow.cta(colors.brand), isRTL && styles.rowRTL]}
+            style={[styles.addButton, shadow.cta(colors.cta), isRTL && styles.rowRTL]}
             onPress={handleAddAddress}
             activeOpacity={0.85}
           >
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 16,
     marginHorizontal: 16,

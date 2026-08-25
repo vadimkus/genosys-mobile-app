@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 24,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   stockOverlay: {
     position: 'absolute',
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   beautyBoxDiscount: {
     ...T.captionTiny,
     fontWeight: 'bold',
-    color: colors.brand,
+    color: colors.accent,
     backgroundColor: '#FFE5E5',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 8,
     paddingVertical: 8,
     marginTop: 8,

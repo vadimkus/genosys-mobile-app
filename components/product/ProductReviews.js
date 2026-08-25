@@ -288,7 +288,7 @@ export default function ProductReviews({ productId }) {
       {/* Reviews List */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.brand} />
+          <ActivityIndicator size="small" color={colors.accent} />
           <Text style={styles.loadingText}>{t('reviews.loading') || 'Loading reviews...'}</Text>
         </View>
       ) : reviews.length > 0 ? (
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',

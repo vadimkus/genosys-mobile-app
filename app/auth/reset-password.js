@@ -184,7 +184,7 @@ export default function ResetPasswordScreen() {
             </View>
 
             <TouchableOpacity
-              style={[styles.button, shadow.cta(colors.brand), !canSubmit && styles.buttonDisabled]}
+              style={[styles.button, shadow.cta(colors.cta), !canSubmit && styles.buttonDisabled]}
               onPress={handleReset}
               disabled={!canSubmit}
               activeOpacity={0.85}
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
 
   // Primary CTA
   button: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     minHeight: 52,
     alignItems: 'center',

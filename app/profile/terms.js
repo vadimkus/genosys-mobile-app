@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     marginTop: 8,
   },
   bulletText: { ...T.bodySmall, color: colors.bodyText, flex: 1, lineHeight: 22 },
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 4,
   },
-  contactItem: { ...T.bodySmall, color: colors.brand, fontWeight: '600', marginBottom: 8 },
+  contactItem: { ...T.bodySmall, color: colors.accent, fontWeight: '600', marginBottom: 8 },
   contactItemLast: { marginBottom: 0 },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },

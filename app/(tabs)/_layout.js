@@ -68,7 +68,7 @@ export default function TabLayout() {
           },
           isRTL && { flexDirection: 'row-reverse' },
         ],
-        tabBarActiveTintColor: colors.brand,
+        tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.secondaryLabel,
         tabBarLabelStyle: {
           fontSize: 10,
@@ -110,7 +110,7 @@ export default function TabLayout() {
                   size={size}
                   focused={focused}
                 />
-                <TabBarBadge count={ordersCount} color={colors.brand} />
+                <TabBarBadge count={ordersCount} color={colors.accent} />
               </View>
             );
           },
@@ -137,7 +137,7 @@ export default function TabLayout() {
                   size={size}
                   focused={focused}
                 />
-                <TabBarBadge count={cartCount} color={colors.brand} />
+                <TabBarBadge count={cartCount} color={colors.accent} />
               </View>
             );
           },

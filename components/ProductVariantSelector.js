@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   selectedColorOption: {
-    borderColor: colors.brand,
+    borderColor: colors.accent,
     backgroundColor: '#FFF5F5',
   },
   colorSwatch: {
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     borderColor: colors.separator,
   },
   selectedColorSwatch: {
-    borderColor: colors.brand,
+    borderColor: colors.accent,
   },
   colorLabel: {
     ...T.captionSmall,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedColorLabel: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
   },
   
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   selectedSizeOption: {
-    borderColor: colors.brand,
+    borderColor: colors.accent,
     backgroundColor: '#FFF5F5',
   },
   sizeLabel: {
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   selectedSizeLabel: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
   },
   sizePrice: {
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedSizePrice: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '500',
   },
   
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   unavailableText: {
     ...T.badge,
     fontWeight: '500',
-    color: colors.brandLight,
+    color: colors.red,
     marginTop: 2,
   },
 });

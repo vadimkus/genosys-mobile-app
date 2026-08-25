@@ -444,7 +444,7 @@ export default function LoginScreen() {
               <View style={styles.uaeRow}>
                 <Text style={styles.uaeFlag}>🇦🇪</Text>
                 <Text style={styles.title}>{t('authScreen.uaeLine')}</Text>
-                <Ionicons name="heart" size={12} color={colors.brand} style={styles.uaeHeart} />
+                <Ionicons name="heart" size={12} color={colors.accent} style={styles.uaeHeart} />
               </View>
             </View>
 
@@ -473,7 +473,7 @@ export default function LoginScreen() {
                   <Ionicons 
                     name={biometricType.includes('Face') ? 'scan' : 'finger-print'} 
                     size={20} 
-                    color={colors.brand} 
+                    color={colors.accent} 
                   />
                   <Text style={[styles.biometricButtonText, isRTL && styles.biometricButtonTextRTL]}>
                     {t('authScreen.loginWithBiometrics', { biometricType })}
@@ -732,7 +732,7 @@ export default function LoginScreen() {
             <TouchableOpacity
               style={[
                 styles.authButton,
-                shadow.cta(colors.brand),
+                shadow.cta(colors.cta),
                 (loading || !privacyConsent) && styles.buttonDisabledOpacity
               ]}
               onPress={handleEmailAuth}
@@ -791,7 +791,7 @@ export default function LoginScreen() {
                   <Ionicons
                     name={partnerIntent ? 'close-circle' : isRTL ? 'chevron-back' : 'chevron-forward'}
                     size={partnerIntent ? 21 : 17}
-                    color={partnerIntent ? colors.brand : colors.secondaryLabel}
+                    color={partnerIntent ? colors.accent : colors.secondaryLabel}
                   />
                 </View>
               </TouchableOpacity>
@@ -847,7 +847,7 @@ export default function LoginScreen() {
                 ]}>
                   {em}
                 </Text>
-                {emirate === em && <Ionicons name="checkmark" size={18} color={colors.brand} />}
+                {emirate === em && <Ionicons name="checkmark" size={18} color={colors.accent} />}
               </TouchableOpacity>
             ))}
           </View>
@@ -985,14 +985,14 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
   },
   langMenuItemActive: {
-    backgroundColor: tint(colors.brand, '12'),
+    backgroundColor: colors.accentBg,
   },
   langMenuItemText: {
     ...T.label,
     color: colors.label,
   },
   langMenuItemTextActive: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '800',
   },
 
@@ -1050,9 +1050,9 @@ const styles = StyleSheet.create({
 
   // Biometric (tinted brand — keeps the single filled primary clean)
   biometricButton: {
-    backgroundColor: tint(colors.brand, '14'),
+    backgroundColor: colors.accentBg,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: tint(colors.brand, '40'),
+    borderColor: colors.accentBg,
     borderRadius: 14,
     minHeight: 52,
     justifyContent: 'center',
@@ -1067,7 +1067,7 @@ const styles = StyleSheet.create({
   biometricButtonText: {
     ...T.bodySmall,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
     lineHeight: undefined,
     marginLeft: 10,
   },
@@ -1270,7 +1270,7 @@ const styles = StyleSheet.create({
     color: colors.tertiary,
   },
   requiredStar: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
   },
   birthdayHint: {
@@ -1310,7 +1310,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.separator,
   },
   emirateMenuItemActive: {
-    backgroundColor: tint(colors.brand, '12'),
+    backgroundColor: colors.accentBg,
   },
   emirateMenuItemText: {
     ...T.body,
@@ -1319,7 +1319,7 @@ const styles = StyleSheet.create({
     lineHeight: undefined,
   },
   emirateMenuItemTextActive: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
   },
 
@@ -1352,8 +1352,8 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   checkboxChecked: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
+    backgroundColor: colors.cta,
+    borderColor: colors.accent,
   },
   privacyText: {
     ...T.caption,
@@ -1363,14 +1363,14 @@ const styles = StyleSheet.create({
   },
   privacyLink: {
     ...T.caption,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '700',
     textDecorationLine: 'underline',
   },
 
   // Primary CTA
   authButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     minHeight: 52,
     alignItems: 'center',
@@ -1431,7 +1431,7 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     ...T.label,
     fontWeight: '600',
-    color: colors.brand,
+    color: colors.accent,
   },
   switchMode: {
     alignItems: 'center',
@@ -1448,6 +1448,6 @@ const styles = StyleSheet.create({
   switchModeButton: {
     ...T.label,
     fontWeight: '700',
-    color: colors.brand,
+    color: colors.accent,
   },
 });

@@ -83,7 +83,7 @@ function FormSection({ title, children, isRTL, icon, tileColor }) {
     <View style={[styles.section, shadow.card]}>
       <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
         {icon ? (
-          <View style={[surfaces.iconTile, { backgroundColor: tileColor || colors.brand }]}>
+          <View style={[surfaces.iconTile, { backgroundColor: tileColor || colors.accent }]}>
             <Ionicons name={icon} size={17} color={colors.white} />
           </View>
         ) : null}
@@ -757,7 +757,7 @@ export default function EditProfileScreen() {
             <Text style={[styles.dangerTitle, isRTL && styles.textRTL]}>{t('editProfile.dangerZoneTitle')}</Text>
           </View>
           <TouchableOpacity
-            style={[styles.deleteAccountButton, shadow.cta(colors.brand), isSaving && styles.deleteAccountButtonDisabled]}
+            style={[styles.deleteAccountButton, shadow.cta(colors.cta), isSaving && styles.deleteAccountButtonDisabled]}
             onPress={handleDeleteAccount}
             disabled={isSaving}
             activeOpacity={0.85}
@@ -859,7 +859,7 @@ export default function EditProfileScreen() {
                     {option.label}
                   </Text>
                   {formData.gender === option.value && (
-                    <Ionicons name="checkmark" size={20} color={colors.brand} />
+                    <Ionicons name="checkmark" size={20} color={colors.accent} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
   },
   headerActionText: {
     ...T.navTitle,
-    color: colors.brand,
+    color: colors.accent,
   },
   headerActionDisabled: {
     color: colors.tertiary,
@@ -1133,7 +1133,7 @@ const styles = StyleSheet.create({
     color: colors.label,
   },
   deleteAccountButton: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 15,
     paddingHorizontal: 16,
@@ -1186,7 +1186,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -1195,7 +1195,7 @@ const styles = StyleSheet.create({
   profilePictureText: {
     ...T.bodySmall,
     lineHeight: undefined,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '600',
   },
 
@@ -1276,14 +1276,14 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.separator,
   },
   selectedGenderOption: {
-    backgroundColor: tint(colors.brand, '12'),
+    backgroundColor: colors.accentBg,
   },
   genderOptionText: {
     ...T.body,
     color: colors.label,
   },
   selectedGenderOptionText: {
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '500',
   },
 });

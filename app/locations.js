@@ -58,7 +58,7 @@ export default function LocationsScreen() {
       shipping: l('45 AED', '٤٥ د.إ', '45 AED'),
       delivery: l('1–2 hours', '١-٢ ساعة', '1–2 часа'),
       icon: 'business',
-      color: colors.brand,
+      color: colors.accent,
     },
     {
       slug: 'abu-dhabi',

@@ -268,7 +268,7 @@ export default function HomecareScriptsScreen() {
             <Text style={styles.brand}>GENOSYS</Text>
             <Text style={styles.headerSubtitle}>{tr('HOMECARE SCRIPTS', 'РЕКОМЕНДАЦИИ', 'توصيات منزلية')}</Text>
           </View>
-          <TouchableOpacity onPress={startNew} style={styles.iconButton}><Ionicons name="add-circle" size={27} color={colors.brand} /></TouchableOpacity>
+          <TouchableOpacity onPress={startNew} style={styles.iconButton}><Ionicons name="add-circle" size={27} color={colors.accent} /></TouchableOpacity>
         </View>
         <Text style={styles.intro}>{tr('Recommend retail products and earn Clinic Points after eligible patient purchases.', 'Рекомендуйте продукты и получайте баллы после покупок пациентов.', 'أوصِ بمنتجات التجزئة واكسب نقاط العيادة بعد مشتريات المرضى المؤهلة.')}</Text>
       </View>
@@ -285,7 +285,7 @@ export default function HomecareScriptsScreen() {
       </View>
 
       {loading ? (
-        <View style={styles.center}><ActivityIndicator color={colors.brand} /></View>
+        <View style={styles.center}><ActivityIndicator color={colors.accent} /></View>
       ) : (
         <FlatList
           data={scripts}
@@ -338,7 +338,7 @@ export default function HomecareScriptsScreen() {
                   <View style={[styles.actions, isRTL && styles.rowRTL]}>
                     <TouchableOpacity style={styles.primaryAction} onPress={() => shareScript(item)}><Ionicons name="share-outline" size={17} color={colors.white} /><Text style={styles.primaryActionText}>{tr('Share', 'Отправить', 'مشاركة')}</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.action} onPress={() => startEdit(item)}><Ionicons name="create-outline" size={17} color={colors.label} /><Text style={styles.actionText}>{tr('Edit', 'Изменить', 'تعديل')}</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.deleteAction} onPress={() => confirmRevoke(item)}><Ionicons name="trash-outline" size={17} color={colors.brandDark} /></TouchableOpacity>
+                    <TouchableOpacity style={styles.deleteAction} onPress={() => confirmRevoke(item)}><Ionicons name="trash-outline" size={17} color={colors.red} /></TouchableOpacity>
                   </View>
                 ) : null}
               </View>
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   brand: { color: colors.white, fontSize: 18, fontWeight: '900', letterSpacing: 3 },
   headerTitle: { color: colors.white, fontSize: 17, fontWeight: '800' },
-  headerSubtitle: { color: colors.brand, fontSize: 9, fontWeight: '800', letterSpacing: 2 },
+  headerSubtitle: { color: colors.accent, fontSize: 9, fontWeight: '800', letterSpacing: 2 },
   intro: { color: colors.placeholder, fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 12, paddingHorizontal: 20 },
   pointsRow: { flexDirection: 'row', gap: 10, padding: 16, paddingBottom: 0 },
   pointsCard: { flex: 1, backgroundColor: colors.card, borderRadius: 16, padding: 15, borderWidth: 1, borderColor: colors.groupedBg },
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   historyDescription: { fontSize: 12, fontWeight: '600', color: colors.label },
   historyMeta: { marginTop: 2, fontSize: 10, color: colors.secondaryLabel },
   historyPoints: { fontSize: 13, fontWeight: '800', color: '#15803D' },
-  historyPointsNegative: { color: colors.brandDark },
+  historyPointsNegative: { color: colors.red },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scriptCard: { backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.groupedBg, padding: 15, marginBottom: 11 },
   scriptTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
@@ -384,10 +384,10 @@ const styles = StyleSheet.create({
   primaryActionText: { color: colors.white, fontSize: 13, fontWeight: '700' },
   action: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.fill, borderRadius: 10, paddingVertical: 10 },
   actionText: { color: colors.label, fontSize: 13, fontWeight: '700' },
-  deleteAction: { width: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.brandTint, borderRadius: 10 },
+  deleteAction: { width: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentBg, borderRadius: 10 },
   empty: { alignItems: 'center', paddingTop: 80 },
   emptyTitle: { color: colors.label, fontSize: 16, fontWeight: '700', marginTop: 12 },
-  emptyButton: { backgroundColor: colors.brand, borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12, marginTop: 16 },
+  emptyButton: { backgroundColor: colors.cta, borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12, marginTop: 16 },
   emptyButtonText: { color: colors.white, fontSize: 14, fontWeight: '700' },
   label: { color: colors.mutedText, fontSize: 12, fontWeight: '700', marginBottom: 6 },
   input: { backgroundColor: colors.card, borderRadius: 13, borderWidth: 1, borderColor: colors.separator, color: colors.label, fontSize: 14, paddingHorizontal: 13, paddingVertical: 12, marginBottom: 15 },
@@ -396,15 +396,15 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, color: colors.label, fontSize: 14, paddingVertical: 12 },
   selectedText: { color: colors.mutedText, fontSize: 12, fontWeight: '600', marginBottom: 10 },
   productRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 14, borderWidth: 1, borderColor: colors.groupedBg, padding: 10, marginBottom: 8 },
-  productRowActive: { borderColor: colors.brand, backgroundColor: '#FFF7F7' },
+  productRowActive: { borderColor: colors.accent, backgroundColor: '#FFF7F7' },
   thumb: { width: 48, height: 48, borderRadius: 10, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   thumbImage: { width: '100%', height: '100%' },
   productName: { color: colors.label, fontSize: 13.5, fontWeight: '700' },
   productMeta: { color: colors.mutedText, fontSize: 11, marginTop: 2 },
   check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: colors.separatorStrong, alignItems: 'center', justifyContent: 'center' },
-  checkActive: { backgroundColor: colors.brand, borderColor: colors.brand },
+  checkActive: { backgroundColor: colors.cta, borderColor: colors.accent },
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.separator, padding: 14 },
-  saveButton: { backgroundColor: colors.brand, borderRadius: 14, minHeight: 50, alignItems: 'center', justifyContent: 'center' },
+  saveButton: { backgroundColor: colors.cta, borderRadius: 14, minHeight: 50, alignItems: 'center', justifyContent: 'center' },
   saveText: { color: colors.white, fontSize: 15, fontWeight: '800' },
   rowRTL: { flexDirection: 'row-reverse' },
   rtlText: { textAlign: 'right', writingDirection: 'rtl' },

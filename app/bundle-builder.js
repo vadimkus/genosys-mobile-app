@@ -361,7 +361,7 @@ export default function BundleBuilderScreen() {
           onPress={() => toggleProduct(product, currentStepData?.id)}
           activeOpacity={0.7}
         >
-          <Ionicons name={selected ? 'checkmark' : 'add'} size={18} color={selected ? colors.white : colors.brand} />
+          <Ionicons name={selected ? 'checkmark' : 'add'} size={18} color={selected ? colors.white : colors.accent} />
           <Text style={[styles.addBtnText, selected && styles.addBtnTextSelected]}>
             {selected ? t('bundleBuilder.added') : t('bundleBuilder.add')}
           </Text>
@@ -383,7 +383,7 @@ export default function BundleBuilderScreen() {
           <View style={styles.backBtn} />
         </View>
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>{t('bundleBuilder.loadingProducts')}</Text>
         </View>
       </SafeAreaView>
@@ -401,7 +401,7 @@ export default function BundleBuilderScreen() {
           <View style={styles.backBtn} />
         </View>
         <View style={styles.loadingWrap}>
-          <Ionicons name="alert-circle" size={48} color={colors.brandLight} />
+          <Ionicons name="alert-circle" size={48} color={colors.red} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={fetchBundleData} activeOpacity={0.7}>
             <Text style={styles.retryBtnText}>{t('bundleBuilder.tryAgain')}</Text>
@@ -428,7 +428,7 @@ export default function BundleBuilderScreen() {
             accessibilityLabel={`${t('bundleBuilder.yourBundle')} (${itemCount})`}
             accessibilityState={{ expanded: showSummary }}
           >
-            <Ionicons name="bag-outline" size={22} color={colors.brand} />
+            <Ionicons name="bag-outline" size={22} color={colors.accent} />
             <View style={styles.cartBadge}><Text style={styles.cartBadgeText}>{itemCount}</Text></View>
           </TouchableOpacity>
         ) : (
@@ -678,7 +678,7 @@ export default function BundleBuilderScreen() {
                       accessibilityRole="button"
                       accessibilityLabel={`${t('bag.removeItem')} — ${product.name}`}
                     >
-                      <Ionicons name="close-circle" size={22} color={colors.brandLight} />
+                      <Ionicons name="close-circle" size={22} color={colors.red} />
                     </TouchableOpacity>
                   </View>
                 );
@@ -721,7 +721,7 @@ export default function BundleBuilderScreen() {
               onPress={() => { haptics.mediumTap(); setSelectedItems({}); closeSummary(); }}
               activeOpacity={0.7}
             >
-              <Ionicons name="trash-outline" size={16} color={colors.brandLight} />
+              <Ionicons name="trash-outline" size={16} color={colors.red} />
               <Text style={styles.clearAllText}>{t('bundleBuilder.clearAll')}</Text>
             </TouchableOpacity>
           </Animated.View>
@@ -744,20 +744,20 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { ...T.navTitle, flex: 1, fontWeight: '700', color: colors.label, textAlign: 'center' },
   cartBadgeBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: colors.brand, borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: colors.cta, borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
   cartBadgeText: { ...T.badge, color: colors.white },
 
   // Progress bar
   progressSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
   progressBar: { height: 6, backgroundColor: colors.separator, borderRadius: 3, position: 'relative', overflow: 'visible' },
-  progressFill: { height: 6, backgroundColor: colors.brand, borderRadius: 3 },
+  progressFill: { height: 6, backgroundColor: colors.cta, borderRadius: 3 },
   tierMarker: { position: 'absolute', top: -3, alignItems: 'center', marginLeft: -4 },
   tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.separator, borderWidth: 2, borderColor: colors.white },
   tierDotActive: { backgroundColor: '#16a34a' },
   progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 },
   progressLabel: { ...T.badge, color: colors.placeholder },
   progressLabelActive: { color: '#16a34a', fontWeight: '700' },
-  nextTierHint: { ...T.captionSmall, color: colors.brand, fontWeight: '600', textAlign: 'center', marginTop: 6 },
+  nextTierHint: { ...T.captionSmall, color: colors.accent, fontWeight: '600', textAlign: 'center', marginTop: 6 },
   discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: '#F0FDF4', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
   discountActiveText: { ...T.badgeMedium, color: '#16a34a' },
 
@@ -765,10 +765,10 @@ const styles = StyleSheet.create({
   stepIndicator: { backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, height: 52 },
   stepIndicatorContent: { paddingHorizontal: 12, gap: 8, alignItems: 'center', paddingVertical: 10 },
   stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.fill, borderWidth: 1.5, borderColor: colors.fill, height: 32 },
-  stepPillActive: { backgroundColor: colors.brandTint, borderColor: colors.brand },
+  stepPillActive: { backgroundColor: colors.accentBg, borderColor: colors.accent },
   stepEmoji: { fontSize: 14 },
   stepPillText: { ...T.captionTiny, fontWeight: '600', color: colors.mutedText },
-  stepPillTextActive: { color: colors.brand },
+  stepPillTextActive: { color: colors.accent },
   requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#F59E0B' },
   stepCountBadge: { backgroundColor: '#16a34a', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
   stepCountText: { ...T.badge, color: colors.white },
@@ -789,10 +789,10 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH, ...surfaces.card, ...shadow.card, borderRadius: 14,
     borderWidth: 1.5, borderColor: 'transparent', overflow: 'hidden',
   },
-  productCardSelected: { borderColor: colors.brand, backgroundColor: tint(colors.brand, '0A') },
+  productCardSelected: { borderColor: colors.accent, backgroundColor: colors.accentBg },
   selectedBadge: {
     position: 'absolute', top: 8, right: 8, zIndex: 10,
-    width: 24, height: 24, borderRadius: 12, backgroundColor: colors.brand,
+    width: 24, height: 24, borderRadius: 12, backgroundColor: colors.cta,
     alignItems: 'center', justifyContent: 'center',
   },
   // Square tile, photo edge-to-edge. contentFit="cover" center-crops the
@@ -810,9 +810,9 @@ const styles = StyleSheet.create({
   priceDiscounted: { color: '#16a34a' },
   loginToSee: { ...T.captionTiny, color: colors.placeholder, marginTop: 4, fontStyle: 'italic' },
 
-  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.brand },
-  addBtnSelected: { backgroundColor: colors.brand, borderColor: colors.brand },
-  addBtnText: { ...T.caption, fontWeight: '600', color: colors.brand },
+  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.accent },
+  addBtnSelected: { backgroundColor: colors.cta, borderColor: colors.accent },
+  addBtnText: { ...T.caption, fontWeight: '600', color: colors.accent },
   addBtnTextSelected: { color: colors.white },
 
   // Bottom bar
@@ -830,7 +830,7 @@ const styles = StyleSheet.create({
   navTotal: { ...T.price, color: colors.label },
   navItems: { ...T.caption, fontWeight: '600', color: colors.mutedText },
 
-  addToCartBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.brand, paddingVertical: 14, borderRadius: 14, marginTop: 8 },
+  addToCartBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.cta, paddingVertical: 14, borderRadius: 14, marginTop: 8 },
   addToCartText: { ...T.button, fontWeight: '700', color: colors.white },
 
   // Summary overlay
@@ -861,16 +861,16 @@ const styles = StyleSheet.create({
   pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: '#16a34a' },
   pricingRowTotal: { borderTopWidth: 1, borderTopColor: colors.separator, paddingTop: 8, marginTop: 4 },
   pricingTotalLabel: { ...T.totalLabel, color: colors.label, fontSize: 16 },
-  pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: colors.brand, fontSize: 18 },
+  pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: colors.accent, fontSize: 18 },
 
   clearAllBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12 },
-  clearAllText: { ...T.buttonSmall, color: colors.brandLight },
+  clearAllText: { ...T.buttonSmall, color: colors.red },
 
   // Empty & loading
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
   loadingText: { ...T.bodySmall, marginTop: 12, color: colors.mutedText, lineHeight: undefined },
   errorText: { ...T.label, fontSize: 16, color: colors.bodyText, marginTop: 12, textAlign: 'center' },
-  retryBtn: { backgroundColor: colors.brand, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
+  retryBtn: { backgroundColor: colors.cta, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
   retryBtnText: { ...T.buttonSmall, color: colors.white, fontSize: 15 },
   emptyStep: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyStepText: { ...T.caption, color: colors.placeholder, marginTop: 8, fontSize: 14 },

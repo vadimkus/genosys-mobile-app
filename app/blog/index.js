@@ -113,7 +113,7 @@ export default function BlogScreen() {
 
       {loading && !refreshing ? (
         <View style={[styles.centerState, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       ) : error ? (
         <View style={[styles.centerState, { paddingTop: headerHeight }]}>
@@ -132,7 +132,7 @@ export default function BlogScreen() {
             scrollEventThrottle={16}
             contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 32 }}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={() => fetchPosts(true)} tintColor={colors.brand} progressViewOffset={headerHeight} />
+              <RefreshControl refreshing={refreshing} onRefresh={() => fetchPosts(true)} tintColor={colors.accent} progressViewOffset={headerHeight} />
             }
           >
             {/* Hero — large title */}
@@ -238,14 +238,14 @@ const styles = StyleSheet.create({
 
   categoryPill: {
     alignSelf: 'flex-start',
-    backgroundColor: tint(colors.brand, '1A'),
+    backgroundColor: colors.accentBg,
     borderRadius: 999,
     paddingHorizontal: 9,
     paddingVertical: 3,
     marginBottom: 8,
   },
   categoryPillRTL: { alignSelf: 'flex-end' },
-  categoryText: { ...T.captionTiny, fontWeight: '700', color: colors.brand },
+  categoryText: { ...T.captionTiny, fontWeight: '700', color: colors.accent },
 
   postTitle: { ...T.sectionTitleSmall, color: colors.label, lineHeight: 23 },
   postExcerpt: { ...T.caption, color: colors.secondaryLabel, lineHeight: 20, marginTop: 6 },

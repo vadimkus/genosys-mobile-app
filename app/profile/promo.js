@@ -80,11 +80,11 @@ export default function PromoScreen() {
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingTop: headerHeight, paddingHorizontal: 16, paddingBottom: (insets?.bottom || 0) + 40 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} progressViewOffset={headerHeight} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} progressViewOffset={headerHeight} />}
       >
         <Animated.View style={[styles.card, shadow.card, { opacity: fade, transform: [{ translateY: lift }] }]}>
           <View style={[styles.cardHeader, isRTL && styles.rowRTL]}>
-            <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.brand }]}>
+            <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.cta }]}>
               <Ionicons name="megaphone" size={18} color={colors.white} />
             </View>
             <View style={styles.titleWrap}>
@@ -95,7 +95,7 @@ export default function PromoScreen() {
 
           {loading ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator color={colors.brand} />
+              <ActivityIndicator color={colors.accent} />
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           ) : promo?.text ? (

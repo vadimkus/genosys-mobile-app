@@ -339,7 +339,7 @@ export default function StripePaymentScreen() {
               disabled={!canCheck || checking}
               activeOpacity={0.85}
             >
-              {checking ? <ActivityIndicator color={colors.brand} /> : <Ionicons name="refresh" size={18} color={colors.brand} />}
+              {checking ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="refresh" size={18} color={colors.accent} />}
               <Text style={styles.secondaryButtonText}>{checking ? t('payment.checking') : t('payment.checkPaymentStatus')}</Text>
             </TouchableOpacity>
 
@@ -432,14 +432,14 @@ const styles = StyleSheet.create({
   title: { ...T.sectionTitleSmall },
   subtitle: { ...T.label, fontWeight: '400', color: colors.secondaryLabel, lineHeight: 20, marginTop: 6 },
   status: { ...T.label, color: colors.label, marginTop: 10 },
-  errorText: { ...T.label, color: colors.brand, marginTop: 10 },
+  errorText: { ...T.label, color: colors.accent, marginTop: 10 },
   primaryButton: {
     marginTop: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 14,
     borderRadius: 12,
   },
@@ -451,12 +451,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: '#FFF5F5',
   },
-  secondaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700', color: colors.brand },
+  secondaryButtonText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700', color: colors.accent },
   linkButton: { alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 12 },
   linkText: { ...T.link },
   buttonDisabled: { opacity: 0.6 },

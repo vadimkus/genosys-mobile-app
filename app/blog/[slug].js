@@ -202,7 +202,7 @@ export default function BlogPostScreen() {
     h2: { fontSize: 22, fontWeight: '700', color: colors.label, marginTop: 24, marginBottom: 12 },
     h3: { fontSize: 19, fontWeight: '700', color: colors.label, marginTop: 20, marginBottom: 10 },
     h4: { fontSize: 17, fontWeight: '600', color: colors.label, marginTop: 16, marginBottom: 8 },
-    a: { color: colors.brand, textDecorationLine: 'none' },
+    a: { color: colors.accent, textDecorationLine: 'none' },
     strong: { fontWeight: '700', color: colors.label },
     em: { fontStyle: 'italic' },
     ul: { marginBottom: 16, paddingLeft: 16 },
@@ -210,10 +210,10 @@ export default function BlogPostScreen() {
     li: { marginBottom: 6, fontSize: 16, lineHeight: 24, color: colors.bodyText },
     blockquote: {
       borderLeftWidth: 3,
-      borderLeftColor: colors.brand,
+      borderLeftColor: colors.accent,
       paddingLeft: 14,
       marginVertical: 16,
-      backgroundColor: colors.brandTint,
+      backgroundColor: colors.accentBg,
       paddingVertical: 10,
       paddingRight: 14,
       borderRadius: 4,
@@ -247,7 +247,7 @@ export default function BlogPostScreen() {
 
       {loading && !refreshing ? (
         <View style={[styles.centerState, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={colors.brand} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={[styles.loadingText, isRTL && styles.textRTL]}>{l('Loading article...', 'جاري التحميل...', 'Загрузка...')}</Text>
         </View>
       ) : error || !post ? (
@@ -273,7 +273,7 @@ export default function BlogPostScreen() {
               scrollEventThrottle={16}
               contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
               refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={() => fetchPost(true)} tintColor={colors.brand} progressViewOffset={headerHeight} />
+                <RefreshControl refreshing={refreshing} onRefresh={() => fetchPost(true)} tintColor={colors.accent} progressViewOffset={headerHeight} />
               }
             >
               {/* Featured Image — hero cover */}
@@ -400,7 +400,7 @@ export default function BlogPostScreen() {
                       onPress={() => { haptics.lightTap(); router.push('/auth/login'); }}
                       activeOpacity={0.85}
                     >
-                      <Ionicons name="chatbubble-outline" size={18} color={colors.brand} />
+                      <Ionicons name="chatbubble-outline" size={18} color={colors.accent} />
                       <Text style={styles.loginToCommentText}>
                         {l('Log in to leave a comment', 'سجل دخولك لترك تعليق', 'Войдите, чтобы комментировать')}
                       </Text>
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
   rowRTL: { flexDirection: 'row-reverse' },
   commentsTitle: { ...T.sectionTitleSmall, color: colors.label },
-  commentCountBadge: { backgroundColor: colors.brand, borderRadius: 11, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  commentCountBadge: { backgroundColor: colors.cta, borderRadius: 11, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   commentCountText: { ...T.badgeMedium, color: colors.white },
 
   // Comment input
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   commentInputCard: { ...surfaces.card, padding: 12 },
   commentInputRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   commentInputRowRTL: { flexDirection: 'row-reverse' },
-  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
   commentAvatarText: { ...T.button, fontWeight: '700', color: colors.white },
   commentInput: {
     flex: 1, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator, borderRadius: 12,
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   commentInputRTL: { textAlign: 'right', writingDirection: 'rtl' },
   submitBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    backgroundColor: colors.brand, paddingVertical: 10, paddingHorizontal: 20,
+    backgroundColor: colors.cta, paddingVertical: 10, paddingHorizontal: 20,
     borderRadius: 12, marginTop: 10, alignSelf: 'flex-end',
   },
   submitBtnDisabled: { opacity: 0.6 },
@@ -508,9 +508,9 @@ const styles = StyleSheet.create({
 
   loginToComment: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: tint(colors.brand, '14'), paddingVertical: 14, borderRadius: 14,
+    backgroundColor: colors.accentBg, paddingVertical: 14, borderRadius: 14,
   },
-  loginToCommentText: { ...T.buttonSmall, color: colors.brand },
+  loginToCommentText: { ...T.buttonSmall, color: colors.accent },
 
   // Comments list
   noComments: { alignItems: 'center', paddingVertical: 32, gap: 8 },

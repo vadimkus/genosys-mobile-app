@@ -56,7 +56,7 @@ export default function ProductQuickFactsCard({ facts }) {
               <Ionicons
                 name={ICONS[index % ICONS.length]}
                 size={17}
-                color={colors.brand}
+                color={colors.accent}
               />
             </View>
             <View style={styles.factCopy}>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
   },
   headerText: {
     flex: 1,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     ...T.captionSmall,
-    color: colors.brand,
+    color: colors.accent,
     fontWeight: '800',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: tint(colors.brand),
+    backgroundColor: colors.accentBg,
     flexShrink: 0,
   },
   factCopy: {

@@ -186,7 +186,7 @@ export default function SkinAnalysisScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.landingIcon}>
-            <Ionicons name="sparkles" size={48} color={colors.brand} />
+            <Ionicons name="sparkles" size={48} color={colors.accent} />
           </View>
           <Text style={[styles.landingTitle, isRTL && styles.textCenter]}>
             {t('skinAnalysis.title')}
@@ -209,7 +209,7 @@ export default function SkinAnalysisScreen() {
             onPress={() => router.push('/skin-analysis-camera')}
             activeOpacity={0.85}
           >
-            <Ionicons name="camera-outline" size={20} color={colors.brand} />
+            <Ionicons name="camera-outline" size={20} color={colors.accent} />
             <Text style={styles.cameraButtonText}>{t('skinAnalysis.startCamera')}</Text>
           </TouchableOpacity>
         </Animated.ScrollView>
@@ -230,7 +230,7 @@ export default function SkinAnalysisScreen() {
 
         {loading ? (
           <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
-            <ActivityIndicator size="large" color={colors.brand} />
+            <ActivityIndicator size="large" color={colors.accent} />
             <Text style={styles.loadingText}>{t('skinAnalysis.analyzing')}</Text>
           </View>
         ) : (
@@ -269,7 +269,7 @@ export default function SkinAnalysisScreen() {
 
             {apiError ? (
               <View style={styles.errorBox}>
-                <Ionicons name="cloud-offline-outline" size={28} color={colors.brand} />
+                <Ionicons name="cloud-offline-outline" size={28} color={colors.accent} />
                 <Text style={styles.errorText}>{t('skinAnalysis.recommendationsFailedFull')}</Text>
                 {/* Retry the request — answers are kept, no need to redo the quiz */}
                 <TouchableOpacity style={styles.retryBtn} onPress={fetchRecommendations} activeOpacity={0.85}>
@@ -383,7 +383,7 @@ export default function SkinAnalysisScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.85}>
-              <Ionicons name="refresh" size={18} color={colors.brand} />
+              <Ionicons name="refresh" size={18} color={colors.accent} />
               <Text style={styles.resetButtonText}>{t('skinAnalysis.tryAgain')}</Text>
             </TouchableOpacity>
           </Animated.ScrollView>
@@ -435,7 +435,7 @@ export default function SkinAnalysisScreen() {
                 <Ionicons
                   name={SKIN_TYPE_ICONS[type] || 'ellipse-outline'}
                   size={28}
-                  color={skinType === type ? colors.brand : colors.mutedText}
+                  color={skinType === type ? colors.accent : colors.mutedText}
                 />
                 <Text style={[styles.optionLabel, skinType === type && styles.optionLabelSelected]}>
                   {t(`skinAnalysis.skinType${type}`)}
@@ -458,7 +458,7 @@ export default function SkinAnalysisScreen() {
                 <Ionicons
                   name="person-outline"
                   size={28}
-                  color={ageGroup === age ? colors.brand : colors.mutedText}
+                  color={ageGroup === age ? colors.accent : colors.mutedText}
                 />
                 <Text style={[styles.optionLabel, ageGroup === age && styles.optionLabelSelected]}>
                   {t(`skinAnalysis.${getAgeKey(age)}`)}
@@ -509,7 +509,7 @@ export default function SkinAnalysisScreen() {
                   <Ionicons
                     name={icons[opt] || 'ellipse-outline'}
                     size={28}
-                    color={usage === opt ? colors.brand : colors.mutedText}
+                    color={usage === opt ? colors.accent : colors.mutedText}
                   />
                   <Text style={[styles.optionLabel, usage === opt && styles.optionLabelSelected]}>
                     {t(`skinAnalysis.${getUsageKey(opt)}`)}
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: 3,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     borderRadius: 2,
   },
 
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: tint(colors.brand, '14'),
+    backgroundColor: colors.accentBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
@@ -603,14 +603,14 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: colors.card,
     borderWidth: 2,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
     width: '100%',
     justifyContent: 'center',
   },
-  cameraButtonText: { ...T.button, fontWeight: '700', color: colors.brand },
+  cameraButtonText: { ...T.button, fontWeight: '700', color: colors.accent },
 
   // Quiz steps
   stepContent: { padding: 24 },
@@ -633,8 +633,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   optionCardSelected: {
-    borderColor: colors.brand,
-    backgroundColor: tint(colors.brand, '0F'),
+    borderColor: colors.accent,
+    backgroundColor: colors.accentBg,
   },
   optionLabel: {
     ...T.label,
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-  optionLabelSelected: { color: colors.brand },
+  optionLabelSelected: { color: colors.accent },
 
   chipsContainer: {
     flexDirection: 'row',
@@ -661,8 +661,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   chipSelected: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
+    backgroundColor: colors.cta,
+    borderColor: colors.accent,
   },
   chipText: { ...T.label, color: colors.bodyText },
   chipTextSelected: { color: colors.white },
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 16,
     borderRadius: 12,
   },
@@ -730,13 +730,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   matchChipText: { ...T.badge, fontWeight: '600', color: '#16A34A' },
-  recPrice: { ...T.label, fontWeight: '800', color: colors.brand, marginTop: 4 },
+  recPrice: { ...T.label, fontWeight: '800', color: colors.accent, marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -763,19 +763,19 @@ const styles = StyleSheet.create({
   recViewText: { ...T.captionSmall, fontWeight: '600', color: colors.bodyText },
 
   errorBox: {
-    backgroundColor: colors.brandTint,
+    backgroundColor: colors.accentBg,
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
     gap: 10,
     marginBottom: 16,
   },
-  errorText: { ...T.label, fontWeight: '400', color: colors.brandDark, textAlign: 'center', lineHeight: 20 },
+  errorText: { ...T.label, fontWeight: '400', color: colors.red, textAlign: 'center', lineHeight: 20 },
   retryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.brand,
+    borderColor: colors.accent,
   },
-  resetButtonText: { ...T.bodySmall, fontWeight: '700', color: colors.brand, lineHeight: undefined },
+  resetButtonText: { ...T.bodySmall, fontWeight: '700', color: colors.accent, lineHeight: undefined },
 });

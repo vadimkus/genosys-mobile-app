@@ -42,7 +42,7 @@ export default function PaymentMethodSelector({
         <Ionicons
           name={selected ? 'checkmark-circle' : 'ellipse-outline'}
           size={22}
-          color={selected ? colors.brand : colors.tertiary}
+          color={selected ? colors.accent : colors.tertiary}
         />
       </TouchableOpacity>
     );
@@ -116,8 +116,8 @@ const ls = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   methodRowSelected: {
-    backgroundColor: tint(colors.brand, '0D'),
-    borderColor: colors.brand,
+    backgroundColor: colors.accentBg,
+    borderColor: colors.accent,
   },
   methodTile: {
     width: 30,

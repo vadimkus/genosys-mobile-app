@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.1,
   },
   updateBtn: {
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 5,
     paddingHorizontal: 14,
     borderRadius: 14,

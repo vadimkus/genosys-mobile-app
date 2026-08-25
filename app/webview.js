@@ -258,7 +258,7 @@ export default function WebViewScreen() {
       {/* Loading bar */}
       {loading && (
         <View style={styles.loadingBar}>
-          <ActivityIndicator size="small" color={colors.brand} />
+          <ActivityIndicator size="small" color={colors.accent} />
         </View>
       )}
 
@@ -392,13 +392,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 14,
     width: '100%',
     maxWidth: 260,
-    ...shadow.cta(colors.brand),
+    ...shadow.cta(colors.cta),
   },
   retryButtonText: {
     ...T.buttonSmall,

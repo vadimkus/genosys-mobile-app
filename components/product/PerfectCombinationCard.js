@@ -315,7 +315,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
   return (
     <View style={styles.pcOuter}>
       <View style={styles.pcHeaderRow}>
-        <Ionicons name="sparkles" size={18} color={colors.brand} />
+        <Ionicons name="sparkles" size={18} color={colors.accent} />
         <Text style={styles.pcHeaderTitle}>{t('product.perfectCombination')}</Text>
       </View>
 
@@ -427,7 +427,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
 
         <View style={styles.pcBenefitsCard}>
           <View style={styles.pcBenefitsHeader}>
-            <Ionicons name="sparkles" size={14} color={colors.brand} />
+            <Ionicons name="sparkles" size={14} color={colors.accent} />
             <Text style={styles.pcBenefitsTitle}>{t('product.whyCombineTheseProducts')}</Text>
           </View>
           <View style={styles.pcBenefitsList}>

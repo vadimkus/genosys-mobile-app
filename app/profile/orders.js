@@ -361,7 +361,7 @@ function OrdersScreen() {
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} progressViewOffset={headerHeight} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} progressViewOffset={headerHeight} />}
       >
         {loading ? (
           <OrdersSkeleton />
@@ -493,7 +493,7 @@ function OrdersScreen() {
                   {/* GENOSYS Rewards — points earned by this order */}
                   {Number(o?.loyaltyPointsEarned) > 0 ? (
                     <View style={[styles.pointsEarnedRow, isRTL && styles.rowRTL]}>
-                      <Ionicons name="ribbon-outline" size={13} color={colors.brand} />
+                      <Ionicons name="ribbon-outline" size={13} color={colors.accent} />
                       <Text style={[styles.pointsEarnedText, isRTL && styles.textRTLRight]}>
                         {t('rewards.orderEarned', { points: Number(o.loyaltyPointsEarned).toLocaleString() })}
                       </Text>
@@ -704,7 +704,7 @@ function OrdersScreen() {
                   {/* Primary / tertiary actions */}
                   {showPay ? (
                     <TouchableOpacity
-                      style={[styles.payButton, shadow.cta(colors.brand), isRTL && styles.buttonRTL, isPaying && styles.buttonDisabled]}
+                      style={[styles.payButton, shadow.cta(colors.cta), isRTL && styles.buttonRTL, isPaying && styles.buttonDisabled]}
                       onPress={() => handlePay(o)}
                       disabled={isPaying}
                       activeOpacity={0.85}
@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
   emptyText: { ...T.label, fontWeight: '400', color: colors.secondaryLabel, textAlign: 'center', lineHeight: 20 },
   shopButton: {
     marginTop: 18,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 14,
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
   metaText: { ...T.captionSmall, color: colors.secondaryLabel, flexShrink: 1 },
   metaRightCol: { alignItems: 'flex-end' },
   metaRightColRTL: { alignItems: 'flex-start' },
-  totalText: { ...T.priceSmall, color: colors.brand },
+  totalText: { ...T.priceSmall, color: colors.accent },
   itemsText: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 2 },
 
   // Quiet actions
@@ -865,7 +865,7 @@ const styles = StyleSheet.create({
   orderSummaryItemRow: { marginBottom: 6 },
   orderSummaryLineMuted: { ...T.captionSmall, color: colors.mutedText, lineHeight: 18 },
   orderSummaryPriceStrike: { textDecorationLine: 'line-through', color: colors.placeholder, fontWeight: '700' },
-  orderSummaryPriceFinal: { color: colors.brand, fontWeight: '800' },
+  orderSummaryPriceFinal: { color: colors.accent, fontWeight: '800' },
   orderSummaryDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginTop: 10, marginBottom: 6 },
   orderSummaryDividerLight: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separatorStrong, marginVertical: 4 },
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
@@ -894,7 +894,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   freeShippingText: { fontSize: 10, color: colors.greenDeep, fontWeight: '600' },
-  vatNoteRed: { fontSize: 10, color: colors.brand, paddingVertical: 1 },
+  vatNoteRed: { fontSize: 10, color: colors.accent, paddingVertical: 1 },
   youSavedBanner: {
     backgroundColor: '#F0FDF4',
     borderRadius: 8,
@@ -914,7 +914,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.cta,
     paddingVertical: 13,
     borderRadius: 14,
   },

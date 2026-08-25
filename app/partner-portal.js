@@ -395,7 +395,7 @@ export default function PartnerPortalScreen() {
   if (!profileAccessChecked) {
     return (
       <View style={[styles.center, { paddingTop: insets.top }]}>
-        <ActivityIndicator color={colors.brand} />
+        <ActivityIndicator color={colors.accent} />
         <Text style={styles.guardText}>
           {tr('Verifying partner access…', 'Проверяем доступ партнёра…', 'جارٍ التحقق من صلاحية الشريك…')}
         </Text>
@@ -769,7 +769,7 @@ export default function PartnerPortalScreen() {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={colors.brand} />
+          <ActivityIndicator color={colors.accent} />
         </View>
       ) : (
         <FlatList
@@ -853,7 +853,7 @@ export default function PartnerPortalScreen() {
                               </View>
                             </View>
                             <TouchableOpacity style={styles.reorderBtn} onPress={() => reorderFrom(o)}>
-                              <Ionicons name="refresh" size={14} color={colors.brand} />
+                              <Ionicons name="refresh" size={14} color={colors.accent} />
                               <Text style={styles.reorderBtnText}>{tr('Reorder', 'Повторить', 'إعادة')}</Text>
                             </TouchableOpacity>
                           </TouchableOpacity>
@@ -1051,8 +1051,8 @@ const styles = StyleSheet.create({
   headerBack: { width: 40 },
   headerBrand: { color: colors.white, fontSize: 16, fontWeight: '900', letterSpacing: 3 },
   headerLogo: { width: 118, height: 34 },
-  headerLabel: { color: colors.brand, fontSize: 9, fontWeight: '700', letterSpacing: 3, marginTop: 1 },
-  offPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, minWidth: 40, alignItems: 'center' },
+  headerLabel: { color: colors.accent, fontSize: 9, fontWeight: '700', letterSpacing: 3, marginTop: 1 },
+  offPill: { backgroundColor: colors.cta, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5, minWidth: 40, alignItems: 'center' },
   offPillText: { color: colors.white, fontSize: 12, fontWeight: '800' },
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 14 },
   searchInput: { flex: 1, color: colors.white, fontSize: 15, padding: 0 },
@@ -1067,9 +1067,9 @@ const styles = StyleSheet.create({
   sizeLabel: { fontSize: 13, fontWeight: '700', color: colors.label },
   sizeCountBadge: { backgroundColor: colors.groupedBg, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   sizeCountBadgeText: { color: colors.secondaryLabel, fontSize: 10, fontWeight: '700' },
-  qtyPill: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
+  qtyPill: { backgroundColor: colors.cta, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   qtyPillText: { color: colors.white, fontSize: 13, fontWeight: '800' },
-  rowActive: { borderColor: colors.brand },
+  rowActive: { borderColor: colors.accent },
   rowSoldOut: { opacity: 0.6 },
   rowRTL: { flexDirection: 'row-reverse' },
   rtlText: { textAlign: 'right', writingDirection: 'rtl' },
@@ -1082,18 +1082,18 @@ const styles = StyleSheet.create({
   rowInfo: { flex: 1, marginHorizontal: 12 },
   rowName: { fontSize: 14, fontWeight: '600', color: colors.label, lineHeight: 18 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  rowPrice: { fontSize: 14, fontWeight: '800', color: colors.brand },
+  rowPrice: { fontSize: 14, fontWeight: '800', color: colors.accent },
   rowRetail: { fontSize: 12, color: colors.secondaryLabel, textDecorationLine: 'line-through' },
   offBadge: { backgroundColor: '#E9F9EF', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   offBadgeText: { color: '#0F7B3E', fontSize: 10, fontWeight: '800' },
   // Stepper / add
   addBtn: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
-  addBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
+  addBtnText: { color: colors.accent, fontSize: 13, fontWeight: '700' },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stepBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.groupedBg, alignItems: 'center', justifyContent: 'center' },
   stepBtnSmall: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.separator, alignItems: 'center', justifyContent: 'center' },
   addBtnSmall: { backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  stepBtnAdd: { backgroundColor: colors.brand, borderColor: colors.brand },
+  stepBtnAdd: { backgroundColor: colors.cta, borderColor: colors.accent },
   stepQty: { minWidth: 20, textAlign: 'center', fontSize: 15, fontWeight: '800', color: colors.label },
   // Notes
   notesWrap: { marginTop: 8 },
@@ -1115,7 +1115,7 @@ const styles = StyleSheet.create({
   reorderItemMeta: { fontSize: 11, color: colors.secondaryLabel, marginTop: 1 },
   reorderItemPrice: { fontSize: 12.5, fontWeight: '700', color: colors.label },
   reorderBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#FCE8E8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  reorderBtnText: { color: colors.brand, fontSize: 13, fontWeight: '700' },
+  reorderBtnText: { color: colors.accent, fontSize: 13, fontWeight: '700' },
   reorderHint: { fontSize: 12, color: colors.secondaryLabel, marginTop: 4, marginBottom: 2 },
   // Footer
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.separator, paddingHorizontal: 16, paddingTop: 10 },
@@ -1135,17 +1135,17 @@ const styles = StyleSheet.create({
   footerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   footerCount: { fontSize: 12, color: colors.secondaryLabel },
   footerTotal: { fontSize: 18, fontWeight: '800', color: colors.label },
-  submitBtn: { flex: 1, backgroundColor: colors.brand, borderRadius: 14, paddingVertical: 15, alignItems: 'center', justifyContent: 'center' },
+  submitBtn: { flex: 1, backgroundColor: colors.cta, borderRadius: 14, paddingVertical: 15, alignItems: 'center', justifyContent: 'center' },
   submitText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   // Guard / success
   guardTitle: { fontSize: 18, fontWeight: '700', color: colors.label, marginTop: 16 },
   guardText: { fontSize: 14, color: colors.secondaryLabel, textAlign: 'center', marginTop: 8, lineHeight: 20 },
-  guardBtn: { marginTop: 20, backgroundColor: colors.brand, borderRadius: 14, paddingHorizontal: 28, paddingVertical: 13 },
+  guardBtn: { marginTop: 20, backgroundColor: colors.cta, borderRadius: 14, paddingHorizontal: 28, paddingVertical: 13 },
   guardBtnText: { color: colors.white, fontSize: 15, fontWeight: '700' },
   linkText: { color: colors.secondaryLabel, fontSize: 14 },
   successIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.green, alignItems: 'center', justifyContent: 'center' },
   successOrder: { fontSize: 15, fontWeight: '700', color: colors.label, marginTop: 8 },
-  successTotal: { fontSize: 20, fontWeight: '800', color: colors.brand, marginTop: 4, marginBottom: 4 },
+  successTotal: { fontSize: 20, fontWeight: '800', color: colors.accent, marginTop: 4, marginBottom: 4 },
   // Consignment chips
   consignPill: { backgroundColor: '#FEF3C7', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, marginTop: 4 },
   consignPillText: { color: '#92400E', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
@@ -1163,7 +1163,7 @@ const styles = StyleSheet.create({
   agreeTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.6 },
   agreeDesc: { fontSize: 10.5, color: colors.placeholder, marginTop: 2, lineHeight: 15 },
   homecareShortcut: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginTop: 12 },
-  homecareShortcutIcon: { width: 32, height: 32, borderRadius: 9, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  homecareShortcutIcon: { width: 32, height: 32, borderRadius: 9, backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center' },
   homecareShortcutTitle: { color: colors.white, fontSize: 12.5, fontWeight: '800' },
   homecareShortcutText: { color: colors.placeholder, fontSize: 10.5, marginTop: 1 },
   // Category section headers
@@ -1173,7 +1173,7 @@ const styles = StyleSheet.create({
   groupLabel: { fontSize: 14, fontWeight: '800', color: colors.label },
   groupCount: { backgroundColor: colors.groupedBg, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
   groupCountText: { fontSize: 10, fontWeight: '700', color: colors.secondaryLabel },
-  groupSelected: { backgroundColor: colors.brand, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  groupSelected: { backgroundColor: colors.cta, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
   groupSelectedText: { fontSize: 10, fontWeight: '800', color: colors.white },
   // Professional / equipment badges
   proBadge: { backgroundColor: '#2563EB', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 1.5 },
