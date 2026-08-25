@@ -59,18 +59,11 @@ export function shouldHideHeader({ y, lastY, headerHeight, isHidden }) {
 }
 
 /**
- * Hook that wires an Animated scroll value + the padding the content needs.
- *
- * `hideDistance` is for screens that bring their own header rather than this
- * one — the shop's is taller, with a logo and a subtitle — so they can share the
- * behaviour without inheriting this bar's dimensions.
+ * The hide-on-scroll movement on its own, for a screen that already owns its
+ * scroll handler and wants only the behaviour. Feed it the offset from wherever
+ * that handler already reads it; it hands back the transform for the bar.
  */
-export function useCollapsibleHeader({ hideOnScroll = false, hideDistance } = {}) {
-  const insets = useSafeAreaInsets();
-  const scrollY = React.useRef(new Animated.Value(0)).current;
-  const barHeight = HEADER_BAR_HEIGHT + HEADER_GAP + insets.top;
-  const headerHeight = hideDistance ?? barHeight;
-
+export function useHideOnScroll(distance) {
   const hidden = React.useRef(new Animated.Value(0)).current;
   const isHidden = React.useRef(false);
   const lastY = React.useRef(0);
@@ -89,34 +82,50 @@ export function useCollapsibleHeader({ hideOnScroll = false, hideDistance } = {}
     [hidden]
   );
 
-  const revealHeader = React.useCallback(() => setHidden(false), [setHidden]);
+  const handleScroll = React.useCallback(
+    (y) => {
+      const next = shouldHideHeader({
+        y,
+        lastY: lastY.current,
+        headerHeight: distance,
+        isHidden: isHidden.current,
+      });
+      lastY.current = y;
+      setHidden(next);
+    },
+    [distance, setHidden]
+  );
+
+  const translateY = React.useMemo(
+    () => hidden.interpolate({ inputRange: [0, 1], outputRange: [0, -distance] }),
+    [hidden, distance]
+  );
+
+  const reveal = React.useCallback(() => setHidden(false), [setHidden]);
+
+  return { translateY, handleScroll, reveal };
+}
+
+/**
+ * Hook that wires an Animated scroll value + the padding the content needs.
+ *
+ * `hideDistance` is for screens that bring their own header rather than this
+ * one — the shop's is taller, with a logo and a subtitle — so they can share the
+ * behaviour without inheriting this bar's dimensions.
+ */
+export function useCollapsibleHeader({ hideOnScroll = false, hideDistance } = {}) {
+  const insets = useSafeAreaInsets();
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const barHeight = HEADER_BAR_HEIGHT + HEADER_GAP + insets.top;
+  const { translateY, handleScroll, reveal } = useHideOnScroll(hideDistance ?? barHeight);
 
   const onScroll = React.useMemo(() => {
     const config = { useNativeDriver: true };
     if (hideOnScroll) {
-      config.listener = (event) => {
-        const y = event.nativeEvent.contentOffset.y;
-        const next = shouldHideHeader({
-          y,
-          lastY: lastY.current,
-          headerHeight,
-          isHidden: isHidden.current,
-        });
-        lastY.current = y;
-        setHidden(next);
-      };
+      config.listener = (event) => handleScroll(event.nativeEvent.contentOffset.y);
     }
     return Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], config);
-  }, [scrollY, hideOnScroll, headerHeight, setHidden]);
-
-  const headerTranslate = React.useMemo(
-    () =>
-      hidden.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -headerHeight],
-      }),
-    [hidden, headerHeight]
-  );
+  }, [scrollY, hideOnScroll, handleScroll]);
 
   return {
     scrollY,
@@ -125,8 +134,8 @@ export function useCollapsibleHeader({ hideOnScroll = false, hideDistance } = {}
     // header already know theirs and only borrowed the behaviour.
     headerHeight: barHeight,
     insets,
-    translateY: hideOnScroll ? headerTranslate : undefined,
-    revealHeader,
+    translateY: hideOnScroll ? translateY : undefined,
+    revealHeader: reveal,
   };
 }
 

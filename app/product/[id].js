@@ -18,7 +18,7 @@ import {
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { setAudioModeAsync } from 'expo-audio';
 import { Image } from 'expo-image';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -67,16 +67,18 @@ import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 import SectionHeader from '../../components/SectionHeader';
+import { useHideOnScroll } from '../../components/CollapsibleHeader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Square hero stage, as on the website. The studio packshots are square, so a
 // fixed 320 left roughly a quarter of the screen width as empty margin beside
 // every product photo on the one screen where the photo has to sell.
 const HEADER_HEIGHT = SCREEN_WIDTH;
-// The compact header takes over as the hero leaves: the previous thresholds
-// were absolute pixels tuned to a 320 hero, and would now fire while a third
-// of the image was still on screen.
-const MINI_HEADER_FADE_IN = [HEADER_HEIGHT - 120, HEADER_HEIGHT - 40];
+// The product name joins the bar as the gallery leaves the screen. Tied to the
+// hero's height rather than fixed pixels, so it tracks the square stage on any
+// handset.
+const HEADER_PILL_HEIGHT = 48;
+const TITLE_FADE_IN = [HEADER_HEIGHT - 120, HEADER_HEIGHT - 40];
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -321,6 +323,14 @@ const getPdpCopy = (locale) => {
 /** iOS Settings–style filled glyph tile + bold section title (matches order details). */
 function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
+  // The pill floats clear of the status bar, and absolute insets ignore the
+  // SafeAreaView's padding, so it has to account for that itself — and travel
+  // far enough to take the status bar strip with it when it goes.
+  const headerTop = insets.top + 8;
+  const { translateY: headerTranslateY, handleScroll: onHeaderScroll } = useHideOnScroll(
+    headerTop + HEADER_PILL_HEIGHT + 8
+  );
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { t, locale, dir } = useLocalization();
@@ -332,7 +342,6 @@ function ProductDetailScreen() {
   const [selectedColor, setSelectedColor] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [reviewAggregate, setReviewAggregate] = useState(null); // { averageRating, reviewCount }
-  const [condensedHeader, setCondensedHeader] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -364,7 +373,6 @@ function ProductDetailScreen() {
   const contentFade = useRef(new Animated.Value(0)).current;
   const contentLift = useRef(new Animated.Value(12)).current;
 
-  const condensedHeaderRef = useRef(false);
 
   // Re-fetch when the auth token changes too (M4): logging in while the PDP
   // is mounted must replace guest pricing with the user's server pricing.
@@ -1069,8 +1077,14 @@ function ProductDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed header bar (not overlapping image) */}
-      <View style={styles.headerBar}>
+      {/* One floating bar, the same object as on every other screen: it sits
+          over the gallery, steps aside on the way down and comes back on the
+          way up. The product name joins it once the gallery is gone, so there
+          is still an answer to "what am I looking at" further down the page. */}
+      <Animated.View
+        style={[styles.headerBar, { top: headerTop, transform: [{ translateY: headerTranslateY }] }]}
+        pointerEvents="box-none"
+      >
         <View style={[styles.headerButtons, isRTL && styles.headerButtonsRTL]}>
           <TouchableOpacity
             style={styles.headerButton}
@@ -1083,6 +1097,17 @@ function ProductDetailScreen() {
           >
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={20} color={colors.label} />
           </TouchableOpacity>
+
+          <Animated.Text
+            style={[
+              styles.headerTitle,
+              isRTL && styles.textRTL,
+              { opacity: scrollY.interpolate({ inputRange: TITLE_FADE_IN, outputRange: [0, 1], extrapolate: 'clamp' }) },
+            ]}
+            numberOfLines={1}
+          >
+            {asText(getLocalizedProductName(product, locale) || product.name)}
+          </Animated.Text>
 
           <View style={[styles.headerRightButtons, isRTL && styles.headerRightButtonsRTL]}>
             {/* This screen already refetches on `locale`, so English and Russian
@@ -1114,76 +1139,7 @@ function ProductDetailScreen() {
           </View>
         </View>
 
-        {/* Sticky mini header – fades in once the hero image scrolls out of view.
-            Shows the product name, selected-unit price and a compact bag button so
-            the user can add to bag without scrolling back up. */}
-        <Animated.View
-          pointerEvents={condensedHeader ? 'auto' : 'none'}
-          style={[
-            styles.miniHeaderOverlay,
-            {
-              opacity: scrollY.interpolate({
-                inputRange: MINI_HEADER_FADE_IN,
-                outputRange: [0, 1],
-                extrapolate: 'clamp',
-              }),
-              transform: [
-                {
-                  translateY: scrollY.interpolate({
-                    inputRange: MINI_HEADER_FADE_IN,
-                    outputRange: [-8, 0],
-                    extrapolate: 'clamp',
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          <View style={[styles.miniHeaderRow, isRTL && styles.miniHeaderRowRTL]}>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => {
-                haptics.lightTap();
-                router.back();
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.back')}
-            >
-              <Ionicons
-                name={isRTL ? 'chevron-forward' : 'chevron-back'}
-                size={20}
-                color={colors.label}
-              />
-            </TouchableOpacity>
-            <View style={styles.miniHeaderTextWrap}>
-              <Text
-                style={[styles.miniHeaderName, isRTL && styles.textRTL]}
-                numberOfLines={1}
-              >
-                {asText(getLocalizedProductName(product, locale) || product.name)}
-              </Text>
-              {(priceView.kind === 'single' || priceView.kind === 'discounted') && priceView.price ? (
-                <Text style={[styles.miniHeaderPrice, isRTL && styles.textRTL]} numberOfLines={1}>
-                  {formatAed(priceView.price)}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={handleAddToBag}
-              style={styles.miniHeaderBagButton}
-              accessibilityRole="button"
-              accessibilityLabel={t('product.addToBag')}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name={isInCart(product.id, selectedColor, selectedSize) ? 'checkmark' : 'bag'}
-                size={16}
-                color={colors.white}
-              />
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </View>
+      </Animated.View>
 
       {/* Product Content */}
       <Animated.ScrollView
@@ -1195,14 +1151,7 @@ function ProductDetailScreen() {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           {
             useNativeDriver: true,
-            listener: (e) => {
-              const y = e.nativeEvent.contentOffset.y;
-              const shouldCondense = y > MINI_HEADER_FADE_IN[0];
-              if (shouldCondense !== condensedHeaderRef.current) {
-                condensedHeaderRef.current = shouldCondense;
-                setCondensedHeader(shouldCondense);
-              }
-            },
+            listener: (e) => onHeaderScroll(e.nativeEvent.contentOffset.y),
           }
         )}
       >
@@ -1852,52 +1801,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // The same floating pill the rest of the app uses: inset, rounded, on its own
+  // hairline and shadow, with the gallery passing underneath it.
   headerBar: {
-    backgroundColor: colors.card,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.separator,
-  },
-  miniHeaderOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.card,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    position: 'absolute',
+    start: 12,
+    end: 12,
+    zIndex: 20,
+    height: HEADER_PILL_HEIGHT,
+    paddingHorizontal: 6,
     justifyContent: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 24,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.separator,
+    ...shadow.card,
   },
-  miniHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-  },
-  miniHeaderRowRTL: {
-    flexDirection: 'row-reverse',
-  },
-  miniHeaderTextWrap: {
-    flex: 1,
-    paddingHorizontal: 8,
-    justifyContent: 'center',
-  },
-  miniHeaderName: {
-    fontSize: 14,
+  headerTitle: {
+    ...T.labelSmall,
     fontWeight: '700',
     color: colors.label,
-    letterSpacing: -0.1,
-  },
-  miniHeaderPrice: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.secondaryLabel,
-    marginTop: 1,
-  },
-  miniHeaderBagButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.cta,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
+    textAlign: 'center',
+    paddingHorizontal: 8,
   },
   headerButtons: {
     flexDirection: 'row',
@@ -1921,14 +1847,8 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: colors.shadowCast,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   scrollView: {
     flex: 1,
