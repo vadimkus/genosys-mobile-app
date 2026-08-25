@@ -36,6 +36,7 @@ import * as haptics from '../utils/haptics';
 import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { ASSET_ORIGIN } from '../utils/assets';
+import { buildQuickActionRows } from '../utils/chatQuickActions';
 
 
 /** Get user context for personalised greetings (mirrors web getUserContext) */
@@ -112,27 +113,8 @@ export default function ChatScreen() {
   }, [messages, loading]);
 
   /* ─── Quick-action definitions (same 10 as mobile web, arranged in rows of 3-3-2-2) ─── */
-  const QUICK_ACTIONS_ROW1 = useMemo(() => [
-    { label: t('chat.quickDrySkin'), query: t('chat.quickDrySkinQuery'), emoji: '💧' },
-    { label: t('chat.quickOilySkin'), query: t('chat.quickOilySkinQuery'), emoji: '🧴' },
-    { label: t('chat.quickAntiAging'), query: t('chat.quickAntiAgingQuery'), emoji: '✨' },
-  ], [t]);
-
-  const QUICK_ACTIONS_ROW2 = useMemo(() => [
-    { label: t('chat.quickGlassSkin'), query: t('chat.quickGlassSkinQuery'), emoji: '🪞' },
-    { label: t('chat.quickAcne'), query: t('chat.quickAcneQuery'), emoji: '🌿' },
-    { label: t('chat.quickRoutine'), query: t('chat.quickRoutineQuery'), emoji: '📋' },
-  ], [t]);
-
-  const QUICK_ACTIONS_ROW3 = useMemo(() => [
-    { label: t('chat.quickWhyGenosys'), query: t('chat.quickWhyGenosysQuery'), emoji: '🏆' },
-    { label: t('chat.quickSun'), query: t('chat.quickSunQuery'), emoji: '☀️' },
-  ], [t]);
-
-  const QUICK_ACTIONS_ROW4 = useMemo(() => [
-    { label: t('chat.quickDiscount'), query: t('chat.quickDiscountQuery'), emoji: '🎁', highlight: true },
-    { label: t('chat.quickAiSkin'), query: t('chat.quickAiSkinQuery'), emoji: '📸', highlight: true },
-  ], [t]);
+  const [QUICK_ACTIONS_ROW1, QUICK_ACTIONS_ROW2, QUICK_ACTIONS_ROW3, QUICK_ACTIONS_ROW4] =
+    useMemo(() => buildQuickActionRows(t), [t]);
 
   /* ─── Chat API ─── */
   const handleSend = async (overrideText) => {

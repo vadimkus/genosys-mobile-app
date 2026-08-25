@@ -38,6 +38,7 @@ import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { colors } from '../utils/theme';
 import { ASSET_ORIGIN } from '../utils/assets';
+import { buildQuickActionRows } from '../utils/chatQuickActions';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PANEL_HEIGHT = Math.round(SCREEN_HEIGHT * 0.82);
@@ -112,24 +113,8 @@ export default function ChatButton({ visible = true }) {
   if (!visible) return null;
 
   /* ─── Quick-action definitions (3-3-2-2 layout) ─── */
-  const QUICK_ACTIONS_ROW1 = [
-    { label: t('chat.quickDrySkin'), query: t('chat.quickDrySkinQuery'), emoji: '💧' },
-    { label: t('chat.quickOilySkin'), query: t('chat.quickOilySkinQuery'), emoji: '🧴' },
-    { label: t('chat.quickAntiAging'), query: t('chat.quickAntiAgingQuery'), emoji: '✨' },
-  ];
-  const QUICK_ACTIONS_ROW2 = [
-    { label: t('chat.quickGlassSkin'), query: t('chat.quickGlassSkinQuery'), emoji: '🪞' },
-    { label: t('chat.quickAcne'), query: t('chat.quickAcneQuery'), emoji: '🌿' },
-    { label: t('chat.quickRoutine'), query: t('chat.quickRoutineQuery'), emoji: '📋' },
-  ];
-  const QUICK_ACTIONS_ROW3 = [
-    { label: t('chat.quickWhyGenosys'), query: t('chat.quickWhyGenosysQuery'), emoji: '🏆' },
-    { label: t('chat.quickSun'), query: t('chat.quickSunQuery'), emoji: '☀️' },
-  ];
-  const QUICK_ACTIONS_ROW4 = [
-    { label: t('chat.quickDiscount'), query: t('chat.quickDiscountQuery'), emoji: '🎁', highlight: true },
-    { label: t('chat.quickAiSkin'), query: t('chat.quickAiSkinQuery'), emoji: '📸', highlight: true },
-  ];
+  const [QUICK_ACTIONS_ROW1, QUICK_ACTIONS_ROW2, QUICK_ACTIONS_ROW3, QUICK_ACTIONS_ROW4] =
+    useMemo(() => buildQuickActionRows(t), [t]);
 
   /* ─── Chat API ─── */
   const handleSend = async (overrideText) => {

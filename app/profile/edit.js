@@ -28,6 +28,7 @@ import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import SectionCard from '../../components/SectionCard';
+import SectionHeader from '../../components/SectionHeader';
 
 const log = createLogger('EditProfile');
 
@@ -735,12 +736,13 @@ export default function EditProfileScreen() {
 
         {/* Danger Zone */}
         <View style={[styles.dangerZone, shadow.card]}>
-          <View style={[styles.sectionHeaderRow, isRTL && styles.sectionHeaderRowRTL]}>
-            <View style={[surfaces.iconTile, { backgroundColor: colors.red }]}>
-              <Ionicons name="warning-outline" size={17} color={colors.white} />
-            </View>
-            <Text style={[styles.dangerTitle, isRTL && styles.textRTL]}>{t('editProfile.dangerZoneTitle')}</Text>
-          </View>
+          <SectionHeader
+            icon="warning-outline"
+            title={t('editProfile.dangerZoneTitle')}
+            tileColor={colors.red}
+            isRTL={isRTL}
+            style={styles.dangerHeader}
+          />
           <TouchableOpacity
             style={[styles.deleteAccountButton, shadow.cta(colors.cta), isSaving && styles.deleteAccountButtonDisabled]}
             onPress={handleDeleteAccount}
@@ -904,6 +906,7 @@ const CAT_AVATARS = [
 ];
 
 const styles = StyleSheet.create({
+  dangerHeader: { marginBottom: 12 },
   container: {
     flex: 1,
     backgroundColor: colors.groupedBg,
@@ -953,15 +956,6 @@ const styles = StyleSheet.create({
   },
 
   // Sections (soft cards)
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 12,
-  },
-  sectionHeaderRowRTL: {
-    flexDirection: 'row-reverse',
-  },
   textRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
@@ -1098,12 +1092,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 14,
     padding: 16,
-  },
-  dangerTitle: {
-    ...T.body,
-    fontWeight: '700',
-    lineHeight: undefined,
-    color: colors.label,
   },
   deleteAccountButton: {
     backgroundColor: colors.cta,

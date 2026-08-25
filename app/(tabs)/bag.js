@@ -31,6 +31,7 @@ import T from '../../utils/typography';
 import { colors, shadow, surfaces } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 import { EMPTY_UNI_IMAGE } from '../../utils/assets';
+import SectionHeader from '../../components/SectionHeader';
 
 function BagScreen() {
   const { user } = useAuth();
@@ -623,14 +624,14 @@ function BagScreen() {
           <>
             {/* Free Mask Promotion (Progress UI) */}
             <View style={[styles.sectionCard, isRTL && styles.sectionCardRTL]}>
-              <View style={[styles.sectionTitleRow, isRTL && styles.sectionTitleRowRTL]}>
-                <View style={[styles.sectionTitleLeft, isRTL && styles.sectionTitleLeftRTL]}>
-                  <View style={[surfaces.iconTile, { backgroundColor: colors.cta }]}>
-                    <Ionicons name="gift" size={16} color={colors.white} />
-                  </View>
-                  <Text style={[styles.sectionTitle, isRTL && styles.sectionTitleRTL]}>{t('bag.freeMaskPromotion')}</Text>
-                </View>
-              </View>
+              <SectionHeader
+                icon="gift"
+                title={t('bag.freeMaskPromotion')}
+                tileColor={colors.cta}
+                isRTL={isRTL}
+                style={styles.bagSectionHeader}
+                titleStyle={styles.bagSectionHeaderTitle}
+              />
 
               <ProgressCard
                 leftText={t('bag.promoSpendAed', { amount: 500 })}
@@ -668,12 +669,12 @@ function BagScreen() {
             <View style={styles.sectionCard}>
               <ProgressCard
                 headerLeft={
-                  <View style={styles.sectionTitleLeft}>
-                    <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-                      <Ionicons name="car" size={16} color={colors.white} />
-                    </View>
-                    <Text style={styles.sectionTitle}>{t('bag.freeDeliveryTitle')}</Text>
-                  </View>
+                  <SectionHeader
+                    icon="car"
+                    title={t('bag.freeDeliveryTitle')}
+                    style={styles.bagSectionHeaderInline}
+                    titleStyle={styles.bagSectionHeaderTitle}
+                  />
                 }
                 headerRight={
                   cartSummary.hasFreeShipping ? (
@@ -876,6 +877,11 @@ function BagScreen() {
 }
 
 const styles = StyleSheet.create({
+  // The bag's section titles are a touch tighter than the shared default and
+  // sit next to a progress figure, so the row has to be able to shrink.
+  bagSectionHeader: { marginBottom: 12 },
+  bagSectionHeaderInline: { marginBottom: 0, flex: 1, minWidth: 0 },
+  bagSectionHeaderTitle: { letterSpacing: -0.2 },
   // GENOSYS Rewards earn hints
   earnPointsRow: {
     flexDirection: 'row',
@@ -952,26 +958,6 @@ const styles = StyleSheet.create({
     ...shadow.card,
     padding: 14,
     marginBottom: 16,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    marginBottom: 12,
-  },
-  sectionTitleLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    flex: 1,
-    minWidth: 0,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-    color: colors.label,
   },
   progressCard: {
     marginBottom: 12,
@@ -1505,18 +1491,6 @@ const styles = StyleSheet.create({
   sectionCardRTL: {
     // Important: keep children stretched full-width; use per-row RTL styles instead.
     alignItems: 'stretch',
-  },
-  sectionTitleRowRTL: {
-    flexDirection: 'row-reverse',
-  },
-  sectionTitleLeftRTL: {
-    flexDirection: 'row-reverse',
-  },
-  sectionTitleRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    marginLeft: 0,
-    marginRight: 8,
   },
   // Empty state RTL
   emptyTitleRTL: {

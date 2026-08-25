@@ -5,6 +5,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { PAYMENT_METHODS } from '../../services/paymentPreferences';
 import { colors, surfaces } from '../../utils/theme';
 import T from '../../utils/typography';
+import SectionHeader from '../SectionHeader';
 
 /**
  * PaymentMethodSelector
@@ -50,12 +51,7 @@ export default function PaymentMethodSelector({
 
   return (
     <View style={styles.section}>
-      <View style={[styles.sectionHeader, isRTL && styles.sectionHeaderRTL]}>
-        <View style={[surfaces.iconTile, { backgroundColor: colors.accent }]}>
-          <Ionicons name="card" size={17} color={colors.white} />
-        </View>
-        <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>{t('checkout.paymentMethod')}</Text>
-      </View>
+      <SectionHeader icon="card" title={t('checkout.paymentMethod')} isRTL={isRTL} />
 
       <Text style={[styles.paymentHint, isRTL && styles.textRTL]}>
         {t('checkout.defaultPaymentMethod')}:{' '}
