@@ -41,10 +41,11 @@
     "smoke:product-options": "tsx scripts/smoke-product-options.js",
     "verify:splash": "node scripts/verify-splash-sync.js",
     "verify:homecare-links": "node scripts/verify-homecare-links.js",
-    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation",
+    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation && npm run verify:tokens",
     "smoke:bespoke-content": "node scripts/smoke-bespoke-content.js",
     "smoke:header-hide": "node scripts/smoke-header-hide.js",
-    "smoke:auth-validation": "tsx scripts/smoke-auth-validation.js"
+    "smoke:auth-validation": "tsx scripts/smoke-auth-validation.js",
+    "verify:tokens": "node scripts/verify-design-tokens.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

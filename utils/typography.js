@@ -73,10 +73,14 @@ export const T = {
   // The small uppercase label the site sets above headings ("BLOG",
   // "CLEANSER", "LATEST ARTICLE"). Sans, not serif, on the site too. Rose
   // rather than red: the interface has no red left in it.
+  // Matches `.cera-eyebrow` on the website: 12px, 600, 0.16em tracking.
+  // Tracking is em-based on the web, so it is resolved here against the font
+  // size (12 * 0.16 = 1.92) to keep the two identical. Source of truth is
+  // design-tokens.json; `npm run verify:tokens` fails if they diverge.
   eyebrow: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 1.92,
     textTransform: 'uppercase',
     color: colors.accent,
   },
