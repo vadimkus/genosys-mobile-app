@@ -90,6 +90,21 @@ export async function savePushTokenToBackend(authToken, expoPushToken) {
   });
 }
 
+/**
+ * Hand over an ActivityKit token so the server can drive the Lock Screen card.
+ *
+ * Not the Expo push token above. `push-to-start` is app-wide and raises a card while the
+ * app is not running; `activity` updates the card raised for one order, and needs that
+ * order's number.
+ */
+export async function saveLiveActivityToken(authToken, { kind, token, orderNumber }) {
+  return await apiRequest('/user/live-activity-token', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${authToken}` },
+    body: JSON.stringify({ kind, token, orderNumber }),
+  });
+}
+
 export async function clearPushTokenOnBackend(authToken) {
   return await apiRequest('/user/push-token', {
     method: 'DELETE',

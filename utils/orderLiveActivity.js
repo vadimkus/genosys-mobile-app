@@ -45,7 +45,7 @@ function load() {
   }
 }
 
-export async function syncOrderActivity(orders, t) {
+export async function syncOrderActivity(orders, t, send) {
   if (!available()) return;
   const OrderActivity = load();
   if (!OrderActivity) return;
@@ -73,6 +73,9 @@ export async function syncOrderActivity(orders, t) {
     activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
     activityOrderId = id;
     log.debug('Started Live Activity for order', id);
+    // Not awaited: the card is already up, and the server only needs this to carry on
+    // updating it later.
+    reportActivityToken(activity, state.orderNumber, send);
   } catch (e) {
     // A card that fails to appear must never take the orders screen with it.
     log.warn('Could not sync Live Activity:', e?.message);
@@ -130,6 +133,20 @@ export function registerTokens(send) {
   }
 
   return () => subs.forEach((s) => s?.remove?.());
+}
+
+/**
+ * Hand the server the token for the card we just raised, so it can keep updating it after
+ * the app is gone. Called once per activity, from `syncOrderActivity`.
+ */
+async function reportActivityToken(instance, orderNumber, send) {
+  if (!send || !instance?.getPushToken) return;
+  try {
+    const token = await instance.getPushToken();
+    if (token) await send({ kind: 'activity', token, orderNumber });
+  } catch (e) {
+    log.debug('No activity token to report:', e?.message);
+  }
 }
 
 export default { syncOrderActivity, registerTokens };

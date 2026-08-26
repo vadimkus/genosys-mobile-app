@@ -35,7 +35,8 @@ import { loginWithGoogleDirect } from '../services/googleAuthService';
 import { createLogger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setOnAuthExpired, refreshToken, persistRefreshedToken } from '../services/authFetch';
-import { clearPushTokenOnBackend, registerForPushNotificationsAsync, savePushTokenToBackend } from '../services/pushNotificationsService';
+import { clearPushTokenOnBackend, registerForPushNotificationsAsync, savePushTokenToBackend, saveLiveActivityToken } from '../services/pushNotificationsService';
+import { registerTokens as registerLiveActivityTokens } from '../utils/orderLiveActivity';
 import { storeUserSession, getUserSession, clearUserSession, sanitizeUserSession } from '../services/secureTokenStorage';
 import { setSentryUser } from '../config/sentry';
 
@@ -101,6 +102,17 @@ export const AuthProvider = ({ children }) => {
       }
     })();
     return () => { cancelled = true; };
+  }, [user?.token]);
+
+  // ActivityKit's push-to-start token, which is a different thing from the device token
+  // above: it is the only one that can raise a Lock Screen order card while the app is
+  // not running. iOS only, and a no-op on builds without the widget extension.
+  useEffect(() => {
+    if (!user?.token) return undefined;
+    const authToken = user.token;
+    return registerLiveActivityTokens((payload) =>
+      saveLiveActivityToken(authToken, payload)
+    );
   }, [user?.token]);
 
   const initializeAuth = async () => {
