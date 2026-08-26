@@ -7,7 +7,6 @@ import {
   Easing,
   TouchableOpacity,
   Alert,
-  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +31,7 @@ import T from '../utils/typography';
 import { colors, tint, shadow, surfaces } from '../utils/theme';
 import AUTH_CONFIG from '../config/auth';
 import { EMPTY_UNI_IMAGE } from '../utils/assets';
+import { openWhatsApp } from '../utils/support';
 
 const log = createLogger('FavoritesScreen');
 
@@ -322,10 +322,8 @@ export default function FavoritesScreen() {
                       style={[styles.requestQuoteButton, isRTL && styles.rowRTL]}
                       onPress={() => {
                         const productName = getLocalizedProductName(product, locale) || product.name || '';
-                        const msg = encodeURIComponent(
-                          t('product.requestQuoteMessage', { name: productName })
-                        );
-                        Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
+                        const msg = t('product.requestQuoteMessage', { name: productName });
+                        openWhatsApp(msg);
                       }}
                       activeOpacity={0.7}
                     >

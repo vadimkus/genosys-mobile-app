@@ -12,7 +12,6 @@ import {
   Animated,
   TouchableOpacity,
   Platform,
-  Linking,
   Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -32,6 +31,7 @@ import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
 import { ASSET_ORIGIN } from '../utils/assets';
+import { openWhatsApp } from '../utils/support';
 
 
 // Map detected concern names to the canonical vocabulary used by product
@@ -252,10 +252,8 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
                         <TouchableOpacity
                           style={styles.recQuoteBtn}
                           onPress={() => {
-                            const msg = encodeURIComponent(
-                              t('product.requestQuoteMessage', { name })
-                            );
-                            Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
+                            const msg = t('product.requestQuoteMessage', { name });
+                            openWhatsApp(msg);
                           }}
                           activeOpacity={0.8}
                         >

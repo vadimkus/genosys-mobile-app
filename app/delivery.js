@@ -11,7 +11,6 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,6 +22,7 @@ import T from '../utils/typography';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { colors, tint, shadow, surfaces } from '../utils/theme';
 import SectionCard from '../components/SectionCard';
+import { openWhatsApp } from '../utils/support';
 
 export default function DeliveryScreen() {
   const router = useRouter();
@@ -197,7 +197,7 @@ export default function DeliveryScreen() {
             </Text>
             <TouchableOpacity
               style={[styles.helpBtn, isRTL && styles.rowRTL]}
-              onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
+              onPress={() => { haptics.mediumTap(); openWhatsApp(); }}
               activeOpacity={0.85}
             >
               <Ionicons name="logo-whatsapp" size={20} color={colors.whatsappDeep} />

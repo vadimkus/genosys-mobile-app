@@ -12,7 +12,6 @@ import {
   Share,
   FlatList,
   ScrollView,
-  Linking,
   findNodeHandle,
 } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
@@ -68,6 +67,7 @@ import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 import SectionHeader from '../../components/SectionHeader';
 import { useHideOnScroll } from '../../components/CollapsibleHeader';
+import { openWhatsApp } from '../../utils/support';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Square hero stage, as on the website. The studio packshots are square, so a
@@ -382,7 +382,14 @@ function ProductDetailScreen() {
   // Re-fetch when the auth token changes too (M4): logging in while the PDP
   // is mounted must replace guest pricing with the user's server pricing.
   useEffect(() => {
-    loadProduct();
+    // Logging in re-runs this while the guest request is still open. Both
+    // resolve into the same setState, and the server answers guest requests
+    // from cache faster than it computes a user's price, so without this flag
+    // the stale guest reply lands last and the member sees retail again —
+    // on a screen with an Add to Bag button under it.
+    const run = { cancelled: false };
+    loadProduct(run);
+    return () => { run.cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, user?.token, locale]);
 
@@ -443,13 +450,15 @@ function ProductDetailScreen() {
 
   const scrollToReviews = useCallback(() => scrollToSection(reviewsWrapperRef), [scrollToSection]);
 
-  const loadProduct = async () => {
+  const loadProduct = async (run = { cancelled: false }) => {
     try {
       log.debug('Loading product', { id: String(id) });
       
       // Use enhanced fetchProductById with user context
       const enhancedProduct = await fetchProductById(id, user, { locale });
-      
+
+      if (run.cancelled) return;
+
       if (enhancedProduct) {
         setProduct(enhancedProduct);
         log.debug('Product loaded', {
@@ -470,8 +479,11 @@ function ProductDetailScreen() {
         }
 
         if (enhancedProduct.colorVariants && enhancedProduct.colorVariants.length > 0) {
-          // Use first available color variant
-          setSelectedColor(enhancedProduct.colorVariants[0].value);
+          // Use first available color variant. Optional-chained because a variant
+          // without `value` would otherwise select undefined, and the stock check
+          // on Add to Bag reads that colour.
+          const firstColor = enhancedProduct.colorVariants[0]?.value;
+          if (firstColor) setSelectedColor(firstColor);
         }
 
         if (user && enhancedProduct.originalPrice && enhancedProduct.originalPrice !== (enhancedProduct.displayPrice || enhancedProduct.price)) {
@@ -488,7 +500,7 @@ function ProductDetailScreen() {
       // lets the user retry via pull-back navigation instead of losing context.
       log.error('Error loading product', error?.message || error);
     } finally {
-      setLoading(false);
+      if (!run.cancelled) setLoading(false);
     }
   };
 
@@ -1686,10 +1698,8 @@ function ProductDetailScreen() {
             style={[styles.requestQuoteBottomButton, isRTL && styles.addToBagButtonRTL]}
             onPress={() => {
               const productName = getLocalizedProductName(product, locale) || product.name || '';
-              const message = encodeURIComponent(
-                (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName)
-              );
-              Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
+              const message = (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', productName);
+              openWhatsApp(message);
             }}
             activeOpacity={0.7}
           >

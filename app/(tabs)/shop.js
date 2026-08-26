@@ -15,7 +15,6 @@ import {
   Pressable,
   I18nManager,
   Animated as RNAnimated,
-  Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -74,6 +73,7 @@ import { tabBarSpace } from '../../utils/tabBar';
 // first frame; onLayout replaces it with the measured height immediately after.
 const ESTIMATED_HEADER_HEIGHT = 96;
 import { withErrorBoundary } from '../../components/ErrorBoundary';
+import { openWhatsApp } from '../../utils/support';
 
 const log = createLogger('Shop');
 
@@ -289,10 +289,8 @@ const ShopGridCard = React.memo(function ShopGridCard({
               style={[styles.requestQuoteButton, isRTL && styles.addToCartButtonRTL]}
               onPress={() => {
                 const productName = getLocalizedProductName(product, locale) || product.name || '';
-                const message = encodeURIComponent(
-                  t('product.requestQuoteMessage', { name: productName })
-                );
-                Linking.openURL(`https://wa.me/971585487665?text=${message}`).catch(() => {});
+                const message = t('product.requestQuoteMessage', { name: productName });
+                openWhatsApp(message);
               }}
               activeOpacity={0.7}
               accessibilityRole="button"

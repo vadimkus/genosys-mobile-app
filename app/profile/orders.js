@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, RefreshControl, Alert, Linking, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, RefreshControl, Alert, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,6 +33,7 @@ import { tabBarSpace } from '../../utils/tabBar';
 import AUTH_CONFIG from '../../config/auth';
 import { withErrorBoundary } from '../../components/ErrorBoundary';
 import { ASSET_ORIGIN, EMPTY_UNI_IMAGE } from '../../utils/assets';
+import { openWhatsApp } from '../../utils/support';
 
 const log = createLogger('Orders');
 
@@ -286,12 +287,11 @@ function OrdersScreen() {
   const contactSupportWhatsApp = (order) => {
     haptics.lightTap();
     const orderNumber = order?.orderNumber || order?.order_number || order?.number || order?.id || '';
-    const phoneNumber = '971585487665';
     const message = t('support.whatsappOrderHelpMessage', { orderNumber: String(orderNumber) });
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    Linking.openURL(whatsappUrl).catch((e) => {
-      log.warn('Failed to open WhatsApp', e?.message);
-      Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
+    openWhatsApp(message).then((opened) => {
+      if (!opened) {
+        Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
+      }
     });
   };
 

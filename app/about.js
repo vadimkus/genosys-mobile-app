@@ -12,7 +12,6 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
-  Linking,
   Image,
   I18nManager,
 } from 'react-native';

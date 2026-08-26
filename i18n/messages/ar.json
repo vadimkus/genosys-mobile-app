@@ -1256,7 +1256,9 @@
   "support": {
     "whatsappOpenFailedTitle": "تعذر فتح واتساب",
     "whatsappOpenFailedMessage": "يرجى تثبيت واتساب أو المحاولة مرة أخرى.",
-    "whatsappOrderHelpMessage": "مرحباً! أحتاج مساعدة بخصوص الطلب {orderNumber}. هل يمكنكم المساعدة؟"
+    "whatsappOrderHelpMessage": "مرحباً! أحتاج مساعدة بخصوص الطلب {orderNumber}. هل يمكنكم المساعدة؟",
+    "whatsappCheckoutHelpMessage": "مرحباً! أحتاج مساعدة في إتمام الطلب {orderNumber}. طريقة الدفع: {paymentMethod}. هل يمكنكم المساعدة؟",
+    "whatsappCheckoutErrorMessage": "مرحباً! واجهت خطأ أثناء إتمام الطلب {orderNumber}. طريقة الدفع: {paymentMethod}. هل يمكنكم المساعدة؟"
   },
   "authScreen": {
     "uaeLine": "الإمارات العربية المتحدة",

@@ -32,6 +32,7 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { createLogger } from '../utils/logger';
 import { colors, shadow, surfaces, tint } from '../utils/theme';
+import { openWhatsApp } from '../utils/support';
 
 const log = createLogger('FAQ');
 
@@ -352,7 +353,7 @@ export default function FAQScreen() {
             <View style={[styles.ctaButtons, isRTL && styles.ctaButtonsRTL]}>
               <TouchableOpacity
                 style={[styles.ctaBtn, { backgroundColor: tint(colors.whatsapp) }]}
-                onPress={() => { haptics.mediumTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
+                onPress={() => { haptics.mediumTap(); openWhatsApp(); }}
                 activeOpacity={0.7}
               >
                 <Ionicons name="logo-whatsapp" size={18} color={colors.whatsappDeep} />

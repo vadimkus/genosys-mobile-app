@@ -46,6 +46,7 @@ import {
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
 import { withErrorBoundary } from '../components/ErrorBoundary';
+import { openWhatsApp } from '../utils/support';
 
 function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
@@ -629,12 +630,11 @@ function CheckoutScreen() {
             { 
               text: t('checkout.contactSupport'), 
               onPress: async () => {
-                const phoneNumber = '971585487665';
-                const message = `Hi! I need help with placing order ${orderNumber}. Payment method: ${selectedPaymentMethod}. Can you assist me?`;
-                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                try {
-                  await Linking.openURL(whatsappUrl);
-                } catch {
+                const message = t('support.whatsappCheckoutHelpMessage', {
+                  orderNumber: String(orderNumber),
+                  paymentMethod: String(selectedPaymentMethod),
+                });
+                if (!(await openWhatsApp(message))) {
                   Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
                 }
               }
@@ -667,12 +667,14 @@ function CheckoutScreen() {
           { 
             text: t('checkout.contactSupport'), 
             onPress: async () => {
-              const phoneNumber = '971585487665';
-              const message = `Hi! I encountered an error while placing order ${orderNumber}. Payment method: ${selectedPaymentMethod}.${errMsg ? ` Error: ${errMsg}` : ''} Can you help me?`;
-              const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-              try {
-                await Linking.openURL(whatsappUrl);
-              } catch {
+              const base = t('support.whatsappCheckoutErrorMessage', {
+                orderNumber: String(orderNumber),
+                paymentMethod: String(selectedPaymentMethod),
+              });
+              // The raw error is appended untranslated on purpose — support needs
+              // the server's wording verbatim to match it against the logs.
+              const message = errMsg ? `${base} (${errMsg})` : base;
+              if (!(await openWhatsApp(message))) {
                 Alert.alert(t('support.whatsappOpenFailedTitle'), t('support.whatsappOpenFailedMessage'));
               }
             }

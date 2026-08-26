@@ -23,6 +23,7 @@ import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { createLogger } from '../../utils/logger';
 import { colors, shadow, surfaces } from '../../utils/theme';
+import { openWhatsApp, callSupport, supportWhatsAppDisplay } from '../../utils/support';
 
 const log = createLogger('Help');
 
@@ -107,19 +108,19 @@ export default function HelpSupportScreen() {
       id: 'phone',
       title: t('help.support.phoneTitle'),
       subtitle: t('help.support.phoneSubtitle'),
-      description: '+971 58 548 76 65',
+      description: supportWhatsAppDisplay(),
       icon: 'call',
       tileColor: colors.accent,
-      action: () => Linking.openURL('tel:+971585487665').catch(() => {}),
+      action: () => callSupport(),
     },
     {
       id: 'whatsapp',
       title: t('help.support.whatsappTitle'),
       subtitle: t('help.support.whatsappSubtitle'),
-      description: '+971 58 548 76 65',
+      description: supportWhatsAppDisplay(),
       icon: 'logo-whatsapp',
       tileColor: colors.whatsappDeep,
-      action: () => Linking.openURL('https://wa.me/971585487665').catch(() => {}),
+      action: () => openWhatsApp(),
     },
   ];
 
@@ -309,7 +310,7 @@ export default function HelpSupportScreen() {
 
             <TouchableOpacity
               style={[styles.quickActionCard, shadow.card]}
-              onPress={() => { haptics.lightTap(); Linking.openURL('https://wa.me/971585487665').catch(() => {}); }}
+              onPress={() => { haptics.lightTap(); openWhatsApp(); }}
               activeOpacity={0.7}
             >
               <View style={[surfaces.iconTile, styles.quickTile, { backgroundColor: colors.whatsappDeep }]}>

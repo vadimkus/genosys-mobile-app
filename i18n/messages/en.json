@@ -1256,7 +1256,9 @@
   "support": {
     "whatsappOpenFailedTitle": "Could not open WhatsApp",
     "whatsappOpenFailedMessage": "Please install WhatsApp or try again.",
-    "whatsappOrderHelpMessage": "Hi! I need help with order {orderNumber}. Can you assist me?"
+    "whatsappOrderHelpMessage": "Hi! I need help with order {orderNumber}. Can you assist me?",
+    "whatsappCheckoutHelpMessage": "Hi! I need help placing order {orderNumber}. Payment method: {paymentMethod}. Can you assist me?",
+    "whatsappCheckoutErrorMessage": "Hi! I hit an error placing order {orderNumber}. Payment method: {paymentMethod}. Can you help me?"
   },
   "authScreen": {
     "uaeLine": "United Arab Emirates",

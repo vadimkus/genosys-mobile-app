@@ -37,6 +37,7 @@ import AUTH_CONFIG from '../config/auth';
 import T from '../utils/typography';
 import { ASSET_ORIGIN } from '../utils/assets';
 import { buildQuickActionRows } from '../utils/chatQuickActions';
+import { openWhatsApp } from '../utils/support';
 
 
 /** Get user context for personalised greetings (mirrors web getUserContext) */
@@ -233,10 +234,8 @@ export default function ChatScreen() {
               <TouchableOpacity
                 style={styles.requestQuoteBtn}
                 onPress={() => {
-                  const msg = encodeURIComponent(
-                    t('product.requestQuoteMessage', { name })
-                  );
-                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
+                  const msg = t('product.requestQuoteMessage', { name });
+                  openWhatsApp(msg);
                 }}
                 activeOpacity={0.8}
               >

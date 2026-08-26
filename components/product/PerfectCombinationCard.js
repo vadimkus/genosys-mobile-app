@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, Alert} from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -14,6 +14,7 @@ import { asText } from '../../utils/productDetailUtils';
 import { isProductOptionSelectionRequired } from '../../utils/productOptions';
 import AUTH_CONFIG from '../../config/auth';
 import { colors } from '../../utils/theme';
+import { openWhatsApp } from '../../utils/support';
 
 function getProductIdForCombo(p) {
   return String(p?.productNumber || p?.id || '').trim();
@@ -368,10 +369,8 @@ export default function PerfectCombinationCard({ product, user, styles }) {
             <TouchableOpacity
               style={[styles.pcAddBtn, { backgroundColor: colors.whatsappDeep }]}
               onPress={() => {
-                const msg = encodeURIComponent(
-                  t('product.requestQuoteMessage', { name: recName })
-                );
-                Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
+                const msg = t('product.requestQuoteMessage', { name: recName });
+                openWhatsApp(msg);
               }}
               activeOpacity={0.9}
             >

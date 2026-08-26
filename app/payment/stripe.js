@@ -70,6 +70,9 @@ export default function StripePaymentScreen() {
   const [statusText, setStatusText] = useState('');
   const [errorText, setErrorText] = useState('');
   const sheetReadyRef = useRef(false);
+  // Synchronous mirror of `busy`. State cannot gate a double-tap because it
+  // only takes effect on the next render; this is readable in the same tick.
+  const busyRef = useRef(false);
   const autoStartedRef = useRef(false);
 
   const canCheck = !!token && (!!orderId || !!orderNumber);
@@ -135,6 +138,13 @@ export default function StripePaymentScreen() {
   // --- Native Stripe Payment Sheet -----------------------------------------
   const payWithSheet = useCallback(async () => {
     if (!clientSecret) return;
+    // `disabled={busy}` cannot hold this on its own: the screen auto-starts the
+    // sheet on mount, and `busy` is still false until that state commits, so the
+    // button is live for a frame. Two callers would both find sheetReadyRef
+    // false (it is only set after the await) and initialise the same
+    // PaymentIntent twice, which Stripe rejects. A ref flips synchronously.
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     setErrorText('');
     try {
@@ -193,6 +203,7 @@ export default function StripePaymentScreen() {
       sheetReadyRef.current = false;
       setErrorText(t('payment.pleaseTryAgain'));
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }, [clientSecret, initPaymentSheet, presentPaymentSheet, checkPayment, user, t, fromOrders, clearCart]);
@@ -203,6 +214,10 @@ export default function StripePaymentScreen() {
       setErrorText(t('payment.paymentLinkMissingMessage'));
       return;
     }
+    // Same reasoning as payWithSheet: this also auto-starts on mount, and two
+    // browser sessions on one payment link is worse than one.
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     try {
       await WebBrowser.openBrowserAsync(paymentUrl, {
@@ -220,6 +235,7 @@ export default function StripePaymentScreen() {
       log.warn('Failed to open hosted payment link', e?.message || e);
       Alert.alert(t('payment.couldNotOpenPaymentTitle'), t('payment.pleaseTryAgain'));
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }, [paymentUrl, canCheck, checkPayment, t, fromOrders, clearCart]);

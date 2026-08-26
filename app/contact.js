@@ -21,10 +21,10 @@ import CollapsibleHeader, { useCollapsibleHeader } from '../components/Collapsib
 import AppFooter from '../components/AppFooter';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
-import AUTH_CONFIG from '../config/auth';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
+import { openWhatsApp, callSupport } from '../utils/support';
 
 export default function ContactScreen() {
   const router = useRouter();
@@ -32,7 +32,6 @@ export default function ContactScreen() {
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
   const { onScroll, headerHeight, translateY: headerTranslateY } = useCollapsibleHeader({ hideOnScroll: true });
-  const WHATSAPP_NUMBER = String(AUTH_CONFIG.WHATSAPP_NUMBER || '971585487665').replace(/[^\d]/g, '');
   const PHONE_DISPLAY = t('contact.phoneDisplay');
   const EMAIL = 'sales@genosys.ae';
   const WEBSITE = 'https://genosys.ae';
@@ -58,7 +57,7 @@ export default function ContactScreen() {
       icon: 'logo-whatsapp',
       tileColor: colors.whatsappDeep,
       description: t('contact.methodWhatsappDesc'),
-      action: () => Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() => {}),
+      action: () => openWhatsApp(),
     },
     {
       id: 'phone',
@@ -67,7 +66,7 @@ export default function ContactScreen() {
       icon: 'call',
       tileColor: colors.accent,
       description: t('contact.methodPhoneDesc'),
-      action: () => Linking.openURL(`tel:+${WHATSAPP_NUMBER}`).catch(() => {}),
+      action: () => callSupport(),
     },
     {
       id: 'email',

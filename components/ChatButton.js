@@ -39,6 +39,7 @@ import T from '../utils/typography';
 import { colors } from '../utils/theme';
 import { ASSET_ORIGIN } from '../utils/assets';
 import { buildQuickActionRows } from '../utils/chatQuickActions';
+import { openWhatsApp } from '../utils/support';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PANEL_HEIGHT = Math.round(SCREEN_HEIGHT * 0.82);
@@ -231,8 +232,8 @@ export default function ChatButton({ visible = true }) {
                 style={s.requestQuoteBtn}
                 onPress={() => {
                   haptics.mediumTap();
-                  const msg = encodeURIComponent((t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name));
-                  Linking.openURL(`https://wa.me/971585487665?text=${msg}`).catch(() => {});
+                  const msg = (t('product.requestQuoteMessage') || "Hi, I'm interested in {name}. Could you please provide pricing information?").replace('{name}', name);
+                  openWhatsApp(msg);
                 }}
                 activeOpacity={0.8}
               >
