@@ -328,6 +328,9 @@ export default function ProfileScreen() {
               </View>
             </View>
             <View style={styles.switchRight}>
+              {/* The title sits in a sibling View, so VoiceOver would otherwise
+                  read this as an unnamed switch. Naming it here tells the user
+                  which setting they are toggling. */}
               <Switch
                 value={value}
                 onValueChange={onValueChange}
@@ -335,6 +338,9 @@ export default function ProfileScreen() {
                 thumbColor={SWITCH_THUMB}
                 ios_backgroundColor={SWITCH_IOS_BG}
                 disabled={!!disabled}
+                accessibilityLabel={title}
+                accessibilityHint={subtitle || undefined}
+                accessibilityState={{ checked: !!value, disabled: !!disabled }}
               />
             </View>
           </View>

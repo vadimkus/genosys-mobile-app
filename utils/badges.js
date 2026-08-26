@@ -1,4 +1,5 @@
 import { isBeautyBoxProduct } from './productRules';
+import { colors } from './theme';
 
 /**
  * Compute display badges for a product card.
@@ -33,12 +34,12 @@ export function computeProductBadges(product, labels = {}) {
   // shown. Only the "Order" badge (Mesopecia kit) is computed here; NEW /
   // out-of-stock and other meaningful badges still come through below.
   if (!isOutOfStock && isMesopeciaKit) {
-    computedBadges.push({ text: labels.order || 'Order', color: '#FF9500', priority: 0 });
+    computedBadges.push({ text: labels.order || 'Order', color: colors.orange, priority: 0 });
   }
 
   const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
   if (isRevitaGlow && !hasNewBadge) {
-    computedBadges.push({ text: labels.new || 'New', color: '#007AFF', priority: 1 });
+    computedBadges.push({ text: labels.new || 'New', color: colors.blue, priority: 1 });
   }
 
   return [...computedBadges, ...baseBadges]

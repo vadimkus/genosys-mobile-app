@@ -189,6 +189,9 @@ const ShopGridCard = React.memo(function ShopGridCard({
           {/* Favorite Heart Button */}
           <TouchableOpacity
             style={styles.favoriteHeart}
+            // The heart is 32pt so it stays light over the product shot; 6pt of
+            // slop each side takes the tappable area to the 44pt HIG minimum.
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             onPress={(e) => {
               e.stopPropagation(); // Prevent product card press
               onToggleFavorite(product);

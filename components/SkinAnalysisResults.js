@@ -64,7 +64,7 @@ function buildProfileFromConcerns(concerns) {
 function ScoreBar({ label, value, inverted = false, icon, isRTL = false }) {
   // inverted: true means lower value = better (blemishes, wrinkles, etc.)
   const displayValue = inverted ? 100 - value : value;
-  const color = displayValue >= 70 ? '#16A34A' : displayValue >= 45 ? '#F59E0B' : colors.accent;
+  const color = displayValue >= 70 ? colors.greenDeep : displayValue >= 45 ? colors.orange : colors.accent;
 
   return (
     <View style={styles.scoreRow}>
@@ -127,7 +127,7 @@ export default function SkinAnalysisResults({ result, onReset, onBack }) {
     }
   };
 
-  const overallColor = result.overall >= 70 ? '#16A34A' : result.overall >= 45 ? '#F59E0B' : colors.accent;
+  const overallColor = result.overall >= 70 ? colors.greenDeep : result.overall >= 45 ? colors.orange : colors.accent;
 
   return (
     <View style={styles.container}>

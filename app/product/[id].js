@@ -79,6 +79,10 @@ const HEADER_HEIGHT = SCREEN_WIDTH;
 // handset.
 const HEADER_PILL_HEIGHT = 48;
 const TITLE_FADE_IN = [HEADER_HEIGHT - 120, HEADER_HEIGHT - 40];
+// The header icons are 36pt so they sit comfortably inside the floating pill.
+// 4pt of slop on each side takes the tappable area to the 44pt HIG minimum
+// without growing the pill itself.
+const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
 // Spec fields mapping to support website-like details
 const SPEC_FIELDS = [
@@ -1117,6 +1121,7 @@ function ProductDetailScreen() {
         <View style={[styles.headerButtons, isRTL && styles.headerButtonsRTL]}>
           <TouchableOpacity
             style={styles.headerButton}
+            hitSlop={HEADER_HIT_SLOP}
             onPress={() => {
               haptics.lightTap();
               router.back();
@@ -1145,6 +1150,7 @@ function ProductDetailScreen() {
 
             <TouchableOpacity
               style={styles.headerButton}
+              hitSlop={HEADER_HIT_SLOP}
               onPress={handleShare}
               accessibilityRole="button"
               accessibilityLabel={t('product.share')}
@@ -1154,6 +1160,7 @@ function ProductDetailScreen() {
 
             <TouchableOpacity
               style={styles.headerButton}
+              hitSlop={HEADER_HIT_SLOP}
               onPress={handleWishlistToggle}
               accessibilityRole="button"
               accessibilityLabel={isWishlisted ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}

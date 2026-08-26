@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Animated,
   TouchableOpacity,
+  ActivityIndicator,
   Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -559,10 +560,13 @@ function BagScreen() {
     return (
       <View style={styles.container}>
         <CollapsibleHeader title={t('bag.title')} onBack={onBack} isRTL={isRTL} />
-        <View style={[styles.emptyContainer, { paddingTop: navBarHeight }]}>
-          <View style={styles.iconContainer}>
-            <Image source={{ uri: EMPTY_UNI_IMAGE }} style={styles.emptyUniImage} resizeMode="contain" />
-          </View>
+        <View
+          style={[styles.emptyContainer, { paddingTop: navBarHeight }]}
+          accessibilityRole="progressbar"
+          accessibilityLabel={t('bag.loading')}
+        >
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.loadingText, isRTL && styles.emptyTextRTL]}>{t('bag.loading')}</Text>
         </View>
       </View>
     );
@@ -1266,6 +1270,12 @@ const styles = StyleSheet.create({
     color: colors.secondaryLabel,
     textAlign: 'center',
     marginBottom: 32,
+  },
+  loadingText: {
+    ...T.body,
+    color: colors.secondaryLabel,
+    textAlign: 'center',
+    marginTop: 16,
   },
   shopButton: {
     backgroundColor: colors.cta,
