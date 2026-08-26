@@ -24,6 +24,7 @@ import T from '../../utils/typography';
 import { createLogger } from '../../utils/logger';
 import { colors, shadow, surfaces } from '../../utils/theme';
 import { openWhatsApp, callSupport, supportWhatsAppDisplay } from '../../utils/support';
+import PageHero from '../../components/PageHero';
 
 const log = createLogger('Help');
 
@@ -245,11 +246,7 @@ export default function HelpSupportScreen() {
         contentContainerStyle={{ paddingTop: headerHeight, paddingBottom: (insets?.bottom || 0) + 24 }}
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
-          {/* Hero */}
-          <View style={styles.heroSection}>
-            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{t('help.hero')}</Text>
-            <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>{t('help.heroSubtitle')}</Text>
-          </View>
+          <PageHero title={t('help.hero')} subtitle={t('help.heroSubtitle')} isRTL={isRTL} />
 
           {/* Contact Options */}
           <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('help.contactUs')}</Text>
@@ -407,14 +404,6 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
 
   // Hero
-  heroSection: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 20,
-    alignItems: 'center',
-  },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  heroSubtitle: { ...T.body, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 22 },
 
   // Group header
   groupHeader: {

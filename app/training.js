@@ -32,6 +32,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { fetchTraining as fetchTrainingAPI } from '../services/api';
 import { createLogger } from '../utils/logger';
 import SectionHeader from '../components/SectionHeader';
+import PageHero from '../components/PageHero';
 
 const log = createLogger('Training');
 
@@ -201,16 +202,12 @@ export default function TrainingScreen() {
         >
           <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
             {/* Hero */}
-            <View style={styles.heroSection}>
-              <View style={[surfaces.iconWell, styles.heroTile]}>
-                <Ionicons name="school" size={24} color={colors.accent} />
-              </View>
-              <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
-                {l('Training Materials', 'مواد التدريب', 'Учебные материалы')}
-              </Text>
-              <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>
-                {l('Professional resources for GENOSYS partners', 'موارد مهنية لشركاء GENOSYS', 'Профессиональные ресурсы для партнёров GENOSYS')}
-              </Text>
+            <PageHero
+              isRTL={isRTL}
+              title={l('Training Materials', 'مواد التدريب', 'Учебные материалы')}
+              subtitle={l('Professional resources for GENOSYS partners', 'موارد مهنية لشركاء GENOSYS', 'Профессиональные ресурсы для партнёров GENOSYS')}
+            >
+              {/* Counts of what is actually in here: information, not ornament. */}
               {stats && (
                 <View style={[styles.statsRow, isRTL && styles.rowRTL]}>
                   <View style={styles.statBadge}>
@@ -227,7 +224,7 @@ export default function TrainingScreen() {
                   </View>
                 </View>
               )}
-            </View>
+            </PageHero>
 
             {/* Training Documents */}
             {trainingDocs.length > 0 && (
@@ -354,10 +351,6 @@ const styles = StyleSheet.create({
   loadingText: { ...T.bodySmall, marginTop: 12, color: colors.secondaryLabel },
 
   // Hero
-  heroSection: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20, alignItems: 'center' },
-  heroTile: { width: 56, height: 56, borderRadius: 16, marginBottom: 14 },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  heroSubtitle: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 21 },
   statsRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   statBadge: {
     flexDirection: 'row',
@@ -434,5 +427,4 @@ const styles = StyleSheet.create({
   // RTL
   rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });

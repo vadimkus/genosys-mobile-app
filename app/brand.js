@@ -11,7 +11,6 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
-  Image,
   Linking,
   Dimensions,
 } from 'react-native';
@@ -25,6 +24,7 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, tint } from '../utils/theme';
 import SectionCard from '../components/SectionCard';
+import PageHero from '../components/PageHero';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -115,13 +115,9 @@ export default function BrandScreen() {
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Hero Section */}
-          <View style={styles.heroSection}>
-            <Image
-              source={require('../assets/genosys-logo-transparent.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{brandTitle}</Text>
+          <PageHero title={brandTitle} isRTL={isRTL}>
+            {/* Made in Korea and UAE-certified are facts about the brand, not ornament,
+                so they stay where the logo was. */}
             <View style={styles.badgeRow}>
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{sectionLabels.madeInKorea}</Text>
@@ -130,7 +126,7 @@ export default function BrandScreen() {
                 <Text style={[styles.badgeText, styles.badgeGreenText]}>{sectionLabels.certifiedUAE}</Text>
               </View>
             </View>
-          </View>
+          </PageHero>
 
           {/* About Section */}
           <SectionCard padding={18} icon="information-circle" title={sectionLabels.about} isRTL={isRTL}>
@@ -219,14 +215,6 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
 
   // Hero
-  heroSection: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 24,
-    alignItems: 'center',
-  },
-  logo: { width: 240, height: 72, marginBottom: 16 },
-  heroTitle: { ...T.sectionTitle, textAlign: 'center', marginBottom: 16 },
   badgeRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
   badge: {
     backgroundColor: colors.accentBg,
@@ -304,5 +292,4 @@ const styles = StyleSheet.create({
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });

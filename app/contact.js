@@ -12,8 +12,6 @@ import {
   Easing,
   TouchableOpacity,
   Linking,
-  Image,
-  I18nManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +23,7 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
 import { openWhatsApp, callSupport } from '../utils/support';
+import PageHero from '../components/PageHero';
 
 export default function ContactScreen() {
   const router = useRouter();
@@ -151,19 +150,11 @@ export default function ContactScreen() {
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Hero Section */}
-          <View style={styles.heroSection}>
-            <Image
-              source={require('../assets/genosys-logo-transparent.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{t('contact.companyName')}</Text>
-            <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
-              <Text style={styles.flagText}>🇦🇪</Text>
-              <Text style={[styles.countryText, isRTL && styles.textRTLCenter]}>{t('contact.country')}</Text>
-              <Ionicons name="heart" size={14} color={colors.accent} />
-            </View>
-          </View>
+          <PageHero
+            title={t('contact.companyName')}
+            subtitle={t('contact.country')}
+            isRTL={isRTL}
+          />
 
           {/* Contact Methods */}
           <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('contact.contactMethods')}</Text>
@@ -217,24 +208,6 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
 
   // Hero Section
-  heroSection: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 24,
-    alignItems: 'center',
-  },
-  logo: { width: 240, height: 72, marginBottom: 14 },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  countryRow: {
-    marginTop: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  countryRowRtl: { flexDirection: 'row-reverse' },
-  flagText: { fontSize: 14 },
-  countryText: { ...T.body, color: colors.secondaryLabel },
 
   // Group header
   groupHeader: {
@@ -279,7 +252,6 @@ const styles = StyleSheet.create({
   distributorText: { ...T.bodySmall, color: colors.label, flex: 1, lineHeight: 21 },
 
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
   valueLTRRight: { writingDirection: 'ltr', textAlign: 'right' },
 });

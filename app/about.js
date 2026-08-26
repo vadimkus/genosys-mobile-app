@@ -12,8 +12,6 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
-  Image,
-  I18nManager,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +23,7 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
 import SectionHeader from '../components/SectionHeader';
+import PageHero from '../components/PageHero';
 
 export default function AboutScreen() {
   const router = useRouter();
@@ -71,19 +70,11 @@ export default function AboutScreen() {
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Hero Section */}
-          <View style={styles.heroSection}>
-            <Image
-              source={require('../assets/genosys-logo-transparent.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>{t('about.companyName')}</Text>
-            <View style={[styles.countryRow, I18nManager.isRTL && styles.countryRowRtl]}>
-              <Text style={styles.flagText}>🇦🇪</Text>
-              <Text style={[styles.countryText, isRTL && styles.textRTLCenter]}>{t('about.country')}</Text>
-              <Ionicons name="heart" size={14} color={colors.accent} />
-            </View>
-          </View>
+          <PageHero
+            title={t('about.companyName')}
+            subtitle={t('about.country')}
+            isRTL={isRTL}
+          />
 
           {/* About Us */}
           <View style={[styles.card, styles.cardPad, shadow.card]}>
@@ -131,24 +122,6 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
 
   // Hero Section
-  heroSection: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 24,
-    alignItems: 'center',
-  },
-  logo: { width: 240, height: 72, marginBottom: 14 },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  countryRow: {
-    marginTop: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  countryRowRtl: { flexDirection: 'row-reverse' },
-  flagText: { fontSize: 14 },
-  countryText: { ...T.body, color: colors.secondaryLabel },
 
   // Cards
   card: {
@@ -192,5 +165,4 @@ const styles = StyleSheet.create({
 
   // RTL
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });

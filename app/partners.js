@@ -28,6 +28,7 @@ import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces, tint } from '../utils/theme';
 import { createLogger } from '../utils/logger';
+import PageHero from '../components/PageHero';
 
 const log = createLogger('Partners');
 
@@ -202,21 +203,15 @@ export default function PartnersScreen() {
         >
           <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
             {/* Hero */}
-            <View style={styles.heroSection}>
-              <View style={[surfaces.iconTile, styles.heroTile, { backgroundColor: colors.cta }]}>
-                <Ionicons name="business" size={24} color={colors.white} />
-              </View>
-              <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
-                {l('Our Partners', 'شركاؤنا', 'Наши партнёры')}
-              </Text>
-              <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>
-                {l(
-                  `${partners.length} premium salons, clinics and spas across the UAE offering GENOSYS treatments`,
-                  `${partners.length} صالون ومركز تجميل وسبا فاخر في جميع أنحاء الإمارات يقدمون علاجات جينوسيس`,
-                  `${partners.length} премиальных салонов, клиник и спа по всем ОАЭ, предлагающих процедуры GENOSYS`
-                )}
-              </Text>
-            </View>
+            <PageHero
+              isRTL={isRTL}
+              title={l('Our Partners', 'شركاؤنا', 'Наши партнёры')}
+              subtitle={l(
+                `${partners.length} premium salons, clinics and spas across the UAE offering GENOSYS treatments`,
+                `${partners.length} صالون ومركز تجميل وسبا فاخر في جميع أنحاء الإمارات يقدمون علاجات جينوسيس`,
+                `${partners.length} премиальных салонов, клиник и спа по всем ОАЭ, предлагающих процедуры GENOSYS`
+              )}
+            />
 
             {/* Partners List */}
             <View style={styles.section}>
@@ -358,10 +353,6 @@ const styles = StyleSheet.create({
   retryBtnText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
 
   // Hero
-  heroSection: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20, alignItems: 'center' },
-  heroTile: { width: 56, height: 56, borderRadius: 16, marginBottom: 14 },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  heroSubtitle: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 21 },
 
   // Section
   section: { paddingHorizontal: 16, paddingTop: 4 },
@@ -414,6 +405,5 @@ const styles = StyleSheet.create({
   // RTL
   rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
   valueLTR: { writingDirection: 'ltr', textAlign: 'left' },
 });

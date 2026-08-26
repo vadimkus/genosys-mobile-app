@@ -33,6 +33,7 @@ import T from '../utils/typography';
 import { createLogger } from '../utils/logger';
 import { colors, shadow, surfaces, tint } from '../utils/theme';
 import { openWhatsApp } from '../utils/support';
+import PageHero from '../components/PageHero';
 
 const log = createLogger('FAQ');
 
@@ -245,16 +246,11 @@ export default function FAQScreen() {
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Hero */}
-          <View style={styles.heroSection}>
-            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
-              {subtitle || l('Frequently Asked Questions', 'الأسئلة الشائعة', 'Часто задаваемые вопросы')}
-            </Text>
-            {description ? (
-              <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>
-                {description}
-              </Text>
-            ) : null}
-          </View>
+          <PageHero
+            isRTL={isRTL}
+            title={subtitle || l('Frequently Asked Questions', 'الأسئلة الشائعة', 'Часто задаваемые вопросы')}
+            subtitle={description}
+          />
 
           {/* Search */}
           <View style={styles.searchContainer}>
@@ -395,9 +391,6 @@ const styles = StyleSheet.create({
   retryBtnText: { ...T.button, color: colors.white, fontWeight: '700' },
 
   // Hero
-  heroSection: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 16, alignItems: 'center' },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  heroSubtitle: { ...T.body, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 22 },
 
   // Search
   searchContainer: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 },

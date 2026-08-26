@@ -22,6 +22,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
+import PageHero from '../components/PageHero';
 
 export default function LocationsScreen() {
   const router = useRouter();
@@ -133,17 +134,13 @@ export default function LocationsScreen() {
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           {/* Hero */}
-          <View style={styles.heroSection}>
-            <Text style={styles.heroEmoji}>🇦🇪</Text>
-            <Text style={[styles.heroTitle, isRTL && styles.textRTLCenter]}>
-              {l('We Deliver Across the UAE', 'نوصل في جميع أنحاء الإمارات', 'Доставляем по всем ОАЭ')}
-            </Text>
-            <Text style={[styles.heroSubtitle, isRTL && styles.textRTLCenter]}>
-              {l('Premium skincare delivered to your door in all 7 emirates',
-                 'العناية الفاخرة بالبشرة توصل إلى باب منزلك في الإمارات السبع',
-                 'Премиальная косметика с доставкой до двери во все 7 эмиратов')}
-            </Text>
-          </View>
+          <PageHero
+            isRTL={isRTL}
+            title={l('We Deliver Across the UAE', 'نوصل في جميع أنحاء الإمارات', 'Доставляем по всем ОАЭ')}
+            subtitle={l('Premium skincare delivered to your door in all 7 emirates',
+               'العناية الفاخرة بالبشرة توصل إلى باب منزلك في الإمارات السبع',
+               'Премиальная косметика с доставкой до двери во все 7 эмиратов')}
+          />
 
           {/* Free Shipping Note */}
           <View style={[styles.freeShipBanner, isRTL && styles.rowRTL]}>
@@ -228,10 +225,6 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
 
   // Hero
-  heroSection: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20, alignItems: 'center' },
-  heroEmoji: { fontSize: 40, marginBottom: 8 },
-  heroTitle: { ...T.pageTitle, textAlign: 'center', marginBottom: 8 },
-  heroSubtitle: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', lineHeight: 21 },
 
   // Free Ship Banner (tinted inline highlight)
   freeShipBanner: {
@@ -283,5 +276,4 @@ const styles = StyleSheet.create({
   // RTL
   rowRTL: { flexDirection: 'row-reverse' },
   textRTL: { writingDirection: 'rtl', textAlign: 'right' },
-  textRTLCenter: { writingDirection: 'rtl', textAlign: 'center' },
 });
