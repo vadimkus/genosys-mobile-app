@@ -24,8 +24,25 @@ import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow } from '../../utils/theme';
 import SectionCard from '../../components/SectionCard';
+import { validateAddressForm, firstAddressError } from '../../utils/addressFormValidation';
 
 const log = createLogger('AddAddress');
+
+/**
+ * The message under an input. Renders nothing when the field is clean, so it
+ * can sit under every input unconditionally.
+ */
+const FieldError = ({ message, isRTL }) => {
+  if (!message) return null;
+  return (
+    <Text
+      style={[styles.fieldErrorText, isRTL && styles.textRTL]}
+      accessibilityLiveRegion="polite"
+    >
+      {message}
+    </Text>
+  );
+};
 
 export default function AddEditAddressScreen() {
   const router = useRouter();
@@ -53,6 +70,17 @@ export default function AddEditAddressScreen() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const initialFormRef = useRef(null);
+  // Per-field validation messages, so a bad value is marked where it was typed
+  // rather than described in a modal that covers the form.
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
+
+  // Refs for the inputs, in screen order. All three advertised a keyboard Next
+  // key with no onSubmitEditing behind it, so it did nothing at all.
+  const nameRef = useRef(null);
+  const phoneRef = useRef(null);
+  const addressRef = useRef(null);
+  const scrollRef = useRef(null);
 
   // Subtle entrance motion (matches order details feel).
   const fade = useRef(new Animated.Value(0)).current;
@@ -86,22 +114,31 @@ export default function AddEditAddressScreen() {
 
   const updateField = useCallback((field, value) => {
     setFormData(prevData => ({...prevData, [field]: value}));
+    // Clear this field's message as soon as the user acts on it, so the form
+    // stops shouting about something they are in the middle of fixing.
+    setErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
+    setFormError('');
   }, []);
 
   const handleSave = async () => {
     haptics.mediumTap();
-    // Validate form
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.address.trim()) {
-      Alert.alert(t('common.error'), t('addAddress.validationMissingFields'));
+    // Every problem at once, marked on the field it belongs to.
+    const nextErrors = validateAddressForm(formData, t);
+    const firstBad = firstAddressError(nextErrors);
+    if (firstBad) {
+      haptics.error();
+      setErrors(nextErrors);
+      setFormError(t('addAddress.fixFieldsBelow'));
+      // Send the user to the first offending field rather than leaving them to
+      // hunt for it.
+      const focusTarget = { name: nameRef, phone: phoneRef, address: addressRef }[firstBad];
+      if (focusTarget?.current) focusTarget.current.focus();
+      else scrollRef.current?.scrollTo?.({ y: 0, animated: true });
       return;
     }
 
-    // Phone validation (UAE format)
-    const phoneRegex = /^(\+971|0)[0-9]{8,9}$/;
-    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      Alert.alert(t('common.error'), t('addAddress.validationInvalidUaePhone'));
-      return;
-    }
+    setErrors({});
+    setFormError('');
 
     try {
       setIsSaving(true);
@@ -187,6 +224,7 @@ export default function AddEditAddressScreen() {
       >
         <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
           <Animated.ScrollView
+            ref={scrollRef}
             style={styles.scrollView}
             onScroll={onScroll}
             scrollEventThrottle={16}
@@ -195,6 +233,16 @@ export default function AddEditAddressScreen() {
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
           >
+            {formError ? (
+              <View
+                style={[styles.formErrorBanner, isRTL && styles.rowRTL]}
+                accessibilityLiveRegion="polite"
+              >
+                <Ionicons name="alert-circle" size={16} color={colors.red} />
+                <Text style={[styles.formErrorBannerText, isRTL && styles.textRTL]}>{formError}</Text>
+              </View>
+            ) : null}
+
             {/* Address Type */}
             <SectionCard icon="home" title={t('addAddress.addressType')} isRTL={isRTL}>
               <View style={[styles.typeContainer, isRTL && styles.typeContainerRTL]}>
@@ -229,7 +277,8 @@ export default function AddEditAddressScreen() {
                   <Text style={styles.requiredMark}> *</Text>
                 </Text>
                 <TextInput
-                  style={[styles.textInput, isRTL && styles.inputRTL]}
+                  ref={nameRef}
+                  style={[styles.textInput, isRTL && styles.inputRTL, errors.name && styles.textInputError]}
                   value={formData.name}
                   onChangeText={(text) => updateField('name', text)}
                   placeholder={t('addAddress.enterFullName')}
@@ -237,8 +286,10 @@ export default function AddEditAddressScreen() {
                   autoCorrect={false}
                   returnKeyType="next"
                   blurOnSubmit={false}
+                  onSubmitEditing={() => phoneRef.current?.focus()}
                   placeholderTextColor={colors.tertiary}
                 />
+                <FieldError message={errors.name} isRTL={isRTL} />
               </View>
 
               <View style={[styles.fieldContainer, styles.fieldContainerLast]}>
@@ -247,7 +298,8 @@ export default function AddEditAddressScreen() {
                   <Text style={styles.requiredMark}> *</Text>
                 </Text>
                 <TextInput
-                  style={[styles.textInput, isRTL && styles.inputValueLTR]}
+                  ref={phoneRef}
+                  style={[styles.textInput, isRTL && styles.inputValueLTR, errors.phone && styles.textInputError]}
                   value={formData.phone}
                   onChangeText={(text) => updateField('phone', text)}
                   placeholder={t('addAddress.phonePlaceholder')}
@@ -255,8 +307,10 @@ export default function AddEditAddressScreen() {
                   autoCorrect={false}
                   returnKeyType="next"
                   blurOnSubmit={false}
+                  onSubmitEditing={() => addressRef.current?.focus()}
                   placeholderTextColor={colors.tertiary}
                 />
+                <FieldError message={errors.phone} isRTL={isRTL} />
               </View>
             </SectionCard>
 
@@ -268,7 +322,8 @@ export default function AddEditAddressScreen() {
                   <Text style={styles.requiredMark}> *</Text>
                 </Text>
                 <TextInput
-                  style={[styles.textInput, styles.multilineInput, isRTL && styles.inputRTL]}
+                  ref={addressRef}
+                  style={[styles.textInput, styles.multilineInput, isRTL && styles.inputRTL, errors.address && styles.textInputError]}
                   value={formData.address}
                   onChangeText={(text) => updateField('address', text)}
                   placeholder={t('addAddress.enterAddressLine')}
@@ -280,6 +335,7 @@ export default function AddEditAddressScreen() {
                   blurOnSubmit={false}
                   placeholderTextColor={colors.tertiary}
                 />
+                <FieldError message={errors.address} isRTL={isRTL} />
               </View>
 
               <View style={styles.fieldContainer}>
@@ -469,6 +525,35 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
     minHeight: 44,
+  },
+  // These inputs already carry a border and a fill, so the error state only has
+  // to recolour them.
+  textInputError: {
+    backgroundColor: colors.redBg,
+    borderColor: colors.redLine,
+  },
+  fieldErrorText: {
+    ...T.caption,
+    color: colors.red,
+    marginTop: 6,
+  },
+  formErrorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: colors.redBg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.redLine,
+  },
+  formErrorBannerText: {
+    ...T.bodySmall,
+    color: colors.red,
+    flex: 1,
   },
   inputRTL: {
     textAlign: 'right',

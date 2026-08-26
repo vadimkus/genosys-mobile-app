@@ -954,7 +954,11 @@
     "country": "Country",
     "setAsDefault": "Set as Default Address",
     "setAsDefaultHint": "Use this address for all future orders by default",
-    "deliveryNote": "Please provide accurate address details including building/villa number and any landmarks to ensure smooth delivery."
+    "deliveryNote": "Please provide accurate address details including building/villa number and any landmarks to ensure smooth delivery.",
+    "nameRequired": "Enter a full name.",
+    "phoneRequired": "Enter a phone number.",
+    "addressRequired": "Enter a street address.",
+    "fixFieldsBelow": "Check the highlighted fields below."
   },
   "ordersDetail": {
     "loading": "Loading…",
