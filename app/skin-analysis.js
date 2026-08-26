@@ -305,7 +305,7 @@ export default function SkinAnalysisScreen() {
                         <View style={[styles.matchChipsRow, isRTL && { flexDirection: 'row-reverse' }]}>
                           {matchedLabels.slice(0, 3).map((c) => (
                             <View key={c} style={styles.matchChip}>
-                              <Ionicons name="checkmark" size={10} color="#16A34A" />
+                              <Ionicons name="checkmark" size={10} color={colors.green} />
                               <Text style={styles.matchChipText}>{t(`skinAnalysis.${getConcernKey(c)}`)}</Text>
                             </View>
                           ))}

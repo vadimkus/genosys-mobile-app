@@ -272,7 +272,7 @@ export default function ConcernDetailScreen() {
               <TouchableOpacity style={styles.pdfCard} onPress={handleProtocolDownload} activeOpacity={0.85}>
                 <View style={[styles.pdfRow, isRTL && { flexDirection: 'row-reverse' }]}>
                   <View style={styles.pdfIconBox}>
-                    <Ionicons name="document-text-outline" size={22} color="#92400E" />
+                    <Ionicons name="document-text-outline" size={22} color={colors.orange} />
                   </View>
                   <View style={styles.pdfContent}>
                     <View style={[styles.pdfTitleRow, isRTL && { flexDirection: 'row-reverse' }]}>
@@ -283,7 +283,7 @@ export default function ConcernDetailScreen() {
                   </View>
                   <View style={styles.pdfDownload}>
                     <Text style={styles.pdfSize}>{protocolPdf.fileSize}</Text>
-                    <Ionicons name="download-outline" size={18} color="#92400E" />
+                    <Ionicons name="download-outline" size={18} color={colors.orange} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -342,7 +342,7 @@ export default function ConcernDetailScreen() {
                                     activeOpacity={0.7}
                                   >
                                     {chipInCart ? (
-                                      <Ionicons name="checkmark-circle" size={14} color="#16a34a" />
+                                      <Ionicons name="checkmark-circle" size={14} color={colors.green} />
                                     ) : null}
                                     <Text style={[styles.stepProductName, chipInCart && styles.stepProductNameInCart]}>{p.name}</Text>
                                     {!user ? (

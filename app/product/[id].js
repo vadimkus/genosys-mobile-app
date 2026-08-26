@@ -1802,7 +1802,7 @@ function ProductDetailScreen() {
           bottomOffset={(footerHeight || 96) + (insets.bottom || 12) + 12}
           isRTL={isRTL}
           icon={isOutOfStock ? 'alert-circle' : 'checkmark-circle'}
-          iconColor={isOutOfStock ? '#F59E0B' : '#22C55E'}
+          iconColor={isOutOfStock ? colors.orange : colors.green}
         />
 
         {/* Full-screen image gallery (Lightbox) */}

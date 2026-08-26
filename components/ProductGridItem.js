@@ -276,7 +276,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
             <Ionicons
               name={inCart ? 'checkmark-circle' : justAdded ? 'checkmark-circle' : 'bag-add-outline'}
               size={14}
-              color={inCart ? '#15803D' : colors.white}
+              color={inCart ? colors.greenDeep : colors.white}
             />
             <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
               {inCart

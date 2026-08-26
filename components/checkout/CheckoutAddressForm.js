@@ -199,7 +199,7 @@ export default function CheckoutAddressForm({
             />
             {isValidEmail(email) ? (
               <View style={styles.inputRightIcon}>
-                <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
+                <Ionicons name="checkmark-circle" size={18} color={colors.green} />
               </View>
             ) : null}
           </View>
@@ -238,7 +238,7 @@ export default function CheckoutAddressForm({
               />
               {isValidUaeMobileNational(phoneNational) ? (
                 <View style={styles.inputRightIcon}>
-                  <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
+                  <Ionicons name="checkmark-circle" size={18} color={colors.green} />
                 </View>
               ) : null}
             </View>

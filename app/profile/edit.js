@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -22,13 +22,14 @@ import * as ImagePicker from 'expo-image-picker';
 import { Asset } from 'expo-asset';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { isValidEmailValue, normalizeUserProfile } from '../../utils/userProfile';
+import { normalizeUserProfile } from '../../utils/userProfile';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import SectionCard from '../../components/SectionCard';
 import SectionHeader from '../../components/SectionHeader';
+import { validateProfileForm, firstProfileError } from '../../utils/profileValidation';
 
 const log = createLogger('EditProfile');
 
@@ -80,6 +81,22 @@ const getGenderLabel = (t, genderValue) => {
   }
 };
 
+/**
+ * The message under an input. Renders nothing when the field is clean, so it
+ * can sit under every input unconditionally.
+ */
+const FieldError = ({ message, isRTL }) => {
+  if (!message) return null;
+  return (
+    <Text
+      style={[styles.fieldErrorText, isRTL && styles.textRTL]}
+      accessibilityLiveRegion="polite"
+    >
+      {message}
+    </Text>
+  );
+};
+
 export default function EditProfileScreen() {
   const router = useRouter();
   const { t, locale, dir } = useLocalization();
@@ -125,6 +142,20 @@ export default function EditProfileScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [tempDate, setTempDate] = useState(new Date());
   const [initialSnapshot, setInitialSnapshot] = useState(null);
+  // Per-field validation messages, so a bad value is marked where it was typed
+  // rather than described in a modal that covers the form.
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
+
+  // Refs for the editable inputs, in screen order. Every one of these already
+  // advertised returnKeyType="next" with blurOnSubmit={false} and had no
+  // onSubmitEditing, so the keyboard's Next key did nothing at all and could
+  // not even dismiss.
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
+  const contactEmailRef = useRef(null);
+  const phoneRef = useRef(null);
+  const scrollRef = useRef(null);
 
   // Populate form with user data when component loads
   useEffect(() => {
@@ -176,6 +207,10 @@ export default function EditProfileScreen() {
   const updateField = useCallback((field, text) => {
     if (!isEditing) setIsEditing(true);
     setFormData(prevData => ({...prevData, [field]: text}));
+    // Clear this field's message as soon as the user acts on it, so the form
+    // stops shouting about something they are in the middle of fixing.
+    setErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
+    setFormError('');
   }, [isEditing]);
 
   // Notification preferences were moved to Profile → Privacy & Security.
@@ -368,30 +403,29 @@ export default function EditProfileScreen() {
     haptics.mediumTap();
     log.debug('Profile save started');
 
-    // Validate form
-    if (
-      !formData.firstName.trim() ||
-      !formData.lastName.trim() ||
-      !formData.email.trim() ||
-      !String(formData.contactEmail || '').trim() ||
-      !String(formData.phone || '').trim()
-    ) {
-      Alert.alert(t('common.error'), t('editProfile.validationMissingFields'));
+    // Every problem at once, marked on the field it belongs to.
+    const nextErrors = validateProfileForm(formData, t);
+    const firstBad = firstProfileError(nextErrors);
+    if (firstBad) {
+      haptics.error();
+      setErrors(nextErrors);
+      setFormError(t('editProfile.fixFieldsBelow'));
+      // Send the user to the first offending field rather than leaving them to
+      // hunt for it.
+      const focusTarget = {
+        firstName: firstNameRef,
+        lastName: lastNameRef,
+        contactEmail: contactEmailRef,
+        phone: phoneRef,
+      }[firstBad];
+      if (focusTarget?.current) focusTarget.current.focus();
+      else scrollRef.current?.scrollTo?.({ y: 0, animated: true });
       return;
     }
 
-    // Email validation
-    if (!isValidEmailValue(formData.email)) {
-      Alert.alert(t('common.error'), t('editProfile.validationInvalidEmail'));
-      return;
-    }
-
-    // Contact Email validation (mandatory)
+    setErrors({});
+    setFormError('');
     const contactEmail = String(formData.contactEmail || '').trim();
-    if (!isValidEmailValue(contactEmail)) {
-      Alert.alert(t('common.error'), t('editProfile.validationInvalidContactEmail'));
-      return;
-    }
 
     try {
       setIsSaving(true);
@@ -537,6 +571,7 @@ export default function EditProfileScreen() {
       />
 
       <Animated.ScrollView
+        ref={scrollRef}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -545,6 +580,16 @@ export default function EditProfileScreen() {
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: (insets?.bottom || 0) + 24 }}
       >
+        {formError ? (
+          <View
+            style={[styles.formErrorBanner, isRTL && styles.rowRTL]}
+            accessibilityLiveRegion="polite"
+          >
+            <Ionicons name="alert-circle" size={16} color={colors.red} />
+            <Text style={[styles.formErrorBannerText, isRTL && styles.textRTL]}>{formError}</Text>
+          </View>
+        ) : null}
+
         {/* Profile Picture Section */}
         <SectionCard title={t('editProfile.profilePicture')} isRTL={isRTL} icon="camera-outline">
           <View style={styles.formContent}>
@@ -583,7 +628,8 @@ export default function EditProfileScreen() {
                 {t('editProfile.firstName')}
               </Text>
               <TextInput
-                style={[styles.textInput, isRTL && styles.inputRTL]}
+                ref={firstNameRef}
+                style={[styles.textInput, isRTL && styles.inputRTL, errors.firstName && styles.textInputError]}
                 value={formData.firstName}
                 onChangeText={(text) => updateField('firstName', text)}
                 placeholder={t('editProfile.enterFirstName')}
@@ -592,9 +638,11 @@ export default function EditProfileScreen() {
                 autoComplete="name-given"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                onSubmitEditing={() => lastNameRef.current?.focus()}
                 placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
+              <FieldError message={errors.firstName} isRTL={isRTL} />
             </View>
 
             <View style={styles.fieldContainer}>
@@ -602,7 +650,8 @@ export default function EditProfileScreen() {
                 {t('editProfile.lastName')}
               </Text>
               <TextInput
-                style={[styles.textInput, isRTL && styles.inputRTL]}
+                ref={lastNameRef}
+                style={[styles.textInput, isRTL && styles.inputRTL, errors.lastName && styles.textInputError]}
                 value={formData.lastName}
                 onChangeText={(text) => updateField('lastName', text)}
                 placeholder={t('editProfile.enterLastName')}
@@ -611,9 +660,11 @@ export default function EditProfileScreen() {
                 autoComplete="name-family"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                onSubmitEditing={() => contactEmailRef.current?.focus()}
                 placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
+              <FieldError message={errors.lastName} isRTL={isRTL} />
             </View>
 
             {/* Email (read-only) — lock icon in label + universal "Used to
@@ -634,8 +685,6 @@ export default function EditProfileScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 autoComplete="email"
-                returnKeyType="next"
-                blurOnSubmit={false}
                 placeholderTextColor={colors.tertiary}
                 editable={false}
               />
@@ -655,7 +704,8 @@ export default function EditProfileScreen() {
                 {t('editProfile.contactEmail')}
               </Text>
               <TextInput
-                style={[styles.textInput, isRTL && styles.inputValueLTR]}
+                ref={contactEmailRef}
+                style={[styles.textInput, isRTL && styles.inputValueLTR, errors.contactEmail && styles.textInputError]}
                 value={formData.contactEmail}
                 onChangeText={(text) => updateField('contactEmail', text)}
                 placeholder={t('editProfile.contactEmailPlaceholder')}
@@ -665,9 +715,11 @@ export default function EditProfileScreen() {
                 autoComplete="email"
                 returnKeyType="next"
                 blurOnSubmit={false}
+                onSubmitEditing={() => phoneRef.current?.focus()}
                 placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
+              <FieldError message={errors.contactEmail} isRTL={isRTL} />
               {/* Softened from amber warning banner to neutral gray hint —
                   this is helpful info, not a warning. */}
               <View style={[styles.hintRow, isRTL && styles.rowRTL]}>
@@ -683,7 +735,8 @@ export default function EditProfileScreen() {
                 {t('editProfile.phoneNumber')}
               </Text>
               <TextInput
-                style={[styles.textInput, isRTL && styles.inputValueLTR]}
+                ref={phoneRef}
+                style={[styles.textInput, isRTL && styles.inputValueLTR, errors.phone && styles.textInputError]}
                 value={formData.phone}
                 onChangeText={(text) => updateField('phone', text)}
                 placeholder={t('editProfile.enterPhone')}
@@ -691,10 +744,10 @@ export default function EditProfileScreen() {
                 autoCorrect={false}
                 autoComplete="tel"
                 returnKeyType="done"
-                blurOnSubmit={false}
                 placeholderTextColor={colors.tertiary}
                 editable={isEditing}
               />
+              <FieldError message={errors.phone} isRTL={isRTL} />
             </View>
           </View>
         </SectionCard>
@@ -1015,6 +1068,39 @@ const styles = StyleSheet.create({
   },
   textInputReadOnly: {
     color: colors.secondaryLabel,
+  },
+  // These inputs are borderless by design, so a red message alone would leave
+  // an empty required field with nothing to look at. A washed panel marks the
+  // input itself, which works whether the value is missing or malformed.
+  textInputError: {
+    backgroundColor: colors.redBg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.redLine,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+  fieldErrorText: {
+    ...T.caption,
+    color: colors.red,
+    marginTop: 6,
+  },
+  formErrorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: colors.redBg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.redLine,
+  },
+  formErrorBannerText: {
+    ...T.bodySmall,
+    color: colors.red,
+    flex: 1,
   },
   hintRow: {
     flexDirection: 'row',

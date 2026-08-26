@@ -693,7 +693,7 @@ function BagScreen() {
                 headerRight={
                   cartSummary.hasFreeShipping ? (
                     <View style={styles.progressRightRow}>
-                      <Ionicons name="checkmark-circle" size={18} color="#34C759" />
+                      <Ionicons name="checkmark-circle" size={18} color={colors.green} />
                       <Text style={[styles.progressRightText, styles.progressRightTextMet]}>{t('common.free')}</Text>
                     </View>
                   ) : (
@@ -834,7 +834,7 @@ function BagScreen() {
               {/* Free Shipping banner */}
               {cartSummary.hasFreeShipping && (
                 <View style={styles.freeShippingBannerGreen}>
-                  <Ionicons name="checkmark-circle" size={14} color="#27AE60" style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                  <Ionicons name="checkmark-circle" size={14} color={colors.green} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
                   <Text style={[styles.freeShippingTextGreen, isRTL && styles.summaryLabelRTL]}>
                     {t('checkout.freeShippingApplied')}
                   </Text>

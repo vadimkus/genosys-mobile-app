@@ -33,7 +33,7 @@ const log = createLogger('Partners');
 
 const THEME_COLORS = {
   emerald: colors.green,
-  pink: '#ec4899',
+  pink: colors.rose,
   blue: colors.blue,
   purple: colors.purple,
 };

@@ -20,8 +20,8 @@ if (
 }
 
 const TIER_STYLES = {
-  MEMBER: { bg: colors.groupedBg, fg: '#3A3A3C', bar: colors.secondaryLabel },
-  SILVER: { bg: colors.groupedBg, fg: '#3A3A3C', bar: colors.placeholder },
+  MEMBER: { bg: colors.groupedBg, fg: colors.label, bar: colors.secondaryLabel },
+  SILVER: { bg: colors.groupedBg, fg: colors.label, bar: colors.placeholder },
   GOLD: { bg: '#FAF3E3', fg: '#8A6D1D', bar: '#D4AF37' },
   PLATINUM: { bg: colors.label, fg: colors.subtleBg, bar: colors.label },
 };

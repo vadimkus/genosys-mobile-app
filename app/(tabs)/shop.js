@@ -2108,7 +2108,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.accent,
     fontWeight: '600',
-    backgroundColor: '#dc262620',
+    backgroundColor: colors.redBg,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,

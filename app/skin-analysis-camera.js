@@ -396,7 +396,7 @@ export default function SkinAnalysisCameraScreen() {
               {aiResult.routine?.am?.length > 0 && (
                 <View style={styles.routineBlock}>
                   <View style={styles.routineLabelRow}>
-                    <Ionicons name="sunny" size={14} color="#F59E0B" />
+                    <Ionicons name="sunny" size={14} color={colors.orange} />
                     <Text style={styles.routineLabel}>{t('skinCamera.morningAM')}</Text>
                   </View>
                   {aiResult.routine.am.map((step, i) => (
@@ -411,7 +411,7 @@ export default function SkinAnalysisCameraScreen() {
               {aiResult.routine?.pm?.length > 0 && (
                 <View style={styles.routineBlock}>
                   <View style={styles.routineLabelRow}>
-                    <Ionicons name="moon" size={14} color="#6366F1" />
+                    <Ionicons name="moon" size={14} color={colors.blue} />
                     <Text style={styles.routineLabel}>{t('skinCamera.eveningPM')}</Text>
                   </View>
                   {aiResult.routine.pm.map((step, i) => (
@@ -434,7 +434,7 @@ export default function SkinAnalysisCameraScreen() {
               </View>
               {aiResult.tips.map((tip, i) => (
                 <View key={i} style={styles.tipRow}>
-                  <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+                  <Ionicons name="checkmark-circle" size={16} color={colors.green} />
                   <Text style={styles.tipText}>{tip}</Text>
                 </View>
               ))}
@@ -533,8 +533,8 @@ export default function SkinAnalysisCameraScreen() {
 // Helpers
 function scoreColor(score) {
   if (!score) return colors.placeholder;
-  if (score >= 7) return '#16A34A';
-  if (score >= 5) return '#F59E0B';
+  if (score >= 7) return colors.green;
+  if (score >= 5) return colors.orange;
   return colors.accent;
 }
 function capitalize(s) {

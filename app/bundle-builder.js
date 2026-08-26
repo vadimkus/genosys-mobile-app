@@ -462,7 +462,7 @@ export default function BundleBuilderScreen() {
         )}
         {discountPercent > 0 && (
           <View style={styles.discountActiveBadge}>
-            <Ionicons name="pricetag" size={14} color="#16a34a" />
+            <Ionicons name="pricetag" size={14} color={colors.green} />
             <Text style={styles.discountActiveText}>{discountPercent}% {t('bundleBuilder.bundleDiscount')}</Text>
           </View>
         )}
@@ -654,7 +654,7 @@ export default function BundleBuilderScreen() {
             <View style={styles.summaryHandle} />
             <View style={styles.summaryHeader}>
               <Text style={styles.summaryTitle}>{t('bundleBuilder.yourBundle')} ({itemCount})</Text>
-              <TouchableOpacity onPress={closeSummary}><Ionicons name="close" size={24} color={colors.bodyText} /></TouchableOpacity>
+              <TouchableOpacity onPress={closeSummary} accessibilityRole="button" accessibilityLabel={t('common.close')}><Ionicons name="close" size={24} color={colors.bodyText} /></TouchableOpacity>
             </View>
 
             <ScrollView style={styles.summaryScroll} showsVerticalScrollIndicator={false}>

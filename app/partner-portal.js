@@ -598,11 +598,11 @@ export default function PartnerPortalScreen() {
             )
           ) : q > 0 ? (
             <View style={[styles.stepper, isRTL && styles.rowRTL]}>
-              <TouchableOpacity style={styles.stepBtn} onPress={() => setLine(baseKey, q - 1)}>
+              <TouchableOpacity style={styles.stepBtn} onPress={() => setLine(baseKey, q - 1)} accessibilityRole="button" accessibilityLabel="Decrease quantity">
                 <Ionicons name="remove" size={18} color={colors.label} />
               </TouchableOpacity>
               <Text style={styles.stepQty}>{q}</Text>
-              <TouchableOpacity style={[styles.stepBtn, styles.stepBtnAdd]} onPress={() => setLine(baseKey, q + 1)}>
+              <TouchableOpacity style={[styles.stepBtn, styles.stepBtnAdd]} onPress={() => setLine(baseKey, q + 1)} accessibilityRole="button" accessibilityLabel="Increase quantity">
                 <Ionicons name="add" size={18} color={colors.white} />
               </TouchableOpacity>
             </View>
@@ -658,11 +658,11 @@ export default function PartnerPortalScreen() {
                     <Text style={styles.soldPillText}>{tr('Not for consignment', 'Не для консигнации', 'ليس للأمانة')}</Text>
                   ) : lq > 0 ? (
                     <View style={[styles.stepper, isRTL && styles.rowRTL]}>
-                      <TouchableOpacity style={styles.stepBtnSmall} onPress={() => setLine(lineKey, lq - 1)}>
+                      <TouchableOpacity style={styles.stepBtnSmall} onPress={() => setLine(lineKey, lq - 1)} accessibilityRole="button" accessibilityLabel="Decrease quantity">
                         <Ionicons name="remove" size={16} color={colors.label} />
                       </TouchableOpacity>
                       <Text style={styles.stepQty}>{lq}</Text>
-                      <TouchableOpacity style={[styles.stepBtnSmall, styles.stepBtnAdd]} onPress={() => setLine(lineKey, lq + 1)}>
+                      <TouchableOpacity style={[styles.stepBtnSmall, styles.stepBtnAdd]} onPress={() => setLine(lineKey, lq + 1)} accessibilityRole="button" accessibilityLabel="Increase quantity">
                         <Ionicons name="add" size={16} color={colors.white} />
                       </TouchableOpacity>
                     </View>
@@ -685,7 +685,7 @@ export default function PartnerPortalScreen() {
       {/* Corporate dark header */}
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <View style={[styles.headerRow, isRTL && styles.rowRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.headerBack} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.headerBack} accessibilityRole="button" accessibilityLabel="Back" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color={colors.white} />
           </TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
@@ -945,7 +945,7 @@ export default function PartnerPortalScreen() {
               <Ionicons
                 name={useClinicPoints && payOption !== 'consignment' ? 'checkbox' : 'square-outline'}
                 size={22}
-                color="#92400E"
+                color={colors.orange}
               />
             </TouchableOpacity>
           ) : null}

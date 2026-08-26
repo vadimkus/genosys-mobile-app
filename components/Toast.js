@@ -24,7 +24,7 @@ export default function Toast({
   onHide,
   bottomOffset = 110,
   icon = 'checkmark-circle',
-  iconColor = '#22C55E',
+  iconColor = colors.green,
   isRTL = false,
 }) {
   const translateY = useRef(new Animated.Value(40)).current;

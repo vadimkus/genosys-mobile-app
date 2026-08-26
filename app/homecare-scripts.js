@@ -225,7 +225,7 @@ export default function HomecareScriptsScreen() {
       <View style={styles.container}>
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <View style={[styles.headerRow, isRTL && styles.rowRTL]}>
-            <TouchableOpacity onPress={reset} style={styles.iconButton}><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color={colors.white} /></TouchableOpacity>
+            <TouchableOpacity onPress={reset} style={styles.iconButton} accessibilityRole="button" accessibilityLabel="Back"><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color={colors.white} /></TouchableOpacity>
             <Text style={styles.headerTitle}>{editingId ? tr('Update recommendation', 'Обновить рекомендацию', 'تحديث التوصية') : tr('New recommendation', 'Новая рекомендация', 'توصية جديدة')}</Text>
             <View style={styles.iconButton} />
           </View>
@@ -263,12 +263,12 @@ export default function HomecareScriptsScreen() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <View style={[styles.headerRow, isRTL && styles.rowRTL]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color={colors.white} /></TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()} style={styles.iconButton} accessibilityRole="button" accessibilityLabel="Back"><Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={25} color={colors.white} /></TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
             <Text style={styles.brand}>GENOSYS</Text>
             <Text style={styles.headerSubtitle}>{tr('HOMECARE SCRIPTS', 'РЕКОМЕНДАЦИИ', 'توصيات منزلية')}</Text>
           </View>
-          <TouchableOpacity onPress={startNew} style={styles.iconButton}><Ionicons name="add-circle" size={27} color={colors.accent} /></TouchableOpacity>
+          <TouchableOpacity onPress={startNew} style={styles.iconButton} accessibilityRole="button" accessibilityLabel="New script"><Ionicons name="add-circle" size={27} color={colors.accent} /></TouchableOpacity>
         </View>
         <Text style={styles.intro}>{tr('Recommend retail products and earn Clinic Points after eligible patient purchases.', 'Рекомендуйте продукты и получайте баллы после покупок пациентов.', 'أوصِ بمنتجات التجزئة واكسب نقاط العيادة بعد مشتريات المرضى المؤهلة.')}</Text>
       </View>
@@ -338,7 +338,7 @@ export default function HomecareScriptsScreen() {
                   <View style={[styles.actions, isRTL && styles.rowRTL]}>
                     <TouchableOpacity style={styles.primaryAction} onPress={() => shareScript(item)}><Ionicons name="share-outline" size={17} color={colors.white} /><Text style={styles.primaryActionText}>{tr('Share', 'Отправить', 'مشاركة')}</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.action} onPress={() => startEdit(item)}><Ionicons name="create-outline" size={17} color={colors.label} /><Text style={styles.actionText}>{tr('Edit', 'Изменить', 'تعديل')}</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.deleteAction} onPress={() => confirmRevoke(item)}><Ionicons name="trash-outline" size={17} color={colors.red} /></TouchableOpacity>
+                    <TouchableOpacity style={styles.deleteAction} onPress={() => confirmRevoke(item)} accessibilityRole="button" accessibilityLabel="Delete"><Ionicons name="trash-outline" size={17} color={colors.red} /></TouchableOpacity>
                   </View>
                 ) : null}
               </View>

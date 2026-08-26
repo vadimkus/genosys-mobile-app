@@ -900,7 +900,12 @@
     "privacyNote": "Your personal information is protected and will not be shared with third parties. By updating your profile, you agree to our Privacy Policy.",
     "avatarError": "Could not set your avatar. Please try again.",
     "photoError": "Could not take the photo. Please try again.",
-    "photoSelectError": "Could not select that photo. Please try again."
+    "photoSelectError": "Could not select that photo. Please try again.",
+    "firstNameRequired": "Enter your first name.",
+    "lastNameRequired": "Enter your last name.",
+    "contactEmailRequired": "Enter a contact email.",
+    "phoneRequired": "Enter a phone number.",
+    "fixFieldsBelow": "Check the highlighted fields below."
   },
   "addAddress": {
     "addTitle": "Add Address",

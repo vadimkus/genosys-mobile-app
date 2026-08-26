@@ -87,7 +87,7 @@ export default function TabLayout() {
           tabBarLabel: t('tabs.orders'),
           tabBarIcon: ({ color, size, focused }) => {
             // Change orders icon color to green when there are orders
-            const ordersColor = ordersCount > 0 ? '#10b981' : color; // green-500 when orders exist
+            const ordersColor = ordersCount > 0 ? colors.green : color; // green-500 when orders exist
             return (
               <View>
                 <TabIcon
@@ -114,7 +114,7 @@ export default function TabLayout() {
           ...(cartCount > 0 ? { tabBarStyle: { display: 'none' } } : {}),
           tabBarIcon: ({ color, size, focused }) => {
             // Change bag icon color to green when cart has items
-            const bagColor = cartCount > 0 ? '#10b981' : color; // green-500 when cart has items
+            const bagColor = cartCount > 0 ? colors.green : color; // green-500 when cart has items
             return (
               <View>
                 <TabIcon
