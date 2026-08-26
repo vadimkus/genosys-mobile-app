@@ -1325,6 +1325,7 @@
     "birthdayHint": "احصل على هدية خاصة في عيد ميلادك! 🎁",
     "passwordLabel": "كلمة المرور",
     "passwordPlaceholder": "أدخل كلمة المرور",
+    "passwordHint8": "8 أحرف على الأقل",
     "showPassword": "إظهار كلمة المرور",
     "hidePassword": "إخفاء كلمة المرور",
     "privacyConsentPrefix": "أوافق على",

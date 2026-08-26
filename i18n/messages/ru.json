@@ -1325,6 +1325,7 @@
     "birthdayHint": "Получите подарок в день рождения! 🎁",
     "passwordLabel": "Пароль",
     "passwordPlaceholder": "Введите пароль",
+    "passwordHint8": "Не менее 8 символов",
     "showPassword": "Показать пароль",
     "hidePassword": "Скрыть пароль",
     "privacyConsentPrefix": "Я соглашаюсь с",

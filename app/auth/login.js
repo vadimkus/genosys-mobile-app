@@ -100,6 +100,22 @@ export default function LoginScreen() {
   } = useAuth();
   const emailSuggestion = !isLogin ? suggestEmailAddressCorrection(email) : null;
 
+  // Return-key chaining down the form, so a seven-field sign-up can be filled
+  // without reaching back to the screen between every field.
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const phoneRef = useRef(null);
+  const addressRef = useRef(null);
+
+  // The consent tick sits below seven sign-up fields, so the notice at the top
+  // that points at it has to be able to take you there.
+  const scrollRef = useRef(null);
+  const consentY = useRef(0);
+  const scrollToConsent = () => {
+    haptics.selectionTick();
+    scrollRef.current?.scrollTo({ y: Math.max(consentY.current - 80, 0), animated: true });
+  };
+
   // Subtle entrance motion (native driver) — matches the rest of the app.
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(10)).current;
@@ -413,6 +429,7 @@ export default function LoginScreen() {
         style={styles.keyboardContainer}
       >
         <ScrollView
+          ref={scrollRef}
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -437,7 +454,7 @@ export default function LoginScreen() {
             {/* Header with Logo */}
             <View style={styles.header}>
               <Image 
-                source={require('../../assets/genosys-logo-gray.png')}
+                source={require('../../assets/genosys-logo-transparent.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />
@@ -450,12 +467,23 @@ export default function LoginScreen() {
 
             {/* Privacy Policy Notice */}
             {!privacyConsent && (
-              <View style={styles.privacyNotice}>
+              <TouchableOpacity
+                style={styles.privacyNotice}
+                onPress={scrollToConsent}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={t('authScreen.privacyNotice')}
+              >
                 <Ionicons name="information-circle" size={16} color={colors.orange} />
                 <Text style={[styles.privacyNoticeText, isRTL && styles.textRTL]}>
                   {t('authScreen.privacyNotice')}
                 </Text>
-              </View>
+                <Ionicons
+                  name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                  size={14}
+                  color={colors.orange}
+                />
+              </TouchableOpacity>
             )}
 
             {/* Biometric Login Button */}
@@ -467,6 +495,7 @@ export default function LoginScreen() {
                 ]}
                 onPress={handleBiometricLogin}
                 disabled={loading || !privacyConsent}
+                accessibilityState={{ disabled: loading || !privacyConsent }}
                 activeOpacity={0.85}
               >
                 <View style={[styles.biometricButtonContent, isRTL && styles.rowReverse]}>
@@ -492,6 +521,7 @@ export default function LoginScreen() {
                 ]}
                 onPress={handleGoogleLogin}
                 disabled={loading || !privacyConsent}
+                accessibilityState={{ disabled: loading || !privacyConsent }}
                 activeOpacity={0.85}
                 accessibilityLabel={t('authScreen.continueWithGoogle')}
               >
@@ -510,6 +540,7 @@ export default function LoginScreen() {
                   style={[styles.appleButton, shadow.card, !privacyConsent && styles.buttonDisabledOpacity]}
                   onPress={handleAppleLogin}
                   disabled={loading || !privacyConsent}
+                  accessibilityState={{ disabled: loading || !privacyConsent }}
                   activeOpacity={0.85}
                   accessibilityLabel={t('authScreen.continueWithApple')}
                 >
@@ -542,6 +573,9 @@ export default function LoginScreen() {
                     onChangeText={setName}
                     autoCapitalize="words"
                     autoComplete="name"
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => emailRef.current?.focus()}
                     placeholderTextColor={colors.tertiary}
                   />
                 </View>
@@ -557,10 +591,16 @@ export default function LoginScreen() {
                     setEmail(value);
                     setConfirmedEmail(null);
                   }}
+                  ref={emailRef}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  autoCorrect={false}
+                  spellCheck={false}
                   autoComplete="email"
                   textContentType={isLogin ? 'username' : 'emailAddress'}
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => passwordRef.current?.focus()}
                   placeholderTextColor={colors.tertiary}
                 />
                 {emailSuggestion && confirmedEmail !== normalizeEmailAddress(email) ? (
@@ -609,9 +649,17 @@ export default function LoginScreen() {
                     placeholder={t('authScreen.passwordPlaceholder')}
                     value={password}
                     onChangeText={setPassword}
+                    ref={passwordRef}
                     secureTextEntry={!showPassword}
                     autoComplete={isLogin ? 'current-password' : 'new-password'}
                     textContentType={isLogin ? 'password' : 'newPassword'}
+                    // Signing in, the password is the last field, so the return
+                    // key submits rather than dropping the keyboard.
+                    returnKeyType={isLogin ? 'go' : 'next'}
+                    blurOnSubmit={isLogin}
+                    onSubmitEditing={() =>
+                      isLogin ? handleEmailAuth() : phoneRef.current?.focus()
+                    }
                     placeholderTextColor={colors.tertiary}
                   />
                   <TouchableOpacity
@@ -628,6 +676,13 @@ export default function LoginScreen() {
                     />
                   </TouchableOpacity>
                 </View>
+                {/* Stated before submitting rather than as an alert after it,
+                    so nobody types a six-character password and gets bounced. */}
+                {!isLogin && (
+                  <Text style={[styles.fieldHint, isRTL && styles.textRTL]}>
+                    {t('authScreen.passwordHint8')}
+                  </Text>
+                )}
               </View>
 
               {/* Registration-only fields */}
@@ -641,10 +696,16 @@ export default function LoginScreen() {
                     <TextInput
                       style={[styles.textInput, styles.inputValueLTR]}
                       placeholder={t('authScreen.phonePlaceholder')}
+                      ref={phoneRef}
                       value={phone}
                       onChangeText={setPhone}
                       keyboardType="phone-pad"
                       autoComplete="tel"
+                      // iOS shows no return key on a phone pad, so this only
+                      // chains on Android; the tap target stays the fallback.
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => addressRef.current?.focus()}
                       placeholderTextColor={colors.tertiary}
                     />
                   </View>
@@ -657,9 +718,13 @@ export default function LoginScreen() {
                     <TextInput
                       style={[styles.textInput, isRTL && styles.inputRTL]}
                       placeholder={t('authScreen.addressPlaceholder')}
+                      ref={addressRef}
                       value={address}
                       onChangeText={setAddress}
                       autoComplete="street-address"
+                      // Emirate and birthday are pickers, so the keyboard's work
+                      // ends here.
+                      returnKeyType="done"
                       placeholderTextColor={colors.tertiary}
                     />
                   </View>
@@ -707,11 +772,18 @@ export default function LoginScreen() {
             </View>
 
             {/* Privacy Policy Consent */}
-            <View style={[styles.privacySection, isRTL && styles.privacySectionRTL]}>
+            <View
+              style={[styles.privacySection, isRTL && styles.privacySectionRTL]}
+              onLayout={(e) => { consentY.current = e.nativeEvent.layout.y; }}
+            >
               <TouchableOpacity
                 style={[styles.checkboxContainer, isRTL && styles.rowReverse]}
                 onPress={() => { haptics.selectionTick(); setPrivacyConsent(!privacyConsent); }}
                 activeOpacity={0.7}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: privacyConsent }}
+                accessibilityLabel={`${t('authScreen.privacyConsentPrefix')} ${t('authScreen.privacyPolicyLink')} ${t('authScreen.privacyConsentSuffix')}`}
+                hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
               >
                 <View style={[styles.checkbox, privacyConsent && styles.checkboxChecked, isRTL && styles.checkboxRTL]}>
                   {privacyConsent && (
@@ -737,6 +809,7 @@ export default function LoginScreen() {
               ]}
               onPress={handleEmailAuth}
               disabled={loading || !privacyConsent}
+              accessibilityState={{ disabled: loading || !privacyConsent, busy: loading }}
               activeOpacity={0.85}
             >
               {loading ? (
@@ -1177,6 +1250,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.secondaryLabel,
     marginBottom: 6,
+  },
+  fieldHint: {
+    fontSize: 12,
+    color: colors.tertiary,
+    marginTop: 6,
   },
   textInput: {
     ...T.input,

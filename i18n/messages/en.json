@@ -1313,6 +1313,7 @@
     "emailPlaceholder": "Enter your email",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Enter your password",
+    "passwordHint8": "At least 8 characters",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "privacyConsentPrefix": "I agree to the",

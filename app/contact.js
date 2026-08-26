@@ -154,7 +154,7 @@ export default function ContactScreen() {
           {/* Hero Section */}
           <View style={styles.heroSection}>
             <Image
-              source={require('../assets/genosys-logo-gray.png')}
+              source={require('../assets/genosys-logo-transparent.png')}
               style={styles.logo}
               resizeMode="contain"
             />
