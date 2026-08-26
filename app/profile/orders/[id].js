@@ -28,6 +28,7 @@ import { getOrderContactEmail } from '../../../utils/userProfile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as haptics from '../../../utils/haptics';
 import T from '../../../utils/typography';
+import OrderProgress from '../../../components/OrderProgress';
 import { colors, shadow, surfaces, statusStyle } from '../../../utils/theme';
 import SectionCard from '../../../components/SectionCard';
 import { ASSET_ORIGIN } from '../../../utils/assets';
@@ -463,6 +464,11 @@ export default function OrderDetailScreen() {
                 <Text style={[styles.dateTimeText, isRTL && styles.textRTL]}>{formattedDateTime}</Text>
               </View>
             ) : null}
+            {/* Where the order has got to, on the same card as its number: the two
+                things a customer opens this screen to find. */}
+            <View style={styles.progressBlock}>
+              <OrderProgress order={order} t={t} isRTL={isRTL} />
+            </View>
           </View>
 
           {/* Payment Method Section */}
@@ -1098,6 +1104,12 @@ const styles = StyleSheet.create({
     gap: 6,
     marginTop: 14,
     paddingTop: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.separator,
+  },
+  progressBlock: {
+    marginTop: 16,
+    paddingTop: 18,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.separator,
   },

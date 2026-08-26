@@ -1026,7 +1026,10 @@
     "totalSaved": "إجمالي التوفير",
     "viewBoxContents": "عرض محتويات العلبة",
     "hideBoxContents": "إخفاء محتويات العلبة",
-    "boxDetailsUnavailable": "تفاصيل محتويات العلبة غير متاحة."
+    "boxDetailsUnavailable": "تفاصيل محتويات العلبة غير متاحة.",
+    "paidOnDelivery": "الدفع عند الاستلام",
+    "trackerCancelled": "تم إلغاء هذا الطلب",
+    "trackerComplete": "تم التوصيل — شكرًا لك"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",

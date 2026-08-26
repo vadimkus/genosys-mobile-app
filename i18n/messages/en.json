@@ -1026,7 +1026,10 @@
     "totalSaved": "Total Saved",
     "viewBoxContents": "View Box Contents",
     "hideBoxContents": "Hide Box Contents",
-    "boxDetailsUnavailable": "Box contents details are not available."
+    "boxDetailsUnavailable": "Box contents details are not available.",
+    "paidOnDelivery": "Paid on delivery",
+    "trackerCancelled": "This order was cancelled",
+    "trackerComplete": "Delivered — thank you"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Could not start payment",

@@ -1026,7 +1026,10 @@
     "totalSaved": "Итого сэкономлено",
     "viewBoxContents": "Показать состав набора",
     "hideBoxContents": "Скрыть состав набора",
-    "boxDetailsUnavailable": "Детали состава набора недоступны."
+    "boxDetailsUnavailable": "Детали состава набора недоступны.",
+    "paidOnDelivery": "Оплата при получении",
+    "trackerCancelled": "Заказ отменён",
+    "trackerComplete": "Доставлен — спасибо"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",
