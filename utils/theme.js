@@ -108,6 +108,10 @@ export const colors = {
   // on the page rather than on its own tile, use the darker official variant.
   whatsapp: '#25D366',
   whatsappDeep: '#075E54',   // 7.19:1 on cream
+  // One step darker again. The website needs this for the hover state on its
+  // filled WhatsApp buttons; here it is the pressed tone, and it keeps the two
+  // surfaces on the same three values.
+  whatsappHover: '#054840',
   white: '#FFFFFF',
 };
 

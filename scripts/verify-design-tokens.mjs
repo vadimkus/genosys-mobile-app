@@ -46,6 +46,46 @@ if (!ceraBlock) {
   }
 }
 
+/* ── Status colours, on the `colors` object in utils/theme.js ─────────── */
+
+const colorsBlock = theme.match(/export const colors = \{([\s\S]*?)\n\};/);
+
+if (!colorsBlock) {
+  failures.push('`export const colors` not found in utils/theme.js');
+} else {
+  const body = colorsBlock[1];
+  for (const [name, expected] of Object.entries(tokens.status)) {
+    if (name.startsWith('$')) continue;
+    const match = body.match(new RegExp(`\\n\\s*${name}:\\s*'([^']+)'`));
+    if (!match) {
+      failures.push(`colors.${name} is missing from utils/theme.js`);
+      continue;
+    }
+    const actual = match[1].trim().toLowerCase();
+    if (actual !== expected.toLowerCase()) {
+      failures.push(`colors.${name} is ${actual} in theme.js but ${expected} in design-tokens.json`);
+    }
+  }
+}
+
+/* ── Third-party brand marks, on `colors` in utils/theme.js ───────────── */
+
+if (colorsBlock) {
+  const body = colorsBlock[1];
+  for (const [name, expected] of Object.entries(tokens.brand)) {
+    if (name.startsWith('$')) continue;
+    const match = body.match(new RegExp(`\\n\\s*${name}:\\s*'([^']+)'`));
+    if (!match) {
+      failures.push(`colors.${name} is missing from utils/theme.js`);
+      continue;
+    }
+    const actual = match[1].trim().toLowerCase();
+    if (actual !== expected.toLowerCase()) {
+      failures.push(`colors.${name} is ${actual} in theme.js but ${expected} in design-tokens.json`);
+    }
+  }
+}
+
 /* ── The eyebrow, in utils/typography.js ──────────────────────────────── */
 
 const typography = read('utils/typography.js');
@@ -79,6 +119,21 @@ if (!eyebrowBlock) {
   }
 }
 
+/* ── Section title: this app is phone-only, so its size is the shared one ─ */
+
+const sectionTitle = typography.match(/\n  sectionTitle: \{([\s\S]*?)\n  \},/);
+if (!sectionTitle) {
+  failures.push('`sectionTitle` style not found in utils/typography.js');
+} else {
+  const m = sectionTitle[1].match(/fontSize:\s*(\d+)/);
+  const expected = tokens.typography.sectionTitle.phoneFontSize;
+  if (!m || Number(m[1]) !== expected) {
+    failures.push(
+      `T.sectionTitle.fontSize is ${m ? m[1] : 'unset'} but design-tokens.json says ${expected}`
+    );
+  }
+}
+
 /* ── Checksum, so the website repo can prove it holds the same file ───── */
 
 const checksum = createHash('sha256').update(read('design-tokens.json')).digest('hex');
@@ -93,7 +148,8 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-const count = Object.keys(tokens.color).filter((k) => !k.startsWith('$')).length;
+const countOf = (group) => Object.keys(group).filter((k) => !k.startsWith('$')).length;
+const count = countOf(tokens.color) + countOf(tokens.status) + countOf(tokens.brand);
 console.log(`[design-tokens] ${count} colours and the eyebrow match design-tokens.json`);
 console.log(`[design-tokens] v${tokens.version} sha256 ${checksum.slice(0, 16)}`);
 console.log('[design-tokens] cosmetics-website must report the same version and sha256');
