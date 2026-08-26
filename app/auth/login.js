@@ -23,6 +23,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocalization } from '../../contexts/LocalizationContext';
 import PrivacyPolicyModal from '../../components/PrivacyPolicyModal';
+import { validateAuthForm, firstAuthError } from '../../utils/authValidation';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import AUTH_CONFIG from '../../config/auth';
@@ -30,7 +31,6 @@ import Constants from 'expo-constants';
 import T from '../../utils/typography';
 import { colors, shadow, surfaces, tint } from '../../utils/theme';
 import {
-  isEmailAddressSyntaxValid,
   normalizeEmailAddress,
   suggestEmailAddressCorrection,
 } from '../../utils/emailAddressValidation';
@@ -59,6 +59,23 @@ const getNativeBundleId = () => {
     return '';
   }
 };
+
+/**
+ * The message that belongs to one field, rendered under it. Renders nothing
+ * when the field is fine, so it can sit in the tree unconditionally.
+ */
+function FieldError({ message, isRTL }) {
+  if (!message) return null;
+  return (
+    <Text
+      style={[styles.fieldError, isRTL && styles.textRTL]}
+      accessibilityRole="alert"
+      accessibilityLiveRegion="polite"
+    >
+      {message}
+    </Text>
+  );
+}
 
 export default function LoginScreen() {
   const { t, locale, setLocale, dir } = useLocalization();
@@ -100,8 +117,17 @@ export default function LoginScreen() {
   } = useAuth();
   const emailSuggestion = !isLogin ? suggestEmailAddressCorrection(email) : null;
 
+  // Validation reports itself under the field that failed. formError is for
+  // what has no field to sit under: a rejected password, a provider that would
+  // not talk to us, a dropped connection.
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [formError, setFormError] = useState(null);
+  const clearFieldError = (key) =>
+    setFieldErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
+
   // Return-key chaining down the form, so a seven-field sign-up can be filled
   // without reaching back to the screen between every field.
+  const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const phoneRef = useRef(null);
@@ -128,10 +154,12 @@ export default function LoginScreen() {
 
   const handleGoogleLogin = async () => {
     haptics.lightTap();
+    setFormError(null);
     // Check privacy consent
     if (!privacyConsent) {
       haptics.warning();
-      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
+      setFieldErrors((prev) => ({ ...prev, consent: t('authScreen.privacyRequiredMessage') }));
+      scrollToConsent();
       return;
     }
 
@@ -144,22 +172,11 @@ export default function LoginScreen() {
         // Navigation will be handled by the auth context automatically
       } else {
         haptics.warning();
-        // Show helpful error message with alternative
-        Alert.alert(
-          t('authScreen.googleSignInIssueTitle'), 
-          result.error || t('authScreen.googleSignInIssueMessage'),
-          [
-            { text: t('common.ok'), style: 'default' },
-            { text: t('authScreen.useEmailLogin'), style: 'default', onPress: () => {
-              // Focus on email input or scroll to email form
-              log.debug('User chose email login alternative');
-            }}
-          ]
-        );
+        setFormError(result.error || t('authScreen.googleSignInIssueMessage'));
       }
     } catch (error) {
       haptics.warning();
-      Alert.alert(t('common.error'), t('authScreen.googleAuthFailed'));
+      setFormError(t('authScreen.googleAuthFailed'));
     } finally {
       setLoading(false);
     }
@@ -167,15 +184,17 @@ export default function LoginScreen() {
 
   const handleAppleLogin = async () => {
     haptics.lightTap();
+    setFormError(null);
     if (!privacyConsent) {
       haptics.warning();
-      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
+      setFieldErrors((prev) => ({ ...prev, consent: t('authScreen.privacyRequiredMessage') }));
+      scrollToConsent();
       return;
     }
     if (!AppleAuthentication) {
       haptics.warning();
       // Should never happen since the button is only shown on iOS, but guard anyway
-      Alert.alert(t('authScreen.authFailedTitle'), t('authScreen.appleIosOnly'));
+      setFormError(t('authScreen.appleIosOnly'));
       return;
     }
     try {
@@ -184,10 +203,7 @@ export default function LoginScreen() {
       const isAvailable = await AppleAuthentication.isAvailableAsync().catch(() => false);
       if (!isAvailable) {
         haptics.warning();
-        Alert.alert(
-          t('authScreen.authFailedTitle'),
-          t('authScreen.appleUnavailableDevice')
-        );
+        setFormError(t('authScreen.appleUnavailableDevice'));
         return;
       }
       const credential = await AppleAuthentication.signInAsync({
@@ -204,14 +220,14 @@ export default function LoginScreen() {
 
       if (!identityToken) {
         haptics.warning();
-        Alert.alert(t('authScreen.authFailedTitle'), t('authScreen.appleNoToken'));
+        setFormError(t('authScreen.appleNoToken'));
         return;
       }
 
       const result = await loginWithApple({ identityToken, fullName });
       if (!result.success) {
         haptics.warning();
-        Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.appleAuthFailed'));
+        setFormError(result.error || t('authScreen.appleAuthFailed'));
       } else {
         haptics.success();
       }
@@ -239,19 +255,13 @@ export default function LoginScreen() {
 
       if (looksLikeSetupNotComplete || looksLikeNotHandled) {
         haptics.warning();
-        Alert.alert(
-          t('authScreen.authFailedTitle'),
-          t('authScreen.appleSetupNotComplete', { bundleId: bundleId || 'unknown' })
-        );
+        setFormError(t('authScreen.appleSetupNotComplete', { bundleId: bundleId || 'unknown' }));
         return;
       }
       const detail = [code, msg].filter(Boolean).join(': ');
       haptics.warning();
-      Alert.alert(
-        t('common.error'),
-        detail
-          ? `${t('authScreen.appleAuthFailed')}\n\n${detail}`
-          : t('authScreen.appleAuthFailed')
+      setFormError(
+        detail ? `${t('authScreen.appleAuthFailed')} (${detail})` : t('authScreen.appleAuthFailed')
       );
     } finally {
       setLoading(false);
@@ -260,10 +270,12 @@ export default function LoginScreen() {
 
   const handleBiometricLogin = async () => {
     haptics.lightTap();
+    setFormError(null);
     // Check privacy consent
     if (!privacyConsent) {
       haptics.warning();
-      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
+      setFieldErrors((prev) => ({ ...prev, consent: t('authScreen.privacyRequiredMessage') }));
+      scrollToConsent();
       return;
     }
 
@@ -277,71 +289,41 @@ export default function LoginScreen() {
         log.debug('Biometric login successful');
       } else {
         haptics.warning();
-        Alert.alert(t('authScreen.authFailedTitle'), result.error || t('authScreen.biometricLoginFailed'));
+        setFormError(result.error || t('authScreen.biometricLoginFailed'));
       }
     } catch (error) {
       haptics.warning();
-      Alert.alert(t('common.error'), t('authScreen.biometricAuthFailed'));
+      setFormError(t('authScreen.biometricAuthFailed'));
     } finally {
       setLoading(false);
     }
   };
 
+  const FIELD_REFS = { name: nameRef, email: emailRef, password: passwordRef, phone: phoneRef, address: addressRef };
+
   const handleEmailAuth = async () => {
     haptics.mediumTap();
-    if (!email || !password || (!isLogin && !name)) {
-      haptics.warning();
-      Alert.alert(t('common.error'), t('authScreen.fillAllFields'));
-      return;
-    }
-
-    // Registration-specific validation
-    if (!isLogin) {
-      if (!phone.trim()) {
-        haptics.warning();
-        Alert.alert(t('common.error'), t('authScreen.phoneRequired'));
-        return;
-      }
-      if (!address.trim()) {
-        haptics.warning();
-        Alert.alert(t('common.error'), t('authScreen.addressRequired'));
-        return;
-      }
-      if (!emirate) {
-        haptics.warning();
-        Alert.alert(t('common.error'), t('authScreen.emirateRequired'));
-        return;
-      }
-    }
+    setFormError(null);
 
     const normalizedEmail = normalizeEmailAddress(email);
-    if (!isEmailAddressSyntaxValid(normalizedEmail)) {
+    const errors = validateAuthForm(
+      { name, email, normalizedEmail, password, phone, address, emirate, privacyConsent, emailSuggestion, confirmedEmail },
+      { isLogin, t }
+    );
+    const firstError = firstAuthError(errors);
+
+    if (firstError) {
       haptics.warning();
-      Alert.alert(t('common.error'), t('authScreen.invalidEmail'));
+      setFieldErrors(errors);
+      // Take them to the first problem: the keyboard for a text field, a scroll
+      // for the emirate picker and the consent tick, which have none.
+      const ref = FIELD_REFS[firstError];
+      if (ref) ref.current?.focus();
+      else scrollToConsent();
       return;
     }
 
-    if (emailSuggestion && confirmedEmail !== normalizedEmail) {
-      haptics.warning();
-      Alert.alert(t('authScreen.checkEmailTitle'), t('authScreen.emailSuggestionRequired'));
-      return;
-    }
-
-    // Register-only: min 8, aligned with the server + reset-password policy.
-    // Login is not length-checked so legacy accounts with shorter passwords
-    // can still sign in (server validates credentials anyway).
-    if (!isLogin && password.length < 8) {
-      haptics.warning();
-      Alert.alert(t('common.error'), t('authScreen.passwordMinLength'));
-      return;
-    }
-
-    // Check privacy consent
-    if (!privacyConsent) {
-      haptics.warning();
-      Alert.alert(t('authScreen.privacyRequiredTitle'), t('authScreen.privacyRequiredMessage'));
-      return;
-    }
+    setFieldErrors({});
 
     try {
       setLoading(true);
@@ -368,11 +350,11 @@ export default function LoginScreen() {
         // Navigation will be handled by the auth context automatically
       } else {
         haptics.warning();
-        Alert.alert(t('common.error'), result.error || (isLogin ? t('authScreen.loginFailed') : t('authScreen.registrationFailed')));
+        setFormError(result.error || (isLogin ? t('authScreen.loginFailed') : t('authScreen.registrationFailed')));
       }
     } catch (error) {
       haptics.warning();
-      Alert.alert(t('common.error'), t('authScreen.genericError'));
+      setFormError(t('authScreen.genericError'));
     } finally {
       setLoading(false);
     }
@@ -380,6 +362,10 @@ export default function LoginScreen() {
 
   const toggleMode = () => {
     haptics.selectionTick();
+    // The two modes validate different fields, so the other one's complaints
+    // must not follow you across.
+    setFieldErrors({});
+    setFormError(null);
     if (isLogin && partnerIntent) {
       router.setParams({ returnTo: '' });
     }
@@ -486,6 +472,15 @@ export default function LoginScreen() {
               </TouchableOpacity>
             )}
 
+            {/* Anything with no field of its own: a rejected password, a
+                provider that would not talk to us, a dropped connection. */}
+            {formError && (
+              <View style={styles.formError} accessibilityRole="alert" accessibilityLiveRegion="polite">
+                <Ionicons name="alert-circle" size={16} color={colors.red} />
+                <Text style={[styles.formErrorText, isRTL && styles.textRTL]}>{formError}</Text>
+              </View>
+            )}
+
             {/* Biometric Login Button */}
             {biometricAvailable && biometricEnabled && (
               <TouchableOpacity
@@ -565,12 +560,12 @@ export default function LoginScreen() {
             <View style={[styles.formCard, shadow.card]}>
               {!isLogin && (
                 <View style={styles.fieldContainer}>
-                  <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('authScreen.fullNameLabel')}</Text>
+                  <Text style={[styles.fieldLabel, fieldErrors.name && styles.fieldLabelError, isRTL && styles.textRTL]}>{t('authScreen.fullNameLabel')}</Text>
                   <TextInput
                     style={[styles.textInput, isRTL && styles.inputRTL]}
                     placeholder={t('authScreen.fullNamePlaceholder')}
                     value={name}
-                    onChangeText={setName}
+                    onChangeText={(v) => { setName(v); clearFieldError('name'); }}
                     autoCapitalize="words"
                     autoComplete="name"
                     returnKeyType="next"
@@ -578,11 +573,12 @@ export default function LoginScreen() {
                     onSubmitEditing={() => emailRef.current?.focus()}
                     placeholderTextColor={colors.tertiary}
                   />
+                  <FieldError message={fieldErrors.name} isRTL={isRTL} />
                 </View>
               )}
 
               <View style={styles.fieldContainer}>
-                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('authScreen.emailLabel')}</Text>
+                <Text style={[styles.fieldLabel, fieldErrors.email && styles.fieldLabelError, isRTL && styles.textRTL]}>{t('authScreen.emailLabel')}</Text>
                 <TextInput
                   style={[styles.textInput, isRTL && styles.inputValueLTR]}
                   placeholder={t('authScreen.emailPlaceholder')}
@@ -590,6 +586,7 @@ export default function LoginScreen() {
                   onChangeText={(value) => {
                     setEmail(value);
                     setConfirmedEmail(null);
+                    clearFieldError('email');
                   }}
                   ref={emailRef}
                   keyboardType="email-address"
@@ -639,16 +636,17 @@ export default function LoginScreen() {
                     </View>
                   </View>
                 ) : null}
+                <FieldError message={fieldErrors.email} isRTL={isRTL} />
               </View>
 
               <View style={[styles.fieldContainer, isLogin && styles.fieldContainerLast]}>
-                <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>{t('authScreen.passwordLabel')}</Text>
+                <Text style={[styles.fieldLabel, fieldErrors.password && styles.fieldLabelError, isRTL && styles.textRTL]}>{t('authScreen.passwordLabel')}</Text>
                 <View style={[styles.passwordRow, isRTL && styles.rowReverse]}>
                   <TextInput
                     style={[styles.passwordInput, isRTL && styles.inputValueLTR]}
                     placeholder={t('authScreen.passwordPlaceholder')}
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={(v) => { setPassword(v); clearFieldError('password'); }}
                     ref={passwordRef}
                     secureTextEntry={!showPassword}
                     autoComplete={isLogin ? 'current-password' : 'new-password'}
@@ -678,11 +676,13 @@ export default function LoginScreen() {
                 </View>
                 {/* Stated before submitting rather than as an alert after it,
                     so nobody types a six-character password and gets bounced. */}
-                {!isLogin && (
+                {fieldErrors.password ? (
+                  <FieldError message={fieldErrors.password} isRTL={isRTL} />
+                ) : !isLogin ? (
                   <Text style={[styles.fieldHint, isRTL && styles.textRTL]}>
                     {t('authScreen.passwordHint8')}
                   </Text>
-                )}
+                ) : null}
               </View>
 
               {/* Registration-only fields */}
@@ -690,7 +690,7 @@ export default function LoginScreen() {
                 <>
                   {/* Phone */}
                   <View style={styles.fieldContainer}>
-                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                    <Text style={[styles.fieldLabel, fieldErrors.phone && styles.fieldLabelError, isRTL && styles.textRTL]}>
                       {t('authScreen.phoneLabel')} <Text style={styles.requiredStar}>*</Text>
                     </Text>
                     <TextInput
@@ -698,7 +698,7 @@ export default function LoginScreen() {
                       placeholder={t('authScreen.phonePlaceholder')}
                       ref={phoneRef}
                       value={phone}
-                      onChangeText={setPhone}
+                      onChangeText={(v) => { setPhone(v); clearFieldError('phone'); }}
                       keyboardType="phone-pad"
                       autoComplete="tel"
                       // iOS shows no return key on a phone pad, so this only
@@ -708,11 +708,12 @@ export default function LoginScreen() {
                       onSubmitEditing={() => addressRef.current?.focus()}
                       placeholderTextColor={colors.tertiary}
                     />
+                    <FieldError message={fieldErrors.phone} isRTL={isRTL} />
                   </View>
 
                   {/* Address */}
                   <View style={styles.fieldContainer}>
-                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                    <Text style={[styles.fieldLabel, fieldErrors.address && styles.fieldLabelError, isRTL && styles.textRTL]}>
                       {t('authScreen.addressLabel')} <Text style={styles.requiredStar}>*</Text>
                     </Text>
                     <TextInput
@@ -720,18 +721,19 @@ export default function LoginScreen() {
                       placeholder={t('authScreen.addressPlaceholder')}
                       ref={addressRef}
                       value={address}
-                      onChangeText={setAddress}
+                      onChangeText={(v) => { setAddress(v); clearFieldError('address'); }}
                       autoComplete="street-address"
                       // Emirate and birthday are pickers, so the keyboard's work
                       // ends here.
                       returnKeyType="done"
                       placeholderTextColor={colors.tertiary}
                     />
+                    <FieldError message={fieldErrors.address} isRTL={isRTL} />
                   </View>
 
                   {/* Emirate */}
                   <View style={styles.fieldContainer}>
-                    <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
+                    <Text style={[styles.fieldLabel, fieldErrors.emirate && styles.fieldLabelError, isRTL && styles.textRTL]}>
                       {t('authScreen.emirateLabel')} <Text style={styles.requiredStar}>*</Text>
                     </Text>
                     <TouchableOpacity
@@ -748,6 +750,7 @@ export default function LoginScreen() {
                       </Text>
                       <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.tertiary} />
                     </TouchableOpacity>
+                    <FieldError message={fieldErrors.emirate} isRTL={isRTL} />
                   </View>
 
                   {/* Birthday (optional) */}
@@ -778,7 +781,7 @@ export default function LoginScreen() {
             >
               <TouchableOpacity
                 style={[styles.checkboxContainer, isRTL && styles.rowReverse]}
-                onPress={() => { haptics.selectionTick(); setPrivacyConsent(!privacyConsent); }}
+                onPress={() => { haptics.selectionTick(); setPrivacyConsent(!privacyConsent); clearFieldError('consent'); }}
                 activeOpacity={0.7}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: privacyConsent }}
@@ -798,6 +801,7 @@ export default function LoginScreen() {
                   {t('authScreen.privacyConsentSuffix')}
                 </Text>
               </TouchableOpacity>
+              <FieldError message={fieldErrors.consent} isRTL={isRTL} />
             </View>
 
             {/* Login/Register Button */}
@@ -909,7 +913,7 @@ export default function LoginScreen() {
             {UAE_EMIRATES.map((em) => (
               <TouchableOpacity
                 key={em}
-                onPress={() => { setEmirate(em); setShowEmiratePicker(false); }}
+                onPress={() => { setEmirate(em); setShowEmiratePicker(false); clearFieldError('emirate'); }}
                 activeOpacity={0.85}
                 style={[styles.emirateMenuItem, emirate === em && styles.emirateMenuItemActive]}
               >
@@ -1255,6 +1259,34 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.tertiary,
     marginTop: 6,
+  },
+  fieldLabelError: {
+    color: colors.red,
+  },
+  fieldError: {
+    fontSize: 12,
+    color: colors.red,
+    marginTop: 6,
+  },
+  // Sits where the privacy notice does and reads the same way, in red rather
+  // than amber because this one reports a failure, not a precondition.
+  formError: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.redBg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.redLine,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  formErrorText: {
+    ...T.caption,
+    fontWeight: '500',
+    color: colors.label,
+    flex: 1,
   },
   textInput: {
     ...T.input,
