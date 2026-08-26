@@ -11,8 +11,12 @@
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		5FCCB202A1DF4165BB396C0D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = BF1310AED9894DC98133E9D7 /* AppIcon.icon */; };
-		B857CA478FD840ADA2D6224B /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CA5BF671984F699EC5E7CA /* noop-file.swift */; };
+		10D26EE88AA54CF88DE79FB8 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = F19DCDB57E554662ADF1E020 /* AppIcon.icon */; };
+		54C6EAD0DA99452E91CD6F32 /* index.swift in Sources */ = {isa = PBXBuildFile; fileRef = A660062635A74FBF86B91A02 /* index.swift */; };
+		64A8C10BAEAC4C218052BEF9 /* ExpoWidgetsTarget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3A886C56536F42E0BDC9CEEC /* ExpoWidgetsTarget.appex */; };
+		8547F84BFFBF4B77AA27461C /* ExpoWidgetsTarget.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = F74069ADF96542858BAB979B /* ExpoWidgetsTarget.entitlements */; };
+		D130DE44DDB94D41B8FF63A8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D59D11687D943B983686197 /* Info.plist */; };
+		7612EF38D96F44308E8E7AC1 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F57FC1AC9C484B8CBF096F /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,12 +28,23 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GenosysUAE/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* GenosysUAE-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "GenosysUAE-Bridging-Header.h"; path = "GenosysUAE/GenosysUAE-Bridging-Header.h"; sourceTree = "<group>"; };
-		BF1310AED9894DC98133E9D7 /* AppIcon.icon */ = {isa = PBXFileReference; name = "AppIcon.icon"; path = "GenosysUAE/AppIcon.icon"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		B7CA5BF671984F699EC5E7CA /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		F19DCDB57E554662ADF1E020 /* AppIcon.icon */ = {isa = PBXFileReference; name = "AppIcon.icon"; path = "GenosysUAE/AppIcon.icon"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		3A886C56536F42E0BDC9CEEC /* ExpoWidgetsTarget.appex */ = {isa = PBXFileReference; name = "ExpoWidgetsTarget.appex"; path = "ExpoWidgetsTarget.appex"; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = wrapper.app-extension; includeInIndex = 0; };
+		A660062635A74FBF86B91A02 /* index.swift */ = {isa = PBXFileReference; name = "index.swift"; path = "index.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		F74069ADF96542858BAB979B /* ExpoWidgetsTarget.entitlements */ = {isa = PBXFileReference; name = "ExpoWidgetsTarget.entitlements"; path = "ExpoWidgetsTarget.entitlements"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8D59D11687D943B983686197 /* Info.plist */ = {isa = PBXFileReference; name = "Info.plist"; path = "Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		53F57FC1AC9C484B8CBF096F /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "GenosysUAE/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DE1D6B680FC44FA99F96B8C6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -48,8 +63,8 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				BF1310AED9894DC98133E9D7 /* AppIcon.icon */,
-				B7CA5BF671984F699EC5E7CA /* noop-file.swift */,
+				F19DCDB57E554662ADF1E020 /* AppIcon.icon */,
+				53F57FC1AC9C484B8CBF096F /* noop-file.swift */,
 			);
 			name = GenosysUAE;
 			sourceTree = "<group>";
@@ -76,6 +91,7 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				4FFCC83ACED14DD39E052271 /* ExpoWidgetsTarget */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -86,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* GenosysUAE.app */,
+				3A886C56536F42E0BDC9CEEC /* ExpoWidgetsTarget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -97,6 +114,17 @@
 			);
 			name = Supporting;
 			path = GenosysUAE/Supporting;
+			sourceTree = "<group>";
+		};
+		4FFCC83ACED14DD39E052271 /* ExpoWidgetsTarget */ = {
+			isa = PBXGroup;
+			children = (
+				F74069ADF96542858BAB979B /* ExpoWidgetsTarget.entitlements */,
+				8D59D11687D943B983686197 /* Info.plist */,
+				A660062635A74FBF86B91A02 /* index.swift */,
+			);
+			name = ExpoWidgetsTarget;
+			path = ExpoWidgetsTarget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,16 +140,34 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				5A45F6B9BE0D4095B0B45852 /* Upload Debug Symbols to Sentry */,
+				A80F16425F994BDBB5364E75 /* Embed Foundation Extensions */,
+				6FBAFBB03C0A426EA00987AA /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9E2EB99909214A889CE3AEC5 /* PBXTargetDependency */,
 			);
 			name = GenosysUAE;
 			productName = GenosysUAE;
 			productReference = 13B07F961A680F5B00A75B9A /* GenosysUAE.app */;
 			productType = "com.apple.product-type.application";
+		};
+		58641B9EB518476281C3CF1E /* ExpoWidgetsTarget */ = {
+			isa = PBXNativeTarget;
+			name = ExpoWidgetsTarget;
+			productName = ExpoWidgetsTarget;
+			productReference = 3A886C56536F42E0BDC9CEEC;
+			productType = "com.apple.product-type.app-extension";
+			buildConfigurationList = B20FEBDC403B4AFAAC6E13EC;
+			buildPhases = (
+				544F05B7D7894F7DBAAEE231 /* Sources */,
+				DE1D6B680FC44FA99F96B8C6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
 		};
 /* End PBXNativeTarget section */
 
@@ -132,6 +178,9 @@
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
+						LastSwiftMigration = 1250;
+					};
+					58641B9EB518476281C3CF1E = {
 						LastSwiftMigration = 1250;
 					};
 				};
@@ -150,6 +199,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* GenosysUAE */,
+				58641B9EB518476281C3CF1E /* ExpoWidgetsTarget */,
 			);
 		};
 /* End PBXProject section */
@@ -162,7 +212,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				5FCCB202A1DF4165BB396C0D /* AppIcon.icon in Resources */,
+				10D26EE88AA54CF88DE79FB8 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,7 +280,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GenosysUAE/Pods-GenosysUAE-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5A45F6B9BE0D4095B0B45852 /* Upload Debug Symbols to Sentry */ = {
+		6FBAFBB03C0A426EA00987AA /* Upload Debug Symbols to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -252,7 +302,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				B857CA478FD840ADA2D6224B /* noop-file.swift in Sources */,
+				7612EF38D96F44308E8E7AC1 /* noop-file.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544F05B7D7894F7DBAAEE231 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54C6EAD0DA99452E91CD6F32 /* index.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +492,46 @@
 			};
 			name = Release;
 		};
+		44F672B406A74906905B5AD4 /* Debug */ = {
+			name = Debug;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				INFOPLIST_FILE = ExpoWidgetsTarget/Info.plist;
+				CURRENT_PROJECT_VERSION = "103";
+				IPHONEOS_DEPLOYMENT_TARGET = "16.4";
+				PRODUCT_BUNDLE_IDENTIFIER = "ae.genosys.app.widgets";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = ExpoWidgetsTarget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MARKETING_VERSION = "1.11.0";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				CODE_SIGN_ENTITLEMENTS = "ExpoWidgetsTarget/ExpoWidgetsTarget.entitlements";
+				APPLICATION_EXTENSION_API_ONLY = "YES";
+			};
+		};
+		B01005C927B5436E8EF93CA6 /* Release */ = {
+			name = Release;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				INFOPLIST_FILE = ExpoWidgetsTarget/Info.plist;
+				CURRENT_PROJECT_VERSION = "103";
+				IPHONEOS_DEPLOYMENT_TARGET = "16.4";
+				PRODUCT_BUNDLE_IDENTIFIER = "ae.genosys.app.widgets";
+				GENERATE_INFOPLIST_FILE = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = ExpoWidgetsTarget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MARKETING_VERSION = "1.11.0";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				CODE_SIGN_ENTITLEMENTS = "ExpoWidgetsTarget/ExpoWidgetsTarget.entitlements";
+				APPLICATION_EXTENSION_API_ONLY = "YES";
+			};
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -455,7 +553,48 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		B20FEBDC403B4AFAAC6E13EC /* Build configuration list for PBXNativeTarget "ExpoWidgetsTarget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				44F672B406A74906905B5AD4 /* Debug */,
+				B01005C927B5436E8EF93CA6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin PBXTargetDependency section */
+		9E2EB99909214A889CE3AEC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 58641B9EB518476281C3CF1E /* ExpoWidgetsTarget */;
+			targetProxy = 384DCED9A8654CE4B5BF55A1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		384DCED9A8654CE4B5BF55A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 58641B9EB518476281C3CF1E;
+			remoteInfo = ExpoWidgetsTarget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A80F16425F994BDBB5364E75 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64A8C10BAEAC4C218052BEF9 /* ExpoWidgetsTarget.appex in Embed Foundation Extensions */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Embed Foundation Extensions";
+			dstPath = "";
+			dstSubfolderSpec = 13;
+		};
+/* End PBXCopyFilesBuildPhase section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

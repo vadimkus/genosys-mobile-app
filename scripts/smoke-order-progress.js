@@ -7,6 +7,8 @@
  * and only its label changes with the payment method.
  */
 import { getOrderProgress, isOrderSettled } from '../utils/orderModel.js';
+import { buildOrderActivityState, shouldTrackOrder } from '../utils/orderActivity.js';
+import en from '../i18n/messages/en.json' with { type: 'json' };
 
 let failures = 0;
 function check(label, actual, expected) {
@@ -101,6 +103,48 @@ check('only the first dot: still none', litAfter(cod('CONFIRMED')), [false, fals
 check('second dot reached: first segment', litAfter(cod('SHIPPED')), [true, false]);
 check('third dot reached: both', litAfter(cod('DELIVERED')), [true, true]);
 check('cancelled: none', litAfter({ status: 'CANCELLED' }), [false, false]);
+
+/**
+ * The Lock Screen card's props are a wire format: the server sends the same shape inside
+ * an APNs payload, and ActivityKit decodes nothing if it does not match. The usual
+ * symptom is a push that reports success and displays nothing, so the shape is pinned
+ * here rather than discovered on a device.
+ */
+console.log('live activity payload');
+const t = (key) => key.split('.').reduce((o, k) => (o || {})[k], en) ?? key;
+const state = buildOrderActivityState({ orderNumber: '46125502', paymentMethod: 'cod', status: 'SHIPPED' }, t);
+
+check('carries exactly the widget’s props', Object.keys(state).sort(), [
+  'cancelled',
+  'done',
+  'orderNumber',
+  'status',
+  'steps',
+]);
+check('order number is a string', typeof state.orderNumber, 'string');
+check('done is a number the bar can use', state.done, 2);
+check('three step labels', state.steps.length, 3);
+check('labels are translated, not keys', state.steps, ['Confirmed', 'Shipped', 'Delivered']);
+check('status line is present tense', state.status, 'On its way to you');
+
+const prepaid = buildOrderActivityState({ orderNumber: '1', paymentMethod: 'stripe', status: 'PENDING', paymentStatus: 'paid' }, t);
+check('prepaid says Paid, not Confirmed', prepaid.steps[0], 'Paid');
+check('and is one step in', prepaid.done, 1);
+
+const done = buildOrderActivityState({ orderNumber: '1', paymentMethod: 'cod', status: 'DELIVERED' }, t);
+check('a finished order reads as finished', done.status, 'Delivered — thank you');
+check('with the bar full', done.done, 3);
+
+const gone = buildOrderActivityState({ orderNumber: '1', status: 'CANCELLED' }, t);
+check('a cancelled order empties the bar', gone.done, 0);
+check('and says so', gone.status, 'This order was cancelled');
+check('and is flagged', gone.cancelled, true);
+
+// Nothing that cannot change belongs on the Lock Screen.
+console.log('what gets a card');
+check('an order on its way does', shouldTrackOrder({ paymentMethod: 'cod', status: 'SHIPPED' }), true);
+check('a delivered one does not', shouldTrackOrder({ paymentMethod: 'cod', status: 'DELIVERED' }), false);
+check('a cancelled one does not', shouldTrackOrder({ status: 'CANCELLED' }), false);
 
 if (failures) {
   console.error(`\n${failures} check(s) failed`);

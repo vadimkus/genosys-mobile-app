@@ -21,7 +21,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.11.0</string>
+    <string>1.12.0</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -34,7 +34,11 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>103</string>
+    <string>104</string>
+    <key>ExpoWidgetsAppGroupIdentifier</key>
+    <string>group.ae.genosys.app</string>
+    <key>ExpoWidgets_EnablePushNotifications</key>
+    <true/>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
     <key>LSMinimumSystemVersion</key>
@@ -60,6 +64,10 @@
     <string>Genosys uses your photo library to let you choose a profile photo or skin analysis image.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Genosys uses speech recognition for voice search to help you find products quickly.</string>
+    <key>NSSupportsLiveActivities</key>
+    <true/>
+    <key>NSSupportsLiveActivitiesFrequentUpdates</key>
+    <false/>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>

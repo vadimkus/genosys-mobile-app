@@ -1029,7 +1029,10 @@
     "boxDetailsUnavailable": "Детали состава набора недоступны.",
     "paidOnDelivery": "Оплата при получении",
     "trackerCancelled": "Заказ отменён",
-    "trackerComplete": "Доставлен — спасибо"
+    "trackerComplete": "Доставлен — спасибо",
+    "activityAwaitingConfirmation": "Ожидает подтверждения",
+    "activityPreparing": "Собираем ваш заказ",
+    "activityOnItsWay": "В пути к вам"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",

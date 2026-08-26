@@ -3,7 +3,7 @@
     "name": "Genosys UAE",
     "owner": "vadimkus",
     "slug": "genosys-mobile-app",
-    "version": "1.11.0",
+    "version": "1.12.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ae.genosys.app",
-      "buildNumber": "103",
+      "buildNumber": "104",
       "usesAppleSignIn": true,
       "icon": "./assets/AppIcon.icon",
       "associatedDomains": [
@@ -44,7 +44,7 @@
     },
     "android": {
       "package": "ae.genosys.app",
-      "versionCode": 90,
+      "versionCode": 91,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-foreground-1024.png",
         "backgroundImage": "./assets/icon-background-1024.png",
@@ -243,7 +243,16 @@
       ],
       "expo-image",
       "expo-splash-screen",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-widgets",
+        {
+          "bundleIdentifier": "ae.genosys.app.widgets",
+          "groupIdentifier": "group.ae.genosys.app",
+          "enablePushNotifications": true,
+          "widgets": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -257,7 +266,7 @@
         "projectId": "b874a5c1-c47e-4c4e-9286-42e431978d51"
       }
     },
-    "runtimeVersion": "1.11.0",
+    "runtimeVersion": "1.12.0",
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",

@@ -1029,7 +1029,10 @@
     "boxDetailsUnavailable": "تفاصيل محتويات العلبة غير متاحة.",
     "paidOnDelivery": "الدفع عند الاستلام",
     "trackerCancelled": "تم إلغاء هذا الطلب",
-    "trackerComplete": "تم التوصيل — شكرًا لك"
+    "trackerComplete": "تم التوصيل — شكرًا لك",
+    "activityAwaitingConfirmation": "في انتظار التأكيد",
+    "activityPreparing": "نُجهّز طلبك",
+    "activityOnItsWay": "في طريقه إليك"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",
