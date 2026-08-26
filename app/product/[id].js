@@ -68,17 +68,13 @@ import { withErrorBoundary } from '../../components/ErrorBoundary';
 import SectionHeader from '../../components/SectionHeader';
 import { useHideOnScroll } from '../../components/CollapsibleHeader';
 import { openWhatsApp } from '../../utils/support';
+import { HEADER_PILL_HEIGHT, pdpHeaderGeometry } from '../../utils/pdpHeaderGeometry';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Square hero stage, as on the website. The studio packshots are square, so a
 // fixed 320 left roughly a quarter of the screen width as empty margin beside
 // every product photo on the one screen where the photo has to sell.
 const HEADER_HEIGHT = SCREEN_WIDTH;
-// The product name joins the bar as the gallery leaves the screen. Tied to the
-// hero's height rather than fixed pixels, so it tracks the square stage on any
-// handset.
-const HEADER_PILL_HEIGHT = 48;
-const TITLE_FADE_IN = [HEADER_HEIGHT - 120, HEADER_HEIGHT - 40];
 // The header icons are 36pt so they sit comfortably inside the floating pill.
 // 4pt of slop on each side takes the tappable area to the 44pt HIG minimum
 // without growing the pill itself.
@@ -328,13 +324,22 @@ const getPdpCopy = (locale) => {
 function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
-  // The pill floats clear of the status bar, and absolute insets ignore the
-  // SafeAreaView's padding, so it has to account for that itself — and travel
-  // far enough to take the status bar strip with it when it goes.
+  // The container hands SafeAreaView only the side edges, so every vertical
+  // measurement on this screen is taken from the top of the window and the pill
+  // clears the status bar itself. It also travels far enough on the way out to
+  // take the status bar strip with it.
   const [footerHeight, setFooterHeight] = useState(0);
-  const headerTop = insets.top + 8;
-  const { translateY: headerTranslateY, handleScroll: onHeaderScroll } = useHideOnScroll(
-    headerTop + HEADER_PILL_HEIGHT + 8
+  // The gallery starts below the pill rather than under it. The slides are
+  // artwork with a headline across the top, so a bar floating over them takes
+  // the first line of the claim with it.
+  const { headerTop, hideDistance, galleryTopInset } = pdpHeaderGeometry(insets.top);
+  const { translateY: headerTranslateY, handleScroll: onHeaderScroll } =
+    useHideOnScroll(hideDistance);
+  // The name joins the pill as the photograph leaves the screen, so the
+  // hand-off moves down with the stage.
+  const titleFadeIn = useMemo(
+    () => [galleryTopInset + HEADER_HEIGHT - 120, galleryTopInset + HEADER_HEIGHT - 40],
+    [galleryTopInset]
   );
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -1121,9 +1126,14 @@ function ProductDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    // Only the side edges are handed to SafeAreaView. Both bars on this screen
+    // are absolutely positioned and already place themselves from `insets`, and
+    // the scroll content pads itself past the footer, so letting the container
+    // also pad top and bottom would apply the same inset twice and leaves the
+    // gallery's headroom depending on how absolute children read that padding.
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       {/* One floating bar, the same object as on every other screen: it sits
-          over the gallery, steps aside on the way down and comes back on the
+          above the gallery, steps aside on the way down and comes back on the
           way up. The product name joins it once the gallery is gone, so there
           is still an answer to "what am I looking at" further down the page. */}
       <Animated.View
@@ -1148,7 +1158,7 @@ function ProductDetailScreen() {
             style={[
               styles.headerTitle,
               isRTL && styles.textRTL,
-              { opacity: scrollY.interpolate({ inputRange: TITLE_FADE_IN, outputRange: [0, 1], extrapolate: 'clamp' }) },
+              { opacity: scrollY.interpolate({ inputRange: titleFadeIn, outputRange: [0, 1], extrapolate: 'clamp' }) },
             ]}
             numberOfLines={1}
           >
@@ -1206,6 +1216,10 @@ function ProductDetailScreen() {
           }
         )}
       >
+        {/* The strip the pill sits on. Same colour as the stage below it, so it
+            reads as headroom in the photograph rather than a band above it. */}
+        <View style={{ height: galleryTopInset, backgroundColor: colors.card }} />
+
         {/* Image Gallery */}
         {(() => {
           const hasMultipleImages = galleryImages.length > 1;
@@ -1867,7 +1881,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   // The same floating pill the rest of the app uses: inset, rounded, on its own
-  // hairline and shadow, with the gallery passing underneath it.
+  // hairline and shadow. The gallery is inset below it rather than running
+  // under it, so no part of the photograph is ever behind the controls.
   headerBar: {
     position: 'absolute',
     start: 12,

@@ -43,6 +43,7 @@
     "verify:homecare-links": "node scripts/verify-homecare-links.js",
     "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation && npm run smoke:profile-validation && npm run smoke:address-validation && npm run smoke:support-links && npm run verify:tokens",
     "smoke:bespoke-content": "node scripts/smoke-bespoke-content.js",
+    "smoke:pdp-header-clearance": "node scripts/smoke-pdp-header-clearance.js",
     "smoke:header-hide": "node scripts/smoke-header-hide.js",
     "smoke:auth-validation": "tsx scripts/smoke-auth-validation.js",
     "smoke:profile-validation": "tsx scripts/smoke-profile-validation.js",
