@@ -59,7 +59,8 @@ export default function ProfileScreen() {
   // Arabic locale should still force RTL layout for key typography (like the name).
   const isRTL = dir === 'rtl' || locale === 'ar';
   const insets = useSafeAreaInsets();
-  const { onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight, translateY: headerTranslateY } =
+    useCollapsibleHeader({ hideOnScroll: true });
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [pushToggleLoading, setPushToggleLoading] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -416,7 +417,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('profile.accountTitle')} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('profile.accountTitle')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

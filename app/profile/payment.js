@@ -27,7 +27,8 @@ export default function PaymentScreen() {
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight, translateY: headerTranslateY } =
+    useCollapsibleHeader({ hideOnScroll: true });
   const { user } = useAuth();
   const token = user?.token || '';
   const [defaultMethod, setDefaultMethodState] = useState(PAYMENT_METHODS.COD);
@@ -117,7 +118,7 @@ export default function PaymentScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('paymentSettings.title')} onBack={onBack} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('paymentSettings.title')} onBack={onBack} isRTL={isRTL} />
 
       <Animated.View style={{ flex: 1, opacity: fade, transform: [{ translateY: lift }] }}>
         <Animated.ScrollView

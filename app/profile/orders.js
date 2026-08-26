@@ -162,7 +162,8 @@ function OrdersScreen() {
   const { t, dir, locale } = useLocalization();
   const isRTL = dir === 'rtl';
   const insets = useSafeAreaInsets();
-  const { onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight, translateY: headerTranslateY } =
+    useCollapsibleHeader({ hideOnScroll: true });
 
   const [openedFromProfile, setOpenedFromProfile] = useState(false);
 
@@ -344,7 +345,7 @@ function OrdersScreen() {
   if (!user) {
     return (
       <View style={styles.container}>
-        <CollapsibleHeader title={t('orders.title')} onBack={onBack} isRTL={isRTL} />
+        <CollapsibleHeader translateY={headerTranslateY} title={t('orders.title')} onBack={onBack} isRTL={isRTL} />
         <View style={[styles.center, { paddingTop: headerHeight + 24 }, isRTL && styles.centerRTL]}>
           <Text style={[styles.emptyTitle, isRTL && styles.textRTLRight]}>{t('ordersScreen.loginRequired')}</Text>
           <Text style={[styles.emptyText, isRTL && styles.textRTLRight]}>{t('ordersScreen.loginRequiredText')}</Text>
@@ -355,7 +356,7 @@ function OrdersScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader title={t('orders.title')} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
+      <CollapsibleHeader translateY={headerTranslateY} title={t('orders.title')} onBack={onBack} onRefresh={onRefresh} isRTL={isRTL} />
 
       <Animated.ScrollView
         style={styles.scrollView}

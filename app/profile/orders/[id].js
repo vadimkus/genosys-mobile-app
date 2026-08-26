@@ -142,7 +142,8 @@ export default function OrderDetailScreen() {
   const token = user?.token || user?.accessToken || '';
   const { t, locale, dir } = useLocalization();
   const isRTL = dir === 'rtl';
-  const { onScroll, headerHeight } = useCollapsibleHeader();
+  const { onScroll, headerHeight, translateY: headerTranslateY } =
+    useCollapsibleHeader({ hideOnScroll: true });
 
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
@@ -413,7 +414,7 @@ export default function OrderDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleHeader
+      <CollapsibleHeader translateY={headerTranslateY}
         title={t('ordersDetail.orderDetails')}
         onBack={onBack}
         onRefresh={load}
