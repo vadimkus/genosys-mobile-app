@@ -59,16 +59,59 @@ three rules, and each one exists to stop us saying something we have not agreed:
 
 The wording restates checkout rather than inventing a second promise.
 
-The destination is named too, for the same reason the window is split at all:
-two customers get two different promises, and the one holding the phone should
-be able to see which applies rather than wondering why theirs says a day and a
-half. It is sent as its own field, not joined with a separator — "Umm Al Quwain
-· Arriving within 24–36 hours" runs into the edge of the card in every language,
-so the place hangs on the opposite edge instead.
+The destination is named in the sentence, for the same reason the window is
+split at all: two customers get two different promises, and the one holding
+the phone should be able to see which applies rather than wondering why theirs
+says a day and a half.
+
+Each language phrases it its own way rather than sharing one template. English
+takes the place inside the sentence — "Arriving in Dubai within 1–2 hours" —
+but Russian would need the accusative after "в", and three of the seven
+emirates decline: Шарджа becomes Шарджу, Фуджейра becomes Фуджейру. Russian
+and Arabic lead with the place and a colon, natural in both and needing no
+grammar a format string cannot do.
 
 An emirate we carry no translation for falls back to whatever was entered at
 checkout. "Al Ain" is not one of the seven, but it is still the truth about
 where the order is going, and it correctly gets the slower window.
+
+## Pass four: the 160-point budget
+
+Apple truncates a Lock Screen activity taller than **160 points**, and the
+standard margin is **14**. That is a hard budget, and it decides the layout
+more than taste does.
+
+The proposed version stacked the company name and the order number on separate
+rows, which came to roughly 174pt — truncated. Sharing one row brings it to
+about 153pt, and it fits comfortably because both are quiet 10–11pt text.
+
+Row order, top to bottom:
+
+```
+GENOSYS MIDDLE EAST                    Order #CODM2608270331
+We are preparing your order
+Arriving in Dubai within 1–2 hours
+●━━━━━○━━━━━○
+Confirmed          Shipped          Delivered
+Your tier: SILVER                                    32 pts
+```
+
+The ETA row disappears entirely when there is no promise to make, which is
+also what the guidelines ask for: shrink when there is less to say.
+
+### Wording
+
+- **"Order #..."** rather than a bare `#CODM2608270331`. The hash follows the
+  same rule as the push notifications — English takes `#`, Russian `№`, Arabic
+  neither, because a leading `#` in right-to-left text lands on the wrong end
+  of the digits.
+- **"Your tier: SILVER"** rather than "You are: SILVER", which is a sentence
+  fragment in English and does not translate. The points unit now comes from
+  `rewards.points`, so it is `балл.` in Russian and `نقطة` in Arabic instead of
+  a hard-coded "pts".
+- **"GENOSYS MIDDLE EAST"**, matching the website's desktop wordmark. The full
+  `FZ-LLC` suffix was deliberately trimmed from customer-facing copy in the
+  April SEO sweep; the Lock Screen is a customer surface, not a document.
 
 The rule is written twice — `etaLine` in the app's `utils/orderActivity.js` and
 `etaFor` in the website's `lib/liveActivityPayload.ts` — because the two live in

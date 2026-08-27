@@ -1033,8 +1033,10 @@
     "activityAwaitingConfirmation": "في انتظار التأكيد",
     "activityPreparing": "نُجهّز طلبك",
     "activityOnItsWay": "في طريقه إليك",
-    "activityEtaDubai": "يصل خلال 1–2 ساعة",
-    "activityEtaOther": "يصل خلال 24–36 ساعة"
+    "activityOrderLabel": "الطلب {orderNumber}",
+    "activityEtaDubai": "{place}: يصل خلال 1–2 ساعة",
+    "activityEtaOther": "{place}: يصل خلال 24–36 ساعة",
+    "activityTierLabel": "مستواك"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",

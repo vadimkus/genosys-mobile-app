@@ -30,8 +30,10 @@ import { createLiveActivity } from 'expo-widgets';
  * inside. `scripts/smoke-widget-layout.js` fails the build if that slips.
  */
 export type OrderActivityProps = {
-  /** Shown to the customer, e.g. "46125502". */
+  /** The raw number, kept for the push alert. Prefer `orderLabel` for display. */
   orderNumber: string;
+  /** The number as a sentence, already translated, e.g. "Order #46125502". */
+  orderLabel?: string;
   /** 0, 1, 2 or 3 — how many of the three steps are done. */
   done: number;
   /** The line under the order number, already translated by the sender. */
@@ -41,22 +43,21 @@ export type OrderActivityProps = {
   /** True once the order is cancelled: the track stops. */
   cancelled?: boolean;
   /**
-   * The delivery promise, already translated, e.g. "Arriving within 1–2 hours". Absent
-   * before the order is accepted and once it is over — the sender decides, because the
-   * window depends on the emirate. The line is simply not drawn when it is missing.
+   * The delivery promise, already translated and naming the destination, e.g.
+   * "Arriving in Dubai within 1–2 hours". Absent before the order is accepted and once it
+   * is over — the sender decides, because the window depends on the emirate. The line is
+   * simply not drawn when it is missing.
    */
   eta?: string;
-  /** Where it is going, already translated. Travels with `eta` and hangs opposite it. */
-  place?: string;
   /**
    * Ignored. Kept on the type so a payload that still carries a device-local path does not
    * fail to decode. Do not render it.
    */
   logoUri?: string;
-  /** Rewards tier, e.g. "SILVER". Omitted for a guest or when it could not be read. */
+  /** Rewards standing, already translated, e.g. "Your tier: SILVER". */
   tier?: string;
-  /** Points balance. Omitted alongside `tier`. */
-  points?: number;
+  /** Points balance, already translated and formatted, e.g. "32 pts". */
+  points?: string;
 };
 
 const OrderActivity = (props: OrderActivityProps) => {
@@ -107,8 +108,6 @@ const OrderActivity = (props: OrderActivityProps) => {
   // has. Smaller than the status so it does not compete, brighter than the step labels
   // so it does not read as metadata.
   //
-  // The destination hangs on the opposite edge rather than being joined to the promise
-  // with a separator, which would run into the edge of the card at "Umm Al Quwain".
   const eta = props.eta ? (
     <HStack>
       {/* `primary`, not brand: at 13pt semibold this is body text and owes 4.5:1, which
@@ -118,9 +117,6 @@ const OrderActivity = (props: OrderActivityProps) => {
         {props.eta}
       </Text>
       <Spacer />
-      {props.place ? (
-        <Text modifiers={[font({ size: 12 }), foregroundStyle('secondary')]}>{props.place}</Text>
-      ) : null}
     </HStack>
   ) : null;
 
@@ -144,15 +140,18 @@ const OrderActivity = (props: OrderActivityProps) => {
   );
 
   return {
+    // 14pt is the standard Lock Screen margin, which lines the card up with the
+    // notifications above it. The whole thing has to stay under 160pt or the system
+    // truncates it, which is why the name and the order number share a row.
     banner: (
-      <VStack spacing={9} modifiers={[padding({ horizontal: 16, vertical: 13 })]}>
+      <VStack spacing={9} modifiers={[padding({ horizontal: 14, vertical: 14 })]}>
         <HStack>
           <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle('secondary')]}>
-            {'GENOSYS'}
+            {'GENOSYS MIDDLE EAST'}
           </Text>
           <Spacer />
           <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
-            {'#' + props.orderNumber}
+            {props.orderLabel || '#' + props.orderNumber}
           </Text>
         </HStack>
 
@@ -172,9 +171,11 @@ const OrderActivity = (props: OrderActivityProps) => {
           <HStack modifiers={[opacity(0.75)]}>
             <Text modifiers={[font({ size: 10 }), foregroundStyle('secondary')]}>{props.tier}</Text>
             <Spacer />
-            <Text modifiers={[font({ size: 10 }), foregroundStyle('secondary')]}>
-              {(props.points ?? 0) + ' pts'}
-            </Text>
+            {props.points ? (
+              <Text modifiers={[font({ size: 10 }), foregroundStyle('secondary')]}>
+                {props.points}
+              </Text>
+            ) : null}
           </HStack>
         ) : null}
       </VStack>
@@ -197,7 +198,7 @@ const OrderActivity = (props: OrderActivityProps) => {
     expandedLeading: (
       <VStack modifiers={[padding({ all: 10 })]}>
         <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
-          {'#' + props.orderNumber}
+          {props.orderLabel || '#' + props.orderNumber}
         </Text>
       </VStack>
     ),

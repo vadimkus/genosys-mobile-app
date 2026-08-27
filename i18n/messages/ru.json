@@ -1033,8 +1033,10 @@
     "activityAwaitingConfirmation": "Ожидает подтверждения",
     "activityPreparing": "Собираем ваш заказ",
     "activityOnItsWay": "В пути к вам",
-    "activityEtaDubai": "Доставим за 1–2 часа",
-    "activityEtaOther": "Доставим за 24–36 часов"
+    "activityOrderLabel": "Заказ №{orderNumber}",
+    "activityEtaDubai": "{place}: доставим за 1–2 часа",
+    "activityEtaOther": "{place}: доставим за 24–36 часов",
+    "activityTierLabel": "Ваш уровень"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",

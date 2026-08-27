@@ -111,16 +111,27 @@ check('cancelled: none', litAfter({ status: 'CANCELLED' }), [false, false]);
  * here rather than discovered on a device.
  */
 console.log('live activity payload');
-const t = (key) => key.split('.').reduce((o, k) => (o || {})[k], en) ?? key;
+// Stands in for the app's translator, interpolation included — a stub that ignored params
+// would let an unfilled "{place}" through here and onto a customer's Lock Screen.
+const t = (key, params) => {
+  const value = key.split('.').reduce((o, k) => (o || {})[k], en) ?? key;
+  if (typeof value !== 'string' || !params) return value;
+  return Object.entries(params).reduce(
+    (out, [name, replacement]) => out.split(`{${name}}`).join(String(replacement)),
+    value
+  );
+};
 const state = buildOrderActivityState({ orderNumber: '46125502', paymentMethod: 'cod', status: 'SHIPPED' }, t);
 
 check('carries exactly the widget’s props', Object.keys(state).sort(), [
   'cancelled',
   'done',
+  'orderLabel',
   'orderNumber',
   'status',
   'steps',
 ]);
+check('the number reads as a sentence', state.orderLabel, 'Order #46125502');
 check('order number is a string', typeof state.orderNumber, 'string');
 check('done is a number the bar can use', state.done, 2);
 check('three step labels', state.steps.length, 3);
@@ -152,18 +163,16 @@ console.log('delivery promise');
 const withEmirate = (emirate, status) =>
   buildOrderActivityState({ orderNumber: '1', paymentMethod: 'cod', status, customerEmirate: emirate }, t);
 
-check('Dubai gets the hours', withEmirate('Dubai', 'CONFIRMED').eta, 'Arriving within 1–2 hours');
-check('and is not case-sensitive', withEmirate('dubai', 'CONFIRMED').eta, 'Arriving within 1–2 hours');
-check('Abu Dhabi does not', withEmirate('Abu Dhabi', 'CONFIRMED').eta, 'Arriving within 24–36 hours');
-check('nor Sharjah', withEmirate('Sharjah', 'SHIPPED').eta, 'Arriving within 24–36 hours');
+check('Dubai gets the hours', withEmirate('Dubai', 'CONFIRMED').eta, 'Arriving in Dubai within 1–2 hours');
+check('and is not case-sensitive', withEmirate('dubai', 'CONFIRMED').eta, 'Arriving in Dubai within 1–2 hours');
 
 // Naming the destination is what makes two different windows read as fair rather than
 // arbitrary. A customer in Ajman should be able to see why theirs says a day and a half.
-check('the destination is named', withEmirate('Ras Al-Khaimah', 'CONFIRMED').place, 'Ras Al Khaimah');
-check('however it was typed', withEmirate('abudhabi', 'CONFIRMED').place, 'Abu Dhabi');
-check('and a place we do not translate falls back to what was entered', withEmirate('Al Ain', 'CONFIRMED').place, 'Al Ain');
-check('with the slower window it belongs to', withEmirate('Al Ain', 'CONFIRMED').eta, 'Arriving within 24–36 hours');
-check('never a place without a window', 'place' in withEmirate('Dubai', 'PENDING'), false);
+check('Abu Dhabi does not', withEmirate('Abu Dhabi', 'CONFIRMED').eta, 'Arriving in Abu Dhabi within 24–36 hours');
+check('nor Sharjah', withEmirate('Sharjah', 'SHIPPED').eta, 'Arriving in Sharjah within 24–36 hours');
+check('however the place was typed', withEmirate('ras al-khaimah', 'CONFIRMED').eta, 'Arriving in Ras Al Khaimah within 24–36 hours');
+check('and a place we do not translate falls back to what was entered', withEmirate('Al Ain', 'CONFIRMED').eta, 'Arriving in Al Ain within 24–36 hours');
+check('no placeholder is left unfilled', withEmirate('Dubai', 'CONFIRMED').eta.includes('{place}'), false);
 
 // The three silences. Each is a promise we have no business making.
 check('nothing before we accept', 'eta' in withEmirate('Dubai', 'PENDING'), false);
@@ -173,7 +182,7 @@ check('nothing without an emirate', 'eta' in buildOrderActivityState({ orderNumb
 check('nor for a blank one', 'eta' in withEmirate('   ', 'CONFIRMED'), false);
 
 // The server sends snake_case in places; the card must not go silent because of it.
-check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).place, 'Dubai');
+check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).eta, 'Arriving in Dubai within 1–2 hours');
 
 /**
  * The logo path and the rewards standing are decoration: a card without them is still a
@@ -182,19 +191,18 @@ check('accepts the plain field name too', buildOrderActivityState({ orderNumber:
  */
 console.log('optional decoration');
 const bare = buildOrderActivityState({ orderNumber: '1', status: 'SHIPPED' }, t);
-check('absent when not supplied', ['logoUri', 'tier', 'points'].filter((k) => k in bare), []);
+check('absent when not supplied', ['tier', 'points'].filter((k) => k in bare), []);
 
 const dressed = buildOrderActivityState({ orderNumber: '1', status: 'SHIPPED' }, t, {
-  logoUri: 'file:///group/genosys-logo-white.png',
   tier: 'SILVER',
   points: 1240.4,
 });
-check('logo path carried through', dressed.logoUri, 'file:///group/genosys-logo-white.png');
-check('tier carried through', dressed.tier, 'SILVER');
-check('points rounded', dressed.points, 1240);
+// The widget prints these verbatim, so the words and the rounding happen here.
+check('the tier says whose it is', dressed.tier, 'Your tier: SILVER');
+check('points are rounded and carry their unit', dressed.points, '1240 pts');
 
 const partial = buildOrderActivityState({ orderNumber: '1', status: 'SHIPPED' }, t, { tier: 'GOLD' });
-check('a tier without points is still fine', partial.tier, 'GOLD');
+check('a tier without points is still fine', partial.tier, 'Your tier: GOLD');
 check('and adds no points key', 'points' in partial, false);
 check('nothing added for a guest', 'tier' in buildOrderActivityState({ orderNumber: '1' }, t, {}), false);
 

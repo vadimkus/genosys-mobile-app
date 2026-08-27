@@ -26,26 +26,32 @@ export function buildOrderActivityState(order, t, extras) {
     t('ordersDetail.statusDelivered'),
   ];
 
+  const orderNumber = String(order?.orderNumber || order?.order_number || order?.id || '');
+
   const state = {
-    orderNumber: String(order?.orderNumber || order?.order_number || order?.id || ''),
+    orderNumber,
+    // "#1234" alone is a code; "Order #1234" is a sentence. The hash follows the same rule
+    // as the push notifications: Arabic takes neither a hash nor a №, because a leading #
+    // in right-to-left text lands on the wrong end of the digits.
+    orderLabel: t('ordersDetail.activityOrderLabel', { orderNumber }),
     done,
     status: statusLine(progress, t),
     steps,
     cancelled: progress.cancelled,
   };
 
-  const promise = deliveryPromise(order, done, progress.cancelled, t);
-  if (promise) {
-    state.eta = promise.eta;
-    state.place = promise.place;
-  }
+  const eta = deliveryPromise(order, done, progress.cancelled, t);
+  if (eta) state.eta = eta;
 
-  // Optional, and only ever added when known. The card falls back to a text wordmark and
-  // hides the rewards line rather than showing an empty one, so a payload without these —
-  // which is every payload the server sends — is still a complete card.
-  if (extras?.logoUri) state.logoUri = extras.logoUri;
-  if (extras?.tier) state.tier = String(extras.tier);
-  if (Number.isFinite(extras?.points)) state.points = Math.round(extras.points);
+  // Optional, and only ever added when known. The card hides the rewards line rather than
+  // showing an empty one, so a payload without these — which is every payload the server
+  // sends — is still a complete card.
+  if (extras?.tier) {
+    state.tier = `${t('ordersDetail.activityTierLabel')}: ${String(extras.tier)}`;
+  }
+  if (Number.isFinite(extras?.points)) {
+    state.points = `${Math.round(extras.points)} ${t('rewards.points')}`;
+  }
 
   return state;
 }
@@ -63,13 +69,15 @@ export function buildOrderActivityState(order, t, extras) {
  *    it on and the courier clock has not started.
  * 3. **Nothing once it is over.** Delivered or cancelled, an estimate is noise.
  *
- * The destination is named for the same reason the window is split at all: two customers
- * get two different promises, and the one reading the card should be able to see which
- * applies rather than wondering why theirs says a day and a half.
+ * The destination is named in the sentence for the same reason the window is split at all:
+ * two customers get two different promises, and the one reading the card should be able to
+ * see which applies rather than wondering why theirs says a day and a half.
  *
- * Returned as two fields rather than one joined string so the card can hang the place on
- * the opposite edge. "Umm Al Quwain · Arriving within 24–36 hours" on one line runs into
- * the edge of the card in every language.
+ * Each language phrases that its own way rather than sharing one template. English takes
+ * the place inside the sentence — "Arriving in Dubai within 1–2 hours" — but Russian would
+ * need the accusative after "в", and three of the seven emirates decline: Шарджа becomes
+ * Шарджу, Фуджейра becomes Фуджейру. Russian and Arabic lead with the place and a colon,
+ * which is natural in both and needs no grammar we cannot do in a format string.
  *
  * The wording matches what the customer read at checkout on purpose: the card restates
  * the promise rather than inventing a second one.
@@ -80,15 +88,14 @@ function deliveryPromise(order, done, cancelled, t) {
   const emirate = String(order?.customerEmirate || order?.emirate || '').trim();
   if (!emirate) return null;
 
-  return {
-    eta:
-      canonicalEmirateKey(emirate) === 'dubai'
-        ? t('ordersDetail.activityEtaDubai')
-        : t('ordersDetail.activityEtaOther'),
-    // An emirate we have no translation for falls back to what the customer typed, which
-    // is still the truth about where it is going.
-    place: formatEmirateLabel(t, emirate),
-  };
+  const key =
+    canonicalEmirateKey(emirate) === 'dubai'
+      ? 'ordersDetail.activityEtaDubai'
+      : 'ordersDetail.activityEtaOther';
+
+  // An emirate we have no translation for falls back to what the customer typed, which is
+  // still the truth about where it is going.
+  return t(key, { place: formatEmirateLabel(t, emirate) });
 }
 
 /** The sentence under the bar: what is happening now, not what happened. */

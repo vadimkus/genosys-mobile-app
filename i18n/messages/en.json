@@ -1033,8 +1033,10 @@
     "activityAwaitingConfirmation": "Waiting to be confirmed",
     "activityPreparing": "We are preparing your order",
     "activityOnItsWay": "On its way to you",
-    "activityEtaDubai": "Arriving within 1–2 hours",
-    "activityEtaOther": "Arriving within 24–36 hours"
+    "activityOrderLabel": "Order #{orderNumber}",
+    "activityEtaDubai": "Arriving in {place} within 1–2 hours",
+    "activityEtaOther": "Arriving in {place} within 24–36 hours",
+    "activityTierLabel": "Your tier"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Could not start payment",
