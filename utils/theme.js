@@ -45,13 +45,17 @@ export const colors = {
   separator: '#e8e0db',      // hairlines, cera line. was #E5E5EA
   separatorStrong: '#d9cec7', // input borders. was #D1D5DB
 
-  // Primary actions follow the website's product pages: an ink button with
-  // white text, with rose carrying the accents. Brand red stays defined
-  // because the logo and a few badges still need it, but it no longer paints
-  // buttons.
-  // Button labels come from the `T.button*` styles, which already carry white,
+  // Primary actions are a soft rose with white text, matching the website.
+  // Brand red stays defined because the logo and a few badges still need it,
+  // but it no longer paints buttons.
+  //
+  // `cta` and `accent` are two tones of one family doing two jobs, and they are
+  // not interchangeable. A filled button is measured against the white label on
+  // it, where `cta` reaches 4.55:1. Text on cream is measured against the page,
+  // where `cta` would be 4.27:1 and fail, so that work goes to `accent` at
+  // 5.21:1. Button labels come from the `T.button*` styles, which carry white,
   // so there is no separate token for them.
-  cta: '#191716',            // primary button background, cera ink
+  cta: '#9c686d',            // primary button background, cera cta
   accent: '#8f5a5a',         // links, active icons, prices. cera rose-ink
   accentBg: '#f7ecec',       // tinted pills behind accent text. cera blush
 
@@ -139,7 +143,11 @@ export const cera = {
   blush: '#f7ecec',       // tinted panels
   blushDeep: '#efd9d9',
   rose: '#c98b8b',        // decorative rules, quiet icons
-  roseInk: '#8f5a5a',     // links and controls on cream
+  roseInk: '#8f5a5a',     // links and controls on cream, 5.21:1
+  // Fills primary buttons. Never text: 4.55:1 under white is fine for the
+  // label on a filled button, but on cream it drops to 4.27:1 and fails.
+  // roseInk is the same family and carries text at 5.21:1.
+  cta: '#9c686d',
   ink: '#191716',         // headings
   body: '#3d3734',        // running text
   muted: '#665e59',       // captions, metadata
