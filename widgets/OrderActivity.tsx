@@ -1,27 +1,30 @@
 import { HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui';
 import { font, foregroundStyle, padding } from '@expo/ui/swift-ui/modifiers';
-import { createLiveActivity, type LiveActivityEnvironment } from 'expo-widgets';
+import { createLiveActivity } from 'expo-widgets';
 
 /**
  * The order card on the Lock Screen and in the Dynamic Island.
  *
+ * ## Colour is the system's to choose
+ *
+ * The first version that rendered used cera ink, `#191716`, and was almost unreadable:
+ * the Lock Screen puts the card on a dark material whichever appearance the phone is in,
+ * so near-black text lands on near-black. `environment.colorScheme` does not describe the
+ * card, it describes the device.
+ *
+ * `primary` and `secondary` are SwiftUI's semantic colours and follow whatever material
+ * the card is actually sitting on. Nothing here should name a colour.
+ *
  * ## The layout must be self-contained
  *
- * Babel serialises the body of this function — everything after the `'widget'` directive —
- * into a **string**, which the widget extension evaluates in its own runtime. That runtime
- * has the `@expo/ui` primitives, the modifiers and a jsx stub on `globalThis`, and nothing
- * else. It does not have this module.
+ * Babel serialises the body of this function into a **string**, which the widget
+ * extension evaluates in a runtime holding only the `@expo/ui` primitives, the modifiers
+ * and a jsx stub. It cannot see this module, so a reference to anything declared outside
+ * the function throws — and the card renders empty, silently.
+ * `scripts/smoke-widget-layout.js` fails the build if that creeps back.
  *
- * So a reference to anything declared outside the function is a `ReferenceError` on
- * device. Two colour constants at module scope are what made the first two versions of
- * this render as an empty black card: it fails before producing a single node, and an
- * empty card is what the system draws when there are no nodes.
- *
- * Every value is therefore written inline, and `scripts/smoke-widget-layout.js` fails the
- * build if anything creeps back out of scope.
- *
- * Keep it plain for the same reason: a layout that throws shows nothing useful. Add
- * richness one piece at a time, checking on a device between each.
+ * Everything is text and stacks for the same reason: keep what renders, add richness a
+ * piece at a time and check on a device between each.
  */
 export type OrderActivityProps = {
   /** Shown to the customer, e.g. "46125502". */
@@ -36,66 +39,113 @@ export type OrderActivityProps = {
   cancelled?: boolean;
 };
 
-const OrderActivity = (props: OrderActivityProps, environment: LiveActivityEnvironment) => {
+const OrderActivity = (props: OrderActivityProps) => {
   'widget';
 
-  // Inline, not module constants: see the note above. cera ink and cera muted, with
-  // lighter equivalents for a dark Lock Screen.
-  const dark = environment.colorScheme === 'dark';
-  const ink = dark ? '#FFFFFF' : '#191716';
-  const muted = dark ? '#B8AEA8' : '#776E68';
-
   const done = props.cancelled ? 0 : props.done;
-  // Filled and hollow circles joined by rules. Characters always draw; a view with no
-  // content does not.
-  const bar = [0, 1, 2].map((i) => (i < done ? '●' : '○')).join('━━━');
-  const step = props.steps[done > 2 ? 2 : done] ?? props.steps[0];
+  // Filled where the order has been, hollow where it has not. Characters draw reliably;
+  // an empty view with a colour on it does not.
+  const bar =
+    (done > 0 ? '●' : '○') +
+    '━━━━━' +
+    (done > 1 ? '●' : '○') +
+    '━━━━━' +
+    (done > 2 ? '●' : '○');
 
   return {
     banner: (
-      <VStack spacing={6} modifiers={[padding({ all: 14 })]}>
+      <VStack spacing={7} modifiers={[padding({ horizontal: 16, vertical: 13 })]}>
+        {/* The mark and the order number: quiet, because neither is the news. */}
         <HStack>
-          <Text modifiers={[font({ weight: 'semibold', size: 15 }), foregroundStyle(ink)]}>
-            {'#' + props.orderNumber}
+          <Text
+            modifiers={[
+              font({ size: 10, weight: 'semibold' }),
+              foregroundStyle('secondary'),
+            ]}
+          >
+            {'G E N O S Y S'}
           </Text>
           <Spacer />
-          <Text modifiers={[font({ size: 13 }), foregroundStyle(muted)]}>{step}</Text>
+          <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
+            {'#' + props.orderNumber}
+          </Text>
         </HStack>
+
+        {/* What is happening now. This is what the card is for. */}
         <HStack>
-          <Text modifiers={[font({ size: 15 }), foregroundStyle(ink)]}>{bar}</Text>
+          <Text modifiers={[font({ size: 17, weight: 'semibold' }), foregroundStyle('primary')]}>
+            {props.status}
+          </Text>
           <Spacer />
         </HStack>
+
         <HStack>
-          <Text modifiers={[font({ size: 13 }), foregroundStyle(muted)]}>{props.status}</Text>
+          <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{bar}</Text>
           <Spacer />
+        </HStack>
+
+        {/* The three stops, spread to sit under the bar. */}
+        <HStack>
+          <Text
+            modifiers={[
+              font({ size: 11, weight: done > 0 ? 'semibold' : 'regular' }),
+              foregroundStyle(done > 0 ? 'primary' : 'secondary'),
+            ]}
+          >
+            {props.steps[0]}
+          </Text>
+          <Spacer />
+          <Text
+            modifiers={[
+              font({ size: 11, weight: done > 1 ? 'semibold' : 'regular' }),
+              foregroundStyle(done > 1 ? 'primary' : 'secondary'),
+            ]}
+          >
+            {props.steps[1]}
+          </Text>
+          <Spacer />
+          <Text
+            modifiers={[
+              font({ size: 11, weight: done > 2 ? 'semibold' : 'regular' }),
+              foregroundStyle(done > 2 ? 'primary' : 'secondary'),
+            ]}
+          >
+            {props.steps[2]}
+          </Text>
         </HStack>
       </VStack>
     ),
 
-    compactLeading: <Text modifiers={[font({ size: 13 }), foregroundStyle(ink)]}>{'●'}</Text>,
-    compactTrailing: (
-      <Text modifiers={[font({ size: 13 }), foregroundStyle(ink)]}>{done + '/3'}</Text>
+    compactLeading: (
+      <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{'●'}</Text>
     ),
-    minimal: <Text modifiers={[font({ size: 13 }), foregroundStyle(ink)]}>{done + '/3'}</Text>,
+    compactTrailing: (
+      <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{done + '/3'}</Text>
+    ),
+    minimal: (
+      <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{done + '/3'}</Text>
+    ),
 
     expandedLeading: (
       <VStack modifiers={[padding({ all: 10 })]}>
-        <Text modifiers={[font({ size: 13 }), foregroundStyle(muted)]}>
+        <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
           {'#' + props.orderNumber}
         </Text>
       </VStack>
     ),
     expandedTrailing: (
       <VStack modifiers={[padding({ all: 10 })]}>
-        <Text modifiers={[font({ weight: 'semibold', size: 13 }), foregroundStyle(ink)]}>
-          {step}
+        <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
+          {done + ' / 3'}
         </Text>
       </VStack>
     ),
     expandedBottom: (
-      <VStack spacing={6} modifiers={[padding({ all: 10 })]}>
-        <Text modifiers={[font({ size: 15 }), foregroundStyle(ink)]}>{bar}</Text>
-        <Text modifiers={[font({ size: 13 }), foregroundStyle(muted)]}>{props.status}</Text>
+      <VStack spacing={6} modifiers={[padding({ horizontal: 14, bottom: 12 })]}>
+        <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundStyle('primary')]}>
+          {props.status}
+        </Text>
+        <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{bar}</Text>
       </VStack>
     ),
   };
