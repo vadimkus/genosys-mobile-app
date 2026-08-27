@@ -15,7 +15,7 @@ import { getOrderProgress } from './orderModel';
  * `t` is the app's translator. On the server the same shape is built from its own
  * message catalogue.
  */
-export function buildOrderActivityState(order, t) {
+export function buildOrderActivityState(order, t, extras) {
   const progress = getOrderProgress(order);
   const done = progress.cancelled ? 0 : progress.steps.filter((s) => s.done).length;
 
@@ -25,13 +25,22 @@ export function buildOrderActivityState(order, t) {
     t('ordersDetail.statusDelivered'),
   ];
 
-  return {
+  const state = {
     orderNumber: String(order?.orderNumber || order?.order_number || order?.id || ''),
     done,
     status: statusLine(progress, t),
     steps,
     cancelled: progress.cancelled,
   };
+
+  // Optional, and only ever added when known. The card falls back to a text wordmark and
+  // hides the rewards line rather than showing an empty one, so a payload without these —
+  // which is every payload the server sends — is still a complete card.
+  if (extras?.logoUri) state.logoUri = extras.logoUri;
+  if (extras?.tier) state.tier = String(extras.tier);
+  if (Number.isFinite(extras?.points)) state.points = Math.round(extras.points);
+
+  return state;
 }
 
 /** The sentence under the bar: what is happening now, not what happened. */

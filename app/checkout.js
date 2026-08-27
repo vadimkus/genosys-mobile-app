@@ -609,6 +609,7 @@ function CheckoutScreen() {
             paymentMethod: 'cod',
             t,
             send: (payload) => saveLiveActivityToken(user?.token, payload),
+            authToken: user?.token,
           });
           setSuccessOrder(finalOrderNumber);
           return;

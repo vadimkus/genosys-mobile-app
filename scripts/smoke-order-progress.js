@@ -140,6 +140,29 @@ check('a cancelled order empties the bar', gone.done, 0);
 check('and says so', gone.status, 'This order was cancelled');
 check('and is flagged', gone.cancelled, true);
 
+/**
+ * The logo path and the rewards standing are decoration: a card without them is still a
+ * complete card, and the server — which cannot know a device-local file path — sends
+ * neither. So they must never appear as empty keys.
+ */
+console.log('optional decoration');
+const bare = buildOrderActivityState({ orderNumber: '1', status: 'SHIPPED' }, t);
+check('absent when not supplied', ['logoUri', 'tier', 'points'].filter((k) => k in bare), []);
+
+const dressed = buildOrderActivityState({ orderNumber: '1', status: 'SHIPPED' }, t, {
+  logoUri: 'file:///group/genosys-logo-white.png',
+  tier: 'SILVER',
+  points: 1240.4,
+});
+check('logo path carried through', dressed.logoUri, 'file:///group/genosys-logo-white.png');
+check('tier carried through', dressed.tier, 'SILVER');
+check('points rounded', dressed.points, 1240);
+
+const partial = buildOrderActivityState({ orderNumber: '1', status: 'SHIPPED' }, t, { tier: 'GOLD' });
+check('a tier without points is still fine', partial.tier, 'GOLD');
+check('and adds no points key', 'points' in partial, false);
+check('nothing added for a guest', 'tier' in buildOrderActivityState({ orderNumber: '1' }, t, {}), false);
+
 // Nothing that cannot change belongs on the Lock Screen.
 console.log('what gets a card');
 check('an order on its way does', shouldTrackOrder({ paymentMethod: 'cod', status: 'SHIPPED' }), true);

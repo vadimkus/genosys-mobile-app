@@ -204,7 +204,7 @@ function OrdersScreen() {
       refreshOrdersCount();
       // Bring the Lock Screen card in step with what we just fetched. Deliberately not
       // awaited: the card is a nicety, and the orders list should never wait on it.
-      syncOrderActivity(data, t, (payload) => saveLiveActivityToken(token, payload));
+      syncOrderActivity(data, t, (payload) => saveLiveActivityToken(token, payload), token);
     } catch (e) {
       log.warn('Failed to load orders', e?.message || e);
       setError(t('ordersDetailAlerts.pleaseTryAgain'));

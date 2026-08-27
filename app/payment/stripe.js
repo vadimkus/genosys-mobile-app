@@ -208,6 +208,7 @@ export default function StripePaymentScreen() {
         paymentStatus: 'paid',
         t,
         send: (payload) => saveLiveActivityToken(token, payload),
+        authToken: token,
       });
       setPaid(true);
     } catch (e) {

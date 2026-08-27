@@ -1,9 +1,37 @@
 import { Platform } from 'react-native';
 import { buildOrderActivityState, shouldTrackOrder } from './orderActivity';
 import { getOrderId, getOrderNumber, sortOrdersNewestFirst } from './orderModel';
+import { getWidgetLogoUri } from './widgetAssets';
 import { createLogger } from './logger';
 
 const log = createLogger('OrderLiveActivity');
+
+/**
+ * The logo path and the customer's rewards standing, for the card.
+ *
+ * Both are best-effort: a card without them is still a complete card, so neither is
+ * allowed to delay or fail the thing the customer actually came for.
+ */
+async function decorations(token) {
+  const extras = {};
+  extras.logoUri = await getWidgetLogoUri();
+
+  if (token) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { fetchMembership } = require('../services/api');
+      const membership = await fetchMembership(token);
+      const data = membership?.data ?? membership;
+      if (data?.tier) extras.tier = data.tier;
+      const balance = Number(data?.points?.balance);
+      if (Number.isFinite(balance)) extras.points = balance;
+    } catch (e) {
+      log.debug('No rewards standing for the card:', e?.message);
+    }
+  }
+
+  return extras;
+}
 
 /**
  * Keeps the Lock Screen card in step with the customer's orders.
@@ -60,6 +88,7 @@ export async function startOrderActivityForNewOrder({
   paymentStatus,
   t,
   send,
+  authToken,
 }) {
   if (!available()) return;
   const OrderActivity = load();
@@ -69,7 +98,7 @@ export async function startOrderActivityForNewOrder({
     // A new order is PENDING: accepted by us, nothing shipped. The card shows an empty
     // bar and "waiting to be confirmed", which is exactly true.
     const order = { orderNumber, paymentMethod, paymentStatus, status: 'PENDING' };
-    const state = buildOrderActivityState(order, t);
+    const state = buildOrderActivityState(order, t, await decorations(authToken));
     const id = orderId || orderNumber;
 
     await retireStrays(OrderActivity, t);
@@ -103,7 +132,7 @@ async function retireStrays(OrderActivity, t) {
   activityOrderId = null;
 }
 
-export async function syncOrderActivity(orders, t, send) {
+export async function syncOrderActivity(orders, t, send, authToken) {
   if (!available()) return;
   const OrderActivity = load();
   if (!OrderActivity) return;
@@ -117,7 +146,7 @@ export async function syncOrderActivity(orders, t, send) {
       return;
     }
 
-    const state = buildOrderActivityState(tracked, t);
+    const state = buildOrderActivityState(tracked, t, await decorations(authToken));
     const id = getOrderId(tracked) || getOrderNumber(tracked);
 
     if (activity && activityOrderId === id) {

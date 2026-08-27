@@ -1,5 +1,5 @@
-import { HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui';
-import { font, foregroundStyle, padding } from '@expo/ui/swift-ui/modifiers';
+import { HStack, Image, Spacer, Text, VStack } from '@expo/ui/swift-ui';
+import { font, foregroundStyle, frame, padding } from '@expo/ui/swift-ui/modifiers';
 import { createLiveActivity } from 'expo-widgets';
 
 /**
@@ -37,6 +37,17 @@ export type OrderActivityProps = {
   steps: [string, string, string];
   /** True once the order is cancelled: the bar stops. */
   cancelled?: boolean;
+  /**
+   * Absolute `file://` path to the white wordmark, staged into the App Group by the app.
+   *
+   * Device-local, so the server cannot know it — every server-pushed payload omits it and
+   * the card falls back to the wordmark set as text.
+   */
+  logoUri?: string;
+  /** Rewards tier, e.g. "SILVER". Omitted for a guest or when it could not be read. */
+  tier?: string;
+  /** Points balance. Omitted alongside `tier`. */
+  points?: number;
 };
 
 const OrderActivity = (props: OrderActivityProps) => {
@@ -55,16 +66,16 @@ const OrderActivity = (props: OrderActivityProps) => {
   return {
     banner: (
       <VStack spacing={7} modifiers={[padding({ horizontal: 16, vertical: 13 })]}>
-        {/* The mark and the order number: quiet, because neither is the news. */}
+        {/* The mark and the order number: quiet, because neither is the news. The real
+            wordmark when the app has staged it, letterspaced text when it has not. */}
         <HStack>
-          <Text
-            modifiers={[
-              font({ size: 10, weight: 'semibold' }),
-              foregroundStyle('secondary'),
-            ]}
-          >
-            {'G E N O S Y S'}
-          </Text>
+          {props.logoUri ? (
+            <Image uiImage={props.logoUri} modifiers={[frame({ width: 84, height: 25 })]} />
+          ) : (
+            <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle('secondary')]}>
+              {'G E N O S Y S'}
+            </Text>
+          )}
           <Spacer />
           <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
             {'#' + props.orderNumber}
@@ -113,6 +124,19 @@ const OrderActivity = (props: OrderActivityProps) => {
             {props.steps[2]}
           </Text>
         </HStack>
+
+        {/* Rewards standing, when we know it. A guest gets no empty row. */}
+        {props.tier ? (
+          <HStack>
+            <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('secondary')]}>
+              {props.tier}
+            </Text>
+            <Spacer />
+            <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
+              {(props.points ?? 0) + ' pts'}
+            </Text>
+          </HStack>
+        ) : null}
       </VStack>
     ),
 
