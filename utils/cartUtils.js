@@ -239,7 +239,7 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
       ? getCanonicalUnitPrice(item.product)
       : (() => {
           // Bundle items ("Build Your Set"): bundle and VIP discounts do not
-          // stack — the BEST one wins, matching the server (cartPricing.ts
+          // stack - the BEST one wins, matching the server (cartPricing.ts
           // contractBeatsBundle) and the per-line badges in the bag UI.
           if (isBundleItem) {
             const bundlePct = Number(item?.bundleDiscountPercent || item?.product?.bundleDiscountPercent) || 0;
@@ -279,7 +279,7 @@ export function calculateCartTotals(items, user, selectedEmirate, emiratesOverri
               return productOriginal * (1 - discountPct / 100);
             }
             // Fallback: use product.price (retail) as base for discount when originalPrice is absent
-            // (e.g. product fetched without user context — displayPrice equals retail)
+            // (e.g. product fetched without user context - displayPrice equals retail)
             const retailBase = Number(item.product?.price);
             if (Number.isFinite(retailBase) && retailBase > 0) {
               return retailBase * (1 - discountPct / 100);
@@ -471,7 +471,7 @@ export function computeWaterfallBreakdown(items, user) {
         if (pct > 0) _bundleDiscountPct = pct;
       }
     }
-    // "Build Your Set" bundle items — bundle vs VIP: best discount wins
+    // "Build Your Set" bundle items - bundle vs VIP: best discount wins
     // (matches server cartPricing.ts contractBeatsBundle and bag line badges).
     const bundlePct = Number(item?.bundleDiscountPercent || product?.bundleDiscountPercent) || 0;
     if (isBundleItem && bundlePct > 0) {

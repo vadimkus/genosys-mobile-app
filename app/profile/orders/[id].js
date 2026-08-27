@@ -45,7 +45,7 @@ const resolveImageUrl = (raw) => {
   if (!s) return '';
   // Already a full URL
   if (s.startsWith('http://') || s.startsWith('https://')) return s;
-  // Relative path — prepend asset origin
+  // Relative path - prepend asset origin
   return `${ASSET_ORIGIN}${s.startsWith('/') ? '' : '/'}${s}`;
 };
 
@@ -113,10 +113,10 @@ const isUserDiscountExcludedOrderItemName = (nameRaw) => {
   if (name.includes('beauty box') || name.includes('beautybox')) return true;
   // Hydro Cool Modelling Mask
   if (name.includes('hydro') && name.includes('cool') && name.includes('mask')) return true;
-  // Devices (fallback by name) — compact to alphanumerics so hyphenated
+  // Devices (fallback by name) - compact to alphanumerics so hyphenated
   // names match too: "GENO-LED IR II" -> genoledirii, "Hair-GENTRON" -> hairgentron.
   const compact = name.replace(/[^a-z0-9]/g, '');
-  // Hair Stamp is a consumable for the HairGen Booster, not a device — discounts apply.
+  // Hair Stamp is a consumable for the HairGen Booster, not a device - discounts apply.
   if (compact.includes('hairstamp')) return false;
   if (compact.includes('genoled') || compact.includes('gentron') || compact.includes('hairgen')) return true;
   return false;
@@ -270,7 +270,7 @@ export default function OrderDetailScreen() {
           return;
         }
       }
-      // No parseable details — store empty so we don't re-fetch
+      // No parseable details - store empty so we don't re-fetch
       setBeautyBoxDetails((prev) => ({ ...prev, [productId]: { items: [], title: '' } }));
     } catch {
       setBeautyBoxDetails((prev) => ({ ...prev, [productId]: { items: [], title: '' } }));
@@ -808,7 +808,7 @@ export default function OrderDetailScreen() {
             ) : null}
           </SectionCard>
 
-          {/* Order Summary — Waterfall Pricing Breakdown */}
+          {/* Order Summary - Waterfall Pricing Breakdown */}
           <SectionCard padding={18} icon="calculator" title={t('ordersDetail.orderSummary')} isRTL={isRTL}>
             {(() => {
               const orderDiscPct = Number(order?.discountPercentage);
@@ -871,7 +871,7 @@ export default function OrderDetailScreen() {
                       </View>
                     </>
                   ) : (
-                    /* No discounts — simple subtotal */
+                    /* No discounts - simple subtotal */
                     <View style={[styles.summaryRow, isRTL && styles.summaryRowRTL]}>
                       <Text style={[styles.summaryLabel, isRTL && styles.textRTL]}>{t('ordersDetail.subtotal')}</Text>
                       <Text style={[styles.summaryValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>

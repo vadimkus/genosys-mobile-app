@@ -2,7 +2,7 @@
  * CollapsibleSection - Reusable accordion block for product detail pages.
  *
  * Header: icon (optional) + title + chevron. Tapping toggles content visibility.
- * Uses LayoutAnimation for a smooth expand/collapse — no additional native deps,
+ * Uses LayoutAnimation for a smooth expand/collapse - no additional native deps,
  * safe to ship via OTA.
  *
  * Matches the web PDP accordion pattern (ProductInfoAccordion.tsx).

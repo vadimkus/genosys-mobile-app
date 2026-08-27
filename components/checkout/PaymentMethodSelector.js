@@ -12,7 +12,7 @@ import SectionHeader from '../SectionHeader';
  *
  * Renders the payment method selection section of checkout.
  * Currently supports COD and Card (Stripe) payment methods.
- * Purely presentational — selection callback is owned by parent.
+ * Purely presentational - selection callback is owned by parent.
  */
 export default function PaymentMethodSelector({
   selectedMethod,

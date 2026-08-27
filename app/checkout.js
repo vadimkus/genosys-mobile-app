@@ -216,7 +216,7 @@ function CheckoutScreen() {
     (async () => {
       try {
         const saved = await getDefaultPaymentMethod();
-        // Legacy value cleanup (Apple Pay was removed) — fall back to CARD.
+        // Legacy value cleanup (Apple Pay was removed) - fall back to CARD.
         if (saved === 'apple_pay') {
           setSelectedPaymentMethod(PAYMENT_METHODS.CARD);
         } else {
@@ -665,7 +665,7 @@ function CheckoutScreen() {
             : '';
 
       log.error('Order processing error', errMsg || error);
-      // Order-submission failures are the most business-critical error class —
+      // Order-submission failures are the most business-critical error class -
       // make sure they reach Sentry, not just the local log.
       captureException(error instanceof Error ? error : new Error(errMsg || 'Order processing error'), {
         tags: { area: 'checkout', op: 'submitOrder' },
@@ -684,7 +684,7 @@ function CheckoutScreen() {
                 orderNumber: String(orderNumber),
                 paymentMethod: String(selectedPaymentMethod),
               });
-              // The raw error is appended untranslated on purpose — support needs
+              // The raw error is appended untranslated on purpose - support needs
               // the server's wording verbatim to match it against the logs.
               const message = errMsg ? `${base} (${errMsg})` : base;
               if (!(await openWhatsApp(message))) {
@@ -828,7 +828,7 @@ function CheckoutScreen() {
             />
           </View>
 
-          {/* GENOSYS Rewards — always-visible redemption control */}
+          {/* GENOSYS Rewards - always-visible redemption control */}
           <RewardsRedemptionCard
             balance={loyaltyBalance}
             quote={redeemQuote}
@@ -854,7 +854,7 @@ function CheckoutScreen() {
       </Animated.ScrollView>
       </Animated.View>
 
-      {/* Sticky pay bar — single primary action */}
+      {/* Sticky pay bar - single primary action */}
       <View style={[styles.payBar, { paddingBottom: (insets?.bottom || 0) + 12 }]}>
         <TouchableOpacity
           style={[
@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   orderHeaderIconWrapRTL: {
-    // no transform — icon is symmetric
+    // no transform - icon is symmetric
   },
   orderHeaderLeft: {
     flex: 1,

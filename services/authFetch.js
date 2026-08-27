@@ -45,7 +45,7 @@ export async function refreshToken(expiredToken) {
   }
 
   _refreshPromise = (async () => {
-    // 10s timeout — shorter than the main 15s request limit so a hung refresh
+    // 10s timeout - shorter than the main 15s request limit so a hung refresh
     // fails fast (and triggers logout) instead of stalling every queued
     // authenticated request behind it.
     const controller = new AbortController();
@@ -133,7 +133,7 @@ export async function authenticatedFetch(url, options = {}, currentToken = null)
     return response;
   }
 
-  // The caller aborted (timeout/unmount) — don't start a refresh + retry
+  // The caller aborted (timeout/unmount) - don't start a refresh + retry
   // cycle whose result nobody will consume.
   if (options.signal?.aborted) {
     return response;
@@ -166,7 +166,7 @@ export async function authenticatedFetch(url, options = {}, currentToken = null)
   // if this particular request was aborted while refreshing).
   await persistRefreshedToken(refreshResult);
 
-  // Caller aborted while the token was refreshing — skip the retry.
+  // Caller aborted while the token was refreshing - skip the retry.
   if (options.signal?.aborted) {
     return response;
   }

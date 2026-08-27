@@ -18,7 +18,7 @@ export const isCushionBB = (product) => {
   return name.includes('blemish balm') && name.includes('cushion');
 };
 
-// Matches backend mobileDiscountRules.ts BEAUTY_BOX_PRODUCT_NUMBERS —
+// Matches backend mobileDiscountRules.ts BEAUTY_BOX_PRODUCT_NUMBERS -
 // keep in sync so display exclusions equal what checkout actually charges.
 const BEAUTY_BOX_PRODUCT_NUMBERS = new Set(['55', '56', '57', '58', '59', '62']);
 
@@ -62,7 +62,7 @@ export const isDeviceProduct = (product) => {
   // "GENO-LED IR II" -> "genoledirii", "Hair-GENTRON" -> "hairgentron".
   const nameCompact = normalizeProductName(product).replace(/[^a-z0-9]/g, '');
   // Hair Stamp is a consumable cartridge for the HairGen Booster, not a
-  // device — user discounts DO apply despite "hairgen" in its name.
+  // device - user discounts DO apply despite "hairgen" in its name.
   if (nameCompact.includes('hairstamp')) return false;
   return (
     nameCompact.includes('genoled') ||

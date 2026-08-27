@@ -120,7 +120,7 @@ const getObjValueCaseInsensitive = (obj, keys) => {
 const log = createLogger('ProductDetail');
 
 /**
- * ProductVideo – shows a thumbnail with play button; loads video on tap.
+ * ProductVideo - shows a thumbnail with play button; loads video on tap.
  *
  * Migrated from expo-av → expo-video. Differences:
  *   • useVideoPlayer must be called unconditionally (Rules of Hooks), so
@@ -202,7 +202,7 @@ function ProductVideo({ videoUrl }) {
   }
 
   // Before play: a compact grey play button (same pattern as the website
-  // PDP) instead of a full-width 16:9 black box — keeps the page tight and
+  // PDP) instead of a full-width 16:9 black box - keeps the page tight and
   // defers all video loading until the user actually taps.
   if (!isPlaying) {
     return (
@@ -281,7 +281,7 @@ const videoStyles = StyleSheet.create({
   },
 });
 
-// PDP Batch C — inlined copy for strings that power the new UI surfaces
+// PDP Batch C - inlined copy for strings that power the new UI surfaces
 // (quantity stepper, toast, read-more control, VAT line, OOS messaging).
 // Kept inline (mirrors TrustStrip/TrustBadges pattern) so translations
 // ship with the JS bundle and are not subject to runtime i18n cache misses.
@@ -320,7 +320,7 @@ const getPdpCopy = (locale) => {
   return PDP_COPY_MAP[lang] || PDP_COPY_MAP.en;
 };
 
-/** iOS Settings–style filled glyph tile + bold section title (matches order details). */
+/** iOS Settings - style filled glyph tile + bold section title (matches order details). */
 function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
@@ -390,7 +390,7 @@ function ProductDetailScreen() {
     // Logging in re-runs this while the guest request is still open. Both
     // resolve into the same setState, and the server answers guest requests
     // from cache faster than it computes a user's price, so without this flag
-    // the stale guest reply lands last and the member sees retail again —
+    // the stale guest reply lands last and the member sees retail again -
     // on a screen with an Add to Bag button under it.
     const run = { cancelled: false };
     loadProduct(run);
@@ -410,7 +410,7 @@ function ProductDetailScreen() {
   }, [loading, product]);
 
   // Lightweight review aggregate fetch for the summary shown under product name.
-  // The ProductReviews component renders its own full list further down — we keep
+  // The ProductReviews component renders its own full list further down - we keep
   // the summary call separate so the "Be the first to review" link can appear
   // instantly alongside the product header, without waiting for the full list.
   useEffect(() => {
@@ -521,7 +521,7 @@ function ProductDetailScreen() {
       return;
     }
 
-    // OOS guard — no-op if product is out of stock (defensive, UI also disables the button).
+    // OOS guard - no-op if product is out of stock (defensive, UI also disables the button).
     if (isOutOfStock) {
       haptics.lightTap();
       setToastMessage(PDP_COPY.outOfStock);
@@ -1010,7 +1010,7 @@ function ProductDetailScreen() {
             <Text style={[styles.listBullet, isRTL && styles.listBulletRTL]}>•</Text>
             <Text style={[styles.listText, isRTL && styles.textRTL]}>
               <Text style={{ fontWeight: '700', color: colors.label }}>{it.name}</Text>
-              {it.description ? ` — ${it.description}` : ''}
+              {it.description ? ` - ${it.description}` : ''}
             </Text>
           </View>
         ))}
@@ -1418,7 +1418,7 @@ function ProductDetailScreen() {
                 )}
               </View>
 
-            {/* VAT-inclusive disclosure — matches web PDP. Only where an
+            {/* VAT-inclusive disclosure - matches web PDP. Only where an
                 actual number is on screen. */}
             {(priceView.kind === 'single' || priceView.kind === 'discounted') && (
               <Text style={[styles.vatNote, isRTL && styles.textRTL]}>
@@ -1430,7 +1430,7 @@ function ProductDetailScreen() {
           {/* Size and colour sit directly under the price, because they set it.
               They used to follow the editorial hero, a card tall enough that a
               shopper could reach the buy button having never seen there was a
-              choice — and be sold the default. */}
+              choice - and be sold the default. */}
           {hasVariantChoice && (
             <View>
               <ProductVariantSelector
@@ -1552,7 +1552,7 @@ function ProductDetailScreen() {
                         if (typeof x === 'string') return x;
                         const t = asText(x.title || '').trim();
                         const d = asText(x.description || '').trim();
-                        return `${t}${t && d ? ' — ' : ''}${d}`.trim();
+                        return `${t}${t && d ? ' - ' : ''}${d}`.trim();
                       })
                       .filter(Boolean);
                   })(),
@@ -1560,7 +1560,11 @@ function ProductDetailScreen() {
                 const filteredBenefits = filterListForLocale(benefits, locale);
                 const benefitsOpts = { collapsible: true, defaultOpen: true, icon: 'sparkles-outline', iconColor: colors.accent };
 
-                if (filteredBenefits.length === 1 && filteredBenefits[0].length > 200 && !filteredBenefits[0].includes(' — ')) {
+                // Matches any dash, not just the hyphen this file now joins with: benefit
+                // text also arrives from the database, where older rows still carry an em
+                // or en dash. Written as escapes so the file itself stays free of them.
+                const joined = /\s[-\u2014\u2013]\s/;
+                if (filteredBenefits.length === 1 && filteredBenefits[0].length > 200 && !joined.test(filteredBenefits[0])) {
                   return renderInfoSection(t('product.benefits'), filteredBenefits[0], benefitsOpts);
                 }
                 return renderListSection(t('product.benefits'), filteredBenefits, benefitsOpts);
@@ -1740,7 +1744,7 @@ function ProductDetailScreen() {
               : t('product.addToBag');
           return (
             <View style={[styles.bottomRow, isRTL && styles.bottomRowRTL]}>
-              {/* Quantity stepper — web PDP parity. Hidden when OOS. */}
+              {/* Quantity stepper - web PDP parity. Hidden when OOS. */}
               {!disabled && user && (
                 <View
                   style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
@@ -1816,7 +1820,7 @@ function ProductDetailScreen() {
         })()}
         </View>
 
-        {/* Toast — non-blocking add-to-bag (and OOS) feedback */}
+        {/* Toast - non-blocking add-to-bag (and OOS) feedback */}
         <Toast
           visible={toastVisible}
           message={toastMessage}
@@ -2083,7 +2087,7 @@ const styles = StyleSheet.create({
     ...T.serifHeading,
     marginBottom: 16,
   },
-  // iOS Settings–style icon-tile section header (used on card sections).
+  // iOS Settings - style icon-tile section header (used on card sections).
   rowReverse: {
     flexDirection: 'row-reverse',
   },

@@ -4,7 +4,7 @@
  * The recommendations API (/api/skin-recommendations) scores products against
  * canonical keys: lowercase skin types ("oily"), kebab-case concerns
  * ("acne-blemishes"), and web age groups ("young-adult"). The quiz UI uses
- * display labels ("Oily", "Acne", "Under 25") — these maps translate them.
+ * display labels ("Oily", "Acne", "Under 25") - these maps translate them.
  * The server also normalizes aliases defensively, but new clients should
  * always send canonical values.
  */

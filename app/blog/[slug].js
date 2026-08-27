@@ -275,7 +275,7 @@ export default function BlogPostScreen() {
                 <RefreshControl refreshing={refreshing} onRefresh={() => fetchPost(true)} tintColor={colors.accent} progressViewOffset={headerHeight} />
               }
             >
-              {/* Featured Image — hero cover */}
+              {/* Featured Image - hero cover */}
               {featuredImageUrl ? (
                 <Image source={{ uri: featuredImageUrl }} style={styles.hero} contentFit="cover" transition={200} />
               ) : null}

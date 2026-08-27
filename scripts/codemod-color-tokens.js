@@ -8,8 +8,8 @@
  * colours inline.
  *
  * Scope is deliberately narrow. Only structural neutrals and the brand red are
- * swept, because those are the ones stage 2 repoints. Status colours — greens,
- * ambers, blues, WhatsApp, Google, flags, gold — carry meaning that survives
+ * swept, because those are the ones stage 2 repoints. Status colours - greens,
+ * ambers, blues, WhatsApp, Google, flags, gold - carry meaning that survives
  * the retheme and are left exactly as they are.
  *
  * `shadowColor` is skipped throughout. It is always black by design and has
@@ -208,7 +208,7 @@ for (const file of files) {
 
 // ── Pass 2: literals inside expressions ───────────────────────────────
 // Pass 1 only sees `prop: '#fff'` and `prop="#fff"`. It misses the same
-// colours sitting in ternaries, default arguments and function returns —
+// colours sitting in ternaries, default arguments and function returns -
 // `color={selected ? '#fff' : '#6B7280'}`, `chevronColor = '#86868B'`.
 //
 // Those have no property name attached, so this pass cannot tell a card
@@ -216,7 +216,7 @@ for (const file of files) {
 // same value today, and a swatch default reading `colors.white` is honest.
 //
 // Black is excluded: it is nearly always a shadow, and `shadowColor` lines are
-// skipped outright. Unquoted hex is left alone too — `VideoLaunchScreen`
+// skipped outright. Unquoted hex is left alone too - `VideoLaunchScreen`
 // carries real CSS in a template literal, and that is not ours to tokenise.
 const PASS2 = { ...MAP };
 delete PASS2['#000'];

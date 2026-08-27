@@ -394,8 +394,8 @@ export default function PerfectCombinationCard({ product, user, styles }) {
                 !user
                   ? t('shop.loginToBuy')
                   : requiresOptions
-                    ? `${t('variant.chooseOptions')} — ${recName}`
-                    : `${t('product.addToBag')} — ${recName}`
+                    ? `${t('variant.chooseOptions')} - ${recName}`
+                    : `${t('product.addToBag')} - ${recName}`
               }
             >
               <Ionicons

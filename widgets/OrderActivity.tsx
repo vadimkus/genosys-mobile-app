@@ -5,7 +5,7 @@ import { createLiveActivity } from 'expo-widgets';
 /**
  * The order card on the Lock Screen and in the Dynamic Island.
  *
- * ## Colour is the system's to choose — except on the track
+ * ## Colour is the system's to choose - except on the track
  *
  * The Lock Screen puts the card on a dark material whichever appearance the phone is in,
  * so named ink colours go missing. Text uses `primary` and `secondary`, which follow the
@@ -33,7 +33,7 @@ export type OrderActivityProps = {
   orderNumber: string;
   /** The number as a sentence, already translated, e.g. "Order #46125502". */
   orderLabel?: string;
-  /** 0, 1, 2 or 3 — how many of the three steps are done. */
+  /** 0, 1, 2 or 3 - how many of the three steps are done. */
   done: number;
   /** The line under the order number, already translated by the sender. */
   status: string;
@@ -43,8 +43,8 @@ export type OrderActivityProps = {
   cancelled?: boolean;
   /**
    * The delivery promise, already translated and naming the destination, e.g.
-   * "Arriving in Dubai within 1–2 hours". Absent before the order is accepted and once it
-   * is over — the sender decides, because the window depends on the emirate. The line is
+   * "Arriving in Dubai within 1-2 hours". Absent before the order is accepted and once it
+   * is over - the sender decides, because the window depends on the emirate. The line is
    * simply not drawn when it is missing.
    */
   eta?: string;
@@ -66,7 +66,7 @@ const OrderActivity = (props: OrderActivityProps) => {
 
   /**
    * Done is green, the step in hand is amber, what has not started recedes into grey.
-   * Red is not in the track at all — it belongs to a cancelled order and nothing else.
+   * Red is not in the track at all - it belongs to a cancelled order and nothing else.
    *
    * Brand red used to paint the progress, and that was wrong twice over. Red on a
    * *finished* step reads as a fault, and `statusStyle` in `utils/theme.js` already spends
@@ -100,7 +100,7 @@ const OrderActivity = (props: OrderActivityProps) => {
    * everyone can read: green and amber are one shade apart under deuteranopia, which is
    * roughly one man in twelve. A future step is smaller as well as quieter.
    *
-   * A ring — `strokeBorder` on a clear circle — is the textbook drawing for a step in
+   * A ring - `strokeBorder` on a clear circle - is the textbook drawing for a step in
    * progress, and both exist in `@expo/ui`. It is not used because nothing here can be
    * checked before it is on a customer's Lock Screen, and a modifier that silently fails
    * leaves a hole in the track exactly where the current step should be.
@@ -123,7 +123,7 @@ const OrderActivity = (props: OrderActivityProps) => {
    * read green, the leg being travelled reads amber. The track becomes a path rather than
    * three unrelated pips.
    *
-   * Shapes are flexible in SwiftUI, so this takes whatever width the row has left — which
+   * Shapes are flexible in SwiftUI, so this takes whatever width the row has left - which
    * is what keeps the three labels under their own nodes at every text size.
    */
   const rail = (into: number) => {
@@ -169,7 +169,7 @@ const OrderActivity = (props: OrderActivityProps) => {
    * The one place red belongs. A cancelled order stops the track, so without this the
    * card would say something went wrong in grey and look like any other quiet state.
    *
-   * `#FF453A` clears 5.4:1 on this material, so it is legible as body text — the brand's
+   * `#FF453A` clears 5.4:1 on this material, so it is legible as body text - the brand's
    * own `#dc2626` reaches only 3.8:1 and would not be.
    */
   const statusTint = props.cancelled ? red : 'primary';

@@ -60,15 +60,15 @@ export default function DeliveryScreen() {
     {
       icon: 'flash',
       iconColor: colors.accent,
-      title: l('Express Delivery — Dubai', 'التوصيل السريع — دبي', 'Экспресс-доставка — Дубай'),
-      desc: l('Within 1–2 hours', 'خلال ١-٢ ساعة', 'В течение 1–2 часов'),
+      title: l('Express Delivery - Dubai', 'التوصيل السريع - دبي', 'Экспресс-доставка - Дубай'),
+      desc: l('Within 1-2 hours', 'خلال ١-٢ ساعة', 'В течение 1-2 часов'),
       partner: l('Via Careem / QuipQup', 'عبر كريم / كويب كوب', 'Через Careem / QuipQup'),
     },
     {
       icon: 'car',
       iconColor: colors.blue,
-      title: l('Standard Delivery — UAE', 'التوصيل القياسي — الإمارات', 'Стандартная доставка — ОАЭ'),
-      desc: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      title: l('Standard Delivery - UAE', 'التوصيل القياسي - الإمارات', 'Стандартная доставка - ОАЭ'),
+      desc: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       partner: l('All Emirates', 'جميع الإمارات', 'Все эмираты'),
     },
   ];
@@ -94,7 +94,7 @@ export default function DeliveryScreen() {
     },
     {
       icon: 'wallet',
-      text: l('Refund processed within 3–5 business days', 'يتم معالجة الاسترداد خلال ٣-٥ أيام عمل', 'Возврат средств в течение 3–5 рабочих дней'),
+      text: l('Refund processed within 3-5 business days', 'يتم معالجة الاسترداد خلال ٣-٥ أيام عمل', 'Возврат средств в течение 3-5 рабочих дней'),
     },
   ];
 
@@ -207,7 +207,7 @@ export default function DeliveryScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Footer — shared brand block */}
+          {/* Footer - shared brand block */}
           <AppFooter style={{ paddingBottom: 8 }} />
         </Animated.View>
       </Animated.ScrollView>

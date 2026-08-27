@@ -88,7 +88,7 @@ const statusRank = (order) => {
 };
 
 /** Money actually received. Deliberately stricter than `isPaidLikeOrder`, which counts
- *  'confirmed' as paid — true for a card order, never true for cash on delivery. */
+ *  'confirmed' as paid - true for a card order, never true for cash on delivery. */
 export const isOrderSettled = (order) => {
   const paymentStatus = String(order?.paymentStatus || order?.payment_status || '').toLowerCase();
   if (paymentStatus === 'paid') return true;
@@ -114,7 +114,7 @@ export const ORDER_STEP_KEYS = ['accepted', 'shipped', 'delivered'];
  * One bar, one progress rule, one label difference. Payment is a note on step one when it
  * is taken up front and on step three when it is taken at the door.
  *
- * Returns `currentIndex` as the step being worked on — the first incomplete one, or the
+ * Returns `currentIndex` as the step being worked on - the first incomplete one, or the
  * last if everything is done.
  */
 export const getOrderProgress = (order) => {

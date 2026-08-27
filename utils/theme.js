@@ -202,8 +202,8 @@ export const surfaces = {
    * block of accent with a white glyph.
    *
    * The colour was never the problem: #8f5a5a is the website's rose-ink to the
-   * digit. But the site only ever uses it *as* ink — small type, an eyebrow, a
-   * stroke — and paints its icon wells in a tint with the darker colour on top.
+   * digit. But the site only ever uses it *as* ink - small type, an eyebrow, a
+   * stroke - and paints its icon wells in a tint with the darker colour on top.
    * Filling the tile instead inverts that, and twenty-four filled tiles down a
    * settings list stop reading as an accent and start reading as brown blocks.
    */

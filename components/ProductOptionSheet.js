@@ -391,7 +391,7 @@ export default function ProductOptionSheet({
               }}
               disabled={!canConfirm}
               accessibilityRole="button"
-              accessibilityLabel={`${t('shop.addToBag')} — ${localizedName}`}
+              accessibilityLabel={`${t('shop.addToBag')} - ${localizedName}`}
               accessibilityState={{ disabled: !canConfirm }}
             >
               {isAdding ? (

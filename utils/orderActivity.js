@@ -9,7 +9,7 @@ import { canonicalEmirateKey, formatEmirateLabel } from './emirateUtils';
  * string or number, already translated. This is the only place that translation happens.
  *
  * It is also the wire format. The server sends the same shape inside an APNs payload, and
- * ActivityKit decodes nothing if it does not match — a push that reports success and
+ * ActivityKit decodes nothing if it does not match - a push that reports success and
  * displays nothing is the usual symptom. Keep this, `OrderActivityProps` in
  * `widgets/OrderActivity.tsx`, and the server's payload builder in step.
  *
@@ -44,8 +44,8 @@ export function buildOrderActivityState(order, t, extras) {
   if (eta) state.eta = eta;
 
   // Optional, and only ever added when known. The card hides the rewards line rather than
-  // showing an empty one, so a payload without these — which is every payload the server
-  // sends — is still a complete card.
+  // showing an empty one, so a payload without these - which is every payload the server
+  // sends - is still a complete card.
   if (extras?.tier) {
     state.tier = `${t('ordersDetail.activityTierLabel')}: ${String(extras.tier)}`;
   }
@@ -74,7 +74,7 @@ export function buildOrderActivityState(order, t, extras) {
  * see which applies rather than wondering why theirs says a day and a half.
  *
  * Each language phrases that its own way rather than sharing one template. English takes
- * the place inside the sentence — "Arriving in Dubai within 1–2 hours" — but Russian would
+ * the place inside the sentence - "Arriving in Dubai within 1-2 hours" - but Russian would
  * need the accusative after "в", and three of the seven emirates decline: Шарджа becomes
  * Шарджу, Фуджейра becomes Фуджейру. Russian and Arabic lead with the place and a colon,
  * which is natural in both and needs no grammar we cannot do in a format string.
@@ -113,7 +113,7 @@ function statusLine(progress, t) {
  * Whether an order is worth putting on the Lock Screen.
  *
  * A card that never changes is clutter, so a delivered or cancelled order does not get
- * one — it gets a final update and then ends.
+ * one - it gets a final update and then ends.
  */
 export function shouldTrackOrder(order) {
   const progress = getOrderProgress(order);

@@ -69,7 +69,7 @@ export default function WebViewScreen() {
     // Allow the initial page load
     if (reqUrl === displayUrl) return true;
 
-    // Allow iframe loads (YouTube embeds, etc.) — don't intercept sub-frame navigation
+    // Allow iframe loads (YouTube embeds, etc.) - don't intercept sub-frame navigation
     if (isTopFrame === false) return true;
 
     // Allow YouTube embed URLs (used in training page iframes)
@@ -126,7 +126,7 @@ export default function WebViewScreen() {
         'div[aria-hidden="true"] { display: none !important; height: 0 !important; }',
         // === IN-PAGE SUB-NAVIGATION (< Products | Title | Profile icon) ===
         // These are rendered by PWAPageWrapper and individual page components
-        // Some pages have border-b, some don't — match all variations
+        // Some pages have border-b, some don't - match all variations
         'div[class*="justify-between"][class*="px-5"][class*="py-4"] { display: none !important; }',
         'div[class*="justify-between"][class*="px-4"][class*="py-3"] { display: none !important; }',
         // === CHAT WIDGET ===

@@ -15,7 +15,7 @@ import { createLogger } from '../utils/logger';
 
 const log = createLogger('Cart');
 
-// Max units per cart line — matches the web quantity cap (M5).
+// Max units per cart line - matches the web quantity cap (M5).
 const MAX_LINE_QTY = 99;
 
 const CartContext = createContext();
@@ -270,7 +270,7 @@ export const CartProvider = ({ children }) => {
       // Always rebuild so free/promo items are pushed to the END of the cart,
       // even when no promo add/remove is needed. This handles the case where
       // the user adds more non-promo items after free masks were already
-      // granted — without this reorder, new items would appear below the
+      // granted - without this reorder, new items would appear below the
       // promo rows because addItem always pushes to the tail of `prev`.
       const nextItems = [...prevNonPromo, ...keptPromo, ...toAdd];
 
@@ -378,7 +378,7 @@ export const CartProvider = ({ children }) => {
 
       if (shippingRatesData) {
         const parsed = JSON.parse(shippingRatesData);
-        // Only trust cached rates for 24h — otherwise a rate change on the
+        // Only trust cached rates for 24h - otherwise a rate change on the
         // server could show stale shipping until the app is force-quit.
         // loadShippingRates() re-fetches on mount regardless; this just avoids
         // rendering a week-old cached value first.
@@ -482,7 +482,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const normalizedProduct = (() => {
-      // Bundle items already have correct pricing from the bundle builder —
+      // Bundle items already have correct pricing from the bundle builder -
       // skip variant/discount inference to avoid inflating originalPrice.
       if (isBundleAdd) return product;
 
@@ -823,7 +823,7 @@ export const CartProvider = ({ children }) => {
 
       // Update size and recalculate price from the new variant.
       // Do NOT use itemToUpdate.product.originalPrice for the "server confirmed discount"
-      // check — after a prior size switch it may be an inferred value. Instead use:
+      // check - after a prior size switch it may be an inferred value. Instead use:
       //   1. The new variant's own originalPrice (if server set it)
       //   2. Any variant carrying a server-set originalPrice
       //   3. The product's discountLabel (set by API, never overwritten by cart mutations)

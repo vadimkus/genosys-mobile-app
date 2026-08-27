@@ -116,7 +116,7 @@ export default function CheckoutAddressForm({
                     if (!found) return t('checkout.selectSavedAddress');
                     const label = getSavedTypeLabel(found.type);
                     const addrLine = String(found.address || '').trim();
-                    return `${label}${found.isDefault ? ' • ' + t('addresses.default') : ''} — ${addrLine}`;
+                    return `${label}${found.isDefault ? ' • ' + t('addresses.default') : ''} - ${addrLine}`;
                   })()
                 : t('checkout.selectSavedAddress')}
             </Text>

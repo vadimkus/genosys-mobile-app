@@ -1,7 +1,7 @@
 /**
  * Partner catalog rules for the app's Partner Portal screen.
  *
- * MIRROR of the website's lib/partnerCatalog.ts — that file is the source
+ * MIRROR of the website's lib/partnerCatalog.ts - that file is the source
  * of truth (the server enforces these rules on every order). Keep the two
  * in sync when products are reclassified.
  */

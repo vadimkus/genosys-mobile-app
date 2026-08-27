@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontWeight: '700',
   },
-  // A card like the rest of the page. It was inverted — white on ink — which
+  // A card like the rest of the page. It was inverted - white on ink - which
   // made the two partner blocks read as dark slabs against the cream rather
   // than as the account's most important rows.
   partnerCard: {

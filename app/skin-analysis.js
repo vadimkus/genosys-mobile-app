@@ -81,7 +81,7 @@ export default function SkinAnalysisScreen() {
     setApiError(null);
     try {
       // The API scores against canonical keys (lowercase skin type, kebab-case
-      // concerns, web age groups) — display labels would score zero and fall
+      // concerns, web age groups) - display labels would score zero and fall
       // back to a generic top-rated list.
       const baseUrl = (AUTH_CONFIG.API_BASE_URL || 'https://genosys.ae/api/mobile').replace('/api/mobile', '');
       const params = new URLSearchParams({
@@ -270,7 +270,7 @@ export default function SkinAnalysisScreen() {
               <View style={styles.errorBox}>
                 <Ionicons name="cloud-offline-outline" size={28} color={colors.accent} />
                 <Text style={styles.errorText}>{t('skinAnalysis.recommendationsFailedFull')}</Text>
-                {/* Retry the request — answers are kept, no need to redo the quiz */}
+                {/* Retry the request - answers are kept, no need to redo the quiz */}
                 <TouchableOpacity style={styles.retryBtn} onPress={fetchRecommendations} activeOpacity={0.85}>
                   <Ionicons name="refresh" size={16} color={colors.white} />
                   <Text style={styles.retryBtnText}>{t('skinAnalysis.tryAgain')}</Text>

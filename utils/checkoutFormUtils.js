@@ -78,9 +78,9 @@ export function getDeliveryEtaInfo(selectedEmirate) {
   const isDubai = emirate.toLowerCase() === 'dubai';
   return {
     isDubai,
-    // Dubai: today 1–2 hours; others: tomorrow 24–36 hours
+    // Dubai: today 1-2 hours; others: tomorrow 24-36 hours
     etaLabel: isDubai ? 'today' : 'tomorrow',
-    etaWindow: isDubai ? '1–2 hours' : '24–36 hours',
+    etaWindow: isDubai ? '1-2 hours' : '24-36 hours',
   };
 }
 

@@ -302,7 +302,7 @@ export default function ChatScreen() {
         router.push({ pathname: '/webview', params: { url, title: '' } });
       }
     } else {
-      // External URL — open in browser
+      // External URL - open in browser
       Linking.openURL(url).catch(() => {});
     }
   }, []);
@@ -401,19 +401,19 @@ export default function ChatScreen() {
         {/* Quick-action buttons after the welcome message */}
         {isWelcome && messages.length === 1 && (
           <View style={styles.quickActionsContainer}>
-            {/* Row 1 – skin types */}
+            {/* Row 1 - skin types */}
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW1.map(renderQuickActionButton)}
             </View>
-            {/* Row 2 – skin types + concerns */}
+            {/* Row 2 - skin types + concerns */}
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW2.map(renderQuickActionButton)}
             </View>
-            {/* Row 3 – info */}
+            {/* Row 3 - info */}
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW3.map(renderQuickActionButton)}
             </View>
-            {/* Row 4 – highlight: discount + AI */}
+            {/* Row 4 - highlight: discount + AI */}
             <View style={[styles.quickActionsRow, isRTL && styles.quickActionsRowRTL]}>
               {QUICK_ACTIONS_ROW4.map(renderQuickActionButton)}
             </View>

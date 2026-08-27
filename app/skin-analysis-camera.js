@@ -221,7 +221,7 @@ export default function SkinAnalysisCameraScreen() {
   }
 
   // Permission denied. When the OS won't show the prompt again
-  // (canAskAgain === false), the only way out is the system Settings —
+  // (canAskAgain === false), the only way out is the system Settings -
   // otherwise the "Grant Permission" button silently does nothing.
   if (!permission.granted) {
     const permanentlyDenied = permission.canAskAgain === false;
@@ -280,7 +280,7 @@ export default function SkinAnalysisCameraScreen() {
           <View style={styles.aiScoreCard}>
             <View style={[styles.aiScoreCircle, { borderColor: scoreColor(aiResult.healthScore) }]}>
               <Text style={[styles.aiScoreNum, { color: scoreColor(aiResult.healthScore) }]}>
-                {aiResult.healthScore || '—'}
+                {aiResult.healthScore || ' - '}
               </Text>
               <Text style={styles.aiScoreMax}>/10</Text>
             </View>

@@ -1,8 +1,8 @@
 /**
  * The editorial product copy, as written for the website.
  *
- * The catalogue's best writing — the claims checked against the Intertek
- * dossier, the ingredient figures, the "look elsewhere if" lists — lived only in
+ * The catalogue's best writing - the claims checked against the Intertek
+ * dossier, the ingredient figures, the "look elsewhere if" lists - lived only in
  * the website's bespoke pages, so a clinic opening the same product in the app
  * saw a much thinner version of it. The API now sends that copy as blocks; this
  * draws them.

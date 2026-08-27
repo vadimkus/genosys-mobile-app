@@ -25,7 +25,7 @@ export function getDeviceInfo() {
   const isIOS = Platform.OS === 'ios';
   const isAndroid = Platform.OS === 'android';
 
-  // This app only runs on phones/tablets — never desktop.
+  // This app only runs on phones/tablets - never desktop.
   let deviceType = 'mobile';
   if (isIOS && Platform.isPad) deviceType = 'tablet';
 

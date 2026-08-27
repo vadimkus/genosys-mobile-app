@@ -28,8 +28,8 @@
  * Wired into: npm run verify:release
  *
  * Exit codes:
- *   0 — splash assets and config in sync
- *   1 — drift detected (full diff printed)
+ *   0 - splash assets and config in sync
+ *   1 - drift detected (full diff printed)
  */
 
 const fs = require('fs')
@@ -131,7 +131,7 @@ if (!/<color key="backgroundColor" name="SplashScreenBackground"\/>/.test(storyb
 }
 
 // 3. SplashScreenBackground colorset must be pure white (#ffffff). The JS
-//    overlay is hard-coded to white in components/VideoLaunchScreen.js — if
+//    overlay is hard-coded to white in components/VideoLaunchScreen.js - if
 //    the storyboard background drifts to any other color we get the original
 //    double-blink regression back.
 const colorset = readJson(splashBackgroundColorset)

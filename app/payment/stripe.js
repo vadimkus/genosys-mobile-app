@@ -101,7 +101,7 @@ export default function StripePaymentScreen() {
       if (!isPaidLikeOrder(match)) {
         const sessionId = extractStripeSessionIdFromUrl(paymentUrl);
         // PaymentIntent id is the part of the client secret before "_secret_".
-        // Only forward it when it is actually a PaymentIntent id — other intent
+        // Only forward it when it is actually a PaymentIntent id - other intent
         // formats (e.g. seti_) would silently fail the status refresh.
         const rawIntentId = clientSecret ? String(clientSecret).split('_secret_')[0] : '';
         const paymentIntentId = rawIntentId.startsWith('pi_') ? rawIntentId : '';
@@ -183,10 +183,10 @@ export default function StripePaymentScreen() {
       const { error: presentError } = await presentPaymentSheet();
 
       if (presentError) {
-        // User dismissed the sheet — let them retry, no error banner.
+        // User dismissed the sheet - let them retry, no error banner.
         if (presentError.code === 'Canceled') return;
         log.warn('presentPaymentSheet error', presentError.code, presentError.message);
-        // Force a fresh initPaymentSheet on the next attempt — re-presenting a
+        // Force a fresh initPaymentSheet on the next attempt - re-presenting a
         // failed sheet with the same client secret can error with a stale state.
         sheetReadyRef.current = false;
         setErrorText(presentError.message || t('payment.checkStatusFailed'));
@@ -197,7 +197,7 @@ export default function StripePaymentScreen() {
       // the order + emails server-side; sync status in the background but show
       // success immediately (no waiting on webhook lag).
       checkPayment(true).catch(() => {});
-      // Clear the cart right away — waiting for a nav button tap left paid
+      // Clear the cart right away - waiting for a nav button tap left paid
       // items in the cart if the user dismissed the screen with a gesture.
       // Skip when retrying an older pending order (cart holds unrelated items).
       if (!fromOrders) clearCart();

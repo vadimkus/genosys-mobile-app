@@ -2,7 +2,7 @@
  * Training Screen - Native (API-driven)
  * Fetches training documents, product documentation, and video lessons
  * from the website's /api/mobile/training endpoint.
- * Authenticated — only visible to logged-in users.
+ * Authenticated - only visible to logged-in users.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -54,7 +54,7 @@ export default function TrainingScreen() {
 
   const l = (en, ar, ru) => locale === 'ar' ? ar : locale === 'ru' ? ru : en;
 
-  // Subtle entrance motion (matches order/about screens) — runs once content is ready.
+  // Subtle entrance motion (matches order/about screens) - runs once content is ready.
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(12)).current;
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function TrainingScreen() {
 
   const onBack = () => { haptics.lightTap(); router.canGoBack() ? router.back() : router.replace('/(tabs)/shop'); };
 
-  /** iOS Settings–style filled glyph tile + bold section title. */
+  /** iOS Settings - style filled glyph tile + bold section title. */
   // Redirect if not logged in
   if (!user) {
     return (
@@ -330,7 +330,7 @@ export default function TrainingScreen() {
               </View>
             )}
 
-            {/* Footer — shared brand block */}
+            {/* Footer - shared brand block */}
             <AppFooter
               tagline={l('Professional Training Resources', 'موارد التدريب المهني', 'Профессиональные учебные ресурсы')}
               style={{ paddingBottom: 16 }}

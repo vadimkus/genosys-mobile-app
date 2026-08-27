@@ -109,7 +109,7 @@ export default function AboutScreen() {
             <InfoRow label={t('about.areaLabel')} value={t('about.areaValue')} isLast />
           </View>
 
-          {/* Footer — shared brand block */}
+          {/* Footer - shared brand block */}
           <AppFooter style={{ paddingBottom: 16 }} />
         </Animated.View>
       </Animated.ScrollView>

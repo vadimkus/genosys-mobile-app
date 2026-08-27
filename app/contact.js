@@ -195,7 +195,7 @@ export default function ContactScreen() {
             </View>
           </View>
 
-          {/* Footer — shared brand block */}
+          {/* Footer - shared brand block */}
           <AppFooter style={{ paddingBottom: 16 }} />
         </Animated.View>
       </Animated.ScrollView>

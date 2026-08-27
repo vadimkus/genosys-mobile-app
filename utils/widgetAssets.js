@@ -13,7 +13,7 @@ const log = createLogger('WidgetAssets');
  *
  * `<Image uiImage>` then takes the absolute `file://` path. That path is device-local, so
  * it is passed to the card as a prop rather than being something the server could ever
- * know — which is why the layout falls back to a text wordmark when it is absent.
+ * know - which is why the layout falls back to a text wordmark when it is absent.
  *
  * Copied once and cached, since the file outlives the process.
  */

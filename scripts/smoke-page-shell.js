@@ -4,7 +4,7 @@
  * They had drifted: the hero's padding came in four combinations, the title was
  * `pageTitle` on seven pages and the smaller `sectionTitle` on brand, the subtitle was
  * `body` on two and `subtitle` on three, and about, brand and contact each opened with
- * the GENOSYS logo — repeating on every page what the header already said, and pushing
+ * the GENOSYS logo - repeating on every page what the header already said, and pushing
  * the content below the fold.
  *
  * This pins the shape: one hero component, no page rebuilding it by hand, and no logo

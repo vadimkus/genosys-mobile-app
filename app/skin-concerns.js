@@ -1,5 +1,5 @@
 /**
- * Skin Concerns — interactive face map ("Tap where it bothers you").
+ * Skin Concerns - interactive face map ("Tap where it bothers you").
  * Zone taps and quick chips navigate to the native concern-detail screen.
  */
 
@@ -19,9 +19,9 @@ export const CONCERNS = [
     slug: 'sun-protection',
     icon: '☀️',
     short: { en: 'Sun Protection', ar: 'الحماية من الشمس', ru: 'Защита от солнца' },
-    en: { h1: 'Sun Protection for UAE Climate', heroShort: 'Professional-grade Korean sunscreens and BB cushions with SPF — lightweight, non-greasy formulas designed for the intense UAE sun.' },
-    ar: { h1: 'الحماية من الشمس لمناخ الإمارات', heroShort: 'واقيات شمس كورية احترافية وكوشن BB مع SPF — تركيبات خفيفة وغير دهنية مصممة لشمس الإمارات الحارقة.' },
-    ru: { h1: 'Защита от солнца для климата ОАЭ', heroShort: 'Профессиональные корейские солнцезащитные средства и BB-кушоны с SPF — лёгкие нежирные формулы для интенсивного солнца ОАЭ.' },
+    en: { h1: 'Sun Protection for UAE Climate', heroShort: 'Professional-grade Korean sunscreens and BB cushions with SPF - lightweight, non-greasy formulas designed for the intense UAE sun.' },
+    ar: { h1: 'الحماية من الشمس لمناخ الإمارات', heroShort: 'واقيات شمس كورية احترافية وكوشن BB مع SPF - تركيبات خفيفة وغير دهنية مصممة لشمس الإمارات الحارقة.' },
+    ru: { h1: 'Защита от солнца для климата ОАЭ', heroShort: 'Профессиональные корейские солнцезащитные средства и BB-кушоны с SPF - лёгкие нежирные формулы для интенсивного солнца ОАЭ.' },
   },
   {
     slug: 'acne-treatment',
@@ -29,7 +29,7 @@ export const CONCERNS = [
     short: { en: 'Acne & Blemish', ar: 'حب الشباب', ru: 'Акне' },
     en: { h1: 'Acne & Blemish Treatment', heroShort: 'Clinically proven toner, serum & cream that control breakouts without damaging your skin barrier.' },
     ar: { h1: 'علاج حب الشباب والبثور', heroShort: 'تونر وسيروم وكريم مثبتون سريرياً يتحكمون في البثور دون الإضرار بحاجز البشرة.' },
-    ru: { h1: 'Лечение акне и высыпаний', heroShort: 'Клинически доказанные тоник, сыворотка и крем — контролируют высыпания, не повреждая барьер кожи.' },
+    ru: { h1: 'Лечение акне и высыпаний', heroShort: 'Клинически доказанные тоник, сыворотка и крем - контролируют высыпания, не повреждая барьер кожи.' },
   },
   {
     slug: 'pigmentation',
@@ -43,9 +43,9 @@ export const CONCERNS = [
     slug: 'scars-treatment',
     icon: '🧬',
     short: { en: 'Scars & Repair', ar: 'الندبات', ru: 'Рубцы' },
-    en: { h1: 'Scar Treatment & Skin Repair', heroShort: 'EGF repair creams & microneedling serums — rebuild collagen and smooth scar tissue.' },
-    ar: { h1: 'علاج الندبات وإصلاح البشرة', heroShort: 'كريمات إصلاح EGF وسيرومات الوخز بالإبر — إعادة بناء الكولاجين وتنعيم أنسجة الندبات.' },
-    ru: { h1: 'Лечение рубцов и восстановление', heroShort: 'Кремы с EGF и сыворотки для микронидлинга — восстановление коллагена и разглаживание рубцов.' },
+    en: { h1: 'Scar Treatment & Skin Repair', heroShort: 'EGF repair creams & microneedling serums - rebuild collagen and smooth scar tissue.' },
+    ar: { h1: 'علاج الندبات وإصلاح البشرة', heroShort: 'كريمات إصلاح EGF وسيرومات الوخز بالإبر - إعادة بناء الكولاجين وتنعيم أنسجة الندبات.' },
+    ru: { h1: 'Лечение рубцов и восстановление', heroShort: 'Кремы с EGF и сыворотки для микронидлинга - восстановление коллагена и разглаживание рубцов.' },
   },
   {
     slug: 'hair-loss',
@@ -53,7 +53,7 @@ export const CONCERNS = [
     short: { en: 'Hair & Scalp', ar: 'الشعر وفروة الرأس', ru: 'Волосы' },
     en: { h1: 'Hair Loss & Scalp Care', heroShort: 'HR3 MATRIX shampoo, tonic & solution that reactivate follicles and reduce hair loss.' },
     ar: { h1: 'علاج تساقط الشعر وفروة الرأس', heroShort: 'شامبو وتونيك ومحلول HR3 MATRIX يعيدون تنشيط البصيلات ويقللون تساقط الشعر.' },
-    ru: { h1: 'Выпадение волос и уход за кожей головы', heroShort: 'Шампунь, тоник и раствор HR3 MATRIX — реактивация фолликулов и уменьшение выпадения волос.' },
+    ru: { h1: 'Выпадение волос и уход за кожей головы', heroShort: 'Шампунь, тоник и раствор HR3 MATRIX - реактивация фолликулов и уменьшение выпадения волос.' },
   },
   {
     slug: 'anti-aging',
@@ -67,9 +67,9 @@ export const CONCERNS = [
     slug: 'hydration',
     icon: '💧',
     short: { en: 'Hydration', ar: 'الترطيب', ru: 'Увлажнение' },
-    en: { h1: 'Hydrating Skincare for Dry Climate', heroShort: 'Hyaluronic acid serums & barrier-lock creams — Korean hydration tech for UAE dehydration.' },
-    ar: { h1: 'ترطيب البشرة للمناخ الجاف', heroShort: 'سيرومات حمض الهيالورونيك وكريمات حماية الحاجز — تقنية ترطيب كورية لجفاف الإمارات.' },
-    ru: { h1: 'Увлажнение для сухого климата', heroShort: 'Сыворотки с гиалуроновой кислотой и барьерные кремы — корейское увлажнение для климата ОАЭ.' },
+    en: { h1: 'Hydrating Skincare for Dry Climate', heroShort: 'Hyaluronic acid serums & barrier-lock creams - Korean hydration tech for UAE dehydration.' },
+    ar: { h1: 'ترطيب البشرة للمناخ الجاف', heroShort: 'سيرومات حمض الهيالورونيك وكريمات حماية الحاجز - تقنية ترطيب كورية لجفاف الإمارات.' },
+    ru: { h1: 'Увлажнение для сухого климата', heroShort: 'Сыворотки с гиалуроновой кислотой и барьерные кремы - корейское увлажнение для климата ОАЭ.' },
   },
   {
     slug: 'sensitivity',
@@ -118,7 +118,7 @@ export default function SkinConcernsScreen() {
         scrollEventThrottle={16}
       >
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
-        {/* Interactive face map — tap a zone (or a quick chip) to jump to its concern.
+        {/* Interactive face map - tap a zone (or a quick chip) to jump to its concern.
             The map includes a chip cloud for all concerns; no separate grid needed. */}
         <ConcernFaceMap
           concerns={CONCERNS}

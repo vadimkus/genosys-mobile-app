@@ -140,7 +140,7 @@ export const fetchProducts = async (user = null, options = {}) => {
     
   } catch (error) {
     log.error('Failed to fetch products', error?.message || error);
-    // Surface API failures to Sentry — previously only render crashes were
+    // Surface API failures to Sentry - previously only render crashes were
     // captured, so production API error rates were invisible.
     captureException(error, { tags: { area: 'api', op: 'fetchProducts' } });
     
@@ -285,7 +285,7 @@ export const fetchUserProfile = async (token) => {
 
 /**
  * Fetch GENOSYS Rewards membership status (tier, points, progress).
- * Returns null on failure — the profile card hides itself gracefully.
+ * Returns null on failure - the profile card hides itself gracefully.
  * @param {string} token - User authentication token
  * @returns {Promise<Object|null>} Membership payload or null
  */

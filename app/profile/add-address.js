@@ -422,7 +422,7 @@ export default function AddEditAddressScreen() {
               </Text>
             </View>
 
-            {/* Save — primary action */}
+            {/* Save - primary action */}
             <TouchableOpacity
               style={[styles.saveButton, shadow.cta(colors.cta), isSaving && styles.buttonDisabled]}
               onPress={handleSave}
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Save — primary
+  // Save - primary
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',

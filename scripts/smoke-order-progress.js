@@ -111,7 +111,7 @@ check('cancelled: none', litAfter({ status: 'CANCELLED' }), [false, false]);
  * here rather than discovered on a device.
  */
 console.log('live activity payload');
-// Stands in for the app's translator, interpolation included — a stub that ignored params
+// Stands in for the app's translator, interpolation included - a stub that ignored params
 // would let an unfilled "{place}" through here and onto a customer's Lock Screen.
 const t = (key, params) => {
   const value = key.split('.').reduce((o, k) => (o || {})[k], en) ?? key;
@@ -143,7 +143,7 @@ check('prepaid says Paid, not Confirmed', prepaid.steps[0], 'Paid');
 check('and is one step in', prepaid.done, 1);
 
 const done = buildOrderActivityState({ orderNumber: '1', paymentMethod: 'cod', status: 'DELIVERED' }, t);
-check('a finished order reads as finished', done.status, 'Delivered — thank you');
+check('a finished order reads as finished', done.status, 'Delivered - thank you');
 check('with the bar full', done.done, 3);
 
 const gone = buildOrderActivityState({ orderNumber: '1', status: 'CANCELLED' }, t);
@@ -163,15 +163,15 @@ console.log('delivery promise');
 const withEmirate = (emirate, status) =>
   buildOrderActivityState({ orderNumber: '1', paymentMethod: 'cod', status, customerEmirate: emirate }, t);
 
-check('Dubai gets the hours', withEmirate('Dubai', 'CONFIRMED').eta, 'Arriving in Dubai within 1–2 hours');
-check('and is not case-sensitive', withEmirate('dubai', 'CONFIRMED').eta, 'Arriving in Dubai within 1–2 hours');
+check('Dubai gets the hours', withEmirate('Dubai', 'CONFIRMED').eta, 'Arriving in Dubai within 1-2 hours');
+check('and is not case-sensitive', withEmirate('dubai', 'CONFIRMED').eta, 'Arriving in Dubai within 1-2 hours');
 
 // Naming the destination is what makes two different windows read as fair rather than
 // arbitrary. A customer in Ajman should be able to see why theirs says a day and a half.
-check('Abu Dhabi does not', withEmirate('Abu Dhabi', 'CONFIRMED').eta, 'Arriving in Abu Dhabi within 24–36 hours');
-check('nor Sharjah', withEmirate('Sharjah', 'SHIPPED').eta, 'Arriving in Sharjah within 24–36 hours');
-check('however the place was typed', withEmirate('ras al-khaimah', 'CONFIRMED').eta, 'Arriving in Ras Al Khaimah within 24–36 hours');
-check('and a place we do not translate falls back to what was entered', withEmirate('Al Ain', 'CONFIRMED').eta, 'Arriving in Al Ain within 24–36 hours');
+check('Abu Dhabi does not', withEmirate('Abu Dhabi', 'CONFIRMED').eta, 'Arriving in Abu Dhabi within 24-36 hours');
+check('nor Sharjah', withEmirate('Sharjah', 'SHIPPED').eta, 'Arriving in Sharjah within 24-36 hours');
+check('however the place was typed', withEmirate('ras al-khaimah', 'CONFIRMED').eta, 'Arriving in Ras Al Khaimah within 24-36 hours');
+check('and a place we do not translate falls back to what was entered', withEmirate('Al Ain', 'CONFIRMED').eta, 'Arriving in Al Ain within 24-36 hours');
 check('no placeholder is left unfilled', withEmirate('Dubai', 'CONFIRMED').eta.includes('{place}'), false);
 
 // The three silences. Each is a promise we have no business making.
@@ -182,11 +182,11 @@ check('nothing without an emirate', 'eta' in buildOrderActivityState({ orderNumb
 check('nor for a blank one', 'eta' in withEmirate('   ', 'CONFIRMED'), false);
 
 // The server sends snake_case in places; the card must not go silent because of it.
-check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).eta, 'Arriving in Dubai within 1–2 hours');
+check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).eta, 'Arriving in Dubai within 1-2 hours');
 
 /**
  * The logo path and the rewards standing are decoration: a card without them is still a
- * complete card, and the server — which cannot know a device-local file path — sends
+ * complete card, and the server - which cannot know a device-local file path - sends
  * neither. So they must never appear as empty keys.
  */
 console.log('optional decoration');

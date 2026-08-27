@@ -66,10 +66,10 @@ const isUserDiscountExcludedOrderItemName = (nameRaw) => {
   if (name.includes('beauty box') || name.includes('beautybox')) return true;
   // Hydro Cool Modelling Mask
   if (name.includes('hydro') && name.includes('cool') && name.includes('mask')) return true;
-  // Devices (fallback by name) — compact to alphanumerics so hyphenated
+  // Devices (fallback by name) - compact to alphanumerics so hyphenated
   // names match too: "GENO-LED IR II" -> genoledirii, "Hair-GENTRON" -> hairgentron.
   const compact = name.replace(/[^a-z0-9]/g, '');
-  // Hair Stamp is a consumable for the HairGen Booster, not a device — discounts apply.
+  // Hair Stamp is a consumable for the HairGen Booster, not a device - discounts apply.
   if (compact.includes('hairstamp')) return false;
   if (compact.includes('genoled') || compact.includes('gentron') || compact.includes('hairgen')) return true;
   return false;
@@ -144,7 +144,7 @@ const isApplePayLike = (order) => {
   return metaFlow === 'apple_pay';
 };
 
-/** Tinted status capsule with leading dot — shared look with details screen. */
+/** Tinted status capsule with leading dot - shared look with details screen. */
 function StatusCapsule({ status, label, isRTL }) {
   const s = statusStyle(status);
   return (
@@ -432,7 +432,7 @@ function OrdersScreen() {
                 : (user?.discountType ? Number(user?.discountPercentage) : 0);
               return (
                 <View key={`${String(o.id || orderNumber)}-${orderIndex}`} style={[styles.card, shadow.card]}>
-                  {/* Header — whole row taps through to details */}
+                  {/* Header - whole row taps through to details */}
                   <TouchableOpacity
                     style={[styles.cardHead, isRTL && styles.rowRTL]}
                     onPress={() => openDetails(o)}
@@ -503,7 +503,7 @@ function OrdersScreen() {
                     </View>
                   </View>
 
-                  {/* GENOSYS Rewards — points earned by this order */}
+                  {/* GENOSYS Rewards - points earned by this order */}
                   {Number(o?.loyaltyPointsEarned) > 0 ? (
                     <View style={[styles.pointsEarnedRow, isRTL && styles.rowRTL]}>
                       <Ionicons name="ribbon-outline" size={13} color={colors.accent} />
@@ -560,7 +560,7 @@ function OrdersScreen() {
                           String(size || '').trim() === '__PROMO__' ||
                           Number(price) === 0;
                         const excludedFromUserDiscount = isUserDiscountExcludedOrderItemName(name);
-                        // Detect bundle items — bundle discount is mutually exclusive with VIP per item
+                        // Detect bundle items - bundle discount is mutually exclusive with VIP per item
                         const orderBundleDiscPct = Number(o?.bundleDiscountPercentage);
                         const orderBundleDiscAmt = Number(o?.bundleDiscountAmount);
                         const hasBundleOnOrder = Number.isFinite(orderBundleDiscPct) && orderBundleDiscPct > 0 && Number.isFinite(orderBundleDiscAmt) && orderBundleDiscAmt > 0;
@@ -582,7 +582,7 @@ function OrdersScreen() {
                             style={styles.orderSummaryItemRow}
                           >
                             <Text style={[styles.orderSummaryLine, isRTL && styles.textRTLRight]}>
-                              {qty}× {String(name)}{extras ? ` — ${extras}` : ''}
+                              {qty}× {String(name)}{extras ? ` - ${extras}` : ''}
                             </Text>
                             {isPromo ? (
                               <Text style={[styles.orderSummaryLineMuted, isRTL && styles.textRTLRight]}>{t('common.free')}</Text>
@@ -658,7 +658,7 @@ function OrdersScreen() {
                                 </View>
                               </>
                             ) : (
-                              /* No discounts — simple subtotal */
+                              /* No discounts - simple subtotal */
                               <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
                                 <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTLRight]}>{t('ordersScreen.subtotal')}</Text>
                                 <Text style={[styles.orderTotalsValue, isRTL && styles.valueLTR]}>AED {formatAED(subtotal)}</Text>

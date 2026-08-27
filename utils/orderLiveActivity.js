@@ -39,7 +39,7 @@ async function decorations(token) {
  * would be noise, and the common case is one order on the way.
  *
  * Everything in here is JavaScript, so it ships over the air. The only part that needed a
- * binary was the widget extension target itself — which means the card's behaviour,
+ * binary was the widget extension target itself - which means the card's behaviour,
  * wording and lifecycle can all be changed later without another App Store round.
  *
  * The card is started locally today. When the server's APNs channel is ready, the tokens
@@ -79,7 +79,7 @@ function load() {
  *
  * Waiting for the customer to open the Orders tab is too late: the whole point of the
  * card is that it is there when they lock the phone after checking out. There is no order
- * object to hand yet, only what checkout knows, so the state is built from that — the
+ * object to hand yet, only what checkout knows, so the state is built from that - the
  * server's own status arrives at the next sync and corrects anything.
  */
 export async function startOrderActivityForNewOrder({
@@ -100,7 +100,7 @@ export async function startOrderActivityForNewOrder({
     // A new order is PENDING: accepted by us, nothing shipped. The card shows an empty
     // bar and "waiting to be confirmed", which is exactly true.
     // The emirate decides the delivery promise, and a prepaid order is already one step
-    // in — so without it a Dubai card order would start with no window on it.
+    // in - so without it a Dubai card order would start with no window on it.
     const order = { orderNumber, paymentMethod, paymentStatus, emirate, status: 'PENDING' };
     const state = buildOrderActivityState(order, t, await decorations(authToken));
     const id = orderId || orderNumber;
@@ -119,7 +119,7 @@ export async function startOrderActivityForNewOrder({
  * End every card this app already has running.
  *
  * `activity` is module state, so it is lost when the app restarts while the card lives on
- * in the system. Without this, each new order stacked another card on the Lock Screen —
+ * in the system. Without this, each new order stacked another card on the Lock Screen -
  * the system groups them under the app name, so two orders read as two cards rather than
  * one that moved. `getInstances` is the only view of what is genuinely still up.
  */
@@ -141,8 +141,8 @@ async function retireStrays(OrderActivity, t) {
 /**
  * Move the card from an order-status notification.
  *
- * The status push already carries everything the card needs — order number and new
- * status — so the card can advance the instant the notification lands, with no round trip
+ * The status push already carries everything the card needs - order number and new
+ * status - so the card can advance the instant the notification lands, with no round trip
  * and no screen to open.
  *
  * This is not a substitute for the APNs channel. It only fires when the app is running or
@@ -196,7 +196,7 @@ export async function syncOrderActivity(orders, t, send, authToken) {
   try {
     // Nothing in flight: take down whatever is on screen. A card we hold gets the graceful
     // ending, with its final state left up for a moment; one we only know about through
-    // `getInstances` — the server's, or our own from before a restart — can only be cut.
+    // `getInstances` - the server's, or our own from before a restart - can only be cut.
     if (!tracked) {
       if (activity) await endActivity(t, orders);
       else await retireStrays(OrderActivity, t);
@@ -209,7 +209,7 @@ export async function syncOrderActivity(orders, t, send, authToken) {
     if (activity && activityOrderId === id) {
       await activity.update(state);
     } else if (!activity && (await adoptRunningCard(OrderActivity, state, id, send))) {
-      // Adopted a card this process never started — see `adoptRunningCard`.
+      // Adopted a card this process never started - see `adoptRunningCard`.
     } else {
       // A different order has taken over. End the old card before raising the new one.
       await retireStrays(OrderActivity, t);
@@ -232,7 +232,7 @@ export async function syncOrderActivity(orders, t, send, authToken) {
 /**
  * Take over a card that is already on screen, rather than raising a second one.
  *
- * There are two things that can put a card up — this app, and the server by push — and
+ * There are two things that can put a card up - this app, and the server by push - and
  * only one of them can be tracked in a module variable that dies with the process. So the
  * running instances are the only honest answer to "is there already a card?".
  */
@@ -331,7 +331,7 @@ export function registerTokens(send) {
  *
  * This must be a subscription, not a question. `getPushToken()` returns null when the
  * token "is not yet available", and it is never available in the moment an activity
- * starts — ActivityKit delivers it asynchronously, slightly later.
+ * starts - ActivityKit delivers it asynchronously, slightly later.
  *
  * Asking once and giving up is what produced two cards for one order: the server never
  * learned the token for the card the app had raised, so on the next status change it saw

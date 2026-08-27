@@ -111,7 +111,7 @@ export const getCategoryTagsForProduct = (product) => {
 export const getLocalizedProductName = (product, locale) => {
   if (!product) return '';
 
-  // Brand decision (2026-07-08): product names are NEVER translated — the
+  // Brand decision (2026-07-08): product names are NEVER translated - the
   // English name is the product's identity across EN/AR/RU (labels, invoices,
   // support all reference the same name). Descriptions remain localized.
   return pickFirstNonEmpty(

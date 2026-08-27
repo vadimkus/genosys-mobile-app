@@ -1,6 +1,6 @@
 /**
  * Bundle Builder Screen - Native (replaces WebView)
- * "Build Your Set" — 8-step skincare routine builder with tiered discounts.
+ * "Build Your Set" - 8-step skincare routine builder with tiered discounts.
  * Fetches products from /api/mobile/bundle-builder and adds to cart.
  */
 
@@ -183,7 +183,7 @@ export default function BundleBuilderScreen() {
   const discountPercent = getDiscountForCount(itemCount);
   const nextTier = getNextTier(itemCount);
 
-  // Bundle pricing: bundle and VIP discounts do NOT stack — the best one wins
+  // Bundle pricing: bundle and VIP discounts do NOT stack - the best one wins
   // per line (matches server cartPricing contractBeatsBundle + bag display).
   const vipPctRaw = Number(user?.discountPercentage);
   const vipPct = user?.discountType && Number.isFinite(vipPctRaw) && vipPctRaw > 0 && vipPctRaw < 100 ? vipPctRaw : 0;
@@ -280,7 +280,7 @@ export default function BundleBuilderScreen() {
       };
     });
     // Only clear the selection and navigate if the cart actually accepted the
-    // bundle — a silent failure here left a phantom "added" state (M7/M8 class).
+    // bundle - a silent failure here left a phantom "added" state (M7/M8 class).
     try {
       addBundleItems(bundleProducts, discountPercent);
     } catch (err) {
@@ -305,7 +305,7 @@ export default function BundleBuilderScreen() {
   // Render product card
   const renderProductCard = ({ item: product }) => {
     const selected = isSelected(product.id);
-    // No VIP discount shown in bundle builder — only retail price displayed
+    // No VIP discount shown in bundle builder - only retail price displayed
 
     return (
       <TouchableOpacity
@@ -343,7 +343,7 @@ export default function BundleBuilderScreen() {
           ) : null}
           {product.size ? <Text style={styles.productSize}>{product.size}</Text> : null}
 
-          {/* Price — retail only, no VIP in bundle builder */}
+          {/* Price - retail only, no VIP in bundle builder */}
           {user ? (
             <View style={styles.priceRow}>
               <Text style={styles.priceMain}>
@@ -556,7 +556,7 @@ export default function BundleBuilderScreen() {
           <Ionicons name={footerExpanded ? 'chevron-down' : 'chevron-up'} size={18} color={colors.placeholder} />
         </TouchableOpacity>
 
-        {/* Expanded pricing breakdown — best discount wins (bundle vs VIP) */}
+        {/* Expanded pricing breakdown - best discount wins (bundle vs VIP) */}
         {footerExpanded && user && itemCount > 0 && (
           <View style={styles.footerPricing}>
             {/* Retail Price (before discount) */}
@@ -566,7 +566,7 @@ export default function BundleBuilderScreen() {
                 <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.secondaryLabel }]}>{formatAed(retailTotal)}</Text>
               </View>
             )}
-            {/* Discount row — labelled by the discount that actually won */}
+            {/* Discount row - labelled by the discount that actually won */}
             {discountAmount > 0 && (
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabelGreen}>{discountRowLabel}{discountRowPctText}</Text>
@@ -676,7 +676,7 @@ export default function BundleBuilderScreen() {
                       style={styles.summaryRemoveBtn}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       accessibilityRole="button"
-                      accessibilityLabel={`${t('bag.removeItem')} — ${product.name}`}
+                      accessibilityLabel={`${t('bag.removeItem')} - ${product.name}`}
                     >
                       <Ionicons name="close-circle" size={22} color={colors.red} />
                     </TouchableOpacity>
@@ -685,7 +685,7 @@ export default function BundleBuilderScreen() {
               })}
             </ScrollView>
 
-            {/* Pricing breakdown — best discount wins (bundle vs VIP) */}
+            {/* Pricing breakdown - best discount wins (bundle vs VIP) */}
             {user && (
               <View style={styles.summaryPricing}>
                 {/* Retail Price */}
@@ -695,7 +695,7 @@ export default function BundleBuilderScreen() {
                     <Text style={[styles.pricingValue, { textDecorationLine: 'line-through', color: colors.secondaryLabel }]}>{formatAed(retailTotal)}</Text>
                   </View>
                 )}
-                {/* Discount row — labelled by the discount that actually won */}
+                {/* Discount row - labelled by the discount that actually won */}
                 {discountAmount > 0 && (
                   <View style={styles.pricingRow}>
                     <Text style={styles.pricingLabelGreen}>{discountRowLabel}{discountRowPctText}</Text>
@@ -797,7 +797,7 @@ const styles = StyleSheet.create({
   },
   // Square tile, photo edge-to-edge. contentFit="cover" center-crops the
   // 956×662 landscape studio shots to fill the square (products are centered,
-  // verified safe) — kills the white letterbox bands ("white endings").
+  // verified safe) - kills the white letterbox bands ("white endings").
   productImageWrap: { height: CARD_WIDTH, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
   productImage: { width: '100%', height: '100%' },
   productInfo: { paddingHorizontal: 10, paddingVertical: 8 },

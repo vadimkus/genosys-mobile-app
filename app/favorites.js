@@ -165,7 +165,7 @@ export default function FavoritesScreen() {
           >
             <Text style={[styles.browseButtonText, isRTL && styles.textCenterRTL]}>{t('favorites.browseProducts')}</Text>
           </TouchableOpacity>
-          {/* Login nudge for signed-out guests — favorites are stored
+          {/* Login nudge for signed-out guests - favorites are stored
               per-device, so cross-device sync is a real incentive to
               sign in. Hidden once the user has an auth session. */}
           {!user ? (
@@ -259,7 +259,7 @@ export default function FavoritesScreen() {
                           })()}
                         </Text>
 
-                        {/* Pricing — shared decision, see `resolvePriceView`. */}
+                        {/* Pricing - shared decision, see `resolvePriceView`. */}
                         {(() => {
                           const view = resolvePriceView(product, { user });
 
@@ -310,13 +310,13 @@ export default function FavoritesScreen() {
                       activeOpacity={0.6}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       accessibilityRole="button"
-                      accessibilityLabel={`${t('favorites.removeFromFavorites')} — ${product?.name || ''}`}
+                      accessibilityLabel={`${t('favorites.removeFromFavorites')} - ${product?.name || ''}`}
                     >
                       <Ionicons name="heart" size={22} color={colors.accent} />
                     </TouchableOpacity>
                   </View>
 
-                  {/* Add to Cart / Request Quote — compact tinted pill */}
+                  {/* Add to Cart / Request Quote - compact tinted pill */}
                   {product.isPriceOnRequest ? (
                     <TouchableOpacity
                       style={[styles.requestQuoteButton, isRTL && styles.rowRTL]}

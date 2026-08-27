@@ -45,7 +45,7 @@ const rawImageUri = (img) => {
 };
 
 // Order lines are keyed by product id, or `id||size` when a size variant is
-// selected — one product can have several lines (e.g. 200ml and 600ml).
+// selected - one product can have several lines (e.g. 200ml and 600ml).
 const keyOf = (id, size) => (size ? `${id}||${size}` : String(id));
 const parseKey = (key) => {
   const i = String(key).indexOf('||');
@@ -86,7 +86,7 @@ export default function PartnerPortalScreen() {
   const discountPct = Math.round(Number(user?.discountPercentage) || 0);
 
   // Trade flags (consignment / credit / portal access): the stored user may
-  // be stale (set at login), so refresh from the server on mount — they are
+  // be stale (set at login), so refresh from the server on mount - they are
   // toggled by admin.
   const [freshProfile, setFreshProfile] = useState(null);
   const [profileAccessChecked, setProfileAccessChecked] = useState(false);
@@ -124,7 +124,7 @@ export default function PartnerPortalScreen() {
     else if (hasCredit) setPayOption('credit');
   }, [hasConsignment, hasCredit]);
 
-  // Collapsible category sections (Creams, Serums, Masks…) — flat list while
+  // Collapsible category sections (Creams, Serums, Masks…) - flat list while
   // searching. Same grouping as the website partner portal.
   const [openGroups, setOpenGroups] = useState(() => new Set());
   const toggleGroup = (key) => {
@@ -340,7 +340,7 @@ export default function PartnerPortalScreen() {
         tr('Not for consignment', 'Не для консигнации', 'ليس للأمانة'),
         tr(
           'These items are professional/equipment and cannot go to consignment stock:\n\n',
-          'Эти позиции — профессиональные/оборудование, их нельзя добавить на консигнацию:\n\n',
+          'Эти позиции - профессиональные/оборудование, их нельзя добавить на консигнацию:\n\n',
           'هذه المنتجات مهنية/أجهزة ولا يمكن إضافتها إلى مخزون الأمانة:\n\n'
         ) + nonConsignableInCart.join('\n')
       );
@@ -447,17 +447,17 @@ export default function PartnerPortalScreen() {
         <Text style={styles.guardText}>
           {placed.paymentOption === 'consignment'
             ? tr(
-                'Added to your consignment stock — same-day delivery. Settlement via your monthly sales report.',
-                'Добавлено на консигнационный склад — доставка в тот же день. Расчёт по ежемесячному отчёту.',
-                'أُضيف إلى مخزون الأمانة — توصيل في نفس اليوم. التسوية عبر التقرير الشهري.'
+                'Added to your consignment stock - same-day delivery. Settlement via your monthly sales report.',
+                'Добавлено на консигнационный склад - доставка в тот же день. Расчёт по ежемесячному отчёту.',
+                'أُضيف إلى مخزون الأمانة - توصيل في نفس اليوم. التسوية عبر التقرير الشهري.'
               )
             : placed.paymentOption === 'credit'
               ? tr(
-                  `Professional order on ${creditDays}-day credit — payment due within ${creditDays} days of delivery.`,
-                  `Профессиональный заказ с отсрочкой ${creditDays} дней — оплата в течение ${creditDays} дней после доставки.`,
-                  `طلب مهني بأجل ${creditDays} يومًا — الدفع خلال ${creditDays} يومًا من التسليم.`
+                  `Professional order on ${creditDays}-day credit - payment due within ${creditDays} days of delivery.`,
+                  `Профессиональный заказ с отсрочкой ${creditDays} дней - оплата в течение ${creditDays} дней после доставки.`,
+                  `طلب مهني بأجل ${creditDays} يومًا - الدفع خلال ${creditDays} يومًا من التسليم.`
                 )
-              : tr('Priority partner order — we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ — доставим в тот же день.', 'طلب شريك ذو أولوية — توصيل بنفس اليوم.')}
+              : tr('Priority partner order - we will confirm and arrange same-day delivery.', 'Приоритетный партнёрский заказ - доставим в тот же день.', 'طلب شريك ذو أولوية - توصيل بنفس اليوم.')}
         </Text>
         <TouchableOpacity style={styles.guardBtn} onPress={() => router.replace('/(tabs)/orders')}>
           <Text style={styles.guardBtnText}>{tr('View orders', 'Мои заказы', 'طلباتي')}</Text>
@@ -703,7 +703,7 @@ export default function PartnerPortalScreen() {
           </View>
         </View>
 
-        {/* Active trade agreements — clear cards instead of cramped pills */}
+        {/* Active trade agreements - clear cards instead of cramped pills */}
         {(hasConsignment || hasCredit) ? (
           <View style={styles.agreeWrap}>
             {hasConsignment ? (
@@ -711,7 +711,7 @@ export default function PartnerPortalScreen() {
                 <View style={[styles.agreeDot, { backgroundColor: colors.orange }]} />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.agreeTitle, { color: colors.orange }, isRTL && styles.rtlText]}>
-                    {tr('CONSIGNMENT AGREEMENT — ACTIVE', 'ДОГОВОР КОНСИГНАЦИИ — АКТИВЕН', 'اتفاقية الأمانة — مفعّلة')}
+                    {tr('CONSIGNMENT AGREEMENT - ACTIVE', 'ДОГОВОР КОНСИГНАЦИИ - АКТИВЕН', 'اتفاقية الأمانة - مفعّلة')}
                   </Text>
                   <Text style={[styles.agreeDesc, isRTL && styles.rtlText]}>
                     {tr('Retail products · settle via monthly sales report', 'Розничные продукты · расчёт по ежемесячному отчёту', 'منتجات التجزئة · تسوية عبر التقرير الشهري')}
@@ -724,7 +724,7 @@ export default function PartnerPortalScreen() {
                 <View style={[styles.agreeDot, { backgroundColor: colors.blue }]} />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.agreeTitle, { color: colors.blue }, isRTL && styles.rtlText]}>
-                    {tr(`CREDIT ${creditDays} DAYS — ACTIVE`, `КРЕДИТ ${creditDays} ДНЕЙ — АКТИВЕН`, `أجل ${creditDays} يومًا — مفعّل`)}
+                    {tr(`CREDIT ${creditDays} DAYS - ACTIVE`, `КРЕДИТ ${creditDays} ДНЕЙ - АКТИВЕН`, `أجل ${creditDays} يومًا - مفعّل`)}
                   </Text>
                   <Text style={[styles.agreeDesc, isRTL && styles.rtlText]}>
                     {tr(`Professional products · pay within ${creditDays} days of delivery`, `Профессиональные продукты · оплата в течение ${creditDays} дней`, `منتجات مهنية · الدفع خلال ${creditDays} يومًا من التسليم`)}
@@ -809,13 +809,13 @@ export default function PartnerPortalScreen() {
                   <View style={[styles.reorderBanner, isRTL && styles.rowRTL]}>
                     <Ionicons name="refresh" size={16} color={colors.white} />
                     <Text style={[styles.reorderBannerText, isRTL && styles.rtlText]}>
-                      {tr(`Loaded ${reorderMsg} item${reorderMsg === 1 ? '' : 's'} — adjust & place`, `Загружено ${reorderMsg} — измените и оформите`, `تم تحميل ${reorderMsg} — عدّل ثم قدّم`)}
+                      {tr(`Loaded ${reorderMsg} item${reorderMsg === 1 ? '' : 's'} - adjust & place`, `Загружено ${reorderMsg} - измените и оформите`, `تم تحميل ${reorderMsg} - عدّل ثم قدّم`)}
                     </Text>
                   </View>
                 ) : null}
                 {!search && recentOrders.length > 0 ? (
                   <>
-                    {/* Collapsible reorder section — same visual language as
+                    {/* Collapsible reorder section - same visual language as
                         the category headers below */}
                     <TouchableOpacity
                       style={[styles.groupHeader, isRTL && styles.rowRTL]}
@@ -958,9 +958,9 @@ export default function PartnerPortalScreen() {
                     Alert.alert(
                       tr('Retail products only', 'Только розничные продукты', 'منتجات التجزئة فقط'),
                       tr(
-                        'Remove professional/equipment items first — consignment stock is retail products only:\n\n',
-                        'Сначала уберите профессиональные позиции — на консигнацию идут только розничные продукты:\n\n',
-                        'أزل المنتجات المهنية أولًا — مخزون الأمانة للتجزئة فقط:\n\n'
+                        'Remove professional/equipment items first - consignment stock is retail products only:\n\n',
+                        'Сначала уберите профессиональные позиции - на консигнацию идут только розничные продукты:\n\n',
+                        'أزل المنتجات المهنية أولًا - مخزون الأمانة للتجزئة فقط:\n\n'
                       ) + nonConsignableInCart.join('\n')
                     );
                     return;
@@ -1003,11 +1003,11 @@ export default function PartnerPortalScreen() {
           </View>
           <Text style={[styles.footerHint, isRTL && styles.rtlText]}>
             {payOption === 'consignment'
-              ? tr('Retail products only — settle via monthly sales report', 'Только розничные продукты — расчёт по ежемесячному отчёту', 'منتجات التجزئة فقط — تسوية عبر التقرير الشهري')
+              ? tr('Retail products only - settle via monthly sales report', 'Только розничные продукты - расчёт по ежемесячному отчёту', 'منتجات التجزئة فقط - تسوية عبر التقرير الشهري')
               : payOption === 'credit'
-                ? tr(`Professional order — pay within ${creditDays} days of delivery`, `Профессиональный заказ — оплата в течение ${creditDays} дней`, `طلب مهني — الدفع خلال ${creditDays} يومًا`)
+                ? tr(`Professional order - pay within ${creditDays} days of delivery`, `Профессиональный заказ - оплата в течение ${creditDays} дней`, `طلب مهني - الدفع خلال ${creditDays} يومًا`)
               : payOption === 'online'
-                ? tr('Card / Apple Pay — secure checkout', 'Карта / Apple Pay — безопасная оплата', 'بطاقة / Apple Pay — دفع آمن')
+                ? tr('Card / Apple Pay - secure checkout', 'Карта / Apple Pay - безопасная оплата', 'بطاقة / Apple Pay - دفع آمن')
                 : tr('Pay when your order arrives', 'Оплатите при доставке', 'ادفع عند وصول الطلب')}
           </Text>
           <View style={[styles.footerRow, isRTL && styles.rowRTL]}>
@@ -1030,7 +1030,7 @@ export default function PartnerPortalScreen() {
                     : payOption === 'consignment'
                       ? tr('Add to consignment', 'На консигнацию', 'إضافة إلى الأمانة')
                       : payOption === 'credit'
-                        ? tr(`Place order — ${creditDays}d credit`, `Оформить — кредит ${creditDays}д`, `تقديم الطلب — أجل ${creditDays} يومًا`)
+                        ? tr(`Place order - ${creditDays}d credit`, `Оформить - кредит ${creditDays}д`, `تقديم الطلب - أجل ${creditDays} يومًا`)
                         : tr('Place order', 'Оформить заказ', 'تقديم الطلب')}
                 </Text>
               )}

@@ -39,7 +39,7 @@ export function buildAuthenticatedWebViewUrl(urlPath, locale, user) {
     );
   }
 
-  // Not logged in – load the page directly
+  // Not logged in - load the page directly
   return `${BASE_URL}${localePrefix}${urlPath}`;
 }
 

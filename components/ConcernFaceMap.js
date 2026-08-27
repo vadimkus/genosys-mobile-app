@@ -1,19 +1,19 @@
 /**
- * ConcernFaceMap — "Tap where it bothers you" (native version).
+ * ConcernFaceMap - "Tap where it bothers you" (native version).
  *
  * Living-diagnostic face map for the Skin Concerns screen, styled after
  * AI skin-analysis scanners (Revieve / YouCam aesthetic):
  *
- *  1. Scan sweep — a soft light band with a red "laser" edge sweeps down the
+ *  1. Scan sweep - a soft light band with a red "laser" edge sweeps down the
  *     face once on mount; each hotspot pops in as the line passes it.
- *  2. Breathing dots — frosted-glass dots pulse with per-dot phase offsets
+ *  2. Breathing dots - frosted-glass dots pulse with per-dot phase offsets
  *     so the face feels alive instead of blinking in unison.
- *  3. Target reticle — the active dot grows a slowly rotating dashed focus
+ *  3. Target reticle - the active dot grows a slowly rotating dashed focus
  *     ring (clinical HUD) with a leader line up to the zone label chip.
- *  4. Quick chips — a chip cloud below gives one-tap access to all concerns
+ *  4. Quick chips - a chip cloud below gives one-tap access to all concerns
  *     (replaces the old duplicated card grid).
  *
- * Mirrors the web component (components/products/ConcernFaceMap.tsx) — same
+ * Mirrors the web component (components/products/ConcernFaceMap.tsx) - same
  * image, zones and copy. Built with RN Animated + react-native-svg only.
  */
 
@@ -33,9 +33,9 @@ const ZONES = [
   { id: 'scalp', cx: 50, cy: 11, concerns: ['hair-loss'], label: { en: 'Scalp & hairline', ar: 'فروة الرأس وخط الشعر', ru: 'Кожа головы и линия роста волос' } },
   { id: 'forehead', cx: 50, cy: 30, concerns: ['anti-aging', 'sun-protection'], label: { en: 'Forehead', ar: 'الجبهة', ru: 'Лоб' } },
   { id: 'eyes', cx: 71, cy: 47, concerns: ['anti-aging'], label: { en: 'Eye contour', ar: 'محيط العين', ru: 'Контур глаз' } },
-  { id: 'cheek-left', cx: 26, cy: 62, concerns: ['pigmentation'], label: { en: 'Cheek — spots', ar: 'الخد — تصبغات', ru: 'Щека — пигментация' } },
+  { id: 'cheek-left', cx: 26, cy: 62, concerns: ['pigmentation'], label: { en: 'Cheek - spots', ar: 'الخد - تصبغات', ru: 'Щека - пигментация' } },
   { id: 'nose', cx: 50, cy: 58, concerns: ['acne-treatment'], label: { en: 'Nose & T-zone', ar: 'الأنف والمنطقة T', ru: 'Нос и Т-зона' } },
-  { id: 'cheek-right', cx: 74, cy: 62, concerns: ['sensitivity'], label: { en: 'Cheek — redness', ar: 'الخد — احمرار', ru: 'Щека — покраснение' } },
+  { id: 'cheek-right', cx: 74, cy: 62, concerns: ['sensitivity'], label: { en: 'Cheek - redness', ar: 'الخد - احمرار', ru: 'Щека - покраснение' } },
   { id: 'mouth', cx: 50, cy: 78, concerns: ['hydration'], label: { en: 'Lips & smile lines', ar: 'الشفاه وخطوط الابتسامة', ru: 'Губы и носогубные линии' } },
   { id: 'chin', cx: 50, cy: 90, concerns: ['scars-treatment', 'acne-treatment'], label: { en: 'Chin & jawline', ar: 'الذقن وخط الفك', ru: 'Подбородок и линия челюсти' } },
 ];
@@ -87,7 +87,7 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
         Animated.spring(reveals[i], { toValue: 1, friction: 5, tension: 140, useNativeDriver: true }),
       ]);
 
-      // Breathing pulse: one-time phase offset per dot, then a steady loop —
+      // Breathing pulse: one-time phase offset per dot, then a steady loop -
       // the offsets make the pulses travel across the face like a wave
       const pulse = Animated.sequence([
         Animated.delay(revealDelay + 400 + i * 300),
@@ -164,7 +164,7 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
           cachePolicy="memory-disk"
         />
 
-        {/* Scan sweep — soft glow band with a red laser edge */}
+        {/* Scan sweep - soft glow band with a red laser edge */}
         {cardHeight > 0 && (
           <Animated.View
             pointerEvents="none"
@@ -269,7 +269,7 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
       {activeConcerns.length > 0 ? (
         <View style={styles.results}>
           <Text style={[styles.zoneLabel, isRTL && styles.textRTL]}>
-            {loc(COPY.zoneLabel)} — {loc(activeZone.label)}
+            {loc(COPY.zoneLabel)} - {loc(activeZone.label)}
           </Text>
           {activeConcerns.map((concern) => {
             const data = concern[locale] || concern.en;
@@ -304,7 +304,7 @@ export default function ConcernFaceMap({ concerns, locale, isRTL, onSelectConcer
         </View>
       )}
 
-      {/* Quick chips — one-tap access to every concern */}
+      {/* Quick chips - one-tap access to every concern */}
       <Text style={[styles.allConcernsLabel, isRTL && styles.textRTL]}>{loc(COPY.allConcerns)}</Text>
       <View style={[styles.chipsCloud, isRTL && styles.rowRTL]}>
         {concerns.map((concern) => {

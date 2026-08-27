@@ -7,7 +7,7 @@
  * module the function was written in.
  *
  * So a reference to anything declared outside the function throws a `ReferenceError` on
- * device — and the card renders as an empty black rectangle, because the system draws
+ * device - and the card renders as an empty black rectangle, because the system draws
  * nothing when the layout produces no nodes. No error reaches the app, the logs or the
  * screen. Two colour constants at module scope cost an evening exactly that way.
  *
@@ -45,7 +45,7 @@ function widgetGlobals() {
   ]);
 
   // `expo-widgets/bundle/index.ts` does `Object.assign(globalThis, ...swiftUI, ...modifiers)`,
-  // so every *export* is a global — not every file name. Several primitives share one
+  // so every *export* is a global - not every file name. Several primitives share one
   // module: `Circle`, `Capsule` and `Rectangle` all live in `Shapes`. Reading the
   // declarations rather than the directory listing is the difference between trusting
   // this check and having it reject something that works.
@@ -107,7 +107,7 @@ for (const file of LAYOUTS) {
 
   // `<Image uiImage>` ignores `frame` and paints the asset across the whole card. The
   // white wordmark is a black field with a red mark, so putting it back means a giant sun
-  // behind the copy — which shipped once. The mark is text.
+  // behind the copy - which shipped once. The mark is text.
   console.log(`the card draws no images (${file})`);
   if (/\bImage\b/.test(source)) {
     fail(`${file} renders an Image. Live Activity images fill the card; use text.`);
@@ -142,7 +142,7 @@ for (const file of LAYOUTS) {
     ['#FF453A', 'red, for a cancelled order'],
   ];
   for (const [hex, role] of palette) {
-    if (literals.has(hex)) console.log(`  ok   ${hex} — ${role}`);
+    if (literals.has(hex)) console.log(`  ok   ${hex} - ${role}`);
     else fail(`${file} no longer uses ${hex} (${role}).`);
   }
   if (literals.has('#dc2626')) {

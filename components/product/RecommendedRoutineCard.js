@@ -8,7 +8,7 @@ import { colors, shadow, surfaces } from '../../utils/theme';
 import * as haptics from '../../utils/haptics';
 import AUTH_CONFIG from '../../config/auth';
 
-// API sends relative image paths (/images/...) — prepend the web origin.
+// API sends relative image paths (/images/...) - prepend the web origin.
 function toImageUri(img) {
   const s = String(img || '').trim();
   if (!s) return null;
@@ -17,7 +17,7 @@ function toImageUri(img) {
 }
 
 /**
- * "Recommended Routine" card on the product page — mirrors the website PDP
+ * "Recommended Routine" card on the product page - mirrors the website PDP
  * block. Fully API-driven: the backend sends `product.routine` already
  * localized ({ heading, steps: [{ title, description, productId }] }), so
  * routine changes on the website appear here without an app update.

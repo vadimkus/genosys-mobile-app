@@ -109,7 +109,7 @@ export default function CheckoutOrderHeaderCard({
                 <View key={`${it.product?.id || name}-${idx}`} style={styles.orderSummaryLineBlock}>
                   <Text style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                     {qty}× {name}
-                    {extras ? ` — ${extras}` : ''}
+                    {extras ? ` - ${extras}` : ''}
                   </Text>
                   <View style={[styles.orderSummaryPriceRow, isRTL && styles.orderTotalsRowRTL]}>
                     <Text style={[styles.orderSummaryOriginalPrice, isRTL && styles.textRTL]}>
@@ -129,7 +129,7 @@ export default function CheckoutOrderHeaderCard({
             return (
               <Text key={`${it.product?.id || name}-${idx}`} style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                 {qty}× {name}
-                {extras ? ` — ${extras}` : ''} — {formatAed(finalLine)}
+                {extras ? ` - ${extras}` : ''} - {formatAed(finalLine)}
               </Text>
             );
           })}
@@ -145,7 +145,7 @@ export default function CheckoutOrderHeaderCard({
                 return (
                   <Text key={`${it.product?.id || name}-promo-${idx}`} style={[styles.orderSummaryLine, isRTL && styles.textRTL]}>
                     {qty}× {name}
-                    {size ? ` — ${size}` : ''} — {t('common.free')}
+                    {size ? ` - ${size}` : ''} - {t('common.free')}
                   </Text>
                 );
               })}
@@ -217,7 +217,7 @@ export default function CheckoutOrderHeaderCard({
               </View>
             </>
           ) : (
-            /* No discounts — simple subtotal row */
+            /* No discounts - simple subtotal row */
             <View style={[styles.orderTotalsRow, isRTL && styles.orderTotalsRowRTL]}>
               <Text style={[styles.orderTotalsLabel, isRTL && styles.textRTL]}>{t('checkout.subtotal')}</Text>
               <Text style={[styles.orderTotalsValue, isRTL && styles.summaryValueRTL]}>AED {Number(safeSubtotal || 0).toFixed(2)}</Text>

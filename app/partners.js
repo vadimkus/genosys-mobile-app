@@ -100,7 +100,7 @@ export default function PartnersScreen() {
 
   const l = (en, ar, ru) => (locale === 'ar' ? ar : locale === 'ru' ? ru : en);
 
-  // Subtle entrance motion (matches order/about screens) — runs once content is ready.
+  // Subtle entrance motion (matches order/about screens) - runs once content is ready.
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(12)).current;
   useEffect(() => {
@@ -333,7 +333,7 @@ export default function PartnersScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Footer — shared brand block */}
+            {/* Footer - shared brand block */}
             <AppFooter style={{ paddingBottom: 8 }} />
           </Animated.View>
         </Animated.ScrollView>

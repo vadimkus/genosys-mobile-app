@@ -1,5 +1,5 @@
 /**
- * Concern Detail — fully native concern page.
+ * Concern Detail - fully native concern page.
  * Replaces the previous WebView approach.
  * Receives `slug` param from skin-concerns.js or deep links.
  */
@@ -230,7 +230,7 @@ export default function ConcernDetailScreen() {
           ) : null}
         </View>
 
-        {/* Why Section — collapsible */}
+        {/* Why Section - collapsible */}
         {why && why.items?.length > 0 ? (
           <View style={styles.section}>
             <TouchableOpacity
@@ -255,7 +255,7 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* Documentation — collapsible */}
+        {/* Documentation - collapsible */}
         {protocolPdf ? (
           <View style={styles.section}>
             <TouchableOpacity
@@ -374,7 +374,7 @@ export default function ConcernDetailScreen() {
           </View>
         ) : null}
 
-        {/* Products Grid — collapsible */}
+        {/* Products Grid - collapsible */}
         {products && products.length > 0 ? (
           <View style={styles.section}>
             <TouchableOpacity
@@ -518,12 +518,12 @@ export default function ConcernDetailScreen() {
           </View>
         )}
 
-        {/* SEO intro text hidden — only relevant for web crawlers, not native app */}
+        {/* SEO intro text hidden - only relevant for web crawlers, not native app */}
 
         <View style={{ height: user && cartItems.length > 0 ? 120 : 40 }} />
       </Animated.ScrollView>
 
-      {/* Sticky Bottom Bar — expandable, visible when cart has items */}
+      {/* Sticky Bottom Bar - expandable, visible when cart has items */}
       {user && cartItems.length > 0 && (() => {
         const summary = getCartSummary();
         return (
@@ -570,7 +570,7 @@ export default function ConcernDetailScreen() {
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       style={styles.stickyRemoveBtn}
                       accessibilityRole="button"
-                      accessibilityLabel={`${t('bag.removeItem')} — ${name}`}
+                      accessibilityLabel={`${t('bag.removeItem')} - ${name}`}
                     >
                       <Ionicons name="close-circle" size={16} color={colors.separatorStrong} />
                     </TouchableOpacity>

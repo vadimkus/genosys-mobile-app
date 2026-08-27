@@ -92,7 +92,7 @@ export async function storeUserSession(userData) {
  */
 export async function getUserSession() {
   try {
-    // Independent reads — run in parallel. SecureStore (encrypted) is slower
+    // Independent reads - run in parallel. SecureStore (encrypted) is slower
     // than AsyncStorage, so serializing them added ~50-150ms to cold-start
     // auth restore for no reason.
     const [token, profileRaw] = await Promise.all([

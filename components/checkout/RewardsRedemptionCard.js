@@ -5,7 +5,7 @@ import { useLocalization } from '../../contexts/LocalizationContext';
 import { colors, shadow } from '../../utils/theme';
 
 /**
- * GENOSYS Rewards card in checkout — always-visible redemption control
+ * GENOSYS Rewards card in checkout - always-visible redemption control
  * (the order-summary toggle only shows when the summary is expanded).
  *
  * States:

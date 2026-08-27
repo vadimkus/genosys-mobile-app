@@ -55,9 +55,9 @@ export default function LocationsScreen() {
     {
       slug: 'dubai',
       name: l('Dubai', 'دبي', 'Дубай'),
-      desc: l('Same-day delivery within 1–2 hours via Careem/QuipQup', 'توصيل في نفس اليوم خلال ١-٢ ساعة عبر كريم', 'Доставка в тот же день за 1–2 часа через Careem'),
+      desc: l('Same-day delivery within 1-2 hours via Careem/QuipQup', 'توصيل في نفس اليوم خلال ١-٢ ساعة عبر كريم', 'Доставка в тот же день за 1-2 часа через Careem'),
       shipping: l('45 AED', '٤٥ د.إ', '45 AED'),
-      delivery: l('1–2 hours', '١-٢ ساعة', '1–2 часа'),
+      delivery: l('1-2 hours', '١-٢ ساعة', '1-2 часа'),
       icon: 'business',
       color: colors.accent,
     },
@@ -66,7 +66,7 @@ export default function LocationsScreen() {
       name: l('Abu Dhabi & Al Ain', 'أبو ظبي والعين', 'Абу-Даби и Аль-Айн'),
       desc: l('Next-day delivery across Abu Dhabi emirate', 'التوصيل في اليوم التالي في إمارة أبو ظبي', 'Доставка на следующий день по эмирату Абу-Даби'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
-      delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'flag',
       color: colors.blue,
     },
@@ -75,7 +75,7 @@ export default function LocationsScreen() {
       name: l('Sharjah', 'الشارقة', 'Шарджа'),
       desc: l('Fast delivery to all areas in Sharjah', 'توصيل سريع إلى جميع مناطق الشارقة', 'Быстрая доставка по всей Шардже'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
-      delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'location',
       color: colors.greenDeep,
     },
@@ -84,7 +84,7 @@ export default function LocationsScreen() {
       name: l('Ras Al Khaimah', 'رأس الخيمة', 'Рас-эль-Хайма'),
       desc: l('Delivery across RAK emirate', 'التوصيل في إمارة رأس الخيمة', 'Доставка по эмирату Рас-эль-Хайма'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
-      delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'compass',
       color: colors.orange,
     },
@@ -93,7 +93,7 @@ export default function LocationsScreen() {
       name: l('Ajman', 'عجمان', 'Аджман'),
       desc: l('Delivery to all areas in Ajman', 'التوصيل إلى جميع مناطق عجمان', 'Доставка по всему Аджману'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
-      delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'navigate',
       color: colors.purple,
     },
@@ -102,7 +102,7 @@ export default function LocationsScreen() {
       name: l('Fujairah', 'الفجيرة', 'Фуджейра'),
       desc: l('Delivery across Fujairah emirate', 'التوصيل في إمارة الفجيرة', 'Доставка по эمирату Фуджейра'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
-      delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'earth',
       color: colors.teal,
     },
@@ -111,7 +111,7 @@ export default function LocationsScreen() {
       name: l('Umm Al Quwain', 'أم القيوين', 'Умм-эль-Кайвайн'),
       desc: l('Delivery to Umm Al Quwain', 'التوصيل إلى أم القيوين', 'Доставка в Умм-эль-Кайвайн'),
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
-      delivery: l('24–36 hours', '٢٤-٣٦ ساعة', '24–36 часов'),
+      delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'pin',
       color: colors.green,
     },
@@ -212,7 +212,7 @@ export default function LocationsScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Footer — shared brand block */}
+          {/* Footer - shared brand block */}
           <AppFooter style={{ paddingBottom: 8 }} />
         </Animated.View>
       </Animated.ScrollView>

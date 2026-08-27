@@ -45,20 +45,20 @@ export default function BrandScreen() {
     ]).start();
   }, [fade, lift]);
 
-  const brandTitle = locale === 'ar' ? 'GENOSYS — نظام إعادة ولادة الجينات'
-    : locale === 'ru' ? 'GENOSYS — Система генетического возрождения'
-    : 'GENOSYS — Gene Re-Birth System';
+  const brandTitle = locale === 'ar' ? 'GENOSYS - نظام إعادة ولادة الجينات'
+    : locale === 'ru' ? 'GENOSYS - Система генетического возрождения'
+    : 'GENOSYS - Gene Re-Birth System';
 
   const brandDescription = locale === 'ar'
     ? 'جينوسيس هي علامة تجارية كورية متخصصة في مستحضرات العناية بالبشرة المهنية. تجمع منتجاتنا بين أحدث التقنيات الحيوية وأبحاث الجلد المتقدمة لتقديم حلول فعالة للعناية بالبشرة.'
     : locale === 'ru'
-    ? 'GENOSYS — корейский бренд профессиональной дерматокосметики. Наши продукты сочетают новейшие биотехнологии и передовые исследования кожи для эффективного ухода.'
+    ? 'GENOSYS - корейский бренд профессиональной дерматокосметики. Наши продукты сочетают новейшие биотехнологии и передовые исследования кожи для эффективного ухода.'
     : 'GENOSYS is a Korean professional dermacosmetics brand. Our products combine cutting-edge biotechnology and advanced skin research to deliver effective skincare solutions.';
 
   const brandMission = locale === 'ar'
     ? 'مهمتنا هي تقديم حلول متقدمة للعناية بالبشرة تعزز الجمال الطبيعي من خلال العلم والابتكار. نحن ملتزمون بأعلى معايير الجودة والسلامة.'
     : locale === 'ru'
-    ? 'Наша миссия — предоставлять передовые решения по уходу за кожей, которые усиливают естественную красоту через науку и инновации. Мы привержены высочайшим стандартам качества и безопасности.'
+    ? 'Наша миссия - предоставлять передовые решения по уходу за кожей, которые усиливают естественную красоту через науку и инновации. Мы привержены высочайшим стандартам качества и безопасности.'
     : 'Our mission is to provide advanced skincare solutions that enhance natural beauty through science and innovation. We are committed to the highest standards of quality and safety.';
 
   const keyTechnologies = locale === 'ar'
@@ -195,14 +195,14 @@ export default function BrandScreen() {
             </View>
             <Text style={[styles.productCaption, isRTL && styles.textRTL]}>
               {locale === 'ar'
-                ? 'مجموعة منتجات جينوسيس المهنية للعناية بالبشرة — منتجات مختبرة طبيًا'
+                ? 'مجموعة منتجات جينوسيس المهنية للعناية بالبشرة - منتجات مختبرة طبيًا'
                 : locale === 'ru'
-                ? 'Профессиональная линейка средств GENOSYS — дерматологически протестированные продукты'
-                : 'GENOSYS Professional Skincare Line — Dermatologically Tested Products'}
+                ? 'Профессиональная линейка средств GENOSYS - дерматологически протестированные продукты'
+                : 'GENOSYS Professional Skincare Line - Dermatologically Tested Products'}
             </Text>
           </SectionCard>
 
-          {/* Footer — shared brand block */}
+          {/* Footer - shared brand block */}
           <AppFooter style={{ paddingBottom: 16 }} />
         </Animated.View>
       </Animated.ScrollView>

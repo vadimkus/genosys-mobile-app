@@ -7,8 +7,8 @@
  * resolves a destination generically instead.
  *
  * Two steps, in order:
- *   1. `notificationRoute` — a direct in-app route for the types we know.
- *   2. `notificationUrl` + `handleDeepLink` — every payload carries a `url`, and
+ *   1. `notificationRoute` - a direct in-app route for the types we know.
+ *   2. `notificationUrl` + `handleDeepLink` - every payload carries a `url`, and
  *      the deep-link router already maps every web path shape to a native route,
  *      strips /en /ar /ru prefixes, and falls back to the in-app WebView. Reusing
  *      it means a new notification type works without touching this file.

@@ -15,7 +15,7 @@ import { colors } from '../utils/theme';
  * The ornament went with it. About, brand and contact each opened with the GENOSYS logo,
  * which repeated on every page what the header already said and pushed the actual content
  * below the fold; locations opened with a flag emoji, partners and training with an icon
- * tile. The help page — the one everything else is being brought in line with — has none
+ * tile. The help page - the one everything else is being brought in line with - has none
  * of that, and reads better for it.
  *
  * Geometry is the help page's.

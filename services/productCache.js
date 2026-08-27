@@ -5,8 +5,8 @@
  * - On network failure: returns cached data so users can still browse
  * - Cache expires after 1 hour (configurable)
  *
- * THE CACHE IS KEYED BY LOCALE. The payload holds names, descriptions and — since the
- * translated studio slides shipped — image paths, all of which differ per language. A
+ * THE CACHE IS KEYED BY LOCALE. The payload holds names, descriptions and - since the
+ * translated studio slides shipped - image paths, all of which differ per language. A
  * single key meant that browsing in Arabic, going offline and switching to English served
  * the Arabic payload back, because the entry that happened to be written last won.
  *
@@ -28,7 +28,7 @@ const SUPPORTED_LOCALES = ['en', 'ar', 'ru'];
  * it holds. That ambiguity is the bug, so it is deleted rather than read: the cost is one
  * offline session with no cache, and it refills on the next successful fetch.
  *
- * Spelled out rather than derived from CACHE_PREFIX on purpose — if the prefix is ever
+ * Spelled out rather than derived from CACHE_PREFIX on purpose - if the prefix is ever
  * renamed, this still has to clean up what old installs actually wrote.
  */
 const LEGACY_CACHE_KEY = '@product_catalog';

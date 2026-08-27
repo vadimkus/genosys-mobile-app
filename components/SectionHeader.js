@@ -29,7 +29,7 @@ export default function SectionHeader({
 }) {
   return (
     <View style={[styles.row, isRTL && styles.rowRTL, style]}>
-      {/* A pale well with the accent as the glyph — see `surfaces.iconWell`.
+      {/* A pale well with the accent as the glyph - see `surfaces.iconWell`.
           `tileColor` now tints the glyph rather than flooding the tile, so a
           caller asking for red still reads as red without a solid block. */}
       <View style={surfaces.iconWell}>

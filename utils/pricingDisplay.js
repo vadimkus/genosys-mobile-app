@@ -87,8 +87,8 @@ const formatAed = (value) => `${toNumber(value).toFixed(2)} AED`;
 /**
  * The one place that decides what a price looks like.
  *
- * Every storefront — the shop list, the grid tile, favourites and the product
- * page — used to re-derive this from `user.discountPercentage`, from badge
+ * Every storefront - the shop list, the grid tile, favourites and the product
+ * page - used to re-derive this from `user.discountPercentage`, from badge
  * text and from a local list of non-discountable products. Those ladders drifted
  * apart: the grid tile omitted the `noDiscount` flag the backend honours, so the
  * same product could advertise a discount in the catalogue that checkout would

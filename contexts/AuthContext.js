@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
       if (!user?.token) return;
       try {
         const pref = await AsyncStorage.getItem('@genosys_push_enabled');
-        if (pref === '0') return; // user opted out — respect it
+        if (pref === '0') return; // user opted out - respect it
         const reg = await registerForPushNotificationsAsync();
         if (cancelled || !reg?.success || !reg?.token) return;
         const saved = await savePushTokenToBackend(user.token, reg.token);
@@ -391,7 +391,7 @@ export const AuthProvider = ({ children }) => {
             await storeUserSession(sanitizedUser);
             setUser(sanitizedUser);
             // Upgrade v1 payload to v2 {email, token} and purge the stored
-            // plaintext password (user just passed Face ID — no re-prompt).
+            // plaintext password (user just passed Face ID - no re-prompt).
             if (sanitizedUser?.token) {
               upgradeBiometricPayloadToToken(creds.email, sanitizedUser.token).catch(() => {});
             }
@@ -456,7 +456,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Only offer setup if biometrics are available but not enabled
       if (biometricAvailable && !biometricEnabled) {
-        // Token-based storage only — never persist a plaintext password.
+        // Token-based storage only - never persist a plaintext password.
         // (Every successful login returns a token; if it's somehow missing,
         // skip setup rather than fall back to storing the password.)
         if (!token) {
@@ -479,7 +479,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (user?.token) {
-        // Clear the push token server-side FIRST — otherwise the next user
+        // Clear the push token server-side FIRST - otherwise the next user
         // on this device could receive the previous user's order pushes.
         await clearPushTokenOnBackend(user.token).catch((e) =>
           log.warn('Push token clear on logout failed', e?.message || e)
@@ -540,7 +540,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Please log in to update your profile' };
       }
       
-      // Resolve the auth token into a local variable — `setUser` does not update
+      // Resolve the auth token into a local variable - `setUser` does not update
       // the `user` value captured by this closure, so relying on `user.token`
       // after a storage-restore meant the API calls below fired with no token.
       let authToken = user.token || '';

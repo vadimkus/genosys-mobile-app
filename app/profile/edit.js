@@ -250,7 +250,7 @@ export default function EditProfileScreen() {
     }
   };
 
-  // Bundled she-cat avatars — resolve to a local file:// URI so they ride the
+  // Bundled she-cat avatars - resolve to a local file:// URI so they ride the
   // same upload pipeline as camera/library photos (AuthContext.updateProfile).
   const useCatAvatar = () => setShowCatModal(true);
 
@@ -622,7 +622,7 @@ export default function EditProfileScreen() {
           <View style={styles.formContent}>
             {/* Required asterisks dropped: at 5/7 fields, they carried no
                 information (redundant noise). Optional fields are marked
-                "(optional)" below — same pattern as the web app. */}
+                "(optional)" below - same pattern as the web app. */}
             <View style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, isRTL && styles.textRTL]}>
                 {t('editProfile.firstName')}
@@ -667,7 +667,7 @@ export default function EditProfileScreen() {
               <FieldError message={errors.lastName} isRTL={isRTL} />
             </View>
 
-            {/* Email (read-only) — lock icon in label + universal "Used to
+            {/* Email (read-only) - lock icon in label + universal "Used to
                 sign in" hint below clarifies the two-email UX. Apple Relay
                 users also get the relay-specific info box beneath. */}
             <View style={styles.fieldContainer}>
@@ -720,7 +720,7 @@ export default function EditProfileScreen() {
                 editable={isEditing}
               />
               <FieldError message={errors.contactEmail} isRTL={isRTL} />
-              {/* Softened from amber warning banner to neutral gray hint —
+              {/* Softened from amber warning banner to neutral gray hint -
                   this is helpful info, not a warning. */}
               <View style={[styles.hintRow, isRTL && styles.rowRTL]}>
                 <Ionicons name="mail-outline" size={12} color={colors.secondaryLabel} />
@@ -949,7 +949,7 @@ export default function EditProfileScreen() {
   );
 }
 
-// Bundled she-cat avatar set — different fur colors and moods.
+// Bundled she-cat avatar set - different fur colors and moods.
 const CAT_AVATARS = [
   { key: 'rose', source: require('../../assets/avatar-cat.png') },
   { key: 'grey', source: require('../../assets/avatar-cat-grey.png') },

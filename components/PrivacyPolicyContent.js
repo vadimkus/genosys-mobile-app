@@ -96,7 +96,7 @@ export default function PrivacyPolicyContent({ showLastUpdated = true, onScroll 
             {section.content && (
               <Text style={[styles.paragraph, isRTL && styles.textRTL]}>{section.content}</Text>
             )}
-            {/* Grouped card with hairline dividers between rows — matches the
+            {/* Grouped card with hairline dividers between rows - matches the
                 web divided-list style shipped in d25b1e16 for scannability. */}
             <View style={styles.listCard}>
               {section.items?.map((item, i) => (
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   errorText: { ...T.body, color: colors.mutedText, marginTop: 16, textAlign: 'center' },
   fallbackButton: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 16, padding: 12 },
   fallbackButtonText: { ...T.button, color: colors.accent },
-  // Tight pill badge replaces the full-width italic banner — matches
+  // Tight pill badge replaces the full-width italic banner - matches
   // the web Privacy Policy "Last Updated" treatment shipped in 6f9e4f04.
   updateInfo: {
     paddingHorizontal: 20,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   sectionTitle: { ...T.sectionTitleSmall, fontWeight: '600', marginBottom: 12 },
   paragraph: { ...T.body, color: colors.bodyText, marginBottom: 12, lineHeight: 22 },
   listContainer: { marginVertical: 4 },
-  // Legacy styles — still referenced elsewhere, kept for safety
+  // Legacy styles - still referenced elsewhere, kept for safety
   listItem: { marginBottom: 12, paddingStart: 16 },
   listItemRTL: { paddingStart: 16 },
   // New grouped-card + divided-row layout (matches web d25b1e16)

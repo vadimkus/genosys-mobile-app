@@ -58,12 +58,12 @@ async function downloadAndCache(remoteUrl, cacheTTL) {
  * Full-screen video launch screen with fade-out transition.
  *
  * Props:
- *   localSource — optional require() asset (skips download/cache when provided)
- *   videoUrl    — remote mp4 URL (used when localSource is not provided)
- *   posterUrl   — optional still image while video loads
- *   duration    — max time in ms before auto-dismissing
- *   cacheTTL    — seconds to keep cached video
- *   onDone      — called when the screen should be dismissed
+ *   localSource - optional require() asset (skips download/cache when provided)
+ *   videoUrl    - remote mp4 URL (used when localSource is not provided)
+ *   posterUrl   - optional still image while video loads
+ *   duration    - max time in ms before auto-dismissing
+ *   cacheTTL    - seconds to keep cached video
+ *   onDone      - called when the screen should be dismissed
  */
 export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, duration = 3000, cacheTTL = 86400, onCoverReady, onDone }) {
   const launchConfigRef = useRef({
@@ -253,7 +253,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
         // Fire 'ready' ONLY when the video is actually playing, i.e. frames
         // are being painted to screen. 'loadeddata' / 'canplay' fire when
         // the first frame is decoded into memory but may precede the
-        // actual paint — flipping the cover off then exposes a brief
+        // actual paint - flipping the cover off then exposes a brief
         // logo-less white gap that reads as a flicker.
         video.addEventListener('playing', function () { post('ready'); });
         // Trigger playback. canplay's call is the primary path; the
@@ -306,7 +306,7 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
             overScrollMode="never"
             // Make the WebView's underlying surface white so any momentary
             // blank paint is the same color as the iOS LaunchScreen and the
-            // splash cover above — no perceptible color flash if the cover
+            // splash cover above - no perceptible color flash if the cover
             // is briefly transparent for any reason.
             //
             // Deliberately a literal and not a theme token: it is pinned to

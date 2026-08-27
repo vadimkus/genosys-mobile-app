@@ -6,8 +6,8 @@
  * button is `--cera-ink` with white text, and rose carries the accents. This
  * brings the app to that convention.
  *
- * `colors.brand` had been standing in for four different jobs — button fill,
- * accent text, active borders, tinted washes — so the split is by property:
+ * `colors.brand` had been standing in for four different jobs - button fill,
+ * accent text, active borders, tinted washes - so the split is by property:
  *
  *   backgroundColor  → cta        ink button
  *   color            → accent     rose-ink text and icons
@@ -91,7 +91,7 @@ for (const file of files) {
     });
 
   // Pass 2: what is left sits in ternaries, defaults and props passed down to
-  // shared components — `tileColor={colors.brand}`,
+  // shared components - `tileColor={colors.brand}`,
   // `color={active ? colors.brand : colors.tertiary}`. No property name is
   // attached, so these are read as accents, which is what they are.
   //

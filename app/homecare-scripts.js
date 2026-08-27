@@ -239,7 +239,7 @@ export default function HomecareScriptsScreen() {
           ListHeaderComponent={
             <View>
               <Text style={styles.label}>{tr('Patient reference (optional)', 'Метка пациента (необязательно)', 'مرجع المريض (اختياري)')}</Text>
-              <TextInput value={patientLabel} onChangeText={setPatientLabel} maxLength={80} style={[styles.input, isRTL && styles.rtlText]} placeholder={tr('e.g. Anna — July visit', 'напр. Анна — визит в июле', 'مثال: سارة — زيارة يوليو')} placeholderTextColor={colors.secondaryLabel} />
+              <TextInput value={patientLabel} onChangeText={setPatientLabel} maxLength={80} style={[styles.input, isRTL && styles.rtlText]} placeholder={tr('e.g. Anna - July visit', 'напр. Анна - визит в июле', 'مثال: سارة - زيارة يوليو')} placeholderTextColor={colors.secondaryLabel} />
               <Text style={styles.label}>{tr('Product-use notes (optional)', 'Инструкции по применению', 'ملاحظات استخدام المنتجات')}</Text>
               <TextInput value={careInstructions} onChangeText={setCareInstructions} maxLength={1000} multiline style={[styles.input, styles.notes, isRTL && styles.rtlText]} placeholder={tr('AM/PM order and instructions', 'Порядок применения утром/вечером', 'ترتيب الاستخدام صباحًا ومساءً')} placeholderTextColor={colors.secondaryLabel} />
               <View style={[styles.search, isRTL && styles.rowRTL]}>

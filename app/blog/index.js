@@ -134,7 +134,7 @@ export default function BlogScreen() {
               <RefreshControl refreshing={refreshing} onRefresh={() => fetchPosts(true)} tintColor={colors.accent} progressViewOffset={headerHeight} />
             }
           >
-            {/* Hero — large title */}
+            {/* Hero - large title */}
             <View style={styles.hero}>
               <Text style={[styles.heroTitle, isRTL && styles.textRTL]}>
                 {l('GENOSYS Blog', 'مدونة جينوسيس', 'Блог GENOSYS')}

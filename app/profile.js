@@ -493,7 +493,7 @@ export default function ProfileScreen() {
         {/* GENOSYS Rewards membership card */}
         <MembershipCard isRTL={isRTL} />
 
-        {/* Partner Portal — prominent, right under the membership card (partner accounts only) */}
+        {/* Partner Portal - prominent, right under the membership card (partner accounts only) */}
         {(user?.partnerPortalAccess === true || ['CLINIC', 'VIP'].includes(String(user?.discountType || '').toUpperCase())) && (
           <TouchableOpacity
             activeOpacity={0.85}
@@ -749,7 +749,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </ProfileSection>
 
-        {/* Footer — shared brand block */}
+        {/* Footer - shared brand block */}
         <AppFooter style={{ paddingBottom: (insets?.bottom || 0) + 24 }} />
       </Animated.ScrollView>
     </View>
@@ -917,7 +917,7 @@ const styles = StyleSheet.create({
   },
 
   // Quick Actions
-  // The partner blocks used to be inverted — white on ink — which on a cream
+  // The partner blocks used to be inverted - white on ink - which on a cream
   // page read as two dark slabs rather than as the most important rows. They
   // are cards like everything else now; their weight comes from sitting first.
   portalCard: {

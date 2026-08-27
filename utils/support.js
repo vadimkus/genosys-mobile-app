@@ -2,7 +2,7 @@
  * Support contact links.
  *
  * `AUTH_CONFIG.WHATSAPP_NUMBER` already existed and is driven by
- * `EXPO_PUBLIC_WHATSAPP_NUMBER`, but only the contact screen read it — every
+ * `EXPO_PUBLIC_WHATSAPP_NUMBER`, but only the contact screen read it - every
  * other "chat to us" button in the app carried the number as a literal. Pointing
  * the env var at a new number therefore moved one screen and left twelve others
  * dialling the old one, which is worse than having no knob at all.
@@ -13,7 +13,7 @@ import { Linking } from 'react-native';
 import { AUTH_CONFIG } from '../config/auth';
 import { log } from './logger';
 
-/** Digits only — wa.me rejects '+', spaces and dashes. */
+/** Digits only - wa.me rejects '+', spaces and dashes. */
 export function supportWhatsAppNumber() {
   return String(AUTH_CONFIG.WHATSAPP_NUMBER || '').replace(/[^\d]/g, '');
 }

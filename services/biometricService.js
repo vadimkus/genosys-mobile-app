@@ -166,7 +166,7 @@ export const enableBiometricAuth = async (emailOrPayload, password) => {
 
 /**
  * Silently upgrade an existing v1 {email, password} biometric payload to the
- * v2 {email, token} format WITHOUT re-prompting Face ID/Touch ID — used right
+ * v2 {email, token} format WITHOUT re-prompting Face ID/Touch ID - used right
  * after a successful biometric login where the user just authenticated.
  * Purges the stored plaintext password.
  */
@@ -179,7 +179,7 @@ export const upgradeBiometricPayloadToToken = async (email, token) => {
     const credentials = JSON.stringify({ v: BIOMETRIC_PAYLOAD_VERSION, email: cleanEmail, token: cleanToken });
     await SecureStore.setItemAsync(BIOMETRIC_CREDENTIALS_KEY, credentials);
     await SecureStore.setItemAsync(BIOMETRIC_ENABLED_KEY, 'true');
-    log.info('Biometric payload upgraded to v2 (token) — stored password purged');
+    log.info('Biometric payload upgraded to v2 (token) - stored password purged');
     return { success: true };
   } catch (error) {
     log.error('Failed to upgrade biometric payload', error?.message || error);

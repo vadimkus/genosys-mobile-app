@@ -33,7 +33,7 @@ try {
     _speechAvailable = true;
   }
 } catch {
-  // native module not available – voice search will be hidden
+  // native module not available - voice search will be hidden
 }
 import { fetchProductById, fetchProductCategories, fetchProducts } from '../../services/api';
 import { cacheProducts, getCachedProducts } from '../../services/productCache';
@@ -243,7 +243,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
             </Text>
           )}
 
-          {/* Pricing Display — shared decision, see `resolvePriceView`. */}
+          {/* Pricing Display - shared decision, see `resolvePriceView`. */}
           {(() => {
             const view = resolvePriceView(product, { user });
 
@@ -319,7 +319,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
                 <View
                   style={[styles.qtyStepper, isRTL && styles.qtyStepperRTL]}
                   accessibilityRole="adjustable"
-                  accessibilityLabel={`${t('shop.inBag')} (${qtyInBag}) — ${product?.name || ''}`}
+                  accessibilityLabel={`${t('shop.inBag')} (${qtyInBag}) - ${product?.name || ''}`}
                 >
                   <TouchableOpacity
                     style={styles.qtyStepperBtn}
@@ -379,7 +379,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
                 accessibilityLabel={
                   outOfStock
                     ? t('stock.outOfStock')
-                    : `${requiresOptions ? t('variant.chooseOptions') : t('shop.addToBag')} — ${product?.name || ''}`
+                    : `${requiresOptions ? t('variant.chooseOptions') : t('shop.addToBag')} - ${product?.name || ''}`
                 }
                 accessibilityState={{ disabled: outOfStock || isAdding }}
               >
@@ -417,7 +417,7 @@ function ShopScreen() {
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
   const [products, setProducts] = useState([]);
-  // True when the API failed AND the offline cache had nothing — the grid
+  // True when the API failed AND the offline cache had nothing - the grid
   // would otherwise render silently blank with no retry affordance.
   const [loadFailed, setLoadFailed] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -545,7 +545,7 @@ function ShopScreen() {
     setVoicePartial('');
   }, []);
 
-  // Animations disabled — static values only
+  // Animations disabled - static values only
 
 
   const currentLangCode = langSwitching
@@ -950,8 +950,8 @@ function ShopScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* The header floats over the grid — inset, rounded and on its own
-          shadow, the same treatment as the search field below it — and steps
+      {/* The header floats over the grid - inset, rounded and on its own
+          shadow, the same treatment as the search field below it - and steps
           out of the way on the way down the catalogue. */}
       <RNAnimated.View
         style={[
@@ -1188,7 +1188,7 @@ function ShopScreen() {
               </Modal>
             )}
 
-            {/* Categories Filter — single horizontal scrollable row (no wrapping).
+            {/* Categories Filter - single horizontal scrollable row (no wrapping).
                 New badges come only from API (lib/productBadges.ts on website). */}
             {categories.length > 0 && (() => {
               const isNewCategory = (c) => categoryBadges[c] === 'new';
@@ -1644,7 +1644,7 @@ const styles = StyleSheet.create({
     ...surfaces.card,
     ...shadow.card,
     marginBottom: 16,
-    // Soft elevation only — no hard border. overflow stays visible so the
+    // Soft elevation only - no hard border. overflow stays visible so the
     // image rounds itself (its own container clips) while card stays open.
   },
   gridImageContainer: {
@@ -1869,7 +1869,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Categories Styles — single horizontal scroll row (matches web mobile)
+  // Categories Styles - single horizontal scroll row (matches web mobile)
   categoriesContainer: {
     paddingBottom: 12,
     backgroundColor: 'transparent',
@@ -1917,7 +1917,7 @@ const styles = StyleSheet.create({
   // Transparent positioner that spans the pill's horizontal extent and
   // centers the badge above it. Using a wrapper (instead of a hard-coded
   // translateX on the badge itself) lets the badge auto-size for any
-  // locale — "NEW" (EN), "Новинка" (RU), "جديد" (AR) — without forcing
+  // locale - "NEW" (EN), "Новинка" (RU), "جديد" (AR) - without forcing
   // the text onto a second line. `overflow: visible` lets the badge
   // extend slightly past the pill edges when the localized word is
   // wider than the pill itself; the extra marginRight on categoryItem
@@ -2047,7 +2047,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   
-  // Stock Overlay — frosted capsule (legible over any product image)
+  // Stock Overlay - frosted capsule (legible over any product image)
   stockOverlay: {
     position: 'absolute',
     bottom: 8,

@@ -105,7 +105,7 @@ export function handleDeepLink(url) {
       return true;
     }
 
-    // Skin concerns — specific concern detail page
+    // Skin concerns - specific concern detail page
     if (cleanPath.startsWith('products/concern/') && cleanPath.split('/').length >= 3) {
       const slug = cleanPath.replace('products/concern/', '').split('/')[0];
       if (slug) {
@@ -114,7 +114,7 @@ export function handleDeepLink(url) {
       }
     }
 
-    // Skin concerns — list page
+    // Skin concerns - list page
     if (cleanPath === 'skin-concerns' || cleanPath === 'products/concern') {
       router.push('/skin-concerns');
       return true;

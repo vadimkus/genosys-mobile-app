@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     writingDirection: 'ltr',
   },
 
-  // Save — primary
+  // Save - primary
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -3,7 +3,7 @@
  *
  * The copy comes from the website's bespoke pages, flattened server-side into
  * blocks. That flattening reads the shape of each section rather than knowing
- * the products by name, so the risk is not that it crashes — it is that a
+ * the products by name, so the risk is not that it crashes - it is that a
  * section quietly arrives in a form the renderer skips, and a claim disappears
  * from the app while still being on the website.
  *

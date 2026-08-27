@@ -11,7 +11,7 @@ import { tStatic } from '../contexts/LocalizationContext';
  *
  * A floating bar rather than a band across the top: inset from both edges,
  * rounded, on its own hairline and shadow, so it reads as an element sitting on
- * the page the way the search field does — not as a white rectangle the page
+ * the page the way the search field does - not as a white rectangle the page
  * happens to start below. Content scrolls underneath it.
  *
  * Usage:
@@ -110,7 +110,7 @@ export function useHideOnScroll(distance) {
  * Hook that wires an Animated scroll value + the padding the content needs.
  *
  * `hideDistance` is for screens that bring their own header rather than this
- * one — the shop's is taller, with a logo and a subtitle — so they can share the
+ * one - the shop's is taller, with a logo and a subtitle - so they can share the
  * behaviour without inheriting this bar's dimensions.
  */
 export function useCollapsibleHeader({ hideOnScroll = false, hideDistance } = {}) {
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // For text actions (e.g. "Save") in the `right` slot — hug content, don't clip.
+  // For text actions (e.g. "Save") in the `right` slot - hug content, don't clip.
   sideAuto: {
     width: undefined,
     minWidth: 40,

@@ -45,7 +45,7 @@ function ShimmerBar({ width = '100%', height = 16, borderRadius = 8, style }) {
 function ProductCardSkeleton() {
   return (
     <View style={styles.productCard}>
-      {/* Square image tile — mirrors shop grid's square photo frame */}
+      {/* Square image tile - mirrors shop grid's square photo frame */}
       <ShimmerBar width="100%" height={(SCREEN_WIDTH - 36) / 2} borderRadius={12} />
       <View style={styles.productCardBody}>
         <ShimmerBar width="60%" height={10} />
@@ -113,7 +113,7 @@ export function ProductDetailSkeleton() {
   );
 }
 
-/** Orders list skeleton — mirrors the Apple-native order card */
+/** Orders list skeleton - mirrors the Apple-native order card */
 export function OrdersSkeleton() {
   return (
     <View style={styles.ordersContainer}>

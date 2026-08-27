@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
   },
   // The chosen option wears a tick. A rose border and a blush fill are the
-  // right colours but too quiet on their own — blush differs from white by
+  // right colours but too quiet on their own - blush differs from white by
   // 1.16:1, so at a glance the selected chip looks like the others.
   checkBadge: {
     position: 'absolute',

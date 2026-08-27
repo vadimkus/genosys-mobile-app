@@ -96,7 +96,7 @@ function ZoomableImage({ source, isActive, onZoomChange }) {
       }
     });
 
-  // Pan must FAIL when not zoomed — otherwise it steals the horizontal
+  // Pan must FAIL when not zoomed - otherwise it steals the horizontal
   // swipe from FlatList even if onUpdate is a no-op (scroll stays stuck).
   const pan = Gesture.Pan()
     .averageTouches(true)

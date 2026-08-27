@@ -50,7 +50,7 @@ export const FavoritesProvider = ({ children }) => {
   }, []);
 
   // Sync favorites with database when the session changes (optional - app
-  // works offline). Keyed on the token string — not the user object — so a
+  // works offline). Keyed on the token string - not the user object - so a
   // profile update or token-preserving refresh doesn't kick off extra syncs.
   useEffect(() => {
     if (user?.token) {
@@ -71,7 +71,7 @@ export const FavoritesProvider = ({ children }) => {
     try {
       const storedFavorites = await AsyncStorage.getItem(FAVORITES_STORAGE_KEY);
       // If a server sync already completed while we were reading storage,
-      // the synced list is fresher — don't clobber it with the stale cache.
+      // the synced list is fresher - don't clobber it with the stale cache.
       if (storedFavorites && !syncCompletedRef.current) {
         const parsed = JSON.parse(storedFavorites);
         setFavorites(parsed);

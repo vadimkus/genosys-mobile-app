@@ -64,7 +64,7 @@ function scoreProduct(product, profile) {
 /**
  * Parse a JSON-array string, comma-separated string, or array field into a
  * normalized array. Product fields from the API (e.g. targetConcerns) are
- * JSON strings like '["anti-aging","hydration"]' — naive comma-splitting
+ * JSON strings like '["anti-aging","hydration"]' - naive comma-splitting
  * left brackets/quotes on the values and every match failed.
  */
 function parseField(value) {

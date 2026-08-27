@@ -142,7 +142,7 @@ export default function AddressesScreen() {
             haptics.heavyTap();
             const result = await removeAddress(addressId);
             if (result.success) {
-              // Remove only the deleted address — the backend stores multiple
+              // Remove only the deleted address - the backend stores multiple
               // addresses (the old "single address" comment was outdated and
               // emptied the whole list on any delete).
               setAddresses(prev => prev.filter(addr => addr.id !== addressId));
@@ -210,7 +210,7 @@ export default function AddressesScreen() {
             onPress={() => openOptions(address)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
-            accessibilityLabel={`${t('addresses.optionsTitle')} — ${address.name || typeMeta.label}`}
+            accessibilityLabel={`${t('addresses.optionsTitle')} - ${address.name || typeMeta.label}`}
           >
             <Ionicons name="ellipsis-horizontal" size={20} color={colors.secondaryLabel} />
           </TouchableOpacity>
@@ -292,7 +292,7 @@ export default function AddressesScreen() {
             )}
           </View>
 
-          {/* Add New Address — primary action */}
+          {/* Add New Address - primary action */}
           <TouchableOpacity
             style={[styles.addButton, shadow.cta(colors.cta), isRTL && styles.rowRTL]}
             onPress={handleAddAddress}
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Add New — primary
+  // Add New - primary
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',

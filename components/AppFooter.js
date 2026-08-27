@@ -7,7 +7,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { colors, surfaces } from '../utils/theme';
 
 /**
- * Shared app footer — single source of truth for the brand block shown
+ * Shared app footer - single source of truth for the brand block shown
  * at the bottom of Account, About, Brand, Training and similar screens.
  *
  * A quiet card at the foot of the page, not an inverted slab: the wordmark in

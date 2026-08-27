@@ -145,12 +145,12 @@ function BagScreen() {
     return Math.floor(line * loyaltyMultiplier);
   }, [loyaltyMultiplier, user]);
 
-  // Earn basis is products-only (shipping never earns points) — matches
+  // Earn basis is products-only (shipping never earns points) - matches
   // awardPointsForDeliveredOrder on the backend.
   const orderEarnPoints = loyaltyMultiplier > 0 ? Math.floor(safeSubtotal * loyaltyMultiplier) : 0;
 
   // Refresh DB-driven shipping rates when opening bag, and again after
-  // login/logout (M6) — the previous empty dep array meant a user who signed
+  // login/logout (M6) - the previous empty dep array meant a user who signed
   // in from the bag kept whatever rates were fetched pre-auth.
   useEffect(() => {
     reloadShippingRates?.();
@@ -447,7 +447,7 @@ function BagScreen() {
                 }
 
                 // Use server-provided originalPrice or the product's base price (retail) for strikethrough display.
-                // Never reverse-engineer original by dividing displayPrice — that wrongly inflates when the
+                // Never reverse-engineer original by dividing displayPrice - that wrongly inflates when the
                 // server returned undiscounted pricing (e.g. concern-detail API with no user context).
                 const storedOriginal = Number(item.product?.originalPrice);
                 const productBasePrice = Number(item.product?.price);
@@ -492,7 +492,7 @@ function BagScreen() {
               })()
             )}
 
-            {/* GENOSYS Rewards — per-line earn estimate */}
+            {/* GENOSYS Rewards - per-line earn estimate */}
             {!promo && (() => {
               const pts = itemEarnPoints(item);
               if (pts <= 0) return null;
@@ -544,7 +544,7 @@ function BagScreen() {
                 onPress={() => handleRemoveItem(item)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 accessibilityRole="button"
-                accessibilityLabel={`${t('bag.removeItem')} — ${item?.product?.name || ''}`}
+                accessibilityLabel={`${t('bag.removeItem')} - ${item?.product?.name || ''}`}
               >
                 <Ionicons name="trash-outline" size={20} color={colors.accent} />
               </TouchableOpacity>
@@ -708,7 +708,7 @@ function BagScreen() {
               </ProgressCard>
             </View>
 
-            {/* GENOSYS Rewards — order earn preview */}
+            {/* GENOSYS Rewards - order earn preview */}
             {orderEarnPoints > 0 ? (
               <View style={[styles.rewardsEarnCard, shadow.card, isRTL && styles.rewardsEarnCardRTL]}>
                 <View style={[surfaces.iconTile, { backgroundColor: colors.cta }]}>
@@ -966,7 +966,7 @@ const styles = StyleSheet.create({
     // paddingBottom is computed dynamically from the footer height (see ScrollView contentContainerStyle)
   },
 
-  // New sections (Promotion + Free Delivery) — soft Apple-native cards
+  // New sections (Promotion + Free Delivery) - soft Apple-native cards
   sectionCard: {
     ...surfaces.card,
     ...shadow.card,
@@ -1289,7 +1289,7 @@ const styles = StyleSheet.create({
   },
   // Floating, like the header above it and the buy bar on a product page.
   // `bottom` comes from the safe area inline, and the list leaves room for the
-  // measured height rather than a guess — this footer changes height as the
+  // measured height rather than a guess - this footer changes height as the
   // summary expands.
   checkoutFooter: {
     position: 'absolute',

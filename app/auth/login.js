@@ -40,7 +40,7 @@ let AppleAuthentication = null;
 try {
   AppleAuthentication = require('expo-apple-authentication');
 } catch (e) {
-  // Expected on Android — module may not resolve
+  // Expected on Android - module may not resolve
 }
 
 const log = createLogger('Login');
@@ -142,7 +142,7 @@ export default function LoginScreen() {
     scrollRef.current?.scrollTo({ y: Math.max(consentY.current - 80, 0), animated: true });
   };
 
-  // Subtle entrance motion (native driver) — matches the rest of the app.
+  // Subtle entrance motion (native driver) - matches the rest of the app.
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(10)).current;
   useEffect(() => {
@@ -1125,7 +1125,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Biometric (tinted brand — keeps the single filled primary clean)
+  // Biometric (tinted brand - keeps the single filled primary clean)
   biometricButton: {
     backgroundColor: colors.accentBg,
     borderWidth: StyleSheet.hairlineWidth,

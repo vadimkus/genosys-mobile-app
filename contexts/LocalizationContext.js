@@ -107,7 +107,7 @@ export function LocalizationProvider({ children }) {
   }, [applyRTLIfNeeded]);
 
   // Hydrate the stored locale, then ensure the native RTL flag matches it.
-  // The RTL check must run AFTER the storage read resolves — the previous
+  // The RTL check must run AFTER the storage read resolves - the previous
   // guard ran on the initial 'en' render and never re-checked, so Arabic
   // cold starts could stay LTR.
   useEffect(() => {

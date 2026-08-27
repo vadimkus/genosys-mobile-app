@@ -21,8 +21,8 @@ import { colors } from '../utils/theme';
  *
  * Changing language used to mean leaving whatever you were reading, walking to
  * Profile > Language, switching, and finding your way back. On a product page
- * or an article — the two screens where language actually matters, because they
- * are the ones carrying translated copy — that is enough friction that most
+ * or an article - the two screens where language actually matters, because they
+ * are the ones carrying translated copy - that is enough friction that most
  * people never discover the translations exist.
  *
  * Presentation deliberately mirrors the language control in the home header

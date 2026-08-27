@@ -396,7 +396,7 @@ export function generateOrderNumber() {
 
 // Card / Apple Pay / Google Pay / Link are handled by the native Stripe Payment
 // Sheet via createCardPaymentSheetIntent (PaymentIntent confirmed in-app).
-// Note: Apple's 15-30% IAP commission does NOT apply here — these are physical
+// Note: Apple's 15-30% IAP commission does NOT apply here - these are physical
 // goods, which Apple requires to use standard payment processing (no Apple cut).
 // getPaymentUrlForExistingOrder remains the hosted fallback for retrying older
 // pending orders.

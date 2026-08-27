@@ -6,7 +6,7 @@ export function formatPrice(value) {
   if (Number.isFinite(num)) {
     return num.toFixed(2);
   }
-  return value ?? '—';
+  return value ?? ' - ';
 }
 
 // Coerce any incoming value to a displayable string

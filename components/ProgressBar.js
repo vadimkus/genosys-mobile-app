@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.separator,
     overflow: 'hidden',
   },
-  // Rose while there is still spending to do, green once the threshold is met —
+  // Rose while there is still spending to do, green once the threshold is met -
   // the same two states the website's cart uses for this bar. It used to fill
   // grey, which read as disabled rather than as progress.
   fill: {
