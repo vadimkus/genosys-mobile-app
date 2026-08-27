@@ -146,6 +146,51 @@ the card, or if any of the three palette values disappears. It reads the
 keeps comments — a comment explaining why brand red is gone would otherwise
 fail the check that brand red is gone. It did, on the first run.
 
+## Pass seven: the card is cream, and it is ours
+
+`activityBackgroundTint` paints the Lock Screen card cera cream, so it reads as
+a piece of the brand rather than another dark slab in the stack. Everything on
+it is the app's own cream-tuned palette, measured against `#faf7f5`:
+
+| | | |
+| --- | --- | --- |
+| ink | 16.75:1 | headline |
+| body | 10.97:1 | the delivery promise |
+| muted | 5.95:1 | order number, rewards |
+| roseInk | 5.21:1 | the wordmark |
+| green `#2E7D4F` | 4.73:1 | a step behind us |
+| amber `#9A5A00` | 5.13:1 | the step in hand |
+| ahead `#968981` | 3.18:1 | a step not started |
+
+The rail ahead is `line`, far below 3:1 on purpose: it is a connector, and the
+node it leads to carries the state.
+
+### The Dynamic Island keeps the dark palette
+
+Apple is explicit that compact, minimal and expanded presentations use a black
+opaque background and cannot be customised. So there are two palettes, and the
+helpers take one as an argument. Painting the card cream and leaving the island
+on the same values would have put ink text on black.
+
+### Nothing may be a semantic colour any more
+
+This is the part that would have shipped a blank card. `primary` and
+`secondary` follow the **device** appearance, not the surface. On a cream
+background, `primary` resolves to white in dark mode and the card goes empty.
+
+Once the background is ours, every foreground has to be ours. The smoke test
+now fails the build on any `foregroundStyle('primary')` or `('secondary')`, and
+on the tint going missing.
+
+### Two things Apple flags that are worth watching on a device
+
+- **Always-On display.** The system reduces luminance; cream becomes grey and
+  ink stays legible, but it is worth a look.
+- **StandBy.** A custom background is extended to fill the screen, so this card
+  becomes a full-screen cream panel at night. If that reads as too bright, the
+  answer is a different tint for that presentation rather than dropping the
+  tint everywhere.
+
 ## Pass five: the track had no frontier
 
 On a device the track read as a faint hairline with three identical pips, and

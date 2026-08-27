@@ -125,6 +125,33 @@ for (const file of LAYOUTS) {
    * The values are the dark-surface variants. The app's cream-tuned green and amber drop
    * to roughly 4:1 on the Lock Screen's material and go muddy; these clear 10:1.
    */
+  /**
+   * The card is ours, so nothing on it may be a semantic colour.
+   *
+   * `primary` and `secondary` follow the *device* appearance, not the surface. With a
+   * cream background that is fatal: in dark mode `primary` resolves to white and the card
+   * goes blank. The Dynamic Island is always black and gets the dark palette explicitly,
+   * so neither surface needs them.
+   */
+  console.log(`no semantic colours once the background is ours (${file})`);
+  const semantic = [...source.matchAll(/foregroundStyle\(\s*["'](primary|secondary)["']\s*\)/g)];
+  if (semantic.length) {
+    fail(
+      `${file} uses foregroundStyle('${semantic[0][1]}') ${semantic.length} time(s).\n` +
+        '    Semantic colours follow the device appearance, not the card. On the cream\n' +
+        '    background they turn white in dark mode and the card goes blank.'
+    );
+  } else {
+    console.log('  ok   every foreground is an explicit value');
+  }
+
+  console.log(`the card is painted cream (${file})`);
+  if (/activityBackgroundTint/.test(source)) {
+    console.log('  ok   activityBackgroundTint is set');
+  } else {
+    fail(`${file} no longer tints the background; the card falls back to the dark material.`);
+  }
+
   console.log(`progress is green and amber, red is for cancelled (${file})`);
   // Read the string literals rather than the text: Babel keeps comments in the serialised
   // layout, and a comment explaining why brand red is gone would otherwise fail the check
@@ -136,10 +163,15 @@ for (const file of LAYOUTS) {
     },
   });
 
+  // Two surfaces, two palettes: the cream card takes the app's own cream-tuned values,
+  // the Dynamic Island takes the dark-surface ones, because it is always black.
   const palette = [
-    ['#30D158', 'green, for a step that is done'],
-    ['#FF9F0A', 'amber, for the step in hand'],
-    ['#FF453A', 'red, for a cancelled order'],
+    ['#2E7D4F', 'card: green, a step behind us'],
+    ['#9A5A00', 'card: amber, the step in hand'],
+    ['#d22b1e', 'card: red, a cancelled order'],
+    ['#30D158', 'island: green'],
+    ['#FF9F0A', 'island: amber'],
+    ['#FF453A', 'island: red'],
   ];
   for (const [hex, role] of palette) {
     if (literals.has(hex)) console.log(`  ok   ${hex} - ${role}`);
