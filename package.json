@@ -41,7 +41,7 @@
     "smoke:product-options": "tsx scripts/smoke-product-options.js",
     "verify:splash": "node scripts/verify-splash-sync.js",
     "verify:homecare-links": "node scripts/verify-homecare-links.js",
-    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation && npm run smoke:profile-validation && npm run smoke:address-validation && npm run smoke:support-links && npm run smoke:order-progress && npm run smoke:page-shell && npm run verify:tokens",
+    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation && npm run smoke:profile-validation && npm run smoke:address-validation && npm run smoke:support-links && npm run smoke:order-progress && npm run smoke:page-shell && npm run smoke:widget-layout && npm run verify:tokens",
     "smoke:bespoke-content": "node scripts/smoke-bespoke-content.js",
     "smoke:pdp-header-clearance": "node scripts/smoke-pdp-header-clearance.js",
     "smoke:header-hide": "node scripts/smoke-header-hide.js",
@@ -51,7 +51,8 @@
     "verify:tokens": "node scripts/verify-design-tokens.mjs",
     "smoke:support-links": "node scripts/smoke-support-links.js",
     "smoke:order-progress": "tsx scripts/smoke-order-progress.js",
-    "smoke:page-shell": "tsx scripts/smoke-page-shell.js"
+    "smoke:page-shell": "tsx scripts/smoke-page-shell.js",
+    "smoke:widget-layout": "node scripts/smoke-widget-layout.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

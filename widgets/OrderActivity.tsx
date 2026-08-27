@@ -5,20 +5,23 @@ import { createLiveActivity, type LiveActivityEnvironment } from 'expo-widgets';
 /**
  * The order card on the Lock Screen and in the Dynamic Island.
  *
- * This renders in a widget extension, not in the app: a separate JS runtime with no React
- * and no React Native, holding only the @expo/ui primitives and the modifiers. It takes
- * everything it needs as flat props and derives nothing.
+ * ## The layout must be self-contained
  *
- * **A layout that throws renders an empty card**, with no error surfaced anywhere — which
- * is exactly what the first version did on device. So this one is deliberately plain:
- * text and stacks, no images, no frames, no backgrounds. The progress bar is drawn with
- * characters rather than filled views, because a `VStack` with no children and a
- * `foregroundStyle` — what the first version used — paints nothing at all: foreground is
- * the colour of *content*, and an empty container has none.
+ * Babel serialises the body of this function — everything after the `'widget'` directive —
+ * into a **string**, which the widget extension evaluates in its own runtime. That runtime
+ * has the `@expo/ui` primitives, the modifiers and a jsx stub on `globalThis`, and nothing
+ * else. It does not have this module.
  *
- * Add richness back one piece at a time, checking on a device between each. The layout is
- * stored into the App Group by the app at runtime, so it ships over the air; a change
- * here does not need a new build.
+ * So a reference to anything declared outside the function is a `ReferenceError` on
+ * device. Two colour constants at module scope are what made the first two versions of
+ * this render as an empty black card: it fails before producing a single node, and an
+ * empty card is what the system draws when there are no nodes.
+ *
+ * Every value is therefore written inline, and `scripts/smoke-widget-layout.js` fails the
+ * build if anything creeps back out of scope.
+ *
+ * Keep it plain for the same reason: a layout that throws shows nothing useful. Add
+ * richness one piece at a time, checking on a device between each.
  */
 export type OrderActivityProps = {
   /** Shown to the customer, e.g. "46125502". */
@@ -33,15 +36,14 @@ export type OrderActivityProps = {
   cancelled?: boolean;
 };
 
-const INK = '#191716';
-const MUTED = '#776E68';
-
 const OrderActivity = (props: OrderActivityProps, environment: LiveActivityEnvironment) => {
   'widget';
 
+  // Inline, not module constants: see the note above. cera ink and cera muted, with
+  // lighter equivalents for a dark Lock Screen.
   const dark = environment.colorScheme === 'dark';
-  const ink = dark ? '#FFFFFF' : INK;
-  const muted = dark ? '#B8AEA8' : MUTED;
+  const ink = dark ? '#FFFFFF' : '#191716';
+  const muted = dark ? '#B8AEA8' : '#776E68';
 
   const done = props.cancelled ? 0 : props.done;
   // Filled and hollow circles joined by rules. Characters always draw; a view with no
@@ -70,9 +72,7 @@ const OrderActivity = (props: OrderActivityProps, environment: LiveActivityEnvir
       </VStack>
     ),
 
-    compactLeading: (
-      <Text modifiers={[font({ size: 13 }), foregroundStyle(ink)]}>{'\u25CF'}</Text>
-    ),
+    compactLeading: <Text modifiers={[font({ size: 13 }), foregroundStyle(ink)]}>{'●'}</Text>,
     compactTrailing: (
       <Text modifiers={[font({ size: 13 }), foregroundStyle(ink)]}>{done + '/3'}</Text>
     ),

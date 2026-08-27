@@ -72,7 +72,7 @@ export async function startOrderActivityForNewOrder({
     const state = buildOrderActivityState(order, t);
     const id = orderId || orderNumber;
 
-    if (activity) await endActivity(t, []);
+    await retireStrays(OrderActivity, t);
     activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
     activityOrderId = String(id);
     log.debug('Started Live Activity at checkout for', orderNumber);
@@ -80,6 +80,27 @@ export async function startOrderActivityForNewOrder({
   } catch (e) {
     log.warn('Could not start Live Activity at checkout:', e?.message);
   }
+}
+
+/**
+ * End every card this app already has running.
+ *
+ * `activity` is module state, so it is lost when the app restarts while the card lives on
+ * in the system. Without this, each new order stacked another card on the Lock Screen —
+ * the system groups them under the app name, so two orders read as two cards rather than
+ * one that moved. `getInstances` is the only view of what is genuinely still up.
+ */
+async function retireStrays(OrderActivity, t) {
+  try {
+    const running = OrderActivity.getInstances?.() ?? [];
+    for (const instance of running) {
+      await instance.end('immediate').catch(() => {});
+    }
+  } catch (e) {
+    log.debug('Could not retire previous activities:', e?.message);
+  }
+  activity = null;
+  activityOrderId = null;
 }
 
 export async function syncOrderActivity(orders, t, send) {
@@ -99,14 +120,14 @@ export async function syncOrderActivity(orders, t, send) {
     const state = buildOrderActivityState(tracked, t);
     const id = getOrderId(tracked) || getOrderNumber(tracked);
 
-    // A different order took over, so the old card is stale.
-    if (activity && activityOrderId !== id) await endActivity(t, orders);
-
-    if (activity) {
+    if (activity && activityOrderId === id) {
       await activity.update(state);
       return;
     }
 
+    // Either a different order took over, or the app restarted and lost track of a card
+    // that is still on screen. Both end the same way.
+    await retireStrays(OrderActivity, t);
     activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
     activityOrderId = id;
     log.debug('Started Live Activity for order', id);
