@@ -49,6 +49,8 @@ async function decorations(token) {
 
 let activity = null;
 let activityOrderId = null;
+/** The token subscription for whichever card is current. See `watchActivityToken`. */
+let tokenSub = null;
 
 /** `expo-widgets` is iOS-only, and Live Activities need iOS 16.2. */
 function available() {
@@ -107,7 +109,7 @@ export async function startOrderActivityForNewOrder({
     activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
     activityOrderId = String(id);
     log.debug('Started Live Activity at checkout for', orderNumber);
-    reportActivityToken(activity, String(orderNumber), send);
+    watchActivityToken(activity, orderNumber, send);
   } catch (e) {
     log.warn('Could not start Live Activity at checkout:', e?.message);
   }
@@ -130,6 +132,8 @@ async function retireStrays(OrderActivity, t) {
   } catch (e) {
     log.debug('Could not retire previous activities:', e?.message);
   }
+  tokenSub?.remove?.();
+  tokenSub = null;
   activity = null;
   activityOrderId = null;
 }
@@ -190,9 +194,12 @@ export async function syncOrderActivity(orders, t, send, authToken) {
   const tracked = sortOrdersNewestFirst(Array.isArray(orders) ? orders : []).find(shouldTrackOrder);
 
   try {
-    // Nothing in flight: retire whatever is on screen.
+    // Nothing in flight: take down whatever is on screen. A card we hold gets the graceful
+    // ending, with its final state left up for a moment; one we only know about through
+    // `getInstances` — the server's, or our own from before a restart — can only be cut.
     if (!tracked) {
-      await endActivity(t, orders);
+      if (activity) await endActivity(t, orders);
+      else await retireStrays(OrderActivity, t);
       return;
     }
 
@@ -201,21 +208,66 @@ export async function syncOrderActivity(orders, t, send, authToken) {
 
     if (activity && activityOrderId === id) {
       await activity.update(state);
-      return;
+    } else if (!activity && (await adoptRunningCard(OrderActivity, state, id, send))) {
+      // Adopted a card this process never started — see `adoptRunningCard`.
+    } else {
+      // A different order has taken over. End the old card before raising the new one.
+      await retireStrays(OrderActivity, t);
+      activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
+      activityOrderId = id;
+      log.debug('Started Live Activity for order', id);
+      watchActivityToken(activity, state.orderNumber, send);
     }
 
-    // Either a different order took over, or the app restarted and lost track of a card
-    // that is still on screen. Both end the same way.
-    await retireStrays(OrderActivity, t);
-    activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
-    activityOrderId = id;
-    log.debug('Started Live Activity for order', id);
-    // Not awaited: the card is already up, and the server only needs this to carry on
-    // updating it later.
-    reportActivityToken(activity, state.orderNumber, send);
+    // Every path ends here, including the one where we simply updated a card we were
+    // already holding. A duplicate raised while the app was closed is invisible to that
+    // path, and leaving it on screen is exactly the two-card bug.
+    await pruneDuplicates(OrderActivity);
   } catch (e) {
     // A card that fails to appear must never take the orders screen with it.
     log.warn('Could not sync Live Activity:', e?.message);
+  }
+}
+
+/**
+ * Take over a card that is already on screen, rather than raising a second one.
+ *
+ * There are two things that can put a card up — this app, and the server by push — and
+ * only one of them can be tracked in a module variable that dies with the process. So the
+ * running instances are the only honest answer to "is there already a card?".
+ */
+async function adoptRunningCard(OrderActivity, state, id, send) {
+  const existing = (OrderActivity.getInstances?.() ?? [])[0];
+  if (!existing) return false;
+
+  await existing.update(state);
+  activity = existing;
+  activityOrderId = id;
+  watchActivityToken(existing, state.orderNumber, send);
+  log.debug('Adopted the card already on screen for order', id);
+  return true;
+}
+
+/**
+ * One order, one card. Ends anything running that is not the card we are holding.
+ *
+ * `getId` is ActivityKit's own identifier, so this compares what is actually on the Lock
+ * Screen rather than trusting a module variable that does not survive a restart.
+ */
+async function pruneDuplicates(OrderActivity) {
+  try {
+    const keep = activity?.getId?.();
+    if (!keep) return;
+
+    const strays = (OrderActivity.getInstances?.() ?? []).filter(
+      (instance) => instance?.getId?.() !== keep
+    );
+    for (const stray of strays) {
+      await stray.end('immediate').catch(() => {});
+    }
+    if (strays.length) log.debug('Ended', strays.length, 'duplicate card(s)');
+  } catch (e) {
+    log.debug('Could not prune duplicate cards:', e?.message);
   }
 }
 
@@ -237,6 +289,8 @@ async function endActivity(t, orders) {
   } catch (e) {
     log.warn('Could not end Live Activity:', e?.message);
   }
+  tokenSub?.remove?.();
+  tokenSub = null;
   activity = null;
   activityOrderId = null;
 }
@@ -273,16 +327,40 @@ export function registerTokens(send) {
 }
 
 /**
- * Hand the server the token for the card we just raised, so it can keep updating it after
- * the app is gone. Called once per activity, from `syncOrderActivity`.
+ * Hand the server the token for a card, and keep handing it over if it changes.
+ *
+ * This must be a subscription, not a question. `getPushToken()` returns null when the
+ * token "is not yet available", and it is never available in the moment an activity
+ * starts — ActivityKit delivers it asynchronously, slightly later.
+ *
+ * Asking once and giving up is what produced two cards for one order: the server never
+ * learned the token for the card the app had raised, so on the next status change it saw
+ * an order with no card and raised its own. The customer got the old card, frozen, next
+ * to a new one.
+ *
+ * It still asks as well as listens, because an adopted card may have had its token issued
+ * long before we started watching.
  */
-async function reportActivityToken(instance, orderNumber, send) {
-  if (!send || !instance?.getPushToken) return;
+function watchActivityToken(instance, orderNumber, send) {
+  tokenSub?.remove?.();
+  tokenSub = null;
+  if (!send || !instance) return;
+
+  const relay = (token) => {
+    if (!token) return;
+    send({ kind: 'activity', token, orderNumber: String(orderNumber) }).catch(() => {});
+  };
+
   try {
-    const token = await instance.getPushToken();
-    if (token) await send({ kind: 'activity', token, orderNumber });
+    tokenSub = instance.addPushTokenListener?.((event) => relay(event?.pushToken));
   } catch (e) {
-    log.debug('No activity token to report:', e?.message);
+    log.debug('No activity token stream:', e?.message);
+  }
+
+  try {
+    instance.getPushToken?.().then(relay).catch(() => {});
+  } catch (e) {
+    log.debug('No activity token yet:', e?.message);
   }
 }
 
