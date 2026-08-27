@@ -47,6 +47,8 @@ import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
 import { withErrorBoundary } from '../components/ErrorBoundary';
 import { openWhatsApp } from '../utils/support';
+import { startOrderActivityForNewOrder } from '../utils/orderLiveActivity';
+import { saveLiveActivityToken } from '../services/pushNotificationsService';
 
 function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
@@ -599,6 +601,15 @@ function CheckoutScreen() {
         // (OrderSuccessScreen) self-animates and fires the success haptic.
         if (selectedPaymentMethod === PAYMENT_METHODS.COD) {
           clearCart();
+          // Put the card on the Lock Screen now rather than waiting for the customer to
+          // open Orders. Not awaited: checkout must not hang on it.
+          startOrderActivityForNewOrder({
+            orderNumber: finalOrderNumber,
+            orderId: result.orderId,
+            paymentMethod: 'cod',
+            t,
+            send: (payload) => saveLiveActivityToken(user?.token, payload),
+          });
           setSuccessOrder(finalOrderNumber);
           return;
         }

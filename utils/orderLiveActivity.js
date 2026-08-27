@@ -45,6 +45,43 @@ function load() {
   }
 }
 
+/**
+ * Raise the card the moment an order is placed.
+ *
+ * Waiting for the customer to open the Orders tab is too late: the whole point of the
+ * card is that it is there when they lock the phone after checking out. There is no order
+ * object to hand yet, only what checkout knows, so the state is built from that — the
+ * server's own status arrives at the next sync and corrects anything.
+ */
+export async function startOrderActivityForNewOrder({
+  orderNumber,
+  orderId,
+  paymentMethod,
+  paymentStatus,
+  t,
+  send,
+}) {
+  if (!available()) return;
+  const OrderActivity = load();
+  if (!OrderActivity) return;
+
+  try {
+    // A new order is PENDING: accepted by us, nothing shipped. The card shows an empty
+    // bar and "waiting to be confirmed", which is exactly true.
+    const order = { orderNumber, paymentMethod, paymentStatus, status: 'PENDING' };
+    const state = buildOrderActivityState(order, t);
+    const id = orderId || orderNumber;
+
+    if (activity) await endActivity(t, []);
+    activity = await OrderActivity.start(state, `genosys://profile/orders/${id}`);
+    activityOrderId = String(id);
+    log.debug('Started Live Activity at checkout for', orderNumber);
+    reportActivityToken(activity, String(orderNumber), send);
+  } catch (e) {
+    log.warn('Could not start Live Activity at checkout:', e?.message);
+  }
+}
+
 export async function syncOrderActivity(orders, t, send) {
   if (!available()) return;
   const OrderActivity = load();

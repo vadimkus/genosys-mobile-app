@@ -17,6 +17,8 @@ import { getJson } from '../../services/httpClient';
 import OrderSuccessScreen from '../../components/OrderSuccessScreen';
 import T from '../../utils/typography';
 import { EMPTY_UNI_IMAGE } from '../../utils/assets';
+import { startOrderActivityForNewOrder } from '../../utils/orderLiveActivity';
+import { saveLiveActivityToken } from '../../services/pushNotificationsService';
 
 const log = createLogger('StripePayment');
 
@@ -197,6 +199,16 @@ export default function StripePaymentScreen() {
       // items in the cart if the user dismissed the screen with a gesture.
       // Skip when retrying an older pending order (cart holds unrelated items).
       if (!fromOrders) clearCart();
+      // Same as the COD path: the card goes up at the moment of purchase, not when the
+      // customer next opens Orders. Paid up front, so step one is already complete.
+      startOrderActivityForNewOrder({
+        orderNumber,
+        orderId,
+        paymentMethod: 'stripe',
+        paymentStatus: 'paid',
+        t,
+        send: (payload) => saveLiveActivityToken(token, payload),
+      });
       setPaid(true);
     } catch (e) {
       log.warn('Payment Sheet flow failed', e?.message || e);
