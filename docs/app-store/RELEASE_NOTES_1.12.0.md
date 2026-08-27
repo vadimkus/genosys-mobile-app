@@ -5,7 +5,7 @@
 | App name | Genosys UAE |
 | Bundle ID | `ae.genosys.app` |
 | Version | 1.12.0 |
-| iOS build | 105 |
+| iOS build | 106 |
 | Android versionCode | 91 |
 | Previous release | 1.11.0, 9 July 2026 |
 | Lock Screen order card | Requires iOS 16.2 or later |
