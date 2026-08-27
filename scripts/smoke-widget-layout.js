@@ -115,6 +115,46 @@ for (const file of LAYOUTS) {
     console.log('  ok   no Image in the serialised layout');
   }
 
+  /**
+   * Progress is green and amber; red belongs to a cancelled order.
+   *
+   * Brand red painted the track once, and it was wrong twice over: red on a *finished*
+   * step reads as a fault, and `statusStyle` in `utils/theme.js` already spends red on
+   * cancelled, failed and refunded everywhere else in the app.
+   *
+   * The values are the dark-surface variants. The app's cream-tuned green and amber drop
+   * to roughly 4:1 on the Lock Screen's material and go muddy; these clear 10:1.
+   */
+  console.log(`progress is green and amber, red is for cancelled (${file})`);
+  // Read the string literals rather than the text: Babel keeps comments in the serialised
+  // layout, and a comment explaining why brand red is gone would otherwise fail the check
+  // that brand red is gone.
+  const literals = new Set();
+  traverse(ast, {
+    StringLiteral(nodePath) {
+      literals.add(nodePath.node.value);
+    },
+  });
+
+  const palette = [
+    ['#30D158', 'green, for a step that is done'],
+    ['#FF9F0A', 'amber, for the step in hand'],
+    ['#FF453A', 'red, for a cancelled order'],
+  ];
+  for (const [hex, role] of palette) {
+    if (literals.has(hex)) console.log(`  ok   ${hex} — ${role}`);
+    else fail(`${file} no longer uses ${hex} (${role}).`);
+  }
+  if (literals.has('#dc2626')) {
+    fail(
+      `${file} paints with the brand red #dc2626.\n` +
+        '    Red means cancelled in this app (utils/theme.js statusStyle); a finished\n' +
+        '    step must not share it. Progress is green and amber.'
+    );
+  } else {
+    console.log('  ok   brand red is not painted on the card');
+  }
+
   if (escaped.size) {
     fail(
       `${file} references ${[...escaped].join(', ')}, which the widget runtime does not have.\n` +

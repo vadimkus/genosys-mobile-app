@@ -99,6 +99,53 @@ Your tier: SILVER                                    32 pts
 The ETA row disappears entirely when there is no promise to make, which is
 also what the guidelines ask for: shrink when there is less to say.
 
+## Pass six: red was the wrong colour for progress
+
+Brand red painted the whole track — solid for a finished step, half strength
+for the step in hand. It was wrong twice over, and Vadim caught it on a device:
+
+1. **Red on a *finished* step reads as an error.** "Confirmed" in red says
+   something went wrong with the confirmation.
+2. **Red is already spoken for.** `statusStyle` in `utils/theme.js` maps green
+   to confirmed, paid and delivered, blue to shipped, orange to pending, and
+   **red only to cancelled, failed, refunded and deleted**. A colour cannot
+   mean "going well" on the Lock Screen and "gone wrong" three screens away.
+
+Now: **green** for a step that is done, **amber** for the step in hand, **grey**
+for what has not started. The leg leading into a node takes that node's colour,
+so travelled legs read green and the leg being travelled reads amber — the
+track is a path rather than three unrelated pips.
+
+Red is kept for the one case that needs it. A cancelled order stops the track
+and puts its status line in red, which is legible as body text where the brand
+red would not be: `#FF453A` clears 5.4:1 on this material, `#dc2626` only 3.8:1.
+
+### The values are the dark-surface variants
+
+`theme.js` tunes its green and amber for a cream page, where they clear 4.5:1.
+On the Lock Screen's dark material the same values drop to about 4:1 and go
+muddy. `#30D158` and `#FF9F0A` clear 10:1 there.
+
+### Considered: the traffic light
+
+The first proposal was green / amber / **red** — red for a step not yet
+reached. Rejected for the `statusStyle` collision above, and because under
+deuteranopia (about one man in twelve) green, amber and red collapse into three
+shades of the same mustard, which is precisely when a colour code matters most.
+Grey stays plainly absent, and size carries the signal independently: 7pt
+against 10pt.
+
+Both schemes were drawn, with computed contrast and a colour-blind rendering,
+before the decision.
+
+### Guarded
+
+`scripts/smoke-widget-layout.js` now fails the build if `#dc2626` is painted on
+the card, or if any of the three palette values disappears. It reads the
+**string literals** from the AST rather than the serialised text, because Babel
+keeps comments — a comment explaining why brand red is gone would otherwise
+fail the check that brand red is gone. It did, on the first run.
+
 ## Pass five: the track had no frontier
 
 On a device the track read as a faint hairline with three identical pips, and
