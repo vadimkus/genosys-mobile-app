@@ -66,14 +66,31 @@ const OrderActivity = (props: OrderActivityProps) => {
   const done = props.cancelled ? 0 : props.done;
   const brand = '#dc2626';
 
-  // A node on the track. Reached is brand and larger; ahead is a quiet grey pip, so the
-  // customer reads their position from shape as well as colour.
-  const node = (reached: boolean) => (
+  /**
+   * A node on the track, in one of three states.
+   *
+   * Two states would be a lie at the step being worked on: a solid brand dot on "Shipped"
+   * says it has shipped. So the step in hand is the same brand red at half strength —
+   * unmistakably the frontier, and unmistakably not finished.
+   *
+   * Size carries the same information as colour, because colour alone is not a signal
+   * everyone can read.
+   *
+   * A ring — `strokeBorder` on a clear circle — is the textbook drawing for this, and both
+   * exist in `@expo/ui`. It is not used because nothing here can be checked before it is on
+   * a customer's Lock Screen, and a modifier that silently fails leaves a hole in the track
+   * where the current step should be. `opacity` and `frame` are already on screen.
+   */
+  const node = (index: number) => (
     <Circle
       modifiers={
-        reached
-          ? [frame({ width: 9, height: 9 }), foregroundStyle(brand)]
-          : [frame({ width: 7, height: 7 }), foregroundStyle('secondary'), opacity(0.45)]
+        done > index
+          ? [frame({ width: 10, height: 10 }), foregroundStyle(brand)]
+          : // A cancelled order has no step in hand, so nothing is the frontier. Without
+            // this it would light its first node, since `done` is zero either way.
+            !props.cancelled && done === index
+            ? [frame({ width: 10, height: 10 }), foregroundStyle(brand), opacity(0.55)]
+            : [frame({ width: 7, height: 7 }), foregroundStyle('secondary'), opacity(0.5)]
       }
     />
   );
@@ -86,18 +103,18 @@ const OrderActivity = (props: OrderActivityProps) => {
       modifiers={
         lit
           ? [frame({ height: 2 }), foregroundStyle(brand)]
-          : [frame({ height: 2 }), foregroundStyle('secondary'), opacity(0.25)]
+          : [frame({ height: 2 }), foregroundStyle('secondary'), opacity(0.3)]
       }
     />
   );
 
-  // Three states, not two: done is emphatic, the step being worked on is legible, and
-  // what has not started yet recedes.
+  // The same three states as the nodes: done is emphatic, the step in hand is legible,
+  // and what has not started yet recedes.
   const label = (index: number, text: string) => (
     <Text
       modifiers={[
         font({ size: 10, weight: done > index ? 'semibold' : 'regular' }),
-        foregroundStyle(done >= index ? 'primary' : 'secondary'),
+        foregroundStyle(!props.cancelled && done >= index ? 'primary' : 'secondary'),
       ]}
     >
       {text}
@@ -123,11 +140,11 @@ const OrderActivity = (props: OrderActivityProps) => {
   const track = (
     <VStack spacing={7}>
       <HStack spacing={6} alignment="center">
-        {node(done > 0)}
+        {node(0)}
         {rail(done > 1)}
-        {node(done > 1)}
+        {node(1)}
         {rail(done > 2)}
-        {node(done > 2)}
+        {node(2)}
       </HStack>
       <HStack>
         {label(0, props.steps[0])}

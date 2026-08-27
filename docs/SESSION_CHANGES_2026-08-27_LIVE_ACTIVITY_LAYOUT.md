@@ -99,6 +99,32 @@ Your tier: SILVER                                    32 pts
 The ETA row disappears entirely when there is no promise to make, which is
 also what the guidelines ask for: shrink when there is less to say.
 
+## Pass five: the track had no frontier
+
+On a device the track read as a faint hairline with three identical pips, and
+at the first step there was no brand colour on the card at all — everything was
+grey and white.
+
+Two states were never enough. A solid brand dot on "Shipped" says it *has*
+shipped, so the step in hand is now the same red at **half strength**:
+unmistakably the frontier, unmistakably not finished. Reached nodes are solid
+and 10pt, the step in hand is 10pt at 55%, and what has not started is a 7pt
+grey pip — so position reads from size as well as colour, which matters for
+anyone who cannot rely on the colour.
+
+A cancelled order gets no frontier at all. `done` is zero whether an order is
+new or cancelled, so without an explicit check a cancelled order would light
+its first node and claim to be in progress.
+
+### Why not a ring
+
+`Circle().strokeBorder` is the textbook drawing for a step in progress, and
+both `strokeBorder` and the `clear` colour exist in `@expo/ui`. It is not used:
+nothing in this layout can be checked before it is on a customer's Lock Screen,
+and a modifier that silently fails leaves a *hole* in the track exactly where
+the current step should be. `opacity` and `frame` are already on screen and
+known to render.
+
 ### Wording
 
 - **"Order #..."** rather than a bare `#CODM2608270331`. The hash follows the
