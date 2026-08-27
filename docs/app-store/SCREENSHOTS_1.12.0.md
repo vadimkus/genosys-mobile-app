@@ -33,6 +33,17 @@ folder matching the slot in App Store Connect.
 Sign in as yourself, not the review account, so the rewards and order history
 look real.
 
+Three things learned from the first batch:
+
+- **One language per set.** App Store Connect keeps a separate screenshot set
+  per localisation. A mix of English and Russian in one set means one of them
+  is wrong wherever it lands. Shoot the English set first; Russian later if the
+  Russian listing is worth populating.
+- **Never an empty state.** A bag reading "your cart is empty" shows the app
+  with nothing in it. Put two or three items in first.
+- **Let the scroll settle.** Two of the first batch were caught mid-scroll,
+  with a heading half behind the floating bar and a card clipped at the bottom.
+
 | # | Screen | Worth having in frame |
 | --- | --- | --- |
 | 1 | Home | The rose Add to Bag buttons, the search bar, category pills |
