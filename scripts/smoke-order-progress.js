@@ -157,6 +157,14 @@ check('and is not case-sensitive', withEmirate('dubai', 'CONFIRMED').eta, 'Arriv
 check('Abu Dhabi does not', withEmirate('Abu Dhabi', 'CONFIRMED').eta, 'Arriving within 24–36 hours');
 check('nor Sharjah', withEmirate('Sharjah', 'SHIPPED').eta, 'Arriving within 24–36 hours');
 
+// Naming the destination is what makes two different windows read as fair rather than
+// arbitrary. A customer in Ajman should be able to see why theirs says a day and a half.
+check('the destination is named', withEmirate('Ras Al-Khaimah', 'CONFIRMED').place, 'Ras Al Khaimah');
+check('however it was typed', withEmirate('abudhabi', 'CONFIRMED').place, 'Abu Dhabi');
+check('and a place we do not translate falls back to what was entered', withEmirate('Al Ain', 'CONFIRMED').place, 'Al Ain');
+check('with the slower window it belongs to', withEmirate('Al Ain', 'CONFIRMED').eta, 'Arriving within 24–36 hours');
+check('never a place without a window', 'place' in withEmirate('Dubai', 'PENDING'), false);
+
 // The three silences. Each is a promise we have no business making.
 check('nothing before we accept', 'eta' in withEmirate('Dubai', 'PENDING'), false);
 check('nothing once delivered', 'eta' in withEmirate('Dubai', 'DELIVERED'), false);
@@ -165,7 +173,7 @@ check('nothing without an emirate', 'eta' in buildOrderActivityState({ orderNumb
 check('nor for a blank one', 'eta' in withEmirate('   ', 'CONFIRMED'), false);
 
 // The server sends snake_case in places; the card must not go silent because of it.
-check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).eta, 'Arriving within 1–2 hours');
+check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).place, 'Dubai');
 
 /**
  * The logo path and the rewards standing are decoration: a card without them is still a

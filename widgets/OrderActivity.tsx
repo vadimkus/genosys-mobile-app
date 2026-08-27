@@ -46,6 +46,8 @@ export type OrderActivityProps = {
    * window depends on the emirate. The line is simply not drawn when it is missing.
    */
   eta?: string;
+  /** Where it is going, already translated. Travels with `eta` and hangs opposite it. */
+  place?: string;
   /**
    * Ignored. Kept on the type so a payload that still carries a device-local path does not
    * fail to decode. Do not render it.
@@ -104,6 +106,9 @@ const OrderActivity = (props: OrderActivityProps) => {
   // Between the status and the track: the answer to the question the customer actually
   // has. Smaller than the status so it does not compete, brighter than the step labels
   // so it does not read as metadata.
+  //
+  // The destination hangs on the opposite edge rather than being joined to the promise
+  // with a separator, which would run into the edge of the card at "Umm Al Quwain".
   const eta = props.eta ? (
     <HStack>
       {/* `primary`, not brand: at 13pt semibold this is body text and owes 4.5:1, which
@@ -113,6 +118,9 @@ const OrderActivity = (props: OrderActivityProps) => {
         {props.eta}
       </Text>
       <Spacer />
+      {props.place ? (
+        <Text modifiers={[font({ size: 12 }), foregroundStyle('secondary')]}>{props.place}</Text>
+      ) : null}
     </HStack>
   ) : null;
 

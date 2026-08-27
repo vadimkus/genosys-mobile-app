@@ -1,4 +1,5 @@
 import { getOrderProgress } from './orderModel';
+import { canonicalEmirateKey, formatEmirateLabel } from './emirateUtils';
 
 /**
  * Turn an order into the flat props the Lock Screen card renders.
@@ -33,8 +34,11 @@ export function buildOrderActivityState(order, t, extras) {
     cancelled: progress.cancelled,
   };
 
-  const eta = etaLine(order, done, progress.cancelled, t);
-  if (eta) state.eta = eta;
+  const promise = deliveryPromise(order, done, progress.cancelled, t);
+  if (promise) {
+    state.eta = promise.eta;
+    state.place = promise.place;
+  }
 
   // Optional, and only ever added when known. The card falls back to a text wordmark and
   // hides the rewards line rather than showing an empty one, so a payload without these —
@@ -59,18 +63,32 @@ export function buildOrderActivityState(order, t, extras) {
  *    it on and the courier clock has not started.
  * 3. **Nothing once it is over.** Delivered or cancelled, an estimate is noise.
  *
+ * The destination is named for the same reason the window is split at all: two customers
+ * get two different promises, and the one reading the card should be able to see which
+ * applies rather than wondering why theirs says a day and a half.
+ *
+ * Returned as two fields rather than one joined string so the card can hang the place on
+ * the opposite edge. "Umm Al Quwain · Arriving within 24–36 hours" on one line runs into
+ * the edge of the card in every language.
+ *
  * The wording matches what the customer read at checkout on purpose: the card restates
  * the promise rather than inventing a second one.
  */
-function etaLine(order, done, cancelled, t) {
+function deliveryPromise(order, done, cancelled, t) {
   if (cancelled || done < 1 || done >= 3) return null;
 
   const emirate = String(order?.customerEmirate || order?.emirate || '').trim();
   if (!emirate) return null;
 
-  return emirate.toLowerCase() === 'dubai'
-    ? t('ordersDetail.activityEtaDubai')
-    : t('ordersDetail.activityEtaOther');
+  return {
+    eta:
+      canonicalEmirateKey(emirate) === 'dubai'
+        ? t('ordersDetail.activityEtaDubai')
+        : t('ordersDetail.activityEtaOther'),
+    // An emirate we have no translation for falls back to what the customer typed, which
+    // is still the truth about where it is going.
+    place: formatEmirateLabel(t, emirate),
+  };
 }
 
 /** The sentence under the bar: what is happening now, not what happened. */

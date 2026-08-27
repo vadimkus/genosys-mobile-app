@@ -59,6 +59,17 @@ three rules, and each one exists to stop us saying something we have not agreed:
 
 The wording restates checkout rather than inventing a second promise.
 
+The destination is named too, for the same reason the window is split at all:
+two customers get two different promises, and the one holding the phone should
+be able to see which applies rather than wondering why theirs says a day and a
+half. It is sent as its own field, not joined with a separator — "Umm Al Quwain
+· Arriving within 24–36 hours" runs into the edge of the card in every language,
+so the place hangs on the opposite edge instead.
+
+An emirate we carry no translation for falls back to whatever was entered at
+checkout. "Al Ain" is not one of the seven, but it is still the truth about
+where the order is going, and it correctly gets the slower window.
+
 The rule is written twice — `etaLine` in the app's `utils/orderActivity.js` and
 `etaFor` in the website's `lib/liveActivityPayload.ts` — because the two live in
 different repositories and either can be the last to touch a card. Both sides
