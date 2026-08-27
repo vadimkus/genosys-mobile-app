@@ -1032,7 +1032,9 @@
     "trackerComplete": "Доставлен — спасибо",
     "activityAwaitingConfirmation": "Ожидает подтверждения",
     "activityPreparing": "Собираем ваш заказ",
-    "activityOnItsWay": "В пути к вам"
+    "activityOnItsWay": "В пути к вам",
+    "activityEtaDubai": "Доставим за 1–2 часа",
+    "activityEtaOther": "Доставим за 24–36 часов"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "Не удалось начать оплату",

@@ -607,6 +607,7 @@ function CheckoutScreen() {
             orderNumber: finalOrderNumber,
             orderId: result.orderId,
             paymentMethod: 'cod',
+            emirate: selectedEmirate,
             t,
             send: (payload) => saveLiveActivityToken(user?.token, payload),
             authToken: user?.token,

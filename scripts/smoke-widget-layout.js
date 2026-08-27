@@ -44,21 +44,28 @@ function widgetGlobals() {
     'undefined', 'globalThis', 'console',
   ]);
 
-  for (const dir of ['swift-ui', 'swift-ui/modifiers']) {
-    const base = path.join(root, 'node_modules/@expo/ui/build', dir);
-    const index = path.join(base, 'index.d.ts');
-    if (!fs.existsSync(index)) continue;
-    // Every primitive is a folder or file next to the index; every modifier likewise.
-    for (const entry of fs.readdirSync(base)) {
-      if (entry.startsWith('index') || entry.endsWith('.map')) continue;
-      names.add(entry.replace(/\.d\.ts$/, ''));
+  // `expo-widgets/bundle/index.ts` does `Object.assign(globalThis, ...swiftUI, ...modifiers)`,
+  // so every *export* is a global — not every file name. Several primitives share one
+  // module: `Circle`, `Capsule` and `Rectangle` all live in `Shapes`. Reading the
+  // declarations rather than the directory listing is the difference between trusting
+  // this check and having it reject something that works.
+  const base = path.join(root, 'node_modules/@expo/ui/build/swift-ui');
+  const walk = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+        continue;
+      }
+      if (!entry.name.endsWith('.d.ts')) continue;
+      const source = fs.readFileSync(full, 'utf8');
+      for (const m of source.matchAll(/export declare (?:const|function) ([A-Za-z0-9_]+)/g)) {
+        names.add(m[1]);
+      }
     }
-    // The modifier index re-exports names that are not file names of their own.
-    const source = fs.readFileSync(index, 'utf8');
-    for (const m of source.matchAll(/export declare (?:const|function) ([A-Za-z0-9_]+)/g)) {
-      names.add(m[1]);
-    }
-  }
+  };
+  walk(base);
   return names;
 }
 
@@ -97,6 +104,16 @@ for (const file of LAYOUTS) {
       escaped.add(name);
     },
   });
+
+  // `<Image uiImage>` ignores `frame` and paints the asset across the whole card. The
+  // white wordmark is a black field with a red mark, so putting it back means a giant sun
+  // behind the copy — which shipped once. The mark is text.
+  console.log(`the card draws no images (${file})`);
+  if (/\bImage\b/.test(source)) {
+    fail(`${file} renders an Image. Live Activity images fill the card; use text.`);
+  } else {
+    console.log('  ok   no Image in the serialised layout');
+  }
 
   if (escaped.size) {
     fail(

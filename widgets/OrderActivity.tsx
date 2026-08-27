@@ -1,30 +1,33 @@
-import { HStack, Image, Spacer, Text, VStack } from '@expo/ui/swift-ui';
-import { font, foregroundStyle, frame, padding } from '@expo/ui/swift-ui/modifiers';
+import { Capsule, Circle, HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui';
+import { font, foregroundStyle, frame, opacity, padding } from '@expo/ui/swift-ui/modifiers';
 import { createLiveActivity } from 'expo-widgets';
 
 /**
  * The order card on the Lock Screen and in the Dynamic Island.
  *
- * ## Colour is the system's to choose
+ * ## Colour is the system's to choose — except one
  *
- * The first version that rendered used cera ink, `#191716`, and was almost unreadable:
- * the Lock Screen puts the card on a dark material whichever appearance the phone is in,
- * so near-black text lands on near-black. `environment.colorScheme` does not describe the
- * card, it describes the device.
+ * The Lock Screen puts the card on a dark material whichever appearance the phone is in,
+ * so named ink colours go missing. Text uses `primary` and `secondary`, which follow the
+ * material.
  *
- * `primary` and `secondary` are SwiftUI's semantic colours and follow whatever material
- * the card is actually sitting on. Nothing here should name a colour.
+ * The single exception is the track. Brand red on the progress a customer has actually
+ * made is the one thing that makes this card ours rather than any courier's, and a
+ * graphic element only needs 3:1 — which `#dc2626` clears on the Lock Screen's material.
+ * Text is never drawn in it.
+ *
+ * ## No images
+ *
+ * `<Image uiImage>` ignores `frame` and paints the asset across the whole card. The white
+ * wordmark is a black field with a red mark, which is why an early version had a giant sun
+ * behind the copy. A text mark is the only size we control.
  *
  * ## The layout must be self-contained
  *
- * Babel serialises the body of this function into a **string**, which the widget
- * extension evaluates in a runtime holding only the `@expo/ui` primitives, the modifiers
- * and a jsx stub. It cannot see this module, so a reference to anything declared outside
- * the function throws — and the card renders empty, silently.
- * `scripts/smoke-widget-layout.js` fails the build if that creeps back.
- *
- * Everything is text and stacks for the same reason: keep what renders, add richness a
- * piece at a time and check on a device between each.
+ * Babel serialises the body of this function into a string, and the widget extension
+ * evaluates it in a runtime holding only the `@expo/ui` exports. A reference to anything
+ * declared outside the function throws and the card renders empty, silently. Helpers live
+ * inside. `scripts/smoke-widget-layout.js` fails the build if that slips.
  */
 export type OrderActivityProps = {
   /** Shown to the customer, e.g. "46125502". */
@@ -35,13 +38,17 @@ export type OrderActivityProps = {
   status: string;
   /** The three step labels, already translated and already COD-aware. */
   steps: [string, string, string];
-  /** True once the order is cancelled: the bar stops. */
+  /** True once the order is cancelled: the track stops. */
   cancelled?: boolean;
   /**
-   * Absolute `file://` path to the white wordmark, staged into the App Group by the app.
-   *
-   * Device-local, so the server cannot know it — every server-pushed payload omits it and
-   * the card falls back to the wordmark set as text.
+   * The delivery promise, already translated, e.g. "Arriving within 1–2 hours". Absent
+   * before the order is accepted and once it is over — the sender decides, because the
+   * window depends on the emirate. The line is simply not drawn when it is missing.
+   */
+  eta?: string;
+  /**
+   * Ignored. Kept on the type so a payload that still carries a device-local path does not
+   * fail to decode. Do not render it.
    */
   logoUri?: string;
   /** Rewards tier, e.g. "SILVER". Omitted for a guest or when it could not be read. */
@@ -54,35 +61,93 @@ const OrderActivity = (props: OrderActivityProps) => {
   'widget';
 
   const done = props.cancelled ? 0 : props.done;
-  // Filled where the order has been, hollow where it has not. Characters draw reliably;
-  // an empty view with a colour on it does not.
-  const bar =
-    (done > 0 ? '●' : '○') +
-    '━━━━━' +
-    (done > 1 ? '●' : '○') +
-    '━━━━━' +
-    (done > 2 ? '●' : '○');
+  const brand = '#dc2626';
+
+  // A node on the track. Reached is brand and larger; ahead is a quiet grey pip, so the
+  // customer reads their position from shape as well as colour.
+  const node = (reached: boolean) => (
+    <Circle
+      modifiers={
+        reached
+          ? [frame({ width: 9, height: 9 }), foregroundStyle(brand)]
+          : [frame({ width: 7, height: 7 }), foregroundStyle('secondary'), opacity(0.45)]
+      }
+    />
+  );
+
+  // The rail between two nodes. Shapes are flexible in SwiftUI, so this takes whatever
+  // width the row has left — which is what keeps the three labels under their own nodes
+  // at every text size.
+  const rail = (lit: boolean) => (
+    <Capsule
+      modifiers={
+        lit
+          ? [frame({ height: 2 }), foregroundStyle(brand)]
+          : [frame({ height: 2 }), foregroundStyle('secondary'), opacity(0.25)]
+      }
+    />
+  );
+
+  // Three states, not two: done is emphatic, the step being worked on is legible, and
+  // what has not started yet recedes.
+  const label = (index: number, text: string) => (
+    <Text
+      modifiers={[
+        font({ size: 10, weight: done > index ? 'semibold' : 'regular' }),
+        foregroundStyle(done >= index ? 'primary' : 'secondary'),
+      ]}
+    >
+      {text}
+    </Text>
+  );
+
+  // Between the status and the track: the answer to the question the customer actually
+  // has. Smaller than the status so it does not compete, brighter than the step labels
+  // so it does not read as metadata.
+  const eta = props.eta ? (
+    <HStack>
+      {/* `primary`, not brand: at 13pt semibold this is body text and owes 4.5:1, which
+          the red does not clear on the Lock Screen's material. The red stays on the
+          track, where 3:1 is the bar. */}
+      <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('primary')]}>
+        {props.eta}
+      </Text>
+      <Spacer />
+    </HStack>
+  ) : null;
+
+  const track = (
+    <VStack spacing={7}>
+      <HStack spacing={6} alignment="center">
+        {node(done > 0)}
+        {rail(done > 1)}
+        {node(done > 1)}
+        {rail(done > 2)}
+        {node(done > 2)}
+      </HStack>
+      <HStack>
+        {label(0, props.steps[0])}
+        <Spacer />
+        {label(1, props.steps[1])}
+        <Spacer />
+        {label(2, props.steps[2])}
+      </HStack>
+    </VStack>
+  );
 
   return {
     banner: (
-      <VStack spacing={7} modifiers={[padding({ horizontal: 16, vertical: 13 })]}>
-        {/* The mark and the order number: quiet, because neither is the news. The real
-            wordmark when the app has staged it, letterspaced text when it has not. */}
+      <VStack spacing={9} modifiers={[padding({ horizontal: 16, vertical: 13 })]}>
         <HStack>
-          {props.logoUri ? (
-            <Image uiImage={props.logoUri} modifiers={[frame({ width: 84, height: 25 })]} />
-          ) : (
-            <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle('secondary')]}>
-              {'G E N O S Y S'}
-            </Text>
-          )}
+          <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle('secondary')]}>
+            {'GENOSYS'}
+          </Text>
           <Spacer />
           <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
             {'#' + props.orderNumber}
           </Text>
         </HStack>
 
-        {/* What is happening now. This is what the card is for. */}
         <HStack>
           <Text modifiers={[font({ size: 17, weight: 'semibold' }), foregroundStyle('primary')]}>
             {props.status}
@@ -90,49 +155,16 @@ const OrderActivity = (props: OrderActivityProps) => {
           <Spacer />
         </HStack>
 
-        <HStack>
-          <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{bar}</Text>
-          <Spacer />
-        </HStack>
+        {eta}
 
-        {/* The three stops, spread to sit under the bar. */}
-        <HStack>
-          <Text
-            modifiers={[
-              font({ size: 11, weight: done > 0 ? 'semibold' : 'regular' }),
-              foregroundStyle(done > 0 ? 'primary' : 'secondary'),
-            ]}
-          >
-            {props.steps[0]}
-          </Text>
-          <Spacer />
-          <Text
-            modifiers={[
-              font({ size: 11, weight: done > 1 ? 'semibold' : 'regular' }),
-              foregroundStyle(done > 1 ? 'primary' : 'secondary'),
-            ]}
-          >
-            {props.steps[1]}
-          </Text>
-          <Spacer />
-          <Text
-            modifiers={[
-              font({ size: 11, weight: done > 2 ? 'semibold' : 'regular' }),
-              foregroundStyle(done > 2 ? 'primary' : 'secondary'),
-            ]}
-          >
-            {props.steps[2]}
-          </Text>
-        </HStack>
+        {track}
 
-        {/* Rewards standing, when we know it. A guest gets no empty row. */}
+        {/* Rewards are a courtesy, not the news: quieter than the step labels above. */}
         {props.tier ? (
-          <HStack>
-            <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('secondary')]}>
-              {props.tier}
-            </Text>
+          <HStack modifiers={[opacity(0.75)]}>
+            <Text modifiers={[font({ size: 10 }), foregroundStyle('secondary')]}>{props.tier}</Text>
             <Spacer />
-            <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
+            <Text modifiers={[font({ size: 10 }), foregroundStyle('secondary')]}>
               {(props.points ?? 0) + ' pts'}
             </Text>
           </HStack>
@@ -141,13 +173,17 @@ const OrderActivity = (props: OrderActivityProps) => {
     ),
 
     compactLeading: (
-      <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{'●'}</Text>
+      <Text modifiers={[font({ size: 12 }), foregroundStyle(done > 0 ? brand : 'secondary')]}>
+        {'\u25CF'}
+      </Text>
     ),
     compactTrailing: (
-      <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{done + '/3'}</Text>
+      <Text modifiers={[font({ size: 12 }), foregroundStyle('primary')]}>{done + '/3'}</Text>
     ),
     minimal: (
-      <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{done + '/3'}</Text>
+      <Text modifiers={[font({ size: 12 }), foregroundStyle(done > 0 ? brand : 'secondary')]}>
+        {'\u25CF'}
+      </Text>
     ),
 
     expandedLeading: (
@@ -159,17 +195,19 @@ const OrderActivity = (props: OrderActivityProps) => {
     ),
     expandedTrailing: (
       <VStack modifiers={[padding({ all: 10 })]}>
-        <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>
-          {done + ' / 3'}
-        </Text>
+        <Text modifiers={[font({ size: 11 }), foregroundStyle('secondary')]}>{done + '/3'}</Text>
       </VStack>
     ),
     expandedBottom: (
-      <VStack spacing={6} modifiers={[padding({ horizontal: 14, bottom: 12 })]}>
-        <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundStyle('primary')]}>
-          {props.status}
-        </Text>
-        <Text modifiers={[font({ size: 13 }), foregroundStyle('primary')]}>{bar}</Text>
+      <VStack spacing={9} modifiers={[padding({ horizontal: 14, bottom: 12 })]}>
+        <HStack>
+          <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundStyle('primary')]}>
+            {props.status}
+          </Text>
+          <Spacer />
+        </HStack>
+        {eta}
+        {track}
       </VStack>
     ),
   };

@@ -141,6 +141,33 @@ check('and says so', gone.status, 'This order was cancelled');
 check('and is flagged', gone.cancelled, true);
 
 /**
+ * The delivery promise.
+ *
+ * This is the one thing on the card that is a commitment rather than a report, so the
+ * rules are pinned here on both sides. One to two hours is the Careem service inside
+ * Dubai; everywhere else is 24 to 36. Nothing is promised before we accept the order,
+ * and nothing once it is over.
+ */
+console.log('delivery promise');
+const withEmirate = (emirate, status) =>
+  buildOrderActivityState({ orderNumber: '1', paymentMethod: 'cod', status, customerEmirate: emirate }, t);
+
+check('Dubai gets the hours', withEmirate('Dubai', 'CONFIRMED').eta, 'Arriving within 1–2 hours');
+check('and is not case-sensitive', withEmirate('dubai', 'CONFIRMED').eta, 'Arriving within 1–2 hours');
+check('Abu Dhabi does not', withEmirate('Abu Dhabi', 'CONFIRMED').eta, 'Arriving within 24–36 hours');
+check('nor Sharjah', withEmirate('Sharjah', 'SHIPPED').eta, 'Arriving within 24–36 hours');
+
+// The three silences. Each is a promise we have no business making.
+check('nothing before we accept', 'eta' in withEmirate('Dubai', 'PENDING'), false);
+check('nothing once delivered', 'eta' in withEmirate('Dubai', 'DELIVERED'), false);
+check('nothing when cancelled', 'eta' in withEmirate('Dubai', 'CANCELLED'), false);
+check('nothing without an emirate', 'eta' in buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED' }, t), false);
+check('nor for a blank one', 'eta' in withEmirate('   ', 'CONFIRMED'), false);
+
+// The server sends snake_case in places; the card must not go silent because of it.
+check('accepts the plain field name too', buildOrderActivityState({ orderNumber: '1', status: 'CONFIRMED', emirate: 'Dubai' }, t).eta, 'Arriving within 1–2 hours');
+
+/**
  * The logo path and the rewards standing are decoration: a card without them is still a
  * complete card, and the server — which cannot know a device-local file path — sends
  * neither. So they must never appear as empty keys.

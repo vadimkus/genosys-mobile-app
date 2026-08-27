@@ -1032,7 +1032,9 @@
     "trackerComplete": "تم التوصيل — شكرًا لك",
     "activityAwaitingConfirmation": "في انتظار التأكيد",
     "activityPreparing": "نُجهّز طلبك",
-    "activityOnItsWay": "في طريقه إليك"
+    "activityOnItsWay": "في طريقه إليك",
+    "activityEtaDubai": "يصل خلال 1–2 ساعة",
+    "activityEtaOther": "يصل خلال 24–36 ساعة"
   },
   "ordersDetailAlerts": {
     "couldNotStartPaymentTitle": "تعذر بدء الدفع",

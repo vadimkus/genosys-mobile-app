@@ -48,7 +48,9 @@ const getPaymentStatusLabel = (status, t) => {
 
 export default function StripePaymentScreen() {
   const { user } = useAuth();
-  const { clearCart } = useCart();
+  // `selectedEmirate` only for the Lock Screen card's delivery promise: a prepaid order
+  // is already one step in, so the window is due the moment payment clears.
+  const { clearCart, selectedEmirate } = useCart();
   const token = user?.token || user?.accessToken || '';
   const { t, dir } = useLocalization();
   const isRTL = dir === 'rtl';
@@ -206,6 +208,7 @@ export default function StripePaymentScreen() {
         orderId,
         paymentMethod: 'stripe',
         paymentStatus: 'paid',
+        emirate: selectedEmirate,
         t,
         send: (payload) => saveLiveActivityToken(token, payload),
         authToken: token,

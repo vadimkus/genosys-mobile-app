@@ -1,7 +1,6 @@
 import { Platform } from 'react-native';
 import { buildOrderActivityState, shouldTrackOrder } from './orderActivity';
 import { getOrderId, getOrderNumber, sortOrdersNewestFirst } from './orderModel';
-import { getWidgetLogoUri } from './widgetAssets';
 import { createLogger } from './logger';
 
 const log = createLogger('OrderLiveActivity');
@@ -14,7 +13,7 @@ const log = createLogger('OrderLiveActivity');
  */
 async function decorations(token) {
   const extras = {};
-  extras.logoUri = await getWidgetLogoUri();
+  // Do not pass logoUri. The widget Image paints the PNG across the whole card.
 
   if (token) {
     try {
@@ -86,6 +85,7 @@ export async function startOrderActivityForNewOrder({
   orderId,
   paymentMethod,
   paymentStatus,
+  emirate,
   t,
   send,
   authToken,
@@ -97,7 +97,9 @@ export async function startOrderActivityForNewOrder({
   try {
     // A new order is PENDING: accepted by us, nothing shipped. The card shows an empty
     // bar and "waiting to be confirmed", which is exactly true.
-    const order = { orderNumber, paymentMethod, paymentStatus, status: 'PENDING' };
+    // The emirate decides the delivery promise, and a prepaid order is already one step
+    // in — so without it a Dubai card order would start with no window on it.
+    const order = { orderNumber, paymentMethod, paymentStatus, emirate, status: 'PENDING' };
     const state = buildOrderActivityState(order, t, await decorations(authToken));
     const id = orderId || orderNumber;
 
