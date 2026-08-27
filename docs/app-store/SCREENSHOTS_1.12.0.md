@@ -8,9 +8,17 @@ order card.
 
 1. Install build 106 from TestFlight.
 2. Take the ten screenshots below on your iPhone. Side button and volume up.
-3. AirDrop them to this Mac and drop them into `raw/` **in the order below**,
+3. **AirDrop** them to this Mac and drop them into `raw/` **in the order below**,
    because the converter numbers them by filename order and that becomes the
    order they appear in the listing.
+
+   Not WhatsApp as a photo. It resamples a 1290 wide screenshot down to 589 and
+   compresses it to about 60KB, which is smaller than anything the App Store
+   accepts and would have to be upscaled back. If AirDrop is not an option,
+   attach them in WhatsApp as a **Document** instead of a photo, which keeps the
+   original file. A real iPhone screenshot is a PNG of a few megabytes.
+
+   The converter refuses undersized files rather than quietly upscaling them.
 4. Run:
 
    ```

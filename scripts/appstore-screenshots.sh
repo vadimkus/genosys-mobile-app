@@ -36,6 +36,41 @@ fi
 echo "Found ${#FILES[@]} screenshot(s)."
 echo
 
+# Refuse to upscale.
+#
+# The listing is the first thing a customer sees, and an upscaled JPEG looks
+# exactly like what it is. WhatsApp is the usual culprit: it resamples a 1290
+# wide screenshot down to 589 and compresses it to about 60KB, which is a 2.1x
+# upscale away from the smallest size the App Store accepts.
+#
+# AirDrop keeps the original PNG. So does attaching the file as a Document in
+# WhatsApp rather than as a photo.
+UNDERSIZED=0
+for f in "${FILES[@]}"; do
+  w=$(sips -g pixelWidth "$f" 2>/dev/null | awk '/pixelWidth/{print $2}')
+  h=$(sips -g pixelHeight "$f" 2>/dev/null | awk '/pixelHeight/{print $2}')
+  [ -z "$w" ] && continue
+  if [ "$w" -lt 1242 ] || [ "$h" -lt 2688 ]; then
+    if [ "$UNDERSIZED" -eq 0 ]; then
+      echo "These are smaller than the App Store's smallest accepted size (1242 x 2688):"
+      echo
+    fi
+    printf "   %5s x %-5s  %s\n" "$w" "$h" "$(basename "$f")"
+    UNDERSIZED=$((UNDERSIZED + 1))
+  fi
+done
+
+if [ "$UNDERSIZED" -gt 0 ]; then
+  echo
+  echo "Converting them would mean upscaling, which looks soft on the listing."
+  echo "Send the originals to this Mac by AirDrop, or in WhatsApp attach them as"
+  echo "a Document rather than a photo. A real iPhone screenshot is a PNG of"
+  echo "around 1290 x 2796 and a few megabytes."
+  echo
+  echo "Nothing was written."
+  exit 1
+fi
+
 convert_set() {
   local label="$1" width="$2" height="$3"
   local out="$BASE/$label"
