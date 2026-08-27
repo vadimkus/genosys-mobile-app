@@ -9,6 +9,8 @@ import * as Notifications from 'expo-notifications';
 import { Platform, AppState, Vibration } from 'react-native';
 import { createLogger } from '../utils/logger';
 import { navigateFromNotification } from '../utils/notificationRouting';
+import { updateOrderActivityFromPush } from '../utils/orderLiveActivity';
+import { tStatic } from './LocalizationContext';
 
 const log = createLogger('Notification');
 
@@ -72,6 +74,10 @@ export function NotificationProvider({ children }) {
         try {
           log.debug('📩 Notification received in foreground:', notification.request.content.title);
           setLastNotification(notification);
+
+          // An order-status push carries the new status, so the Lock Screen card can
+          // advance the moment it lands rather than waiting for a screen to be opened.
+          updateOrderActivityFromPush(notification.request.content.data, tStatic);
           
           // Vibrate briefly to get attention
           if (Platform.OS === 'android') {
@@ -91,6 +97,10 @@ export function NotificationProvider({ children }) {
           Notifications.setBadgeCountAsync(0);
           
           const data = response.notification.request.content.data;
+
+          // Tapping is often the first the app hears of a status change, so move the card
+          // before navigating anywhere.
+          updateOrderActivityFromPush(data, tStatic);
 
           // Resolve the destination generically: orders, blog posts, and any
           // future type that ships a `url` in its payload.

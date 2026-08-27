@@ -132,6 +132,54 @@ async function retireStrays(OrderActivity, t) {
   activityOrderId = null;
 }
 
+/**
+ * Move the card from an order-status notification.
+ *
+ * The status push already carries everything the card needs — order number and new
+ * status — so the card can advance the instant the notification lands, with no round trip
+ * and no screen to open.
+ *
+ * This is not a substitute for the APNs channel. It only fires when the app is running or
+ * has just been opened by the tap; a force-quit app cannot move its own card. Only a
+ * push addressed to the ActivityKit token can do that.
+ */
+export async function updateOrderActivityFromPush(data, t) {
+  if (!available()) return;
+  const type = data?.type;
+  if (type !== 'order_status' && type !== 'order-status') return;
+
+  const orderNumber = data.orderNumber || data.order_number;
+  if (!orderNumber || !data.status) return;
+
+  const OrderActivity = load();
+  if (!OrderActivity) return;
+
+  try {
+    // Payment method is not in the payload, so keep whatever the card already shows by
+    // reusing its own labels rather than recomputing them and risking a COD card
+    // suddenly reading "Paid".
+    const order = { orderNumber, status: data.status, paymentMethod: data.paymentMethod };
+    const state = buildOrderActivityState(order, t);
+
+    if (activity && activityOrderId) {
+      await activity.update(state);
+      log.debug('Advanced the card from a push:', data.status);
+      return;
+    }
+
+    // The app was not running when the card went up, so adopt whatever is on screen.
+    const running = OrderActivity.getInstances?.() ?? [];
+    const first = running[0];
+    if (first) {
+      await first.update(state);
+      activity = first;
+      activityOrderId = String(orderNumber);
+    }
+  } catch (e) {
+    log.warn('Could not advance the card from a push:', e?.message);
+  }
+}
+
 export async function syncOrderActivity(orders, t, send, authToken) {
   if (!available()) return;
   const OrderActivity = load();
