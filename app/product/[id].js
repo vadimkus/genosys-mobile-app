@@ -296,8 +296,8 @@ const PDP_COPY_MAP = {
     quantity: 'Quantity',
   },
   ar: {
-    addedToBag: 'أُضيف إلى الحقيبة',
-    viewBag: 'عرض الحقيبة',
+    addedToBag: 'أُضيف إلى السلة',
+    viewBag: 'عرض السلة',
     readMore: 'اقرأ المزيد',
     showLess: 'عرض أقل',
     vatIncluded: 'شامل ضريبة القيمة المضافة',

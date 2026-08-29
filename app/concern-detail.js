@@ -173,12 +173,12 @@ export default function ConcernDetailScreen() {
     const existingCartItem = findCartItem(cartId);
     if (existingCartItem) {
       removeItem(cartId, existingCartItem.selectedColor || '', existingCartItem.selectedSize || '');
-      showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
+      showToast(locale === 'ar' ? 'تمت الإزالة من السلة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
     } else {
       addItem(fullProduct, 1, '', '');
       setJustAddedIds((prev) => ({ ...prev, [routeId]: true }));
       setTimeout(() => setJustAddedIds((prev) => ({ ...prev, [routeId]: false })), 1200);
-      showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено في корзину' : 'Added to bag');
+      showToast(locale === 'ar' ? 'تمت الإضافة إلى السلة' : locale === 'ru' ? 'Добавлено في корзину' : 'Added to bag');
     }
   }, [productLookup, addItem, removeItem, findCartItem, showToast, locale, router, slug, user]);
 
@@ -409,7 +409,7 @@ export default function ConcernDetailScreen() {
                           if (inCart) {
                             const ci = findCartItem(pid);
                             if (ci) removeItem(pid, ci.selectedColor || '', ci.selectedSize || '');
-                            showToast(locale === 'ar' ? 'تمت الإزالة من الحقيبة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
+                            showToast(locale === 'ar' ? 'تمت الإزالة من السلة' : locale === 'ru' ? 'Удалено из корзины' : 'Removed from bag');
                           } else {
                             if (!user) {
                               router.push({
@@ -425,7 +425,7 @@ export default function ConcernDetailScreen() {
                             addItem(product, 1, '', '');
                             setJustAddedIds(prev => ({ ...prev, [pid]: true }));
                             setTimeout(() => setJustAddedIds(prev => ({ ...prev, [pid]: false })), 1200);
-                            showToast(locale === 'ar' ? 'تمت الإضافة إلى الحقيبة' : locale === 'ru' ? 'Добавлено в корзину' : 'Added to bag');
+                            showToast(locale === 'ar' ? 'تمت الإضافة إلى السلة' : locale === 'ru' ? 'Добавлено в корзину' : 'Added to bag');
                           }
                         }}
                       />
@@ -444,7 +444,7 @@ export default function ConcernDetailScreen() {
           </Text>
           <Text style={[styles.ctaSubtitle, isRTL && styles.textRTL]}>
             {locale === 'ar'
-              ? 'اضغطي على المنتجات في الروتين أعلاه لإضافتها إلى حقيبتك'
+              ? 'اضغطي على المنتجات في الروتين أعلاه لإضافتها إلى سلتك'
               : locale === 'ru'
                 ? 'Нажимайте на продукты в рутине выше, чтобы добавить их в корзину'
                 : 'Tap products in the routine above to add them to your bag'}
@@ -458,7 +458,7 @@ export default function ConcernDetailScreen() {
             >
               <Ionicons name="bag-handle-outline" size={18} color={colors.white} />
               <Text style={styles.ctaBtnPrimaryText}>
-                {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
+                {locale === 'ar' ? 'عرض السلة' : locale === 'ru' ? 'Перейти в корзину' : 'View Bag'}
                 {cartItems.length > 0 ? ` (${cartItems.length})` : ''}
               </Text>
             </TouchableOpacity>
@@ -591,7 +591,7 @@ export default function ConcernDetailScreen() {
                   {rows}
                   {nonPromoItems.length > 1 && (
                     <TouchableOpacity
-                      onPress={() => { haptics.lightTap(); clearCart(); showToast(locale === 'ar' ? 'تم مسح الحقيبة' : locale === 'ru' ? 'Корзина очищена' : 'Bag cleared'); }}
+                      onPress={() => { haptics.lightTap(); clearCart(); showToast(locale === 'ar' ? 'تم مسح السلة' : locale === 'ru' ? 'Корзина очищена' : 'Bag cleared'); }}
                       style={[styles.stickyClearAll, isRTL && { alignSelf: 'flex-end' }]}
                       hitSlop={{ top: 6, bottom: 6, left: 10, right: 10 }}
                     >
@@ -655,7 +655,7 @@ export default function ConcernDetailScreen() {
               </View>
               <TouchableOpacity style={styles.stickyBtn} onPress={async () => { haptics.mediumTap(); await AsyncStorage.setItem('@genosys_nav_bag_source', JSON.stringify({ pathname: '/concern-detail', params: { slug } })).catch(() => {}); router.push('/(tabs)/bag'); }} activeOpacity={0.85}>
                 <Text style={styles.stickyBtnText}>
-                  {locale === 'ar' ? 'عرض الحقيبة' : locale === 'ru' ? 'Корзина' : 'View Bag'}
+                  {locale === 'ar' ? 'عرض السلة' : locale === 'ru' ? 'Корзина' : 'View Bag'}
                 </Text>
                 <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.white} />
               </TouchableOpacity>
