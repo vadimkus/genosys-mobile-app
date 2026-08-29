@@ -611,3 +611,103 @@ Expected sequence:
   - Dashboard: https://expo.dev/accounts/vadimkus/projects/genosys-mobile-app/updates/788089f1-3b8b-4e57-9829-2025e9cd358b
 
 Note: source `app.json` was restored to runtime `1.10.1` after publishing the compatibility OTA for runtime `1.10.0`.
+
+---
+
+## 2026-08-29 Update #8 — The video was playing; nobody could see it
+
+### Symptom
+
+> "splash screen white - i see there's was video that was playing after, now video is not playing"
+
+White logo splash on cold start, then the app, with the branded video never
+appearing. Reported on iPhone 16 Pro Max, build 106 / runtime 1.12.0.
+
+### What was ruled out
+
+Everything on the server. `/api/mobile/splash-config` returns `enabled: true`,
+the mp4 serves `200 video/mp4`, and the exact splash HTML was replayed in
+WebKit (the same engine as WKWebView), where the video reached `playing` in
+853ms and ran to completion. The only recent commit touching the config route
+was the dash sweep, which was comment-only. Nothing functional had changed in
+`VideoLaunchScreen.js` either.
+
+### Root cause
+
+`playbackStarted` was the single gate on lifting the logo cover, and the only
+thing that could set it was a `'playing'` message posted from the page:
+
+```js
+function post(type) {
+  try { window.ReactNativeWebView.postMessage(type); } catch (e) {}
+}
+```
+
+`window.ReactNativeWebView` is injected by react-native-webview and is not
+guaranteed to exist when the inline script runs. The `catch` discarded the
+failure. So when the bridge was late, the `'playing'` event fired into nothing,
+the cover never lifted, and the video played its full length *underneath* an
+opaque logo until the 8s loading failsafe dismissed the overlay. From the
+outside that is indistinguishable from "the video is not playing".
+
+Timing makes this a live race rather than a theoretical one: playback starts
+around one second, well inside the window where the bridge can still be absent.
+The SDK 57 upgrade (RN 0.86, New Architecture only) is the most likely reason
+the injection timing shifted.
+
+### Change
+
+`components/VideoLaunchScreen.js`:
+
+- The page queues messages and drains them once the bridge appears, instead of
+  posting once and swallowing the failure.
+- `onLoadEnd` gives the reveal a second route that is a native callback and so
+  cannot be lost the same way. Its grace period is 2500ms, deliberately far
+  longer than playback needs, so it only runs when the bridge is silent and a
+  slow connection still gets to paint a frame before the logo lifts. Revealing
+  onto a still-buffering WebView is the regression Update #5 fought.
+- `onError` and `onContentProcessDidTerminate` dismiss instead of stranding the
+  splash on the logo for 8s. `onHttpError` was deliberately left off: it can
+  fire for subresources on Android and would dismiss the splash spuriously.
+
+`app/_layout.js` points at the faststart video. The launch config is frozen on
+mount, so the hard-coded default is what actually plays and the server value
+never reaches the current launch.
+
+### Video
+
+`public/videos/Splash.mp4` had its `moov` atom after `mdat`, so a player had to
+fetch all 4.5MB before the first frame. Re-muxed with a stream copy (`-c copy
+-movflags +faststart`), so the footage is untouched and only atom order changed:
+`ftyp -> moov -> free -> mdat`. Published as `Splash-v2.mp4` because `/videos`
+is served `immutable` and replacing bytes in place would leave cached clients on
+the slow copy. The old file stays for bundles that have not taken the update.
+
+### Verification
+
+- WebKit replay of the shipped injected script with the bridge deliberately
+  absent, then injected late: video reported `playing` at 1011ms with no bridge,
+  and the queued `ready` was delivered intact on injection. Under the old code
+  that signal was lost.
+- `npm run verify:splash` passed.
+- `npx expo export --platform ios` passed.
+
+Local reproduction on a simulator was not possible: the Xcode licence has not
+been accepted (`sudo xcodebuild -license accept`), so `simctl` and `expo
+run:ios` are blocked.
+
+### OTA
+
+- Branch: `production`, runtime `1.12.0`, iOS + Android
+- Update group ID: `7aeff2f0-3545-4970-8f90-77f5c5f30cb4`
+- iOS update ID: `01a04e45-cfed-7a18-a541-e9be7f3cac4a`
+- Android update ID: `01a04e45-cfed-7888-aaef-29dcb647677e`
+- Commit: `700ec5cc042da3175ad68aa9f34e79e44f6b5bb2`
+- Website commit: `88affa5e`
+
+### Note
+
+The splash dismisses 5.5s after playback starts (`duration: 5000` + 500ms) but
+the video runs 8s, so the last ~2.5s is never seen. That is existing configured
+behaviour, not part of this fix. Raising `duration` to 7500 in the API route
+would play it through, at the cost of a longer cold start.
