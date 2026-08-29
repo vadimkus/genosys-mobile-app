@@ -71,6 +71,25 @@ for (const dir of DIRS) {
   }
 }
 
+// Sentence case, matching the website's 92 bespoke product pages, which use it
+// for every control they own. "Bag" alone keeps its capital - it is the start
+// of a nav label, not a word inside a sentence.
+{
+  const en = JSON.parse(readFileSync('i18n/messages/en.json', 'utf8'));
+  const walkStrings = (node, prefix = '') => {
+    if (typeof node === 'string') return [[prefix, node]];
+    if (!node || typeof node !== 'object') return [];
+    return Object.entries(node).flatMap(([k, v]) =>
+      walkStrings(v, prefix ? `${prefix}.${k}` : k)
+    );
+  };
+  for (const [key, value] of walkStrings(en)) {
+    if (value !== 'Bag' && !value.startsWith('Bag:') && /\bBag\b/.test(value)) {
+      problems.push(`i18n/messages/en.json  ${key} is title case - the labels are sentence case\n    ${value}`);
+    }
+  }
+}
+
 if (problems.length) {
   console.error(`bag wording: ${problems.length} problem(s)\n`);
   for (const p of problems) console.error(`  ${p}`);
