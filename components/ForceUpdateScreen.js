@@ -32,7 +32,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
           <Text style={styles.iconText}>⬆</Text>
         </View>
 
-        <Text style={styles.title}>Update Required</Text>
+        <Text style={styles.title}>Update required</Text>
         <Text style={styles.message}>
           {message || 'A new version of Genosys UAE is available. Please update to continue.'}
         </Text>
