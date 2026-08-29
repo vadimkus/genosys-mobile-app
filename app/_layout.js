@@ -50,7 +50,12 @@ const SPLASH_CACHE_KEY = '@splash_config';
 const DEFAULT_SPLASH_CONFIG = {
   enabled: true,
   type: 'video',
-  videoUrl: `${AUTH_CONFIG.WEB_ORIGIN}/videos/Splash.mp4`,
+  // Faststart re-mux of the same footage. The original had its moov atom after
+  // mdat, so a player had to fetch all 4.5MB before the first frame; this one
+  // starts painting almost immediately. New filename because /videos is served
+  // immutable, so replacing the bytes in place would leave return visitors on
+  // the slow copy.
+  videoUrl: `${AUTH_CONFIG.WEB_ORIGIN}/videos/Splash-v2.mp4`,
   posterUrl: null,
   duration: 5000,
   cacheTTL: 86400,

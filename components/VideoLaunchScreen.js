@@ -146,6 +146,40 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     });
   }, [fadeAnim]);
 
+  // Second route to the reveal, independent of the page's message bridge.
+  //
+  // `playing` reaching us over `postMessage` is the precise signal and stays
+  // preferred, but it is the only thing that lifted the cover, so anything that
+  // broke the bridge stranded the splash on a static logo while the video
+  // played behind it. onLoadEnd is a native callback and cannot be lost that
+  // way, so treat "document loaded, then a grace period" as playback having
+  // begun.
+  //
+  // The grace period is deliberately longer than playback needs. When the
+  // bridge is healthy it answers within about a second, so this only ever runs
+  // when the bridge is silent; leaving room means a slow connection still gets
+  // to paint a frame first, rather than us lifting the logo onto a WebView
+  // that is visibly still buffering.
+  const loadEndTimeoutRef = useRef(null);
+  const handleWebViewLoadEnd = useCallback(() => {
+    if (loadEndTimeoutRef.current) clearTimeout(loadEndTimeoutRef.current);
+    loadEndTimeoutRef.current = setTimeout(() => {
+      if (dismissed.current) return;
+      setPlaybackStarted(true);
+    }, 2500);
+  }, []);
+
+  // A WebView that fails at the native level reports nothing to the page, so
+  // without this the splash sat on the logo until the 8s failsafe. Fail fast
+  // into the app instead.
+  const handleWebViewFailure = useCallback(() => {
+    dismiss();
+  }, [dismiss]);
+
+  useEffect(() => () => {
+    if (loadEndTimeoutRef.current) clearTimeout(loadEndTimeoutRef.current);
+  }, []);
+
   useEffect(() => {
     if (launchConfig.localSource || !launchConfig.videoUrl) return;
 
@@ -243,8 +277,26 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
     <script>
       (function () {
         var video = document.getElementById('splashVideo');
+        // The bridge is injected by react-native-webview and is not guaranteed
+        // to exist when this script runs. It used to be posted to inside a
+        // try/catch that swallowed the failure, so a 'playing' event fired
+        // before injection was lost silently and the cover never lifted: the
+        // video played underneath an opaque logo until the failsafe dismissed
+        // the whole splash. Queue instead, and drain once the bridge appears.
+        var queue = [];
+        var drainTimer = null;
+        function drain() {
+          if (!window.ReactNativeWebView || !window.ReactNativeWebView.postMessage) return;
+          while (queue.length) {
+            try { window.ReactNativeWebView.postMessage(queue[0]); } catch (e) { return; }
+            queue.shift();
+          }
+          if (drainTimer) { clearInterval(drainTimer); drainTimer = null; }
+        }
         function post(type) {
-          try { window.ReactNativeWebView.postMessage(type); } catch (e) {}
+          queue.push(type);
+          drain();
+          if (queue.length && !drainTimer) drainTimer = setInterval(drain, 40);
         }
         video.addEventListener('ended', function () { post('ended'); });
         video.addEventListener('error', function () { post('error'); });
@@ -315,6 +367,9 @@ export default function VideoLaunchScreen({ localSource, videoUrl, posterUrl, du
             // during the retheme would put a coloured surface against a white
             // native launch screen and show as a flash on cold start.
             backgroundColor="#ffffff"
+            onLoadEnd={handleWebViewLoadEnd}
+            onError={handleWebViewFailure}
+            onContentProcessDidTerminate={handleWebViewFailure}
             onMessage={(event) => {
               const type = event?.nativeEvent?.data;
               if (type === 'ready') {
