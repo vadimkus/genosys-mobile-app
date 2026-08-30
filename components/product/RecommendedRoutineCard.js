@@ -159,6 +159,10 @@ const s = StyleSheet.create({
   stepBody: {
     flex: 1,
     minWidth: 0,
+    // The step the current product occupies renders without a trailing chevron,
+    // which changes how the row measures. Without an explicit shrink the last
+    // line of a long description could be clipped on that row alone.
+    flexShrink: 1,
   },
   stepTitle: {
     fontSize: 14,
