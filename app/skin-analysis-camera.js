@@ -434,7 +434,7 @@ export default function SkinAnalysisCameraScreen() {
               </View>
               {aiResult.tips.map((tip, i) => (
                 <View key={i} style={styles.tipRow}>
-                  <Ionicons name="checkmark-circle" size={16} color={colors.green} />
+                  <Ionicons name="checkmark-circle" size={16} color={colors.ok} />
                   <Text style={styles.tipText}>{tip}</Text>
                 </View>
               ))}
@@ -533,7 +533,7 @@ export default function SkinAnalysisCameraScreen() {
 // Helpers
 function scoreColor(score) {
   if (!score) return colors.placeholder;
-  if (score >= 7) return colors.green;
+  if (score >= 7) return colors.ok;
   if (score >= 5) return colors.orange;
   return colors.accent;
 }
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 8,
   },
-  aiRecAddBtnAdded: { backgroundColor: colors.greenDeep },
+  aiRecAddBtnAdded: { backgroundColor: colors.ok },
   aiRecAddText: { ...T.captionSmall, fontWeight: '700', color: colors.white },
   aiRecViewBtn: {
     paddingHorizontal: 14,

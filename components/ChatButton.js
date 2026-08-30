@@ -603,7 +603,7 @@ const s = StyleSheet.create({
   productPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: colors.whatsappDeep, marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 6, marginTop: 4 },
   addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.cta, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
-  addToBagBtnAdded: { backgroundColor: colors.greenDeep },
+  addToBagBtnAdded: { backgroundColor: colors.label },
   requestQuoteBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.whatsappDeep, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
   addToBagText: { ...T.badge, color: colors.white },
   viewProductBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, borderWidth: 1, borderColor: colors.separatorStrong },

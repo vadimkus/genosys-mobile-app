@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   rateText: {
     fontSize: 17,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   rateLabel: {
     fontSize: 10,

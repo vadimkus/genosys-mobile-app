@@ -89,6 +89,26 @@ export const colors = {
   // pushed further, because a background this pale disappears as a border.
   greenBg: '#e8ece6',
   greenLine: '#c5d7ca',
+  // The affirmative state, in brand colour rather than green. Green was doing
+  // two jobs here: telling apart the stages of an order, where several sit in
+  // one list and the hue is all that separates them, and confirming a single
+  // thing went right, where the tick and the words already say so. The second
+  // never needed green, and a green pill on cream reads like a courier app.
+  //
+  // `green` stays for the first job, through `statusStyle`. These take the
+  // second: in stock, added, saved, free delivery, the amount you saved.
+  // Aliases of tones already in the palette rather than new values, because
+  // the colour was there; what was missing was a name for which job is meant.
+  // Text holds 4.81:1 on `okBg`, matching the green pair it replaces.
+  //
+  // A filled confirmation goes to `label` (ink) instead. Flipping a filled
+  // button from `cta` to `ok` would be two tones of one hue and would barely
+  // register; against ink it plainly has. The same applies to the progress
+  // bars, whose unmet state is already `accent`: `ok` there would be the same
+  // colour twice and the bar would stop reporting anything.
+  ok: '#8f5a5a',             // = roseInk
+  okBg: '#f7ecec',           // = blush
+  okLine: '#efd9d9',         // = blushDeep
   blueBg: '#e7e9ee',
   blueLine: '#c4cfe1',
   orangeBg: '#f1e9df',

@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   savings: {
     ...T.captionTiny,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   vatText: {
     ...T.captionTiny,

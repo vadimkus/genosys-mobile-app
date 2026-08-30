@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   fillMet: {
-    backgroundColor: colors.green,
+    backgroundColor: colors.label,
   },
 });
 

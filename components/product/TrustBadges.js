@@ -36,7 +36,7 @@ const COPY = {
 
 const BADGES = [
   { key: 'shipping', icon: 'car-outline', color: colors.orange },
-  { key: 'authentic', icon: 'shield-checkmark-outline', color: colors.greenDeep },
+  { key: 'authentic', icon: 'shield-checkmark-outline', color: colors.ok },
   { key: 'vat', icon: 'card-outline', color: colors.blue },
 ];
 

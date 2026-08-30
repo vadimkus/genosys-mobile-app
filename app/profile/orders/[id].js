@@ -567,8 +567,8 @@ export default function OrderDetailScreen() {
                       <View style={styles.itemTitleWrap}>
                         <Text style={[styles.itemName, isRTL && styles.textRTL]} numberOfLines={2}>{String(name)}</Text>
                         {canShowDiscountBreakdown && Number.isFinite(discountPct) ? (
-                          <View style={[styles.discountPill, isBundleItem && { backgroundColor: colors.greenBg }]}>
-                            <Text style={[styles.discountPillText, isBundleItem && { color: colors.greenDeep }]}>
+                          <View style={[styles.discountPill, isBundleItem && { backgroundColor: colors.okBg }]}>
+                            <Text style={[styles.discountPillText, isBundleItem && { color: colors.ok }]}>
                               {isBundleItem
                                 ? `${Math.round(discountPct)}% Bundle`
                                 : `${Math.round(discountPct)}%`}
@@ -723,7 +723,7 @@ export default function OrderDetailScreen() {
             {promoItems.length > 0 ? (
               <View style={styles.promoSection}>
                 <View style={[styles.promoHeader, isRTL && styles.rowRTL]}>
-                  <Ionicons name="gift" size={16} color={colors.greenDeep} />
+                  <Ionicons name="gift" size={16} color={colors.ok} />
                   <Text style={[styles.promoHeaderText, isRTL && styles.textRTL]}>{t('ordersDetail.freeItems')}</Text>
                 </View>
                 {promoItems.map((it, idx) => {
@@ -745,7 +745,7 @@ export default function OrderDetailScreen() {
                           />
                         ) : (
                           <View style={[styles.promoThumbnail, styles.promoThumbnailPlaceholder]}>
-                            <Ionicons name="gift-outline" size={16} color={colors.greenDeep} />
+                            <Ionicons name="gift-outline" size={16} color={colors.ok} />
                           </View>
                         )}
                         <View style={styles.promoItemContent}>
@@ -893,7 +893,7 @@ export default function OrderDetailScreen() {
                   {/* Free Shipping banner */}
                   {freeShipping ? (
                     <View style={styles.freeShippingBanner}>
-                      <Ionicons name="checkmark-circle" size={14} color={colors.greenDeep} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                      <Ionicons name="checkmark-circle" size={14} color={colors.ok} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
                       <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>
                         {t('checkout.freeShippingApplied')}
                       </Text>
@@ -1163,7 +1163,7 @@ const styles = StyleSheet.create({
   paymentMethodPaidHint: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
 
   // Items
@@ -1221,8 +1221,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   discountPill: {
-    backgroundColor: colors.greenBg,
-    borderColor: colors.greenDeep,
+    backgroundColor: colors.okBg,
+    borderColor: colors.ok,
     borderWidth: 1,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -1231,7 +1231,7 @@ const styles = StyleSheet.create({
   discountPillText: {
     ...T.captionTiny,
     fontWeight: '900',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   itemPrice: {
     ...T.label,
@@ -1290,11 +1290,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   discountValue: {
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '900',
   },
   discountPctText: {
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '900',
   },
   itemLineTotals: {
@@ -1320,15 +1320,15 @@ const styles = StyleSheet.create({
   promoHeaderText: {
     ...T.label,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   promoItemCard: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
   promoItemRow: {
     flexDirection: FLEX_ROW,
@@ -1341,12 +1341,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
   promoThumbnailPlaceholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
   },
   promoItemContent: {
     flex: 1,
@@ -1355,12 +1355,12 @@ const styles = StyleSheet.create({
   promoItemName: {
     ...T.labelSmall,
     flex: 1,
-    color: colors.greenDeep,
+    color: colors.ok,
     lineHeight: 18,
   },
   promoItemQty: {
     ...T.captionSmall,
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '500',
     marginTop: 4,
   },
@@ -1368,14 +1368,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
   freeBadgeText: {
     ...T.captionTiny,
     fontWeight: '800',
-    color: colors.greenDeep,
+    color: colors.ok,
     textTransform: 'uppercase',
   },
 
@@ -1449,27 +1449,27 @@ const styles = StyleSheet.create({
   summaryLabelDiscount: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   summaryValueDiscount: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   youSavedBanner: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 14,
     alignItems: 'center',
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
   youSavedText: {
     ...T.labelSmall,
     fontWeight: '800',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   summaryLabelBold: {
     fontSize: 14,
@@ -1482,13 +1482,13 @@ const styles = StyleSheet.create({
     color: colors.label,
   },
   summaryValueFree: {
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '700',
   },
   freeShippingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
@@ -1496,7 +1496,7 @@ const styles = StyleSheet.create({
   },
   freeShippingText: {
     ...T.captionSmall,
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '600',
   },
   vatNoteRed: {

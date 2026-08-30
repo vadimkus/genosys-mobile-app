@@ -76,7 +76,7 @@ export default function RewardsRedemptionCard({
           </TouchableOpacity>
           {enabled ? (
             <View style={[styles.appliedRow, isRTL && styles.rowReverse]}>
-              <Ionicons name="checkmark-circle" size={13} color={colors.greenDeep} />
+              <Ionicons name="checkmark-circle" size={13} color={colors.ok} />
               <Text style={styles.appliedText}>
                 {t('rewards.applied', { aed: Number(quote.aed).toFixed(2) })}
               </Text>
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   appliedText: {
     fontSize: 11.5,
     fontWeight: '600',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   hintText: {
     fontSize: 12,

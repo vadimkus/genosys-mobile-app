@@ -143,7 +143,7 @@ export default function DeliveryScreen() {
           {/* Free Shipping Banner */}
           <View style={[styles.card, styles.freeShippingCard, shadow.card]}>
             <View style={styles.freeShippingIcon}>
-              <Ionicons name="gift" size={24} color={colors.greenDeep} />
+              <Ionicons name="gift" size={24} color={colors.ok} />
             </View>
             <Text style={[styles.freeShippingTitle, isRTL && styles.textRTLCenter]}>
               {l('Free Shipping', 'شحن مجاني', 'Бесплатная доставка')}
@@ -257,12 +257,12 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: tint(colors.greenDeep),
+    backgroundColor: tint(colors.ok),
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
-  freeShippingTitle: { ...T.sectionTitleSmall, color: colors.greenDeep, marginBottom: 4, textAlign: 'center' },
+  freeShippingTitle: { ...T.sectionTitleSmall, color: colors.ok, marginBottom: 4, textAlign: 'center' },
   freeShippingDesc: { ...T.bodySmall, color: colors.secondaryLabel, textAlign: 'center' },
 
   // Shipping rates

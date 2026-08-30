@@ -237,7 +237,7 @@ export default function CheckoutOrderHeaderCard({
           {/* Free Shipping banner */}
           {isFreeShipping && (
             <View style={styles.freeShippingBanner}>
-              <Ionicons name="checkmark-circle" size={14} color={colors.green} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+              <Ionicons name="checkmark-circle" size={14} color={colors.ok} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
               <Text style={[styles.freeShippingText, isRTL && styles.textRTL]}>
                 {t('checkout.freeShippingApplied')}
               </Text>

@@ -51,7 +51,7 @@ const CATEGORY_LABELS = {
   orders:   { en: 'Orders & Payment',  ar: 'الطلبات والدفع',   ru: 'Заказы и оплата',     icon: 'card',       color: colors.indigo },
   shipping: { en: 'Shipping',          ar: 'الشحن',            ru: 'Доставка',            icon: 'car',        color: colors.teal },
   app:      { en: 'Mobile App',        ar: 'التطبيق',          ru: 'Приложение',          icon: 'phone-portrait', color: colors.blue },
-  account:  { en: 'Account & Support', ar: 'الحساب والدعم',    ru: 'Аккаунт и поддержка', icon: 'person',     color: colors.green },
+  account:  { en: 'Account & Support', ar: 'الحساب والدعم',    ru: 'Аккаунт и поддержка', icon: 'person',     color: colors.ok },
 };
 
 export default function FAQScreen() {

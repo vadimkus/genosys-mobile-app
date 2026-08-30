@@ -33,7 +33,7 @@ import PageHero from '../components/PageHero';
 const log = createLogger('Partners');
 
 const THEME_COLORS = {
-  emerald: colors.green,
+  emerald: colors.ok,
   pink: colors.rose,
   blue: colors.blue,
   purple: colors.purple,

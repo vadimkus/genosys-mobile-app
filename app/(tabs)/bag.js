@@ -693,7 +693,7 @@ function BagScreen() {
                 headerRight={
                   cartSummary.hasFreeShipping ? (
                     <View style={styles.progressRightRow}>
-                      <Ionicons name="checkmark-circle" size={18} color={colors.green} />
+                      <Ionicons name="checkmark-circle" size={18} color={colors.ok} />
                       <Text style={[styles.progressRightText, styles.progressRightTextMet]}>{t('common.free')}</Text>
                     </View>
                   ) : (
@@ -834,7 +834,7 @@ function BagScreen() {
               {/* Free Shipping banner */}
               {cartSummary.hasFreeShipping && (
                 <View style={styles.freeShippingBannerGreen}>
-                  <Ionicons name="checkmark-circle" size={14} color={colors.green} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                  <Ionicons name="checkmark-circle" size={14} color={colors.ok} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
                   <Text style={[styles.freeShippingTextGreen, isRTL && styles.summaryLabelRTL]}>
                     {t('checkout.freeShippingApplied')}
                   </Text>
@@ -987,7 +987,7 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
   },
   progressRightTextMet: {
-    color: colors.green,
+    color: colors.ok,
   },
   rewardRow: {
     flexDirection: 'row',
@@ -1036,7 +1036,7 @@ const styles = StyleSheet.create({
   freeShippingBannerGreen: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
@@ -1045,7 +1045,7 @@ const styles = StyleSheet.create({
   freeShippingTextGreen: {
     ...T.captionSmall,
     fontWeight: '600',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   vatNoteRed: {
     ...T.captionTiny,
@@ -1122,7 +1122,7 @@ const styles = StyleSheet.create({
   promoItemPriceRight: {
     ...T.price,
     fontWeight: '900',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   promoQtyRight: {
     ...T.captionSmall,
@@ -1133,7 +1133,7 @@ const styles = StyleSheet.create({
   promoTag: {
     ...T.captionTiny,
     fontWeight: '800',
-    color: colors.greenDeep,
+    color: colors.ok,
     marginTop: 4,
     textAlign: 'right',
   },
@@ -1209,12 +1209,12 @@ const styles = StyleSheet.create({
   itemBundleLabel: {
     ...T.captionTiny,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   itemDiscountLabel: {
     ...T.captionTiny,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -1372,11 +1372,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelBundle: {
     ...T.summaryValue,
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   summaryValueBundle: {
     ...T.summaryValue,
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   waterfallDivider: {
     height: 1,
@@ -1392,9 +1392,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   youSavedBanner: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -1404,10 +1404,10 @@ const styles = StyleSheet.create({
   youSavedText: {
     ...T.captionSmall,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   freeText: {
-    color: colors.green,
+    color: colors.ok,
   },
   divider: {
     height: 1,

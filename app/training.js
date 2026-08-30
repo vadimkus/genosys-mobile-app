@@ -211,7 +211,7 @@ export default function TrainingScreen() {
               {stats && (
                 <View style={[styles.statsRow, isRTL && styles.rowRTL]}>
                   <View style={styles.statBadge}>
-                    <Ionicons name="document-text" size={14} color={colors.greenDeep} />
+                    <Ionicons name="document-text" size={14} color={colors.ok} />
                     <Text style={styles.statText}>{stats.totalDocuments} {l('Guides', 'أدلة', 'Пособий')}</Text>
                   </View>
                   <View style={styles.statBadge}>
@@ -238,16 +238,16 @@ export default function TrainingScreen() {
                       onPress={() => openDocument(doc.downloadUrl)}
                       activeOpacity={0.6}
                     >
-                      <View style={[styles.docTile, { backgroundColor: tint(colors.greenDeep) }]}>
-                        <Ionicons name={getDocIcon(doc.icon)} size={20} color={colors.greenDeep} />
+                      <View style={[styles.docTile, { backgroundColor: tint(colors.ok) }]}>
+                        <Ionicons name={getDocIcon(doc.icon)} size={20} color={colors.ok} />
                       </View>
                       <View style={styles.docTextWrap}>
                         <Text style={[styles.docTitle, isRTL && styles.textRTL]} numberOfLines={2}>{doc.title}</Text>
                         <Text style={[styles.docSize, isRTL && styles.textRTL]}>{doc.fileSize}</Text>
                       </View>
-                      <View style={[styles.pdfBadge, { backgroundColor: tint(colors.greenDeep) }]}>
-                        <Ionicons name="download-outline" size={15} color={colors.greenDeep} />
-                        <Text style={[styles.pdfBadgeText, { color: colors.greenDeep }]}>PDF</Text>
+                      <View style={[styles.pdfBadge, { backgroundColor: tint(colors.ok) }]}>
+                        <Ionicons name="download-outline" size={15} color={colors.ok} />
+                        <Text style={[styles.pdfBadgeText, { color: colors.ok }]}>PDF</Text>
                       </View>
                     </TouchableOpacity>
                   ))}

@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   },
   discountLabel: {
     ...T.captionTiny,
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '700',
   },
   closeButton: {

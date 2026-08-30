@@ -305,7 +305,7 @@ export default function SkinAnalysisScreen() {
                         <View style={[styles.matchChipsRow, isRTL && { flexDirection: 'row-reverse' }]}>
                           {matchedLabels.slice(0, 3).map((c) => (
                             <View key={c} style={styles.matchChip}>
-                              <Ionicons name="checkmark" size={10} color={colors.green} />
+                              <Ionicons name="checkmark" size={10} color={colors.ok} />
                               <Text style={styles.matchChipText}>{t(`skinAnalysis.${getConcernKey(c)}`)}</Text>
                             </View>
                           ))}
@@ -720,12 +720,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 8,
   },
-  matchChipText: { ...T.badge, fontWeight: '600', color: colors.greenDeep },
+  matchChipText: { ...T.badge, fontWeight: '600', color: colors.ok },
   recPrice: { ...T.label, fontWeight: '800', color: colors.accent, marginTop: 4 },
   recActions: { flexDirection: 'row', gap: 8, marginTop: 8 },
   recAddBtn: {
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 6,
   },
-  recAddBtnAdded: { backgroundColor: colors.greenDeep },
+  recAddBtnAdded: { backgroundColor: colors.ok },
   recQuoteBtn: {
     flexDirection: 'row',
     alignItems: 'center',

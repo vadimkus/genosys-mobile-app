@@ -77,7 +77,7 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'location',
-      color: colors.greenDeep,
+      color: colors.ok,
     },
     {
       slug: 'rak',
@@ -113,7 +113,7 @@ export default function LocationsScreen() {
       shipping: l('70 AED', '٧٠ د.إ', '70 AED'),
       delivery: l('24-36 hours', '٢٤-٣٦ ساعة', '24-36 часов'),
       icon: 'pin',
-      color: colors.green,
+      color: colors.ok,
     },
   ];
 
@@ -144,7 +144,7 @@ export default function LocationsScreen() {
 
           {/* Free Shipping Note */}
           <View style={[styles.freeShipBanner, isRTL && styles.rowRTL]}>
-            <Ionicons name="gift" size={18} color={colors.greenDeep} />
+            <Ionicons name="gift" size={18} color={colors.ok} />
             <Text style={[styles.freeShipText, isRTL && styles.textRTL]}>
               {l('FREE shipping on orders above 1,000 AED', 'شحن مجاني للطلبات فوق ١٬٠٠٠ د.إ', 'БЕСПЛАТНАЯ доставка при заказе от 1 000 AED')}
             </Text>
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
   },
-  freeShipText: { ...T.labelSmall, fontWeight: '700', color: colors.greenDeep, flexShrink: 1 },
+  freeShipText: { ...T.labelSmall, fontWeight: '700', color: colors.ok, flexShrink: 1 },
 
   // Section
   section: { paddingHorizontal: 16, paddingTop: 18 },

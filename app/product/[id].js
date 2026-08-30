@@ -1596,7 +1596,7 @@ function ProductDetailScreen() {
                   collapsible: true,
                   defaultOpen: false,
                   icon: 'leaf-outline',
-                  iconColor: colors.green,
+                  iconColor: colors.ok,
                 });
               })()}
 
@@ -1830,7 +1830,7 @@ function ProductDetailScreen() {
           bottomOffset={(footerHeight || 96) + (insets.bottom || 12) + 12}
           isRTL={isRTL}
           icon={isOutOfStock ? 'alert-circle' : 'checkmark-circle'}
-          iconColor={isOutOfStock ? colors.orange : colors.green}
+          iconColor={isOutOfStock ? colors.orange : colors.ok}
         />
 
         {/* Full-screen image gallery (Lightbox) */}
@@ -2057,14 +2057,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   discountBadge: {
-    backgroundColor: tint(colors.green),
+    backgroundColor: tint(colors.ok),
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
   },
   discountBadgeText: {
     ...T.badgeMedium,
-    color: colors.greenDeep,
+    color: colors.ok,
     letterSpacing: 0.2,
   },
   size: {
@@ -2149,7 +2149,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   noteContainer: {
-    backgroundColor: tint(colors.green),
+    backgroundColor: tint(colors.ok),
     borderRadius: 12,
     padding: 14,
   },
@@ -2158,7 +2158,7 @@ const styles = StyleSheet.create({
     color: colors.label,
   },
   noteText: {
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   readMoreButton: {
     marginTop: 12,
@@ -2643,8 +2643,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   inCartButton: {
-    backgroundColor: colors.greenDeep,
-    shadowColor: colors.greenDeep,
+    backgroundColor: colors.ok,
+    shadowColor: colors.ok,
     elevation: 6,
   },
   buttonIcon: {
@@ -2678,9 +2678,9 @@ const styles = StyleSheet.create({
   },
   stockInfo: {
     ...T.captionSmall,
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '700',
-    backgroundColor: tint(colors.green),
+    backgroundColor: tint(colors.ok),
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,

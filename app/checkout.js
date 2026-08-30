@@ -959,8 +959,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: colors.greenBg,
-    color: colors.greenDeep,
+    backgroundColor: colors.okBg,
+    color: colors.ok,
     fontSize: 11,
     fontWeight: '800',
   },
@@ -1004,8 +1004,8 @@ const styles = StyleSheet.create({
   orderSummaryDiscountPill: {
     overflow: 'hidden',
     borderRadius: 999,
-    backgroundColor: colors.greenBg,
-    color: colors.greenDeep,
+    backgroundColor: colors.okBg,
+    color: colors.ok,
     fontSize: 10,
     fontWeight: '900',
     paddingHorizontal: 6,
@@ -1389,14 +1389,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
   freeBadgeText: {
     ...T.captionTiny,
     fontWeight: '800',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   deliveryEtaHint: {
     ...T.captionSmall,
@@ -1507,7 +1507,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     padding: 8,
     borderRadius: 6,
     marginVertical: 8,
@@ -1515,7 +1515,7 @@ const styles = StyleSheet.create({
   freeShippingText: {
     ...T.captionSmall,
     fontWeight: '500',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   totalRow: {
     flexDirection: 'row',
@@ -1564,11 +1564,11 @@ const styles = StyleSheet.create({
   },
   summaryLabelBundle: {
     ...T.summaryValue,
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   summaryValueBundle: {
     ...T.summaryValue,
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   summaryDividerLight: {
     height: 1,
@@ -1584,7 +1584,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   summaryValueFree: {
-    color: colors.greenDeep,
+    color: colors.ok,
     fontWeight: '600',
   },
   vatNoteRed: {
@@ -1593,9 +1593,9 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   youSavedBanner: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -1605,7 +1605,7 @@ const styles = StyleSheet.create({
   youSavedText: {
     ...T.labelSmall,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
 
   // Sticky pay bar

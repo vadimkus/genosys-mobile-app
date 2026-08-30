@@ -306,15 +306,15 @@ export default function AddressesScreen() {
           <View style={[styles.tipsCard, shadow.card]}>
             <Text style={[styles.tipsTitle, isRTL && styles.textRTL]}>{t('addresses.deliveryTips')}</Text>
             <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
+              <Ionicons name="checkmark-circle" size={18} color={colors.ok} />
               <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipDefault')}</Text>
             </View>
             <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
+              <Ionicons name="checkmark-circle" size={18} color={colors.ok} />
               <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipApt')}</Text>
             </View>
             <View style={[styles.tipItem, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
+              <Ionicons name="checkmark-circle" size={18} color={colors.ok} />
               <Text style={[styles.tipText, isRTL && styles.textRTL]}>{t('addresses.tipPhone')}</Text>
             </View>
           </View>
@@ -396,19 +396,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: tint(colors.greenDeep, '1A'),
+    backgroundColor: tint(colors.ok, '1A'),
   },
   defaultDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.greenDeep,
+    backgroundColor: colors.ok,
   },
   defaultText: {
     ...T.captionTiny,
     fontSize: 11.5,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   moreButton: {
     padding: 4,

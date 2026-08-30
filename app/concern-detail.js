@@ -342,7 +342,7 @@ export default function ConcernDetailScreen() {
                                     activeOpacity={0.7}
                                   >
                                     {chipInCart ? (
-                                      <Ionicons name="checkmark-circle" size={14} color={colors.green} />
+                                      <Ionicons name="checkmark-circle" size={14} color={colors.ok} />
                                     ) : null}
                                     <Text style={[styles.stepProductName, chipInCart && styles.stepProductNameInCart]}>{p.name}</Text>
                                     {!user ? (
@@ -611,10 +611,10 @@ export default function ConcernDetailScreen() {
                         <Text style={[styles.stickyItemOriginalPrice, { fontSize: 14 }]}>{formatAed(breakdown.retailTotal)}</Text>
                       </View>
                       <View style={[styles.stickyPricingRow, isRTL && styles.stickyPricingRowRTL]}>
-                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: colors.greenDeep, fontWeight: '600' }]}>
+                        <Text style={[styles.stickyPricingLabel, isRTL && styles.textRTL, { color: colors.ok, fontWeight: '600' }]}>
                           {locale === 'ar' ? `خصم ${breakdown.userDiscountPct}%` : locale === 'ru' ? `Скидка ${breakdown.userDiscountPct}%` : `${breakdown.userDiscountPct}% Discount`}
                         </Text>
-                        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.greenDeep }}>-{formatAed(discountAmount)}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.ok }}>-{formatAed(discountAmount)}</Text>
                       </View>
                     </>
                   )}
@@ -742,11 +742,11 @@ const styles = StyleSheet.create({
   stepDetail: { ...T.caption, color: colors.mutedText, lineHeight: 20, marginBottom: 10 },
   stepProducts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   stepProductChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.fillSecondary, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
-  stepProductChipInCart: { backgroundColor: tint(colors.greenDeep, '1A') },
+  stepProductChipInCart: { backgroundColor: tint(colors.ok, '1A') },
   stepProductName: { ...T.captionSmall, fontWeight: '600', color: colors.label },
-  stepProductNameInCart: { color: colors.greenDeep },
+  stepProductNameInCart: { color: colors.ok },
   stepProductPrice: { ...T.captionSmall },
-  stepProductPriceInCart: { color: colors.greenDeep },
+  stepProductPriceInCart: { color: colors.ok },
 
   // Products grid
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
@@ -859,7 +859,7 @@ const styles = StyleSheet.create({
   stickyPricingLabel: { ...T.label },
   stickyPricingValue: { ...T.summaryValue, fontWeight: '700' },
   stickyFreeShipping: { ...T.captionSmall, color: colors.orange, marginTop: 4 },
-  stickyFreeShippingDone: { ...T.captionSmall, fontWeight: '600', color: colors.greenDeep, marginTop: 4 },
+  stickyFreeShippingDone: { ...T.captionSmall, fontWeight: '600', color: colors.ok, marginTop: 4 },
   stickyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 },
   stickyRowRTL: { flexDirection: 'row-reverse' },
   stickyInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },

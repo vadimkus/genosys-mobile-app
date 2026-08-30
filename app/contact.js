@@ -168,11 +168,11 @@ export default function ContactScreen() {
           <Text style={[styles.groupHeader, isRTL && styles.textRTL]}>{t('contact.officialDistributorTitle')}</Text>
           <View style={[styles.card, styles.cardPad, shadow.card]}>
             <View style={[styles.distributorRow, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
+              <Ionicons name="checkmark-circle" size={18} color={colors.ok} />
               <Text style={[styles.distributorText, isRTL && styles.textRTL]}>{t('contact.officialDistributorLine1')}</Text>
             </View>
             <View style={[styles.distributorRow, isRTL && styles.rowRTL]}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.greenDeep} />
+              <Ionicons name="checkmark-circle" size={18} color={colors.ok} />
               <Text style={[styles.distributorText, isRTL && styles.textRTL]}>{t('contact.officialDistributorLine2')}</Text>
             </View>
             <View style={[styles.distributorRow, isRTL && styles.rowRTL, { marginTop: 4 }]}>

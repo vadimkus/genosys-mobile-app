@@ -34,7 +34,7 @@ const { width } = Dimensions.get('window');
 
 // Keep Switch color props stable across renders (prevents iOS visual flicker on nearby switches).
 const SWITCH_TRACK_PUSH = { false: colors.separator, true: colors.accent };
-const SWITCH_TRACK_BIOMETRIC = { false: colors.separator, true: colors.green };
+const SWITCH_TRACK_BIOMETRIC = { false: colors.separator, true: colors.ok };
 const SWITCH_TRACK_EMAIL = { false: colors.separator, true: colors.accent };
 const SWITCH_THUMB = colors.white;
 const SWITCH_IOS_BG = colors.separator;
@@ -811,7 +811,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: colors.green,
+    backgroundColor: colors.ok,
     borderWidth: 3,
     borderColor: colors.card,
   },
@@ -864,7 +864,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    backgroundColor: colors.green,
+    backgroundColor: colors.ok,
     borderRadius: 999,
     maxWidth: '100%',
   },

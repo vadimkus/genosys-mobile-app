@@ -462,7 +462,7 @@ export default function BundleBuilderScreen() {
         )}
         {discountPercent > 0 && (
           <View style={styles.discountActiveBadge}>
-            <Ionicons name="pricetag" size={14} color={colors.green} />
+            <Ionicons name="pricetag" size={14} color={colors.ok} />
             <Text style={styles.discountActiveText}>{discountPercent}% {t('bundleBuilder.bundleDiscount')}</Text>
           </View>
         )}
@@ -753,13 +753,13 @@ const styles = StyleSheet.create({
   progressFill: { height: 6, backgroundColor: colors.cta, borderRadius: 3 },
   tierMarker: { position: 'absolute', top: -3, alignItems: 'center', marginLeft: -4 },
   tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.separator, borderWidth: 2, borderColor: colors.white },
-  tierDotActive: { backgroundColor: colors.greenDeep },
+  tierDotActive: { backgroundColor: colors.ok },
   progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 },
   progressLabel: { ...T.badge, color: colors.secondaryLabel },
-  progressLabelActive: { color: colors.greenDeep, fontWeight: '700' },
+  progressLabelActive: { color: colors.ok, fontWeight: '700' },
   nextTierHint: { ...T.captionSmall, color: colors.accent, fontWeight: '600', textAlign: 'center', marginTop: 6 },
-  discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: colors.greenBg, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
-  discountActiveText: { ...T.badgeMedium, color: colors.greenDeep },
+  discountActiveBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, backgroundColor: colors.okBg, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, alignSelf: 'center' },
+  discountActiveText: { ...T.badgeMedium, color: colors.ok },
 
   // Step indicator
   stepIndicator: { backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, height: 52 },
@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
   stepPillText: { ...T.captionTiny, fontWeight: '600', color: colors.mutedText },
   stepPillTextActive: { color: colors.accent },
   requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.orange },
-  stepCountBadge: { backgroundColor: colors.greenDeep, borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
+  stepCountBadge: { backgroundColor: colors.ok, borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
   stepCountText: { ...T.badge, color: colors.white },
 
   // Step header
@@ -807,7 +807,7 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   priceOriginal: { ...T.captionTiny, color: colors.secondaryLabel, textDecorationLine: 'line-through' },
   priceMain: { ...T.label, fontWeight: '700', color: colors.label },
-  priceDiscounted: { color: colors.greenDeep },
+  priceDiscounted: { color: colors.ok },
   loginToSee: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 4, fontStyle: 'italic' },
 
   addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.accent },
@@ -826,7 +826,7 @@ const styles = StyleSheet.create({
   navBtnText: { ...T.buttonSmall, color: colors.bodyText },
   navBtnTextDisabled: { color: colors.placeholder },
   navCenter: { alignItems: 'center' },
-  navDiscount: { ...T.captionTiny, fontWeight: '700', color: colors.greenDeep },
+  navDiscount: { ...T.captionTiny, fontWeight: '700', color: colors.ok },
   navTotal: { ...T.price, color: colors.label },
   navItems: { ...T.caption, fontWeight: '600', color: colors.mutedText },
 
@@ -857,8 +857,8 @@ const styles = StyleSheet.create({
   pricingValue: { ...T.summaryValue, color: colors.bodyText },
   pricingLabelPurple: { ...T.summaryLabel, color: colors.purple, fontWeight: '600' },
   pricingValuePurple: { ...T.summaryValue, fontWeight: '700', color: colors.purple },
-  pricingLabelGreen: { ...T.summaryLabel, color: colors.greenDeep, fontWeight: '600' },
-  pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: colors.greenDeep },
+  pricingLabelGreen: { ...T.summaryLabel, color: colors.ok, fontWeight: '600' },
+  pricingValueGreen: { ...T.summaryValue, fontWeight: '700', color: colors.ok },
   pricingRowTotal: { borderTopWidth: 1, borderTopColor: colors.separator, paddingTop: 8, marginTop: 4 },
   pricingTotalLabel: { ...T.totalLabel, color: colors.label, fontSize: 16 },
   pricingTotalValue: { ...T.totalValue, fontWeight: '800', color: colors.accent, fontSize: 18 },

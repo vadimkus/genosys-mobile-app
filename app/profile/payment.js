@@ -149,7 +149,7 @@ export default function PaymentScreen() {
 
           {/* Secure note */}
           <View style={[styles.noteBox, isRTL && styles.rowRTL]}>
-            <Ionicons name="lock-closed" size={18} color={colors.greenDeep} />
+            <Ionicons name="lock-closed" size={18} color={colors.ok} />
             <Text style={[styles.noteText, isRTL && styles.textRTL]}>{t('paymentSettings.note')}</Text>
           </View>
 

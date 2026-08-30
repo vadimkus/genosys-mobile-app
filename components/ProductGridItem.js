@@ -85,7 +85,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
       computedBadges.push({
         type: 'in_stock',
         text: t('stock.inStock'),
-        color: colors.green,
+        color: colors.ok,
         textColor: colors.white,
         priority: 0,
       });
@@ -276,7 +276,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
             <Ionicons
               name={inCart ? 'checkmark-circle' : justAdded ? 'checkmark-circle' : 'bag-add-outline'}
               size={14}
-              color={inCart ? colors.greenDeep : colors.white}
+              color={inCart ? colors.ok : colors.white}
             />
             <Text style={[styles.addToCartBtnText, inCart && styles.addToCartBtnTextInCart]}>
               {inCart
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   savingsContainer: {
-    backgroundColor: colors.greenDeep,
+    backgroundColor: colors.ok,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -489,14 +489,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   addToCartBtnInCart: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
   addToCartBtnText: {
     ...T.buttonTiny,
   },
   addToCartBtnTextInCart: {
-    color: colors.greenDeep,
+    color: colors.ok,
   },
 });

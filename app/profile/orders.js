@@ -678,7 +678,7 @@ function OrdersScreen() {
                             {/* Free Shipping banner */}
                             {freeShipping ? (
                               <View style={styles.freeShippingBanner}>
-                                <Ionicons name="checkmark-circle" size={12} color={colors.greenDeep} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
+                                <Ionicons name="checkmark-circle" size={12} color={colors.ok} style={{ marginRight: isRTL ? 0 : 4, marginLeft: isRTL ? 4 : 0 }} />
                                 <Text style={[styles.freeShippingText, isRTL && styles.textRTLRight]}>
                                   {t('checkout.freeShippingApplied')}
                                 </Text>
@@ -884,41 +884,41 @@ const styles = StyleSheet.create({
   orderTotalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   orderTotalsRowRTL: { flexDirection: 'row-reverse' },
   orderTotalsLabel: { fontSize: 12, color: colors.bodyText, fontWeight: '700' },
-  orderTotalsLabelGreen: { fontSize: 12, color: colors.greenDeep, fontWeight: '700' },
+  orderTotalsLabelGreen: { fontSize: 12, color: colors.ok, fontWeight: '700' },
   orderTotalsLabelPurple: { fontSize: 12, color: colors.purple, fontWeight: '700' },
   orderTotalsLabelMuted: { fontSize: 12, color: colors.secondaryLabel, fontWeight: '600' },
   orderTotalsValue: { fontSize: 12, color: colors.label, fontWeight: '800' },
   orderTotalsValueMuted: { fontSize: 12, color: colors.secondaryLabel, fontWeight: '700', textDecorationLine: 'line-through' },
   orderTotalsValueMutedSmall: { fontSize: 12, color: colors.secondaryLabel, fontWeight: '700' },
-  orderTotalsValueGreen: { fontSize: 12, color: colors.greenDeep, fontWeight: '800' },
+  orderTotalsValueGreen: { fontSize: 12, color: colors.ok, fontWeight: '800' },
   orderTotalsValuePurple: { fontSize: 12, color: colors.purple, fontWeight: '800' },
   orderTotalsLabelBold: { fontSize: 12, color: colors.label, fontWeight: '800' },
   orderTotalsValueBold: { fontSize: 12, color: colors.label, fontWeight: '800' },
-  orderTotalsValueFree: { color: colors.greenDeep, fontWeight: '800' },
+  orderTotalsValueFree: { color: colors.ok, fontWeight: '800' },
   orderTotalsLabelStrong: { fontSize: 13, color: colors.label, fontWeight: '900' },
   orderTotalsValueStrong: { fontSize: 13, color: colors.label, fontWeight: '900' },
   freeShippingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderRadius: 8,
     paddingVertical: 4,
     paddingHorizontal: 8,
     marginVertical: 2,
   },
-  freeShippingText: { fontSize: 10, color: colors.greenDeep, fontWeight: '600' },
+  freeShippingText: { fontSize: 10, color: colors.ok, fontWeight: '600' },
   vatNoteRed: { fontSize: 10, color: colors.accent, paddingVertical: 1 },
   youSavedBanner: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 10,
     alignItems: 'center',
     marginTop: 6,
     borderWidth: 1,
-    borderColor: colors.greenLine,
+    borderColor: colors.okLine,
   },
-  youSavedText: { fontSize: 12, color: colors.greenDeep, fontWeight: '800' },
+  youSavedText: { fontSize: 12, color: colors.ok, fontWeight: '800' },
 
   // Buttons
   payButton: {

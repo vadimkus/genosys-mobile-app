@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 6,
   },
-  addToBagBtnAdded: { backgroundColor: colors.greenDeep },
+  addToBagBtnAdded: { backgroundColor: colors.ok },
   requestQuoteBtn: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -384,7 +384,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
               style={[
                 styles.pcAddBtn,
                 user && !requiresOptions && inBagForRec
-                  ? { backgroundColor: colors.greenDeep }
+                  ? { backgroundColor: colors.ok }
                   : null,
               ]}
               onPress={handleAddRecommendedToBag}

@@ -332,7 +332,7 @@ export default function HomecareScriptsScreen() {
                     <Text style={[styles.scriptTitle, isRTL && styles.rtlText]}>{item.patientLabel || tr('Patient recommendation', 'Рекомендация пациенту', 'توصية المريض')}</Text>
                     <Text style={[styles.scriptMeta, isRTL && styles.rtlText]}>{version?.items?.length || 0} {tr('products', 'продуктов', 'منتجات')} · {item.openCount || 0} {tr('opens', 'открытий', 'مرات فتح')}</Text>
                   </View>
-                  <View style={[styles.status, active ? styles.statusActive : styles.statusInactive]}><Text style={[styles.statusText, active && { color: colors.greenDeep }]}>{item.effectiveStatus}</Text></View>
+                  <View style={[styles.status, active ? styles.statusActive : styles.statusInactive]}><Text style={[styles.statusText, active && { color: colors.ok }]}>{item.effectiveStatus}</Text></View>
                 </View>
                 {active ? (
                   <View style={[styles.actions, isRTL && styles.rowRTL]}>
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   historyRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator },
   historyDescription: { fontSize: 12, fontWeight: '600', color: colors.label },
   historyMeta: { marginTop: 2, fontSize: 10, color: colors.secondaryLabel },
-  historyPoints: { fontSize: 13, fontWeight: '800', color: colors.greenDeep },
+  historyPoints: { fontSize: 13, fontWeight: '800', color: colors.ok },
   historyPointsNegative: { color: colors.red },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scriptCard: { backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.groupedBg, padding: 15, marginBottom: 11 },
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   scriptTitle: { color: colors.label, fontSize: 15, fontWeight: '800' },
   scriptMeta: { color: colors.mutedText, fontSize: 11, marginTop: 4 },
   status: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
-  statusActive: { backgroundColor: colors.greenBg },
+  statusActive: { backgroundColor: colors.okBg },
   statusInactive: { backgroundColor: colors.fill },
   statusText: { color: colors.mutedText, fontSize: 9, fontWeight: '800' },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14, paddingTop: 13, borderTopWidth: 1, borderTopColor: colors.groupedBg },

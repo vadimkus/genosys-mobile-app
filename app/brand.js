@@ -223,8 +223,8 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   badgeText: { ...T.caption, fontWeight: '700', color: colors.accent },
-  badgeGreen: { backgroundColor: tint(colors.greenDeep) },
-  badgeGreenText: { color: colors.greenDeep },
+  badgeGreen: { backgroundColor: tint(colors.ok) },
+  badgeGreenText: { color: colors.ok },
 
   // Cards
   rowRTL: { flexDirection: 'row-reverse' },

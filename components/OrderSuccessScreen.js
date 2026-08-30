@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: colors.greenDeep,
+    backgroundColor: colors.ok,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 28,

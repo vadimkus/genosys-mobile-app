@@ -1084,8 +1084,8 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   rowPrice: { fontSize: 14, fontWeight: '800', color: colors.accent },
   rowRetail: { fontSize: 12, color: colors.secondaryLabel, textDecorationLine: 'line-through' },
-  offBadge: { backgroundColor: colors.greenBg, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  offBadgeText: { color: colors.greenDeep, fontSize: 10, fontWeight: '800' },
+  offBadge: { backgroundColor: colors.okBg, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  offBadgeText: { color: colors.ok, fontSize: 10, fontWeight: '800' },
   // Stepper / add
   addBtn: { backgroundColor: colors.redBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnText: { color: colors.accent, fontSize: 13, fontWeight: '700' },
@@ -1143,7 +1143,7 @@ const styles = StyleSheet.create({
   guardBtn: { marginTop: 20, backgroundColor: colors.cta, borderRadius: 14, paddingHorizontal: 28, paddingVertical: 13 },
   guardBtnText: { color: colors.white, fontSize: 15, fontWeight: '700' },
   linkText: { color: colors.secondaryLabel, fontSize: 14 },
-  successIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.green, alignItems: 'center', justifyContent: 'center' },
+  successIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.ok, alignItems: 'center', justifyContent: 'center' },
   successOrder: { fontSize: 15, fontWeight: '700', color: colors.label, marginTop: 8 },
   successTotal: { fontSize: 20, fontWeight: '800', color: colors.accent, marginTop: 4, marginBottom: 4 },
   // Consignment chips

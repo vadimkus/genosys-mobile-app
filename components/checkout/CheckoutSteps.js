@@ -35,7 +35,7 @@ export default function CheckoutSteps({
     <View style={[styles.container, style]}>
       <View style={[styles.metaRow, isRTL && styles.rowRTL]}>
         <View style={[styles.secureRow, isRTL && styles.rowRTL]}>
-          <Ionicons name="lock-closed" size={13} color={colors.greenDeep} />
+          <Ionicons name="lock-closed" size={13} color={colors.ok} />
           <Text style={styles.secureText}>{t('checkout.secureCheckout')}</Text>
         </View>
         <Text style={styles.countText}>
@@ -74,7 +74,7 @@ export default function CheckoutSteps({
               <View style={[styles.labelRow, isRTL && styles.rowRTL]}>
                 <View style={[styles.marker, active && styles.markerActive]}>
                   {completed ? (
-                    <Ionicons name="checkmark" size={12} color={colors.greenDeep} />
+                    <Ionicons name="checkmark" size={12} color={colors.ok} />
                   ) : (
                     <Text style={[styles.markerText, active && styles.markerTextActive]}>
                       {index + 1}
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   secureText: {
     fontSize: 11,
     fontWeight: '700',
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   countText: {
     fontSize: 11,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.separator,
   },
   segmentActive: {
-    backgroundColor: colors.greenDeep,
+    backgroundColor: colors.ok,
   },
   labelRow: {
     flexDirection: 'row',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.fillSecondary,
   },
   markerActive: {
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.okBg,
   },
   markerText: {
     fontSize: 10,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     color: colors.secondaryLabel,
   },
   markerTextActive: {
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   stepLabel: {
     flex: 1,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     color: colors.secondaryLabel,
   },
   stepLabelActive: {
-    color: colors.greenDeep,
+    color: colors.ok,
   },
   stepLabelCurrent: {
     fontWeight: '800',
