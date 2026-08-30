@@ -98,7 +98,10 @@ export default function LanguageScreen() {
                     </View>
                     <Text style={[styles.rowLabel, isRTL && styles.textRTL]}>{o.label}</Text>
                     {active ? (
-                      <Ionicons name="checkmark" size={20} color={colors.blue} />
+                      // Rose, matching the globe on the same row. This was the
+                      // system blue, the one colour on the screen that belonged
+                      // to no part of the palette.
+                      <Ionicons name="checkmark" size={20} color={colors.accent} />
                     ) : (
                       <View style={styles.checkPlaceholder} />
                     )}

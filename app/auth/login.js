@@ -433,7 +433,7 @@ export default function LoginScreen() {
                 accessibilityLabel={t('common.switchLanguage')}
               >
                 <Text style={styles.langButtonText}>{currentLangCode}</Text>
-                <Ionicons name="chevron-down" size={14} color={colors.greenDeep} />
+                <Ionicons name="chevron-down" size={14} color={colors.accent} />
               </TouchableOpacity>
             </View>
 
@@ -1036,7 +1036,9 @@ const styles = StyleSheet.create({
   langButtonText: {
     ...T.captionSmall,
     fontWeight: '800',
-    color: colors.greenDeep,
+    // Rose-ink, not green. Green means order status elsewhere in the app, and
+    // the menu this opens was already rose.
+    color: colors.accent,
   },
   langOverlay: {
     flex: 1,

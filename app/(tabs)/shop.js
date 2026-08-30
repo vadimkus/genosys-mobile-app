@@ -978,7 +978,7 @@ function ShopScreen() {
             accessibilityLabel={t('common.switchLanguage')}
           >
             <Text style={styles.langButtonText}>{currentLangCode}</Text>
-            <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color={colors.greenDeep} />
+            <Ionicons name={langOpen ? 'chevron-up' : 'chevron-down'} size={14} color={colors.accent} />
           </TouchableOpacity>
         </View>
         
@@ -1462,7 +1462,9 @@ const styles = StyleSheet.create({
   langButtonText: {
     ...T.captionSmall,
     fontWeight: '800',
-    color: colors.greenDeep, // matches website (green)
+    // Rose-ink, not green. Green carries order status across the app, and the
+    // menu below this trigger was already rose. Matches the website's switcher.
+    color: colors.accent,
   },
   aiLinkBtn: {
     paddingHorizontal: 6,

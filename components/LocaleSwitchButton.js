@@ -26,7 +26,7 @@ import { colors } from '../utils/theme';
  * people never discover the translations exist.
  *
  * Presentation deliberately mirrors the language control in the home header
- * (`app/(tabs)/shop.js`): the same green locale code with a chevron, and the
+ * (`app/(tabs)/shop.js`): the same rose locale code with a chevron, and the
  * same small anchored dropdown. A language switcher that looks like one thing
  * on the home screen and a full-height sheet on a product page reads as two
  * different features.
@@ -122,7 +122,7 @@ export default function LocaleSwitchButton({ style }) {
         <Ionicons
           name={open ? 'chevron-up' : 'chevron-down'}
           size={14}
-          color={colors.greenDeep}
+          color={colors.accent}
         />
       </TouchableOpacity>
 
@@ -174,7 +174,11 @@ const styles = StyleSheet.create({
   triggerText: {
     ...T.captionSmall,
     fontWeight: '800',
-    color: colors.greenDeep, // matches home header and website
+    // Green is the status colour here: it means an order is confirmed, paid or
+    // delivered. A language control is not a status, and the menu this opens is
+    // already rose, so the trigger was announcing one palette and the menu
+    // another. Rose-ink, the same value the website's switcher uses.
+    color: colors.accent,
   },
   overlay: {
     flex: 1,
