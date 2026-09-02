@@ -99,6 +99,9 @@ export default function LoginScreen() {
   const [langOpen, setLangOpen] = useState(false);
   const [langSwitching, setLangSwitching] = useState(false);
   const [confirmedEmail, setConfirmedEmail] = useState(null);
+  // What the server suggested, and the address it suggested it for, so that
+  // editing the address drops the suggestion instead of leaving a stale one.
+  const [serverSuggestion, setServerSuggestion] = useState(null);
 
   const UAE_EMIRATES = [
     'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman',
@@ -115,7 +118,19 @@ export default function LoginScreen() {
     biometricEnabled,
     biometricType
   } = useAuth();
-  const emailSuggestion = !isLogin ? suggestEmailAddressCorrection(email) : null;
+  // The app and the server run the same correction logic, so the local check
+  // normally catches a misspelt domain before anything is sent. The server's
+  // answer is the fallback for when they disagree, which is the only way a
+  // user could get stuck: retyping the address the app is happy with, and
+  // having the server refuse it again.
+  const localSuggestion = !isLogin ? suggestEmailAddressCorrection(email) : null;
+  const emailSuggestion =
+    localSuggestion ||
+    (!isLogin &&
+    serverSuggestion &&
+    serverSuggestion.forEmail === normalizeEmailAddress(email)
+      ? serverSuggestion.suggested
+      : null);
 
   // Validation reports itself under the field that failed. formError is for
   // what has no field to sit under: a rejected password, a provider that would
@@ -350,6 +365,16 @@ export default function LoginScreen() {
         // Navigation will be handled by the auth context automatically
       } else {
         haptics.warning();
+        // A misspelt domain the local check let through. Put the server's
+        // suggestion under the field as a tap, and say so there rather than in
+        // the form-wide error, which sits away from the address it is about.
+        if (!isLogin && result.suggestedEmail && result.suggestedEmail !== normalizedEmail) {
+          setServerSuggestion({ forEmail: normalizedEmail, suggested: result.suggestedEmail });
+          setConfirmedEmail(null);
+          setFieldErrors((prev) => ({ ...prev, email: result.error }));
+          emailRef.current?.focus();
+          return;
+        }
         setFormError(result.error || (isLogin ? t('authScreen.loginFailed') : t('authScreen.registrationFailed')));
       }
     } catch (error) {
@@ -372,6 +397,7 @@ export default function LoginScreen() {
     setIsLogin(!isLogin);
     setEmail('');
     setConfirmedEmail(null);
+    setServerSuggestion(null);
     setPassword('');
     setName('');
     setPhone('');

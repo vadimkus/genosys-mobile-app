@@ -336,7 +336,16 @@ export const AuthProvider = ({ children }) => {
         setUser(sanitizedUser);
         return { success: true };
       } else {
-        return { success: false, error: result.error };
+        // Pass the server's verdict through rather than just its wording. When
+        // it spots a misspelt domain it sends back the address it believes was
+        // meant, and the screen turns that into a tap. Dropping it left the
+        // user re-reading their own typo.
+        return {
+          success: false,
+          error: result.error,
+          code: result.code,
+          suggestedEmail: result.suggestedEmail,
+        };
       }
     } catch (error) {
       log.error('Registration error', error?.message || error);
