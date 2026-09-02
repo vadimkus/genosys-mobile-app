@@ -382,12 +382,12 @@ const styles = StyleSheet.create({
   // Action buttons
   actionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   actionRowRTL: { flexDirection: 'row-reverse' },
-  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 10 },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 },
   actionBtnNeutral: { backgroundColor: colors.fillSecondary },
   actionBtnText: { ...T.caption, fontWeight: '700' },
 
   // CTA
-  ctaCard: { ...surfaces.card, marginHorizontal: 16, marginTop: 6, padding: 18 },
+  ctaCard: { ...surfaces.card, marginHorizontal: 16, marginTop: 6, padding: 20 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   sectionTitle: { ...T.body, flex: 1, fontWeight: '700', color: colors.label },
   ctaDesc: { ...T.caption, color: colors.secondaryLabel, lineHeight: 20, marginBottom: 16 },
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     backgroundColor: colors.cta,
-    paddingVertical: 15,
+    paddingVertical: 16,
     borderRadius: 14,
   },
   ctaBtnText: { ...T.button, fontWeight: '700' },

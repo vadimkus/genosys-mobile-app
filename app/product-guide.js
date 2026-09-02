@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   errorIcon: {
     width: 68,
     height: 68,
-    borderRadius: 34,
+    borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.redBg,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cta,
     borderRadius: 14,
     paddingHorizontal: 24,
-    paddingVertical: 13,
+    paddingVertical: 14,
     ...shadow.cta(colors.cta),
   },
   retryText: {

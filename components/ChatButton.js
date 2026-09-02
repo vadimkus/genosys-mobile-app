@@ -576,11 +576,11 @@ const s = StyleSheet.create({
   typingText: { ...T.captionSmall, color: colors.mutedText, fontStyle: 'italic' },
 
   /* ─── Quick-action buttons ─── */
-  quickActionsContainer: { marginStart: 30, marginTop: 4, marginBottom: 6, gap: 6 },
+  quickActionsContainer: { marginStart: 32, marginTop: 4, marginBottom: 6, gap: 6 },
   quickActionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   quickActionsRowRTL: { flexDirection: 'row-reverse' },
   quickActionBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 3,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
     backgroundColor: colors.fill, borderWidth: StyleSheet.hairlineWidth, borderColor: 'transparent',
   },
@@ -602,11 +602,11 @@ const s = StyleSheet.create({
   productPrice: { ...T.captionSmall, fontWeight: '800', color: colors.accent, marginTop: 2 },
   productPriceOnRequest: { ...T.captionSmall, fontWeight: '700', color: colors.whatsappDeep, marginTop: 2 },
   productActions: { flexDirection: 'row', gap: 6, marginTop: 4 },
-  addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.cta, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
+  addToBagBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.cta, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   addToBagBtnAdded: { backgroundColor: colors.label },
-  requestQuoteBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.whatsappDeep, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5 },
+  requestQuoteBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.whatsappDeep, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   addToBagText: { ...T.badge, color: colors.white },
-  viewProductBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, borderWidth: 1, borderColor: colors.separatorStrong },
+  viewProductBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: colors.separatorStrong },
   viewProductText: { ...T.badge, fontWeight: '600', color: colors.bodyText },
 
   /* ─── Input bar ─── */
@@ -619,13 +619,13 @@ const s = StyleSheet.create({
   input: {
     ...T.label, fontWeight: '400', color: colors.label,
     flex: 1, backgroundColor: colors.fill,
-    borderRadius: 18, paddingHorizontal: 14,
+    borderRadius: 20, paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 8 : 6,
     maxHeight: 80, marginEnd: 8, borderWidth: 1, borderColor: colors.separator,
   },
   inputRTL: { textAlign: 'right', marginEnd: 0, marginStart: 8 },
   sendBtn: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 36, height: 36, borderRadius: 20,
     backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center',
   },
   sendBtnDisabled: { backgroundColor: colors.separatorStrong },

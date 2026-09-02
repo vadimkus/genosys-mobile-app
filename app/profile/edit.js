@@ -1181,7 +1181,7 @@ const styles = StyleSheet.create({
   deleteAccountButton: {
     backgroundColor: colors.cta,
     borderRadius: 14,
-    paddingVertical: 15,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1317,7 +1317,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.separator,
   },

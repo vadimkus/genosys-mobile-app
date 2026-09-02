@@ -965,7 +965,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginTop: 6,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 999,
     backgroundColor: colors.okBg,
     color: colors.ok,
@@ -996,7 +996,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   orderSummaryLineBlock: {
-    marginBottom: 7,
+    marginBottom: 8,
   },
   orderSummaryPriceRow: {
     flexDirection: 'row',
@@ -1062,7 +1062,7 @@ const styles = StyleSheet.create({
   section: {
     ...surfaces.card,
     ...shadow.card,
-    padding: 18,
+    padding: 20,
     marginBottom: 14,
   },
   sectionHeader: {
@@ -1205,7 +1205,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
     justifyContent: 'center',
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
   },
   modalCard: {
     backgroundColor: colors.card,
@@ -1481,11 +1481,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.secondaryLabel,
     marginTop: 6,
-    marginLeft: 22,
+    marginLeft: 24,
   },
   trustTextSecondaryRTL: {
     marginLeft: 0,
-    marginRight: 22,
+    marginRight: 24,
     textAlign: 'right',
     writingDirection: 'rtl',
   },

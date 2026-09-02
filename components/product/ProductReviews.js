@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   container: {
     ...surfaces.card,
     ...shadow.card,
-    padding: 18,
+    padding: 20,
     marginBottom: 14,
   },
   headerRow: {

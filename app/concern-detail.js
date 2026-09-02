@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
   // Header
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: colors.separator },
   headerRTL: { flexDirection: 'row-reverse' },
-  backBtn: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  backBtn: { width: 36, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   headerTitle: { ...T.navTitle, flex: 1, textAlign: 'center' },
 
   // Loading
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.card,
     paddingHorizontal: 16,
-    paddingBottom: 34,
+    paddingBottom: 32,
     borderTopWidth: 1,
     borderTopColor: colors.separator,
     shadowColor: colors.shadowCast,
@@ -871,7 +871,7 @@ const styles = StyleSheet.create({
     gap: 6,
     backgroundColor: colors.cta,
     borderRadius: 12,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     paddingVertical: 10,
   },
   stickyBtnText: { ...T.buttonSmall },

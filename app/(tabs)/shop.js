@@ -1402,7 +1402,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: colors.card,
-    borderRadius: 22,
+    borderRadius: 24,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
     ...shadow.card,
@@ -1536,7 +1536,7 @@ const styles = StyleSheet.create({
   favoritesButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -1599,7 +1599,7 @@ const styles = StyleSheet.create({
     end: -1,
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: 6,
     backgroundColor: colors.ok,
     borderWidth: 2,
     borderColor: colors.white,
@@ -1898,7 +1898,7 @@ const styles = StyleSheet.create({
   categoryButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 18,
+    borderRadius: 20,
     backgroundColor: colors.card,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
@@ -2008,8 +2008,8 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 9,
+    gap: 6,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
     marginBottom: 4,
@@ -2022,7 +2022,7 @@ const styles = StyleSheet.create({
   badgeDot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
   },
   badgeText: {
     fontSize: 10,
@@ -2060,10 +2060,10 @@ const styles = StyleSheet.create({
   stockBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 999,
     shadowColor: colors.shadowCast,
     shadowOffset: { width: 0, height: 1 },
@@ -2074,7 +2074,7 @@ const styles = StyleSheet.create({
   stockDot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
     backgroundColor: colors.red,
   },
   stockOverlayText: {

@@ -179,6 +179,50 @@ export const cera = {
 // 10% alpha helper for tinted capsules / button backgrounds.
 export const tint = (hex, alpha = '1A') => `${hex}${alpha}`;
 
+// ─── Shape and spacing scales ─────────────────────────────────────────
+//
+// Until September 2026 there was no scale here at all, and the screens showed
+// it: 34 distinct corner radii and roughly 130 paddings sitting between the
+// 4pt steps. Nothing a customer would name, but the reason two screens side
+// by side never quite matched. New work picks from these; the guard
+// (`npm run verify:design-scale`) refuses a radius or spacing off the scale.
+//
+// Radii. Small controls sit at 8-12, cards at 14-16, sheets and heroes at
+// 20-28, and anything round is `pill`. Values above 48 are for circles whose
+// size is the element's own size and are allowed as they are.
+export const radius = {
+  hairline: 2,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  card: 14,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  sheet: 28,
+  pill: 999,
+};
+
+// Spacing on a 4pt grid, with 2 and 6 for the tight cases inside a control.
+// A 1px value is a hairline and stays literal.
+export const space = {
+  0: 0,
+  0.5: 2,
+  1: 4,
+  1.5: 6,
+  2: 8,
+  2.5: 10,
+  3: 12,
+  3.5: 14,
+  4: 16,
+  5: 20,
+  6: 24,
+  7: 28,
+  8: 32,
+  10: 40,
+  12: 48,
+};
+
 // ─── Elevation ────────────────────────────────────────────────────────
 export const shadow = {
   // Warm and very faint. A black shadow reads as grey dirt against cream

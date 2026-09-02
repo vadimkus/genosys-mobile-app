@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   progressLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
+    marginBottom: 6,
   },
   progressLabel: {
     fontSize: 11,
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 6,
     backgroundColor: colors.fillSecondary,
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   topTierText: {
     fontSize: 12,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 10,
     paddingHorizontal: 10,
-    paddingVertical: 9,
+    paddingVertical: 10,
     backgroundColor: colors.card,
   },
   tierRowBorder: {
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   tierRowBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 999,
     marginTop: 1,
   },

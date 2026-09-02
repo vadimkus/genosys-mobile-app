@@ -414,12 +414,12 @@ const styles = StyleSheet.create({
     marginTop: -60,
   },
   chipWrapBelow: {
-    marginTop: 18,
+    marginTop: 20,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     backgroundColor: 'rgba(17,17,19,0.85)',
     borderRadius: 999,
     paddingHorizontal: 12,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
   },
   resultCard: {
     backgroundColor: colors.card,
-    borderRadius: 18,
+    borderRadius: 20,
     padding: 14,
     ...shadow.card,
   },
@@ -479,12 +479,12 @@ const styles = StyleSheet.create({
   resultDesc: {
     ...T.caption,
     color: colors.secondaryLabel,
-    marginTop: 3,
+    marginTop: 4,
   },
   exploreRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     marginTop: 8,
   },
   exploreText: {
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'center',
     paddingVertical: 14,
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
     backgroundColor: 'rgba(255,255,255,0.6)',
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     gap: 6,
     backgroundColor: colors.card,
     borderRadius: 999,
-    paddingHorizontal: 13,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,

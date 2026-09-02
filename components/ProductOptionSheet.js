@@ -435,10 +435,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     // The drag handle used to hold this off the top edge. There is a close
     // button for that job, so the spacing lives here now.
-    paddingTop: 18,
+    paddingTop: 20,
     paddingBottom: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.separator,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     ...T.eyebrow,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   productName: {
     ...T.label,
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'baseline',
     gap: 6,
-    marginTop: 5,
+    marginTop: 6,
   },
   originalPrice: {
     ...T.priceStrikethrough,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   scrollContent: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     paddingVertical: 16,
   },
   notice: {
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     color: colors.accent,
   },
   group: {
-    marginBottom: 22,
+    marginBottom: 24,
   },
   groupHeading: {
     flexDirection: 'row',
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     end: -6,
     width: 18,
     height: 18,
-    borderRadius: 9,
+    borderRadius: 10,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
   quantityButton: {
     width: 44,
     height: 44,
-    borderRadius: 11,
+    borderRadius: 12,
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     gap: 10,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.separator,

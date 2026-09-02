@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   secureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
   },
   secureText: {
     fontSize: 11,
@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
   labelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    marginTop: 7,
+    gap: 6,
+    marginTop: 8,
   },
   marker: {
     width: 20,

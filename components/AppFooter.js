@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   card: {
     ...surfaces.card,
-    paddingVertical: 22,
+    paddingVertical: 24,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 11,
     color: colors.mutedText,
-    marginTop: 5,
+    marginTop: 6,
     textAlign: 'center',
   },
   divider: {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   linkItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     paddingVertical: 4,
     paddingHorizontal: 6,
   },
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   legalSub: {
     fontSize: 10,
     color: colors.placeholder,
-    marginTop: 3,
+    marginTop: 4,
     textAlign: 'center',
     letterSpacing: 0.3,
   },

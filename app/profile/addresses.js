@@ -392,16 +392,16 @@ const styles = StyleSheet.create({
   defaultBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 9,
-    paddingVertical: 3,
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 999,
     backgroundColor: tint(colors.ok, '1A'),
   },
   defaultDot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
     backgroundColor: colors.ok,
   },
   defaultText: {
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 16,
     marginHorizontal: 16,
-    marginTop: 18,
+    marginTop: 20,
   },
   addButtonText: {
     ...T.button,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   tipsCard: {
     ...surfaces.card,
     marginHorizontal: 16,
-    marginTop: 18,
+    marginTop: 20,
     padding: 16,
     gap: 12,
   },

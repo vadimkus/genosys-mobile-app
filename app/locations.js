@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   freeShipText: { ...T.labelSmall, fontWeight: '700', color: colors.ok, flexShrink: 1 },
 
   // Section
-  section: { paddingHorizontal: 16, paddingTop: 18 },
+  section: { paddingHorizontal: 16, paddingTop: 20 },
 
   // Location Cards
   locationCard: {
@@ -252,9 +252,9 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   locationHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  locationTile: { width: 40, height: 40, borderRadius: 11 },
+  locationTile: { width: 40, height: 40, borderRadius: 12 },
   locationInfo: { flex: 1, minWidth: 0 },
-  locationName: { ...T.label, fontSize: 16, fontWeight: '700', color: colors.label, marginBottom: 3 },
+  locationName: { ...T.label, fontSize: 16, fontWeight: '700', color: colors.label, marginBottom: 4 },
   locationDesc: { ...T.caption, color: colors.secondaryLabel, lineHeight: 18 },
   hairline: { ...surfaces.hairline, marginVertical: 12 },
   locationMeta: { flexDirection: 'row', gap: 20 },

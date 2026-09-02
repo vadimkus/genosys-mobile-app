@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   section: {
     ...surfaces.card,
     ...shadow.card,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     marginBottom: 14,
   },
   headerTouchable: {

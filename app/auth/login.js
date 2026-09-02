@@ -1087,7 +1087,7 @@ const styles = StyleSheet.create({
   },
   langMenuItem: {
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingVertical: 12,
   },
   langMenuItemActive: {
     backgroundColor: colors.accentBg,
@@ -1104,7 +1104,7 @@ const styles = StyleSheet.create({
   // Branded hero
   header: {
     alignItems: 'center',
-    marginBottom: 22,
+    marginBottom: 24,
     marginTop: 4,
   },
   logo: {
@@ -1185,7 +1185,7 @@ const styles = StyleSheet.create({
   socialRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 18,
+    marginBottom: 20,
   },
   socialRowRTL: {
     flexDirection: 'row-reverse',
@@ -1249,7 +1249,7 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 18,
+    marginVertical: 20,
   },
   dividerLine: {
     flex: 1,
@@ -1537,7 +1537,7 @@ const styles = StyleSheet.create({
   partnerPortalContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 11,
+    gap: 12,
   },
   partnerPortalIcon: {
     width: 34,
@@ -1573,7 +1573,7 @@ const styles = StyleSheet.create({
   },
   switchMode: {
     alignItems: 'center',
-    marginTop: 18,
+    marginTop: 20,
   },
   switchModeText: {
     ...T.caption,

@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
     ...surfaces.card,
     marginHorizontal: 16,
     marginBottom: 14,
-    padding: 18,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
   avatarContainer: {
     width: 76,
     height: 76,
-    borderRadius: 38,
+    borderRadius: 40,
     backgroundColor: colors.cta,
     justifyContent: 'center',
     alignItems: 'center',
@@ -802,7 +802,7 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: 76,
     height: 76,
-    borderRadius: 38,
+    borderRadius: 40,
   },
   onlineDot: {
     position: 'absolute',
@@ -810,7 +810,7 @@ const styles = StyleSheet.create({
     end: 2,
     width: 18,
     height: 18,
-    borderRadius: 9,
+    borderRadius: 10,
     backgroundColor: colors.ok,
     borderWidth: 3,
     borderColor: colors.card,
@@ -901,7 +901,7 @@ const styles = StyleSheet.create({
     bottom: 12,
     width: 30,
     height: 30,
-    borderRadius: 15,
+    borderRadius: 16,
     backgroundColor: colors.redBg,
     borderWidth: 1,
     borderColor: colors.redLine,
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 16,
-    marginBottom: 18,
+    marginBottom: 20,
   },
   quickActionCard: {
     ...surfaces.card,
@@ -993,7 +993,7 @@ const styles = StyleSheet.create({
 
   // Sections
   section: {
-    marginBottom: 18,
+    marginBottom: 20,
   },
   // Tracked uppercase, the eyebrow the website sets above every section.
   sectionTitle: {
@@ -1083,7 +1083,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.fillSecondary,
     marginHorizontal: 16,
     borderRadius: 14,
-    paddingVertical: 15,
+    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 52,

@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
   },
   badge: {
     paddingHorizontal: 6,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     backgroundColor: colors.accentBg,
-    paddingVertical: 11,
+    paddingVertical: 12,
     borderRadius: 12,
   },
   addToCartButtonDisabled: {
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     backgroundColor: tint(colors.whatsapp),
-    paddingVertical: 11,
+    paddingVertical: 12,
     borderRadius: 12,
   },
   requestQuoteText: {

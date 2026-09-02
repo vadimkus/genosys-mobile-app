@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   dotDone: { backgroundColor: colors.cta, borderColor: colors.cta },
   dotCurrent: { borderColor: colors.cta },
 
-  pip: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.separator },
+  pip: { width: 6, height: 6, borderRadius: 4, backgroundColor: colors.separator },
   pipCurrent: { backgroundColor: colors.cta },
 
   label: { ...T.captionSmall, color: colors.secondaryLabel, textAlign: 'center', marginTop: 8 },

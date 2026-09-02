@@ -123,7 +123,7 @@ export function OrdersSkeleton() {
             <ShimmerBar width={52} height={52} borderRadius={12} />
             <View style={{ flex: 1 }}>
               <ShimmerBar width="55%" height={15} />
-              <ShimmerBar width="40%" height={11} style={{ marginTop: 7 }} />
+              <ShimmerBar width="40%" height={11} style={{ marginTop: 8 }} />
             </View>
             <ShimmerBar width={72} height={22} borderRadius={11} />
           </View>

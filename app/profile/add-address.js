@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   },
   emirateButton: {
     paddingHorizontal: 16,
-    paddingVertical: 9,
+    paddingVertical: 10,
     backgroundColor: colors.subtleBg,
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 16,
     marginHorizontal: 16,
-    marginTop: 18,
+    marginTop: 20,
   },
   saveButtonText: {
     ...T.button,

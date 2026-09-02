@@ -63,7 +63,7 @@ const flagStyles = StyleSheet.create({
   flagBox: {
     width: 26,
     height: 18,
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.separator,
@@ -128,7 +128,7 @@ const flagStyles = StyleSheet.create({
     top: '30%',
     width: 9,
     height: 9,
-    borderRadius: 5,
+    borderRadius: 6,
     backgroundColor: colors.card,
   },
   uaqCrescentInner: {
@@ -137,7 +137,7 @@ const flagStyles = StyleSheet.create({
     top: '30%',
     width: 9,
     height: 9,
-    borderRadius: 5,
+    borderRadius: 6,
     backgroundColor: colors.flagRed,
   },
   uaqStar: {

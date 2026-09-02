@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     ...surfaces.card,
     marginHorizontal: 16,
     marginBottom: 14,
-    padding: 18,
+    padding: 20,
   },
   rowRTL: { flexDirection: 'row-reverse' },
 
@@ -247,12 +247,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   methodContent: { flex: 1, minWidth: 0 },
-  methodTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 3 },
+  methodTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 4 },
   methodDesc: { ...T.bodySmall, fontWeight: '700', marginBottom: 2 },
   methodPartner: { ...T.caption, color: colors.secondaryLabel },
 
   // Free shipping
-  freeShippingCard: { alignItems: 'center', paddingVertical: 22 },
+  freeShippingCard: { alignItems: 'center', paddingVertical: 24 },
   freeShippingIcon: {
     width: 48,
     height: 48,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   rateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 13,
+    paddingVertical: 14,
   },
   rateRowBorder: {
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   policyIcon: {
     width: 30,
     height: 30,
-    borderRadius: 9,
+    borderRadius: 10,
     backgroundColor: colors.subtleBg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     backgroundColor: tint(colors.whatsapp, '1F'),
-    paddingVertical: 15,
+    paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 14,
     alignSelf: 'stretch',

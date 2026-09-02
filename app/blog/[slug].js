@@ -481,15 +481,15 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
   rowRTL: { flexDirection: 'row-reverse' },
   commentsTitle: { ...T.serifHeading, fontSize: 19 },
-  commentCountBadge: { backgroundColor: colors.cta, borderRadius: 11, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  commentCountBadge: { backgroundColor: colors.cta, borderRadius: 12, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   commentCountText: { ...T.badgeMedium, color: colors.white },
 
   // Comment input
-  commentInputContainer: { marginBottom: 18 },
+  commentInputContainer: { marginBottom: 20 },
   commentInputCard: { ...surfaces.card, padding: 12 },
   commentInputRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   commentInputRowRTL: { flexDirection: 'row-reverse' },
-  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  commentAvatar: { width: 36, height: 36, borderRadius: 20, backgroundColor: colors.cta, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
   commentAvatarText: { ...T.button, fontWeight: '700', color: colors.white },
   commentInput: {
     flex: 1, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator, borderRadius: 12,
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   commentCard: { ...surfaces.card, padding: 14, marginBottom: 12 },
   commentHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   commentHeaderRTL: { flexDirection: 'row-reverse' },
-  commentAvatarSmall: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.subtleBg, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator },
+  commentAvatarSmall: { width: 30, height: 30, borderRadius: 16, backgroundColor: colors.subtleBg, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator },
   commentAvatarSmallText: { ...T.caption, fontWeight: '700', color: colors.secondaryLabel },
   commentUserName: { ...T.label, color: colors.label },
   commentTime: { ...T.captionTiny, color: colors.secondaryLabel },

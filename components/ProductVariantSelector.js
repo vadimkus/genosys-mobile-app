@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   singleSizeOption: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
   },
   singleSizeStaticOption: {
     // Keep it non-interactive but visually readable (black text, no "disabled" fade).
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     end: -6,
     width: 18,
     height: 18,
-    borderRadius: 9,
+    borderRadius: 10,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',

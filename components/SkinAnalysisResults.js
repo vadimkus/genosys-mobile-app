@@ -393,12 +393,12 @@ const styles = StyleSheet.create({
   barBg: {
     height: 6,
     backgroundColor: colors.separator,
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   barFill: {
     height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
   },
 
   // Recommendations

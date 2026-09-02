@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 14,
   },
-  cardPad: { padding: 18 },
+  cardPad: { padding: 20 },
 
   paragraph: { ...T.body, marginBottom: 12, lineHeight: 23 },
   paragraphLast: { marginBottom: 0 },

@@ -355,10 +355,10 @@ const styles = StyleSheet.create({
   statBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     backgroundColor: colors.card,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 20,
     ...shadow.card,
   },
@@ -369,9 +369,9 @@ const styles = StyleSheet.create({
 
   // Grouped card (training + product doc rows)
   card: { ...surfaces.card, paddingHorizontal: 14 },
-  docRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13 },
+  docRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
   docRowDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator },
-  docTile: { width: 40, height: 40, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  docTile: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   docTextWrap: { flex: 1, minWidth: 0 },
   docTitle: { ...T.label, color: colors.label, marginBottom: 2 },
   docSize: { ...T.captionTiny, color: colors.secondaryLabel },
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
 
   // Product image thumbnail
   productImageWrap: {
-    width: 44, height: 44, borderRadius: 11, overflow: 'hidden',
+    width: 44, height: 44, borderRadius: 12, overflow: 'hidden',
     backgroundColor: colors.subtleBg, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator,
   },
   productImage: { width: '100%', height: '100%' },
@@ -398,20 +398,20 @@ const styles = StyleSheet.create({
   videoThumbImage: { width: '100%', height: '100%' },
   playOverlay: {
     position: 'absolute',
-    width: 52, height: 52, borderRadius: 26,
+    width: 52, height: 52, borderRadius: 28,
     backgroundColor: 'rgba(220, 38, 38, 0.92)',
     alignItems: 'center', justifyContent: 'center',
   },
   durationBadge: {
     position: 'absolute', bottom: 8, right: 8,
-    backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
+    backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
   },
   durationText: { ...T.captionTiny, color: colors.white, fontWeight: '600' },
   videoInfo: { padding: 14 },
   videoTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 8 },
   videoMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   videoMetaRTL: { flexDirection: 'row-reverse' },
-  levelBadge: { backgroundColor: tint(colors.purple), paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  levelBadge: { backgroundColor: tint(colors.purple), paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   levelText: { ...T.captionTiny, fontWeight: '700', color: colors.purple },
   videoCategory: { ...T.captionSmall, color: colors.secondaryLabel },
 
@@ -419,9 +419,9 @@ const styles = StyleSheet.create({
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
   emptyTitle: { ...T.sectionTitleSmall, color: colors.label, marginTop: 16, marginBottom: 8, textAlign: 'center' },
   emptyDesc: { ...T.subtitle, color: colors.secondaryLabel, textAlign: 'center', marginBottom: 20, lineHeight: 22 },
-  loginBtn: { backgroundColor: colors.cta, paddingHorizontal: 32, paddingVertical: 15, borderRadius: 14 },
+  loginBtn: { backgroundColor: colors.cta, paddingHorizontal: 32, paddingVertical: 16, borderRadius: 14 },
   loginBtnText: { ...T.button, fontWeight: '700' },
-  retryBtn: { backgroundColor: colors.cta, paddingHorizontal: 28, paddingVertical: 13, borderRadius: 14, marginTop: 8 },
+  retryBtn: { backgroundColor: colors.cta, paddingHorizontal: 28, paddingVertical: 14, borderRadius: 14, marginTop: 8 },
   retryBtnText: { ...T.buttonSmall, fontSize: 15, fontWeight: '700' },
 
   // RTL

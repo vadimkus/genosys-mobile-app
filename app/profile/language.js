@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 13,
+    paddingVertical: 14,
   },
   rowRTL: { flexDirection: 'row-reverse' },
   rowLabel: { ...T.label, fontSize: 16, flex: 1, color: colors.label },

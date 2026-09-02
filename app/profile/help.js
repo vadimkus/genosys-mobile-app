@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   cardPad: { paddingVertical: 6 },
-  cardCenter: { paddingVertical: 22, alignItems: 'center' },
+  cardCenter: { paddingVertical: 24, alignItems: 'center' },
   hairline: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.separator,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     alignItems: 'center',
   },
-  quickTile: { width: 40, height: 40, borderRadius: 11, marginBottom: 10 },
+  quickTile: { width: 40, height: 40, borderRadius: 12, marginBottom: 10 },
   quickActionTitle: { ...T.captionSmall, fontWeight: '700', color: colors.label, textAlign: 'center' },
 
   // Business Hours
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   returnModalCard: {
     backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 18,
+    padding: 20,
   },
   returnModalHeader: {
     flexDirection: 'row',
@@ -528,9 +528,9 @@ const styles = StyleSheet.create({
   returnBulletDot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
     backgroundColor: colors.blue,
-    marginTop: 7,
+    marginTop: 8,
   },
   returnChecklistText: { ...T.faqAnswer, flex: 1, lineHeight: 20, color: colors.bodyText, fontWeight: '500' },
   returnEmailButton: {
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: colors.fillSecondary,
     borderRadius: 14,
-    paddingVertical: 13,
+    paddingVertical: 14,
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,

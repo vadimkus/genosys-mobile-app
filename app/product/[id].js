@@ -215,7 +215,7 @@ function ProductVideo({ videoUrl }) {
           accessibilityLabel={tStatic('product.watchVideo')}
         >
           <View style={videoStyles.compactPlayButton}>
-            <Ionicons name="play" size={28} color={colors.bodyText} style={{ marginLeft: 3 }} />
+            <Ionicons name="play" size={28} color={colors.bodyText} style={{ marginLeft: 4 }} />
           </View>
           <Text style={videoStyles.compactLabel}>{tStatic('product.watchVideo')}</Text>
         </TouchableOpacity>
@@ -1930,7 +1930,7 @@ const styles = StyleSheet.create({
   headerButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1950,7 +1950,7 @@ const styles = StyleSheet.create({
     bottom: 12,
     end: 12,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 999,
     backgroundColor: colors.cta,
   },
@@ -1984,7 +1984,7 @@ const styles = StyleSheet.create({
   },
   productInfo: {
     ...surfaces.card,
-    padding: 18,
+    padding: 20,
     marginBottom: 14,
   },
   category: {
@@ -2268,7 +2268,7 @@ const styles = StyleSheet.create({
   // Perfect Combination
   pcOuter: {
     ...surfaces.card,
-    padding: 18,
+    padding: 20,
     marginBottom: 14,
   },
   pcHeaderRow: {
@@ -2453,7 +2453,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    borderRadius: 26,
+    borderRadius: 28,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
     ...shadow.card,
@@ -2462,7 +2462,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cta,
     borderRadius: 14,
     paddingVertical: 16,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -2504,15 +2504,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingTop: 5,
-    paddingEnd: 5,
+    paddingTop: 6,
+    paddingEnd: 6,
   },
   footerOption: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingVertical: 8,
     borderRadius: 999,
     backgroundColor: colors.fillSecondary,
     borderWidth: StyleSheet.hairlineWidth,
@@ -2553,7 +2553,7 @@ const styles = StyleSheet.create({
   footerSwatch: {
     width: 14,
     height: 14,
-    borderRadius: 7,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separatorStrong,
   },
@@ -2673,7 +2673,7 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
     backgroundColor: colors.fillSecondary,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 999,
   },
   stockInfo: {
@@ -2682,7 +2682,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     backgroundColor: tint(colors.ok),
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 999,
   },
   originalPrice: {

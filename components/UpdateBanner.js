@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   updateBtn: {
     backgroundColor: colors.cta,
-    paddingVertical: 5,
+    paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 14,
     marginLeft: 8,

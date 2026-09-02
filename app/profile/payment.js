@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     ...T.label,
     fontWeight: '600',
     color: colors.label,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   securityItemText: {
     ...T.caption,

@@ -744,13 +744,13 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { ...T.navTitle, flex: 1, fontWeight: '700', color: colors.label, textAlign: 'center' },
   cartBadgeBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: colors.cta, borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  cartBadge: { position: 'absolute', top: 2, right: 2, backgroundColor: colors.cta, borderRadius: 10, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
   cartBadgeText: { ...T.badge, color: colors.white },
 
   // Progress bar
   progressSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
-  progressBar: { height: 6, backgroundColor: colors.separator, borderRadius: 3, position: 'relative', overflow: 'visible' },
-  progressFill: { height: 6, backgroundColor: colors.cta, borderRadius: 3 },
+  progressBar: { height: 6, backgroundColor: colors.separator, borderRadius: 4, position: 'relative', overflow: 'visible' },
+  progressFill: { height: 6, backgroundColor: colors.cta, borderRadius: 4 },
   tierMarker: { position: 'absolute', top: -3, alignItems: 'center', marginLeft: -4 },
   tierDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.separator, borderWidth: 2, borderColor: colors.white },
   tierDotActive: { backgroundColor: colors.ok },
@@ -764,13 +764,13 @@ const styles = StyleSheet.create({
   // Step indicator
   stepIndicator: { backgroundColor: colors.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, height: 52 },
   stepIndicatorContent: { paddingHorizontal: 12, gap: 8, alignItems: 'center', paddingVertical: 10 },
-  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.fill, borderWidth: 1.5, borderColor: colors.fill, height: 32 },
+  stepPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.fill, borderWidth: 1.5, borderColor: colors.fill, height: 32 },
   stepPillActive: { backgroundColor: colors.accentBg, borderColor: colors.accent },
   stepEmoji: { fontSize: 14 },
   stepPillText: { ...T.captionTiny, fontWeight: '600', color: colors.mutedText },
   stepPillTextActive: { color: colors.accent },
-  requiredDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.orange },
-  stepCountBadge: { backgroundColor: colors.ok, borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
+  requiredDot: { width: 6, height: 6, borderRadius: 4, backgroundColor: colors.orange },
+  stepCountBadge: { backgroundColor: colors.ok, borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
   stepCountText: { ...T.badge, color: colors.white },
 
   // Step header
@@ -810,13 +810,13 @@ const styles = StyleSheet.create({
   priceDiscounted: { color: colors.ok },
   loginToSee: { ...T.captionTiny, color: colors.secondaryLabel, marginTop: 4, fontStyle: 'italic' },
 
-  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1.5, borderColor: colors.accent },
+  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginHorizontal: 10, marginBottom: 10, paddingVertical: 8, borderRadius: 8, borderWidth: 1.5, borderColor: colors.accent },
   addBtnSelected: { backgroundColor: colors.cta, borderColor: colors.accent },
   addBtnText: { ...T.caption, fontWeight: '600', color: colors.accent },
   addBtnTextSelected: { color: colors.white },
 
   // Bottom bar
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingBottom: 34, paddingTop: 0, paddingHorizontal: 16, shadowColor: colors.shadowCast, shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingBottom: 32, paddingTop: 0, paddingHorizontal: 16, shadowColor: colors.shadowCast, shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 8 },
   footerChevron: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
   footerHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, marginBottom: 2 },
   footerPricing: { paddingHorizontal: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator, marginBottom: 4 },
@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
   // Summary overlay
   summaryOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 },
   summaryBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
-  summarySheet: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: 34 },
+  summarySheet: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: 32 },
   summaryHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.separatorStrong, alignSelf: 'center', marginTop: 10 },
   summaryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator },
   summaryTitle: { ...T.sectionTitleSmall, color: colors.label },

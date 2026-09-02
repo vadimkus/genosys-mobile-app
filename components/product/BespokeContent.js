@@ -224,7 +224,7 @@ export default function BespokeContent({ content, isRTL = false }) {
 const styles = StyleSheet.create({
   hero: {
     ...surfaces.card,
-    padding: 18,
+    padding: 20,
     marginBottom: 14,
   },
   eyebrow: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   entry: {
-    gap: 3,
+    gap: 4,
   },
   entryTitle: {
     ...T.label,

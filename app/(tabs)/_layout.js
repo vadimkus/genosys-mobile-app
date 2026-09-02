@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     end: -6,
     minWidth: 18,
     height: 18,
-    borderRadius: 9,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,

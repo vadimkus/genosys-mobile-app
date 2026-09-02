@@ -1069,7 +1069,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 18,
+    padding: 20,
   },
   orderNumberHeader: {
     flexDirection: 'row',
@@ -1098,12 +1098,12 @@ const styles = StyleSheet.create({
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 9,
+    gap: 6,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
   },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  statusDot: { width: 6, height: 6, borderRadius: 4 },
   statusPillText: { ...T.captionTiny, fontSize: 11.5, fontWeight: '700' },
   dateTimeRow: {
     flexDirection: 'row',
@@ -1116,7 +1116,7 @@ const styles = StyleSheet.create({
   },
   progressBlock: {
     marginTop: 16,
-    paddingTop: 18,
+    paddingTop: 20,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.separator,
   },
@@ -1232,7 +1232,7 @@ const styles = StyleSheet.create({
     borderColor: colors.ok,
     borderWidth: 1,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 999,
   },
   discountPillText: {
@@ -1578,7 +1578,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     backgroundColor: 'rgba(37, 211, 102, 0.12)',
-    paddingVertical: 15,
+    paddingVertical: 16,
     borderRadius: 14,
   },
   supportButtonText: {
@@ -1662,7 +1662,7 @@ const styles = StyleSheet.create({
   beautyBoxKitBullet: {
     width: 22,
     height: 22,
-    borderRadius: 11,
+    borderRadius: 12,
     backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1684,6 +1684,6 @@ const styles = StyleSheet.create({
     color: colors.mutedText,
     lineHeight: 17,
     marginTop: 4,
-    marginStart: 30,
+    marginStart: 32,
   },
 });

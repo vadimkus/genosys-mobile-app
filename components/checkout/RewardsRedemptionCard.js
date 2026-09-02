@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   iconTile: {
     width: 26,
     height: 26,
-    borderRadius: 7,
+    borderRadius: 8,
     backgroundColor: colors.cta,
     alignItems: 'center',
     justifyContent: 'center',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.separator,
     paddingHorizontal: 12,
-    paddingVertical: 11,
+    paddingVertical: 12,
   },
   redeemRowActive: {
     backgroundColor: colors.blueBg,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   appliedRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     marginTop: 8,
     paddingHorizontal: 2,
   },
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   earnRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     marginTop: 10,
     paddingHorizontal: 2,
   },

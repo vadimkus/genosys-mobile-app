@@ -136,7 +136,7 @@ const s = StyleSheet.create({
   stepNum: {
     width: 26,
     height: 26,
-    borderRadius: 13,
+    borderRadius: 14,
     backgroundColor: colors.label,
     alignItems: 'center',
     justifyContent: 'center',

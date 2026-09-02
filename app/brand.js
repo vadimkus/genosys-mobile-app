@@ -178,7 +178,7 @@ export default function BrandScreen() {
                   />
                   <View style={styles.playOverlay}>
                     <View style={styles.playButton}>
-                      <Ionicons name="play" size={30} color={colors.white} style={{ marginLeft: 3 }} />
+                      <Ionicons name="play" size={30} color={colors.white} style={{ marginLeft: 4 }} />
                     </View>
                   </View>
                 </View>
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   techContent: { flex: 1, minWidth: 0 },
-  techTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 3 },
+  techTitle: { ...T.label, fontSize: 15, fontWeight: '700', color: colors.label, marginBottom: 4 },
   techDesc: { ...T.bodySmall, color: colors.secondaryLabel, lineHeight: 20 },
 
   // Videos
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   playButton: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 32,
     backgroundColor: colors.accentBg,
     justifyContent: 'center',
     alignItems: 'center',

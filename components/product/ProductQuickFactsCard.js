@@ -79,7 +79,7 @@ export default function ProductQuickFactsCard({ facts }) {
 const styles = StyleSheet.create({
   card: {
     ...surfaces.card,
-    padding: 18,
+    padding: 20,
     marginBottom: 14,
   },
   header: {
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   headerIcon: {
     width: 36,
     height: 36,
-    borderRadius: 11,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.cta,
@@ -113,14 +113,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   factList: {
-    gap: 9,
+    gap: 10,
   },
   fact: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
     padding: 12,
-    borderRadius: 13,
+    borderRadius: 14,
     backgroundColor: colors.subtleBg,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.separator,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   factIcon: {
     width: 32,
     height: 32,
-    borderRadius: 9,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.accentBg,

@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
   },
   updatePillText: { ...T.captionSmall, color: colors.secondaryLabel, fontWeight: '500' },
 
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   bulletDot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
     backgroundColor: colors.cta,
     marginTop: 8,
   },
