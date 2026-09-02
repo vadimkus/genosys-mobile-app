@@ -55,6 +55,11 @@ function CheckoutScreen() {
   const { user, getAddresses } = useAuth();
   const { items, getTotalItems, selectedEmirate, setSelectedEmirate, clearCart, getAvailableEmirates, reloadShippingRates, shippingRates } = useCart();
   const { t, locale, dir } = useLocalization();
+  // Order failures arrive from the service as a code; the sentence lives in
+  // the catalogue so RU and AR users are not shown English under a translated
+  // line. Unknown or missing code: nothing, and the caller falls back.
+  const orderErrorText = (code) =>
+    code && ['timeout', 'card', 'resume', 'generic'].includes(code) ? t(`checkout.orderErrors.${code}`) : '';
   const isRTL = dir === 'rtl';
   const { onScroll, headerHeight, insets } = useCollapsibleHeader();
   // Subtle entrance motion (matches OrderSuccessScreen / orders detail feel).
@@ -637,7 +642,7 @@ function CheckoutScreen() {
         log.error('Order submission failed', result);
         Alert.alert(
           t('checkout.orderSubmissionFailedTitle'),
-          result.error || t('checkout.orderProcessingErrorMessage'),
+          orderErrorText(result.errorCode) || t('checkout.orderProcessingErrorMessage'),
           [
             { text: t('checkout.tryAgain'), style: 'default' },
             { 
@@ -663,6 +668,9 @@ function CheckoutScreen() {
           : typeof error === 'string'
             ? error
             : '';
+      // The service throws an English fallback with a code attached; show the
+      // translated line for the code and keep the raw text for the log only.
+      const shownMsg = orderErrorText(error?.code) || (error?.code ? '' : errMsg);
 
       log.error('Order processing error', errMsg || error);
       // Order-submission failures are the most business-critical error class -
@@ -672,8 +680,8 @@ function CheckoutScreen() {
       });
       Alert.alert(
         t('checkout.orderProcessingErrorTitle'),
-        errMsg
-          ? `${t('checkout.orderProcessingErrorMessage')}\n\n${errMsg}`
+        shownMsg
+          ? `${t('checkout.orderProcessingErrorMessage')}\n\n${shownMsg}`
           : t('checkout.orderProcessingErrorMessage'),
         [
           { text: t('checkout.tryAgain'), style: 'default' },

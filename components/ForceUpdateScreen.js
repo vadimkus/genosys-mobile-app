@@ -2,15 +2,17 @@ import React from 'react';
 import { View, Text, StyleSheet, StatusBar, Pressable, Linking, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { colors } from '../utils/theme';
+import { tFor } from '../contexts/LocalizationContext';
 
 /**
  * Full-screen blocking overlay shown when the installed app version
  * is below the server-side `minimumVersion`.
  *
- * Rendered in `_layout.js` BEFORE any providers, so it cannot
- * depend on AuthContext, LocalizationContext, etc.
+ * Rendered in `_layout.js` BEFORE any providers, so it cannot use the
+ * localisation hook. It receives the stored locale and translates through
+ * `tFor` instead; the copy used to be hardcoded English for every user.
  */
-export default function ForceUpdateScreen({ updateUrl, message }) {
+export default function ForceUpdateScreen({ updateUrl, message, locale = 'en' }) {
   const handleUpdate = () => {
     if (updateUrl) {
       Linking.openURL(updateUrl).catch(() => {});
@@ -32,9 +34,9 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
           <Text style={styles.iconText}>⬆</Text>
         </View>
 
-        <Text style={styles.title}>Update required</Text>
+        <Text style={styles.title}>{tFor(locale, 'forceUpdate.title')}</Text>
         <Text style={styles.message}>
-          {message || 'A new version of Genosys UAE is available. Please update to continue.'}
+          {message || tFor(locale, 'forceUpdate.message')}
         </Text>
 
         <Pressable
@@ -42,7 +44,7 @@ export default function ForceUpdateScreen({ updateUrl, message }) {
           onPress={handleUpdate}
         >
           <Text style={styles.buttonText}>
-            {Platform.OS === 'ios' ? 'Update on App Store' : 'Update on Google Play'}
+            {tFor(locale, Platform.OS === 'ios' ? 'forceUpdate.updateAppStore' : 'forceUpdate.updateGooglePlay')}
           </Text>
         </Pressable>
       </View>

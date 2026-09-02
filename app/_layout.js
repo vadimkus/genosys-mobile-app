@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
-import { LocalizationProvider } from '../contexts/LocalizationContext';
+import { LocalizationProvider, readStoredLocale } from '../contexts/LocalizationContext';
 import { OrdersProvider } from '../contexts/OrdersContext';
 import { AnimationProvider } from '../contexts/AnimationContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
@@ -134,9 +134,11 @@ export default function RootLayout() {
         const currentVersion = Constants.expoConfig?.version || '0.0.0';
 
         if (data.forceUpdate && data.minimumVersion && compareVersions(currentVersion, data.minimumVersion) < 0) {
-          const locale = Constants.expoConfig?.extra?.locale || 'en';
-          const message = data.message?.[locale] || data.message?.en || data.message;
-          setForceUpdate({ updateUrl: data.updateUrl, message });
+          // The user's chosen language, not a build constant: this screen
+          // renders above the localisation provider, so it has to look it up.
+          const locale = await readStoredLocale();
+          const message = data.message?.[locale] || data.message?.en || (typeof data.message === 'string' ? data.message : '');
+          setForceUpdate({ updateUrl: data.updateUrl, message, locale });
         } else {
           setForceUpdate(false);
 
@@ -199,7 +201,7 @@ export default function RootLayout() {
 
   // Block the entire app if a force update is required
   if (forceUpdate && typeof forceUpdate === 'object') {
-    return <ForceUpdateScreen updateUrl={forceUpdate.updateUrl} message={forceUpdate.message} />;
+    return <ForceUpdateScreen updateUrl={forceUpdate.updateUrl} message={forceUpdate.message} locale={forceUpdate.locale} />;
   }
 
   return (

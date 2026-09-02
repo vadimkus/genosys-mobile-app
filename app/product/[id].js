@@ -1339,7 +1339,7 @@ function ProductDetailScreen() {
                           key={i}
                           name={i <= rounded ? 'star' : 'star-outline'}
                           size={14}
-                          color={i <= rounded ? '#FBBF24' : colors.separatorStrong}
+                          color={i <= rounded ? colors.star : colors.separatorStrong}
                           style={styles.reviewStarIcon}
                         />
                       ))}

@@ -107,7 +107,7 @@ for (const [key, value] of flatten(en)) {
   const text = value.replace(NOISE, ' ').trim();
   const words = text.split(/\s+/);
   if (words.length < 2 || words.length > 8) continue;
-  if (/[.!?](\s|$)/.test(text)) continue;
+  if (/[.!?\u2026](\s|$)/.test(text)) continue;
   checked += 1;
   const bad = offendingWords(value);
   if (bad.length) {

@@ -53,6 +53,16 @@ function getSafeOrderErrorMessage(kind) {
   return 'Could not place order. Please try again.';
 }
 
+// This module runs outside React and has no translator. The message above is
+// the English fallback; the code is what the checkout screen translates, so
+// a Russian or Arabic user is not shown an English sentence under a localised
+// one. Keys live at checkout.orderErrors.<code>.
+function orderError(kind) {
+  const error = new Error(getSafeOrderErrorMessage(kind));
+  error.code = ['timeout', 'card', 'resume'].includes(kind) ? kind : 'generic';
+  return error;
+}
+
 async function postMobileJson(url, payload, orderDataOrToken, kind) {
   const token = getToken(orderDataOrToken);
   const headers = typeof orderDataOrToken === 'string'
@@ -80,7 +90,7 @@ async function postMobileJson(url, payload, orderDataOrToken, kind) {
   } catch (error) {
     if (error?.name === 'AbortError') {
       log.warn('Mobile order request timed out', { kind, url });
-      throw new Error(getSafeOrderErrorMessage('timeout'));
+      throw orderError('timeout');
     }
     throw error;
   } finally {
@@ -95,7 +105,7 @@ async function postMobileJson(url, payload, orderDataOrToken, kind) {
       status: response.status,
       message: body?.error || body?.message || '',
     });
-    throw new Error(getSafeOrderErrorMessage(kind));
+    throw orderError(kind);
   }
   return body;
 }
@@ -263,6 +273,7 @@ export async function submitCODOrder(orderData) {
     return {
       success: false,
       error: getSafeOrderErrorMessage('cod'),
+      errorCode: error?.code || 'generic',
     };
   }
 }
@@ -335,6 +346,7 @@ export async function submitCardOrder(orderData) {
     return {
       success: false,
       error: getSafeOrderErrorMessage('card'),
+      errorCode: error?.code || 'card',
     };
   }
 }
@@ -385,7 +397,7 @@ export async function createCardPaymentSheetIntent(orderData) {
     const clientSecret = result?.clientSecret || result?.client_secret || '';
     if (!result?.success || !clientSecret) {
       log.warn('Payment Sheet intent missing clientSecret', { success: result?.success });
-      return { success: false, error: getSafeOrderErrorMessage('card') };
+      return { success: false, error: getSafeOrderErrorMessage('card'), errorCode: 'card' };
     }
 
     return {
@@ -396,7 +408,7 @@ export async function createCardPaymentSheetIntent(orderData) {
     };
   } catch (error) {
     log.error('Payment Sheet intent creation failed', error?.message || error);
-    return { success: false, error: getSafeOrderErrorMessage('card') };
+    return { success: false, error: getSafeOrderErrorMessage('card'), errorCode: error?.code || 'card' };
   }
 }
 

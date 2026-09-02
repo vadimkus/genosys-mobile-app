@@ -1991,7 +1991,7 @@ const styles = StyleSheet.create({
   },
   newPill: {
     backgroundColor: colors.label,
-    borderRadius: 980,
+    borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 2.5,
   },

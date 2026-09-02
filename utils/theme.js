@@ -81,6 +81,7 @@ export const colors = {
   green: '#2E7D4F',          // was #34C759. 4.7:1 on cream, 5.1:1 under white
   greenDeep: '#256A42',      // was #16A34A. 6.1:1 on cream
   orange: '#9A5A00',         // was #FF9500. 5.1:1 on cream
+  star: '#FBBF24',           // rating stars only. A fill, not text, so contrast rules do not apply; kept gold because a rose star reads as a favourite, not a score
   // Washed panels behind status content, the counterparts of `redBg`. They
   // replace a Tailwind-ish set of cool pales (#F0FDF4, #EFF6FF, #FEF3C7 and
   // friends) that read cold against cream. Each is its status colour mixed a

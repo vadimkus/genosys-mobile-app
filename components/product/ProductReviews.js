@@ -183,7 +183,7 @@ export default function ProductReviews({ productId }) {
           <Ionicons
             name={i <= rating ? 'star' : 'star-outline'}
             size={size}
-            color={i <= rating ? '#FBBF24' : colors.separatorStrong}
+            color={i <= rating ? colors.star : colors.separatorStrong}
           />
         </TouchableOpacity>
       );

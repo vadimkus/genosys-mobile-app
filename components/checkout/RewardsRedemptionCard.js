@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   balanceChip: {
     backgroundColor: colors.fillSecondary,
-    borderRadius: 980,
+    borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },

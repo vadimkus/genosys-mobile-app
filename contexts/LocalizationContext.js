@@ -55,6 +55,26 @@ export function tStatic(key, params) {
   return translate(getMessages(_currentLocale), key, params);
 }
 
+/**
+ * Translate for a given locale without the provider. For the one screen that
+ * renders above it: the forced-update gate, which must speak the user's
+ * language before any context has mounted.
+ */
+export function tFor(locale, key, params) {
+  const safe = SUPPORTED.includes(locale) ? locale : 'en';
+  return translate(getMessages(safe), key, params);
+}
+
+/** The persisted language choice, readable before the provider mounts. */
+export async function readStoredLocale() {
+  try {
+    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    return stored && SUPPORTED.includes(stored) ? stored : 'en';
+  } catch {
+    return 'en';
+  }
+}
+
 export function LocalizationProvider({ children }) {
   const [locale, setLocaleState] = useState('en');
 
