@@ -698,7 +698,7 @@ function ShopScreen() {
         log.warn('Re-fetch for user pricing failed', err?.message);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user?.id, locale]);
 
   // Combined search and category filter effect

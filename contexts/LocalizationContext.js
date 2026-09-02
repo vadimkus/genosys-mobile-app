@@ -123,7 +123,7 @@ export function LocalizationProvider({ children }) {
       // Fire and forget; if it triggers reload, app will restart.
       applyRTLIfNeeded(next);
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   const messages = useMemo(() => getMessages(locale), [locale]);

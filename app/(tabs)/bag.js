@@ -154,7 +154,7 @@ function BagScreen() {
   // in from the bag kept whatever rates were fetched pre-auth.
   useEffect(() => {
     reloadShippingRates?.();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [user?.token]);
 
   const handleQuantityChange = useCallback((item, change) => {

@@ -49,7 +49,7 @@ export default function Toast({
     return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [visible]);
 
   const dismiss = () => {

@@ -236,7 +236,7 @@ export default function EditProfileScreen() {
           } else if (buttonIndex === 2) {
             pickImage();
           } else if (buttonIndex === 3) {
-            useCatAvatar();
+            openCatAvatarPicker();
           }
         }
       );
@@ -245,14 +245,14 @@ export default function EditProfileScreen() {
         { text: t('editProfile.cancel'), style: 'cancel' },
         { text: t('editProfile.takePhoto'), onPress: takePhoto },
         { text: t('editProfile.chooseFromLibrary'), onPress: pickImage },
-        { text: t('editProfile.useCatAvatar'), onPress: useCatAvatar },
+        { text: t('editProfile.useCatAvatar'), onPress: openCatAvatarPicker },
       ]);
     }
   };
 
   // Bundled she-cat avatars - resolve to a local file:// URI so they ride the
   // same upload pipeline as camera/library photos (AuthContext.updateProfile).
-  const useCatAvatar = () => setShowCatModal(true);
+  const openCatAvatarPicker = () => setShowCatModal(true);
 
   const selectCatAvatar = async (source) => {
     try {

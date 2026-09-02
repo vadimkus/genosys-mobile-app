@@ -13,6 +13,10 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
+  // Still used for the video thumbnails and the product shot further down.
+  // Removing the logo on 26 Aug took this import with it and the screen has
+  // thrown "Image is not defined" on open since.
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';

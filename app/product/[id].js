@@ -395,7 +395,7 @@ function ProductDetailScreen() {
     const run = { cancelled: false };
     loadProduct(run);
     return () => { run.cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [id, user?.token, locale]);
 
   // Fade + lift the content in once the product is ready.

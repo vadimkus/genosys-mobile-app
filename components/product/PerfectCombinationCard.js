@@ -191,7 +191,7 @@ export default function PerfectCombinationCard({ product, user, styles }) {
         setRecommendedLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [product?.id, product?.productNumber, locale, user?.id, recId]);
 
   // Hooks must be called unconditionally (before any returns).

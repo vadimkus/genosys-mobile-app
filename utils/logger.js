@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 
 /**
  * Lightweight logger with __DEV__ gating.

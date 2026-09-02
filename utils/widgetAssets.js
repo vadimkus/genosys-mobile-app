@@ -27,7 +27,6 @@ export async function getWidgetLogoUri() {
   try {
     // Imported lazily: on a build without the widget extension this module is absent, and
     // that must be a missing logo rather than a crash.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { widgetsDirectory } = require('expo-widgets');
     if (!widgetsDirectory) return null;
 

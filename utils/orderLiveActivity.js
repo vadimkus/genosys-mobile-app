@@ -17,7 +17,6 @@ async function decorations(token) {
 
   if (token) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { fetchMembership } = require('../services/api');
       const membership = await fetchMembership(token);
       const data = membership?.data ?? membership;
@@ -66,7 +65,6 @@ function available() {
  */
 function load() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require('../widgets/OrderActivity').default;
   } catch (e) {
     log.debug('Live Activity unavailable in this build:', e?.message);
@@ -312,7 +310,6 @@ export function registerTokens(send) {
 
   const subs = [];
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { addPushToStartTokenListener } = require('expo-widgets');
     subs.push(
       addPushToStartTokenListener((event) => {

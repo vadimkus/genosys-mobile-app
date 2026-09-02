@@ -61,7 +61,7 @@ export const FavoritesProvider = ({ children }) => {
       
       return () => clearTimeout(timer);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [user?.token]);
 
   /**

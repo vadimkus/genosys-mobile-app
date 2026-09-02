@@ -91,7 +91,7 @@ export default function AddEditAddressScreen() {
     if (!initialFormRef.current) {
       initialFormRef.current = formData;
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   useEffect(() => {
     Animated.parallel([

@@ -196,7 +196,7 @@ export const CartProvider = ({ children }) => {
       return { ...it, product: { ...product, price: vp, displayPrice: vp, originalPrice: keptOriginal } };
     }));
     bumpPromoTick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user?.id, isLoading]);
 
   // Auto-apply Free Mask Promotion based on cart subtotal (excludes existing promo items).
@@ -285,7 +285,7 @@ export const CartProvider = ({ children }) => {
 
       return nextItems;
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [promoTick, user, selectedEmirate, emirates, isLoading, shippingRates]);
 
   const loadCartFromStorage = async () => {
@@ -986,7 +986,7 @@ export const CartProvider = ({ children }) => {
     getAvailableEmirates,
     shippingRates,
     reloadShippingRates: loadShippingRates,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }), [items, selectedEmirate, isLoading, shippingRates, getTotalItems, isInCart, getItemQuantity, getProductTotalQuantity, getCartTotals, getCartSummary, getAvailableEmirates]);
 
   return (

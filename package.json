@@ -41,7 +41,7 @@
     "smoke:product-options": "tsx scripts/smoke-product-options.js",
     "verify:splash": "node scripts/verify-splash-sync.js",
     "verify:homecare-links": "node scripts/verify-homecare-links.js",
-    "verify:release": "npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation && npm run smoke:profile-validation && npm run smoke:address-validation && npm run smoke:support-links && npm run smoke:order-progress && npm run smoke:page-shell && npm run smoke:widget-layout && npm run verify:tokens && npm run verify:no-dashes && npm run verify:bag-wording && npm run verify:label-case",
+    "verify:release": "npm run verify:lint && npm run verify:splash && npm run smoke:pricing-display && npm run smoke:cart-pricing-contract && npm run smoke:order-payload-pricing-contract && npm run smoke:orders-repository && npm run smoke:bespoke-content && npm run smoke:header-hide && npm run smoke:product-guide && npm run smoke:product-options && npm run smoke:auth-validation && npm run smoke:profile-validation && npm run smoke:address-validation && npm run smoke:support-links && npm run smoke:order-progress && npm run smoke:page-shell && npm run smoke:widget-layout && npm run verify:tokens && npm run verify:no-dashes && npm run verify:bag-wording && npm run verify:label-case",
     "smoke:bespoke-content": "node scripts/smoke-bespoke-content.js",
     "smoke:pdp-header-clearance": "node scripts/smoke-pdp-header-clearance.js",
     "smoke:header-hide": "node scripts/smoke-header-hide.js",
@@ -55,7 +55,8 @@
     "smoke:widget-layout": "node scripts/smoke-widget-layout.js",
     "verify:no-dashes": "node scripts/verify-no-dashes.mjs",
     "verify:bag-wording": "node scripts/verify-bag-wording.mjs",
-    "verify:label-case": "node scripts/verify-label-case.mjs"
+    "verify:label-case": "node scripts/verify-label-case.mjs",
+    "verify:lint": "eslint --no-warn-ignored ."
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -108,6 +109,10 @@
     "@babel/core": "^7.29.0",
     "@types/react": "~19.2.4",
     "babel-preset-expo": "~57.0.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^15.15.0",
     "tsx": "^4.21.0",
     "typescript": "~6.0.3"
   },
