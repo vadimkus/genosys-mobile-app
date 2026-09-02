@@ -159,16 +159,23 @@ export default function OrderDetailScreen() {
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(12)).current;
 
+  // Only the latest request may write. Tapping one order, going back and
+  // tapping another can leave the first fetch still in flight; if it resolved
+  // second it would put order A's details under order B's title.
+  const loadSeq = useRef(0);
   const load = useCallback(async () => {
     if (!token) return;
+    const seq = ++loadSeq.current;
     setLoading(true);
     try {
       const match = await findOrder(token, idParam);
+      if (seq !== loadSeq.current) return;
       setOrder(match);
     } catch (e) {
+      if (seq !== loadSeq.current) return;
       Alert.alert(t('common.error'), t('ordersDetailAlerts.pleaseTryAgain'));
     } finally {
-      setLoading(false);
+      if (seq === loadSeq.current) setLoading(false);
     }
   }, [token, idParam]);
 

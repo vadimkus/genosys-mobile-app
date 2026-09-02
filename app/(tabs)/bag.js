@@ -212,7 +212,7 @@ function BagScreen() {
   };
 
   const keyExtractor = useCallback(
-    (item) => `${item.product.id}-${item.selectedColor}-${item.selectedSize}`,
+    (item) => `${item?.product?.id ?? 'line'}-${item?.selectedColor ?? ''}-${item?.selectedSize ?? ''}`,
     []
   );
 

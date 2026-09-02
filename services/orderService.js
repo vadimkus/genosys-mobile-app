@@ -11,6 +11,7 @@ import { authenticatedFetch } from './authFetch';
 const log = createLogger('orderService');
 
 const { API_BASE_URL, API_KEY } = AUTH_CONFIG;
+const ORDER_TIMEOUT_MS = 15000;
 
 function getToken(orderOrToken) {
   if (!orderOrToken) return '';
@@ -46,6 +47,7 @@ async function readResponseBody(response) {
 }
 
 function getSafeOrderErrorMessage(kind) {
+  if (kind === 'timeout') return 'The connection timed out. Please check your network and try again.';
   if (kind === 'card') return 'Could not start card payment. Please try again.';
   if (kind === 'resume') return 'Could not start payment for this order yet. Please try again later.';
   return 'Could not place order. Please try again.';
@@ -61,11 +63,29 @@ async function postMobileJson(url, payload, orderDataOrToken, kind) {
       }
     : getMobileHeaders(orderDataOrToken);
 
-  const response = await authenticatedFetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
-  }, token);
+  // Every other call goes through httpClient and its 15 s limit; this one
+  // needs the token-refresh retry in authenticatedFetch, so it carries its own.
+  // Without it a hung connection left "Place order" spinning until the app was
+  // force-quit. The server has already given up on its side long before then.
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), ORDER_TIMEOUT_MS) : null;
+  let response;
+  try {
+    response = await authenticatedFetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      ...(controller ? { signal: controller.signal } : {}),
+    }, token);
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      log.warn('Mobile order request timed out', { kind, url });
+      throw new Error(getSafeOrderErrorMessage('timeout'));
+    }
+    throw error;
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
 
   const body = await readResponseBody(response);
   if (!response.ok) {

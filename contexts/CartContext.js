@@ -348,6 +348,11 @@ export const CartProvider = ({ children }) => {
             acc.push(it);
             return acc;
           }
+          // A saved line with no product cannot be shown, priced or removed,
+          // and every cart method reads item.product.id, so one such line
+          // crashed the bag on open. Old storage after a schema change, or a
+          // corrupted write, is where these come from. Drop them here, once.
+          if (!it?.product?.id) return acc;
           const pid = String(it?.product?.id || '');
           const color = String(it?.selectedColor || '');
           const size = normalizeSizeKey(it?.product, it?.selectedSize);
