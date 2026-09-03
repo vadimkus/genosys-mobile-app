@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LogBox, Platform } from 'react-native';
-import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { StripeProvider } from '@stripe/stripe-react-native';
@@ -16,7 +15,8 @@ import { NotificationProvider } from '../contexts/NotificationContext';
 import AuthWrapper from './AuthWrapper';
 import ForceUpdateScreen from '../components/ForceUpdateScreen';
 import VideoLaunchScreen from '../components/VideoLaunchScreen';
-import UpdateBanner from '../components/UpdateBanner';
+import { AppUpdateProvider, installedNativeVersion } from '../contexts/AppUpdateContext';
+import { compareVersions } from '../utils/version';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import AUTH_CONFIG from '../config/auth';
 import { checkForUpdates } from '../config/updates';
@@ -24,7 +24,6 @@ import { initSentry } from '../config/sentry';
 import { getJson } from '../services/httpClient';
 import { colors } from '../utils/theme';
 
-const UPDATE_DISMISSED_KEY = '@update_dismissed_version';
 
 // Keep the native splash (logo) on screen until the JS launch layer has
 // actually painted, so there is no white gap during the native→JS handoff.
@@ -36,15 +35,6 @@ LogBox.ignoreLogs([
   'expo-notifications',
 ]);
 
-function compareVersions(current, minimum) {
-  const c = current.split('.').map(Number);
-  const m = minimum.split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
-    if ((c[i] || 0) < (m[i] || 0)) return -1;
-    if ((c[i] || 0) > (m[i] || 0)) return 1;
-  }
-  return 0;
-}
 
 const SPLASH_CACHE_KEY = '@splash_config';
 const DEFAULT_SPLASH_CONFIG = {
@@ -79,7 +69,8 @@ function setSplashConfigIfChanged(setter, next) {
 
 export default function RootLayout() {
   const [forceUpdate, setForceUpdate] = useState(null);
-  const [softUpdate, setSoftUpdate] = useState(null);
+  // The whole /api/mobile/app-version response, for the soft gate downstream.
+  const [versionInfo, setVersionInfo] = useState(null);
   const [splashVideo, setSplashVideo] = useState(DEFAULT_SPLASH_CONFIG);
 
   // The website's display serif, so headings can be set in the same face.
@@ -131,7 +122,9 @@ export default function RootLayout() {
 
         if (cancelled) return;
 
-        const currentVersion = Constants.expoConfig?.version || '0.0.0';
+        // The binary's version, not the JS manifest's: an OTA can carry a newer
+        // app.json than the build underneath, and the store gate is about the build.
+        const currentVersion = installedNativeVersion();
 
         if (data.forceUpdate && data.minimumVersion && compareVersions(currentVersion, data.minimumVersion) < 0) {
           // The user's chosen language, not a build constant: this screen
@@ -141,13 +134,8 @@ export default function RootLayout() {
           setForceUpdate({ updateUrl: data.updateUrl, message, locale });
         } else {
           setForceUpdate(false);
-
-          if (data.latestVersion && compareVersions(currentVersion, data.latestVersion) < 0) {
-            const dismissed = await AsyncStorage.getItem(UPDATE_DISMISSED_KEY).catch(() => null);
-            if (dismissed !== data.latestVersion) {
-              setSoftUpdate({ latestVersion: data.latestVersion, updateUrl: data.updateUrl });
-            }
-          }
+          // Soft gate (badge, prompt, profile row) lives in AppUpdateProvider.
+          setVersionInfo(data);
         }
       } catch {
         if (!cancelled) setForceUpdate(false);
@@ -212,6 +200,7 @@ export default function RootLayout() {
     >
       <AuthProvider>
         <LocalizationProvider>
+        <AppUpdateProvider versionInfo={versionInfo}>
         <AnimationProvider>
           <NotificationProvider>
             <FavoritesProvider>
@@ -233,20 +222,12 @@ export default function RootLayout() {
                     />
                   )}
 
-                  {softUpdate && !splashVideo && (
-                    <UpdateBanner
-                      updateUrl={softUpdate.updateUrl}
-                      onDismiss={() => {
-                        AsyncStorage.setItem(UPDATE_DISMISSED_KEY, softUpdate.latestVersion).catch(() => {});
-                        setSoftUpdate(null);
-                      }}
-                    />
-                  )}
                 </OrdersProvider>
               </CartProvider>
             </FavoritesProvider>
           </NotificationProvider>
         </AnimationProvider>
+        </AppUpdateProvider>
       </LocalizationProvider>
       </AuthProvider>
     </StripeProvider>

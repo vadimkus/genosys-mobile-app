@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import * as Notifications from 'expo-notifications';
+import { clearNotificationBadge } from '../utils/appBadge';
 import { Platform, AppState, Vibration } from 'react-native';
 import { createLogger } from '../utils/logger';
 import { navigateFromNotification } from '../utils/notificationRouting';
@@ -45,7 +46,7 @@ export function NotificationProvider({ children }) {
   useEffect(() => {
     const clearBadge = () => {
       try {
-        Notifications.setBadgeCountAsync(0);
+        clearNotificationBadge();
       } catch (e) {
         log.warn('Failed to clear badge:', e?.message);
       }
@@ -94,7 +95,7 @@ export function NotificationProvider({ children }) {
           log.debug('👆 Notification tapped:', response.notification.request.content.data);
           
           // Clear badge when user interacts with a notification
-          Notifications.setBadgeCountAsync(0);
+          clearNotificationBadge();
           
           const data = response.notification.request.content.data;
 
@@ -118,7 +119,7 @@ export function NotificationProvider({ children }) {
           if (response) {
             log.debug('App opened from notification:', response.notification.request.content.data);
             // Clear badge on cold start from notification
-            Notifications.setBadgeCountAsync(0);
+            clearNotificationBadge();
             const data = response.notification.request.content.data;
             // Longer delay than the warm path: navigation has to mount first.
             setTimeout(() => {

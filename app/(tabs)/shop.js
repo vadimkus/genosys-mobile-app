@@ -53,6 +53,7 @@ import {
   isProductSelectionComplete,
 } from '../../utils/productOptions';
 import { useLocalization } from '../../contexts/LocalizationContext';
+import { useAppUpdate } from '../../contexts/AppUpdateContext';
 import {
   getLocalizedProductName,
   getLocalizedProductDescription,
@@ -412,6 +413,7 @@ const ShopGridCard = React.memo(function ShopGridCard({
 function ShopScreen() {
   const { user } = useAuth();
   const { t, locale, setLocale, dir } = useLocalization();
+  const { updateAvailable } = useAppUpdate();
   // Animations disabled (kept only for header in bag.js)
   const { addItem, getProductTotalQuantity, decrementProductFromCart } = useCart();
   const { getFavoritesCount, toggleFavorite, isFavorite } = useFavorites();
@@ -1042,6 +1044,7 @@ function ShopScreen() {
                 <Ionicons name="person-outline" size={18} color={colors.secondaryLabel} />
               </View>
             )}
+            {updateAvailable ? <View style={styles.updateDot} accessibilityLabel={t('appUpdate.title')} /> : null}
           </TouchableOpacity>
         </View>
       </RNAnimated.View>
@@ -1592,6 +1595,19 @@ const styles = StyleSheet.create({
   userInitials: {
     ...T.label,
     color: colors.white,
+  },
+  // A store update is waiting. Sits at the top corner so it never collides
+  // with the online dot at the bottom; accent, since it asks for attention.
+  updateDot: {
+    position: 'absolute',
+    top: -2,
+    end: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 6,
+    backgroundColor: colors.accent,
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   onlineDot: {
     position: 'absolute',

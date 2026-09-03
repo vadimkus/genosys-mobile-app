@@ -1779,5 +1779,13 @@
     "message": "A new version of GENOSYS is available. Please update to continue.",
     "updateAppStore": "Update on App Store",
     "updateGooglePlay": "Update on Google Play"
+  },
+  "appUpdate": {
+    "title": "Update available",
+    "message": "GENOSYS {version} is on the {store}. Update for the latest fixes and features.",
+    "updateNow": "Update now",
+    "later": "Later",
+    "profileRow": "Update available",
+    "profileRowSubtitle": "You have {installed}. Version {latest} is ready to install."
   }
 }

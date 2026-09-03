@@ -57,7 +57,8 @@
     "verify:bag-wording": "node scripts/verify-bag-wording.mjs",
     "verify:label-case": "node scripts/verify-label-case.mjs",
     "verify:lint": "eslint --no-warn-ignored .",
-    "verify:design-scale": "python3 scripts/snap-design-scale.py --check"
+    "verify:design-scale": "python3 scripts/snap-design-scale.py --check",
+    "smoke:app-update": "node scripts/smoke-app-update.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

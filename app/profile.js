@@ -20,6 +20,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { useLocalization } from '../contexts/LocalizationContext';
+import { useAppUpdate } from '../contexts/AppUpdateContext';
 import { fetchUserOrders } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerForPushNotificationsAsync, savePushTokenToBackend, clearPushTokenOnBackend } from '../services/pushNotificationsService';
@@ -55,6 +56,7 @@ export default function ProfileScreen() {
     disableBiometric
   } = useAuth();
   const { locale, t, dir } = useLocalization();
+  const appUpdate = useAppUpdate();
   // Be defensive: some screens rely on `dir`, but if it's ever out of sync,
   // Arabic locale should still force RTL layout for key typography (like the name).
   const isRTL = dir === 'rtl' || locale === 'ar';
@@ -682,8 +684,21 @@ export default function ProfileScreen() {
               icon="help-circle-outline"
               title={t('profile.helpAndSupport')}
               onPress={() => { haptics.lightTap(); router.push('/profile/help'); }}
-              isLast={true}
+              isLast={!appUpdate.updateAvailable}
             />
+            {appUpdate.updateAvailable ? (
+              <ProfileItem
+                icon="arrow-up-circle-outline"
+                tint={colors.accent}
+                title={t('appUpdate.profileRow')}
+                subtitle={t('appUpdate.profileRowSubtitle', {
+                  installed: appUpdate.installedVersion,
+                  latest: appUpdate.latestVersion,
+                })}
+                onPress={() => { haptics.lightTap(); appUpdate.openStore(); }}
+                isLast={true}
+              />
+            ) : null}
           </View>
         </ProfileSection>
 

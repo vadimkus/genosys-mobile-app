@@ -229,8 +229,9 @@
       [
         "@sentry/react-native",
         {
-          "organization": "genosys",
-          "project": "mobile-app"
+          "organization": "genosys-middle-east-fz-llc",
+          "project": "genosys-mobile-app",
+          "url": "https://de.sentry.io/"
         }
       ],
       "expo-web-browser",
