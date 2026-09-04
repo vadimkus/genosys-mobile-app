@@ -12,7 +12,6 @@ import {
   Share,
   FlatList,
   ScrollView,
-  findNodeHandle,
 } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { setAudioModeAsync } from 'expo-audio';
@@ -433,24 +432,29 @@ function ProductDetailScreen() {
     };
   }, [id]);
 
+  // Current content offset, kept in plain JS. The Animated value drives the
+  // header on the native thread, so it cannot be read synchronously here.
+  const scrollOffsetRef = useRef(0);
+
   const scrollToSection = useCallback((ref) => {
     haptics.lightTap();
     const scrollable = scrollRef.current;
     const target = ref?.current;
     if (!scrollable || !target) return;
-    // Animated.ScrollView proxies scrollTo. For measureLayout we need the native node handle
-    // of the underlying ScrollView's inner view. `getScrollableNode()` returns it.
-    const innerNode =
-      (scrollable.getScrollableNode && scrollable.getScrollableNode()) ||
-      findNodeHandle(scrollable);
-    if (!innerNode || !target.measureLayout) return;
-    target.measureLayout(
-      innerNode,
-      (_x, y) => {
+    // measureLayout against the ScrollView's node handle fails silently on the
+    // new architecture (the error callback fires, nothing scrolls), which is why
+    // "Be the first to review" did nothing. Measure both in window coordinates
+    // instead: the section's offset inside the content is its distance from the
+    // ScrollView's top edge plus however far the content is already scrolled.
+    const scrollNode =
+      (scrollable.getNativeScrollRef && scrollable.getNativeScrollRef()) || scrollable;
+    if (!target.measureInWindow || !scrollNode.measureInWindow) return;
+    scrollNode.measureInWindow((_sx, scrollTop) => {
+      target.measureInWindow((_tx, targetTop) => {
+        const y = targetTop - scrollTop + scrollOffsetRef.current;
         scrollable.scrollTo({ y: Math.max(0, y - 16), animated: true });
-      },
-      () => {}
-    );
+      });
+    });
   }, []);
 
   const scrollToReviews = useCallback(() => scrollToSection(reviewsWrapperRef), [scrollToSection]);
@@ -1212,7 +1216,10 @@ function ProductDetailScreen() {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           {
             useNativeDriver: true,
-            listener: (e) => onHeaderScroll(e.nativeEvent.contentOffset.y),
+            listener: (e) => {
+              scrollOffsetRef.current = e.nativeEvent.contentOffset.y;
+              onHeaderScroll(e.nativeEvent.contentOffset.y);
+            },
           }
         )}
       >
