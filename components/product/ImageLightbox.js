@@ -4,6 +4,13 @@
  * Opens when the user taps the PDP hero image. Horizontal paging matches
  * the inline gallery. Pinch / pan / double-tap zoom uses gesture-handler +
  * reanimated (already in the binary) so this stays OTA-shippable.
+ *
+ * Gesture wiring, learned the hard way: the pan is enabled only while zoomed
+ * (a JS flag), never left to manual activation behind an Exclusive with the
+ * double-tap. Inside a horizontal FlatList on iOS that arrangement left the
+ * zoomed picture stuck: you could pinch into one spot and never drag to
+ * another. Pinch zooms about the fingers and both gestures clamp to the
+ * drawn picture so it cannot be pushed off screen.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -38,6 +45,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const DOUBLE_TAP_SCALE = 2.5;
+const FRAME_WIDTH = SCREEN_WIDTH;
+const FRAME_HEIGHT = SCREEN_HEIGHT * 0.78;
 
 function ZoomableImage({ source, isActive, onZoomChange }) {
   const scale = useSharedValue(1);
@@ -46,6 +55,28 @@ function ZoomableImage({ source, isActive, onZoomChange }) {
   const translateY = useSharedValue(0);
   const savedTX = useSharedValue(0);
   const savedTY = useSharedValue(0);
+  // Where the two fingers were when the pinch began, relative to the frame's
+  // centre, so the zoom grows out of the spot under them rather than the
+  // middle of the screen.
+  const focalX = useSharedValue(0);
+  const focalY = useSharedValue(0);
+  // Drawn size of the image inside the frame (contentFit="contain"), so the
+  // pan stops at the picture's own edge and not the letterbox around it.
+  const drawnW = useSharedValue(FRAME_WIDTH);
+  const drawnH = useSharedValue(FRAME_HEIGHT);
+  // JS mirror of "scale > 1": gates the pan handler and, via the parent,
+  // the FlatList's own scroll. A pan handler that is merely a no-op when not
+  // zoomed still steals the horizontal swipe from the list, and one that
+  // relies on manual activation inside the list never gets to activate.
+  const [zoomed, setZoomed] = useState(false);
+
+  const setZoomedFromUI = useCallback(
+    (next) => {
+      setZoomed(next);
+      onZoomChange?.(next);
+    },
+    [onZoomChange],
+  );
 
   const resetZoom = useCallback(() => {
     'worklet';
@@ -65,81 +96,103 @@ function ZoomableImage({ source, isActive, onZoomChange }) {
       savedScale.value = 1;
       savedTX.value = 0;
       savedTY.value = 0;
+      setZoomed(false);
       onZoomChange?.(false);
     }
   }, [isActive, onZoomChange, scale, translateX, translateY, savedScale, savedTX, savedTY]);
 
-  const reportZoom = useCallback(
-    (zoomed) => {
-      onZoomChange?.(zoomed);
+  const onLoad = useCallback(
+    (e) => {
+      const w = e?.source?.width;
+      const h = e?.source?.height;
+      if (!w || !h) return;
+      const fit = Math.min(FRAME_WIDTH / w, FRAME_HEIGHT / h);
+      drawnW.value = w * fit;
+      drawnH.value = h * fit;
     },
-    [onZoomChange],
+    [drawnW, drawnH],
   );
 
+  // Clamp so the picture's edge never leaves the frame's edge once zoomed in.
+  const clampTX = (tx, s) => {
+    'worklet';
+    const limit = Math.max(0, (drawnW.value * s - FRAME_WIDTH) / 2);
+    return Math.min(Math.max(tx, -limit), limit);
+  };
+  const clampTY = (ty, s) => {
+    'worklet';
+    const limit = Math.max(0, (drawnH.value * s - FRAME_HEIGHT) / 2);
+    return Math.min(Math.max(ty, -limit), limit);
+  };
+
   const pinch = Gesture.Pinch()
+    .onStart((e) => {
+      focalX.value = e.focalX - FRAME_WIDTH / 2;
+      focalY.value = e.focalY - FRAME_HEIGHT / 2;
+      // Disable the list as soon as fingers land, not after the pinch ends,
+      // so a pan that follows the pinch is ours from the first frame.
+      runOnJS(setZoomedFromUI)(true);
+    })
     .onUpdate((e) => {
       const next = Math.min(Math.max(savedScale.value * e.scale, MIN_SCALE), MAX_SCALE);
+      // Keep the point under the fingers fixed while the scale changes.
+      const ratio = next / savedScale.value;
+      const tx = focalX.value - (focalX.value - savedTX.value) * ratio;
+      const ty = focalY.value - (focalY.value - savedTY.value) * ratio;
       scale.value = next;
-      // While pinching back to 1×, clear pan offset so the frame doesn't stick.
-      if (next <= 1.01) {
-        translateX.value = 0;
-        translateY.value = 0;
-      }
+      translateX.value = clampTX(tx, next);
+      translateY.value = clampTY(ty, next);
     })
     .onEnd(() => {
       if (scale.value <= 1.05) {
         resetZoom();
-        runOnJS(reportZoom)(false);
+        runOnJS(setZoomedFromUI)(false);
       } else {
         savedScale.value = scale.value;
-        runOnJS(reportZoom)(true);
+        savedTX.value = translateX.value;
+        savedTY.value = translateY.value;
       }
     });
 
-  // Pan must FAIL when not zoomed - otherwise it steals the horizontal
-  // swipe from FlatList even if onUpdate is a no-op (scroll stays stuck).
   const pan = Gesture.Pan()
+    .enabled(zoomed)
     .averageTouches(true)
-    .manualActivation(true)
-    .onTouchesMove((_, state) => {
-      if (scale.value > 1.05) {
-        state.activate();
-      } else {
-        state.fail();
-      }
-    })
     .onUpdate((e) => {
-      if (scale.value <= 1.05) return;
-      translateX.value = savedTX.value + e.translationX;
-      translateY.value = savedTY.value + e.translationY;
+      translateX.value = clampTX(savedTX.value + e.translationX, scale.value);
+      translateY.value = clampTY(savedTY.value + e.translationY, scale.value);
     })
     .onEnd(() => {
-      if (scale.value <= 1.05) {
-        savedTX.value = 0;
-        savedTY.value = 0;
-        return;
-      }
       savedTX.value = translateX.value;
       savedTY.value = translateY.value;
     });
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
-    .onEnd(() => {
+    .maxDuration(250)
+    .onEnd((e) => {
       if (scale.value > 1.05) {
         resetZoom();
-        runOnJS(reportZoom)(false);
-      } else {
-        scale.value = withTiming(DOUBLE_TAP_SCALE);
-        savedScale.value = DOUBLE_TAP_SCALE;
-        runOnJS(reportZoom)(true);
+        runOnJS(setZoomedFromUI)(false);
+        return;
       }
+      // Zoom into the tapped spot, clamped to the picture.
+      const fx = e.x - FRAME_WIDTH / 2;
+      const fy = e.y - FRAME_HEIGHT / 2;
+      const tx = clampTX(fx - fx * DOUBLE_TAP_SCALE, DOUBLE_TAP_SCALE);
+      const ty = clampTY(fy - fy * DOUBLE_TAP_SCALE, DOUBLE_TAP_SCALE);
+      scale.value = withTiming(DOUBLE_TAP_SCALE);
+      translateX.value = withTiming(tx);
+      translateY.value = withTiming(ty);
+      savedScale.value = DOUBLE_TAP_SCALE;
+      savedTX.value = tx;
+      savedTY.value = ty;
+      runOnJS(setZoomedFromUI)(true);
     });
 
-  const composed = Gesture.Simultaneous(
-    pinch,
-    Gesture.Exclusive(doubleTap, pan),
-  );
+  // A still double-tap wins the race; any movement fails the tap and hands
+  // the touch to pinch/pan, which run together so a two-finger drag both
+  // scales and moves.
+  const composed = Gesture.Race(doubleTap, Gesture.Simultaneous(pinch, pan));
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -159,6 +212,7 @@ function ZoomableImage({ source, isActive, onZoomChange }) {
             contentFit="contain"
             transition={150}
             cachePolicy="memory-disk"
+            onLoad={onLoad}
           />
         </Animated.View>
       </View>
@@ -312,8 +366,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   slide: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT * 0.78,
+    width: FRAME_WIDTH,
+    height: FRAME_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
