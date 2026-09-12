@@ -352,7 +352,7 @@ export default function LoginScreen() {
           address: address.trim(),
           emirate,
           birthday: birthday.trim(),
-          emailSuggestionConfirmed: confirmedEmail === normalizedEmail,
+          emailSuggestionConfirmed: true, // the inline hint is the prompt; submitting keeps the address
         });
       }
 

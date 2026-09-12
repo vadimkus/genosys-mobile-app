@@ -38,9 +38,10 @@ export function validateAuthForm(values, { isLogin, t }) {
     errors.email = t('authScreen.emailRequired');
   } else if (!isEmailAddressSyntaxValid(normalizedEmail)) {
     errors.email = t('authScreen.invalidEmail');
-  } else if (emailSuggestion && confirmedEmail !== normalizedEmail) {
-    errors.email = t('authScreen.emailSuggestionRequired');
   }
+  // A pending "did you mean" hint no longer blocks submission: the hint with
+  // its two buttons is the prompt, and tapping Create account keeps the
+  // address. Customers were reading the old block as "invalid email".
 
   if (!password) {
     errors.password = t('authScreen.passwordRequired');
