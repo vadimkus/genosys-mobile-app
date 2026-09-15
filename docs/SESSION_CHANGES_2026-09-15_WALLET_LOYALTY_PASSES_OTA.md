@@ -40,6 +40,11 @@ publishing access is approved and physically verified.
   The production website was rolled back to direct `.pkpass` delivery.
 - Native PassKit is implemented for version/runtime 1.13.0 and requires a new
   App Store binary. It must not be published as an OTA to runtime 1.12.0.
+- Audited iOS 1.13.0 build 109 compiled successfully and was uploaded to
+  TestFlight. EAS build: `e4e70220-ac8d-42ab-85b5-758cac423133`; submission:
+  `bf401c99-8035-4bdb-8f2a-f599dc9f8794`.
+- Public release remains blocked until build 109 passes physical Add, Cancel,
+  and Already Added testing.
 - Android was intentionally excluded because Google Wallet remains in
   `[TEST ONLY]` demo mode. The publishing-access request was submitted after
   payments profile `6368-1116-8429` was linked; Google quotes a two-to-three

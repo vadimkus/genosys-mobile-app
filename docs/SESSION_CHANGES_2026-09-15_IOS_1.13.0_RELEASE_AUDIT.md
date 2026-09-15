@@ -2,7 +2,7 @@
 
 **Date:** 15 September 2026
 **Baseline:** iOS 1.12.0 build 106, commit `2ab786a`
-**Candidate:** iOS 1.13.0, next available EAS build number
+**Candidate:** iOS 1.13.0 build 109
 
 ## Why this audit was required
 
@@ -49,12 +49,18 @@ store submission. It is included now:
 
 ## Release gates
 
-Before creating the final binary:
+Completed:
 
 1. Full `verify:release`.
 2. Clean iOS and Android Expo exports.
 3. Expo autolinking confirms the local `GenosysWallet` pod.
-4. Remote Xcode archive succeeds.
-5. Upload to TestFlight only.
-6. Physically verify Apple Wallet Add, Cancel, and Already Added behavior.
-7. Do not release publicly until that physical test passes.
+4. Remote Xcode archive succeeded:
+   `e4e70220-ac8d-42ab-85b5-758cac423133`.
+5. Build 109 uploaded to App Store Connect through submission
+   `bf401c99-8035-4bdb-8f2a-f599dc9f8794`.
+
+Still required:
+
+1. Wait for Apple processing and install build 109 from TestFlight.
+2. Physically verify Apple Wallet Add, Cancel, and Already Added behavior.
+3. Do not release publicly until that physical test passes.
