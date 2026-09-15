@@ -61,6 +61,13 @@
       "android": {
         "track": "internal"
       }
+    },
+    "production:android-public": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "completed",
+        "changesNotSentForReview": false
+      }
     }
   }
 }
