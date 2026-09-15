@@ -15,12 +15,16 @@ Google Play sent Vadim a reminder: register apps and signing keys for Android de
 | Distribution | Google Play only (EAS Build + Play App Signing) |
 | Off-Play stores | Not used for production distribution |
 
-## Verdict
+## Verdict (confirmed 2026-08-31)
 
-- Email is a **mass reminder**, not proof Genosys is unregistered.
-- Google says **~99% of Play apps were auto-registered** via existing Play signing keys.
-- Genosys uses standard Play App Signing with EAS-managed upload key → **very likely already registered**.
-- Still must confirm on Play Console Home (package name status next to each app).
+**Done. No action.** Play Console → Android developer verification → Package names:
+
+- **Genosys UAE** / `ae.genosys.app` → **Registered** (green check)
+- **Keys:** 1
+- **Last updated:** Mar 6, 2026
+- Only package on the account
+
+The Sep 30 banner is account-wide boilerplate. This app already meets it.
 
 ## Action checklist (manual, Play Console)
 
@@ -34,6 +38,24 @@ Google Play sent Vadim a reminder: register apps and signing keys for Android de
 ## Deadline
 
 **September 30, 2026** — ~8 weeks from this note.
+
+## Re-check 2026-08-31 (final-reminder email)
+
+Same mass mail again, now titled **[Final reminder]**, sent to `f.this.that@gmail.com`.
+
+Live Play listing confirmed (not Console):
+
+| Item | Status 31 Aug |
+|---|---|
+| Listing | Live: https://play.google.com/store/apps/details?id=ae.genosys.app |
+| Publisher | Genosys Middle East FZ-LLC |
+| Updated on | **27 Aug 2026** (matches AAB 1.12.0 / versionCode 91) |
+| Rating | 4.4 |
+| Downloads bucket | **10+** |
+| Other Play apps on this repo | None |
+| Off-Play store APKs | Still none. Preview/dev APKs in EAS are internal, not Samsung/Huawei/etc. |
+
+Play Console screenshot confirmed **Registered** (1 key, last updated Mar 6, 2026). No further work.
 
 ## Sources
 

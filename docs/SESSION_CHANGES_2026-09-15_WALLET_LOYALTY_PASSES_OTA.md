@@ -54,3 +54,6 @@ publishing access is approved and physically verified.
 - No-dash guard passed.
 - Expo exports passed for both iOS and Android.
 - Expo autolinking resolves the local `GenosysWallet` pod in runtime 1.13.0.
+- The pending native dependency batch was folded in before the release build:
+  Expo 57.0.22, React Native 0.86.3, fixed Hermes compiler `.17`, and
+  deduplicated native modules. `expo-doctor` passes 20 of 20 checks.

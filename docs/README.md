@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [iOS 1.13.0 Release Audit (2026-09-15)](./SESSION_CHANGES_2026-09-15_IOS_1.13.0_RELEASE_AUDIT.md) | Build-106 baseline audit covering all 35 pending commits, native PassKit, Expo/Hermes regression fixes, SDK alignment, and TestFlight release gates. |
 | [GENOSYS Rewards Wallet Passes (2026-09-15)](./SESSION_CHANGES_2026-09-15_WALLET_LOYALTY_PASSES_OTA.md) | Provider-gated Apple/Google loyalty-card flow; signed URLs, native iOS PassKit candidate, EN/RU/AR and physical-device release gates. |
 | [Beauty Box Quick Facts OTA (2026-08-08)](./SESSION_CHANGES_2026-08-08_beauty-box-quick-facts-ota.md) | Adds a flexible EN/RU/AR + RTL native renderer for server-curated Quick Facts; all six Beauty Boxes are API-driven; runtime 1.11.0 OTA group `4180b771`. |
 | [Shop Product Option Sheet OTA (2026-08-08)](./SESSION_CHANGES_2026-08-08_shop-product-option-sheet-ota.md) | Native Shop cards require explicit size/shade selection in a localized bottom sheet; variant pricing, OOS, cart keys, checkout guard and runtime 1.11.0 OTA coverage. |

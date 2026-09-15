@@ -60,3 +60,15 @@ Expo doctor, two real items:
    override.
 
 Also 29 packages behind their SDK-57 expected versions; minor, same run.
+
+## Native batch resolved for 1.13.0
+
+On 15 September 2026, the next-binary audit applied
+`npx expo install expo@^57.0.9 --fix` before rebuilding:
+
+- Expo resolved to `57.0.22`.
+- React Native moved from `0.86.0` to `0.86.3`.
+- Hermes moved from affected compiler `250829098.0.14` to fixed `.17`.
+- `react-native-screens` and `@expo/ui` are deduplicated.
+- All SDK 57 native packages were aligned to Expo's expected versions.
+- `expo-doctor` now passes all 20 checks.
