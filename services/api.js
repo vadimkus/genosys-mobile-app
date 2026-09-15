@@ -304,6 +304,31 @@ export const fetchMembership = async (token) => {
 };
 
 /**
+ * Mint a five-minute wallet installation URL. Authentication stays in this
+ * request; the returned URL contains no bearer token or customer PII.
+ */
+export const fetchMembershipWalletUrl = async (token, provider, locale = 'en') => {
+  try {
+    const result = await sendJson(
+      `${API_BASE_URL}/membership/wallet`,
+      { provider, locale },
+      {
+        authenticated: true,
+        token,
+        headers: { token },
+        safeMessage: 'Could not prepare the wallet card.',
+      },
+    );
+    return result?.success && result?.installUrl
+      ? { installUrl: result.installUrl, expiresAt: result.expiresAt }
+      : null;
+  } catch (error) {
+    log.warn('Wallet install URL request failed', error?.message || error);
+    return null;
+  }
+};
+
+/**
  * Fetch user's orders (order tracking)
  * @param {string} token - User authentication token
  * @returns {Promise<Array>} Array of orders

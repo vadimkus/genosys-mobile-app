@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager, ActivityIndicator, Alert } from 'react-native';
+import { Image } from 'expo-image';
+import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { fetchMembership } from '../services/api';
+import { fetchMembership, fetchMembershipWalletUrl } from '../services/api';
 import { colors, shadow, surfaces } from '../utils/theme';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
@@ -40,10 +42,11 @@ const tierPerkKey = (tier) => `rewards.tierPerk${tier.charAt(0)}${tier.slice(1).
  */
 export default function MembershipCard({ isRTL = false }) {
   const { user } = useAuth();
-  const { t } = useLocalization();
+  const { t, locale } = useLocalization();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const [walletLoading, setWalletLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!user?.token) {
@@ -71,6 +74,30 @@ export default function MembershipCard({ isRTL = false }) {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded((v) => !v);
   }, []);
+
+  const walletProvider = Platform.OS === 'ios' ? 'APPLE' : 'GOOGLE';
+  const walletAvailable = Platform.OS === 'ios'
+    ? data?.wallet?.apple === true
+    : data?.wallet?.google === true;
+
+  const openWallet = useCallback(async () => {
+    if (walletLoading || !user?.token || !walletAvailable) return;
+    haptics.lightTap();
+    setWalletLoading(true);
+    try {
+      const result = await fetchMembershipWalletUrl(user.token, walletProvider, locale);
+      if (!result?.installUrl) throw new Error('wallet_unavailable');
+      await WebBrowser.openBrowserAsync(result.installUrl, {
+        dismissButtonStyle: 'close',
+        controlsColor: colors.accent,
+      });
+    } catch (error) {
+      log.warn('Wallet save flow failed', error?.message || error);
+      Alert.alert(t('common.error'), t('rewards.walletError'));
+    } finally {
+      setWalletLoading(false);
+    }
+  }, [locale, t, user?.token, walletAvailable, walletLoading, walletProvider]);
 
   if (loading || !data) return null;
 
@@ -198,6 +225,38 @@ export default function MembershipCard({ isRTL = false }) {
 
       {data.memberNumber ? (
         <Text style={[styles.memberNumber, isRTL && styles.textRTL]}>{data.memberNumber}</Text>
+      ) : null}
+
+      {walletAvailable ? (
+        <TouchableOpacity
+          style={[styles.walletButton, isRTL && styles.rowReverse]}
+          onPress={openWallet}
+          disabled={walletLoading}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={
+            Platform.OS === 'ios'
+              ? t('rewards.addToAppleWallet')
+              : t('rewards.addToGoogleWallet')
+          }
+          accessibilityState={{ busy: walletLoading, disabled: walletLoading }}
+        >
+          <Image
+            source={{
+              uri: Platform.OS === 'ios'
+                ? 'https://genosys.ae/images/wallet-badges/apple-en.svg'
+                : `https://genosys.ae/images/wallet-badges/google-${locale === 'ar' ? 'ar' : locale === 'ru' ? 'ru' : 'en'}.svg`,
+            }}
+            style={Platform.OS === 'ios' ? styles.appleWalletBadge : styles.googleWalletBadge}
+            contentFit="contain"
+            accessibilityIgnoresInvertColors
+          />
+          {walletLoading ? (
+            <View style={styles.walletLoadingOverlay}>
+              <ActivityIndicator size="small" color={colors.white} />
+            </View>
+          ) : null}
+        </TouchableOpacity>
       ) : null}
 
       {/* Expanded: how it works + tier table */}
@@ -348,6 +407,28 @@ const styles = StyleSheet.create({
     color: colors.secondaryLabel,
     letterSpacing: 1.2,
     marginTop: 10,
+  },
+  walletButton: {
+    alignSelf: 'flex-start',
+    minHeight: 48,
+    marginTop: 12,
+    padding: 4,
+    position: 'relative',
+  },
+  appleWalletBadge: {
+    width: 152,
+    height: 48,
+  },
+  googleWalletBadge: {
+    width: 174,
+    height: 48,
+  },
+  walletLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 24,
+    backgroundColor: 'rgba(0,0,0,0.55)',
   },
   expandedWrap: {
     marginTop: 14,
