@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager, ActivityIndicator, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager, ActivityIndicator, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchMembership, fetchMembershipWalletUrl } from '../services/api';
+import { addApplePassFromUrl } from '../services/appleWallet';
 import { colors, shadow, surfaces } from '../utils/theme';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
@@ -84,36 +85,33 @@ export default function MembershipCard({ isRTL = false }) {
     if (walletLoading || !user?.token || !walletAvailable) return;
     haptics.lightTap();
     setWalletLoading(true);
-    let walletCompletionStatus = null;
-    let walletReturnSubscription = null;
     try {
       const result = await fetchMembershipWalletUrl(user.token, walletProvider, locale);
       if (!result?.installUrl) throw new Error('wallet_unavailable');
       if (Platform.OS === 'ios') {
-        walletReturnSubscription = Linking.addEventListener('url', ({ url }) => {
-          if (!String(url || '').startsWith('genosys://wallet-complete')) return;
-          const status = String(url).match(/[?&]status=([^&]+)/)?.[1];
-          walletCompletionStatus = status ? decodeURIComponent(status) : 'returned';
-          try {
-            WebBrowser.dismissBrowser();
-          } catch {
-            // The custom link already returned control to the app.
-          }
-        });
+        let passResult;
+        try {
+          passResult = await addApplePassFromUrl(result.installUrl);
+        } catch (nativeError) {
+          log.warn('Native Apple Wallet flow unavailable, using browser', nativeError?.message);
+          passResult = { status: 'unavailable' };
+        }
+        if (passResult.status === 'added' || passResult.status === 'already_added') {
+          haptics.success();
+          Alert.alert(t('rewards.walletAddedTitle'), t('rewards.walletAdded'));
+          return;
+        }
+        if (passResult.status === 'cancelled') return;
       }
+
       await WebBrowser.openBrowserAsync(result.installUrl, {
         dismissButtonStyle: 'close',
         controlsColor: colors.accent,
       });
-      if (walletCompletionStatus === 'added') {
-        haptics.success();
-        Alert.alert(t('rewards.walletAddedTitle'), t('rewards.walletAdded'));
-      }
     } catch (error) {
       log.warn('Wallet save flow failed', error?.message || error);
       Alert.alert(t('common.error'), t('rewards.walletError'));
     } finally {
-      walletReturnSubscription?.remove();
       setWalletLoading(false);
     }
   }, [locale, t, user?.token, walletAvailable, walletLoading, walletProvider]);

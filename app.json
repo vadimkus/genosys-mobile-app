@@ -3,7 +3,7 @@
     "name": "Genosys UAE",
     "owner": "vadimkus",
     "slug": "genosys-mobile-app",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app-icon-1024-pwa-flat-no-alpha.png",
@@ -267,7 +267,7 @@
         "projectId": "b874a5c1-c47e-4c4e-9286-42e431978d51"
       }
     },
-    "runtimeVersion": "1.12.0",
+    "runtimeVersion": "1.13.0",
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",

@@ -22,14 +22,23 @@ for (const locale of locales) {
 
 const api = fs.readFileSync(path.join(__dirname, '..', 'services', 'api.js'), 'utf8');
 const card = fs.readFileSync(path.join(__dirname, '..', 'components', 'MembershipCard.js'), 'utf8');
+const appleWallet = fs.readFileSync(path.join(__dirname, '..', 'services', 'appleWallet.js'), 'utf8');
+const nativeModule = fs.readFileSync(
+  path.join(__dirname, '..', 'modules', 'genosys-wallet', 'ios', 'GenosysWalletModule.swift'),
+  'utf8',
+);
 
 if (!api.includes('fetchMembershipWalletUrl')) throw new Error('wallet API helper missing');
 if (!card.includes("walletProvider = Platform.OS === 'ios' ? 'APPLE' : 'GOOGLE'")) {
   throw new Error('platform wallet selection missing');
 }
 if (!card.includes('WebBrowser.openBrowserAsync')) throw new Error('in-app wallet browser handoff missing');
-if (!card.includes("genosys://wallet-complete") || !card.includes('WebBrowser.dismissBrowser')) {
-  throw new Error('Apple Wallet return-to-app handoff missing');
+if (!card.includes('addApplePassFromUrl')) throw new Error('native Apple Wallet handoff missing');
+if (!appleWallet.includes('FileSystem.downloadAsync') || !appleWallet.includes('GenosysWallet.addPassAsync')) {
+  throw new Error('signed pass download or native presentation missing');
+}
+if (!nativeModule.includes('PKAddPassesViewController') || !nativeModule.includes('PKPassLibrary')) {
+  throw new Error('PassKit presenter missing');
 }
 if (!card.includes('data?.wallet?.apple') || !card.includes('data?.wallet?.google')) {
   throw new Error('provider capability gate missing');

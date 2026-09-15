@@ -135,12 +135,6 @@ export function handleDeepLink(url) {
       return true;
     }
 
-    // Apple Wallet confirmation callback.
-    if (cleanPath === 'wallet-complete') {
-      router.push('/profile');
-      return true;
-    }
-
     // Orders
     if (cleanPath === 'orders') {
       router.push('/(tabs)/orders');
