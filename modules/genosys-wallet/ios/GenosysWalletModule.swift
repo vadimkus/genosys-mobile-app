@@ -37,7 +37,7 @@ public class GenosysWalletModule: Module {
       do {
         pass = try PKPass(data: passData)
       } catch {
-        promise.reject("ERR_INVALID_PASS", "Apple Wallet rejected the signed pass.", error)
+        promise.reject("ERR_INVALID_PASS", "Apple Wallet rejected the signed pass.")
         return
       }
 
