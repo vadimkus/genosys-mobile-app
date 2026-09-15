@@ -2,8 +2,7 @@
 
 **Date:** 15 September 2026  
 **Runtime:** 1.12.0 current, 1.13.0 native PassKit candidate
-**Delivery:** OTA-compatible; Apple is active and Google remains gated until
-publishing access is approved and physically verified.
+**Delivery:** Apple and Google production providers active.
 
 ## Native behavior
 
@@ -47,10 +46,10 @@ publishing access is approved and physically verified.
   with localized EN/AR/RU release notes and native Wallet review instructions.
   Release is automatic after approval and immediate to all users. Current
   status: `Waiting for Review`.
-- Android was intentionally excluded because Google Wallet remains in
-  `[TEST ONLY]` demo mode. The publishing-access request was submitted after
-  payments profile `6368-1116-8429` was linked; Google quotes a two-to-three
-  business-day review.
+- Google approved publishing access, demo mode was removed, and the loyalty
+  class is Active. Production authenticated issuance returns a Google Save URL.
+- Android 1.13.0 versionCode 92 was built with Google Wallet enabled:
+  `f36288cc-cd85-4824-8649-d438b78d164f`.
 - Customers may need to fully close and reopen the iOS app twice: the first
   launch downloads the OTA and the next launch applies it.
 
