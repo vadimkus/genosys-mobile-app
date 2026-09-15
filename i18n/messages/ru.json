@@ -695,6 +695,8 @@
     "addToGoogleWallet": "Добавить в Google Wallet",
     "walletOpening": "Открываем Wallet…",
     "walletError": "Не удалось открыть карту Wallet. Попробуйте ещё раз.",
+    "walletAddedTitle": "Добавлено в Apple Wallet",
+    "walletAdded": "Ваша карта GENOSYS Rewards готова и будет обновляться автоматически.",
     "tierMember": "Участник",
     "tierSilver": "Серебро",
     "tierGold": "Золото",

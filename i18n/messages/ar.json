@@ -695,6 +695,8 @@
     "addToGoogleWallet": "إضافة إلى محفظة Google",
     "walletOpening": "جارٍ فتح المحفظة…",
     "walletError": "تعذّر فتح بطاقة المحفظة. يُرجى المحاولة مرة أخرى.",
+    "walletAddedTitle": "تمت الإضافة إلى Apple Wallet",
+    "walletAdded": "بطاقة GENOSYS Rewards جاهزة وسيتم تحديثها تلقائياً.",
     "tierMember": "عضو",
     "tierSilver": "فضي",
     "tierGold": "ذهبي",

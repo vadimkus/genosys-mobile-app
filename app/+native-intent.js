@@ -108,6 +108,10 @@ export function redirectSystemPath({ path }) {
     // Cart / bag.
     if (cleanPath === 'cart' || cleanPath === 'bag') return '/(tabs)/bag';
 
+    // Apple Wallet landing page callback. The membership card listener closes
+    // the Safari view; this route is the safe fallback for cold/warm links.
+    if (cleanPath === 'wallet-complete') return '/profile';
+
     // Patient recommendation links must use a browser context. The website
     // owns their cart; loading it in the generic app WebView would isolate
     // that web cart from both Safari/Chrome and the native cart.

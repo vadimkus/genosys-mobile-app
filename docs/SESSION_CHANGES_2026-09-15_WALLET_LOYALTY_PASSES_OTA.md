@@ -14,6 +14,10 @@ capability is enabled and physically verified.
   bearer token or customer PII.
 - `expo-web-browser` opens the provider flow and returns the customer to the
   app when dismissed.
+- Apple installation now keeps a localized confirmation page beneath the
+  Wallet sheet. Once Apple registers the pass, the page returns through
+  `genosys://wallet-complete`; the app dismisses Safari and confirms success.
+  A visible Return to GENOSYS button covers delayed registration callbacks.
 - Partner accounts never reach the Rewards branch and the backend rejects them
   independently.
 - EN/RU/AR copy, RTL layout, loading lock, haptic feedback and failure alerts
@@ -26,7 +30,9 @@ capability is enabled and physically verified.
   `bd494daa-ac73-48b2-b9e8-5975c5be785e`.
 - The update message is `Add Apple Wallet rewards card`.
 - Android was intentionally excluded because Google Wallet remains in
-  `[TEST ONLY]` demo mode pending publishing access.
+  `[TEST ONLY]` demo mode. The publishing-access request was submitted after
+  payments profile `6368-1116-8429` was linked; Google quotes a two-to-three
+  business-day review.
 - Customers may need to fully close and reopen the iOS app twice: the first
   launch downloads the OTA and the next launch applies it.
 

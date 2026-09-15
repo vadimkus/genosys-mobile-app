@@ -7,6 +7,8 @@ const keys = [
   'addToGoogleWallet',
   'walletOpening',
   'walletError',
+  'walletAddedTitle',
+  'walletAdded',
 ];
 
 for (const locale of locales) {
@@ -26,6 +28,9 @@ if (!card.includes("walletProvider = Platform.OS === 'ios' ? 'APPLE' : 'GOOGLE'"
   throw new Error('platform wallet selection missing');
 }
 if (!card.includes('WebBrowser.openBrowserAsync')) throw new Error('in-app wallet browser handoff missing');
+if (!card.includes("genosys://wallet-complete") || !card.includes('WebBrowser.dismissBrowser')) {
+  throw new Error('Apple Wallet return-to-app handoff missing');
+}
 if (!card.includes('data?.wallet?.apple') || !card.includes('data?.wallet?.google')) {
   throw new Error('provider capability gate missing');
 }
