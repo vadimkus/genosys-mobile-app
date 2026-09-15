@@ -43,8 +43,10 @@ publishing access is approved and physically verified.
 - Audited iOS 1.13.0 build 109 compiled successfully and was uploaded to
   TestFlight. EAS build: `e4e70220-ac8d-42ab-85b5-758cac423133`; submission:
   `bf401c99-8035-4bdb-8f2a-f599dc9f8794`.
-- Public release remains blocked until build 109 passes physical Add, Cancel,
-  and Already Added testing.
+- Vadim physically accepted build 109. App Store version 1.13.0 was submitted
+  with localized EN/AR/RU release notes and native Wallet review instructions.
+  Release is automatic after approval and immediate to all users. Current
+  status: `Waiting for Review`.
 - Android was intentionally excluded because Google Wallet remains in
   `[TEST ONLY]` demo mode. The publishing-access request was submitted after
   payments profile `6368-1116-8429` was linked; Google quotes a two-to-three

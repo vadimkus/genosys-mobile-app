@@ -61,6 +61,34 @@ Completed:
 
 Still required:
 
-1. Wait for Apple processing and install build 109 from TestFlight.
-2. Physically verify Apple Wallet Add, Cancel, and Already Added behavior.
-3. Do not release publicly until that physical test passes.
+1. Wait for Apple App Review.
+2. Confirm the public App Store lookup reports 1.13.0 after approval.
+3. Update the server fallback version from 1.12.0 to 1.13.0 only after the
+   public listing changes.
+
+## Physical acceptance and production submission
+
+- Vadim physically accepted TestFlight build 109, including the native Apple
+  Wallet behavior.
+- Created App Store version 1.13.0 and attached build 109.
+- Added localized release notes in English, Arabic, and Russian.
+- Updated App Review notes with the retail Rewards test path and the intended
+  Partner-account exclusion.
+- Kept the current App Store rating.
+- Configured immediate availability to all users and automatic release after
+  approval.
+- Submitted to production App Review on 15 September 2026.
+- Current status: `Waiting for Review`. Apple states review can take up to
+  48 hours.
+
+## Older-version update notification verification
+
+- Build 106 runs runtime 1.12.0 and received the production update-prompt OTA
+  group `0394bcd4-ee91-4ee2-971c-75ca247fcebb`.
+- Later runtime-1.12.0 OTAs contain that code as descendants.
+- The live endpoint currently returns 1.12.0 from Apple's public lookup, which
+  correctly avoids a premature prompt.
+- Once Apple publishes 1.13.0, build 106 compares native runtime 1.12.0 with
+  latest 1.13.0 and shows the daily alert, icon badge, home-avatar dot, and
+  Profile update row linking to the App Store.
+- `smoke:app-update` passes the 1.12.0 to 1.13.0 update case.
