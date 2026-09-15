@@ -2,8 +2,8 @@
 
 **Date:** 15 September 2026  
 **Runtime:** 1.12.0  
-**Delivery:** OTA-compatible; do not publish until the website provider
-capability is enabled and physically verified.
+**Delivery:** OTA-compatible; Apple is active and Google remains gated until
+publishing access is approved and physically verified.
 
 ## Native behavior
 
@@ -29,6 +29,10 @@ capability is enabled and physically verified.
 - Published the iOS production OTA on runtime `1.12.0`:
   `bd494daa-ac73-48b2-b9e8-5975c5be785e`.
 - The update message is `Add Apple Wallet rewards card`.
+- Published the Apple post-install return fix in iOS update group
+  `fd2383e9-7edd-4c5f-8962-d37031005c86`, update
+  `01a0a52a-97ed-7e73-8b77-3ffa6ba5e4d1`.
+- The follow-up update message is `Fix Apple Wallet return confirmation`.
 - Android was intentionally excluded because Google Wallet remains in
   `[TEST ONLY]` demo mode. The publishing-access request was submitted after
   payments profile `6368-1116-8429` was linked; Google quotes a two-to-three
