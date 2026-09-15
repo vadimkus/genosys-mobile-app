@@ -164,15 +164,15 @@ export default function MembershipCard({ isRTL = false }) {
   const pct = Math.max(0, Math.min(100, Number(progress.progressPercent || 0)));
 
   return (
-    <TouchableOpacity
-      style={[styles.card, shadow.card]}
-      onPress={toggle}
-      activeOpacity={0.9}
-      accessibilityRole="button"
-      accessibilityState={{ expanded }}
-      accessibilityLabel={t('rewards.title')}
-    >
-      {/* Header */}
+    <View style={[styles.card, shadow.card]}>
+      <TouchableOpacity
+        onPress={toggle}
+        activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        accessibilityLabel={t('rewards.title')}
+      >
+        {/* Header */}
       <View style={[styles.headerRow, isRTL && styles.rowReverse]}>
         <View style={[styles.titleWrap, isRTL && styles.rowReverse]}>
           <Ionicons name="ribbon-outline" size={17} color={colors.accent} />
@@ -226,6 +226,7 @@ export default function MembershipCard({ isRTL = false }) {
       {data.memberNumber ? (
         <Text style={[styles.memberNumber, isRTL && styles.textRTL]}>{data.memberNumber}</Text>
       ) : null}
+      </TouchableOpacity>
 
       {walletAvailable ? (
         <TouchableOpacity
@@ -299,7 +300,7 @@ export default function MembershipCard({ isRTL = false }) {
           </View>
         </View>
       ) : null}
-    </TouchableOpacity>
+    </View>
   );
 }
 

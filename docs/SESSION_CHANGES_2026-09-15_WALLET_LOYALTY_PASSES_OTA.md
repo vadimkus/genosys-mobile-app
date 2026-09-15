@@ -24,3 +24,10 @@ capability is enabled and physically verified.
 No OTA is published while wallet providers are disabled. Before publishing,
 complete the website provider setup, then test Apple Wallet on a physical
 iPhone and Google Wallet on an approved Android demo account.
+
+## Automated verification
+
+- Wallet contract/localization smoke passed.
+- Full ESLint passed.
+- No-dash guard passed.
+- Expo exports passed for both iOS and Android.
