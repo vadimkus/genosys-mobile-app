@@ -19,11 +19,16 @@ capability is enabled and physically verified.
 - EN/RU/AR copy, RTL layout, loading lock, haptic feedback and failure alerts
   are included.
 
-## Release gate
+## Release status
 
-No OTA is published while wallet providers are disabled. Before publishing,
-complete the website provider setup, then test Apple Wallet on a physical
-iPhone and Google Wallet on an approved Android demo account.
+- Apple Wallet signing, live issuance, and physical iPhone installation passed.
+- Published the iOS production OTA on runtime `1.12.0`:
+  `bd494daa-ac73-48b2-b9e8-5975c5be785e`.
+- The update message is `Add Apple Wallet rewards card`.
+- Android was intentionally excluded because Google Wallet remains in
+  `[TEST ONLY]` demo mode pending publishing access.
+- Customers may need to fully close and reopen the iOS app twice: the first
+  launch downloads the OTA and the next launch applies it.
 
 ## Automated verification
 
