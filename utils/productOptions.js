@@ -158,7 +158,22 @@ export async function canonicalizeCartItemForOptionValidation(item, loadProduct)
         (normalizeValue(canonical.id) || normalizeValue(canonical.productNumber)) &&
         normalizeValue(canonical.name)
       ) {
-        return { ...item, product: canonical };
+        const canonicalModel = extractProductOptions(canonical);
+        const sanitizeSelection = (current, options) => {
+          const value = normalizeValue(current);
+          if (options.length === 0) return '';
+          if (options.some((option) => option.value === value)) return value;
+          if (options.length === 1) return options[0].value;
+          // Keep an invalid value for a real multi-option product so checkout
+          // fails closed and asks the customer to choose again.
+          return value;
+        };
+        return {
+          ...item,
+          product: canonical,
+          selectedSize: sanitizeSelection(item?.selectedSize, canonicalModel.sizes),
+          selectedColor: sanitizeSelection(item?.selectedColor, canonicalModel.colors),
+        };
       }
     } catch {
       // Try the second stable identifier before preserving the fail-closed item.

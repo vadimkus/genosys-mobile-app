@@ -115,6 +115,7 @@ assert.equal(isProductSelectionComplete(staleProduct, {}), false);
 const canonicalSimpleProduct = {
   id: '14',
   name: 'MICROBIOME ENERGY INFUSING MIST',
+  size: '80 ml',
   price: 160,
   hasVariants: false,
   variants: [],
@@ -195,7 +196,9 @@ loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async (productId) => {
       },
       fromBundle: true,
       selectedColor: '',
-      selectedSize: '',
+      // Bundle Builder used to copy this display fact into selectedSize even
+      // though the product has no selectable size options.
+      selectedSize: '80 ml',
     };
     const canonicalBundleItem = await canonicalizeCartItemForOptionValidation(
       staleBundleItem,
@@ -206,6 +209,28 @@ loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async (productId) => {
     );
     assert.equal(bundleLookup, '14');
     assert.equal(isProductSelectionComplete(canonicalBundleItem.product, {}), true);
+    assert.equal(canonicalBundleItem.selectedSize, '');
+
+    const remover = {
+      id: '11',
+      productNumber: '11',
+      name: 'SKIN DEFENDER LIP & EYE MAKEUP REMOVER',
+      size: '100 ml',
+      hasVariants: false,
+      variants: [],
+      colorVariants: [],
+    };
+    const canonicalRemoverItem = await canonicalizeCartItemForOptionValidation(
+      {
+        product: { ...remover, hasVariants: true, fromBundle: true },
+        fromBundle: true,
+        selectedSize: '100 ml',
+        selectedColor: '',
+      },
+      async () => remover
+    );
+    assert.equal(canonicalRemoverItem.selectedSize, '');
+    assert.equal(isProductSelectionComplete(canonicalRemoverItem.product, {}), true);
 
     let cleanLookups = 0;
     const unchangedSimple = await canonicalizeCartItemForOptionValidation(

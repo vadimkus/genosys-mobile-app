@@ -84,7 +84,10 @@ const getBundleDefaultSize = (product) => {
   const explicit = String(product?.size || '').trim();
   const variants = Array.isArray(product?.variants) ? product.variants : [];
   if (explicit && variants.some((variant) => String(variant?.size || '').trim() === explicit)) return explicit;
-  return pickDefaultVariantSize(product) || explicit || '';
+  // `product.size` is also used as a display fact ("80 ml") on products with
+  // no selectable variants. Storing that as selectedSize makes checkout reject
+  // the line because the value does not exist in the canonical option model.
+  return pickDefaultVariantSize(product) || '';
 };
 
 const hasServerDiscount = (variantOriginal, variantPrice, variants, product) => {
