@@ -23,7 +23,11 @@ import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } fro
 import { captureException } from '../config/sentry';
 import { useLocalization } from '../contexts/LocalizationContext';
 import { formatAddressForDisplay } from '../utils/addressUtils';
-import { extractProductOptions, isProductSelectionComplete } from '../utils/productOptions';
+import {
+  canonicalizeCartItemForOptionValidation,
+  extractProductOptions,
+  isProductSelectionComplete,
+} from '../utils/productOptions';
 import { normalizeUserProfile } from '../utils/userProfile';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import * as haptics from '../utils/haptics';
@@ -432,17 +436,15 @@ function CheckoutScreen() {
     });
 
     // Persisted carts can carry an old hasVariants=true snapshot even when the
-    // product has no selectable size/color. Refresh only those ambiguous lines
-    // before validating, while still failing closed for real option products.
+    // product has no selectable size/color. Bundle Builder lines are always
+    // refreshed because its reduced payload can also lose real option data.
     const optionValidationItems = await Promise.all(
-      paidItems.map(async (item) => {
-        const model = extractProductOptions(item?.product);
-        if (!model.missingOptionData) return item;
-        const productId = item?.product?.id || item?.product?.productNumber;
-        if (!productId) return item;
-        const canonical = await fetchProductById(productId, user, { locale });
-        return canonical ? { ...item, product: canonical } : item;
-      })
+      paidItems.map((item) =>
+        canonicalizeCartItemForOptionValidation(
+          item,
+          (productId) => fetchProductById(productId, user, { locale })
+        )
+      )
     );
 
     // Block checkout if any paid item is missing a required canonical option.

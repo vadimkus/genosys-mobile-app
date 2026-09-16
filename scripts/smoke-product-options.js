@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   applyProductOptionPrice,
+  canonicalizeCartItemForOptionValidation,
   extractProductOptions,
   getInitialProductSelection,
   getProductOptionKey,
@@ -182,6 +183,40 @@ loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async (productId) => {
       async () => canonicalSimpleProduct
     );
     assert.equal(isProductSelectionComplete(refreshedSimple, {}), true);
+
+    let bundleLookup = '';
+    const staleBundleItem = {
+      product: {
+        ...canonicalSimpleProduct,
+        id: 'bundle-cuid',
+        productNumber: '14',
+        hasVariants: true,
+        fromBundle: true,
+      },
+      fromBundle: true,
+      selectedColor: '',
+      selectedSize: '',
+    };
+    const canonicalBundleItem = await canonicalizeCartItemForOptionValidation(
+      staleBundleItem,
+      async (productId) => {
+        bundleLookup = productId;
+        return canonicalSimpleProduct;
+      }
+    );
+    assert.equal(bundleLookup, '14');
+    assert.equal(isProductSelectionComplete(canonicalBundleItem.product, {}), true);
+
+    let cleanLookups = 0;
+    const unchangedSimple = await canonicalizeCartItemForOptionValidation(
+      { product: canonicalSimpleProduct },
+      async () => {
+        cleanLookups += 1;
+        return canonicalSimpleProduct;
+      }
+    );
+    assert.equal(cleanLookups, 0);
+    assert.equal(unchangedSimple.product, canonicalSimpleProduct);
 
     await assert.rejects(
       loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async () => null),

@@ -128,6 +128,46 @@ export async function loadCanonicalProductForQuickAdd(product, loadProduct) {
   return canonicalProduct;
 }
 
+/**
+ * Checkout must not trust reduced or persisted Bundle Builder snapshots.
+ *
+ * Bundle items are refreshed even when they do not currently look ambiguous:
+ * older cart merges could preserve `hasVariants=true`, while older reduced
+ * payloads could lose real options. Product number is the stable lookup key
+ * across both cases; the database id remains a fallback.
+ */
+export async function canonicalizeCartItemForOptionValidation(item, loadProduct) {
+  const product = item?.product || {};
+  const model = extractProductOptions(product);
+  const fromBundle = item?.fromBundle === true || product?.fromBundle === true;
+  if (!fromBundle && !model.missingOptionData) return item;
+  if (typeof loadProduct !== 'function') return item;
+
+  const ids = [
+    fromBundle ? product?.productNumber : product?.id,
+    fromBundle ? product?.id : product?.productNumber,
+  ]
+    .map(normalizeValue)
+    .filter((value, index, values) => value && values.indexOf(value) === index);
+
+  for (const id of ids) {
+    try {
+      const canonical = await loadProduct(id);
+      if (
+        canonical &&
+        (normalizeValue(canonical.id) || normalizeValue(canonical.productNumber)) &&
+        normalizeValue(canonical.name)
+      ) {
+        return { ...item, product: canonical };
+      }
+    } catch {
+      // Try the second stable identifier before preserving the fail-closed item.
+    }
+  }
+
+  return item;
+}
+
 export function isOptionAvailable(model, dimension, value, selection = {}) {
   const normalizedValue = normalizeValue(value);
   const options = dimension === 'size' ? model?.sizes : model?.colors;

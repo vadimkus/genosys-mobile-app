@@ -258,6 +258,10 @@ export default function BundleBuilderScreen() {
     const bundleProducts = selectedArray.map(({ product }) => {
       // Bundle discount applied to retail price only
       const retailPrice = getBundleRetailPrice(product);
+      const selectableVariants = (Array.isArray(product.variants) ? product.variants : [])
+        .filter((variant) =>
+          String(variant?.size || '').trim() || String(variant?.color || '').trim()
+        );
 
       // Build a cart-compatible product object
       return {
@@ -272,7 +276,11 @@ export default function BundleBuilderScreen() {
         image: product.image,
         category: product.category,
         size: product.size,
-        variants: Array.isArray(product.variants) ? product.variants : [],
+        // Write the canonical state explicitly. Without `false`, merging this
+        // line into an older bundle item preserves a stale `hasVariants=true`.
+        hasVariants: selectableVariants.length > 0,
+        variants: selectableVariants,
+        colorVariants: Array.isArray(product.colorVariants) ? product.colorVariants : [],
         pricing: product.pricing || null,
         inStock: true,
         fromBundle: true,

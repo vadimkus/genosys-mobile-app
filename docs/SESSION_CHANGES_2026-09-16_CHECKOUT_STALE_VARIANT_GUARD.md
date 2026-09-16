@@ -62,3 +62,15 @@ Runtime 1.12.0 compatibility release for currently installed store builds:
 
 Both releases target the production branch on iOS and Android. The repository
 runtime was restored to 1.13.0 after publishing the compatibility update.
+
+## Bundle Builder follow-up
+
+A customer could still reproduce the alert after building a set in the native
+Bundle Builder. Its reduced product object omitted `hasVariants`; when that
+object merged into an older bundle line, the old `hasVariants=true` survived.
+
+The Bundle Builder now writes `hasVariants` explicitly from its selectable
+variants. Checkout also refreshes every Bundle Builder line from the canonical
+product API before option validation, using product number first and database
+id as fallback. This clears stale flags for simple products while still
+blocking a real multi-size or multi-shade product without a valid selection.
