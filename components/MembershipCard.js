@@ -8,6 +8,7 @@ import { useLocalization } from '../contexts/LocalizationContext';
 import { fetchMembership, fetchMembershipWalletUrl } from '../services/api';
 import { addApplePassFromUrl } from '../services/appleWallet';
 import { colors, shadow, surfaces } from '../utils/theme';
+import { visibleTierProgressFill } from '../utils/tierProgress';
 import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 
@@ -23,8 +24,8 @@ if (
 }
 
 const TIER_STYLES = {
-  MEMBER: { bg: colors.groupedBg, fg: colors.label, bar: colors.secondaryLabel },
-  SILVER: { bg: colors.groupedBg, fg: colors.label, bar: colors.placeholder },
+  MEMBER: { bg: colors.groupedBg, fg: colors.label, bar: colors.accent },
+  SILVER: { bg: colors.groupedBg, fg: colors.label, bar: colors.accent },
   GOLD: { bg: '#FAF3E3', fg: '#8A6D1D', bar: '#D4AF37' },
   PLATINUM: { bg: colors.label, fg: colors.subtleBg, bar: colors.label },
 };
@@ -178,7 +179,7 @@ export default function MembershipCard({ isRTL = false }) {
   const balance = Number(data.points?.balance || 0);
   const valueAed = Number(data.points?.valueAed || 0);
   const progress = data.tierProgress || {};
-  const pct = Math.max(0, Math.min(100, Number(progress.progressPercent || 0)));
+  const pct = visibleTierProgressFill(progress);
 
   return (
     <View style={[styles.card, shadow.card]}>
@@ -232,8 +233,21 @@ export default function MembershipCard({ isRTL = false }) {
               {' · '}AED {Number(progress.nextTierAt || 0).toLocaleString()}
             </Text>
           </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: ts.bar }]} />
+          <View
+            style={styles.progressTrack}
+            accessibilityRole="progressbar"
+            accessibilityValue={{ min: 0, max: 100, now: Math.round(pct) }}
+          >
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  width: `${pct}%`,
+                  minWidth: Number(progress.currentSpent || 0) > 0 ? 12 : 0,
+                  backgroundColor: ts.bar,
+                },
+              ]}
+            />
           </View>
         </View>
       ) : (
@@ -407,8 +421,8 @@ const styles = StyleSheet.create({
     color: colors.secondaryLabel,
   },
   progressTrack: {
-    height: 6,
-    backgroundColor: colors.fillSecondary,
+    height: 8,
+    backgroundColor: colors.separator,
     borderRadius: 4,
     overflow: 'hidden',
   },

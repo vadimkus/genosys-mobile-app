@@ -9,8 +9,8 @@ import {
   Alert,
   Dimensions,
   ActivityIndicator,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
@@ -28,6 +28,7 @@ import { createLogger } from '../utils/logger';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
 import { colors, shadow, surfaces } from '../utils/theme';
+import { resolveProfilePictureUri } from '../utils/userProfile';
 
 const log = createLogger('Profile');
 
@@ -69,6 +70,7 @@ export default function ProfileScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [ordersCount, setOrdersCount] = useState(0);
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -145,11 +147,13 @@ export default function ProfileScreen() {
     };
   }, [user?.token]);
 
-  const profileImageUri =
-    (typeof user?.profilePicture === 'string' && user.profilePicture.trim()) ? user.profilePicture.trim()
-    : (typeof user?.profile_picture === 'string' && user.profile_picture.trim()) ? user.profile_picture.trim()
-    : (typeof user?.picture === 'string' && user.picture.trim()) ? user.picture.trim()
-    : '';
+  const profileImageUri = resolveProfilePictureUri(
+    user?.profilePicture || user?.profile_picture || user?.picture
+  );
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [profileImageUri]);
 
   const displayEmail = String(user?.contactEmail || user?.email || '').trim();
 
@@ -448,10 +452,13 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <View style={[styles.avatarWrap, isRTL && styles.avatarWrapRTL]}>
             <View style={styles.avatarContainer}>
-              {profileImageUri ? (
+              {profileImageUri && !avatarFailed ? (
                 <Image
                   source={{ uri: profileImageUri }}
                   style={styles.avatarImage}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  onError={() => setAvatarFailed(true)}
                 />
               ) : (
                 <Text style={styles.avatarText}>
@@ -818,6 +825,7 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 40,
+    overflow: 'hidden',
   },
   onlineDot: {
     position: 'absolute',

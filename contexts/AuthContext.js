@@ -168,7 +168,17 @@ export const AuthProvider = ({ children }) => {
             // If the endpoint is unavailable (or network issue), keep the stored user/token.
             // If the server returned a fresh user, merge it but always preserve the token.
             const mergedUser = validation.user
-              ? { ...validation.user, token: userData.token }
+              ? {
+                  ...userData,
+                  ...validation.user,
+                  token: userData.token,
+                  profilePicture:
+                    validation.user.profilePicture ||
+                    validation.user.profile_picture ||
+                    userData.profilePicture ||
+                    userData.profile_picture ||
+                    null,
+                }
               : userData;
             const sanitizedUser = sanitizeUserSession(mergedUser);
             setUser(sanitizedUser);

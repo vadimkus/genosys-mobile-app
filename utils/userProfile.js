@@ -1,4 +1,5 @@
 import { getAddressLine, parseGenosysAddress } from './addressUtils';
+import { ASSET_ORIGIN } from './assets';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,8 +52,31 @@ export const normalizeUserProfile = (user = {}) => {
     addressDetails: parsedAddress,
     addressLine: getAddressLine(parsedAddress || (user?.address || '')),
     emirate: String(user?.emirate || parsedAddress?.emirate || '').trim(),
-    profilePicture: user?.profilePicture || user?.profile_picture || null,
+    profilePicture: pickProfilePicture(user?.profilePicture, user?.profile_picture),
   };
+};
+
+export const pickProfilePicture = (...candidates) => {
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+  }
+  return null;
+};
+
+export const resolveProfilePictureUri = (raw, origin = ASSET_ORIGIN) => {
+  const value = pickProfilePicture(raw);
+  if (!value) return '';
+  if (
+    value.startsWith('data:') ||
+    value.startsWith('file:') ||
+    value.startsWith('content:') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://')
+  ) {
+    return value;
+  }
+  if (value.startsWith('//')) return `https:${value}`;
+  return `${origin}${value.startsWith('/') ? '' : '/'}${value}`;
 };
 
 export const getOrderContactEmail = (order, user = {}) => {
@@ -67,5 +91,7 @@ export default {
   isValidEmailValue,
   getUserDisplayNameParts,
   normalizeUserProfile,
+  pickProfilePicture,
+  resolveProfilePictureUri,
   getOrderContactEmail,
 };

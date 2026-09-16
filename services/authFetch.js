@@ -102,10 +102,17 @@ export async function refreshToken(expiredToken) {
 export async function persistRefreshedToken(refreshResult) {
   try {
     const storedUser = await getUserSession() || {};
+    const incoming = refreshResult.user || {};
     const updatedUser = {
       ...storedUser,
-      ...(refreshResult.user || {}),
+      ...incoming,
       token: refreshResult.token,
+      profilePicture:
+        incoming.profilePicture ||
+        incoming.profile_picture ||
+        storedUser.profilePicture ||
+        storedUser.profile_picture ||
+        null,
     };
     await storeUserSession(updatedUser);
     log.debug('Persisted refreshed token to storage');

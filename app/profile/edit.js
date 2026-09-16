@@ -7,13 +7,13 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  Image,
   Modal,
   ActionSheetIOS,
   Platform,
   Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import CollapsibleHeader, { useCollapsibleHeader } from '../../components/CollapsibleHeader';
 import { useRouter } from 'expo-router';
@@ -22,7 +22,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Asset } from 'expo-asset';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalization } from '../../contexts/LocalizationContext';
-import { normalizeUserProfile } from '../../utils/userProfile';
+import { normalizeUserProfile, resolveProfilePictureUri } from '../../utils/userProfile';
 import { createLogger } from '../../utils/logger';
 import * as haptics from '../../utils/haptics';
 import T from '../../utils/typography';
@@ -599,8 +599,13 @@ export default function EditProfileScreen() {
               disabled={!isEditing}
             >
               <View style={styles.profilePictureWrapper}>
-                {formData.profilePicture ? (
-                  <Image source={{ uri: formData.profilePicture }} style={styles.profilePicture} />
+                {resolveProfilePictureUri(formData.profilePicture) ? (
+                  <Image
+                    source={{ uri: resolveProfilePictureUri(formData.profilePicture) }}
+                    style={styles.profilePicture}
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
+                  />
                 ) : (
                   <View style={styles.profilePicturePlaceholder}>
                     <Ionicons name="person" size={40} color={colors.tertiary} />
@@ -1216,6 +1221,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     backgroundColor: colors.subtleBg,
+    overflow: 'hidden',
   },
   profilePicturePlaceholder: {
     width: 100,
