@@ -1,6 +1,7 @@
 import { Capsule, Circle, HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui';
 import {
   activityBackgroundTint,
+  background,
   font,
   foregroundStyle,
   frame,
@@ -13,9 +14,10 @@ import { createLiveActivity } from 'expo-widgets';
  *
  * ## Two surfaces, two palettes
  *
- * The Lock Screen card is ours: `activityBackgroundTint` paints it cera cream, so it reads
- * as a piece of the brand rather than another dark slab in the stack. Everything on it is
- * the app's own cream-tuned palette.
+ * The Lock Screen card is ours: `background` paints an opaque cera-cream layer and
+ * `activityBackgroundTint` gives Apple's surrounding activity container the same colour.
+ * Using only the tint lets iOS 26 blend the wallpaper into the card. Everything on the
+ * card uses the app's own cream-tuned palette.
  *
  * The Dynamic Island is not ours. Apple states plainly that compact, minimal and expanded
  * presentations use a black opaque background and cannot be customised, so those keep the
@@ -81,31 +83,31 @@ const OrderActivity = (props: OrderActivityProps) => {
 
   /**
    * The cream card. Every value is the app's own, and every one is measured against
-   * `#faf7f5` rather than assumed:
+   * `#fffaf7` rather than assumed:
    *
-   *   ink      16.75:1   headline
-   *   body     10.97:1   the delivery promise
-   *   muted     5.95:1   order number, rewards
-   *   roseInk   5.21:1   the wordmark
-   *   green     4.73:1   a step behind us
-   *   amber     5.13:1   the step in hand
-   *   ahead     3.18:1   a step not started, which still has to be visible
+   *   ink      17.24:1   headline
+   *   body     11.30:1   the delivery promise
+   *   muted     6.12:1   order number, rewards
+   *   roseInk   8.03:1   the wordmark
+   *   green     4.87:1   a step behind us
+   *   amber     5.28:1   the step in hand
+   *   ahead     4.79:1   a step not started, which still has to be visible
    *
    * The rail ahead is `line`, which is far below 3:1 on purpose: it is a connector, and
    * the node it leads to carries the state.
    */
-  // The card's own background. Not part of the palette below, which is foregrounds only.
-  const CARD_BG = '#faf7f5';
+  // The card's opaque background. Not part of the palette below, which is foregrounds only.
+  const CARD_BG = '#fffaf7';
 
   const LIGHT = {
     ink: '#191716',
     body: '#3d3734',
     muted: '#665e59',
-    mark: '#8f5a5a',
+    mark: '#743f3f',
     done: '#2E7D4F',
     now: '#9A5A00',
-    ahead: '#968981',
-    rail: '#e8e0db',
+    ahead: '#786e68',
+    rail: '#c9bbb3',
     stopped: '#d22b1e',
   };
 
@@ -226,7 +228,11 @@ const OrderActivity = (props: OrderActivityProps) => {
     banner: (
       <VStack
         spacing={9}
-        modifiers={[padding({ horizontal: 14, vertical: 14 }), activityBackgroundTint(CARD_BG)]}
+        modifiers={[
+          padding({ horizontal: 14, vertical: 14 }),
+          background(CARD_BG),
+          activityBackgroundTint(CARD_BG),
+        ]}
       >
         <HStack>
           <Text modifiers={[font({ size: 10, weight: 'semibold' }), foregroundStyle(LIGHT.mark)]}>

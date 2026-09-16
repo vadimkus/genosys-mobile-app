@@ -145,11 +145,21 @@ for (const file of LAYOUTS) {
     console.log('  ok   every foreground is an explicit value');
   }
 
-  console.log(`the card is painted cream (${file})`);
-  if (/activityBackgroundTint/.test(source)) {
-    console.log('  ok   activityBackgroundTint is set');
+  console.log(`the card is painted opaque cream (${file})`);
+  if (/background\(\s*CARD_BG\s*\)/.test(source)) {
+    console.log('  ok   the card has its own opaque background');
+  } else {
+    fail(`${file} no longer paints an opaque card background; iOS can blend in the wallpaper.`);
+  }
+  if (/activityBackgroundTint\(\s*CARD_BG\s*\)/.test(source)) {
+    console.log('  ok   the surrounding activity tint matches');
   } else {
     fail(`${file} no longer tints the background; the card falls back to the dark material.`);
+  }
+  if (source.includes("'#fffaf7'")) {
+    console.log('  ok   the GENOSYS cream is pinned');
+  } else {
+    fail(`${file} no longer uses the approved visible cream #fffaf7.`);
   }
 
   console.log(`progress is green and amber, red is for cancelled (${file})`);

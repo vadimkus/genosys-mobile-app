@@ -252,3 +252,18 @@ material. The red stays on the track, where 3:1 is the bar.
 
 OTA. The layout is the serialised widget function, written into the App Group
 when the app opens. Open the app once after updating, then lock the phone.
+
+## 16 Sep 2026: visible on iOS 26 wallpapers
+
+A physical-device screenshot showed the cera-cream tint blending with a bright
+turquoise Lock Screen wallpaper. The content was structurally correct, but the
+card read like tinted glass rather than a GENOSYS surface.
+
+The banner now paints its own opaque `#fffaf7` background and keeps
+`activityBackgroundTint` in the same colour for Apple's surrounding container.
+The quiet rose wordmark, upcoming nodes and inactive rails were darkened as
+well. Text and state-bearing nodes now clear at least 4.79:1 against the card;
+only the decorative connector rail remains below text contrast.
+
+`scripts/smoke-widget-layout.js` now requires both layers and the approved cream,
+so removing the opaque background fails release verification.
