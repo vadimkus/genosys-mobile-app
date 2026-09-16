@@ -44,3 +44,21 @@ from the canonical single-product API:
 - Product-option smoke passed, including stale-simple refresh coverage.
 - Full ESLint, label-case, and no-dash checks passed.
 - iOS and Android exports passed.
+- Full `verify:release` and `expo-doctor` 20 of 20 passed.
+
+## Production OTA
+
+Runtime 1.13.0:
+
+- Update group: `52cf5996-b8ab-4620-9878-b60350df5242`.
+- Android: `01a0a949-8881-764f-86ad-85a60656ac64`.
+- iOS: `01a0a949-8881-7c20-a6ac-0fcb7262e364`.
+
+Runtime 1.12.0 compatibility release for currently installed store builds:
+
+- Update group: `302aa643-1ae9-4bab-a966-a054681d7b31`.
+- Android: `01a0a94a-ada7-79a0-9df1-d02d3189478c`.
+- iOS: `01a0a94a-ada7-7412-9e0e-12f03294534b`.
+
+Both releases target the production branch on iOS and Android. The repository
+runtime was restored to 1.13.0 after publishing the compatibility update.
