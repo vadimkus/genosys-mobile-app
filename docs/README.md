@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [Checkout Stale Variant Guard (2026-09-16)](./SESSION_CHANGES_2026-09-16_CHECKOUT_STALE_VARIANT_GUARD.md) | Fixes false size/colour selection blocks from old simple-product cart snapshots while preserving strict validation for real variants; OTA for runtimes 1.12.0 and 1.13.0. |
 | [Android 1.13.0 Google Wallet Build (2026-09-15)](./SESSION_CHANGES_2026-09-15_ANDROID_1.13.0_GOOGLE_WALLET_BUILD.md) | Google publishing approval, production activation, versionCode 92 checks, EAS AAB build, and local artifact path. |
 | [iOS 1.13.0 Release Audit (2026-09-15)](./SESSION_CHANGES_2026-09-15_IOS_1.13.0_RELEASE_AUDIT.md) | Build-106 baseline audit covering all 35 pending commits, native PassKit, Expo/Hermes regression fixes, SDK alignment, and TestFlight release gates. |
 | [GENOSYS Rewards Wallet Passes (2026-09-15)](./SESSION_CHANGES_2026-09-15_WALLET_LOYALTY_PASSES_OTA.md) | Provider-gated Apple/Google loyalty-card flow; signed URLs, native iOS PassKit candidate, EN/RU/AR and physical-device release gates. |

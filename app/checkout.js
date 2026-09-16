@@ -17,7 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
 import { useFocusEffect } from 'expo-router';
 import { calculateCartTotals, computeWaterfallBreakdown } from '../utils/cartUtils';
-import { fetchMembership } from '../services/api';
+import { fetchMembership, fetchProductById } from '../services/api';
 import { submitCODOrder, createCardPaymentSheetIntent, generateOrderNumber } from '../services/orderService';
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { captureException } from '../config/sentry';
@@ -431,16 +431,30 @@ function CheckoutScreen() {
       address: true,
     });
 
+    // Persisted carts can carry an old hasVariants=true snapshot even when the
+    // product has no selectable size/color. Refresh only those ambiguous lines
+    // before validating, while still failing closed for real option products.
+    const optionValidationItems = await Promise.all(
+      paidItems.map(async (item) => {
+        const model = extractProductOptions(item?.product);
+        if (!model.missingOptionData) return item;
+        const productId = item?.product?.id || item?.product?.productNumber;
+        if (!productId) return item;
+        const canonical = await fetchProductById(productId, user, { locale });
+        return canonical ? { ...item, product: canonical } : item;
+      })
+    );
+
     // Block checkout if any paid item is missing a required canonical option.
-    const itemsMissingColor = paidItems.filter(item => {
+    const itemsMissingColor = optionValidationItems.filter(item => {
       const model = extractProductOptions(item?.product);
       return model.required.color && !item.selectedColor;
     });
-    const itemsMissingSize = paidItems.filter(item => {
+    const itemsMissingSize = optionValidationItems.filter(item => {
       const model = extractProductOptions(item?.product);
       return model.required.size && !item.selectedSize;
     });
-    const itemsWithInvalidSelections = paidItems.filter(item =>
+    const itemsWithInvalidSelections = optionValidationItems.filter(item =>
       !isProductSelectionComplete(item?.product, {
         selectedColor: item?.selectedColor,
         selectedSize: item?.selectedSize,

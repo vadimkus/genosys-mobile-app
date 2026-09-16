@@ -111,6 +111,15 @@ const staleProduct = { id: 'stale', price: 100, hasVariants: true, variants: [] 
 assert.equal(isProductOptionSelectionRequired(staleProduct), true);
 assert.equal(isProductSelectionComplete(staleProduct, {}), false);
 
+const canonicalSimpleProduct = {
+  id: '14',
+  name: 'MICROBIOME ENERGY INFUSING MIST',
+  price: 160,
+  hasVariants: false,
+  variants: [],
+  colorVariants: [],
+};
+
 const discountedSizeProduct = {
   ...sizeProduct,
   pricing: {
@@ -167,6 +176,13 @@ loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async (productId) => {
     assert.equal(canonicalFavorite, sizeProduct);
     assert.equal(isProductOptionSelectionRequired(canonicalFavorite), true);
     assert.equal(isProductSelectionComplete(canonicalFavorite, {}), false);
+
+    const refreshedSimple = await loadCanonicalProductForQuickAdd(
+      { ...canonicalSimpleProduct, hasVariants: true },
+      async () => canonicalSimpleProduct
+    );
+    assert.equal(isProductSelectionComplete(refreshedSimple, {}), true);
+
     await assert.rejects(
       loadCanonicalProductForQuickAdd(syncedFavoriteSummary, async () => null),
       /PRODUCT_UNAVAILABLE/
