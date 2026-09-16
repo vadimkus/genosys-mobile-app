@@ -44,4 +44,13 @@
 - Local copy:
   `~/Desktop/Genosys-UAE-1.13.0-92.aab`
 
-The AAB is built but has not been uploaded to a Google Play track.
+## Google Play production submission
+
+- Uploaded the AAB manually to the Production track on 16 September 2026.
+- Release: `92 (1.13.0)`.
+- Rollout: full rollout.
+- Managed publishing: off, so Google will publish automatically after approval.
+- Current Play Console status: `In review`.
+- The first automated EAS submission attempt was intentionally abandoned
+  because no Google Play service-account key is configured. Future automated
+  submissions require a dedicated Play service account with release access.

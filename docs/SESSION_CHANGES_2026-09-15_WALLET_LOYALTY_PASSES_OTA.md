@@ -50,6 +50,8 @@
   class is Active. Production authenticated issuance returns a Google Save URL.
 - Android 1.13.0 versionCode 92 was built with Google Wallet enabled:
   `f36288cc-cd85-4824-8649-d438b78d164f`.
+- Version 92 was submitted to the Google Play Production track for full
+  rollout. Current status: `In review`.
 - Customers may need to fully close and reopen the iOS app twice: the first
   launch downloads the OTA and the next launch applies it.
 
