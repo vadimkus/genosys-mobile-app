@@ -715,7 +715,10 @@
     "tierPerkMember": "1 point per AED",
     "tierPerkSilver": "1.25 points per AED + early access",
     "tierPerkGold": "1.5 points per AED + free shipping + birthday gift",
-    "tierPerkPlatinum": "2 points per AED + exclusive gifts + first access"
+    "tierPerkPlatinum": "2 points per AED + exclusive gifts + first access",
+    "walletAlreadyTitle": "Already in your Wallet",
+    "walletAlready": "Your GENOSYS Rewards card is already in Apple Wallet and updates automatically.",
+    "walletOpen": "Open Wallet"
   },
   "profile": {
     "general": "General",

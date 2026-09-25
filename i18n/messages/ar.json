@@ -715,7 +715,10 @@
     "tierPerkMember": "نقطة واحدة لكل درهم",
     "tierPerkSilver": "1.25 نقطة لكل درهم + وصول مبكر",
     "tierPerkGold": "1.5 نقطة لكل درهم + شحن مجاني + هدية عيد ميلاد",
-    "tierPerkPlatinum": "نقطتان لكل درهم + هدايا حصرية + أولوية الوصول"
+    "tierPerkPlatinum": "نقطتان لكل درهم + هدايا حصرية + أولوية الوصول",
+    "walletAlreadyTitle": "البطاقة موجودة في المحفظة",
+    "walletAlready": "بطاقة GENOSYS Rewards موجودة بالفعل في Apple Wallet ويتم تحديثها تلقائياً.",
+    "walletOpen": "فتح المحفظة"
   },
   "profile": {
     "general": "عام",

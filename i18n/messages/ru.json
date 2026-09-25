@@ -715,7 +715,10 @@
     "tierPerkMember": "1 балл за 1 AED",
     "tierPerkSilver": "1.25 балла за AED + ранний доступ",
     "tierPerkGold": "1.5 балла за AED + бесплатная доставка + подарок на день рождения",
-    "tierPerkPlatinum": "2 балла за AED + эксклюзивные подарки + первый доступ"
+    "tierPerkPlatinum": "2 балла за AED + эксклюзивные подарки + первый доступ",
+    "walletAlreadyTitle": "Карта уже в Wallet",
+    "walletAlready": "Ваша карта GENOSYS Rewards уже в Apple Wallet и обновляется автоматически.",
+    "walletOpen": "Открыть Wallet"
   },
   "profile": {
     "general": "Общие",

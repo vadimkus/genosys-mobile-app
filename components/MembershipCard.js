@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager, ActivityIndicator, Alert, Linking } from 'react-native';
 import { Image } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
@@ -97,9 +97,20 @@ export default function MembershipCard({ isRTL = false }) {
           log.warn('Native Apple Wallet flow unavailable, using browser', nativeError?.message);
           passResult = { status: 'unavailable' };
         }
-        if (passResult.status === 'added' || passResult.status === 'already_added') {
+        if (passResult.status === 'added') {
           haptics.success();
           Alert.alert(t('rewards.walletAddedTitle'), t('rewards.walletAdded'));
+          return;
+        }
+        if (passResult.status === 'already_added') {
+          haptics.lightTap();
+          Alert.alert(t('rewards.walletAlreadyTitle'), t('rewards.walletAlready'), [
+            {
+              text: t('rewards.walletOpen'),
+              onPress: () => Linking.openURL('shoebox://').catch(() => {}),
+            },
+            { text: t('common.ok'), style: 'cancel' },
+          ]);
           return;
         }
         if (passResult.status === 'cancelled') return;
