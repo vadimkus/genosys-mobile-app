@@ -99,3 +99,15 @@ and from EAS Workflows. `eas.json` carries no key path. Submit profiles:
   live for all customers.
 - Google sign-in on a physical Android device (1.13 Play build) still needs a
   hand test.
+
+## Polish review (item 6)
+
+- Lock Screen order tracker, dark mode: no change needed. The card paints its
+  own opaque cream (`background` + `activityBackgroundTint`, `#fffaf7`) and every
+  foreground is an explicit hex from `LIGHT`; no semantic colours that follow
+  device appearance (grep clean). Dynamic Island uses the `DARK` palette on
+  Apple's fixed black. `smoke-widget-layout` passes.
+- Arabic RTL on this month's new UI: size guide rows use `rowRTL`/`textRTL`,
+  the update row in Profile uses the shared RTL row styles, and the
+  option-problem / Apple Wallet messages are native alerts (OS handles RTL).
+  No change needed.
