@@ -31,18 +31,12 @@
       "autoIncrement": true,
       "environment": "production",
       "channel": "production",
-      "prebuildCommand": "node scripts/sync-runtime-version.js",
-      "env": {
-        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
-      }
+      "prebuildCommand": "node scripts/sync-runtime-version.js"
     },
     "production:android": {
       "autoIncrement": false,
       "environment": "production",
       "channel": "production",
-      "env": {
-        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
-      },
       "android": {
         "buildType": "app-bundle"
       }
@@ -71,4 +65,3 @@
     }
   }
 }
-
