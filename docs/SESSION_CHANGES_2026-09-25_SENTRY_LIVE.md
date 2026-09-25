@@ -71,3 +71,19 @@ and from EAS Workflows. `eas.json` carries no key path. Submit profiles:
 `production` / `production:android` -> internal track,
 `production:android-public` -> production, completed.
   npx eas-cli submit -p android --profile production:android-public --latest
+
+## Alerts and update tags (item 4)
+
+- Every event now carries `platform`, `runtimeVersion`, `updateId`,
+  `updateChannel`, `updateCreatedAt` and `isEmbeddedLaunch`
+  (`config/sentry.js`, `Sentry.setTags`), so a bad OTA shows up by group ID.
+  Shipped as OTA 52aafd52 (Android) / b00f22e5 (iOS).
+- Sentry now uses the monitors/automations model. Automation 1298958
+  "Mobile app: new or returning issue -> email Vadim" is attached to the
+  project's Error Monitor (detector 2291596): email on first-seen or
+  regression, at most every 5 minutes.
+- Crash-free-sessions monitor NOT created: creating a `metric_issue` detector
+  returns 405 (org) / 404 (project) and the legacy alert-rules API is 404.
+  Likely a plan limit on metric alerts. Crash-free rate is still visible in
+  Sentry > Releases.
+- WhatsApp delivery is not native to Sentry; email arrives on the phone.
