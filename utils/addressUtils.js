@@ -67,3 +67,22 @@ export function formatAddressForDisplay(rawOrObj) {
 
 
 
+
+const PLACE_ONLY_WORDS = new Set([
+  'dubai', 'sharjah', 'abu', 'dhabi', 'abudhabi', 'ajman', 'fujairah', 'ras', 'al', 'khaimah',
+  'umm', 'quwain', 'ain', 'uae', 'united', 'arab', 'emirates', 'emirate', 'city',
+  'дубай', 'шарджа', 'абу-даби', 'аджман', 'оаэ', 'دبي', 'الشارقة', 'أبوظبي', 'عجمان', 'الإمارات',
+]);
+
+/**
+ * True when an address names only an emirate, city or country - "Dubai, Dubai",
+ * "Dubai, UAE" - with no building, street or area. Couriers cannot deliver to
+ * it, and profile defaults often look exactly like this.
+ */
+export function isPlaceOnlyAddress(value) {
+  const words = String(value || '')
+    .toLowerCase()
+    .split(/[\s,.;/\-]+/)
+    .filter(Boolean);
+  return words.length > 0 && words.every((w) => PLACE_ONLY_WORDS.has(w));
+}

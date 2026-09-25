@@ -22,7 +22,7 @@ import { submitCODOrder, createCardPaymentSheetIntent, generateOrderNumber } fro
 import { getDefaultPaymentMethod, setDefaultPaymentMethod, PAYMENT_METHODS } from '../services/paymentPreferences';
 import { captureException } from '../config/sentry';
 import { useLocalization } from '../contexts/LocalizationContext';
-import { formatAddressForDisplay } from '../utils/addressUtils';
+import { formatAddressForDisplay, isPlaceOnlyAddress } from '../utils/addressUtils';
 import {
   canonicalizeCartItemForOptionValidation,
   extractProductOptions,
@@ -182,6 +182,7 @@ function CheckoutScreen() {
     if (!String(phoneNational || '').trim()) next.phone = t('checkout.phoneRequired');
     else if (!isValidUaeMobileNational(phoneNational)) next.phone = t('addAddress.validationInvalidUaePhone');
     if (!address.trim()) next.address = t('checkout.addressRequired');
+    else if (isPlaceOnlyAddress(address)) next.address = t('checkout.addressNeedsStreet');
     return next;
   }, [firstName, lastName, email, phoneNational, address, t]);
 
@@ -499,7 +500,8 @@ function CheckoutScreen() {
       !lastName.trim() ||
       !isValidEmail(email) ||
       !isValidUaeMobileNational(phoneNational) ||
-      !address.trim();
+      !address.trim() ||
+      isPlaceOnlyAddress(address);
 
     if (hasErrors) {
       submittingRef.current = false;

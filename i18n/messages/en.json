@@ -327,7 +327,8 @@
       "messageSize": "{product} comes in more than one size. Pick yours on the product page, then come back to checkout. Your bag is saved.",
       "messageColor": "{product} comes in more than one shade. Pick yours on the product page, then come back to checkout. Your bag is saved.",
       "chooseNow": "Choose now"
-    }
+    },
+    "addressNeedsStreet": "Add your building, street or area and flat number so the courier can find you."
   },
   "applePay": {
     "applePay": "Apple Pay",
