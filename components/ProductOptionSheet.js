@@ -24,6 +24,7 @@ import {
   isProductSelectionComplete,
 } from '../utils/productOptions';
 import { isProductOutOfStock } from '../utils/stock';
+import { getSizeGuide } from '../utils/sizeGuide';
 import { formatAed, getPricingDisplay } from '../utils/pricingDisplay';
 import * as haptics from '../utils/haptics';
 import T from '../utils/typography';
@@ -50,6 +51,7 @@ export default function ProductOptionSheet({
   const [quantity, setQuantity] = useState(1);
 
   const model = useMemo(() => extractProductOptions(product), [product]);
+  const sizeGuide = useMemo(() => getSizeGuide(product, model.sizes, locale), [product, model.sizes, locale]);
   const selection = useMemo(
     () => ({ selectedSize, selectedColor }),
     [selectedSize, selectedColor]
@@ -311,6 +313,34 @@ export default function ProductOptionSheet({
                     <View style={[styles.options, isRTL && styles.optionsRTL]}>
                       {model.sizes.map((option) => renderOption('size', option))}
                     </View>
+                    {sizeGuide && (
+                      <View style={styles.sizeGuide}>
+                        {model.sizes.map((option) => {
+                          const entry = sizeGuide[option.value];
+                          if (!entry) return null;
+                          const active = selectedSize === option.value;
+                          return (
+                            <View
+                              key={`guide-${option.value}`}
+                              style={[styles.sizeGuideRow, active && styles.sizeGuideRowActive]}
+                            >
+                              <View style={[styles.sizeGuideHead, isRTL && styles.rowRTL]}>
+                                <Text style={[styles.sizeGuideSize, isRTL && styles.textRTL]}>
+                                  {option.label || option.value}
+                                </Text>
+                                <Text style={[styles.sizeGuideLasts, isRTL && styles.textRTL]}>{entry.lasts}</Text>
+                                {entry.value ? (
+                                  <View style={styles.sizeGuideBadge}>
+                                    <Text style={styles.sizeGuideBadgeText}>{entry.value}</Text>
+                                  </View>
+                                ) : null}
+                              </View>
+                              <Text style={[styles.sizeGuideNote, isRTL && styles.textRTL]}>{entry.note}</Text>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
                   </View>
                 )}
 
@@ -570,6 +600,55 @@ const styles = StyleSheet.create({
     ...T.sectionTitleSmall,
     color: colors.label,
     marginBottom: 10,
+  },
+  sizeGuide: {
+    marginTop: 14,
+    gap: 8,
+  },
+  sizeGuideRow: {
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: colors.fill,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  sizeGuideRowActive: {
+    borderColor: colors.accent,
+    backgroundColor: colors.card,
+  },
+  sizeGuideHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  sizeGuideSize: {
+    ...T.captionTiny,
+    color: colors.label,
+    fontWeight: '700',
+  },
+  sizeGuideLasts: {
+    ...T.captionTiny,
+    color: colors.accent,
+    fontWeight: '600',
+  },
+  sizeGuideBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: colors.accent,
+  },
+  sizeGuideBadgeText: {
+    ...T.captionTiny,
+    color: colors.white,
+    fontWeight: '700',
+  },
+  sizeGuideNote: {
+    ...T.captionTiny,
+    color: colors.secondaryLabel,
+    marginTop: 4,
+    lineHeight: 17,
   },
   requiredText: {
     ...T.captionTiny,
