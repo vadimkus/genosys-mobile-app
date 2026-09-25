@@ -53,6 +53,7 @@ import { withErrorBoundary } from '../components/ErrorBoundary';
 import { openWhatsApp } from '../utils/support';
 import { startOrderActivityForNewOrder } from '../utils/orderLiveActivity';
 import { saveLiveActivityToken } from '../services/pushNotificationsService';
+import { getLocalizedProductName } from '../utils/productLocalization';
 
 function CheckoutScreen() {
   const log = useMemo(() => createLogger('Checkout'), []);
@@ -654,6 +655,28 @@ function CheckoutScreen() {
             clientSecret: String(result.clientSecret),
           },
         });
+      } else if (result.errorCode === 'options' && result.optionProblem) {
+        // The server rejected a line whose size or shade it could not match.
+        // Send the customer to that product instead of a generic failure; the
+        // bag is untouched.
+        const problem = result.optionProblem;
+        const lineProduct = items
+          .map((it) => it?.product || it)
+          .find((p) => String(p?.id) === String(problem.productId) || (problem.productNumber && String(p?.productNumber) === String(problem.productNumber)));
+        const productName = (lineProduct && (getLocalizedProductName(lineProduct, locale) || lineProduct.name)) || '';
+        const isColor = problem.dimension === 'color';
+        haptics.warning();
+        Alert.alert(
+          isColor ? t('checkout.optionProblem.titleColor') : t('checkout.optionProblem.titleSize'),
+          t(isColor ? 'checkout.optionProblem.messageColor' : 'checkout.optionProblem.messageSize', { product: productName }),
+          [
+            {
+              text: t('checkout.optionProblem.chooseNow'),
+              onPress: () => router.push(`/product/${problem.productNumber || problem.productId}`),
+            },
+            { text: t('common.cancel'), style: 'cancel' },
+          ]
+        );
       } else {
         log.error('Order submission failed', result);
         Alert.alert(

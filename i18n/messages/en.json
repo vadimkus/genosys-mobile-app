@@ -320,6 +320,13 @@
       "card": "Could not start card payment. Please try again.",
       "resume": "Could not start payment for this order yet. Please try again later.",
       "generic": "Could not place your order. Please try again."
+    },
+    "optionProblem": {
+      "titleSize": "Choose a size",
+      "titleColor": "Choose a shade",
+      "messageSize": "{product} comes in more than one size. Pick yours on the product page, then come back to checkout. Your bag is saved.",
+      "messageColor": "{product} comes in more than one shade. Pick yours on the product page, then come back to checkout. Your bag is saved.",
+      "chooseNow": "Choose now"
     }
   },
   "applePay": {

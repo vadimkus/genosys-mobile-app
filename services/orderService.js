@@ -63,6 +63,21 @@ function orderError(kind) {
   return error;
 }
 
+// The server re-checks every line's size and shade before pricing and answers
+// OPTION_REQUIRED / OPTION_UNAVAILABLE with the product and its real options.
+function optionError(body) {
+  const error = new Error(body?.error || 'Please choose an option.');
+  error.code = 'options';
+  error.optionProblem = {
+    productId: body?.productId || '',
+    productNumber: body?.productNumber || '',
+    dimension: body?.dimension === 'color' ? 'color' : 'size',
+    options: Array.isArray(body?.options) ? body.options : [],
+    message: body?.error || '',
+  };
+  return error;
+}
+
 async function postMobileJson(url, payload, orderDataOrToken, kind) {
   const token = getToken(orderDataOrToken);
   const headers = typeof orderDataOrToken === 'string'
@@ -105,6 +120,7 @@ async function postMobileJson(url, payload, orderDataOrToken, kind) {
       status: response.status,
       message: body?.error || body?.message || '',
     });
+    if (body?.code === 'OPTION_REQUIRED' || body?.code === 'OPTION_UNAVAILABLE') throw optionError(body);
     throw orderError(kind);
   }
   return body;
@@ -274,6 +290,7 @@ export async function submitCODOrder(orderData) {
       success: false,
       error: getSafeOrderErrorMessage('cod'),
       errorCode: error?.code || 'generic',
+      ...(error?.optionProblem ? { optionProblem: error.optionProblem } : {}),
     };
   }
 }
@@ -347,6 +364,7 @@ export async function submitCardOrder(orderData) {
       success: false,
       error: getSafeOrderErrorMessage('card'),
       errorCode: error?.code || 'card',
+      ...(error?.optionProblem ? { optionProblem: error.optionProblem } : {}),
     };
   }
 }
@@ -408,7 +426,7 @@ export async function createCardPaymentSheetIntent(orderData) {
     };
   } catch (error) {
     log.error('Payment Sheet intent creation failed', error?.message || error);
-    return { success: false, error: getSafeOrderErrorMessage('card'), errorCode: error?.code || 'card' };
+    return { success: false, error: getSafeOrderErrorMessage('card'), errorCode: error?.code || 'card', ...(error?.optionProblem ? { optionProblem: error.optionProblem } : {}) };
   }
 }
 
