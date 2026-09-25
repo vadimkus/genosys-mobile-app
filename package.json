@@ -60,7 +60,9 @@
     "verify:label-case": "node scripts/verify-label-case.mjs",
     "verify:lint": "eslint --no-warn-ignored .",
     "verify:design-scale": "python3 scripts/snap-design-scale.py --check",
-    "smoke:app-update": "node scripts/smoke-app-update.mjs"
+    "smoke:app-update": "node scripts/smoke-app-update.mjs",
+    "ota": "bash scripts/ota-publish.sh",
+    "ota:check": "node scripts/ota-guard.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

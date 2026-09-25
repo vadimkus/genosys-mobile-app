@@ -18,3 +18,38 @@ anywhere, and the project did not exist (see 2026-09-03 note).
 
 Likely cause of the 2 crashes in the weekly summary: the 16 Sep runtime-1.12
 OTA regression on Google login (rolled back the same day).
+
+## Release safety (same day)
+
+### OTA guard
+
+`npm run ota -- ios|android "Message" [--accept-patch-drift]` is now the only
+supported way to publish. It runs `scripts/ota-guard.js` first, which:
+
+1. finds the git commit EAS recorded for the newest finished production store
+   build of that platform and runtime (override: `release/binaries.json`);
+2. compares HEAD against it: versions of every installed package with native
+   code, files under `modules/`, `ios/`, `android/` (version/build-number-only
+   edits ignored), and `app.json` plugins;
+3. blocks on any minor/major native package change or native file change;
+   exits 2 on patch-only drift until `--accept-patch-drift` is passed.
+
+Then `verify:release`, `eas update` for that one platform, and source-map
+upload to Sentry when `SENTRY_AUTH_TOKEN` is set.
+
+Replaying the 16 Sep incident (runtime 1.12, iOS binary 2ab786a1b) is
+blocked: 44 native package changes plus the new `modules/genosys-wallet`.
+
+Current state: Android 1.13 (binary 21f20ed60) matches HEAD exactly. iOS 1.13
+(binary 48c52c7ba) has patch drift: expo 57.0.22->57.0.23, expo-image-picker,
+expo-image-manipulator, expo-notifications. Updates since 15 Sep already run
+on it without reported crashes; the next iOS store build clears the drift.
+
+Do not call `eas update` directly.
+
+### 1.12 retired
+
+Website `app/api/mobile/app-version`: `minimumVersion` 1.13.0 with
+`forceUpdate` on iOS and Android (Android was a soft gate at 1.9.0). The
+response now clamps the minimum to the live store version, so the gate can
+never lock users out even if a store lookup lags.
