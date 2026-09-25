@@ -1,4 +1,6 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+import * as Updates from 'expo-updates';
 
 /**
  * Sentry Crash Reporting Configuration
@@ -18,6 +20,23 @@ const SENTRY_DSN = (() => {
 
 const APP_VERSION = Constants.expoConfig?.version || '0.0.0';
 const RUNTIME_VERSION = Constants.expoConfig?.runtimeVersion || APP_VERSION;
+
+// Which OTA bundle is running. Lets a bad update be spotted and rolled back
+// by group ID within minutes of it going out.
+function updateTags() {
+  try {
+    return {
+      platform: Platform.OS,
+      runtimeVersion: String(Updates.runtimeVersion || RUNTIME_VERSION),
+      updateId: Updates.updateId || 'embedded',
+      updateChannel: Updates.channel || 'none',
+      updateCreatedAt: Updates.createdAt ? new Date(Updates.createdAt).toISOString() : 'embedded',
+      isEmbeddedLaunch: String(Updates.isEmbeddedLaunch ?? true),
+    };
+  } catch {
+    return { platform: Platform.OS, runtimeVersion: String(RUNTIME_VERSION) };
+  }
+}
 const SENTRY_ENVIRONMENT = (() => {
   try {
     return process?.env?.EXPO_PUBLIC_APP_ENV || (__DEV__ ? 'development' : 'production');
@@ -75,6 +94,8 @@ export async function initSentry() {
       },
     });
     
+    Sentry.setTags(updateTags());
+
     if (__DEV__) {
       console.log('[Sentry] Initialized successfully');
     }
