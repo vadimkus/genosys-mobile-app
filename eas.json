@@ -48,22 +48,19 @@
         "ascAppId": "6756648064"
       },
       "android": {
-        "track": "internal",
-        "serviceAccountKeyPath": "/Users/vadimkus/Desktop/Drive/Genosys/Google/genosys-play-publisher.json"
+        "track": "internal"
       }
     },
     "production:android": {
       "android": {
-        "track": "internal",
-        "serviceAccountKeyPath": "/Users/vadimkus/Desktop/Drive/Genosys/Google/genosys-play-publisher.json"
+        "track": "internal"
       }
     },
     "production:android-public": {
       "android": {
         "track": "production",
         "releaseStatus": "completed",
-        "changesNotSentForReview": false,
-        "serviceAccountKeyPath": "/Users/vadimkus/Desktop/Drive/Genosys/Google/genosys-play-publisher.json"
+        "changesNotSentForReview": false
       }
     }
   }

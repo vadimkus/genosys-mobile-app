@@ -65,7 +65,9 @@ rights. Key: `~/Desktop/Drive/Genosys/Google/genosys-play-publisher.json`
 (outside the repo). Verified: the API opens an edit and reads tracks
 (production 92 = 1.13.0).
 
-All Android submit profiles in `eas.json` point at the key:
+Key uploaded to EAS (Android credentials for ae.genosys.app -> "Google Service
+Account Key for Play Store Submissions"), so submit works from any machine
+and from EAS Workflows. `eas.json` carries no key path. Submit profiles:
 `production` / `production:android` -> internal track,
 `production:android-public` -> production, completed.
   npx eas-cli submit -p android --profile production:android-public --latest
