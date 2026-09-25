@@ -87,3 +87,15 @@ and from EAS Workflows. `eas.json` carries no key path. Submit profiles:
   Likely a plan limit on metric alerts. Crash-free rate is still visible in
   Sentry > Releases.
 - WhatsApp delivery is not native to Sentry; email arrives on the phone.
+
+## Android checks (item 5)
+
+- Android Vitals via Play Developer Reporting API (API enabled on
+  `genosys-website`, read by `play-publisher@`): no daily ANR or crash rate is
+  published for the last 28 days; the install base (~25) is below Play's
+  reporting threshold. Error issues search for 26 Aug to 24 Sep: 0 crash or
+  ANR clusters.
+- Google Wallet: publishing approved 15 Sep; the Android button is correctly
+  live for all customers.
+- Google sign-in on a physical Android device (1.13 Play build) still needs a
+  hand test.
