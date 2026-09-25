@@ -53,3 +53,19 @@ Website `app/api/mobile/app-version`: `minimumVersion` 1.13.0 with
 `forceUpdate` on iOS and Android (Android was a soft gate at 1.9.0). The
 response now clamps the minimum to the live store version, so the gate can
 never lock users out even if a store lookup lags.
+
+### Google Play submission automated
+
+Service account `play-publisher@genosys-website.iam.gserviceaccount.com`
+(GCP project `genosys-website`, Android Publisher API enabled, no Cloud
+roles). Invited in Play Console for Genosys UAE only, 7 permissions: view app
+info, release to production, release to testing tracks, manage testing tracks,
+plus the three Play adds automatically. No admin, financial or store-listing
+rights. Key: `~/Desktop/Drive/Genosys/Google/genosys-play-publisher.json`
+(outside the repo). Verified: the API opens an edit and reads tracks
+(production 92 = 1.13.0).
+
+All Android submit profiles in `eas.json` point at the key:
+`production` / `production:android` -> internal track,
+`production:android-public` -> production, completed.
+  npx eas-cli submit -p android --profile production:android-public --latest
