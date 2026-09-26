@@ -39,6 +39,16 @@ export function NotificationProvider({ children }) {
   const [expoPushToken, setExpoPushToken] = useState(null);
   const notificationListener = useRef();
   const responseListener = useRef();
+  // iOS can hand the launching tap to both the listener and
+  // getLastNotificationResponseAsync; navigate once per notification.
+  const handledResponseIds = useRef(new Set());
+  const firstTimeHandled = (response) => {
+    const id = response?.notification?.request?.identifier;
+    if (!id) return true;
+    if (handledResponseIds.current.has(id)) return false;
+    handledResponseIds.current.add(id);
+    return true;
+  };
 
   // Clear the app icon badge when the app comes to the foreground.
   // This ensures the badge disappears once the user opens the app,
@@ -92,6 +102,7 @@ export function NotificationProvider({ children }) {
       // Listener for when user taps on a notification
       responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
         try {
+          if (!firstTimeHandled(response)) return;
           log.debug('👆 Notification tapped:', response.notification.request.content.data);
           
           // Clear badge when user interacts with a notification
@@ -116,15 +127,13 @@ export function NotificationProvider({ children }) {
       // Check if app was opened from a notification (cold start)
       Notifications.getLastNotificationResponseAsync()
         .then(response => {
-          if (response) {
+          if (response && firstTimeHandled(response)) {
             log.debug('App opened from notification:', response.notification.request.content.data);
             // Clear badge on cold start from notification
             clearNotificationBadge();
-            const data = response.notification.request.content.data;
-            // Longer delay than the warm path: navigation has to mount first.
-            setTimeout(() => {
-              navigateFromNotification(data);
-            }, 500);
+            // Held by navigateFromNotification until AuthWrapper has mounted the
+            // navigator, however long sign-in takes.
+            navigateFromNotification(response.notification.request.content.data);
           }
         })
         .catch(e => {

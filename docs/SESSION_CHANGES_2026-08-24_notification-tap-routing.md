@@ -66,3 +66,16 @@ npx tsx --env-file=.env.local scripts/announce-blog-post.ts <slug> --mobile --fo
 ```
 
 Tap it from a cold start and from the background. Both should land on the post.
+
+## 26 Sep 2026: cold-start tap froze on the loading screen
+
+A tap that launched the app (blog announcement, 16:01) left it stuck on the loading
+screen. The cold-start path pushed after a fixed 500 ms, while AuthWrapper was still on
+its auth spinner with no navigator mounted. expo-router 57 queues that push and then
+throws `assertIsReady` from inside its NavigationContainer, above every error boundary.
+
+Fix: `navigateFromNotification` holds the destination until AuthWrapper reports ready
+(`setNotificationNavigationReady`: not loading, root navigation state has a key, and a
+signed-in launch has left `/` and `/auth`), then navigates once. NotificationContext
+also dedupes by notification identifier, since iOS can deliver the launching tap to both
+the response listener and `getLastNotificationResponseAsync`.

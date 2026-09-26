@@ -52,11 +52,36 @@ export function notificationUrl(data) {
   return null;
 }
 
+// A tap that cold-starts the app arrives while AuthWrapper is still showing its
+// spinner, before any navigator exists. expo-router queues that push and then
+// throws from inside its NavigationContainer, above every error boundary, which
+// left the app frozen on the loading screen. So a tap waits here until
+// AuthWrapper reports the navigator mounted and the launch redirects settled.
+let navigationReady = false;
+let pendingData = null;
+
+export function setNotificationNavigationReady(ready) {
+  navigationReady = ready;
+  if (!ready || !pendingData) return;
+  const data = pendingData;
+  pendingData = null;
+  setTimeout(() => navigateNow(data), 0);
+}
+
 /**
- * Navigate for a tapped notification. Returns true when it went somewhere, so
- * the caller can log the payloads that dead-end.
+ * Navigate for a tapped notification, or hold it until navigation is ready.
+ * Returns true when it went (or will go) somewhere, so the caller can log the
+ * payloads that dead-end.
  */
 export function navigateFromNotification(data) {
+  if (!navigationReady) {
+    pendingData = data;
+    return true;
+  }
+  return navigateNow(data);
+}
+
+function navigateNow(data) {
   try {
     const route = notificationRoute(data);
     if (route) {

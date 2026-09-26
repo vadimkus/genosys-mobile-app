@@ -1,9 +1,10 @@
-import React from 'react';
-import { Stack, Redirect, useLocalSearchParams, usePathname } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Stack, Redirect, useLocalSearchParams, usePathname, useRootNavigationState } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import ChatButton from '../components/ChatButton';
 import { colors } from '../utils/theme';
+import { setNotificationNavigationReady } from '../utils/notificationRouting';
 
 // Screens where the chat button should be hidden
 // Hides on: all standalone info pages, checkout flow, auth, webview, camera
@@ -82,6 +83,15 @@ export default function AuthWrapper() {
   const pathname = usePathname();
   const params = useLocalSearchParams();
   const showChatButton = isAuthenticated && !CHAT_HIDDEN_ROUTES.some((r) => pathname?.startsWith(r));
+
+  // Ready once the Stack below has mounted and a signed-in launch has left
+  // `/` and `/auth` for the shop; pushing earlier gets replaced by that redirect.
+  const rootNavigationKey = useRootNavigationState()?.key;
+  const launchSettled = !(isAuthenticated && (!pathname || pathname === '/' || pathname.startsWith('/auth')));
+  const notificationNavigationReady = !loading && Boolean(rootNavigationKey) && launchSettled;
+  useEffect(() => {
+    setNotificationNavigationReady(notificationNavigationReady);
+  }, [notificationNavigationReady]);
 
   if (loading) {
     return (
