@@ -189,14 +189,17 @@ export const getLocalizedProductSize = (product, locale) => {
     return out;
   }
 
-  // EN "set" → AR
+  // Sizes are stored in English ("1 kit", "1 set", "1 Box"); the website
+  // translates them the same way (utils/sizeTranslations.ts there).
   if (l === 'ar') {
-    out = out.replace(/\bset\b/gi, 'مجموعة');
+    out = out.replace(/\b(?:kit|set)\b/gi, 'مجموعة');
   }
 
-  // EN "set" → RU (if backend ever sends EN size while in RU)
   if (l === 'ru' && !hasCyrillic) {
-    out = out.replace(/\bset\b/gi, 'набор');
+    out = out
+      .replace(/\b(?:kit|set)\b/gi, 'набор')
+      .replace(/\bbox\b/gi, 'коробка')
+      .replace(/(\d+)\s*(?:pcs|pc|ea)\b/gi, '$1шт');
   }
 
   return out;
