@@ -37,6 +37,7 @@ export default function CheckoutAddressForm({
   firstName,
   lastName,
   email,
+  showReceiptHint,
   phoneNational,
   address,
   landmark,
@@ -203,7 +204,11 @@ export default function CheckoutAddressForm({
               </View>
             ) : null}
           </View>
-          {showError('email') ? <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.email}</Text> : null}
+          {showError('email') ? (
+            <Text style={[styles.helperError, isRTL && styles.helperErrorRTL]}>{errors.email}</Text>
+          ) : showReceiptHint ? (
+            <Text style={[styles.helperHint, isRTL && styles.helperErrorRTL]}>{t('checkout.receiptEmailHint')}</Text>
+          ) : null}
         </View>
 
         {/* Phone */}

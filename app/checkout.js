@@ -28,7 +28,7 @@ import {
   extractProductOptions,
   isProductSelectionComplete,
 } from '../utils/productOptions';
-import { normalizeUserProfile } from '../utils/userProfile';
+import { normalizeUserProfile, isAppleRelayEmail } from '../utils/userProfile';
 import CollapsibleHeader, { useCollapsibleHeader } from '../components/CollapsibleHeader';
 import * as haptics from '../utils/haptics';
 import CheckoutOrderHeaderCard from '../components/checkout/CheckoutOrderHeaderCard';
@@ -173,12 +173,15 @@ function CheckoutScreen() {
     ? t('checkout.deliveryEtaDubai')
     : t('checkout.deliveryEtaOther');
 
+  const relayAccount = useMemo(() => normalizeUserProfile(user || {}).hasAppleRelayEmail, [user]);
+
   const errors = useMemo(() => {
     const next = {};
     if (!firstName.trim()) next.firstName = t('checkout.firstNameRequired');
     if (!lastName.trim()) next.lastName = t('checkout.lastNameRequired');
     if (!email.trim()) next.email = t('checkout.emailRequired');
     else if (!isValidEmail(email)) next.email = t('checkout.validationInvalidEmail');
+    else if (isAppleRelayEmail(email)) next.email = t('checkout.validationRelayEmail');
     if (!String(phoneNational || '').trim()) next.phone = t('checkout.phoneRequired');
     else if (!isValidUaeMobileNational(phoneNational)) next.phone = t('addAddress.validationInvalidUaePhone');
     if (!address.trim()) next.address = t('checkout.addressRequired');
@@ -261,7 +264,8 @@ function CheckoutScreen() {
       const profile = normalizeUserProfile(user);
       setFirstName(profile.firstName);
       setLastName(profile.lastName);
-      setEmail(profile.primaryEmail);
+      // Mail to an Apple relay address is never delivered, so relay accounts type a real one.
+      setEmail(profile.hasAppleRelayEmail && !profile.contactEmail ? '' : profile.primaryEmail);
       setAddressDetails(profile.addressDetails);
       setAddress(profile.addressLine);
 
@@ -499,6 +503,7 @@ function CheckoutScreen() {
       !firstName.trim() ||
       !lastName.trim() ||
       !isValidEmail(email) ||
+      isAppleRelayEmail(email) ||
       !isValidUaeMobileNational(phoneNational) ||
       !address.trim() ||
       isPlaceOnlyAddress(address);
@@ -829,6 +834,7 @@ function CheckoutScreen() {
             firstName={firstName}
             lastName={lastName}
             email={email}
+            showReceiptHint={relayAccount}
             phoneNational={phoneNational}
             address={address}
             landmark={landmark}
@@ -905,6 +911,11 @@ function CheckoutScreen() {
 
       {/* Sticky pay bar - single primary action */}
       <View style={[styles.payBar, { paddingBottom: (insets?.bottom || 0) + 12 }]}>
+        {relayAccount && isValidEmail(email) && !isAppleRelayEmail(email) ? (
+          <Text style={[styles.receiptLine, isRTL && styles.textRTL]} numberOfLines={1}>
+            {t('checkout.receiptGoesTo', { email: email.trim() })}
+          </Text>
+        ) : null}
         <TouchableOpacity
           style={[
             styles.placeOrderButton,
@@ -1228,6 +1239,17 @@ const styles = StyleSheet.create({
   helperErrorRTL: {
     textAlign: 'right',
     writingDirection: 'rtl',
+  },
+  helperHint: {
+    ...T.captionSmall,
+    color: colors.secondaryLabel,
+    marginTop: 6,
+  },
+  receiptLine: {
+    ...T.captionSmall,
+    color: colors.secondaryLabel,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   inputRTL: {
     textAlign: 'right',
