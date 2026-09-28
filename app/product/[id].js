@@ -1256,6 +1256,7 @@ function ProductDetailScreen() {
                   style={{ flex: 1 }}
                 >
                   <Image
+                    key={galleryImages[0]}
                     source={galleryImages[0]}
                     style={styles.heroImage}
                     contentFit={imageFit}
@@ -1276,7 +1277,10 @@ function ProductDetailScreen() {
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 nestedScrollEnabled={true}
-                keyExtractor={(item, index) => `gallery-${index}`}
+                // Keyed by address, not position: switching language swaps every
+                // slide for its translated file, and a reused cell keeps painting
+                // the old picture until the new one has downloaded.
+                keyExtractor={(item, index) => `gallery-${index}-${item}`}
                 onMomentumScrollEnd={(e) => {
                   const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
                   setActiveImageIndex(newIndex);

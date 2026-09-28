@@ -299,7 +299,7 @@ export default function ImageLightbox({
           <FlatList
             ref={listRef}
             data={images}
-            keyExtractor={(_, i) => `lightbox-${i}`}
+            keyExtractor={(item, i) => `lightbox-${i}-${item}`}
             horizontal
             pagingEnabled
             scrollEnabled={!zoomed}
