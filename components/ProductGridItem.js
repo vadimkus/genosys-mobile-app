@@ -50,7 +50,6 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
   const isWishlisted = !!(product?.id && isFavorite(product.id));
   const requiresOptions = isProductOptionSelectionRequired(product);
   const nameLower = (product?.name || '').trim().toLowerCase();
-  const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
   const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
   const isBioFermentMask = nameLower.includes('bio') && nameLower.includes('ferment') && nameLower.includes('mask');
@@ -73,15 +72,7 @@ export default function ProductGridItem({ product, onAddToCart, onChooseOptions,
   // Add client-enforced stock badges for the Shop grid requirements
   const computedBadges = [];
   if (!isOutOfStock) {
-    if (isMesopeciaKit) {
-      computedBadges.push({
-        type: 'order',
-        text: t('common.order'),
-        color: colors.orange,
-        textColor: colors.white,
-        priority: 0,
-      });
-    } else if (!isHolidayKit) {
+    if (!isHolidayKit) {
       computedBadges.push({
         type: 'in_stock',
         text: t('stock.inStock'),

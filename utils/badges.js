@@ -11,8 +11,6 @@ import { colors } from './theme';
  */
 export function computeProductBadges(product, labels = {}) {
   const nameLower = (product?.name || '').trim().toLowerCase();
-  const isOutOfStock = product?.status === 'out_of_stock' || product?.stock === false;
-  const isMesopeciaKit = nameLower.includes('mesopecia') && nameLower.includes('kit');
   const isHolidayKit = nameLower.includes('holiday') && nameLower.includes('kit');
   const isPdrnMask = nameLower.includes('pdrn') && nameLower.includes('mask');
   const isCerabarrier = nameLower.includes('cerabarrier');
@@ -30,12 +28,9 @@ export function computeProductBadges(product, labels = {}) {
   });
 
   const computedBadges = [];
-  // "In Stock" is the default and was cluttering every card, so it's no longer
-  // shown. Only the "Order" badge (Mesopecia kit) is computed here; NEW /
-  // out-of-stock and other meaningful badges still come through below.
-  if (!isOutOfStock && isMesopeciaKit) {
-    computedBadges.push({ text: labels.order || 'Order', color: colors.orange, priority: 0 });
-  }
+  // "In Stock" is the default and was cluttering every card, so it is not shown.
+  // The Mesopecia kit's orange "Order" badge went with the made-to-order kit
+  // (product 47, now hidden); its replacement (70) is a normal stocked item.
 
   const hasNewBadge = baseBadges.some((b) => String(b?.text || '').toLowerCase().trim() === 'new');
   if (isRevitaGlow && !hasNewBadge) {
