@@ -29,4 +29,4 @@ play in the app's Shop grid.
   runtime `1.13.0`, update group `ae27c467-021d-4a0a-bd31-7179c26f0a98` (commit `f1e39df`).
   Production API confirmed serving `cardVideo` for the three masks before publishing.
 - Rollback if needed: republish the previous group on `production`
-  (`npx eas-cli@latest update:republish --group 54f0b73f-c01a-47cd-871e-a15249b0383e`).
+  (`npx eas-cli@latest update:republish --group 7b3d4df9-b684-4b1f-a07b-fc4839c347c0`, "Mesopecia kit shows as in stock").
