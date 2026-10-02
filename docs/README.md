@@ -10,6 +10,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [Shop card videos (2026-10-02)](./SESSION_CHANGES_2026-10-02_SHOP_CARD_VIDEOS.md) | Shop grid plays the light-sweep clip (`cardVideo` from the API) once on the card nearest the middle when scrolling settles; muted, mixes with music, off under Reduce Motion. OTA for runtime 1.13.0. |
 | [Account photo and rewards bar (2026-09-16)](./SESSION_CHANGES_2026-09-16_ACCOUNT_PHOTO_AND_REWARDS_BAR.md) | Restores the profile photo after session validate and keeps the Silver→Gold spend bar visible when Silver was earned by orders. OTA for runtimes 1.12.0 and 1.13.0. |
 | [Checkout Stale Variant Guard (2026-09-16)](./SESSION_CHANGES_2026-09-16_CHECKOUT_STALE_VARIANT_GUARD.md) | Fixes false size/colour selection blocks from old simple-product cart snapshots while preserving strict validation for real variants; OTA for runtimes 1.12.0 and 1.13.0. |
 | [Android 1.13.0 Google Wallet Build (2026-09-15)](./SESSION_CHANGES_2026-09-15_ANDROID_1.13.0_GOOGLE_WALLET_BUILD.md) | Google publishing approval, production activation, versionCode 92 checks, EAS AAB build, and local artifact path. |

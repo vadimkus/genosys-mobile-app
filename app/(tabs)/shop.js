@@ -15,6 +15,7 @@ import {
   Pressable,
   I18nManager,
   Animated as RNAnimated,
+  AccessibilityInfo,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,6 +40,7 @@ import { fetchProductById, fetchProductCategories, fetchProducts } from '../../s
 import { cacheProducts, getCachedProducts } from '../../services/productCache';
 import { ShopSkeleton } from '../../components/SkeletonLoader';
 import ProductOptionSheet from '../../components/ProductOptionSheet';
+import CardVideo from '../../components/CardVideo';
 import * as haptics from '../../utils/haptics';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -77,6 +79,12 @@ import { withErrorBoundary } from '../../components/ErrorBoundary';
 import { openWhatsApp } from '../../utils/support';
 
 const log = createLogger('Shop');
+
+// Card clips (product.cardVideo) play once per app session; the website keeps the same rule per visit.
+const playedCardVideos = new Set();
+const assetUrl = (path) => (path.startsWith('http') ? path : `${AUTH_CONFIG.ASSET_ORIGIN || 'https://genosys.ae'}${path}`);
+// A card takes the turn only once it has sat at least 70% on screen for 300 ms, i.e. the scroll settled.
+const CARD_VIDEO_VIEWABILITY = { itemVisiblePercentThreshold: 70, minimumViewTime: 300 };
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_SIDE_PADDING = 20;
@@ -136,6 +144,8 @@ const ShopGridCard = React.memo(function ShopGridCard({
   onToggleFavorite,
   onAddToCart,
   onDecrement,
+  playVideo,
+  onVideoDone,
 }) {
   // NEW is shown as a black pill next to the category (like the website
   // rail cards); other badges (e.g. Order) stay as an image overlay.
@@ -168,6 +178,10 @@ const ShopGridCard = React.memo(function ShopGridCard({
               <Text style={styles.gridPlaceholderText}>{product.name?.charAt(0) || 'G'}</Text>
             </View>
           )}
+
+          {playVideo && product.cardVideo ? (
+            <CardVideo uri={assetUrl(product.cardVideo)} onDone={() => onVideoDone(product)} />
+          ) : null}
 
           {/* Badges (NEW moved to the meta row below the image) */}
           {overlayBadges.length > 0 && (
@@ -458,6 +472,59 @@ function ShopScreen() {
   const pulseAnim = useRef(new RNAnimated.Value(1)).current;
   // Subtle fade-in for the grid once products are ready (presentation only).
   const contentFade = useRef(new RNAnimated.Value(0)).current;
+
+  // ─── Card clips: one light sweep on the card nearest the middle once scrolling settles ───
+  const [activeVideoId, setActiveVideoId] = useState(null);
+  const activeVideoRef = useRef(null);
+  const viewableRef = useRef([]);
+  const reduceMotionRef = useRef(false);
+
+  const pickCardVideo = useCallback(() => {
+    const viewable = viewableRef.current;
+    const active = activeVideoRef.current;
+    if (active != null) {
+      if (viewable.some((v) => v.item?.id === active)) return;
+      activeVideoRef.current = null;
+      setActiveVideoId(null);
+    }
+    if (reduceMotionRef.current || !viewable.length) return;
+    const indexes = viewable.map((v) => v.index ?? 0).sort((a, b) => a - b);
+    const middle = indexes[Math.floor(indexes.length / 2)];
+    const candidates = viewable.filter(
+      (v) => v.item?.cardVideo && !playedCardVideos.has(v.item.cardVideo) && !isProductOutOfStock(v.item)
+    );
+    if (!candidates.length) return;
+    candidates.sort((a, b) => Math.abs((a.index ?? 0) - middle) - Math.abs((b.index ?? 0) - middle));
+    activeVideoRef.current = candidates[0].item.id;
+    setActiveVideoId(candidates[0].item.id);
+  }, []);
+
+  // FlatList requires this callback to keep one identity for the life of the list.
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    viewableRef.current = viewableItems;
+    pickCardVideo();
+  }).current;
+
+  const handleVideoDone = useCallback((product) => {
+    if (product?.cardVideo) playedCardVideos.add(product.cardVideo);
+    if (activeVideoRef.current === product?.id) {
+      activeVideoRef.current = null;
+      setActiveVideoId(null);
+    }
+    pickCardVideo();
+  }, [pickCardVideo]);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then((on) => { reduceMotionRef.current = !!on; }).catch(() => {});
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (on) => {
+      reduceMotionRef.current = !!on;
+      if (on && activeVideoRef.current != null) {
+        activeVideoRef.current = null;
+        setActiveVideoId(null);
+      }
+    });
+    return () => sub?.remove?.();
+  }, []);
 
   // Map app locale to BCP-47 for speech recognizer
   const speechLocale = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-US';
@@ -922,8 +989,12 @@ function ShopScreen() {
       onToggleFavorite={handleToggleFavorite}
       onAddToCart={handleAddToCart}
       onDecrement={handleDecrementFromCart}
+      playVideo={activeVideoId === product.id}
+      onVideoDone={handleVideoDone}
     />
   ), [
+    activeVideoId,
+    handleVideoDone,
     isFavorite,
     addingProducts,
     user,
@@ -1115,6 +1186,8 @@ function ShopScreen() {
         keyExtractor={keyExtractor}
         columnWrapperStyle={styles.gridRow}
         renderItem={renderGridItem}
+        viewabilityConfig={CARD_VIDEO_VIEWABILITY}
+        onViewableItemsChanged={onViewableItemsChanged}
         initialNumToRender={8}
         maxToRenderPerBatch={8}
         windowSize={7}
