@@ -25,3 +25,8 @@ play in the app's Shop grid.
   is JavaScript-only: OTA to runtime 1.13.0.
 - Checked: ESLint clean; `expo export` bundles for iOS and Android. No simulator on this machine, so
   first on-device look is after the OTA.
+- OTA: `npx eas-cli@latest update --branch production --environment production --platform all`,
+  runtime `1.13.0`, update group `ae27c467-021d-4a0a-bd31-7179c26f0a98` (commit `f1e39df`).
+  Production API confirmed serving `cardVideo` for the three masks before publishing.
+- Rollback if needed: republish the previous group on `production`
+  (`npx eas-cli@latest update:republish --group 54f0b73f-c01a-47cd-871e-a15249b0383e`).
