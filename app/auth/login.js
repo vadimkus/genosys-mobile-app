@@ -157,6 +157,26 @@ export default function LoginScreen() {
     scrollRef.current?.scrollTo({ y: Math.max(consentY.current - 80, 0), animated: true });
   };
 
+  // Sign-in buttons stay tappable without the tick: a faded button that ignores taps
+  // reads as "Google does nothing", worst of all in a wide Mac window. Instead the tap
+  // asks for consent, and agreeing ticks the box and carries on with that same action.
+  const askConsent = (proceed) => {
+    haptics.warning();
+    Alert.alert(t('authScreen.consentDialogTitle'), t('authScreen.consentDialogMessage'), [
+      { text: t('authScreen.consentDialogRead'), onPress: () => handlePrivacyPolicyPress() },
+      { text: t('authScreen.consentDialogCancel'), style: 'cancel' },
+      {
+        text: t('authScreen.consentDialogAgree'),
+        onPress: () => {
+          haptics.selectionTick();
+          setPrivacyConsent(true);
+          clearFieldError('consent');
+          proceed();
+        },
+      },
+    ]);
+  };
+
   // Subtle entrance motion (native driver) - matches the rest of the app.
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(10)).current;
@@ -167,14 +187,12 @@ export default function LoginScreen() {
     ]).start();
   }, [fade, lift]);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = async (consented = false) => {
     haptics.lightTap();
     setFormError(null);
     // Check privacy consent
-    if (!privacyConsent) {
-      haptics.warning();
-      setFieldErrors((prev) => ({ ...prev, consent: t('authScreen.privacyRequiredMessage') }));
-      scrollToConsent();
+    if (consented !== true && !privacyConsent) {
+      askConsent(() => handleGoogleLogin(true));
       return;
     }
 
@@ -197,13 +215,11 @@ export default function LoginScreen() {
     }
   };
 
-  const handleAppleLogin = async () => {
+  const handleAppleLogin = async (consented = false) => {
     haptics.lightTap();
     setFormError(null);
-    if (!privacyConsent) {
-      haptics.warning();
-      setFieldErrors((prev) => ({ ...prev, consent: t('authScreen.privacyRequiredMessage') }));
-      scrollToConsent();
+    if (consented !== true && !privacyConsent) {
+      askConsent(() => handleAppleLogin(true));
       return;
     }
     if (!AppleAuthentication) {
@@ -283,14 +299,12 @@ export default function LoginScreen() {
     }
   };
 
-  const handleBiometricLogin = async () => {
+  const handleBiometricLogin = async (consented = false) => {
     haptics.lightTap();
     setFormError(null);
     // Check privacy consent
-    if (!privacyConsent) {
-      haptics.warning();
-      setFieldErrors((prev) => ({ ...prev, consent: t('authScreen.privacyRequiredMessage') }));
-      scrollToConsent();
+    if (consented !== true && !privacyConsent) {
+      askConsent(() => handleBiometricLogin(true));
       return;
     }
 
@@ -316,16 +330,23 @@ export default function LoginScreen() {
 
   const FIELD_REFS = { name: nameRef, email: emailRef, password: passwordRef, phone: phoneRef, address: addressRef };
 
-  const handleEmailAuth = async () => {
+  const handleEmailAuth = async (consented = false) => {
     haptics.mediumTap();
     setFormError(null);
 
     const normalizedEmail = normalizeEmailAddress(email);
+    const hasConsent = consented === true || privacyConsent;
     const errors = validateAuthForm(
-      { name, email, normalizedEmail, password, phone, address, emirate, privacyConsent, emailSuggestion, confirmedEmail },
+      { name, email, normalizedEmail, password, phone, address, emirate, privacyConsent: hasConsent, emailSuggestion, confirmedEmail },
       { isLogin, t }
     );
     const firstError = firstAuthError(errors);
+
+    // Everything else is filled in: ask for consent instead of pointing at the tick.
+    if (firstError === 'consent' && Object.values(errors).filter(Boolean).length === 1) {
+      askConsent(() => handleEmailAuth(true));
+      return;
+    }
 
     if (firstError) {
       haptics.warning();
@@ -510,13 +531,10 @@ export default function LoginScreen() {
             {/* Biometric Login Button */}
             {biometricAvailable && biometricEnabled && (
               <TouchableOpacity
-                style={[
-                  styles.biometricButton,
-                  !privacyConsent && styles.buttonDisabledOpacity
-                ]}
+                style={styles.biometricButton}
                 onPress={handleBiometricLogin}
-                disabled={loading || !privacyConsent}
-                accessibilityState={{ disabled: loading || !privacyConsent }}
+                disabled={loading}
+                accessibilityState={{ disabled: loading }}
                 activeOpacity={0.85}
               >
                 <View style={[styles.biometricButtonContent, isRTL && styles.rowReverse]}>
@@ -537,12 +555,11 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={[
                   styles.googleButton,
-                  shadow.card,
-                  !privacyConsent && styles.buttonDisabledOpacity
+                  shadow.card
                 ]}
                 onPress={handleGoogleLogin}
-                disabled={loading || !privacyConsent}
-                accessibilityState={{ disabled: loading || !privacyConsent }}
+                disabled={loading}
+                accessibilityState={{ disabled: loading }}
                 activeOpacity={0.85}
                 accessibilityLabel={t('authScreen.continueWithGoogle')}
               >
@@ -558,10 +575,10 @@ export default function LoginScreen() {
 
               {Platform.OS === 'ios' && (
                 <TouchableOpacity
-                  style={[styles.appleButton, shadow.card, !privacyConsent && styles.buttonDisabledOpacity]}
+                  style={[styles.appleButton, shadow.card]}
                   onPress={handleAppleLogin}
-                  disabled={loading || !privacyConsent}
-                  accessibilityState={{ disabled: loading || !privacyConsent }}
+                  disabled={loading}
+                  accessibilityState={{ disabled: loading }}
                   activeOpacity={0.85}
                   accessibilityLabel={t('authScreen.continueWithApple')}
                 >
@@ -835,11 +852,11 @@ export default function LoginScreen() {
               style={[
                 styles.authButton,
                 shadow.cta(colors.cta),
-                (loading || !privacyConsent) && styles.buttonDisabledOpacity
+                loading && styles.buttonDisabledOpacity
               ]}
               onPress={handleEmailAuth}
-              disabled={loading || !privacyConsent}
-              accessibilityState={{ disabled: loading || !privacyConsent, busy: loading }}
+              disabled={loading}
+              accessibilityState={{ disabled: loading, busy: loading }}
               activeOpacity={0.85}
             >
               {loading ? (
