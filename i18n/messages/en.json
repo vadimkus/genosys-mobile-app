@@ -1108,7 +1108,7 @@
       "q5": "How long does shipping take?",
       "a5": "Shipping times vary by emirate: Dubai 1-2 hours (Careem), all other emirates 24-36 hours (Quiqup). We process all orders on the same day. Free shipping is available for orders over 1000 AED.",
       "q6": "Can I return or exchange products?",
-      "a6": "We accept returns and exchanges within 7 days of delivery for unopened products in their original packaging. Please contact our support team at sales@genosys.ae or WhatsApp +971 58 548 76 65 to initiate a return or exchange.",
+      "a6": "We accept returns and exchanges within 10 days of delivery for unopened products in their original packaging. Please contact our support team at sales@genosys.ae or WhatsApp +971 58 548 76 65 to initiate a return or exchange.",
       "q7": "Do you offer professional training?",
       "a7": "Yes, we offer comprehensive professional skincare training for licensed practitioners, clinics and beauty salons. Our training includes microneedling techniques, product application methods, treatment protocols, on-site training, live product demonstrations, hands-on treatment sessions, and personalized team guidance.",
       "q8": "Are GENOSYS products certified?",
@@ -1116,7 +1116,7 @@
       "q9": "How do I track my order?",
       "a9": "Once your order is confirmed, you will receive an order confirmation email with your order number. Our support team will contact you via phone, email, or WhatsApp to confirm delivery details. You can also contact us directly with your order number for updates.",
       "q10": "What is your return policy?",
-      "a10": "We accept returns within 7 days of delivery for unopened products. Products must be in their original packaging and unused. Refunds will be processed within 5-7 business days after we receive the returned items.",
+      "a10": "We accept returns within 10 days of delivery for unopened products. Products must be in their original packaging and unused. Refunds will be processed within 5-7 business days after we receive the returned items.",
       "q11": "Do you offer bulk discounts?",
       "a11": "Yes, we offer discounts for bulk orders and professional accounts. Registered users may be eligible for special pricing based on their account type. Contact our sales team at sales@genosys.ae to discuss bulk order pricing.",
       "q12": "How do I become a registered user?",
@@ -1147,7 +1147,7 @@
     "couldNotOpenEmail": "Could not open your email app. Please email sales@genosys.ae.",
     "returnChecklistTitle": "Return policy checklist:",
     "returnChecklist1": "Item is unopened and in original packaging",
-    "returnChecklist2": "Request is within 7 days of delivery",
+    "returnChecklist2": "Request is within 10 days of delivery",
     "returnChecklist3": "Please include your name and phone number",
     "emailSales": "Email sales@genosys.ae",
     "monFri": "Monday - Friday",
@@ -1498,7 +1498,7 @@
       },
       "returns": {
         "title": "Returns and Exchanges",
-        "p1": "We accept returns and exchanges within 7 days of delivery for unopened products in their original packaging. Please contact us to initiate a return or exchange."
+        "p1": "We accept returns and exchanges within 10 days of delivery for unopened products in their original packaging. Please contact us to initiate a return or exchange."
       },
       "privacy": {
         "title": "Privacy Policy",
