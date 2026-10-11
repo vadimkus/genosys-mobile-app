@@ -8,3 +8,8 @@ App FAQ now matches the website: Dubai 1-2 hours, other emirates 24-36 hours (EN
 - Do not run `npm run ota` for both platforms in parallel: they share `dist/` and the first iOS upload failed with
   "Cannot parse an empty JSON string" on `dist/assetmap.json`.
 - Sentry source maps not uploaded (no `SENTRY_AUTH_TOKEN` locally).
+
+## Returns 10 days (22:25)
+
+Commit `fb2cf0b`: EN FAQ a6/a10, terms p1, return checklist (7 days) and RU/AR FAQ a2 (30 days) now 10 days.
+OTA Android `97152a58-d1c6-495d-a877-651a5c643d6f`, iOS `8391558e-5c29-464e-8b88-bd6ac0646e0e` (runtime 1.13.0, run one after the other).
